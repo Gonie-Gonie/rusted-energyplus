@@ -56,6 +56,12 @@ pub(crate) enum SourceAirOutputField {
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceComfortOutputField {
+    PeopleFangerPmv,
+    PeopleFangerPpd,
+    PeopleClothingSurfaceTemperature,
+    PeopleMeanRadiantTemperature,
+    PeopleOperativeTemperature,
+    PeopleClothingValue,
     ZoneSimpleSummer,
     ZoneSimpleWinter,
     ZoneSimpleEither,

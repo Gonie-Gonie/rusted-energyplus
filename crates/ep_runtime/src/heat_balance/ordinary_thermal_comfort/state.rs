@@ -84,6 +84,36 @@ pub(crate) struct SourceComfortPredefinedSummary {
 }
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceThermalComfort {
+    // Native ThermalComfortsData shared Fanger scratch, explicit ctor0.
+    pub(crate) air_temp: f64,                // Native AirTemp
+    pub(crate) rad_temp: f64,                // Native RadTemp
+    pub(crate) rel_hum: f64,                 // Native RelHum
+    pub(crate) act_level: f64,               // Native ActLevel
+    pub(crate) work_eff: f64,                // Native WorkEff
+    pub(crate) clo_unit: f64,                // Native CloUnit
+    pub(crate) air_vel: f64,                 // Native AirVel
+    pub(crate) vap_press: f64,               // Native VapPress
+    pub(crate) int_heat_prod: f64,           // Native IntHeatProd
+    pub(crate) clo_body_rat: f64,            // Native CloBodyRat
+    pub(crate) abs_rad_temp: f64,            // Native AbsRadTemp
+    pub(crate) abs_air_temp: f64,            // Native AbsAirTemp
+    pub(crate) clo_insul: f64,               // Native CloInsul
+    pub(crate) abs_clo_surf_temp: f64,       // Native AbsCloSurfTemp
+    pub(crate) hc_for: f64,                  // Native HcFor
+    pub(crate) hc_nat: f64,                  // Native HcNat
+    pub(crate) hc: f64,                      // Native Hc
+    pub(crate) clo_surf_temp: f64,           // Native CloSurfTemp
+    pub(crate) rad_heat_loss: f64,           // Native RadHeatLoss
+    pub(crate) conv_heat_loss: f64,          // Native ConvHeatLoss
+    pub(crate) dry_heat_loss: f64,           // Native DryHeatLoss
+    pub(crate) evap_heat_loss_reg_comf: f64, // Native EvapHeatLossRegComf
+    pub(crate) evap_heat_loss_diff: f64,     // Native EvapHeatLossDiff
+    pub(crate) evap_heat_loss: f64,          // Native EvapHeatLoss
+    pub(crate) lat_resp_heat_loss: f64,      // Native LatRespHeatLoss
+    pub(crate) dry_resp_heat_loss: f64,      // Native DryRespHeatLoss
+    pub(crate) resp_heat_loss: f64,          // Native RespHeatLoss
+    pub(crate) therm_sens_trans_coef: f64,   // Native ThermSensTransCoef
+    pub(crate) iter_num: i32,                // Native IterNum
     pub(crate) first_time_flag: bool,
     pub(crate) temporary_six_am_temperature: f64,
     pub(crate) people_num: i32,
@@ -113,6 +143,35 @@ pub(crate) struct SourceThermalComfort {
 impl Default for SourceThermalComfort {
     fn default() -> Self {
         Self {
+            air_temp: 0.0,
+            rad_temp: 0.0,
+            rel_hum: 0.0,
+            act_level: 0.0,
+            work_eff: 0.0,
+            clo_unit: 0.0,
+            air_vel: 0.0,
+            vap_press: 0.0,
+            int_heat_prod: 0.0,
+            clo_body_rat: 0.0,
+            abs_rad_temp: 0.0,
+            abs_air_temp: 0.0,
+            clo_insul: 0.0,
+            abs_clo_surf_temp: 0.0,
+            hc_for: 0.0,
+            hc_nat: 0.0,
+            hc: 0.0,
+            clo_surf_temp: 0.0,
+            rad_heat_loss: 0.0,
+            conv_heat_loss: 0.0,
+            dry_heat_loss: 0.0,
+            evap_heat_loss_reg_comf: 0.0,
+            evap_heat_loss_diff: 0.0,
+            evap_heat_loss: 0.0,
+            lat_resp_heat_loss: 0.0,
+            dry_resp_heat_loss: 0.0,
+            resp_heat_loss: 0.0,
+            therm_sens_trans_coef: 0.0,
+            iter_num: 0,
             first_time_flag: true,
             temporary_six_am_temperature: 0.0,
             people_num: 0,

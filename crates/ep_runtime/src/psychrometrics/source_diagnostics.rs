@@ -10,6 +10,7 @@ use crate::heat_balance::source_initialization::SourceRecurringErrorState;
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 
 // Exact zero-based PsychCacheData.hh PsychrometricFunction identities.
+const RELATIVE_HUMIDITY: usize = 1;
 const W_FROM_DEW_POINT: usize = 4;
 const PSAT: usize = 8;
 
@@ -143,6 +144,75 @@ impl SourcePsychrometricAccess {
             };
         }
         Ok(density)
+    }
+
+    /// Actual PsyRhFnTdbWPb over the same Psat state and diagnostic owners.
+    /// Preserve Psat-before-W-floor and the original saturation grouping.
+    pub(crate) fn source_relative_humidity(
+        &mut self,
+        temperature: f64,
+        humidity: f64,
+        pressure: f64,
+        called_from: &str,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let nested_from = if called_from.is_empty() {
+            "PsyRhFnTdbWPb"
+        } else {
+            called_from
+        };
+        let saturation = self.source_saturation_pressure(temperature, nested_from, owners)?;
+        // std::max(dW, floor) retains a NaN first argument. f64::max and
+        // range.contains would change that Original comparison behavior.
+        let humidity = if humidity < 1.0e-5 { 1.0e-5 } else { humidity };
+        let degree = humidity / (0.62198 * saturation / (pressure - saturation));
+        let relative = degree / (1.0 - (1.0 - degree) * (saturation / pressure));
+        let correction = if relative < 0.0 {
+            Some((0.01, relative < -0.05, "1%"))
+        } else if relative > 1.0 {
+            Some((1.0, relative > 1.01, "100.0%"))
+        } else {
+            None
+        };
+        if let Some((bounded, warn, reset)) = correction {
+            if warn && !owners.clock.warmup_flag {
+                if first(RELATIVE_HUMIDITY) {
+                    set_string(format!(
+                        " Dry-Bulb= {} Humidity Ratio= {} Calculated Relative Humidity [%]= {}",
+                        trimmed(temperature, 2)?,
+                        trimmed(humidity, 3)?,
+                        trimmed(relative * 100.0, 2)?
+                    ));
+                    owners.backend.show_warning_message(
+                        "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) ",
+                    )?;
+                    let routine = if called_from.is_empty() {
+                        " Routine=Unknown,".into()
+                    } else {
+                        format!(" Routine={called_from}")
+                    };
+                    owners.backend.show_source_continue_error_time_stamp(
+                        &routine,
+                        owners.clock,
+                        owners.globals,
+                        owners.environment,
+                        owners.hvac,
+                    )?;
+                    owners.backend.show_continue_error(&string())?;
+                    owners.backend.show_continue_error(&format!(
+                        "Relative Humidity being reset to {reset}"
+                    ))?;
+                }
+                owners.recurring(
+                    RELATIVE_HUMIDITY,
+                    "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)",
+                    relative * 100.0,
+                    "%",
+                )?;
+            }
+            return Ok(bounded);
+        }
+        Ok(relative)
     }
 
     /// Cached PsyPsatFnTemp with actual miss-local raw diagnostics and effects.

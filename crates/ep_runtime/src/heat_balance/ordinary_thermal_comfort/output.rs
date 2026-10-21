@@ -1,4 +1,4 @@
-//! Actual Hr/Sum/Zone declarations and borrowed same-owner semantic targets.
+//! Actual Zone declarations and borrowed same-owner comfort semantic targets.
 use super::*;
 use crate::heat_balance::radiation::ordinary::{
     OrdinaryRadiationError, OrdinaryRadiationUnavailable,
@@ -27,7 +27,19 @@ impl SourceThermalComfort {
                     "actual allocated comfort setpoint Zone target",
                 ))
         };
+        let people = || {
+            self.thermal_comfort_data
+                .as_ref()
+                .and_then(|rows| rows.get(index(number).ok()?))
+                .ok_or(Error::Unavailable("actual allocated comfort People target"))
+        };
         match field {
+            PeopleFangerPmv => Ok(&people()?.fanger_pmv),
+            PeopleFangerPpd => Ok(&people()?.fanger_ppd),
+            PeopleClothingSurfaceTemperature => Ok(&people()?.clo_surf_temp),
+            PeopleMeanRadiantTemperature => Ok(&people()?.thermal_comfort_mrt),
+            PeopleOperativeTemperature => Ok(&people()?.thermal_comfort_op_temp),
+            PeopleClothingValue => Ok(&people()?.clothing_value),
             ZoneSimpleSummer => Ok(&simple()?.time_not_summer),
             ZoneSimpleWinter => Ok(&simple()?.time_not_winter),
             ZoneSimpleEither => Ok(&simple()?.time_not_either),
@@ -59,6 +71,23 @@ impl SourceThermalComfort {
         name: &str,
         key: &str,
     ) -> Result<(), Error> {
+        let (units, store_type) = match field {
+            Field::PeopleFangerPmv => (
+                SourceOutputUnits::Dimensionless,
+                SourceOutputStoreType::Average,
+            ),
+            Field::PeopleFangerPpd => (
+                SourceOutputUnits::Percentage,
+                SourceOutputStoreType::Average,
+            ),
+            Field::PeopleClothingSurfaceTemperature
+            | Field::PeopleMeanRadiantTemperature
+            | Field::PeopleOperativeTemperature => {
+                (SourceOutputUnits::C, SourceOutputStoreType::Average)
+            }
+            Field::PeopleClothingValue => (SourceOutputUnits::Clo, SourceOutputStoreType::Average),
+            _ => (SourceOutputUnits::Hr, SourceOutputStoreType::Sum),
+        };
         let binding = SourceRealOutputBinding::new(
             SourceRealOutputTarget::Comfort {
                 field,
@@ -76,8 +105,8 @@ impl SourceThermalComfort {
                 SourceRealOutputDeclaration {
                     name,
                     key,
-                    units: SourceOutputUnits::Hr,
-                    store_type: SourceOutputStoreType::Sum,
+                    units,
+                    store_type,
                 },
                 o.clock.minutes_in_time_step,
                 o.host,

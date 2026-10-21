@@ -15,42 +15,101 @@ impl SourceThermalComfort {
             count(o.gains.totals[0])?
         ]);
         for number in 1..=o.gains.totals[0] {
-            let p = o
-                .gains
-                .allocations
-                .people
-                .get(index(number)?)
-                .ok_or(Error::Unavailable("actual InitThermalComfort People"))?;
-            if p.fanger {
-                return Err(Error::Unavailable("actual positive Fanger registration184"));
+            let (
+                name,
+                fanger,
+                pierce,
+                ksu,
+                adaptive_ash55,
+                adaptive_cen15251,
+                cooling_effect_ash55,
+                ankle_draft_ash55,
+            ) = {
+                let p = o
+                    .gains
+                    .allocations
+                    .people
+                    .get(index(number)?)
+                    .ok_or(Error::Unavailable("actual InitThermalComfort People"))?;
+                (
+                    p.name.clone(),
+                    p.fanger,
+                    p.pierce,
+                    p.ksu,
+                    p.adaptive_ash55,
+                    p.adaptive_cen15251,
+                    p.cooling_effect_ash55,
+                    p.ankle_draft_ash55,
+                )
+            };
+            if fanger {
+                self.register(
+                    o,
+                    Field::PeopleFangerPmv,
+                    number,
+                    "Zone Thermal Comfort Fanger Model PMV",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleFangerPpd,
+                    number,
+                    "Zone Thermal Comfort Fanger Model PPD",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleClothingSurfaceTemperature,
+                    number,
+                    "Zone Thermal Comfort Clothing Surface Temperature",
+                    &name,
+                )?;
             }
-            if p.pierce {
+            if pierce {
                 return Err(Error::Unavailable("actual positive Pierce registration209"));
             }
-            if p.ksu {
+            if ksu {
                 return Err(Error::Unavailable("actual positive KSU registration249"));
             }
-            if p.fanger || p.pierce || p.ksu {
-                return Err(Error::Unavailable(
-                    "actual positive MRT/operative registration259",
-                ));
+            if fanger || pierce || ksu {
+                self.register(
+                    o,
+                    Field::PeopleMeanRadiantTemperature,
+                    number,
+                    "Zone Thermal Comfort Mean Radiant Temperature",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleOperativeTemperature,
+                    number,
+                    "Zone Thermal Comfort Operative Temperature",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleClothingValue,
+                    number,
+                    "Zone Thermal Comfort Clothing Value",
+                    &name,
+                )?;
             }
-            if p.adaptive_ash55 {
+            if adaptive_ash55 {
                 return Err(Error::Unavailable(
                     "actual positive adaptiveASH55 registration284",
                 ));
             }
-            if p.adaptive_cen15251 {
+            if adaptive_cen15251 {
                 return Err(Error::Unavailable(
                     "actual positive adaptiveCEN registration317",
                 ));
             }
-            if p.cooling_effect_ash55 {
+            if cooling_effect_ash55 {
                 return Err(Error::Unavailable(
                     "actual positive CoolingEffect registration357",
                 ));
             }
-            if p.ankle_draft_ash55 {
+            if ankle_draft_ash55 {
                 return Err(Error::Unavailable(
                     "actual positive AnkleDraft registration369",
                 ));

@@ -6,6 +6,7 @@ use crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance;
 use crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays;
 use crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector;
 use crate::heat_balance::predefined_tables::PredefinedRegistry;
+use crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
     HeatBalanceInputError as Error, SelectedHeatBalanceInputState, zone::SelectedZoneInputOwners,
@@ -15,13 +16,16 @@ use crate::heat_balance::selected_input_processor::{
 };
 use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
 use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
+use crate::heat_balance::source_initialization::SourceRecurringErrorState;
 use crate::heat_balance::source_output_prescan::SourceOutputPreScan;
 use crate::heat_balance::source_output_registration::{
     SourceOutputDictionaryHost, SourceOutputFileHost, SourceOutputRegistration,
 };
+use crate::psychrometrics::{SourcePsychrometricAccess, SourcePsychrometricOwners};
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 use ep_model::ReportInputs;
 use std::io::Write;
+mod fanger;
 mod initialization;
 mod output;
 mod setpoint;
@@ -30,7 +34,7 @@ mod state;
 pub(crate) use state::{SourceComfortPredefinedSummary, SourceThermalComfort};
 
 pub(crate) struct SourceThermalComfortOwners<'a, 'backend, H, D> {
-    pub(crate) gains: &'a SelectedInternalHeatGains,
+    pub(crate) gains: &'a mut SelectedInternalHeatGains,
     pub(crate) schedules: &'a SelectedScheduleManager,
     pub(crate) developer: &'a bool,
     pub(crate) zones: &'a SelectedZoneInputOwners,
@@ -41,7 +45,10 @@ pub(crate) struct SourceThermalComfortOwners<'a, 'backend, H, D> {
     pub(crate) hvac: &'a SelectedHvacGlobals,
     pub(crate) air: &'a SourceAirHeatBalance,
     pub(crate) controller: &'a SourceZoneAirPredictorCorrector,
-    pub(crate) fan: &'a SourceZoneFanHeatBalanceArrays,
+    pub(crate) fan: &'a mut SourceZoneFanHeatBalanceArrays,
+    pub(crate) radiation: &'a OrdinarySolarRadiation,
+    pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
+    pub(crate) recurring_errors: &'a mut SourceRecurringErrorState,
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) registration: &'a mut SourceOutputRegistration,
@@ -141,7 +148,7 @@ impl SourceThermalComfort {
                 .fill(0.0);
         }
         if !o.globals.doing_sizing && !o.clock.warmup_flag {
-            self.calc_source_fanger(o.gains)?;
+            self.calc_source_fanger(o)?;
             if o.control.any_thermal_comfort_pierce_model {
                 return Err(Error::Unavailable(
                     "actual CalcThermalComfortPierceASHRAE positive model",
@@ -174,32 +181,6 @@ impl SourceThermalComfort {
                     "actual CalcThermalComfortAdaptiveCEN15251 positive model",
                 ));
             }
-        }
-        Ok(())
-    }
-    fn calc_source_fanger(&mut self, gains: &SelectedInternalHeatGains) -> Result<(), Error> {
-        self.people_num = 1;
-        while self.people_num <= gains.totals[0] {
-            let at = index(self.people_num)?;
-            let people = gains
-                .allocations
-                .people
-                .get(at)
-                .ok_or(Error::Unavailable("actual Fanger People owner"))?;
-            let _comfort = self
-                .thermal_comfort_data
-                .as_mut()
-                .and_then(|v| v.get_mut(at))
-                .ok_or(Error::Unavailable("actual Fanger ThermalComfortData"))?;
-            if people.fanger {
-                return Err(Error::Unavailable(
-                    "actual positive Fanger Zone/Air calculation",
-                ));
-            }
-            self.people_num = self
-                .people_num
-                .checked_add(1)
-                .ok_or(Error::Unavailable("actual Fanger PeopleNum increment"))?;
         }
         Ok(())
     }

@@ -224,6 +224,7 @@ pub(crate) enum SourceOutputUnits {
     Ach,
     JPerKgK,
     Ppm,
+    Clo,
 }
 impl SourceOutputUnits {
     pub(crate) fn symbol(self) -> &'static str {
@@ -255,6 +256,7 @@ impl SourceOutputUnits {
             Self::Ach => "ach",
             Self::JPerKgK => "J/kg-K",
             Self::Ppm => "ppm",
+            Self::Clo => "clo",
         }
     }
 }

@@ -4553,8 +4553,10 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     };
                     use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as ComfortError;
                     use crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams;
-                    for all_unoccupied in [false, true] {
-                        let mut comfort_reports = if all_unoccupied {
+                    for (all_unoccupied, fanger_enabled) in
+                        [(false, false), (true, false), (false, true)]
+                    {
+                        let mut comfort_reports = if all_unoccupied || fanger_enabled {
                             people_getter_base.clone()
                         } else {
                             people_reports.clone()
@@ -4579,6 +4581,35 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         comfort_clock.hour_of_day = 1;
                         comfort_clock.time_step = 1;
                         comfort_clock.num_of_day_in_envrn = 1;
+                        if fanger_enabled {
+                            // Only raw declared Fanger inputs change. The actual getter
+                            // resolves all schedules and retains genuine constructor owners.
+                            let first = &mut comfort_reports
+                                .heat_balance_input
+                                .as_mut()
+                                .ok_or("Fanger raw input")?
+                                .objects
+                                .get_mut("People")
+                                .ok_or("Fanger raw People")?[0];
+                            for (field, value) in [
+                                ("thermal_comfort_model_1_type", "Fanger"),
+                                (
+                                    "mean_radiant_temperature_calculation_type",
+                                    "EnclosureAveraged",
+                                ),
+                                ("work_efficiency_schedule_name", "Constant-0.0"),
+                                (
+                                    "clothing_insulation_calculation_method",
+                                    "ClothingInsulationSchedule",
+                                ),
+                                ("clothing_insulation_schedule_name", "Constant-1.0"),
+                                ("air_velocity_schedule_name", "Unused People Auxiliary"),
+                            ] {
+                                first
+                                    .fields
+                                    .insert(field.into(), ProjectInputValue::String(value.into()));
+                            }
+                        }
                         if all_unoccupied {
                             // An authored raw schedule change and actual getter reread, never
                             // edited People pointers/currentVal/occupancy or report answers.
@@ -4595,6 +4626,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                     ProjectInputValue::String("Constant-0.0".into()),
                                 );
                             }
+                        }
+                        if all_unoccupied || fanger_enabled {
                             CtfInitializationContext {
                                 reports: &mut comfort_reports,
                                 eio: &mut comfort_eio,
@@ -4634,7 +4667,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         let comfort_hvac =
                             crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals::default();
                         let comfort_controller = crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::default();
-                        let comfort_fan = crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+                        let mut comfort_fan = crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+                        let mut comfort_psychrometrics =
+                            crate::psychrometrics::SourcePsychrometricAccess;
                         let mut comfort = SourceThermalComfort::default();
                         let mut comfort_summary = SourceComfortPredefinedSummary::default();
                         {
@@ -4657,13 +4692,16 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 results_framework_output_variables: &mut comfort_reports.source_results_output_variables,
                             };
                             current.manage_source_thermal_comfort(initialize_only, &mut SourceThermalComfortOwners {
-                                gains: &comfort_reports.selected_internal_heat_gains,
+                                gains: &mut comfort_reports.selected_internal_heat_gains,
                                 schedules: comfort_reports.selected_schedule_manager.as_ref().ok_or(ComfortError::Unavailable("comfort genuine schedules"))?,
                                 zones: comfort_reports.selected_zone_input.as_ref().ok_or(ComfortError::Unavailable("comfort genuine Zones"))?,
                                 control: &comfort_reports.heat_balance_input_state, globals: comfort_globals,
                                 clock, environment: &comfort_environment, hvac: &comfort_hvac, air,
                                 developer: &comfort_reports.selected_project_data.as_ref().ok_or(ComfortError::Unavailable("comfort actual project"))?.system.developer_flag,
-                                controller: &comfort_controller, fan: &comfort_fan,
+                                controller: &comfort_controller, fan: &mut comfort_fan,
+                                radiation: comfort_reports.ordinary_solar_radiation.as_ref().ok_or(ComfortError::Unavailable("comfort actual retained radiation"))?,
+                                psychrometrics: &mut comfort_psychrometrics,
+                                recurring_errors: &mut comfort_reports.source_recurring_errors,
                                 input: comfort_reports.selected_input_processor.as_mut().ok_or(ComfortError::Unavailable("comfort genuine IP"))?,
                                 shortcut: &mut comfort_reports.input_processor_shortcut,
                                 registration: &mut comfort_reports.output_registration,
@@ -4684,6 +4722,126 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                     .len(),
                                 2
                             );
+                            if fanger_enabled {
+                                // This fixture reran the real Zone getter, producing a new
+                                // Space with ctor0 enclosure identity. No fabricated link
+                                // is inserted after the six genuine registrations.
+                                let reached =
+                                    run_comfort(false, &mut comfort, &comfort_clock, &comfort_air);
+                                assert!(
+                                    matches!(
+                                        &reached,
+                                        Err(ComfortError::Unavailable(
+                                            "positive actual ThermalComfort ordinal"
+                                        ))
+                                    ),
+                                    "actual positive Fanger prefix: {reached:?}"
+                                );
+                                use crate::heat_balance::source_output_registration::{
+                                    SourceComfortOutputField as F, SourceOutputStoreType as S,
+                                    SourceOutputUnits as U, TimeStepKind,
+                                };
+                                let declarations = [
+                                    (
+                                        "Zone Thermal Comfort Fanger Model PMV",
+                                        F::PeopleFangerPmv,
+                                        U::Dimensionless,
+                                    ),
+                                    (
+                                        "Zone Thermal Comfort Fanger Model PPD",
+                                        F::PeopleFangerPpd,
+                                        U::Percentage,
+                                    ),
+                                    (
+                                        "Zone Thermal Comfort Clothing Surface Temperature",
+                                        F::PeopleClothingSurfaceTemperature,
+                                        U::C,
+                                    ),
+                                    (
+                                        "Zone Thermal Comfort Mean Radiant Temperature",
+                                        F::PeopleMeanRadiantTemperature,
+                                        U::C,
+                                    ),
+                                    (
+                                        "Zone Thermal Comfort Operative Temperature",
+                                        F::PeopleOperativeTemperature,
+                                        U::C,
+                                    ),
+                                    (
+                                        "Zone Thermal Comfort Clothing Value",
+                                        F::PeopleClothingValue,
+                                        U::Clo,
+                                    ),
+                                ];
+                                let mut prior = None;
+                                for (name, field, units) in declarations {
+                                    let at = comfort_reports
+                                        .output_registration
+                                        .dictionary_variables
+                                        .iter()
+                                        .position(|row| row.name == name)
+                                        .ok_or("actual Fanger dictionary declaration")?;
+                                    if let Some(previous) = prior {
+                                        assert!(at > previous);
+                                    }
+                                    prior = Some(at);
+                                    let row = &comfort_reports
+                                        .output_registration
+                                        .dictionary_variables[at];
+                                    assert_eq!(
+                                        (row.units, row.store_type, row.time_step_type),
+                                        (units, S::Average, TimeStepKind::Zone)
+                                    );
+                                    assert_eq!(*comfort.real_output(field, 1)?, 0.0);
+                                }
+                                assert_eq!(U::Clo.symbol(), "clo");
+                                let first = &comfort_reports
+                                    .selected_internal_heat_gains
+                                    .allocations
+                                    .people
+                                    .rows[0];
+                                assert!(
+                                    first.fanger
+                                        && first.work_eff_sched.is_some()
+                                        && first.clothing_sched.is_some()
+                                        && first.air_velocity_sched.is_some()
+                                );
+                                assert_eq!((first.mrt_calc_type, first.clothing_type), (0, 0));
+                                assert!(!comfort.first_time_flag);
+                                // Original ThermalComfort.unit.cc2079-2116 scalar fixtures,
+                                // executed against the real shared Psat state/backend. They
+                                // neither construct enclosure readiness nor seed parent data.
+                                crate::psychrometrics::with_fresh_psychrometric_state(
+                                    || -> Result<(), Box<dyn std::error::Error>> {
+                                        crate::psychrometrics::initialize_source_psychrometric_caches();
+                                        for (
+                                            air,
+                                            mrt,
+                                            rh,
+                                            velocity,
+                                            activity,
+                                            clothing,
+                                            expected,
+                                        ) in [
+                                            (20.0, 18.0, 0.50, 1.0, 58.2, 1.5, -0.715102),
+                                            (25.0, 28.0, 0.75, 1.0, 80.0, 0.8, 0.644378),
+                                        ] {
+                                            let pmv = comfort.calc_source_fanger_pmv(air, mrt, rh, velocity, activity, clothing, 0.0,
+                                            &mut comfort_psychrometrics, &mut crate::psychrometrics::SourcePsychrometricOwners {
+                                                clock: &comfort_clock, globals: comfort_globals, environment: &comfort_environment,
+                                                hvac: &comfort_hvac, recurring: &mut comfort_reports.source_recurring_errors,
+                                                backend: &mut comfort_backend,
+                                            })?;
+                                            assert!(
+                                                (pmv - expected).abs() < 0.00001,
+                                                "literal Native Fanger scalar fixture: {pmv}"
+                                            );
+                                        }
+                                        Ok(())
+                                    },
+                                )?;
+                                continue;
+                            }
                             // Authored averaged air points cover both polygons independently,
                             // neither polygon, and the Native fBC==0 extended-edge quirk.
                             for (temperature, humidity, not_summer, not_winter, not_either) in [

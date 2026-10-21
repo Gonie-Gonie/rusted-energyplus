@@ -2513,6 +2513,94 @@ mod source_a_compact_ingress {
                 );
             }
         }
+        // Positive Fanger keeps its true raw schedule references; unrelated
+        // surface/method names remain unconsumed for these selected methods.
+        for (slot, auxiliary) in [
+            (1, ""),
+            (
+                7,
+                r#","mean_radiant_temperature_calculation_type":"EnclosureAveraged","clothing_insulation_calculation_method":"ClothingInsulationSchedule","ankle_level_air_velocity_schedule_name":"ankle""#,
+            ),
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}},"work":{{"hourly_value":0.2}},"clothes":{{"hourly_value":0.7}},"velocity":{{"hourly_value":0.1}},"ankle":{{"hourly_value":-0.4}}}},"People":{{"Fanger person":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2,"sensible_heat_fraction":0.6,"work_efficiency_schedule_name":"work","clothing_insulation_schedule_name":"clothes","air_velocity_schedule_name":"velocity","surface_name_angle_factor_list_name":"unused surface","clothing_insulation_calculation_method_schedule_name":"unused method","thermal_comfort_model_{slot}_type":"Fanger"{auxiliary}}}}}}}"#
+            );
+            let raw = ep_raw_model::parse_epjson_str(&text)?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            assert!(resolve(&raw).is_err());
+            for ip in [
+                crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                crate::ordinary_input_processor::resolve_source_b(&raw)?,
+            ] {
+                let original = ip.source_raw_object_fields("People", "Fanger person")?;
+                let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                for (name, expected) in [
+                    ("work_efficiency_schedule_name", "work"),
+                    ("clothing_insulation_schedule_name", "clothes"),
+                    ("air_velocity_schedule_name", "velocity"),
+                    ("surface_name_angle_factor_list_name", "unused surface"),
+                    (
+                        "clothing_insulation_calculation_method_schedule_name",
+                        "unused method",
+                    ),
+                ] {
+                    assert_eq!(original.get(name), Some(&V::String(expected.into())));
+                    assert_eq!(hb.objects["People"][0].fields.get(name), Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(expected.into())));
+                }
+                if slot == 7 {
+                    assert_eq!(
+                        original.get("ankle_level_air_velocity_schedule_name"),
+                        Some(&V::String("ankle".into()))
+                    );
+                }
+            }
+            let result = ep_compiler::compile_raw_model(&raw);
+            assert!(
+                !result.has_errors(),
+                "Fanger slot{slot}: {:?}",
+                result.report.diagnostics
+            );
+            for (old, new) in [
+                ("\"Fanger\"", "\"Pierce\""),
+                (
+                    "\"work_efficiency_schedule_name\":\"work\"",
+                    "\"work_efficiency_schedule_name\":\"missing work\"",
+                ),
+                (
+                    "\"clothing_insulation_schedule_name\":\"clothes\"",
+                    "\"clothing_insulation_schedule_name\":\"\"",
+                ),
+                (
+                    "\"air_velocity_schedule_name\":\"velocity\"",
+                    "\"air_velocity_schedule_name\":null",
+                ),
+            ] {
+                let changed = text.replace(old, new);
+                assert_ne!(changed, text);
+                let raw = ep_raw_model::parse_epjson_str(&changed)?;
+                assert!(resolve_source_a(&raw).is_err());
+                assert!(resolve_source_b(&raw).is_err());
+            }
+            if slot == 7 {
+                for (old, new) in [
+                    ("EnclosureAveraged", "SurfaceWeighted"),
+                    ("EnclosureAveraged", "AngleFactor"),
+                    ("ClothingInsulationSchedule", "DynamicClothingModelASHRAE55"),
+                    ("ClothingInsulationSchedule", "CalculationMethodSchedule"),
+                    (
+                        "\"ankle_level_air_velocity_schedule_name\":\"ankle\"",
+                        "\"ankle_level_air_velocity_schedule_name\":\"missing ankle\"",
+                    ),
+                ] {
+                    let changed = text.replace(old, new);
+                    assert_ne!(changed, text);
+                    let raw = ep_raw_model::parse_epjson_str(&changed)?;
+                    assert!(resolve_source_a(&raw).is_err());
+                    assert!(resolve_source_b(&raw).is_err());
+                }
+            }
+        }
         for (field, value) in [
             ("number_of_people", serde_json::json!(-1)),
             ("people_per_floor_area", serde_json::json!(-1)),

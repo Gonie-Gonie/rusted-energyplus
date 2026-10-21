@@ -88,6 +88,7 @@ fn unit(v: SourceOutputUnits) -> i32 {
         U::Deg => 34,
         U::M2 => 41,
         U::Rad => 43,
+        U::Clo => 45,
         U::W => 8,
         U::J => 9,
         U::Kg => 11,

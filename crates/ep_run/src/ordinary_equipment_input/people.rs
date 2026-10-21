@@ -177,9 +177,9 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
     ) {
         return false;
     }
-    // Without a selected model, Native leaves all auxiliary comfort operands
-    // unconsumed. Their schema types/enums were checked before this branch.
-    // Positive comfort models and EMS remain separate owners.
+    // Known field types/enums were validated first. No-model auxiliaries stay
+    // unconsumed; this positive branch connects only genuine scheduled Fanger.
+    let mut fanger = false;
     for name in [
         "thermal_comfort_model_1_type",
         "thermal_comfort_model_2_type",
@@ -189,9 +189,26 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         "thermal_comfort_model_6_type",
         "thermal_comfort_model_7_type",
     ] {
-        if !field(object, name).is_none_or(|v| matches!(v,RawValue::String(s) if s.is_empty())) {
-            return false;
+        if let Some(value) = field(object, name) {
+            if text_is(value, &["Fanger"]) {
+                fanger = true;
+            } else if !matches!(value, RawValue::String(s) if s.is_empty()) {
+                return false;
+            }
         }
+    }
+    if fanger
+        && (!selected(
+            object,
+            "mean_radiant_temperature_calculation_type",
+            &["EnclosureAveraged"],
+        ) || !selected(
+            object,
+            "clothing_insulation_calculation_method",
+            &["ClothingInsulationSchedule"],
+        ))
+    {
+        return false;
     }
     let Some(zones) = raw.objects.get(&ObjectType("Zone".into())) else {
         return false;
@@ -202,24 +219,36 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
     {
         return false;
     }
-    for name in [
+    let source_schedule = |schedule: &str| {
+        ["Constant-0.0", "Constant-1.0"]
+            .iter()
+            .any(|n| schedule.eq_ignore_ascii_case(n))
+            || raw
+                .objects
+                .get(&ObjectType("Schedule:Constant".into()))
+                .is_some_and(|objects| objects.keys().any(|n| n.0.eq_ignore_ascii_case(schedule)))
+            || super::source_b::has_source_detailed_reference(raw, schedule)
+    };
+    let mut required_schedules = vec![
         "number_of_people_schedule_name",
         "activity_level_schedule_name",
-    ] {
+    ];
+    if fanger {
+        required_schedules.extend([
+            "work_efficiency_schedule_name",
+            "clothing_insulation_schedule_name",
+            "air_velocity_schedule_name",
+        ]);
+        // Native validates any nonempty A21 even when AnkleDraft is false.
+        if text(object, "ankle_level_air_velocity_schedule_name").is_some_and(|s| !s.is_empty()) {
+            required_schedules.push("ankle_level_air_velocity_schedule_name");
+        }
+    }
+    for name in required_schedules {
         let Some(schedule) = text(object, name) else {
             return false;
         };
-        if ["Constant-0.0", "Constant-1.0"]
-            .iter()
-            .any(|n| schedule.eq_ignore_ascii_case(n))
-        {
-            continue;
-        }
-        let constant = raw
-            .objects
-            .get(&ObjectType("Schedule:Constant".into()))
-            .is_some_and(|objects| objects.keys().any(|n| n.0.eq_ignore_ascii_case(schedule)));
-        if !constant && !super::source_b::has_source_detailed_reference(raw, schedule) {
+        if !source_schedule(schedule) {
             return false;
         }
     }

@@ -277,12 +277,26 @@ impl SelectedInternalHeatGains {
                             "To avoid these errors, select a valid thermal comfort model or eliminate these schedules in the PEOPLE input.",
                         )?;
                     }
-                    if values.num_alphas >= 14
-                        && values.alphas[13..values.num_alphas.min(20)]
-                            .iter()
-                            .any(|x| !x.is_empty())
+                    for model in values
+                        .alphas
+                        .iter()
+                        .take(values.num_alphas.min(20))
+                        .skip(13)
                     {
-                        return Err(unavailable("positive optional People comfort model"));
+                        if model == "FANGER" {
+                            row.fanger = true;
+                        } else if !model.is_empty() {
+                            return Err(unavailable("positive unsupported People comfort model"));
+                        }
+                    }
+                    if row.fanger {
+                        self.read_fanger_comfort(
+                            count,
+                            position == 0,
+                            &values.alphas,
+                            local,
+                            owners,
+                        )?;
                     }
                 }
                 count += 1;
@@ -389,6 +403,204 @@ impl SelectedInternalHeatGains {
                     owners.table.fixed_real_entry_2(id, &name, total)?;
                 }
             }
+        }
+        Ok(())
+    }
+    /// Actual IHG617-810 additional-input branch for scheduled Fanger only.
+    /// Defaults and blank flags come from the genuine schema/IP getter.
+    fn read_fanger_comfort(
+        &mut self,
+        person: usize,
+        first_space: bool,
+        alphas: &[String; 21],
+        local: &SourceInputProcessorShortCut,
+        owners: &mut SourceGainInputOwners<'_, '_>,
+    ) -> Result<(), E> {
+        let clock = owners
+            .clock
+            .ok_or_else(|| unavailable("actual Fanger input clock"))?;
+        let row = self
+            .allocations
+            .people
+            .rows
+            .get_mut(person)
+            .ok_or_else(|| unavailable("actual Fanger People row"))?;
+        row.mrt_calc_type = match alphas[6].as_str() {
+            "ENCLOSUREAVERAGED" => 0,
+            "SURFACEWEIGHTED" => 1,
+            "ANGLEFACTOR" => 2,
+            _ => -1,
+        };
+        if row.mrt_calc_type != 0 {
+            return Err(unavailable(
+                "positive Fanger non-EnclosureAveraged MRT inputs",
+            ));
+        }
+        if !local.alpha_field_blanks[8] {
+            row.work_eff_sched = owners.schedules.get_source_schedule(&alphas[8])?;
+        }
+        let work = row.work_eff_sched;
+        if first_space {
+            let message = if local.alpha_field_blanks[8] {
+                Some(format!("{} cannot be empty.", local.alpha_field_names[8]))
+            } else if work.is_none() {
+                Some(format!(
+                    "{} = {}, item not found.",
+                    local.alpha_field_names[8], alphas[8]
+                ))
+            } else if !owners.schedules.source_check_min_max_inclusive(
+                work.ok_or_else(|| unavailable("actual Fanger work schedule"))?,
+                0.0,
+                1.0,
+                clock,
+            )? {
+                Some(format!(
+                    "{} = {}, schedule contains values that are < 0 and/or > 1",
+                    local.alpha_field_names[8], alphas[8]
+                ))
+            } else {
+                None
+            };
+            if let Some(message) = message {
+                self.people_comfort_diagnostic(alphas, &message,
+                    local.alpha_field_blanks[8].then_some("It is required when Thermal Comfort Model Type is one of \"Fanger\", \"Pierce\", \"KSU\", \"CoolingEffectASH55\" or \"AnkleDraftASH55\""),
+                    true, owners)?;
+            }
+        }
+        let row = self
+            .allocations
+            .people
+            .rows
+            .get_mut(person)
+            .ok_or_else(|| unavailable("same Fanger clothing People row"))?;
+        if !alphas[9].is_empty() {
+            row.clothing_type = match alphas[9].as_str() {
+                "CLOTHINGINSULATIONSCHEDULE" => 0,
+                "DYNAMICCLOTHINGMODELASHRAE55" => 1,
+                "CALCULATIONMETHODSCHEDULE" => 2,
+                _ => -1,
+            };
+            if row.clothing_type != 0 {
+                return Err(unavailable("positive Fanger non-scheduled clothing inputs"));
+            }
+            row.clothing_sched = owners.schedules.get_source_schedule(&alphas[11])?;
+            let clothing = row.clothing_sched;
+            if first_space {
+                let message = if local.alpha_field_blanks[11] {
+                    Some(format!(
+                        "{} cannot be empty when {} = {}.",
+                        local.alpha_field_names[11], local.alpha_field_names[9], alphas[9]
+                    ))
+                } else if clothing.is_none() {
+                    Some(format!(
+                        "{} = {}, item not found.",
+                        local.alpha_field_names[11], alphas[11]
+                    ))
+                } else if !owners.schedules.source_check_min_with_clock(
+                    clothing.ok_or_else(|| unavailable("actual Fanger clothing schedule"))?,
+                    0.0,
+                    clock,
+                )? {
+                    Some(format!(
+                        "{} = {}, schedule contains values that are < 0",
+                        local.alpha_field_names[11], alphas[11]
+                    ))
+                } else {
+                    None
+                };
+                if let Some(message) = message {
+                    self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
+                } else {
+                    let max_ok = owners.schedules.source_max_with_clock(
+                        clothing.ok_or_else(|| unavailable("actual Fanger clothing maximum"))?,
+                        clock,
+                    )? - 2.0
+                        <= f64::from(f32::EPSILON);
+                    if !max_ok {
+                        let message = format!(
+                            "{} = {}, schedule contains values that are > 2",
+                            local.alpha_field_names[11], alphas[11]
+                        );
+                        self.people_comfort_diagnostic(alphas, &message, None, false, owners)?;
+                    }
+                }
+            }
+        }
+        let row = self
+            .allocations
+            .people
+            .rows
+            .get_mut(person)
+            .ok_or_else(|| unavailable("same Fanger air-speed People row"))?;
+        if !local.alpha_field_blanks[12] {
+            row.air_velocity_sched = owners.schedules.get_source_schedule(&alphas[12])?;
+        }
+        let velocity = row.air_velocity_sched;
+        if first_space {
+            let message = if local.alpha_field_blanks[12] {
+                Some(format!("{} cannot be empty.", local.alpha_field_names[12]))
+            } else if velocity.is_none() {
+                Some(format!(
+                    "{} = {}, item not found.",
+                    local.alpha_field_names[12], alphas[12]
+                ))
+            } else if !owners.schedules.source_check_min_with_clock(
+                velocity.ok_or_else(|| unavailable("actual Fanger air velocity schedule"))?,
+                0.0,
+                clock,
+            )? {
+                Some(format!(
+                    "{} = {}, schedule contains values that are < 0",
+                    local.alpha_field_names[12], alphas[12]
+                ))
+            } else {
+                None
+            };
+            if let Some(message) = message {
+                self.people_comfort_diagnostic(alphas, &message,
+                    local.alpha_field_blanks[12].then_some("Required when Thermal Comfort Model Type is one of \"Fanger\", \"Pierce\", \"KSU\", \"CoolingEffectASH55\" or \"AnkleDraftASH55\""),
+                    true, owners)?;
+            }
+        }
+        let row = self
+            .allocations
+            .people
+            .rows
+            .get_mut(person)
+            .ok_or_else(|| unavailable("same Fanger ankle schedule People row"))?;
+        if !alphas[20].is_empty() {
+            row.ankle_air_velocity_sched = owners.schedules.get_source_schedule(&alphas[20])?;
+        }
+        // The selected AnkleDraft flag is false, but Native still validates a
+        // nonblank A21 lookup. There is deliberately no minimum check here.
+        if first_space && !local.alpha_field_blanks[20] && row.ankle_air_velocity_sched.is_none() {
+            let message = format!(
+                "{} = {}, item not found.",
+                local.alpha_field_names[20], alphas[20]
+            );
+            self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
+        }
+        Ok(())
+    }
+    fn people_comfort_diagnostic(
+        &mut self,
+        alphas: &[String; 21],
+        message: &str,
+        followup: Option<&str>,
+        severe: bool,
+        owners: &mut SourceGainInputOwners<'_, '_>,
+    ) -> Result<(), E> {
+        diagnostic(
+            owners,
+            &format!("GetInternalHeatGains: People = {}", alphas[0]),
+            severe,
+        )?;
+        owners.backend.show_continue_error(message)?;
+        if let Some(followup) = followup {
+            owners.backend.show_continue_error(followup)?;
+        }
+        if severe {
+            self.errors_found = true;
         }
         Ok(())
     }

@@ -241,8 +241,8 @@
       "None and thirteen non-Water fuels are connected: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption use real resource meters, including NaturalGas Gas-IP predefined columns. Owner checks cover all thirteen and sizing/error/write-order branches. Same-input A/B evidence adds per-person sizing with genuine People design totals and different current occupancy while retaining every output policy; earlier evidence covers Electricity, its separate Hourly meter, bound object/Zone/implicit-Space thermal/fuel Timestep dictionaries and nonzero latent/radiant/lost fields. Real device caches, radiant enclosures, surface absorption, moisture balance and psychrometric consumers remain live. Source B retains existing NoLimit IdealLoads with no outdoor air and None humidity controls. Explicit/multiple Spaces, groups and EMS remain unsupported; other model/fraction restrictions remain as stated. This is bounded support, not full OtherEquipment input-domain completion."
     ],
     "People": [
-      "Direct-Zone People uses the real single implicit Space, raw/IP defaults and field counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select their actual numeric operand and use the actual Space floor area where required, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts an explicit numeric value or the genuine omitted, empty or Autocalculate default; automatic sensible uses the same live Space MAT and retained Mixing RoomAir, the Native polynomial and ordered clamps. Getter totals, devices, rates/energy, Which bindings, nominal reporting, mandatory SimpleASH55 and the reached no-optional comfort/report paths remain connected. Unconsumed auxiliary comfort operands keep count-sensitive warnings without extra lookups.",
-      "Same-input A/B evidence compares People Total Heating Rate/Energy Timestep streams with every retained policy: A uses People/Area with omitted automatic sensible, and B uses Area/Person with explicit Autocalculate. Direct sizing and numeric sensible retain their earlier A/B proof. Other object/Zone/Space declarations, signed/zero occupancy, sizing diagnostics, independent Space MAT and clamp branches have connected-owner checks. Built-in Constant-0.0/Constant-1.0 remain distinct from user schedule IDs and absence. Optional comfort models, EMS, explicit/multiple Spaces and group expansion, and positive non-Mixing RoomAir remain unsupported. This is bounded runtime support, not full People input-domain completion."
+      "Direct-Zone People uses the real single implicit Space, raw/IP defaults and counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select the actual numeric operand and Space floor area, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts explicit numeric values or omitted, empty and Autocalculate defaults; automatic sensible uses the same live Space MAT, retained Mixing RoomAir, Native polynomial and ordered clamps. Getter occupant totals, devices, rates/energy, Which bindings, nominal reporting and mandatory SimpleASH55 remain connected. Auxiliary comfort operands stay unconsumed when no optional model is selected, with the original count-sensitive warnings.",
+      "Fanger reporting connects EnclosureAveraged MRT, ClothingInsulationSchedule, actual work/clothing/air-velocity schedules, averaged Zone air and humidity, the same radiant enclosure and HVAC-to-person arrays, and stateful RH/Psat diagnostics. It writes real People temperature/RH and six People-keyed Zone/Average PMV, PPD, clothing-surface, MRT, operative-temperature and clothing-value outputs, including when current occupancy is zero. Same-input A/B evidence retains all earlier policies and separately checks these six outputs; earlier direct/density/area sizing and numeric/automatic sensible proofs remain retained. Connected-owner checks distinguish design totals from signed/zero current occupancy and preserve reached failure prefixes. The other six comfort models, SurfaceWeighted/AngleFactor MRT, dynamic or calculation-schedule clothing, comfort-thermostat PNum/Tset, EMS, explicit/multiple Spaces, groups and positive non-Mixing RoomAir remain unsupported. This is bounded support, not full People input-domain completion."
     ]
   },
   "verification": {
@@ -250,37 +250,37 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/people-sizing-auto-workspace-tests-50b.log",
-        "sha256": "4c42cafa41f30c5bef37c0af25464c6d59e49d6cc6057dc46a33541f90af69a9",
-        "bytes": 773376
+        "path": ".runtime/object-expansion/people-fanger-workspace-tests-52.log",
+        "sha256": "a54cf063ccd143174552a29c2d2f5d75fb85c2c0ae8ffc06afe2ae5ad712d284",
+        "bytes": 773538
       },
-      "scope": "Full workspace milestone after real People sizing/automatic sensible and live Space MAT/RoomAir connection. Existing owner bodies were extended; no new tests or cohorts. The first50 failed compile log is preserved separately."
+      "scope": "Full workspace milestone after Fanger owner-layout, getter, six output bindings and stateful RH/Psat integration. Existing bodies were extended; no new tests or cohorts."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/other-equipment-person-clippy-51.log",
-        "sha256": "f765d5ec3e03f8fb394230b7ecfb7103c2eabfcd8c8d38fe7fbb4747f9f298af",
-        "bytes": 794
+        "path": ".runtime/object-expansion/people-fanger-clippy-52b.log",
+        "sha256": "1bdc6f2d38e152ee1dbb84389b2ced34b9c9b30019a3100499892a6860b12bca",
+        "bytes": 490
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/other-equipment-person-docs-51.log",
+        "path": ".runtime/object-expansion/people-fanger-docs-52.log",
         "sha256": "ec8a295db5abbd6dad049ff0a98d1a6d10013349076b33e52e0c28564df40af9",
         "bytes": 354
       },
-      "clippy_through_build": "other-equipment-person-51",
+      "clippy_through_build": "people-fanger-52",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/people-sizing-auto-native-cohort-check-50.log",
-          "sha256": "ddc2701c1a7e90c8142d1f32eeb19cef45fe629209e48bb216c04506edf2642a",
+          "path": ".runtime/object-expansion/people-fanger-native-cohort-check-52b.log",
+          "sha256": "54f390a97497da7afe5b8d7ee9cf34e970f4bca089fa979e1358ea05451ebd0a",
           "bytes": 1468006
         },
-        "scope": "Compile-only verification of existing optional callers after the actual Space MAT/RoomAir capability threading. Existing feature warnings remain; no optional tests or engines were run.",
-        "through_build": "people-sizing-auto-50"
+        "scope": "Compile-only verification of existing optional callers after mutable Fanger owner threading and the Native clo unit mapping. Existing feature warnings remain; no optional tests or engines were run.",
+        "through_build": "people-fanger-52"
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -4725,12 +4725,148 @@
           "passed": true
         },
         "effective_state": "Current Source51 same-input OtherEquipment per-person comparison against its own sole initial-True Native51, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
+      },
+      {
+        "id": "people-fanger-a",
+        "group": "people_fanger",
+        "source_build": "people-fanger-52",
+        "scope": "A",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-fanger-a/calibration-01/input.epJSON",
+          "sha256": "6857bf555dee6813ba6e0324f8d0d71d35722011649d82ff7b9e5ba3497039d7",
+          "bytes": 54333
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-fanger-a/calibration-01/receipt.json",
+          "sha256": "059da5dc7a9f523786d9f977a1510f104f4c9aa67d3d5a39ee38895fa0db379b",
+          "bytes": 19992
+        },
+        "Native_calibration_unit": 52,
+        "Native52_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-fanger-a-52/people-fanger-a/receipt.json",
+          "sha256": "6b3b811dd98748d7b57d694f2b467d559a82c759511dd5d089c5f8bdc81eab6d",
+          "bytes": 5952
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-fanger-a-52/run-summary.json",
+          "sha256": "31cb092482e179468354b4d069d8ca7f4e425f6c2e74168089b14c26dcba3ad7",
+          "bytes": 52403
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-52/eplus-rs.exe",
+          "sha256": "873e868739a95adc8661cf309a77c9a950c0492453656e57ff661fa1c87b4d63",
+          "bytes": 76174427
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/98/984b726d683c2ce8cc7321017b6bc2c7797e9d49ecb5a2e0bb0bfdf6bbfa099d",
+          "sha256": "984b726d683c2ce8cc7321017b6bc2c7797e9d49ecb5a2e0bb0bfdf6bbfa099d"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-52/receipt.json",
+          "sha256": "916af41667e606fa40e1ff3fb0c669a710a6b825788908f2338ece0ca024c432",
+          "bytes": 6707
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-fanger-a-comparisons-52/people-fanger-a/comparison.json",
+          "sha256": "6366b5e0d4cba4d6a9b3919781f183267a4ebec53aa5742ae91b478acbbc97df",
+          "bytes": 911007
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-fanger-a-52-launch/people-fanger-a/request.json",
+          "sha256": "2dd502abcb424eedbc8d871801d1b17a2e96d845b5a1147067d3154c3e06f308",
+          "bytes": 3280
+        },
+        "totals": {
+          "series": 124,
+          "samples": 11616,
+          "raw_operand_unequal": 79,
+          "parsed_binary64_unequal": 79,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source52 same-input Fanger-only comparison against its own sole initial-True Native52, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
+      },
+      {
+        "id": "people-fanger-b",
+        "group": "people_fanger",
+        "source_build": "people-fanger-52",
+        "scope": "B",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-fanger-b/calibration-01/input.idf",
+          "sha256": "433d7bc82954ab90efc75eeca220ee432c7f7f4a97990bd81ecc1010b41ccfa5",
+          "bytes": 15754
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-fanger-b/calibration-01/receipt.json",
+          "sha256": "d10727fb2aeef662194b8988db06766737c0b065ddc9bb06cf14ebdc6dafbae9",
+          "bytes": 17855
+        },
+        "Native_calibration_unit": 52,
+        "Native52_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-fanger-b-52/people-fanger-b/receipt.json",
+          "sha256": "2198f7d9a08951b771094992ba6f74c234215d9050413a8c953fa1a27e9489a0",
+          "bytes": 5841
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-fanger-b-52/run-summary.json",
+          "sha256": "ebc880308b96eb2cae20cae4f78591b169f1b49f5effef0db4e57e3828e75c84",
+          "bytes": 63036
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-52/eplus-rs.exe",
+          "sha256": "873e868739a95adc8661cf309a77c9a950c0492453656e57ff661fa1c87b4d63",
+          "bytes": 76174427
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/98/984b726d683c2ce8cc7321017b6bc2c7797e9d49ecb5a2e0bb0bfdf6bbfa099d",
+          "sha256": "984b726d683c2ce8cc7321017b6bc2c7797e9d49ecb5a2e0bb0bfdf6bbfa099d"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-52/receipt.json",
+          "sha256": "916af41667e606fa40e1ff3fb0c669a710a6b825788908f2338ece0ca024c432",
+          "bytes": 6707
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-fanger-b-comparisons-52/people-fanger-b/comparison.json",
+          "sha256": "afc041b3f3bb530f41ae997a927600a12965f45a641cdca9f1111a18c349e2e3",
+          "bytes": 465963
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-fanger-b-52-launch/people-fanger-b/request.json",
+          "sha256": "e4e7483c8fc988b87a35305c21d01d47ee2d2f6264f06ab19826bf749d77c639",
+          "bytes": 3164
+        },
+        "totals": {
+          "series": 110,
+          "samples": 10560,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source52 same-input Fanger-only comparison against its own sole initial-True Native52, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
       }
     ],
     "totals": {
-      "paired_cases": 80,
-      "reported_samples": 609798,
-      "raw_operand_unequal": 167841,
+      "paired_cases": 82,
+      "reported_samples": 631974,
+      "raw_operand_unequal": 167920,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -5602,28 +5738,29 @@
           "sha256": "f600e5ab05cd69980ebc7be743234900d813769db0a978d4735f8b097a619f6f",
           "bytes": 76124746
         }
+      },
+      {
+        "id": "people-fanger-52",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-52/receipt.json",
+          "sha256": "916af41667e606fa40e1ff3fb0c669a710a6b825788908f2338ece0ca024c432",
+          "bytes": 6707
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/98/984b726d683c2ce8cc7321017b6bc2c7797e9d49ecb5a2e0bb0bfdf6bbfa099d",
+          "sha256": "984b726d683c2ce8cc7321017b6bc2c7797e9d49ecb5a2e0bb0bfdf6bbfa099d"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-52/eplus-rs.exe",
+          "sha256": "873e868739a95adc8661cf309a77c9a950c0492453656e57ff661fa1c87b4d63",
+          "bytes": 76174427
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 3,
-      "logs": [
-        {
-          "path": ".runtime/object-expansion/other-equipment-person-compiler-focused-51.log",
-          "sha256": "7f6927d23ebc8a2b53f64d78b91573a8eb92828c5ebc389c41fbb427e7512f49",
-          "bytes": 919
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-person-raw-focused-51b.log",
-          "sha256": "bcce5858196adda4144e8b7f68170985c2d1db9bfd6cb51795c4270662913e3e",
-          "bytes": 1016
-        },
-        {
-          "path": ".runtime/object-expansion/other-equipment-person-runtime-focused-51.log",
-          "sha256": "f1656698ba807087f9a98d2033f96dd701eabb025427bf4369e93f22bf34f744",
-          "bytes": 792
-        }
-      ],
-      "scope": "Three existing compiler, Source A/B raw-ingress and connected gain-owner bodies passed after the retained full workspace50 milestone. No new test bodies or cohorts. The first51 raw-fixture expectation failure is preserved separately."
+      "passed": 0,
+      "logs": [],
+      "scope": "All existing owner-body checks are contained in the current full workspace milestone."
     }
   },
   "additional_native_type_calibrations": [

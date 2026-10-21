@@ -1,6 +1,9 @@
 //! Literal reached nominal EIO and Zone.InternalHeatGains writer.
 use super::getter::SourceGainInputOwners;
 use super::{E, SelectedInternalHeatGains, index, unavailable};
+use crate::heat_balance::selected_schedule_manager::{
+    SelectedScheduleManager, SourceScheduleIndex,
+};
 use std::io::Write;
 
 fn rounded(value: f64, precision: usize) -> Result<String, E> {
@@ -14,6 +17,19 @@ fn divide(eio: &mut dyn Write, numerator: f64, denominator: f64) -> Result<(), E
         write!(eio, "N/A,")?;
     }
     Ok(())
+}
+fn optional_schedule_name(
+    schedules: &SelectedScheduleManager,
+    pointer: Option<SourceScheduleIndex>,
+) -> Result<&str, E> {
+    match pointer {
+        None => Ok(""),
+        Some(pointer) => schedules
+            .schedules
+            .get(pointer.0)
+            .map(|row| row.name.as_str())
+            .ok_or_else(|| unavailable("same optional People nominal schedule owner")),
+    }
 }
 
 impl SelectedInternalHeatGains {
@@ -182,9 +198,25 @@ impl SelectedInternalHeatGains {
                 || people.cooling_effect_ash55
                 || people.ankle_draft_ash55
             {
-                return Err(unavailable(
-                    "actual optional People nominal MRT/work/clothing branch2793",
-                ));
+                if !people.fanger
+                    || people.pierce
+                    || people.ksu
+                    || people.cooling_effect_ash55
+                    || people.ankle_draft_ash55
+                    || people.mrt_calc_type != 0
+                    || people.clothing_type != 0
+                {
+                    return Err(unavailable(
+                        "actual unsupported People nominal MRT/work/clothing branch2793",
+                    ));
+                }
+                write!(
+                    owners.eio,
+                    "Zone Averaged,{},Clothing Insulation Schedule,N/A,{},{},Yes,No,No,No,No",
+                    optional_schedule_name(owners.schedules, people.work_eff_sched)?,
+                    optional_schedule_name(owners.schedules, people.clothing_sched)?,
+                    optional_schedule_name(owners.schedules, people.air_velocity_sched)?,
+                )?;
             }
             writeln!(owners.eio)?;
         }
