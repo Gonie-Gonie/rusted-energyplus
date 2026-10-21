@@ -3,12 +3,22 @@ use ep_raw_model::{FieldName, RawModel, RawValue};
 use ep_runtime::heat_balance::selected_sizing::{SelectedSizingInput, SelectedSummaryReportInput};
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedSizingInput, String> {
+    resolve_ordered(raw, false)
+}
+
+pub(crate) fn resolve_source(raw: &RawModel) -> Result<SelectedSizingInput, String> {
+    resolve_ordered(raw, true)
+}
+
+fn resolve_ordered(raw: &RawModel, source_order: bool) -> Result<SelectedSizingInput, String> {
     // The sole ordinary admission has already returned before this pure projection.
     let mut result = SelectedSizingInput::default();
-    for (name, object) in raw
-        .ordered_instances("Output:Table:SummaryReports")
-        .map_err(|e| e.to_string())?
-    {
+    for (name, object) in if source_order {
+        raw.source_ordered_instances("Output:Table:SummaryReports")?
+    } else {
+        raw.ordered_instances("Output:Table:SummaryReports")
+            .map_err(|e| e.to_string())?
+    } {
         let values = match object.fields.get(&FieldName("reports".into())) {
             None | Some(RawValue::Null) => Vec::new(),
             Some(RawValue::Array(rows)) => rows

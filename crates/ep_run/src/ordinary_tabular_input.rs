@@ -8,14 +8,31 @@ pub(crate) fn resolve(
     raw: &RawModel,
     input: &SelectedInputProcessor,
 ) -> Result<SelectedTabularInput, String> {
+    resolve_ordered(raw, input, false)
+}
+
+pub(crate) fn resolve_source(
+    raw: &RawModel,
+    input: &SelectedInputProcessor,
+) -> Result<SelectedTabularInput, String> {
+    resolve_ordered(raw, input, true)
+}
+
+fn resolve_ordered(
+    raw: &RawModel,
+    input: &SelectedInputProcessor,
+    source_order: bool,
+) -> Result<SelectedTabularInput, String> {
     let mut result = SelectedTabularInput {
         source_is_epjson: raw.is_epjson(),
         table_style_objects: Vec::new(),
     };
-    for (name, object) in raw
-        .ordered_instances("OutputControl:Table:Style")
-        .map_err(|e| e.to_string())?
-    {
+    for (name, object) in if source_order {
+        raw.source_ordered_instances("OutputControl:Table:Style")?
+    } else {
+        raw.ordered_instances("OutputControl:Table:Style")
+            .map_err(|e| e.to_string())?
+    } {
         if !input.has_object("OutputControl:Table:Style", &name.0) {
             return Err("Table:Style same raw/IP object identity".into());
         }

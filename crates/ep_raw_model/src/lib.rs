@@ -127,8 +127,8 @@ impl RawModel {
 
     /// Returns one object type's instances in effective input order.
     ///
-    /// Native epJSON models retain canonical object-name order. Converted IDF
-    /// models use a validated declaration-order overlay for configured types.
+    /// The default direct epJSON view retains lexical BTree object-name order.
+    /// Converted IDF uses a validated declaration overlay for configured types.
     pub fn ordered_instances(
         &self,
         object_type: &str,
@@ -177,6 +177,60 @@ impl RawModel {
         }
     }
 
+    /// Returns explicit Source input order for one object type.
+    ///
+    /// Genuine staged IDF keeps the existing validated declaration overlay and
+    /// its errors. Direct epJSON uses the pinned Windows doj comparator: signed
+    /// bytes, ASCII digits, and wrapping 32-bit unsigned number accumulation.
+    /// Only finite name sets with a strict pairwise order are available here.
+    /// NUL names, comparator aliases, and non-strict or cyclic relations remain
+    /// an explicit Source boundary; parsing never coalesces distinct raw keys.
+    pub fn source_ordered_instances(
+        &self,
+        object_type: &str,
+    ) -> Result<Vec<(&ObjectName, &RawObject)>, String> {
+        if !self.is_epjson() {
+            return self
+                .ordered_instances(object_type)
+                .map_err(|error| error.to_string());
+        }
+        let Some(instances) = self.objects.get(&ObjectType(object_type.into())) else {
+            return Ok(Vec::new());
+        };
+        let unavailable = || {
+            format!(
+                "SourceObjectOrderUnavailable: {object_type} requires a strict finite pinned Windows doj name order; NUL and distinct comparator aliases are not available"
+            )
+        };
+        let mut ordered: Vec<(&ObjectName, &RawObject)> = Vec::with_capacity(instances.len());
+        for row in instances {
+            if row.0.0.as_bytes().contains(&0) {
+                return Err(unavailable());
+            }
+            // Insertion does not require the comparator to implement Rust Ord
+            // or a sorting algorithm's strict-weak-order precondition.
+            let index = ordered
+                .iter()
+                .position(|other| {
+                    source_windows_doj_compare(row.0.0.as_bytes(), other.0.0.as_bytes()) < 0
+                })
+                .unwrap_or(ordered.len());
+            ordered.insert(index, row);
+        }
+        // Check every pair, including the reverse relation. This rejects
+        // aliases, wrapping antipodes, and cycles instead of guessing an order.
+        for (index, left) in ordered.iter().enumerate() {
+            for right in &ordered[index + 1..] {
+                if source_windows_doj_compare(left.0.0.as_bytes(), right.0.0.as_bytes()) >= 0
+                    || source_windows_doj_compare(right.0.0.as_bytes(), left.0.0.as_bytes()) <= 0
+                {
+                    return Err(unavailable());
+                }
+            }
+        }
+        Ok(ordered)
+    }
+
     /// Returns true when one object type has a recovered IDF declaration order.
     #[must_use]
     pub fn has_idf_declaration_order(&self, object_type: &str) -> bool {
@@ -193,6 +247,66 @@ impl RawModel {
             object_count: self.object_count(),
             object_type_counts: self.object_type_counts(),
         }
+    }
+}
+
+// Literal non-locale doj::alphanum_impl for the pinned Windows ABI. This is
+// deliberately not an Ord implementation: wrapping subtraction can fail strict
+// ordering, which source_ordered_instances checks for the entire finite set.
+fn source_windows_doj_compare(left: &[u8], right: &[u8]) -> i32 {
+    let mut l = 0;
+    let mut r = 0;
+    loop {
+        let l_char = left.get(l).copied().unwrap_or(0);
+        let r_char = right.get(r).copied().unwrap_or(0);
+        if l_char == 0 {
+            return if r_char == 0 { 0 } else { -1 };
+        }
+        if r_char == 0 {
+            return 1;
+        }
+        let l_digit = l_char.is_ascii_digit();
+        let r_digit = r_char.is_ascii_digit();
+        if l_digit && r_digit {
+            let mut l_int = 0_u32;
+            let mut r_int = 0_u32;
+            let mut l_len = 0_u32;
+            let mut r_len = 0_u32;
+            while let Some(byte) = left.get(l).copied().filter(u8::is_ascii_digit) {
+                l_int = l_int.wrapping_mul(10).wrapping_add(u32::from(byte - b'0'));
+                l_len = l_len.wrapping_add(1);
+                l += 1;
+            }
+            while let Some(byte) = right.get(r).copied().filter(u8::is_ascii_digit) {
+                r_int = r_int.wrapping_mul(10).wrapping_add(u32::from(byte - b'0'));
+                r_len = r_len.wrapping_add(1);
+                r += 1;
+            }
+            let difference = i32::from_ne_bytes(l_int.wrapping_sub(r_int).to_ne_bytes());
+            if difference != 0 {
+                return difference;
+            }
+            if l_len < r_len {
+                return 1;
+            }
+            if l_len > r_len {
+                return -1;
+            }
+            continue;
+        }
+        if l_digit {
+            return -1;
+        }
+        if r_digit {
+            return 1;
+        }
+        let difference =
+            i32::from(i8::from_ne_bytes([l_char])) - i32::from(i8::from_ne_bytes([r_char]));
+        if difference != 0 {
+            return difference;
+        }
+        l += 1;
+        r += 1;
     }
 }
 

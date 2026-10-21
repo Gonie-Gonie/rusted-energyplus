@@ -9,14 +9,32 @@ pub(crate) fn resolve(
     raw: &RawModel,
     input: &SelectedInputProcessor,
 ) -> Result<SelectedMaterialInput, String> {
+    resolve_ordered(raw, input, false)
+}
+
+pub(crate) fn resolve_source(
+    raw: &RawModel,
+    input: &SelectedInputProcessor,
+) -> Result<SelectedMaterialInput, String> {
+    resolve_ordered(raw, input, true)
+}
+
+fn resolve_ordered(
+    raw: &RawModel,
+    input: &SelectedInputProcessor,
+    source_order: bool,
+) -> Result<SelectedMaterialInput, String> {
     let mut result = SelectedMaterialInput {
         source_is_epjson: raw.is_epjson(),
         ..SelectedMaterialInput::default()
     };
     for family in ["Material", "Material:NoMass", "Material:AirGap"] {
-        let rows = raw
-            .ordered_instances(family)
-            .map_err(|error| error.to_string())?;
+        let rows = if source_order {
+            raw.source_ordered_instances(family)?
+        } else {
+            raw.ordered_instances(family)
+                .map_err(|error| error.to_string())?
+        };
         if rows.len() != input.get_num_objects_found(family) {
             return Err(format!("Material raw/IP count: {family}"));
         }

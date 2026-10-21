@@ -93,9 +93,29 @@ pub(crate) fn project(
     configuration: &mut WeatherEnvironmentConfiguration,
     reverse: bool,
 ) -> Result<(), String> {
-    let objects = raw
-        .ordered_instances("SizingPeriod:DesignDay")
-        .map_err(|e| e.to_string())?;
+    project_ordered(raw, configuration, reverse, false)
+}
+
+pub(crate) fn project_source(
+    raw: &RawModel,
+    configuration: &mut WeatherEnvironmentConfiguration,
+    reverse: bool,
+) -> Result<(), String> {
+    project_ordered(raw, configuration, reverse, true)
+}
+
+fn project_ordered(
+    raw: &RawModel,
+    configuration: &mut WeatherEnvironmentConfiguration,
+    reverse: bool,
+    source_order: bool,
+) -> Result<(), String> {
+    let objects = if source_order {
+        raw.source_ordered_instances("SizingPeriod:DesignDay")?
+    } else {
+        raw.ordered_instances("SizingPeriod:DesignDay")
+            .map_err(|e| e.to_string())?
+    };
     if i32::try_from(objects.len()).ok() != Some(configuration.design_day_count) {
         return Err("DesignDay actual collection/count association differs".into());
     }
@@ -182,9 +202,12 @@ pub(crate) fn project(
     if reverse && days.len() > 1 {
         days.swap(0, 1);
     }
-    let controls = raw
-        .ordered_instances("SimulationControl")
-        .map_err(|e| e.to_string())?;
+    let controls = if source_order {
+        raw.source_ordered_instances("SimulationControl")?
+    } else {
+        raw.ordered_instances("SimulationControl")
+            .map_err(|e| e.to_string())?
+    };
     let controls = controls.first().map(|(_, object)| *object);
     let flag = |name: &str, default: bool| -> Result<bool, String> {
         controls.map_or(Ok(default), |object| yes_no(object, name, default))

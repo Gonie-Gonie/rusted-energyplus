@@ -3678,7 +3678,19 @@ fn prepare_runtime_inputs(
                 crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
             if source_initialization_required {
                 let reverse = crate::ordinary_design_day_input::capture_reverse_design_days()?;
-                crate::ordinary_design_day_input::project(raw_model, &mut configuration, reverse)?;
+                if scope.is_some() {
+                    crate::ordinary_design_day_input::project_source(
+                        raw_model,
+                        &mut configuration,
+                        reverse,
+                    )?;
+                } else {
+                    crate::ordinary_design_day_input::project(
+                        raw_model,
+                        &mut configuration,
+                        reverse,
+                    )?;
+                }
             }
             let bytes = std::fs::read(weather_path).map_err(|error| error.to_string())?;
             let weather_series = if source_initialization_required {
@@ -3769,14 +3781,31 @@ fn prepare_runtime_inputs(
                         .as_ref()
                         .ok_or("missing real IP projection")?,
                 )?,
-                schedules: crate::ordinary_schedule_input::resolve(raw_model)?,
-                sizing: crate::ordinary_sizing_input::resolve(raw_model)?,
-                tabular: crate::ordinary_tabular_input::resolve(
-                    raw_model,
-                    selected_input_processor
-                        .as_ref()
-                        .ok_or("missing real IP projection")?,
-                )?,
+                schedules: if scope.is_some() {
+                    crate::ordinary_schedule_input::resolve_source(raw_model)?
+                } else {
+                    crate::ordinary_schedule_input::resolve(raw_model)?
+                },
+                sizing: if scope.is_some() {
+                    crate::ordinary_sizing_input::resolve_source(raw_model)?
+                } else {
+                    crate::ordinary_sizing_input::resolve(raw_model)?
+                },
+                tabular: if scope.is_some() {
+                    crate::ordinary_tabular_input::resolve_source(
+                        raw_model,
+                        selected_input_processor
+                            .as_ref()
+                            .ok_or("missing real IP projection")?,
+                    )?
+                } else {
+                    crate::ordinary_tabular_input::resolve(
+                        raw_model,
+                        selected_input_processor
+                            .as_ref()
+                            .ok_or("missing real IP projection")?,
+                    )?
+                },
                 input_file_path: Some(config.input_path.clone()),
                 input_weather_file_path: config
                     .weather_path
@@ -3797,10 +3826,16 @@ fn prepare_runtime_inputs(
     let (heat_balance_input, material_input) =
         if let Some(input) = selected_input_processor.as_ref() {
             (
-                Some(crate::ordinary_heat_balance_input::resolve(
-                    raw_model, input,
-                )?),
-                Some(crate::ordinary_material_input::resolve(raw_model, input)?),
+                Some(if scope.is_some() {
+                    crate::ordinary_heat_balance_input::resolve_source(raw_model, input)?
+                } else {
+                    crate::ordinary_heat_balance_input::resolve(raw_model, input)?
+                }),
+                Some(if scope.is_some() {
+                    crate::ordinary_material_input::resolve_source(raw_model, input)?
+                } else {
+                    crate::ordinary_material_input::resolve(raw_model, input)?
+                }),
             )
         } else {
             (None, None)
@@ -3817,9 +3852,11 @@ fn prepare_runtime_inputs(
         weather_series,
         selected_input_processor,
         reporting_prescan_input: if source_initialization_required {
-            Some(crate::ordinary_input_processor::resolve_reporting_prescan(
-                raw_model,
-            )?)
+            Some(if scope.is_some() {
+                crate::ordinary_input_processor::resolve_reporting_prescan_source(raw_model)?
+            } else {
+                crate::ordinary_input_processor::resolve_reporting_prescan(raw_model)?
+            })
         } else {
             None
         },

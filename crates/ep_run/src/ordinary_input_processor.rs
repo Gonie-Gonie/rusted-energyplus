@@ -9,7 +9,9 @@ use std::collections::BTreeMap;
 mod input_statistics;
 mod reporting_prescan;
 mod schema;
-pub(crate) use reporting_prescan::resolve as resolve_reporting_prescan;
+pub(crate) use reporting_prescan::{
+    resolve as resolve_reporting_prescan, resolve_source as resolve_reporting_prescan_source,
+};
 
 fn json_size(value: &RawValue) -> usize {
     match value {

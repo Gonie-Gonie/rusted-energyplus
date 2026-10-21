@@ -34,9 +34,7 @@ fn raw_families(raw: &RawModel) -> Result<Value, String> {
         "Schedule:Constant",
         "Schedule:Compact",
     ] {
-        let instances = raw
-            .ordered_instances(family)
-            .map_err(|error| error.to_string())?;
+        let instances = raw.source_ordered_instances(family)?;
         families.push(json!({"object_type":family,
             "has_IDF_declaration_order_overlay":raw.has_idf_declaration_order(family),
             "effective_instances":instances.iter().enumerate().map(|(index,(name,object))|json!({

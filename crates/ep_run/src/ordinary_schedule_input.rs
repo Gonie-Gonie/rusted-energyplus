@@ -49,15 +49,25 @@ fn unit(object: &RawObject) -> Result<ScheduleUnitType, String> {
 }
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedScheduleInput, String> {
+    resolve_ordered(raw, false)
+}
+
+pub(crate) fn resolve_source(raw: &RawModel) -> Result<SelectedScheduleInput, String> {
+    resolve_ordered(raw, true)
+}
+
+fn resolve_ordered(raw: &RawModel, source_order: bool) -> Result<SelectedScheduleInput, String> {
     // Caller already passed the same raw model through the sole ordinary admission.
     let mut result = SelectedScheduleInput {
         source_is_epjson: Some(raw.is_epjson()),
         ..Default::default()
     };
-    for (name, object) in raw
-        .ordered_instances("ScheduleTypeLimits")
-        .map_err(|e| e.to_string())?
-    {
+    for (name, object) in if source_order {
+        raw.source_ordered_instances("ScheduleTypeLimits")?
+    } else {
+        raw.ordered_instances("ScheduleTypeLimits")
+            .map_err(|e| e.to_string())?
+    } {
         result.types.push(SourceScheduleTypeInput {
             object_name: name.0.clone(),
             name: name.0.to_ascii_uppercase(),
@@ -67,10 +77,12 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<SelectedScheduleInput, String> {
             unit: unit(object)?,
         });
     }
-    for (name, object) in raw
-        .ordered_instances("Schedule:Constant")
-        .map_err(|e| e.to_string())?
-    {
+    for (name, object) in if source_order {
+        raw.source_ordered_instances("Schedule:Constant")?
+    } else {
+        raw.ordered_instances("Schedule:Constant")
+            .map_err(|e| e.to_string())?
+    } {
         result.constants.push(SourceConstantScheduleInput {
             object_name: name.0.clone(),
             name: name.0.to_ascii_uppercase(),

@@ -14972,6 +14972,24 @@ impl<'a> Compiler<'a> {
     }
 
     fn objects(&mut self, object_type: &str) -> Vec<(String, RawObject)> {
+        if self.source_file_declarations && self.raw_model.is_epjson() {
+            return match self.raw_model.source_ordered_instances(object_type) {
+                Ok(objects) => objects
+                    .into_iter()
+                    .map(|(name, object)| (name.0.clone(), object.clone()))
+                    .collect(),
+                Err(error) => {
+                    self.error(
+                        "SourceObjectOrderUnavailable",
+                        object_type,
+                        None,
+                        None,
+                        error,
+                    );
+                    Vec::new()
+                }
+            };
+        }
         match self.raw_model.ordered_instances(object_type) {
             Ok(objects) => objects
                 .into_iter()

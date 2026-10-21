@@ -53,12 +53,16 @@ fn scalar_object(name: &str, object: &RawObject) -> Result<ProjectInputObject, S
 pub(super) fn resolve(
     raw: &RawModel,
     input: &SelectedInputProcessor,
+    source_order: bool,
 ) -> Result<SelectedSurfaceInput, String> {
     let mut result = SelectedSurfaceInput::default();
     for family in ["GlobalGeometryRules", "BuildingSurface:Detailed"] {
-        let ordered = raw
-            .ordered_instances(family)
-            .map_err(|error| error.to_string())?;
+        let ordered = if source_order {
+            raw.source_ordered_instances(family)?
+        } else {
+            raw.ordered_instances(family)
+                .map_err(|error| error.to_string())?
+        };
         if input.get_num_objects_found(family) != ordered.len() {
             return Err(format!("surface raw/IP count: {family}"));
         }

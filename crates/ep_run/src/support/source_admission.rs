@@ -27,19 +27,20 @@ impl SourceSupportAdmission {
         .ok()?;
         // The existing raw admission checks every field/frequency/schedule;
         // the same reporting pre-scan must retain every actual request object.
-        let reporting = crate::ordinary_input_processor::resolve_reporting_prescan(raw).ok()?;
+        let reporting =
+            crate::ordinary_input_processor::resolve_reporting_prescan_source(raw).ok()?;
         let requested = raw.objects.get(&ObjectType("Output:Variable".into()));
         if reporting.variables.len() != requested.map_or(0, |objects| objects.len()) {
             return None;
         }
-        if let Some(objects) = requested {
-            if !objects
-                .keys()
-                .zip(&reporting.variables)
-                .all(|(name, request)| name.0 == request.object_name)
-            {
-                return None;
-            }
+        if !raw
+            .source_ordered_instances("Output:Variable")
+            .ok()?
+            .iter()
+            .zip(&reporting.variables)
+            .all(|((name, _), request)| name.0 == request.object_name)
+        {
+            return None;
         }
         // The same real IP/raw projection retains every normal meter request
         // (including unnamed blank keys) for UpdateMeterReporting. This proves
@@ -57,7 +58,7 @@ impl SourceSupportAdmission {
                 PortingScope::B => crate::ordinary_input_processor::resolve_source_b(raw),
             }
             .ok()?;
-            let projected = crate::ordinary_heat_balance_input::resolve(raw, &input).ok()?;
+            let projected = crate::ordinary_heat_balance_input::resolve_source(raw, &input).ok()?;
             for family in ["Output:Meter", "Output:Meter:MeterFileOnly"] {
                 let raw_names = raw
                     .objects

@@ -1051,6 +1051,94 @@ mod tests {
             ordered_names(&model)?,
             vec!["Alpha Later Custom", "Zulu Earlier Holiday"]
         );
+        // The default/legacy BTree view stays unchanged. Explicit Source uses
+        // the pinned signed-byte/numeric order observed by the Native IP.
+        let direct = parse_epjson_str(
+            r#"{"Schedule:File":{"AlwaysOn ":{},"A10":{},"\u00a0":{},"AlwaysOn":{},"A2":{}}}"#,
+        )?;
+        assert_eq!(
+            direct
+                .source_ordered_instances("Schedule:File")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["\u{a0}", "A2", "A10", "AlwaysOn", "AlwaysOn "]
+        );
+        assert_eq!(
+            direct
+                .ordered_instances("Schedule:File")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["A10", "A2", "AlwaysOn", "AlwaysOn ", "\u{a0}"]
+        );
+        let numeric = parse_epjson_str(
+            r#"{"Schedule:File":{"x10":{},"x2":{},"x1":{},"x01":{},"0":{},"A":{},"a":{}}}"#,
+        )?;
+        assert_eq!(
+            numeric
+                .source_ordered_instances("Schedule:File")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["0", "A", "a", "x01", "x1", "x2", "x10"]
+        );
+        // Ordinary wrapped arithmetic is retained, while aliases, antipodes,
+        // cycles, and NUL-c_str ambiguity are explicit unavailable boundaries.
+        let wrapped = parse_epjson_str(r#"{"Schedule:File":{"4294967296":{},"1":{}}}"#)?;
+        assert_eq!(
+            wrapped
+                .source_ordered_instances("Schedule:File")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["4294967296", "1"]
+        );
+        for text in [
+            r#"{"Schedule:File":{"x\u0000tail":{}}}"#,
+            r#"{"Schedule:File":{"0000000000":{},"4294967296":{}}}"#,
+            r#"{"Schedule:File":{"0":{},"2147483648":{}}}"#,
+            r#"{"Schedule:File":{"0":{},"1431655765":{},"2863311530":{}}}"#,
+        ] {
+            let bounded = parse_epjson_str(text)?;
+            assert!(
+                bounded
+                    .source_ordered_instances("Schedule:File")
+                    .is_err_and(|error| error.starts_with("SourceObjectOrderUnavailable:"))
+            );
+            assert_eq!(
+                bounded.ordered_instances("Schedule:File")?.len(),
+                bounded.object_count()
+            );
+        }
+        let staged =
+            parse_epjson_str_with_idf_order(SELECTED_SCHEDULE_EPJSON, SELECTED_SCHEDULE_IDF)?;
+        for family in [
+            "ScheduleTypeLimits",
+            "Schedule:Constant",
+            "Schedule:Compact",
+            "Schedule:File",
+            "SizingPeriod:DesignDay",
+        ] {
+            assert_eq!(
+                staged.source_ordered_instances(family)?,
+                staged.ordered_instances(family)?
+            );
+        }
+        let mut invalid_overlay = staged.clone();
+        invalid_overlay
+            .objects
+            .remove(&crate::ObjectType("Schedule:File".into()));
+        let old_error = invalid_overlay
+            .ordered_instances("Schedule:File")
+            .err()
+            .ok_or("existing invalid overlay must fail")?
+            .to_string();
+        assert_eq!(
+            invalid_overlay.source_ordered_instances("Schedule:File"),
+            Err(old_error)
+        );
+        assert!(direct.source_ordered_instances("Absent:Family")?.is_empty());
         Ok(())
     }
 

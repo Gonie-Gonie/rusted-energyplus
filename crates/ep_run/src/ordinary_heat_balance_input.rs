@@ -10,11 +10,26 @@ pub(crate) fn resolve(
     raw: &RawModel,
     input: &SelectedInputProcessor,
 ) -> Result<SelectedHeatBalanceInput, String> {
+    resolve_ordered(raw, input, false)
+}
+
+pub(crate) fn resolve_source(
+    raw: &RawModel,
+    input: &SelectedInputProcessor,
+) -> Result<SelectedHeatBalanceInput, String> {
+    resolve_ordered(raw, input, true)
+}
+
+fn resolve_ordered(
+    raw: &RawModel,
+    input: &SelectedInputProcessor,
+    source_order: bool,
+) -> Result<SelectedHeatBalanceInput, String> {
     // Actual SourceInputFormat custody comes from the loader, not field keys.
     // Existing ordinary admission has already checked this same raw model.
     let mut result = SelectedHeatBalanceInput {
         source_is_epjson: raw.is_epjson(),
-        surface: surface::resolve(raw, input)?,
+        surface: surface::resolve(raw, input, source_order)?,
         objects: BTreeMap::new(),
     };
     for family in [
@@ -42,7 +57,11 @@ pub(crate) fn resolve(
         "Site:GroundTemperature:Shallow",
         "Site:GroundTemperature:Deep",
     ] {
-        let ordered = raw.ordered_instances(family).map_err(|e| e.to_string())?;
+        let ordered = if source_order {
+            raw.source_ordered_instances(family)?
+        } else {
+            raw.ordered_instances(family).map_err(|e| e.to_string())?
+        };
         if input.get_num_objects_found(family) != ordered.len() {
             return Err(format!("HB raw/IP count: {family}"));
         }
