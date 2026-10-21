@@ -22,11 +22,12 @@ use crate::{
     ScheduleCompact, ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
     ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
     ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    Space, SpaceId, SpaceList, SpaceListId, SpaceOrigin, SpaceTypeId, Surface,
-    SurfaceConvectionAlgorithms, SurfaceId, SurfaceIncidentSolarMultiplierRequest,
-    SurfaceSolarIncident, SurfaceVaporCoefficients, ThermostatDualSetpoint, ThermostatSetpointId,
-    TimestepConfig, VariableAbsorptanceSurfaceBinding, Version, WeekScheduleId,
-    WindowFrameAndDivider, WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
+    SourceFileScheduleDeclaration, Space, SpaceId, SpaceList, SpaceListId, SpaceOrigin,
+    SpaceTypeId, Surface, SurfaceConvectionAlgorithms, SurfaceId,
+    SurfaceIncidentSolarMultiplierRequest, SurfaceSolarIncident, SurfaceVaporCoefficients,
+    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    VariableAbsorptanceSurfaceBinding, Version, WeekScheduleId, WindowFrameAndDivider,
+    WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
     WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
     ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneGroup, ZoneGroupId, ZoneHumidistat,
     ZoneHumidistatId, ZoneId, ZoneList, ZoneListId, ZoneLocalEnvironment, ZoneLocalEnvironmentId,
@@ -149,6 +150,8 @@ pub struct TypedModel {
     pub compact_schedules: Vec<ScheduleCompact>,
     /// File-backed schedules loaded into immutable source values.
     pub file_schedules: Vec<ScheduleFile>,
+    /// Request-only Source File identities, excluded from typed object coverage.
+    pub source_file_schedule_declarations: Vec<SourceFileScheduleDeclaration>,
     /// Annual schedules composed from day and week schedule references.
     pub year_schedules: Vec<ScheduleYear>,
     /// Inactive external-interface schedules held at their initial values.
@@ -354,6 +357,7 @@ impl Default for TypedModel {
             schedules: Vec::new(),
             compact_schedules: Vec::new(),
             file_schedules: Vec::new(),
+            source_file_schedule_declarations: Vec::new(),
             year_schedules: Vec::new(),
             external_interface_schedules: Vec::new(),
             external_interface_fmu_import_schedules: Vec::new(),

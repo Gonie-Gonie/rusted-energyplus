@@ -277,9 +277,21 @@ def collect_union(repo_root: Path) -> dict[str, Any]:
     for row in rows.values():
         if row["schema_known"] and (row["review"] is None or row["review"]["source_admission"] == "unreviewed"):
             raise ValueError(f"canonical corpus object lacks reviewed classification: {row['name']}")
+    # Accepted domain expansions can introduce a type in an ignored, retained
+    # same-input fixture. Use their published review record so regeneration does
+    # not depend on local runtime files, and preserve the original file counts.
+    evidence = json.loads((repo_root / "docs/validation/evidence/object-input-domains.json").read_text(encoding="utf-8"))
+    additional = []
+    for name in sorted(evidence["reviewed_domains"]):
+        if name in rows:
+            continue
+        if name not in names or name not in reviewed or reviewed[name]["source_admission"] == "unreviewed":
+            raise ValueError(f"accepted domain object lacks canonical reviewed classification: {name}")
+        additional.append({"name": name, "review": reviewed[name]})
     return {
         "files": len(paths), "idf_files": formats[".idf"], "epjson_files": formats[".epjson"],
         "rows": sorted(rows.values(), key=lambda row: (row["group"], row["name"])),
+        "additional_reviewed_types": additional,
     }
 
 
@@ -287,10 +299,13 @@ def markdown(repo_root: Path) -> str:
     inventory = collect_union(repo_root)
     known = [row for row in inventory["rows"] if row["schema_known"]]
     unknown = [row for row in inventory["rows"] if not row["schema_known"]]
+    additional = inventory["additional_reviewed_types"]
     lines = [
-        "<!-- DO NOT EDIT. Generated from repository samples, the pinned object catalog and specs/object_coverage.toml by tools/docs/generate_docs.py. -->",
+        "<!-- DO NOT EDIT. Generated from repository samples, accepted domain reviews, the pinned object catalog and specs/object_coverage.toml by tools/docs/generate_docs.py. -->",
         "", "# Example Objects and Source Boundaries", "",
         f"The selected corpus has **{inventory['files']} files** ({inventory['idf_files']} IDF, {inventory['epjson_files']} epJSON), **{len(known)} canonical object types**, and **{sum(row['instances'] for row in known)} instances** of those types.",
+        "",
+        f"Including the additional types in published [accepted domain expansions](../../validation/evidence/object-input-domains.json), the combined inventory contains **{len(known) + len(additional)} canonical object types**. The additional types are listed separately below; they do not change the original corpus occurrence counts.",
         "",
         "Selection includes tracked and ordinary untracked input files under `data/` and `docs/validation/`, respecting Git ignores. It excludes runtime/reference trees and immutable `objects` stores. Invalid-field and negative fixtures remain included; embedded code literals and compressed artifacts are outside this file corpus.",
         "",
@@ -304,6 +319,9 @@ def markdown(repo_root: Path) -> str:
         "", "| Object type | Input files | Instances | Dependency review group | Compiler input typing | Source admission | Scope and review references |", "|---|---|---|---|---|---|---|",
     ]
     lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} | {row['group']} | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} | {source_review_cell(row['review'])} |" for row in known)
+    if additional:
+        lines += ["", "## Additional Types From Accepted Domain Expansions", "", "These types occur in the retained domain-expansion inputs and have published review records. Their local runtime inputs are excluded from the file corpus above; the combined inventory includes each type once. Admission remains bounded by the [full registry](object-coverage.md).", "", "| Object type | Compiler input typing | Source admission |", "|---|---|---|"]
+        lines.extend(f"| `{row['name']}` | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} |" for row in additional)
     if unknown:
         lines += ["", "## Unknown Input Types", "", "These names are absent from the pinned schema. `Unknown:Diagnostic` is an intentional local diagnostic fixture, not an EnergyPlus object type.", "", "| Input type | Input files | Instances |", "|---|---|---|"]
         lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} |" for row in unknown)

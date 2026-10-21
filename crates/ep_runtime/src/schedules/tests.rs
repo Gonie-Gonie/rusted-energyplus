@@ -364,6 +364,44 @@ fn hour_only_api_rejects_file_schedule_without_calendar_axis() {
         .expect_err("file schedule must require a calendar-aware axis");
 
     assert!(error.contains("calendar-aware TimeAxis"));
+    // A request-only Source declaration must not fall back to an empty or
+    // fabricated legacy series. Keep a real scalar alongside it to prove that
+    // the calendar cache still evaluates its supported values.
+    let declaration_id = ScheduleId(17);
+    let constant_id = ScheduleId(2);
+    let source = TypedModel {
+        source_file_schedule_declarations: vec![ep_model::SourceFileScheduleDeclaration {
+            id: declaration_id,
+            name: NormalizedName::new("  Source File  "),
+            source_object_name: "  Source File  ".to_string(),
+        }],
+        schedules: vec![ep_model::ScheduleConstant {
+            id: constant_id,
+            name: NormalizedName::new("Actual Constant"),
+            schedule_type_limits: None,
+            hourly_value: 1.25,
+        }],
+        ..TypedModel::default()
+    };
+    let error = precompute_schedule_value_series(&source, 24)
+        .expect_err("Source File requests require the retained Source manager");
+    assert!(error.contains("actual retained Source schedule manager"));
+    assert_eq!(super::schedule_value(&source, declaration_id, 1), None);
+    assert_eq!(super::schedule_value(&source, constant_id, 1), Some(1.25));
+    let axis = build_hourly_time_axis(&source);
+    assert!(axis.is_ok(), "one-day calendar axis should build");
+    let Ok(axis) = axis else {
+        return;
+    };
+    let cache = super::precompute_schedule_cache_for_time_axis(&source, &axis);
+    assert_eq!(cache.len(), 1);
+    assert!(cache.get(declaration_id).is_none());
+    assert_eq!(cache.value(declaration_id, 0), None);
+    assert_eq!(cache.value(constant_id, 0), Some(1.25));
+    assert_eq!(cache.value(constant_id, 23), Some(1.25));
+    let traces = precompute_schedule_value_series_for_time_axis(&source, &axis);
+    assert_eq!(traces.len(), 1);
+    assert_eq!(traces[0].schedule_id, constant_id);
 }
 
 #[test]

@@ -230,6 +230,22 @@ impl ScheduleFileColumnSeparator {
     }
 }
 
+/// Identity-only `Schedule:File` request for the retained Source input getter.
+///
+/// This declaration supplies no type limits, defaults, file data, or numerical
+/// schedule values. The actual Source InputProcessor and schedule manager own
+/// those operations. Its typed name retains the existing compiler normalization
+/// boundary; `source_object_name` preserves the exact authored lookup identity.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SourceFileScheduleDeclaration {
+    /// Identity shared with all schedule families and typed references.
+    pub id: ScheduleId,
+    /// Existing compiler-normalized name, without widening NameMap semantics.
+    pub name: NormalizedName,
+    /// Exact RawModel object name for the actual Source getter.
+    pub source_object_name: String,
+}
+
 /// Hourly values loaded from one supported `Schedule:File` sidecar.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ScheduleFile {

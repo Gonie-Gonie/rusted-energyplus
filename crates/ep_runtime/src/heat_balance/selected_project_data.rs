@@ -71,6 +71,8 @@ fn fatal(backend: &mut SourceErrorBackend<'_>, message: &str) -> Result<(), Proj
 /// Actual retained SystemVariables members consumed/written by this selected getter.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct ProjectSystemVariables {
+    /// Real SystemVarsData first-time/env-path cells, written only at reached path search.
+    pub(crate) file_search: super::source_initialization::SourceFileSearchState,
     /// Same SystemVarsData.runtimeTimer; actual commonInitialize ticks before Source IP.
     pub(crate) runtime_timer: super::source_initialization::SourceRuntimeTimer,
     // Grouped actual threading members; not another SysVars instance.

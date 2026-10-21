@@ -64,6 +64,7 @@ fn resolve_raw(
             && matches!(
                 family.0.as_str(),
                 "Schedule:Compact"
+                    | "Schedule:File"
                     | "Output:Schedules"
                     | "Schedule:Day:Hourly"
                     | "Schedule:Day:Interval"
@@ -206,6 +207,18 @@ fn resolve_raw(
                             "Schedule:Compact" => {
                                 !matches!(field.0.as_str(), "schedule_type_limits_name" | "data")
                             }
+                            "Schedule:File" => !matches!(
+                                field.0.as_str(),
+                                "schedule_type_limits_name"
+                                    | "file_name"
+                                    | "column_number"
+                                    | "rows_to_skip_at_top"
+                                    | "number_of_hours_of_data"
+                                    | "column_separator"
+                                    | "interpolate_to_timestep"
+                                    | "minutes_per_item"
+                                    | "adjust_schedule_for_daylight_savings"
+                            ),
                             "Schedule:Year" => !matches!(
                                 field.0.as_str(),
                                 "schedule_type_limits_name" | "schedule_weeks"
@@ -1723,6 +1736,49 @@ mod source_a_compact_ingress {
                 resolve_source_a(&ep_raw_model::parse_epjson_str(&invalid.to_string())?).is_err(),
                 "invalid Source schedule scalar {family}.{field}"
             );
+        }
+        // File operands reach the actual Source getter without a frontend
+        // file read, precomputed values, path case folding or interval filter.
+        let mut files = input.clone();
+        files["Schedule:File"] = serde_json::json!({"File schedule":{
+            "file_name":"MixedCase/Untouched.CsV", "column_number":2,
+            "rows_to_skip_at_top":1, "number_of_hours_of_data":8784,
+            "column_separator":"Semicolon", "interpolate_to_timestep":"Yes",
+            "minutes_per_item":5, "adjust_schedule_for_daylight_savings":"No",
+            "user_metadata":{"retained":[null,true,7]}
+        }});
+        files["Output:Variable"]["v"]["schedule_name"] = serde_json::json!("File schedule");
+        let raw = ep_raw_model::parse_epjson_str(&files.to_string())?;
+        assert!(resolve(&raw).is_err());
+        for ip in [
+            crate::ordinary_input_processor::resolve_source_a(&raw)?,
+            crate::ordinary_input_processor::resolve_source_b(&raw)?,
+        ] {
+            let fields = ip.source_raw_object_fields("Schedule:File", "File schedule")?;
+            assert_eq!(
+                fields["file_name"],
+                V::String("MixedCase/Untouched.CsV".into())
+            );
+            assert_eq!(fields["minutes_per_item"], V::Number("5".into()));
+            assert_eq!(fields["column_number"], V::Number("2".into()));
+            assert!(matches!(fields["user_metadata"], V::Object(_)));
+        }
+        for (field, value) in [
+            ("file_name", serde_json::json!(null)),
+            ("column_number", serde_json::json!(0)),
+            ("rows_to_skip_at_top", serde_json::json!(-1)),
+            ("minutes_per_item", serde_json::json!(1.5)),
+            ("interpolate_to_timestep", serde_json::json!("Average")),
+            (
+                "adjust_schedule_for_daylight_savings",
+                serde_json::json!(true),
+            ),
+        ] {
+            let mut invalid = files.clone();
+            invalid["Schedule:File"]["File schedule"][field] = value;
+            let raw = ep_raw_model::parse_epjson_str(&invalid.to_string())?;
+            assert!(resolve_source_a(&raw).is_err(), "File scalar {field}");
+            assert!(resolve_source_b(&raw).is_err(), "File scalar {field}");
         }
         // Output:Schedules has no Name field or nonblank outer-key rule.
         // Scope-only Source admission retains its actual report operands;

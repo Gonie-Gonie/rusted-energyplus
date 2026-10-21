@@ -42,6 +42,12 @@ fn precompute_schedule_cache_for_hours(
                 .to_string(),
         );
     }
+    if !model.source_file_schedule_declarations.is_empty() {
+        return Err(
+            "Schedule:File requests require the actual retained Source schedule manager; legacy caches contain no declaration values"
+                .to_string(),
+        );
+    }
     if !model.file_schedules.is_empty() {
         return Err(
             "Schedule:File requires a calendar-aware TimeAxis; the hour-only API has no annual source index"
@@ -77,7 +83,8 @@ fn precompute_schedule_cache_for_hours(
 ///
 /// The cache follows the run-period TimeAxis and preserves the existing family
 /// and source order. Constant and inactive external-interface schedules use
-/// scalar storage; varying schedules use compact boxed arrays.
+/// scalar storage; varying schedules use compact boxed arrays. Identity-only
+/// Source File requests have no entries, so lookup of those IDs returns None.
 #[must_use]
 pub fn precompute_schedule_cache_for_time_axis(
     model: &TypedModel,

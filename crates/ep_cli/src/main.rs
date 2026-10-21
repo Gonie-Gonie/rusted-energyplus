@@ -470,6 +470,7 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         model.typed.schedules.len()
             + model.typed.compact_schedules.len()
             + model.typed.file_schedules.len()
+            + model.typed.source_file_schedule_declarations.len()
             + file_shading_generated_schedules
             + model.typed.year_schedules.len()
             + model.typed.external_interface_schedules.len()
@@ -482,6 +483,12 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
         model.typed.compact_schedules.len()
     );
     println!("  file_schedules: {}", model.typed.file_schedules.len());
+    if !model.typed.source_file_schedule_declarations.is_empty() {
+        println!(
+            "  source_file_schedule_declarations: {}",
+            model.typed.source_file_schedule_declarations.len()
+        );
+    }
     println!(
         "  file_shading_schedule_objects: {}",
         usize::from(model.typed.file_shading_schedule.is_some())
@@ -12008,6 +12015,13 @@ fn schedule_name_for_id(model: &TypedModel, schedule_id: Option<ScheduleId>) -> 
         })
         .or_else(|| {
             model
+                .source_file_schedule_declarations
+                .iter()
+                .find(|schedule| schedule.id == schedule_id)
+                .map(|schedule| schedule.name.0.clone())
+        })
+        .or_else(|| {
+            model
                 .year_schedules
                 .iter()
                 .find(|schedule| schedule.id == schedule_id)
@@ -19923,6 +19937,7 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
         model.schedules.len()
             + model.compact_schedules.len()
             + model.file_schedules.len()
+            + model.source_file_schedule_declarations.len()
             + file_shading_generated_schedules
             + model.year_schedules.len()
             + model.external_interface_schedules.len()
@@ -19932,6 +19947,12 @@ fn print_typed_model_summary(model: &TypedModel, report: &CompileReport) {
     println!("  constant_schedules: {}", model.schedules.len());
     println!("  compact_schedules: {}", model.compact_schedules.len());
     println!("  file_schedules: {}", model.file_schedules.len());
+    if !model.source_file_schedule_declarations.is_empty() {
+        println!(
+            "  source_file_schedule_declarations: {}",
+            model.source_file_schedule_declarations.len()
+        );
+    }
     println!(
         "  file_shading_schedule_objects: {}",
         usize::from(model.file_shading_schedule.is_some())

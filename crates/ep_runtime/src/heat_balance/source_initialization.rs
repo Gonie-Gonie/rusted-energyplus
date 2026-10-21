@@ -17,6 +17,10 @@ use crate::weather::day::{
 use ep_model::ReportInputs;
 use std::io;
 
+mod external_files;
+pub(crate) use external_files::{
+    SourceExternalInputFiles, SourceFileSearchState, SourceNativePathKey,
+};
 mod files;
 pub(crate) use files::SourceCloseOutputFilesOwners;
 pub(crate) use files::native_text_bytes;
@@ -53,6 +57,8 @@ pub struct SourceInitializationInput {
     pub sizing: super::selected_sizing::SelectedSizingInput,
     /// Actual ordered Table:Style operands admitted by the same input processor.
     pub tabular: super::ordinary_tabular_reports::SelectedTabularInput,
+    /// Genuine original CLI input path, never the staged conversion/output path.
+    pub input_file_path: Option<std::path::PathBuf>,
     /// Caller-supplied genuine weather path for CheckEnvironment213 fileExists.
     pub input_weather_file_path: std::path::PathBuf,
     /// Genuine command-line DesignDay-only request, separate from process settings.
@@ -405,7 +411,7 @@ impl CtfInitializationReports {
             fluid.get_fluid_properties_data(input)?;
             let steps = usize::try_from(weather.global.time_steps_in_hour)
                 .map_err(|_| SourceInitializationError::Association("effective timestep"))?;
-            match schedules.process_schedule_input_with_live_backend_and_clock(
+            match schedules.process_schedule_input_with_live_backend_clock_and_files(
                 input,
                 &raw.schedules,
                 steps,
@@ -418,6 +424,7 @@ impl CtfInitializationReports {
                     doing_sizing: &globals.doing_sizing,
                 },
                 &weather.global,
+                &mut project.system.file_search,
             ) {
                 Err(SelectedScheduleError::AuditOpen { path, source }) => {
                     let message = format!(

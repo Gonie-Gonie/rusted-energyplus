@@ -107,6 +107,7 @@ impl SourceSupportAdmission {
             "Schedule:Week:Compact",
             "Schedule:Week:Daily",
             "Schedule:Year",
+            "Schedule:File",
         ]
         .into_iter()
         .filter(|family| {

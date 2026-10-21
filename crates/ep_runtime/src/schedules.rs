@@ -241,6 +241,16 @@ pub(crate) fn validate_hour_only_internal_gain_schedules(
                 Err(reason) => reason,
             },
             None if model
+                .source_file_schedule_declarations
+                .iter()
+                .any(|schedule| schedule.id == schedule_id) =>
+            {
+                format!(
+                    "Schedule:File request ID {} requires the actual retained Source schedule manager",
+                    schedule_id.0
+                )
+            }
+            None if model
                 .file_schedules
                 .iter()
                 .any(|schedule| schedule.id == schedule_id) =>

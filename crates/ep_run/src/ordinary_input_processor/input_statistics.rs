@@ -114,6 +114,7 @@ pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsIn
         "ComfortViewFactorAngles",
         "Output:Schedules",
         "Schedule:Compact",
+        "Schedule:File",
         "Schedule:Day:Hourly",
         "Schedule:Day:Interval",
         "Schedule:Day:List",

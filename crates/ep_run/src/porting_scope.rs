@@ -190,6 +190,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "ScheduleTypeLimits"
             | "Schedule:Constant"
             | "Schedule:Compact"
+            | "Schedule:File"
             | "Schedule:Day:Hourly"
             | "Schedule:Day:Interval"
             | "Schedule:Day:List"

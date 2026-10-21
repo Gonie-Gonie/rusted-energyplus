@@ -31,6 +31,27 @@ def ref(path: Path) -> dict:
     return {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)}
 
 
+def explicit_input_ref(path: Path) -> dict:
+    """Hash a declared input without retaining its contents, inside or outside ROOT."""
+    path = (path if path.is_absolute() else ROOT / path).resolve()
+    if not path.is_file():
+        raise OSError(f"Declared input is not a regular file: {path}")
+    identity = path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else path.as_posix()
+    return {"path": identity, "sha256": sha(path), "bytes": path.stat().st_size}
+
+
+def capture_explicit_inputs(paths: list[Path]) -> tuple[list[dict], list[dict]]:
+    rows, errors = [], []
+    for index, path in enumerate(paths):
+        try:
+            rows.append(explicit_input_ref(path))
+        except (OSError, ValueError, RuntimeError) as error:
+            failure = {"index": index, "path": str(path), "read_error": str(error)}
+            rows.append(failure)
+            errors.append(failure)
+    return rows, errors
+
+
 def contained(path: Path, parent: Path) -> Path:
     path, parent = path.resolve(), parent.resolve()
     if not path.is_relative_to(parent) or path == parent:
@@ -147,6 +168,8 @@ def cargo_artifacts(command: list[str], stdout: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--input", type=Path, action="append", default=[],
+                        help="Authenticate this real input before/after the command; repeatable, no contents retained")
     parser.add_argument("command", nargs=argparse.REMAINDER)
     args = parser.parse_args()
     command = args.command
@@ -160,20 +183,39 @@ def main() -> int:
     launcher = store_bytes(Path(__file__).read_bytes())
     before = git_state()
     stdout, stderr = directory / "stdout.log", directory / "stderr.log"
+    inputs_before, input_errors_before = capture_explicit_inputs(args.input) if args.input else ([], [])
+    input_request = None
+    if args.input:
+        input_request = directory / "input-custody-request.json"
+        with input_request.open("xb") as stream:
+            stream.write(json_bytes({
+                "schema": "recorded-command-explicit-input-custody-request.v1",
+                "command": command, "cwd": ROOT.as_posix(),
+                "declared_input_arguments": [str(path) for path in args.input],
+                "inputs_before": inputs_before, "input_read_errors_before": input_errors_before,
+            }))
     environment = os.environ.copy()
     environment_keys = ("RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "CARGO_BUILD_TARGET",
                         "CARGO_TARGET_DIR", "RUSTUP_TOOLCHAIN", "RUSTC", "RUSTC_WRAPPER",
                         "RUSTC_WORKSPACE_WRAPPER", "CARGO_HOME")
     start_utc, started = utc_now(), time.perf_counter()
     launch_error = None
+    command_process_started = False
     with stdout.open("xb") as out, stderr.open("xb") as err:
-        try:
-            result = subprocess.run(command, cwd=ROOT, stdout=out, stderr=err, env=environment)
-            exit_code = result.returncode
-        except OSError as error:
-            launch_error, exit_code = str(error), 127
+        if input_errors_before:
+            launch_error, exit_code = "Explicit --input could not be authenticated before launch", 127
             err.write((launch_error + "\n").encode("utf-8"))
+        else:
+            try:
+                result = subprocess.run(command, cwd=ROOT, stdout=out, stderr=err, env=environment)
+                command_process_started = True
+                exit_code = result.returncode
+            except OSError as error:
+                launch_error, exit_code = str(error), 127
+                err.write((launch_error + "\n").encode("utf-8"))
     end_utc, elapsed = utc_now(), time.perf_counter() - started
+    inputs_after, input_errors_after = capture_explicit_inputs(args.input) if args.input else ([], [])
+    explicit_inputs_unchanged = not input_errors_before and not input_errors_after and inputs_before == inputs_after
     artifact_capture = cargo_artifacts(command, stdout)
     after = git_state()
     receipt = {
@@ -190,6 +232,15 @@ def main() -> int:
         "launch_environment_scope": "Selected inherited values passed to subprocess; Cargo config/target resolution remains in emitted compiler-artifact metadata",
         "recorder_updates_gates": False, "recorder_supplies_reference_answers": False,
     }
+    if args.input:
+        receipt["explicit_input_custody"] = {
+            "request": {**ref(input_request), "bytes": input_request.stat().st_size},
+            "declared_input_arguments": [str(path) for path in args.input],
+            "before": inputs_before, "after": inputs_after,
+            "read_errors_before": input_errors_before, "read_errors_after": input_errors_after,
+            "all_explicit_inputs_unchanged": explicit_inputs_unchanged,
+            "command_process_started": command_process_started,
+        }
     receipt_path = directory / "receipt.json"
     with receipt_path.open("xb") as stream:
         stream.write(json_bytes(receipt))
@@ -199,7 +250,9 @@ def main() -> int:
             print(stream.read().decode("utf-8", errors="replace"), end="")
     print(json.dumps({"receipt": ref(receipt_path), "exit_code": exit_code,
                       "source_bytes_match_before_and_after": receipt["source_bytes_match_before_and_after"]}))
-    return exit_code
+    # Preserve the actual child exit code in the receipt. A successful command
+    # with failed declared-input custody still fails the recorder's acceptance.
+    return 2 if args.input and exit_code == 0 and not explicit_inputs_unchanged else exit_code
 
 
 if __name__ == "__main__":

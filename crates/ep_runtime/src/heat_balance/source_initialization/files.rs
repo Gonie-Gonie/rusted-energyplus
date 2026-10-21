@@ -147,6 +147,7 @@ impl Write for SourceOutputStream {
 pub(crate) struct ScheduleInputFileWriters<'a> {
     pub audit: &'a mut dyn Write,
     pub eio: Option<&'a mut dyn Write>,
+    pub external_files: Option<&'a mut super::SourceExternalInputFiles>,
 }
 
 /// Actual audit capability; a concrete real stream must outlive returned errors.
@@ -157,6 +158,7 @@ pub(crate) trait ScheduleAuditFileHost {
         Ok(ScheduleInputFileWriters {
             audit: self.ensure_audit_open()?,
             eio: None,
+            external_files: None,
         })
     }
 }
@@ -164,6 +166,8 @@ pub(crate) trait ScheduleAuditFileHost {
 /// Non-Clone retained source output files, independent of Runtime Result.
 #[derive(Debug)]
 pub struct SourceInitializationFiles {
+    // Optional real input-file capability; legacy hosts do not invent CLI paths.
+    external_files: Option<super::SourceExternalInputFiles>,
     // Native InputFilePath owns this path; each FillWeather call opens a local stream.
     stat_input: PathBuf,
     outputs: [SourceOutputStream; 4],
@@ -187,6 +191,7 @@ impl SourceInitializationFiles {
     #[must_use]
     pub fn new(paths: SourceInitializationFilePaths) -> Self {
         Self {
+            external_files: None,
             stat_input: paths.stat_input,
             outputs: [
                 SourceOutputStream::new(paths.eso),
@@ -214,6 +219,16 @@ impl SourceInitializationFiles {
                 dictionaries::SourceDictionaryStream::new(paths.mdd),
             ],
         }
+    }
+    /// Construct the same outputs with genuine CLI input/executable path operands.
+    /// No schedule sidecar or environment value is read before its reached getter.
+    pub fn new_with_source_input_file(
+        paths: SourceInitializationFilePaths,
+        input_file: &Path,
+    ) -> io::Result<Self> {
+        let mut files = Self::new(paths);
+        files.external_files = Some(super::SourceExternalInputFiles::new(input_file)?);
+        Ok(files)
     }
     /// Native format chooses a path; the separate TAB stream is ordinal-indexed.
     pub(crate) fn source_tabular_output_path(&self, style: i32) -> &Path {
@@ -366,7 +381,11 @@ impl ScheduleAuditFileHost for SourceInitializationFiles {
         } else {
             None
         };
-        Ok(ScheduleInputFileWriters { audit, eio })
+        Ok(ScheduleInputFileWriters {
+            audit,
+            eio,
+            external_files: self.external_files.as_mut(),
+        })
     }
 }
 

@@ -1,9 +1,12 @@
 //! Genuine Constant/Compact ScheduleManager with retained native day/week owners.
 use super::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use super::selected_input_processor::{SelectedInputProcessor, SelectedInputUnavailable};
-use super::source_initialization::{ScheduleAuditFileHost, ScheduleInputFileWriters};
+use super::source_initialization::{
+    ScheduleAuditFileHost, ScheduleInputFileWriters, SourceFileSearchState, SourceNativePathKey,
+};
 use crate::weather::day::WeatherGlobalState;
 use ep_model::ScheduleUnitType;
+use external_data::NativeExternalDataValue;
 use std::collections::BTreeMap;
 mod accessors;
 mod annual;
@@ -12,6 +15,8 @@ mod compact;
 mod compact_native_tests;
 mod day_group;
 mod detailed;
+mod external_data;
+mod file;
 mod input_reports;
 pub(crate) mod minute;
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
@@ -142,6 +147,8 @@ pub(crate) struct SelectedScheduleManager {
     pub(crate) do_schedule_reporting_setup: bool,
     pub(crate) schedule_input_processed: bool,
     pub(crate) schedule_file_shading_processed: bool,
+    pub(crate) unique_processed_external_files:
+        BTreeMap<SourceNativePathKey, NativeExternalDataValue>,
     pub(crate) schedule_types: Vec<SelectedScheduleType>,
     pub(crate) schedules: Vec<SelectedSchedule>,
     pub(crate) day_schedules: Vec<SelectedDaySchedule>,
@@ -158,6 +165,7 @@ impl Default for SelectedScheduleManager {
             do_schedule_reporting_setup: true,
             schedule_input_processed: false,
             schedule_file_shading_processed: false,
+            unique_processed_external_files: BTreeMap::new(),
             schedule_types: Vec::new(),
             schedules: Vec::new(),
             day_schedules: Vec::new(),
@@ -176,6 +184,10 @@ pub(crate) enum SelectedScheduleError {
     HeatBalance(Box<super::selected_heat_balance_input::HeatBalanceInputError>),
     Unavailable(&'static str),
     Audit(std::io::Error),
+    ExternalFile {
+        path: std::path::PathBuf,
+        source: std::io::Error,
+    },
     Report(std::io::Error),
     AuditOpen {
         path: std::path::PathBuf,
@@ -203,6 +215,9 @@ impl std::fmt::Display for SelectedScheduleError {
             Self::Input(e) => std::fmt::Display::fmt(e, f),
             Self::HeatBalance(e) => std::fmt::Display::fmt(e, f),
             Self::Audit(e) | Self::Report(e) => std::fmt::Display::fmt(e, f),
+            Self::ExternalFile { path, source } => {
+                write!(f, "actual external file {}: {source}", path.display())
+            }
             Self::AuditOpen { path, .. } => write!(
                 f,
                 "ProcessScheduleInput: Could not open file {} for output (write).",
@@ -218,7 +233,7 @@ impl std::error::Error for SelectedScheduleError {
             Self::Input(e) => Some(e),
             Self::HeatBalance(e) => Some(e.as_ref()),
             Self::Audit(e) | Self::Report(e) => Some(e),
-            Self::AuditOpen { source, .. } => Some(source),
+            Self::AuditOpen { source, .. } | Self::ExternalFile { source, .. } => Some(source),
             Self::Unavailable(_) => None,
         }
     }
@@ -315,6 +330,7 @@ impl SelectedScheduleManager {
             None,
             None,
             None,
+            None,
         )
     }
 
@@ -337,6 +353,7 @@ impl SelectedScheduleManager {
             time_steps_in_hour,
             audit_files,
             Some(backend),
+            None,
             None,
             None,
         )
@@ -365,13 +382,15 @@ impl SelectedScheduleManager {
             Some(backend),
             Some(flags),
             None,
+            None,
         )
     }
 
     /// Actual Source entry with the same live clock consumed by ReportScheduleDetails.
     #[allow(
+        dead_code,
         clippy::too_many_arguments,
-        reason = "Keep the actual file, diagnostic, phase and clock owners disjoint at the Source call."
+        reason = "Retain the existing explicit clock-only entry for owner tests and callers without a CLI file capability."
     )]
     pub(crate) fn process_schedule_input_with_live_backend_and_clock(
         &mut self,
@@ -391,6 +410,35 @@ impl SelectedScheduleManager {
             Some(backend),
             Some(flags),
             Some(clock),
+            None,
+        )
+    }
+
+    /// Actual Source entry carrying the same real SystemVars file-search cells.
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Borrow independent real file, phase, clock and SystemVars owners."
+    )]
+    pub(crate) fn process_schedule_input_with_live_backend_clock_and_files(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        declarations: &SelectedScheduleInput,
+        time_steps_in_hour: usize,
+        audit_files: &mut dyn ScheduleAuditFileHost,
+        backend: &mut SourceErrorBackend<'_>,
+        flags: &SourceDiagnosticFlags<'_>,
+        clock: &WeatherGlobalState,
+        file_search: &mut SourceFileSearchState,
+    ) -> Result<(), SelectedScheduleError> {
+        self.process_schedule_input_with_optional_backend(
+            input,
+            declarations,
+            time_steps_in_hour,
+            audit_files,
+            Some(backend),
+            Some(flags),
+            Some(clock),
+            Some(file_search),
         )
     }
 
@@ -407,6 +455,7 @@ impl SelectedScheduleManager {
         mut backend: Option<&mut super::error_backend::SourceErrorBackend<'_>>,
         flags: Option<&SourceDiagnosticFlags<'_>>,
         report_clock: Option<&WeatherGlobalState>,
+        file_search: Option<&mut SourceFileSearchState>,
     ) -> Result<(), SelectedScheduleError> {
         if self.schedule_input_processed {
             return Ok(());
@@ -456,6 +505,7 @@ impl SelectedScheduleManager {
                         | "Schedule:Week:Daily"
                         | "Schedule:Week:Compact"
                         | "Schedule:Year"
+                        | "Schedule:File"
                 ) {
                     return Err(SelectedScheduleError::Unavailable(
                         "nonconstant schedule input",
@@ -534,13 +584,16 @@ impl SelectedScheduleManager {
             }
         }
         let audit_path = audit_files.audit_path().to_path_buf();
-        let ScheduleInputFileWriters { audit, eio } =
-            audit_files
-                .ensure_schedule_input_writers()
-                .map_err(|source| SelectedScheduleError::AuditOpen {
-                    path: audit_path,
-                    source,
-                })?;
+        let ScheduleInputFileWriters {
+            audit,
+            eio,
+            external_files,
+        } = audit_files
+            .ensure_schedule_input_writers()
+            .map_err(|source| SelectedScheduleError::AuditOpen {
+                path: audit_path,
+                source,
+            })?;
         writeln!(audit, "  Processing Schedule Input -- Start")?;
         for row in &declarations.types {
             // getObjectItem resets all six getter-local arrays before unused erase.
@@ -610,6 +663,18 @@ impl SelectedScheduleManager {
             input,
             time_steps_in_hour,
             &mut locals,
+            &mut backend,
+            flags,
+            &mut errors_found,
+        )?;
+        self.process_source_files(
+            input,
+            declarations.source_is_epjson,
+            time_steps_in_hour,
+            &mut locals,
+            external_files,
+            file_search,
+            audit,
             &mut backend,
             flags,
             &mut errors_found,

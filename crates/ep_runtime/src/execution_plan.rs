@@ -566,6 +566,13 @@ fn schedule_ids(model: &SimulationModel) -> impl Iterator<Item = ScheduleId> + '
         .chain(
             model
                 .typed
+                .source_file_schedule_declarations
+                .iter()
+                .map(|schedule| schedule.id),
+        )
+        .chain(
+            model
+                .typed
                 .year_schedules
                 .iter()
                 .map(|schedule| schedule.id),

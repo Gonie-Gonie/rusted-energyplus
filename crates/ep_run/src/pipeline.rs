@@ -14,7 +14,7 @@ use ep_compare::{
     SeriesAlignment, SeriesComparisonStatus, Tolerance, compare_series_samples_v2,
     load_eso_time_series,
 };
-use ep_compiler::{CompileReport, compile_raw_model};
+use ep_compiler::{CompileReport, compile_raw_model, compile_raw_model_for_source};
 use ep_model::{AutosizeOrNumber, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, load_epjson_file, load_epjson_file_with_idf_order};
@@ -1150,7 +1150,12 @@ fn run_with_optional_porting_scope_impl(
         .map_err(|error| RunError::new(RunExitCode::OutputExport, error))?;
 
     let compile_start = Instant::now();
-    let compile_result = compile_raw_model(&raw_model);
+    let compile_result = match scope {
+        Some(crate::PortingScope::A | crate::PortingScope::B) => {
+            compile_raw_model_for_source(&raw_model)
+        }
+        None => compile_raw_model(&raw_model),
+    };
     let typed_model = compile_result.model.as_ref();
     timing.push(
         "typed_compile",
@@ -3114,7 +3119,7 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         .file_shading_schedule
         .as_ref()
         .map_or(0, |schedule| schedule.columns.len());
-    BTreeMap::from([
+    let mut counts = BTreeMap::from([
         ("zones", model.zones.len()),
         ("zone_lists", model.zone_lists.len()),
         ("zone_groups", model.zone_groups.len()),
@@ -3164,6 +3169,7 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
             model.schedules.len()
                 + model.compact_schedules.len()
                 + model.file_schedules.len()
+                + model.source_file_schedule_declarations.len()
                 + file_shading_generated_schedules
                 + model.year_schedules.len()
                 + model.external_interface_schedules.len()
@@ -3212,7 +3218,14 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         ("pumps_constant_speed", model.pumps_constant_speed.len()),
         ("boilers_hot_water", model.boilers_hot_water.len()),
         ("chillers_electric_eir", model.chillers_electric_eir.len()),
-    ])
+    ]);
+    if !model.source_file_schedule_declarations.is_empty() {
+        counts.insert(
+            "source_file_schedule_declarations",
+            model.source_file_schedule_declarations.len(),
+        );
+    }
+    counts
 }
 
 fn write_graph_and_plan(
@@ -3274,6 +3287,7 @@ fn write_graph_and_plan(
             "schedule_ids": model.typed.schedules.len()
                 + model.typed.compact_schedules.len()
                 + model.typed.file_schedules.len()
+                + model.typed.source_file_schedule_declarations.len()
                 + model
                     .typed
                     .file_shading_schedule
@@ -3763,6 +3777,7 @@ fn prepare_runtime_inputs(
                         .as_ref()
                         .ok_or("missing real IP projection")?,
                 )?,
+                input_file_path: Some(config.input_path.clone()),
                 input_weather_file_path: config
                     .weather_path
                     .clone()

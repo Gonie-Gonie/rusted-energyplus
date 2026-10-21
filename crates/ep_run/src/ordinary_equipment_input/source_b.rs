@@ -8,6 +8,7 @@ pub(super) fn is_family(family: &str) -> bool {
         "NodeList"
             | "Output:Schedules"
             | "Schedule:Compact"
+            | "Schedule:File"
             | "Schedule:Day:Hourly"
             | "Schedule:Day:Interval"
             | "Schedule:Day:List"
@@ -31,6 +32,27 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
+        ("Schedule:File", "schedule_type_limits_name" | "file_name") => {
+            matches!(value, RawValue::String(_))
+        }
+        ("Schedule:File", "column_number") => {
+            number(value).is_some_and(|n| n.fract() == 0.0 && n >= 1.0)
+        }
+        ("Schedule:File", "rows_to_skip_at_top") => {
+            number(value).is_some_and(|n| n.fract() == 0.0 && n >= 0.0)
+        }
+        ("Schedule:File", "number_of_hours_of_data") => {
+            number(value).is_some_and(|n| (8760.0..=8784.0).contains(&n))
+        }
+        ("Schedule:File", "column_separator") => {
+            text_is(value, &["", "Comma", "Semicolon", "Tab", "Space"])
+        }
+        ("Schedule:File", "interpolate_to_timestep" | "adjust_schedule_for_daylight_savings") => {
+            text_is(value, &["", "No", "Yes"])
+        }
+        ("Schedule:File", "minutes_per_item") => {
+            number(value).is_some_and(|n| n.fract() == 0.0 && (1.0..=60.0).contains(&n))
+        }
         ("Output:Schedules", "key_field") => text_is(value, &["Hourly", "Timestep"]),
         // The unnamed report schema does not prohibit additional members.
         // They remain raw metadata, never schedule values or field counts.
@@ -412,6 +434,7 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         "Schedule:Year" => &["schedule_weeks"],
         "NodeList" => &[],
         "Schedule:Compact" => &[],
+        "Schedule:File" => &["file_name", "column_number", "rows_to_skip_at_top"],
         "ThermostatSetpoint:DualSetpoint" => &[],
         "ZoneControl:Thermostat" => &[
             "zone_or_zonelist_name",
@@ -430,15 +453,17 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
     }
 }
 pub(super) fn has_source_detailed_reference(raw: &RawModel, reference: &str) -> bool {
-    ["Schedule:Compact", "Schedule:Year"].iter().any(|family| {
-        raw.objects
-            .get(&ObjectType((*family).into()))
-            .is_some_and(|objects| {
-                objects
-                    .keys()
-                    .any(|name| name.0.eq_ignore_ascii_case(reference))
-            })
-    })
+    ["Schedule:Compact", "Schedule:Year", "Schedule:File"]
+        .iter()
+        .any(|family| {
+            raw.objects
+                .get(&ObjectType((*family).into()))
+                .is_some_and(|objects| {
+                    objects
+                        .keys()
+                        .any(|name| name.0.eq_ignore_ascii_case(reference))
+                })
+        })
 }
 
 const REGULAR_DAY_FIELDS: [&str; 12] = [

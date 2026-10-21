@@ -69,20 +69,21 @@ use ep_model::{
     ScheduleFileColumnSeparator, ScheduleFileShading, ScheduleFileShadingColumn, ScheduleId,
     ScheduleInterpolation, ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact,
     ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation, SolarDistribution,
-    SpecialDayType, StartingVertexPosition, SunExposure, Surface, SurfaceId, SurfaceType,
-    SurfaceVaporCoefficient, SurfaceVaporCoefficients, SurfaceVaporCoefficientsId, Terrain,
-    ThermostatControlObjectType, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
-    TypedModel, VariableAbsorptanceControl, VariableAbsorptanceFunctionSignal,
-    VariableAbsorptanceSchedule, VertexEntryDirection, WeekScheduleId, WindExposure,
-    WindowBlindDirectionalOpticalProperties, WindowBlindEquivalentLayerMaterial,
-    WindowBlindEquivalentLayerSlatAngleControl, WindowBlindMaterial, WindowBlindSlatAngleType,
-    WindowBlindSlatOrientation, WindowComplexGapGasComposition, WindowComplexGapMaterial,
-    WindowComplexGapSupportPillar, WindowComplexShadeLayerType, WindowComplexShadeMaterial,
-    WindowDividerProperties, WindowDividerType, WindowDrapeEquivalentLayerMaterial,
-    WindowFrameAndDivider, WindowFrameAndDividerId, WindowFrameProperties,
-    WindowGapEquivalentLayerMaterial, WindowGapVentType, WindowGasMaterial, WindowGasMixture,
-    WindowGasMixtureComponent, WindowGasMixtureMaterial, WindowGasPolynomialCoefficients,
-    WindowGasProperties, WindowGasType, WindowGlazingEquivalentLayerDiffuseProperties,
+    SourceFileScheduleDeclaration, SpecialDayType, StartingVertexPosition, SunExposure, Surface,
+    SurfaceId, SurfaceType, SurfaceVaporCoefficient, SurfaceVaporCoefficients,
+    SurfaceVaporCoefficientsId, Terrain, ThermostatControlObjectType, ThermostatDualSetpoint,
+    ThermostatSetpointId, TimestepConfig, TypedModel, VariableAbsorptanceControl,
+    VariableAbsorptanceFunctionSignal, VariableAbsorptanceSchedule, VertexEntryDirection,
+    WeekScheduleId, WindExposure, WindowBlindDirectionalOpticalProperties,
+    WindowBlindEquivalentLayerMaterial, WindowBlindEquivalentLayerSlatAngleControl,
+    WindowBlindMaterial, WindowBlindSlatAngleType, WindowBlindSlatOrientation,
+    WindowComplexGapGasComposition, WindowComplexGapMaterial, WindowComplexGapSupportPillar,
+    WindowComplexShadeLayerType, WindowComplexShadeMaterial, WindowDividerProperties,
+    WindowDividerType, WindowDrapeEquivalentLayerMaterial, WindowFrameAndDivider,
+    WindowFrameAndDividerId, WindowFrameProperties, WindowGapEquivalentLayerMaterial,
+    WindowGapVentType, WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent,
+    WindowGasMixtureMaterial, WindowGasPolynomialCoefficients, WindowGasProperties, WindowGasType,
+    WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingSpectralAverageMaterial, WindowGlazingThermochromicGroupMaterial,
@@ -456,6 +457,18 @@ pub fn compile_raw_model(raw_model: &RawModel) -> CompileResult {
     Compiler::new(raw_model, None).compile()
 }
 
+/// Compiles identities needed by the actual Source input route.
+///
+/// `Schedule:File` remains RawOnly: only its ID and names are declared here.
+/// Field validation, defaults, type lookup and external data belong to the
+/// retained Source getter; legacy compilation and value caches are unchanged.
+#[must_use]
+pub fn compile_raw_model_for_source(raw_model: &RawModel) -> CompileResult {
+    let mut compiler = Compiler::new(raw_model, None);
+    compiler.source_file_declarations = true;
+    compiler.compile()
+}
+
 /// Compiles a RawModel and resolves file-backed schedules below one staged auxiliary root.
 #[must_use]
 pub fn compile_raw_model_with_auxiliary_root(
@@ -609,6 +622,7 @@ const TYPED_OBJECT_TYPES: &[&str] = &[
 struct Compiler<'a> {
     raw_model: &'a RawModel,
     auxiliary_root: Option<&'a Path>,
+    source_file_declarations: bool,
     diagnostics: Vec<ModelDiagnostic>,
     defaults_applied: Vec<DefaultApplication>,
     ffactor_construction_count: usize,
@@ -648,6 +662,7 @@ impl<'a> Compiler<'a> {
         Self {
             raw_model,
             auxiliary_root,
+            source_file_declarations: false,
             diagnostics: Vec::new(),
             defaults_applied: Vec::new(),
             ffactor_construction_count,
@@ -680,7 +695,11 @@ impl<'a> Compiler<'a> {
         self.parse_schedule_type_limits(&mut model);
         self.parse_compact_schedules(&mut model);
         self.parse_schedules(&mut model);
-        self.parse_file_schedules(&mut model);
+        if self.source_file_declarations {
+            self.parse_source_file_schedule_declarations(&mut model);
+        } else {
+            self.parse_file_schedules(&mut model);
+        }
         self.parse_day_hourly_schedules(&mut model);
         self.parse_day_interval_schedules(&mut model);
         self.parse_day_list_schedules(&mut model);
@@ -766,13 +785,21 @@ impl<'a> Compiler<'a> {
             completed_stages.push(CompileStage::ReferenceResolution);
         }
 
+        let mut coverage = compile_coverage(self.raw_model);
+        if self.source_file_declarations {
+            for entry in &mut coverage {
+                if entry.object_type == "Schedule:File" {
+                    entry.status = ObjectCoverageStatus::RawOnly;
+                }
+            }
+        }
         let report = CompileReport {
             completed_stages,
             raw_object_count: self.raw_model.object_count(),
             typed_object_count,
             diagnostics: self.diagnostics,
             defaults_applied: self.defaults_applied,
-            coverage: compile_coverage(self.raw_model),
+            coverage,
         };
 
         CompileResult {
@@ -10613,6 +10640,39 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn parse_source_file_schedule_declarations(&mut self, model: &mut TypedModel) {
+        for (source_object_name, _object) in self.objects("Schedule:File") {
+            let schedule_index = file_shading_schedule_column_count(model)
+                + model.schedules.len()
+                + model.compact_schedules.len()
+                + model.file_schedules.len()
+                + model.source_file_schedule_declarations.len();
+            let Some(id_value) =
+                self.checked_id("Schedule:File", &source_object_name, schedule_index)
+            else {
+                continue;
+            };
+            let id = ScheduleId(id_value);
+            // Preserve the compiler's existing normalized namespace. Distinct
+            // authored names that normalize alike remain an explicit boundary.
+            if model
+                .schedule_names
+                .insert(&source_object_name, id)
+                .is_some()
+            {
+                self.duplicate_name("Schedule:File", &source_object_name);
+                continue;
+            }
+            model
+                .source_file_schedule_declarations
+                .push(SourceFileScheduleDeclaration {
+                    id,
+                    name: NormalizedName::new(&source_object_name),
+                    source_object_name,
+                });
+        }
+    }
+
     fn parse_file_schedules(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Schedule:File") {
             let schedule_type_limits = match self.optional_string(
@@ -11379,6 +11439,7 @@ impl<'a> Compiler<'a> {
                 + model.schedules.len()
                 + model.compact_schedules.len()
                 + model.file_schedules.len()
+                + model.source_file_schedule_declarations.len()
                 + model.year_schedules.len();
             let Some(id_value) = self.checked_id("Schedule:Year", &name, schedule_index) else {
                 continue;
@@ -11481,6 +11542,7 @@ impl<'a> Compiler<'a> {
                 + model.schedules.len()
                 + model.compact_schedules.len()
                 + model.file_schedules.len()
+                + model.source_file_schedule_declarations.len()
                 + model.year_schedules.len()
                 + model.external_interface_schedules.len();
             let Some(id_value) = self.checked_id(OBJECT_TYPE, &name, schedule_index) else {
@@ -11603,6 +11665,7 @@ impl<'a> Compiler<'a> {
                 + model.schedules.len()
                 + model.compact_schedules.len()
                 + model.file_schedules.len()
+                + model.source_file_schedule_declarations.len()
                 + model.year_schedules.len()
                 + model.external_interface_schedules.len()
                 + model.external_interface_fmu_import_schedules.len();
@@ -11722,6 +11785,7 @@ impl<'a> Compiler<'a> {
                 + model.schedules.len()
                 + model.compact_schedules.len()
                 + model.file_schedules.len()
+                + model.source_file_schedule_declarations.len()
                 + model.year_schedules.len()
                 + model.external_interface_schedules.len()
                 + model.external_interface_fmu_import_schedules.len()

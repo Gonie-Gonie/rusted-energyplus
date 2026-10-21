@@ -2997,6 +2997,7 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
         audit: Vec<u8>,
         eio: ReportStream,
         opens: usize,
+        external: Option<crate::heat_balance::source_initialization::SourceExternalInputFiles>,
     }
     impl ScheduleAuditFileHost for ReportFiles {
         fn audit_path(&self) -> &Path {
@@ -3011,6 +3012,7 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
             Ok(ScheduleInputFileWriters {
                 audit: &mut self.audit,
                 eio: Some(&mut self.eio),
+                external_files: self.external.as_mut(),
             })
         }
     }
@@ -3450,5 +3452,566 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
             "actual schedule report EIO stream"
         ))
     ));
+    // File controls run through the same actual IP/manager and real byte IO.
+    // This is an owner matrix in the existing body, not additional Native cohorts.
+    let nonce = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)?
+        .as_nanos();
+    let directory = std::env::temp_dir().join(format!(
+        "source-schedule-file62-{}-{nonce}",
+        std::process::id()
+    ));
+    std::fs::create_dir(&directory)?;
+    let input_path = directory.join("source.epJSON");
+    let basename = format!("file62-{nonce}.json");
+    let mut file_fixture = fixture.clone();
+    for definition in [
+        serde_json::json!(["Schedule:File", 6, 4, 0, 0, null]),
+        serde_json::json!(["Output:Schedules", 1, 0, 0, 0, null]),
+    ] {
+        let definitions = file_fixture["definitions"]
+            .as_array_mut()
+            .ok_or("actual definitions")?;
+        if !definitions.iter().any(|row| row[0] == definition[0]) {
+            definitions.push(definition);
+        }
+    }
+    file_fixture["object_order"] = serde_json::json!({
+        "ScheduleTypeLimits":["Any Number"],"Schedule:File":["F"],"Schedule:Constant":[]
+    });
+    for minutes in [1usize, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60] {
+        let count = 8760 * 60 / minutes;
+        let values: Vec<i32> = (0..count).map(|at| ((at * 7) % 23) as i32 - 11).collect();
+        let sidecar = serde_json::json!({"values":[[null,true,"unused",[],{},18446744073709551615u64],values]});
+        std::fs::write(directory.join(&basename), serde_json::to_vec(&sidecar)?)?;
+        for mode in ["", "No", "Yes"] {
+            let declared_hours = if minutes == 60 && mode.is_empty() {
+                8784
+            } else {
+                8760
+            };
+            let raw = serde_json::json!({
+                "ScheduleTypeLimits":{"Any Number":{}},
+                "Schedule:File":{"F":{"schedule_type_limits_name":"Any Number","file_name":basename,
+                    "column_number":2,"rows_to_skip_at_top":0,"number_of_hours_of_data":declared_hours,
+                    "column_separator":"Comma","interpolate_to_timestep":mode,"minutes_per_item":minutes,
+                    "adjust_schedule_for_daylight_savings":"No"}}
+            });
+            std::fs::write(&input_path, serde_json::to_vec(&raw)?)?;
+            let mut ip = processor(&file_fixture, &raw)?;
+            let mut declarations = schedule_declarations(&file_fixture, &raw)?;
+            declarations.source_is_epjson = Some(true);
+            let mut manager = SelectedScheduleManager::default();
+            manager.init_constant_state(0)?;
+            let mut files = ReportFiles {
+                external: Some(
+                    crate::heat_balance::source_initialization::SourceExternalInputFiles::new(
+                        &input_path,
+                    )?,
+                ),
+                ..Default::default()
+            };
+            let mut search =
+                crate::heat_balance::source_initialization::SourceFileSearchState::default();
+            let (mut state, mut errors, mut console) =
+                (interpolation_error_state(), Vec::new(), Vec::new());
+            {
+                let mut backend = SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                manager.process_schedule_input_with_live_backend_clock_and_files(
+                    &mut ip,
+                    &declarations,
+                    4,
+                    &mut files,
+                    &mut backend,
+                    &flags,
+                    &clock,
+                    &mut search,
+                )?;
+            }
+            assert!(!search.first_time);
+            assert_eq!(files.opens, 1);
+            let audit = std::str::from_utf8(&files.audit)?;
+            assert!(audit.starts_with("  Processing Schedule Input -- Start\n"));
+            assert!(audit.contains("found (IDF Directory)="));
+            assert!(audit.ends_with("  Processing Schedule Input -- Complete\n"));
+            if declared_hours == 8784 {
+                assert!(
+                    std::str::from_utf8(&errors)?.contains(
+                        "less than 8784 hourly values read from file...Number read=8760."
+                    )
+                );
+                assert_eq!(state.tracking.total_warning_errors, 1);
+            } else {
+                assert!(errors.is_empty());
+                assert_eq!(state.tracking.total_warning_errors, 0);
+            }
+            assert_eq!(manager.unique_processed_external_files.len(), 1);
+            assert!(!ip.is_object_unused("Schedule:File", "F"));
+            let index = manager
+                .get_source_schedule("F")?
+                .ok_or("actual File index")?;
+            let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[index.0].data
+            else {
+                return Err("actual File Detailed".into());
+            };
+            assert_eq!(detail.schedule_kind, 2);
+            assert!(!detail.use_daylight_saving);
+            assert_eq!(detail.week_schedules[60], detail.week_schedules[59]);
+            assert_eq!(manager.day_schedules.len(), 366);
+            assert_eq!(manager.week_schedules.len(), 365);
+            let (mut expected_min, mut expected_max) = (f64::INFINITY, f64::NEG_INFINITY);
+            for day in 1..=366usize {
+                let source_day = if day == 60 {
+                    59
+                } else if day > 60 {
+                    day - 1
+                } else {
+                    day
+                };
+                let week = detail.week_schedules[day].ok_or("actual annual File Week")?;
+                let day_index =
+                    manager.week_schedules[week].day_schedules[1].ok_or("actual File Day")?;
+                assert!(
+                    manager.week_schedules[week].day_schedules[1..]
+                        .iter()
+                        .all(|p| *p == Some(day_index))
+                );
+                assert!(
+                    manager.week_schedules[week].is_used
+                        && manager.day_schedules[day_index].is_used
+                );
+                let actual = &manager.day_schedules[day_index];
+                assert_eq!(
+                    actual.interpolation,
+                    if minutes == 60 || mode.is_empty() {
+                        0
+                    } else if mode == "Yes" {
+                        1
+                    } else {
+                        2
+                    }
+                );
+                let mut expected_sum = 0.0;
+                for step in 0..96usize {
+                    let first_minute = (source_day - 1) * 1440 + step * 15;
+                    let expected = if minutes < 60 && mode == "Yes" {
+                        let mut sum = 0.0;
+                        for minute in first_minute..first_minute + 15 {
+                            sum += f64::from(((minute / minutes * 7) % 23) as i32 - 11);
+                        }
+                        sum / 15.0
+                    } else {
+                        f64::from(((((first_minute + 14) / minutes) * 7) % 23) as i32 - 11)
+                    };
+                    assert_eq!(
+                        actual.timestep_values[step].to_bits(),
+                        expected.to_bits(),
+                        "{minutes}/{mode}/day{day}/step{step}"
+                    );
+                    expected_sum += expected;
+                    expected_min = expected_min.min(expected);
+                    expected_max = expected_max.max(expected);
+                }
+                assert_eq!(actual.sum_timestep_values.to_bits(), expected_sum.to_bits());
+            }
+            assert_eq!(
+                manager.source_min_with_clock(index, &clock)?.to_bits(),
+                expected_min.to_bits()
+            );
+            assert_eq!(
+                manager.source_max_with_clock(index, &clock)?.to_bits(),
+                expected_max.to_bits()
+            );
+        }
+    }
+    // First successful spelling controls the complete cached parse, not later
+    // objects' delimiter/skip fields. A dot spelling stays a distinct Native key.
+    let csv_name = format!("file62-{nonce}.csv");
+    let mut bytes = b"unused,selected\n".to_vec();
+    for value in 1..=8784 {
+        bytes.extend_from_slice(&[0xff, b',']);
+        bytes.extend_from_slice(value.to_string().as_bytes());
+        bytes.push(b'\n');
+    }
+    std::fs::write(directory.join(&csv_name), &bytes)?;
+    let base_file = serde_json::json!({"schedule_type_limits_name":"Any Number","file_name":csv_name,
+        "column_number":2,"rows_to_skip_at_top":1,"number_of_hours_of_data":8760,
+        "column_separator":"Comma","interpolate_to_timestep":"No","minutes_per_item":60});
+    let mut raw = serde_json::json!({"ScheduleTypeLimits":{"Any Number":{}},"Schedule:File":{
+        "F0":base_file.clone(),"F1":base_file.clone(),"Fdot":base_file
+    },"Output:Schedules":{"":{"key_field":"Hourly"}}});
+    raw["Schedule:File"]["F1"]["rows_to_skip_at_top"] = serde_json::json!(0);
+    raw["Schedule:File"]["F1"]["column_separator"] = serde_json::json!("Space");
+    raw["Schedule:File"]["F1"]["adjust_schedule_for_daylight_savings"] = serde_json::json!("No");
+    raw["Schedule:File"]["Fdot"]["file_name"] = serde_json::json!(format!("./{csv_name}"));
+    raw["Schedule:File"]["Fdot"]["adjust_schedule_for_daylight_savings"] = serde_json::json!("No");
+    file_fixture["object_order"]["Schedule:File"] = serde_json::json!(["F0", "F1", "Fdot"]);
+    file_fixture["object_order"]["Output:Schedules"] = serde_json::json!([""]);
+    std::fs::write(&input_path, serde_json::to_vec(&raw)?)?;
+    let mut ip = processor(&file_fixture, &raw)?;
+    let mut declarations = schedule_declarations(&file_fixture, &raw)?;
+    declarations.source_is_epjson = Some(true);
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let mut files = ReportFiles {
+        external: Some(
+            crate::heat_balance::source_initialization::SourceExternalInputFiles::new(&input_path)?,
+        ),
+        ..Default::default()
+    };
+    let mut search = crate::heat_balance::source_initialization::SourceFileSearchState::default();
+    let (mut state, mut errors, mut console) =
+        (interpolation_error_state(), Vec::new(), Vec::new());
+    {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend_clock_and_files(
+            &mut ip,
+            &declarations,
+            4,
+            &mut files,
+            &mut backend,
+            &flags,
+            &clock,
+            &mut search,
+        )?;
+    }
+    assert!(errors.is_empty());
+    assert_eq!(manager.unique_processed_external_files.len(), 2);
+    assert_ne!(
+        crate::heat_balance::source_initialization::SourceNativePathKey::new(
+            &directory.join(&csv_name)
+        )?,
+        crate::heat_balance::source_initialization::SourceNativePathKey::new(
+            &directory.join(format!("./{csv_name}"))
+        )?
+    );
+    let mut indices = Vec::new();
+    for name in ["F0", "F1", "FDOT"] {
+        indices.push(
+            manager
+                .get_source_schedule(name)?
+                .ok_or("actual cached File")?,
+        );
+    }
+    for index in &indices {
+        let super::SelectedScheduleData::Detailed(detail) = &manager.schedules[index.0].data else {
+            return Err("actual File Detailed".into());
+        };
+        assert_ne!(detail.week_schedules[60], detail.week_schedules[59]);
+    }
+    let file_clock = WeatherGlobalState {
+        hour_of_day: 24,
+        time_step: 4,
+        time_steps_in_hour: 4,
+        ..WeatherGlobalState::default()
+    };
+    let file_environment = WeatherEnvironmentState {
+        day_of_year_schedule: 59,
+        day_of_week: 1,
+        day_of_week_tomorrow: 2,
+        dst_indicator: 1,
+        ..WeatherEnvironmentState::default()
+    };
+    manager.update_source_schedule_values(&file_clock, &file_environment)?;
+    assert_eq!(manager.source_current_schedule_value(indices[0])?, 1417.0);
+    assert_eq!(manager.source_current_schedule_value(indices[1])?, 1416.0);
+    assert_eq!(manager.source_current_schedule_value(indices[2])?, 1416.0);
+    let eio = std::str::from_utf8(&files.eio.bytes)?;
+    let day_at = eio
+        .find("\nDaySchedule - Hourly,")
+        .ok_or("actual File Day report")?;
+    let week_at = eio
+        .find("\nWeekSchedule - Hourly,")
+        .ok_or("actual File Week report")?;
+    let annual_at = eio
+        .find("\nSchedule - Hourly,F0,")
+        .ok_or("actual File annual report")?;
+    assert!(day_at < week_at && week_at < annual_at);
+    assert!(!ip.is_object_unused("Output:Schedules", ""));
+    // A blank unused cell warns once; the same cached null selected by the next
+    // File produces the original type-error/Fatal after the already-built graph.
+    let warning_name = format!("file62-warning-{nonce}.csv");
+    let mut warning_bytes = b"a,b,c\n".to_vec();
+    for row in 0..8760 {
+        warning_bytes.extend_from_slice(if row == 1 { b"1,,2\n" } else { b"1,3,2\n" });
+    }
+    std::fs::write(directory.join(&warning_name), &warning_bytes)?;
+    let common = serde_json::json!({"schedule_type_limits_name":"Any Number","file_name":warning_name,
+        "column_number":3,"rows_to_skip_at_top":1,"number_of_hours_of_data":8760,"minutes_per_item":60,
+        "adjust_schedule_for_daylight_savings":"No"});
+    let mut raw = serde_json::json!({"ScheduleTypeLimits":{"Any Number":{}},"Schedule:File":{"Good":common.clone(),"Bad":common}});
+    raw["Schedule:File"]["Bad"]["column_number"] = serde_json::json!(2);
+    file_fixture["object_order"]["Schedule:File"] = serde_json::json!(["Good", "Bad"]);
+    std::fs::write(&input_path, serde_json::to_vec(&raw)?)?;
+    let mut ip = processor(&file_fixture, &raw)?;
+    let mut declarations = schedule_declarations(&file_fixture, &raw)?;
+    declarations.source_is_epjson = Some(true);
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let mut files = ReportFiles {
+        external: Some(
+            crate::heat_balance::source_initialization::SourceExternalInputFiles::new(&input_path)?,
+        ),
+        ..Default::default()
+    };
+    let mut search = crate::heat_balance::source_initialization::SourceFileSearchState::default();
+    let (mut state, mut errors, mut console) =
+        (interpolation_error_state(), Vec::new(), Vec::new());
+    let result = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend_clock_and_files(
+            &mut ip,
+            &declarations,
+            4,
+            &mut files,
+            &mut backend,
+            &flags,
+            &clock,
+            &mut search,
+        )
+    };
+    assert!(matches!(
+        result,
+        Err(super::SelectedScheduleError::HeatBalance(_))
+    ));
+    let text = std::str::from_utf8(&errors)?;
+    let warning = "ProcessScheduleInput: Schedule:File = GOOD";
+    let severe = "ProcessScheduleInput: Schedule:File = BAD";
+    assert!(
+        text.find(warning).ok_or("actual blank warning")?
+            < text.find(severe).ok_or("actual selected null severe")?
+    );
+    assert!(text.contains("CsvParser - Line 3 Column 2 - Blank value found, setting to null."));
+    assert!(text.contains("[json.exception.type_error.302] type must be number, but is null"));
+    assert!(text.contains("Program terminates due to previous condition."));
+    assert_eq!(state.tracking.total_warning_errors, 1);
+    assert_eq!(state.tracking.total_severe_errors, 1);
+    assert_eq!(manager.unique_processed_external_files.len(), 1);
+    assert_eq!(manager.day_schedules.len(), 366);
+    assert!(
+        !ip.is_object_unused("Schedule:File", "Good")
+            && !ip.is_object_unused("Schedule:File", "Bad")
+    );
+    assert!(!std::str::from_utf8(&files.audit)?.contains("Processing Schedule Input -- Complete"));
+    // Failed missing-path diagnostics must retain the preceding successful
+    // TempFullFilePath until CheckForActualFilePath has returned its empty path.
+    let common = serde_json::json!({"schedule_type_limits_name":"Any Number","file_name":csv_name,
+        "column_number":2,"rows_to_skip_at_top":1,"number_of_hours_of_data":8784,"minutes_per_item":60});
+    let mut raw = serde_json::json!({"ScheduleTypeLimits":{"Any Number":{}},"Schedule:File":{"First":common.clone(),"Missing":common}});
+    raw["Schedule:File"]["Missing"]["file_name"] =
+        serde_json::json!(format!("file62-missing-{nonce}.csv"));
+    file_fixture["object_order"]["Schedule:File"] = serde_json::json!(["First", "Missing"]);
+    std::fs::write(&input_path, serde_json::to_vec(&raw)?)?;
+    let mut ip = processor(&file_fixture, &raw)?;
+    let mut declarations = schedule_declarations(&file_fixture, &raw)?;
+    declarations.source_is_epjson = Some(true);
+    let mut manager = SelectedScheduleManager::default();
+    manager.init_constant_state(0)?;
+    let mut files = ReportFiles {
+        external: Some(
+            crate::heat_balance::source_initialization::SourceExternalInputFiles::new(&input_path)?,
+        ),
+        ..Default::default()
+    };
+    let mut search = crate::heat_balance::source_initialization::SourceFileSearchState::default();
+    let expected_prefix = b"Program Version,authored caller,authored input\n   ** Severe  *";
+    let (mut state, mut errors, mut console) = (
+        interpolation_error_state(),
+        ReportStream {
+            fail_at: Some(expected_prefix.len()),
+            ..Default::default()
+        },
+        Vec::new(),
+    );
+    let result = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        manager.process_schedule_input_with_live_backend_clock_and_files(
+            &mut ip,
+            &declarations,
+            4,
+            &mut files,
+            &mut backend,
+            &flags,
+            &clock,
+            &mut search,
+        )
+    };
+    assert!(matches!(
+        result,
+        Err(super::SelectedScheduleError::HeatBalance(_))
+    ));
+    assert_eq!(errors.bytes, expected_prefix);
+    assert_eq!(
+        files
+            .external
+            .as_ref()
+            .ok_or("actual retained external files")?
+            .temp_full_file_path,
+        directory.join(&csv_name)
+    );
+    assert_eq!(manager.unique_processed_external_files.len(), 1);
+    assert_eq!(manager.day_schedules.len(), 367);
+    assert!(
+        !ip.is_object_unused("Schedule:File", "First")
+            && !ip.is_object_unused("Schedule:File", "Missing")
+    );
+    assert!(!std::str::from_utf8(&files.audit)?.contains("Processing Schedule Input -- Complete"));
+    std::fs::remove_dir_all(&directory)?;
+    // Pure decoders retain actual external-file kinds before selected conversion.
+    use super::external_data::{
+        NativeExternalDataValue as FileValue, decode_native_csv, decode_native_text_json,
+    };
+    let json = decode_native_text_json(
+        b"\xef\xbb\xbf{/*before*/\"values\":null,\"values\":[[18446744073709551615,-0,-0.0]]}//after\n",
+    ).expect("Native BOM/comments/last duplicate key are valid");
+    let FileValue::Object(object) = json else {
+        return Err("actual JSON object".into());
+    };
+    let FileValue::Array(columns) = &object[b"values".as_slice()] else {
+        return Err("actual columns".into());
+    };
+    let FileValue::Array(values) = &columns[0] else {
+        return Err("actual numeric column".into());
+    };
+    assert!(matches!(values[0], FileValue::Unsigned(u64::MAX)));
+    assert!(matches!(values[1], FileValue::Signed(0)));
+    assert_eq!(
+        values[2].numeric_real64().expect("real -0").to_bits(),
+        (-0.0f64).to_bits()
+    );
+    let selected = columns[0]
+        .real64_column()
+        .expect("actual direct numeric column");
+    assert_eq!(selected[0].to_bits(), (u64::MAX as f64).to_bits());
+    assert!(selected[0] > 0.0);
+    assert_eq!(
+        ep_model::classify_source_json_number("18446744073709551615")
+            .expect("actual IP UInt")
+            .as_f64(),
+        -1.0
+    );
+    assert_eq!(selected[1].to_bits(), 0.0f64.to_bits());
+    for (bytes, kind) in [
+        (b"[1,]".as_slice(), "Syntax"),
+        (b"[1e309]".as_slice(), "NumberOverflow"),
+        (b"[1]/*unterminated".as_slice(), "Syntax"),
+    ] {
+        let error = decode_native_text_json(bytes).expect_err("actual invalid JSON");
+        assert_eq!(format!("{:?}", error.kind), kind);
+        assert!(error.byte_offset <= bytes.len());
+    }
+    for delimiter in [b',', b';', b'\t', b' '] {
+        let mut bytes = Vec::new();
+        for (index, token) in [b"-0".as_slice(), b"+1", b"-1", b"1e999", b"1e-999", b"\xff"]
+            .iter()
+            .enumerate()
+        {
+            if index != 0 {
+                bytes.push(delimiter);
+            }
+            bytes.extend_from_slice(token);
+        }
+        bytes.push(b'\n');
+        let parsed = decode_native_csv(&bytes, delimiter, 0);
+        assert!(parsed.errors.is_empty() && parsed.warnings.is_empty());
+        assert!(parsed.native_undefined_boundary.is_none());
+        let FileValue::Object(object) = parsed.value else {
+            return Err("actual CSV object".into());
+        };
+        let FileValue::Array(columns) = &object[b"values".as_slice()] else {
+            return Err("actual CSV columns".into());
+        };
+        assert_eq!(columns.len(), 6);
+        for (index, expected) in [-0.0f64, 1.0, -1.0, f64::INFINITY, 0.0].iter().enumerate() {
+            let actual = columns[index]
+                .real64_column()
+                .expect("actual numeric CSV column");
+            assert_eq!(actual.len(), 1);
+            assert_eq!(actual[0].to_bits(), expected.to_bits());
+        }
+        assert_eq!(
+            columns[5],
+            FileValue::Array(vec![FileValue::String(vec![0xff])])
+        );
+        assert!(columns[5].real64_column().is_err());
+    }
+    let partial = decode_native_csv(b"a,b,c\n1,2,3\n4,,\xff\n7,8\n9,10,11\n", b',', 1);
+    assert!(partial.native_undefined_boundary.is_none());
+    assert_eq!((partial.warnings.len(), partial.errors.len()), (2, 2));
+    assert!(!partial.warnings[0].continued && partial.warnings[1].continued);
+    assert_eq!(partial.warnings[1].message, b"4,,\xff");
+    assert!(!partial.errors[0].continued && partial.errors[1].continued);
+    assert_eq!(partial.errors[1].message, b"7,8");
+    let FileValue::Object(object) = partial.value else {
+        return Err("actual partial CSV".into());
+    };
+    let FileValue::Array(columns) = &object[b"values".as_slice()] else {
+        return Err("actual partial columns".into());
+    };
+    assert_eq!(
+        columns
+            .iter()
+            .map(|v| match v {
+                FileValue::Array(a) => a.len(),
+                _ => 0,
+            })
+            .collect::<Vec<_>>(),
+        [3, 3, 2]
+    );
+    let FileValue::Array(first) = &columns[0] else {
+        return Err("actual first column".into());
+    };
+    let FileValue::Array(second) = &columns[1] else {
+        return Err("actual second column".into());
+    };
+    let FileValue::Array(third) = &columns[2] else {
+        return Err("actual third column".into());
+    };
+    assert_eq!(first.last(), Some(&FileValue::Real(7.0)));
+    assert_eq!(second[1], FileValue::Null);
+    assert_eq!(third[1], FileValue::String(vec![0xff]));
+    let undefined = decode_native_csv(b"\n", b',', 0);
+    assert!(undefined.native_undefined_boundary.is_some());
+    assert!(undefined.errors.is_empty() && undefined.warnings.is_empty());
     Ok(())
 }

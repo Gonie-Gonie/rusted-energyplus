@@ -1,8 +1,8 @@
 use super::super::{
-    DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model,
+    DiagnosticSeverity, ObjectCoverageStatus, compile_raw_model, compile_raw_model_for_source,
     compile_raw_model_with_auxiliary_root, typed_coverage_status,
 };
-use ep_model::ScheduleFileColumnSeparator;
+use ep_model::{ScheduleFileColumnSeparator, ScheduleId};
 use ep_raw_model::parse_epjson_str;
 use std::path::PathBuf;
 
@@ -81,6 +81,34 @@ fn loads_selected_hourly_column_below_auxiliary_root() -> Result<(), Box<dyn std
     assert_eq!(schedule.values[0], 1.0);
     assert_eq!(schedule.values[1392], 1393.0);
     assert_eq!(schedule.values[8759], 8760.0);
+    // The explicit Source route declares the same identity without reading or
+    // constructing legacy values, even when this auxiliary file is available.
+    let source = compile_raw_model_for_source(&raw_model);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    assert!(source.report.defaults_applied.is_empty());
+    assert_eq!(source.report.typed_object_count, 2); // implicit Timestep + ScheduleTypeLimits
+    assert_eq!(
+        source
+            .report
+            .coverage
+            .iter()
+            .find(|row| row.object_type == "Schedule:File")
+            .map(|row| row.status),
+        Some(ObjectCoverageStatus::RawOnly)
+    );
+    let source_model = source
+        .model
+        .ok_or_else(|| std::io::Error::other("expected Source declaration"))?;
+    assert!(source_model.file_schedules.is_empty());
+    assert_eq!(source_model.source_file_schedule_declarations.len(), 1);
+    let declaration = &source_model.source_file_schedule_declarations[0];
+    assert_eq!(declaration.id, schedule.id);
+    assert_eq!(declaration.name, schedule.name);
+    assert_eq!(declaration.source_object_name, "Selected Column");
+    assert_eq!(
+        source_model.schedule_names.resolve("selected column"),
+        Some(declaration.id)
+    );
     std::fs::remove_dir_all(root)?;
     Ok(())
 }
@@ -125,6 +153,37 @@ fn requires_auxiliary_root_and_rejects_unported_branches() -> Result<(), Box<dyn
             diagnostic.severity == DiagnosticSeverity::Error && diagnostic.code == code
         }));
     }
+    // These are request declarations, not a second field/default/file parser.
+    // Malformed fields are retained for actual Source admission/getter handling.
+    for raw in [
+        unsupported,
+        parse_epjson_str(
+            r#"{"Schedule:File":{"  MiXeD File  ":{"schedule_type_limits_name":"Missing Type","file_name":false,"column_number":"bad"}}}"#,
+        )?,
+    ] {
+        let source = compile_raw_model_for_source(&raw);
+        assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+        assert!(source.report.diagnostics.is_empty());
+        assert!(source.report.defaults_applied.is_empty());
+        assert_eq!(source.report.typed_object_count, 1); // existing implicit Timestep
+        let model = source
+            .model
+            .ok_or_else(|| std::io::Error::other("expected request-only model"))?;
+        assert!(model.file_schedules.is_empty());
+        assert_eq!(model.source_file_schedule_declarations.len(), 1);
+        let declaration = &model.source_file_schedule_declarations[0];
+        assert_eq!(declaration.id, ScheduleId(0));
+        assert_eq!(
+            declaration.name,
+            ep_model::NormalizedName::new(&declaration.source_object_name)
+        );
+        assert_eq!(
+            model
+                .schedule_names
+                .resolve(&declaration.source_object_name),
+            Some(declaration.id)
+        );
+    }
     std::fs::remove_dir_all(root)?;
     Ok(())
 }
@@ -160,6 +219,59 @@ fn rejects_short_and_non_numeric_selected_columns() -> Result<(), Box<dyn std::e
             .iter()
             .any(|diagnostic| { diagnostic.code == "ScheduleFileSelectedColumnNonNumeric" })
     );
+    // Source compilation must not turn the short/non-numeric sidecar into
+    // values. Later inactive schedule families retain distinct reference IDs.
+    let raw = parse_epjson_str(
+        r#"{
+        "Schedule:Constant":{"Before":{"hourly_value":1}},
+        "Schedule:File":{"  MiXeD File  ":{}},
+        "ExternalInterface:Schedule":{"After":{"initial_value":2}},
+        "ExternalInterface:FunctionalMockupUnitImport:To:Schedule":{"Imported":{"fmu_file_name":"x.fmu","fmu_instance_name":"x","fmu_variable_name":"v","initial_value":3}},
+        "ExternalInterface:FunctionalMockupUnitExport:To:Schedule":{"Exported Object":{"schedule_name":"Exported","fmu_variable_name":"v","initial_value":4}}
+    }"#,
+    )?;
+    let source = compile_raw_model_for_source(&raw);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    let model = source
+        .model
+        .ok_or_else(|| std::io::Error::other("expected identity inventory"))?;
+    assert!(model.file_schedules.is_empty());
+    assert_eq!(
+        model.source_file_schedule_declarations[0].source_object_name,
+        "  MiXeD File  "
+    );
+    assert_eq!(
+        model.source_file_schedule_declarations[0].name.0,
+        "MIXED FILE"
+    );
+    for (name, id) in [
+        ("Before", 0),
+        ("  MiXeD File  ", 1),
+        ("After", 2),
+        ("Imported", 3),
+        ("Exported", 4),
+    ] {
+        assert_eq!(model.schedule_names.resolve(name), Some(ScheduleId(id)));
+    }
+    assert_eq!(model.object_count(), 5); // implicit Timestep + four value schedules
+    assert!(compile_raw_model(&raw).has_errors());
+    // Existing normalized-name collisions still fail; this route does not
+    // claim Native whitespace-distinct schedule namespace support.
+    for raw in [
+        r#"{"Schedule:File":{"File":{}," File ":{}}}"#,
+        r#"{"Schedule:Constant":{"File":{"hourly_value":1}},"Schedule:File":{"File":{}}}"#,
+    ] {
+        let collision = compile_raw_model_for_source(&parse_epjson_str(raw)?);
+        assert!(collision.has_errors());
+        assert!(
+            collision
+                .report
+                .diagnostics
+                .iter()
+                .any(|row| row.code == "DuplicateName")
+        );
+        assert!(collision.model.is_none());
+    }
     std::fs::remove_dir_all(root)?;
     Ok(())
 }

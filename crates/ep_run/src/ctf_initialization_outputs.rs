@@ -94,31 +94,35 @@ impl CtfRunOutputs {
             // Actual CLI583-584: copy the supplied EPW path, then replace its extension.
             let mut stat_input = input.input_weather_file_path.clone();
             stat_input.set_extension("stat");
+            let source_input_file = input.input_file_path.clone();
             self.reports.source_initialization_input = Some(input);
-            self.initialization_files = Some(SourceInitializationFiles::new(
-                SourceInitializationFilePaths {
-                    stat_input,
-                    eso: output_dir.join("eplusrs.eso"),
-                    eio: output_dir.join("eplusrs.eio"),
-                    mtr: output_dir.join("eplusrs.mtr"),
-                    bnd: output_dir.join("eplusrs.bnd"),
-                    dxf: output_dir.join("eplusrs.dxf"),
-                    sln: output_dir.join("eplusrs.sln"),
-                    sci: output_dir.join("eplusrs.sci"),
-                    rdd: output_dir.join("eplusrs.rdd"),
-                    mdd: output_dir.join("eplusrs.mdd"),
-                    audit: output_dir.join("eplusrs.audit"),
-                    debug: output_dir.join("eplusrs.dbg"),
-                    end: output_dir.join("eplusrs.end"),
-                    error: output_dir.join("eplusrs.err"),
-                    dfs: output_dir.join("eplusrs.dfs"),
-                    tabular_csv: output_dir.join("eplustbl.csv"),
-                    tabular_tab: output_dir.join("eplustbl.tab"),
-                    tabular_fixed: output_dir.join("eplustbl.txt"),
-                    tabular_html: output_dir.join("eplustbl.htm"),
-                    tabular_xml: output_dir.join("eplustbl.xml"),
-                },
-            ));
+            let paths = SourceInitializationFilePaths {
+                stat_input,
+                eso: output_dir.join("eplusrs.eso"),
+                eio: output_dir.join("eplusrs.eio"),
+                mtr: output_dir.join("eplusrs.mtr"),
+                bnd: output_dir.join("eplusrs.bnd"),
+                dxf: output_dir.join("eplusrs.dxf"),
+                sln: output_dir.join("eplusrs.sln"),
+                sci: output_dir.join("eplusrs.sci"),
+                rdd: output_dir.join("eplusrs.rdd"),
+                mdd: output_dir.join("eplusrs.mdd"),
+                audit: output_dir.join("eplusrs.audit"),
+                debug: output_dir.join("eplusrs.dbg"),
+                end: output_dir.join("eplusrs.end"),
+                error: output_dir.join("eplusrs.err"),
+                dfs: output_dir.join("eplusrs.dfs"),
+                tabular_csv: output_dir.join("eplustbl.csv"),
+                tabular_tab: output_dir.join("eplustbl.tab"),
+                tabular_fixed: output_dir.join("eplustbl.txt"),
+                tabular_html: output_dir.join("eplustbl.htm"),
+                tabular_xml: output_dir.join("eplustbl.xml"),
+            };
+            self.initialization_files = Some(match source_input_file {
+                Some(path) => SourceInitializationFiles::new_with_source_input_file(paths, &path)
+                    .map_err(|error| error.to_string())?,
+                None => SourceInitializationFiles::new(paths),
+            });
         }
         let mut backend = SourceErrorBackend {
             state: &mut self.state,

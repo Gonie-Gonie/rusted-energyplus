@@ -254,6 +254,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         name_field_index: 0,
     },
     IdfOrderTarget {
+        object_type: "Schedule:File",
+        name_field_index: 0,
+    },
+    IdfOrderTarget {
         object_type: "Schedule:Compact",
         name_field_index: 0,
     },
@@ -480,6 +484,7 @@ pub fn apply_idf_declaration_order(
                         | "Schedule:Week:Compact"
                         | "Schedule:Week:Daily"
                         | "Schedule:Year"
+                        | "Schedule:File"
                 )
             {
                 report_field_counts.push((
@@ -510,6 +515,10 @@ pub fn apply_idf_declaration_order(
                         "Schedule:Week:Compact" => idf_object.max_fields.max(3),
                         "Schedule:Week:Daily" => idf_object.max_fields.max(13),
                         "Schedule:Year" => idf_object.max_fields.max(7),
+                        "Schedule:File" if idf_object.semicolon_terminated => {
+                            idf_object.max_fields.max(10)
+                        }
+                        "Schedule:File" => idf_object.max_fields.saturating_sub(1),
                         // Pinned IdealLoads IDD/schema min_fields is 27; only semicolon records reach this padding.
                         "ZoneHVAC:IdealLoadsAirSystem" => idf_object.max_fields.max(27),
                         "Site:GroundTemperature:BuildingSurface"
@@ -992,6 +1001,10 @@ mod tests {
             "A Constant": {"schedule_type_limits_name": "A Type", "hourly_value": 0},
             "Z Constant": {"schedule_type_limits_name": "Z Type", "hourly_value": 1}
         },
+        "Schedule:File": {
+            "A File": {"file_name": "MixedCase.CsV", "column_number": 1, "rows_to_skip_at_top": 0},
+            "Z File": {"file_name": "MixedCase.CsV", "column_number": 2, "rows_to_skip_at_top": 0}
+        },
         "Schedule:Compact": {
             "A Compact": {"schedule_type_limits_name": "A Type"},
             "Z Compact": {"schedule_type_limits_name": "Z Type"}
@@ -1001,6 +1014,8 @@ mod tests {
     const SELECTED_SCHEDULE_IDF: &str = r#"
         SizingPeriod:DesignDay,z design,12;
         SizingPeriod:DesignDay,a design,7;
+        Schedule:File,z file,Z Type,MixedCase.CsV,2,0,8760,Comma,No,60,Yes;
+        Schedule:File,a file,A Type,MixedCase.CsV,1,0,8760,Comma,No,60,Yes;
         Schedule:Constant,z constant,Z Type,1;
         ScheduleTypeLimits,z type,0,1,Continuous,Dimensionless;
         Schedule:Compact,z compact,Z Type,Through:12/31,For:AllDays,Until:24:00,1;
@@ -1051,6 +1066,7 @@ mod tests {
             ("ScheduleTypeLimits", "Z Type", "A Type"),
             ("Schedule:Constant", "Z Constant", "A Constant"),
             ("Schedule:Compact", "Z Compact", "A Compact"),
+            ("Schedule:File", "Z File", "A File"),
         ] {
             let names = |model: &crate::RawModel| -> Result<Vec<String>, IdfOrderError> {
                 Ok(model
@@ -1077,7 +1093,32 @@ mod tests {
                 RawValue::Number("2".into()),
             );
         }
+        for object in expected
+            .get_mut(&crate::ObjectType("Schedule:File".into()))
+            .ok_or("existing named File fixture objects")?
+            .values_mut()
+        {
+            object.fields.insert(
+                FieldName("idf_max_fields".into()),
+                RawValue::Number("10".into()),
+            );
+        }
         assert_eq!(staged.objects, expected);
+        // The File getter needs actual NumNumbers: semicolon records acquire
+        // min_fields10, while Native EOF neither advances nor pads its last field.
+        for (idf, count) in [
+            ("Schedule:File,F,,data.csv,1,0;", "10"),
+            ("Schedule:File,F,,data.csv,1,0,8760,Comma,No,20,No", "9"),
+        ] {
+            let file = parse_epjson_str_with_idf_order(r#"{"Schedule:File":{"F":{}}}"#, idf)?;
+            assert_eq!(
+                file.ordered_instances("Schedule:File")?[0]
+                    .1
+                    .fields
+                    .get(&FieldName("idf_max_fields".into())),
+                Some(&RawValue::Number(count.into()))
+            );
+        }
         // Actual staged declaration order/counts for the regular chain, with
         // reverse lexical Day names. Parser min-fields and extensible counts
         // remain distinct; direct epJSON acquires no IDF metadata.
