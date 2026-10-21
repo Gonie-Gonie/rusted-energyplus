@@ -677,6 +677,14 @@ impl<'a> Compiler<'a> {
             authored_version_identifier: self.parse_authored_version_identifier(),
             ..TypedModel::default()
         };
+        if self.source_file_declarations {
+            // The explicit Source route shares four exact whitespace-preserving
+            // schedule namespaces; IDs and all other typed maps are unchanged.
+            model.schedule_names = NameMap::source_schedule_namespace();
+            model.day_schedule_names = NameMap::source_schedule_namespace();
+            model.week_schedule_names = NameMap::source_schedule_namespace();
+            model.schedule_type_limit_names = NameMap::source_schedule_namespace();
+        }
 
         self.parse_building(&mut model);
         self.parse_global_geometry_rules(&mut model);
@@ -10251,7 +10259,7 @@ impl<'a> Compiler<'a> {
 
             model.schedule_type_limits.push(ScheduleTypeLimits {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.schedule_type_limit_names.normalized_name(&name),
                 lower_limit: self.schedule_optional_number(
                     "ScheduleTypeLimits",
                     &name,
@@ -10565,7 +10573,7 @@ impl<'a> Compiler<'a> {
             columns.push(ScheduleFileShadingColumn {
                 id,
                 surface_header,
-                schedule_name: NormalizedName::new(&generated_name),
+                schedule_name: model.schedule_names.normalized_name(&generated_name),
                 values,
             });
         }
@@ -10596,7 +10604,7 @@ impl<'a> Compiler<'a> {
                 self.selected_schedule_type_limits(model, "Schedule:Constant", &name, &object);
             model.schedules.push(ScheduleConstant {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.schedule_names.normalized_name(&name),
                 schedule_type_limits,
                 hourly_value: self.schedule_number_default(
                     "Schedule:Constant",
@@ -10633,7 +10641,7 @@ impl<'a> Compiler<'a> {
 
             model.compact_schedules.push(ScheduleCompact {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.schedule_names.normalized_name(&name),
                 schedule_type_limits,
                 periods,
             });
@@ -10653,8 +10661,8 @@ impl<'a> Compiler<'a> {
                 continue;
             };
             let id = ScheduleId(id_value);
-            // Preserve the compiler's existing normalized namespace. Distinct
-            // authored names that normalize alike remain an explicit boundary.
+            // Preserve the Source schedule namespace without trimming.
+            // Case-only duplicates remain shared across schedule families.
             if model
                 .schedule_names
                 .insert(&source_object_name, id)
@@ -10667,7 +10675,7 @@ impl<'a> Compiler<'a> {
                 .source_file_schedule_declarations
                 .push(SourceFileScheduleDeclaration {
                     id,
-                    name: NormalizedName::new(&source_object_name),
+                    name: model.schedule_names.normalized_name(&source_object_name),
                     source_object_name,
                 });
         }
@@ -10827,7 +10835,7 @@ impl<'a> Compiler<'a> {
             };
             model.file_schedules.push(ScheduleFile {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.schedule_names.normalized_name(&name),
                 schedule_type_limits,
                 file_name,
                 column_number,
@@ -10871,7 +10879,7 @@ impl<'a> Compiler<'a> {
 
             model.day_schedules.push(ScheduleDayHourly {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.day_schedule_names.normalized_name(&name),
                 schedule_type_limits,
                 hourly_values,
             });
@@ -10911,7 +10919,7 @@ impl<'a> Compiler<'a> {
 
             model.day_interval_schedules.push(ScheduleDayInterval {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.day_schedule_names.normalized_name(&name),
                 schedule_type_limits,
                 interpolation,
                 segments,
@@ -11104,7 +11112,7 @@ impl<'a> Compiler<'a> {
 
             model.day_list_schedules.push(ScheduleDayList {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.day_schedule_names.normalized_name(&name),
                 schedule_type_limits,
                 interpolation,
                 minutes_per_item,
@@ -11271,7 +11279,7 @@ impl<'a> Compiler<'a> {
             }
             model.week_schedules.push(ScheduleWeekDaily {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.week_schedule_names.normalized_name(&name),
                 day_schedules,
             });
         }
@@ -11303,7 +11311,7 @@ impl<'a> Compiler<'a> {
             }
             model.week_compact_schedules.push(ScheduleWeekCompact {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.week_schedule_names.normalized_name(&name),
                 day_schedules,
             });
         }
@@ -11451,7 +11459,7 @@ impl<'a> Compiler<'a> {
             }
             model.year_schedules.push(ScheduleYear {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.schedule_names.normalized_name(&name),
                 schedule_type_limits,
                 week_schedules,
             });
@@ -11558,7 +11566,7 @@ impl<'a> Compiler<'a> {
                 .external_interface_schedules
                 .push(ExternalInterfaceSchedule {
                     id,
-                    name: NormalizedName::new(&name),
+                    name: model.schedule_names.normalized_name(&name),
                     schedule_type_limits,
                     initial_value,
                 });
@@ -11681,7 +11689,7 @@ impl<'a> Compiler<'a> {
             model.external_interface_fmu_import_schedules.push(
                 ExternalInterfaceFmuImportSchedule {
                     id,
-                    name: NormalizedName::new(&name),
+                    name: model.schedule_names.normalized_name(&name),
                     schedule_type_limits,
                     fmu_file_name,
                     fmu_instance_name,
@@ -11803,7 +11811,7 @@ impl<'a> Compiler<'a> {
             model.external_interface_fmu_export_schedules.push(
                 ExternalInterfaceFmuExportSchedule {
                     id,
-                    name: NormalizedName::new(&schedule_name),
+                    name: model.schedule_names.normalized_name(&schedule_name),
                     schedule_type_limits,
                     fmu_variable_name,
                     initial_value,

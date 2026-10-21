@@ -24,8 +24,8 @@ impl Compiler<'_> {
             None
         };
         if let Some(built_in) = built_in {
-            // Native keys retain whitespace. The generic typed NameMap trims
-            // names, so it cannot decide whether a reserved name is duplicated.
+            // Native keys retain whitespace. Default/legacy typed maps trim
+            // names; this raw scan preserves built-in collisions for both policies.
             let exact_collision = self.raw_model.objects.iter().any(|(family, objects)| {
                 match family.0.as_str() {
                     "Schedule:Constant"

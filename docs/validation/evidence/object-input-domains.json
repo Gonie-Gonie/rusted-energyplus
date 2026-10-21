@@ -253,27 +253,27 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/unit64-prep/byte-workspace-tests64a.log",
-        "sha256": "88a68e9fcac228029ee2ac9563da89fabbd680eeb1ba9dcf97d8ddfa06876970",
-        "bytes": 773376
+        "path": ".runtime/object-expansion/unit66-prep/name-workspace-tests66b.log",
+        "sha256": "0feaf9e67efbf0cf51c2ff12077bfdd87c11308f1ae455f884de9a223cc3acd8",
+        "bytes": 773586
       },
-      "scope": "Actual full workspace after the13 current byte-Continue production/test/example changes; quality matrices do not add physical cases or samples."
+      "scope": "Actual default workspace66 after2functional compiler/name-map definitions,2existing test bodies and2documentation-only changes; quality is excluded from physical totals."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/unit64-prep/byte-clippy64a.log",
-        "sha256": "b5a8563fa95f7eeb455ea7b38707cb40ef6883a48b953e1fd15c64c5fb009978",
-        "bytes": 686
+        "path": ".runtime/object-expansion/unit66-prep/name-clippy66b.log",
+        "sha256": "4494066bc1f20ef71ca33aad06d1d4241b1a9b127a77ea606cdac06da06e2a17",
+        "bytes": 794
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit65-prep/schedule-file-unknown-extension-docs-check-65.log",
-        "sha256": "d95dfbd2bfdbb2d3772f59448f9cd75b192d6fae26e992d0a5fbd88fa7a4f0ec",
+        "path": ".runtime/object-expansion/unit66-prep/schedule-file-exact-names-docs-check-66.log",
+        "sha256": "72d8d114e24696dac4fcc4c992beacb77327475dee1655fe9a16bffcd24314b4",
         "bytes": 354
       },
-      "clippy_through_build": "schedule-file-byte-diagnostics-64",
+      "clippy_through_build": "schedule-file-exact-names-66",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -299,9 +299,9 @@
         "through_build": "schedule-file-62"
       },
       "current_clippy_original_log": {
-        "path": ".runtime/object-expansion/unit64-prep/byte-clippy64a.log",
-        "sha256": "b5a8563fa95f7eeb455ea7b38707cb40ef6883a48b953e1fd15c64c5fb009978",
-        "bytes": 686
+        "path": ".runtime/object-expansion/unit66-prep/name-clippy66b.log",
+        "sha256": "4494066bc1f20ef71ca33aad06d1d4241b1a9b127a77ea606cdac06da06e2a17",
+        "bytes": 794
       },
       "strict_log_encoding_views": {
         "path": ".runtime/object-expansion/unit63-prep/quality-log-views63-01.json",
@@ -389,14 +389,14 @@
         }
       },
       "current_format_log": {
-        "path": ".runtime/object-expansion/unit64-prep/byte-fmt64a.log",
+        "path": ".runtime/object-expansion/unit66-prep/name-fmt66b.log",
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "bytes": 0
       },
       "direct_UTF8_quality_manifest": {
-        "path": ".runtime/object-expansion/unit64-prep/byte-quality-accepted64-01.json",
-        "sha256": "1475cdfe72ea5f25bad45e4bdae04f632b7df32c037329ed95167650f6ab636a",
-        "bytes": 2410
+        "path": ".runtime/object-expansion/unit66-prep/name-quality-accepted66-02.json",
+        "sha256": "5364d351ca8b3a5958deb2e06b2f44c83064bab9067ad3b35edc0aa907c0cf05",
+        "bytes": 2141
       },
       "external_file_byte_diagnostic_quality": {
         "quality_manifest": {
@@ -417,6 +417,28 @@
         "new_test_entries": 0,
         "included_in_physical_totals": false,
         "scope": "Existing raw ERR/console/optional sink, borrowed SQLite-update/callback byte ordering and failure-prefix checks plus real File IO/cache/graph checks. SQLite adapters and example quality projections do not claim actual SQLite production parity."
+      },
+      "source_exact_schedule_name_quality": {
+        "quality_manifest": {
+          "path": ".runtime/object-expansion/unit66-prep/name-quality-accepted66-02.json",
+          "sha256": "5364d351ca8b3a5958deb2e06b2f44c83064bab9067ad3b35edc0aa907c0cf05",
+          "bytes": 2141
+        },
+        "dependency_free_existing_body_correction": {
+          "path": ".runtime/object-expansion/unit66-prep/test-correction02/manifest.json",
+          "sha256": "bc3e596a1a3ace41a354778852fbd82bbbae607ea7714aecd25ab95974006007",
+          "bytes": 1107
+        },
+        "postchange_workspace_log": {
+          "path": ".runtime/object-expansion/unit66-prep/name-workspace-tests66b.log",
+          "sha256": "0feaf9e67efbf0cf51c2ff12077bfdd87c11308f1ae455f884de9a223cc3acd8",
+          "bytes": 773586
+        },
+        "new_test_entries": 0,
+        "included_in_physical_totals": false,
+        "optional_Native_compile_rerun": false,
+        "optional_Native_feature_history_retained_through": "schedule-file-byte-diagnostics-64",
+        "scope": "Existing-body Source four-namespace graphs, case duplicates and missing exact references; legacy normalization retained. Initial Clippy66a compile failed for undeclared test-only serde_json before tests began; dependency-free correction02 then passes actual fmt/strict all-target Clippy/full workspace66b. No new dependency or test cohort."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -17473,12 +17495,2446 @@
           "bytes": 217068
         },
         "detailed_per_series_phase_counts_retained_in_complete_proofs": true
+      },
+      {
+        "id": "schedule-file-exact-names-a",
+        "group": "schedule_file_exact_names",
+        "source_build": "schedule-file-exact-names-66",
+        "scope": "A",
+        "actual_Source_build_reused": false,
+        "new_Source_build_created": true,
+        "current66_changed_source_path_count": 6,
+        "current66_functional_production_source_path_count": 2,
+        "input": {
+          "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/input.epJSON",
+          "sha256": "124ff9f9389ccc052525e8dcaf227bedf1a55be025f44e4eab4c92cfbfd73510",
+          "bytes": 59508
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/receipt.json",
+          "sha256": "16c71ffba76655dc3ee2d5e4cd8f205e7e1fa889ffb4c45846b31bf35f834c70",
+          "bytes": 62212
+        },
+        "auxiliary_inputs": [
+          {
+            "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/Sidecars/A62.csv",
+            "sha256": "17df9c1d7193595eb8848eac9f2ed9258d7157b04be20d66a3b2bc37ac4ae082",
+            "bytes": 78867
+          }
+        ],
+        "current_file_contract": {
+          "File_schedules": [
+            {
+              "source_object_name": "AlwaysOn",
+              "schedule_type_limits_name": "On/Off",
+              "file_name": "Sidecars/A62.csv",
+              "column_number": 1,
+              "rows_to_skip_at_top": 1,
+              "number_of_hours_of_data": 8784,
+              "column_separator": "Comma",
+              "interpolate_to_timestep": "",
+              "minutes_per_item": 60,
+              "adjust_schedule_for_daylight_savings": "Yes",
+              "report_name": "ALWAYSON",
+              "sidecar": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/Sidecars/A62.csv",
+                "sha256": "17df9c1d7193595eb8848eac9f2ed9258d7157b04be20d66a3b2bc37ac4ae082",
+                "bytes": 78867
+              },
+              "selected_row_count": 8760,
+              "items_per_hour": 1,
+              "generated_days": 365,
+              "february_29_aliases_28": true,
+              "effective_day_interpolation": "No",
+              "selected_column_big_endian_binary64_sha256": "748a68098bf9efe140479325df288cb534f8b88b9f1c7df2c4c806a07b6aa00c",
+              "one_shared_file_first_parse_controls": {
+                "source_object_name": "AlwaysOn",
+                "column_separator": "Comma",
+                "rows_to_skip_at_top": 1,
+                "first_data_row_columns": 3
+              },
+              "authored_ignored_extra_field": {
+                "physical_input_row_1_based": 3,
+                "field_hex": "ff007461696c",
+                "input_operands_only_no_warning_count_or_output_position": true
+              },
+              "source_namespace_identity": {
+                "ASCII_case_fold_without_trim": true,
+                "exact_authored_name": "AlwaysOn",
+                "input_graph_only_no_thermal_value_or_outcome_seed": true
+              }
+            },
+            {
+              "source_object_name": "AlwaysOn ",
+              "schedule_type_limits_name": "Fraction",
+              "file_name": "Sidecars/A62.csv",
+              "column_number": 2,
+              "rows_to_skip_at_top": 2,
+              "number_of_hours_of_data": 8760,
+              "column_separator": "Semicolon",
+              "interpolate_to_timestep": "No",
+              "minutes_per_item": 60,
+              "adjust_schedule_for_daylight_savings": "No",
+              "report_name": "ALWAYSON ",
+              "sidecar": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/Sidecars/A62.csv",
+                "sha256": "17df9c1d7193595eb8848eac9f2ed9258d7157b04be20d66a3b2bc37ac4ae082",
+                "bytes": 78867
+              },
+              "selected_row_count": 8760,
+              "items_per_hour": 1,
+              "generated_days": 365,
+              "february_29_aliases_28": true,
+              "effective_day_interpolation": "No",
+              "selected_column_big_endian_binary64_sha256": "ba710187157103639ae3f1a54196f38f88da54e796d1810377e74d773fa9259a",
+              "one_shared_file_first_parse_controls": {
+                "source_object_name": "AlwaysOn",
+                "column_separator": "Comma",
+                "rows_to_skip_at_top": 1,
+                "first_data_row_columns": 3
+              },
+              "authored_ignored_extra_field": {
+                "physical_input_row_1_based": 3,
+                "field_hex": "ff007461696c",
+                "input_operands_only_no_warning_count_or_output_position": true
+              },
+              "source_namespace_identity": {
+                "ASCII_case_fold_without_trim": true,
+                "exact_authored_name": "AlwaysOn ",
+                "input_graph_only_no_thermal_value_or_outcome_seed": true
+              }
+            },
+            {
+              "source_object_name": "Ported Half Occupancy",
+              "schedule_type_limits_name": "Fraction",
+              "file_name": "Sidecars/A62.csv",
+              "column_number": 2,
+              "rows_to_skip_at_top": 2,
+              "number_of_hours_of_data": 8760,
+              "column_separator": "Semicolon",
+              "interpolate_to_timestep": "No",
+              "minutes_per_item": 60,
+              "adjust_schedule_for_daylight_savings": "No",
+              "report_name": "PORTED HALF OCCUPANCY",
+              "sidecar": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/Sidecars/A62.csv",
+                "sha256": "17df9c1d7193595eb8848eac9f2ed9258d7157b04be20d66a3b2bc37ac4ae082",
+                "bytes": 78867
+              },
+              "selected_row_count": 8760,
+              "items_per_hour": 1,
+              "generated_days": 365,
+              "february_29_aliases_28": true,
+              "effective_day_interpolation": "No",
+              "selected_column_big_endian_binary64_sha256": "ba710187157103639ae3f1a54196f38f88da54e796d1810377e74d773fa9259a",
+              "one_shared_file_first_parse_controls": {
+                "source_object_name": "AlwaysOn",
+                "column_separator": "Comma",
+                "rows_to_skip_at_top": 1,
+                "first_data_row_columns": 3
+              },
+              "authored_ignored_extra_field": {
+                "physical_input_row_1_based": 3,
+                "field_hex": "ff007461696c",
+                "input_operands_only_no_warning_count_or_output_position": true
+              },
+              "source_namespace_identity": {
+                "ASCII_case_fold_without_trim": true,
+                "exact_authored_name": "Ported Half Occupancy",
+                "input_graph_only_no_thermal_value_or_outcome_seed": true
+              }
+            }
+          ],
+          "input_operands_only_no_engine_answers": true
+        },
+        "source_explicit_input_custody": {
+          "recorder": {
+            "path": "tools/porting/record_command.py",
+            "sha256": "3dbaf8f78af809a6c11e195800c9a04d5ef961ff6ff49d567fc05cd4c4ee0c32",
+            "bytes": 11614
+          },
+          "input_custody_request": {
+            "path": ".runtime/porting/object-domain-20261020/source-schedule-file-exact-names-a-66/schedule-file-exact-names-a/input-custody-request.json",
+            "sha256": "a157c790663f171cdf97401624652f49dbd14c5ac1d61c1006d78a55a5b08c26",
+            "bytes": 2163
+          },
+          "postlaunch_custody": {
+            "path": ".runtime/object-expansion/source-schedule-file-exact-names-a-66-launch/schedule-file-exact-names-a/postlaunch-custody.json",
+            "sha256": "e073ce67013112e7556131c4717e98a35119c4e98b5f0c896dbe0ed2be0c9d4b",
+            "bytes": 6801
+          },
+          "ordered_explicit_input_refs": [
+            {
+              "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/input.epJSON",
+              "sha256": "124ff9f9389ccc052525e8dcaf227bedf1a55be025f44e4eab4c92cfbfd73510",
+              "bytes": 59508
+            },
+            {
+              "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+              "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+              "bytes": 1623506
+            },
+            {
+              "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/Sidecars/A62.csv",
+              "sha256": "17df9c1d7193595eb8848eac9f2ed9258d7157b04be20d66a3b2bc37ac4ae082",
+              "bytes": 78867
+            }
+          ],
+          "same_actual_Native_canonical_input_weather_sidecar": true,
+          "actual_nested_and_outer_before_after_unchanged": true,
+          "actual_command_process_started": true
+        },
+        "actual_exact_schedule_namespace_identity": {
+          "Source": {
+            "padded_epJSON_case": true,
+            "actual_People_owner_name": " PORTED PEOPLE",
+            "actual_People_schedule_field": "ALWAYSON ",
+            "actual_File_EIO_graph_names": [
+              "ALWAYSON",
+              "ALWAYSON ",
+              "PORTED HALF OCCUPANCY"
+            ],
+            "exact_authored_File_names": [
+              "AlwaysOn",
+              "AlwaysOn ",
+              "Ported Half Occupancy"
+            ],
+            "padded_People_reference_checked": true
+          },
+          "Native": {
+            "padded_epJSON_case": true,
+            "actual_People_owner_name": " PORTED PEOPLE",
+            "actual_People_schedule_field": "ALWAYSON ",
+            "actual_File_EIO_graph_names": [
+              "ALWAYSON",
+              "ALWAYSON ",
+              "PORTED HALF OCCUPANCY"
+            ],
+            "exact_authored_File_names": [
+              "AlwaysOn",
+              "AlwaysOn ",
+              "Ported Half Occupancy"
+            ],
+            "padded_People_reference_checked": true
+          }
+        },
+        "Native_calibration_unit": 66,
+        "Native66_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-schedule-file-exact-names-a-66/schedule-file-exact-names-a/receipt.json",
+          "sha256": "ffc21ba09a5ef81ccac5a5e806ffc6d24eaf7a53e39a86e4160764338de3c214",
+          "bytes": 6448
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/schedule-file-exact-names-a-66/run-summary.json",
+          "sha256": "9fadbbaca1a083e27fcf711ec5ed84787aa64bc41680b19b587b07f703e7b08c",
+          "bytes": 51402
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-66/eplus-rs.exe",
+          "sha256": "3e38360d20c641552b1200de6248ac12f176393bafd10a7f5446b0ace194b497",
+          "bytes": 76850703
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/69/69e3b62627a8ae9f89404bac579baf6e04bee9fe4b0d29e3546ec61b980ebf86",
+          "sha256": "69e3b62627a8ae9f89404bac579baf6e04bee9fe4b0d29e3546ec61b980ebf86"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-66/receipt.json",
+          "sha256": "765f75540458d52299a2a1b611576b5c2992d759e39f19016c5660e0e2f8ba3b",
+          "bytes": 4722
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-schedule-file-exact-names-a-comparisons-66/schedule-file-exact-names-a/comparison.json",
+          "sha256": "cfc7e726fc3b50b70fe32c20db2d641ee6a1b35d00daf18dc661908d94224fe8",
+          "bytes": 8016176
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-schedule-file-exact-names-a-66-launch/schedule-file-exact-names-a/request.json",
+          "sha256": "59c37dc3f5fe36194eb8f88e2daa6b83ded3e83b0dd73166bbdfce2a4dea4a87",
+          "bytes": 9786
+        },
+        "totals": {
+          "series": 119,
+          "samples": 222720,
+          "raw_operand_unequal": 47746,
+          "parsed_binary64_unequal": 47746,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_all_phase_kernel_passed": true,
+        "all_per_phase_old_criteria_passed": true,
+        "per_phase_tolerance_failures": 0,
+        "per_phase_rmse_failures": 0,
+        "phase_summaries_by_engine": {
+          "Source": [
+            {
+              "stream": "eso",
+              "actual_file_absent": false,
+              "physical_file": {
+                "path": ".runtime/porting/object-domain-20261020/runs/schedule-file-exact-names-a-66/eplusrs.eso",
+                "sha256": "4eb3d89254d461d9a831d3a45b1f2b8f78f21a90b8ca5b2ac8dbb8b3a8bf5173",
+                "bytes": 3928093
+              },
+              "series": 115,
+              "samples": 220800,
+              "expected_zone_steps_for_kernel": 1920,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "22094a372b4b40f481372e0fac693cd521371392e3751a350b1c0d98ab154f08",
+              "environments": [
+                {
+                  "ordinal": 1,
+                  "raw_line": "1,Warmup {1} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {1} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 124,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 2,
+                  "raw_line": "1,Warmup {2} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {2} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 11261,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 2,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 3,
+                  "raw_line": "1,Warmup {3} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {3} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 22398,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 3,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 4,
+                  "raw_line": "1,Warmup {4} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {4} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 33535,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 4,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 5,
+                  "raw_line": "1,Warmup {5} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {5} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 44672,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 5,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 6,
+                  "raw_line": "1,Warmup {6} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {6} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 55809,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 6,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 7,
+                  "raw_line": "1,Warmup {7} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {7} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 66946,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 7,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 8,
+                  "raw_line": "1,Warmup {8} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {8} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 78083,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 8,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 9,
+                  "raw_line": "1,Warmup {9} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {9} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 89220,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 9,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 10,
+                  "raw_line": "1,Warmup {10} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {10} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 100357,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 10,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 11,
+                  "raw_line": "1,Warmup {11} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {11} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 111494,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 11,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 12,
+                  "raw_line": "1,Warmup {12} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {12} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 122631,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 12,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 13,
+                  "raw_line": "1,Warmup {13} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {13} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 133768,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 13,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 14,
+                  "raw_line": "1,Warmup {14} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {14} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 144905,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 14,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 15,
+                  "raw_line": "1,Warmup {15} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {15} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 156042,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 15,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 16,
+                  "raw_line": "1,Warmup {16} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {16} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 167179,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 16,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 17,
+                  "raw_line": "1,Warmup {17} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {17} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 178316,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 17,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 18,
+                  "raw_line": "1,Warmup {18} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {18} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 189453,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 18,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 19,
+                  "raw_line": "1,Warmup {19} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {19} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 200590,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 19,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 20,
+                  "raw_line": "1,RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 211727,
+                  "phase": {
+                    "kind": "regular",
+                    "day_of_simulation": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                }
+              ]
+            },
+            {
+              "stream": "mtr",
+              "actual_file_absent": false,
+              "physical_file": {
+                "path": ".runtime/porting/object-domain-20261020/runs/schedule-file-exact-names-a-66/eplusrs.mtr",
+                "sha256": "4420f245fffdeb4b6c1b3b6cce2d8560d185ca935ad0cfed9ee9c468b0a08974",
+                "bytes": 36723
+              },
+              "series": 4,
+              "samples": 1920,
+              "expected_zone_steps_for_kernel": 1920,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "ab8a7c6375bee770376eb5d00ad8f808c947990ad2989c3c6ae858d233d4f36d",
+              "environments": [
+                {
+                  "ordinal": 1,
+                  "raw_line": "1,Warmup {1} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {1} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 13,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 2,
+                  "raw_line": "1,Warmup {2} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {2} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 134,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 2,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 3,
+                  "raw_line": "1,Warmup {3} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {3} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 255,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 3,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 4,
+                  "raw_line": "1,Warmup {4} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {4} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 376,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 4,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 5,
+                  "raw_line": "1,Warmup {5} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {5} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 497,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 5,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 6,
+                  "raw_line": "1,Warmup {6} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {6} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 618,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 6,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 7,
+                  "raw_line": "1,Warmup {7} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {7} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 739,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 7,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 8,
+                  "raw_line": "1,Warmup {8} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {8} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 860,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 8,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 9,
+                  "raw_line": "1,Warmup {9} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {9} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 981,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 9,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 10,
+                  "raw_line": "1,Warmup {10} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {10} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1102,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 10,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 11,
+                  "raw_line": "1,Warmup {11} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {11} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1223,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 11,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 12,
+                  "raw_line": "1,Warmup {12} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {12} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1344,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 12,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 13,
+                  "raw_line": "1,Warmup {13} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {13} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1465,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 13,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 14,
+                  "raw_line": "1,Warmup {14} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {14} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1586,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 14,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 15,
+                  "raw_line": "1,Warmup {15} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {15} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1707,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 15,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 16,
+                  "raw_line": "1,Warmup {16} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {16} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1828,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 16,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 17,
+                  "raw_line": "1,Warmup {17} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {17} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1949,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 17,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 18,
+                  "raw_line": "1,Warmup {18} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {18} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 2070,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 18,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 19,
+                  "raw_line": "1,Warmup {19} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {19} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 2191,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 19,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 20,
+                  "raw_line": "1,RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 2312,
+                  "phase": {
+                    "kind": "regular",
+                    "day_of_simulation": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                }
+              ]
+            }
+          ],
+          "Native": [
+            {
+              "stream": "eso",
+              "actual_file_absent": false,
+              "physical_file": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/output/nativeout.eso",
+                "sha256": "986ffe95613761b44c249a50560fb93574e60ce453c6da7197cf22699affa9ff",
+                "bytes": 3927718
+              },
+              "series": 115,
+              "samples": 220800,
+              "expected_zone_steps_for_kernel": 1920,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "22094a372b4b40f481372e0fac693cd521371392e3751a350b1c0d98ab154f08",
+              "environments": [
+                {
+                  "ordinal": 1,
+                  "raw_line": "1,Warmup {1} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {1} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 124,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 2,
+                  "raw_line": "1,Warmup {2} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {2} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 11261,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 2,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 3,
+                  "raw_line": "1,Warmup {3} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {3} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 22398,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 3,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 4,
+                  "raw_line": "1,Warmup {4} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {4} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 33535,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 4,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 5,
+                  "raw_line": "1,Warmup {5} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {5} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 44672,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 5,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 6,
+                  "raw_line": "1,Warmup {6} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {6} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 55809,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 6,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 7,
+                  "raw_line": "1,Warmup {7} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {7} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 66946,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 7,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 8,
+                  "raw_line": "1,Warmup {8} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {8} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 78083,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 8,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 9,
+                  "raw_line": "1,Warmup {9} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {9} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 89220,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 9,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 10,
+                  "raw_line": "1,Warmup {10} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {10} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 100357,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 10,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 11,
+                  "raw_line": "1,Warmup {11} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {11} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 111494,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 11,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 12,
+                  "raw_line": "1,Warmup {12} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {12} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 122631,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 12,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 13,
+                  "raw_line": "1,Warmup {13} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {13} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 133768,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 13,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 14,
+                  "raw_line": "1,Warmup {14} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {14} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 144905,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 14,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 15,
+                  "raw_line": "1,Warmup {15} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {15} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 156042,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 15,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 16,
+                  "raw_line": "1,Warmup {16} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {16} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 167179,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 16,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 17,
+                  "raw_line": "1,Warmup {17} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {17} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 178316,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 17,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 18,
+                  "raw_line": "1,Warmup {18} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {18} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 189453,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 18,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 19,
+                  "raw_line": "1,Warmup {19} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {19} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 200590,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 19,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                },
+                {
+                  "ordinal": 20,
+                  "raw_line": "1,RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 211727,
+                  "phase": {
+                    "kind": "regular",
+                    "day_of_simulation": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 11040
+                }
+              ]
+            },
+            {
+              "stream": "mtr",
+              "actual_file_absent": false,
+              "physical_file": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-a/calibration-01/output/nativeout.mtr",
+                "sha256": "1d245dcbf46c30c6fa2696fc8ae1526ce40dbe426c75e3f7af32096e8998a8f7",
+                "bytes": 36759
+              },
+              "series": 4,
+              "samples": 1920,
+              "expected_zone_steps_for_kernel": 1920,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "ab8a7c6375bee770376eb5d00ad8f808c947990ad2989c3c6ae858d233d4f36d",
+              "environments": [
+                {
+                  "ordinal": 1,
+                  "raw_line": "1,Warmup {1} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {1} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 13,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 2,
+                  "raw_line": "1,Warmup {2} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {2} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 134,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 2,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 3,
+                  "raw_line": "1,Warmup {3} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {3} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 255,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 3,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 4,
+                  "raw_line": "1,Warmup {4} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {4} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 376,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 4,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 5,
+                  "raw_line": "1,Warmup {5} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {5} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 497,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 5,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 6,
+                  "raw_line": "1,Warmup {6} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {6} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 618,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 6,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 7,
+                  "raw_line": "1,Warmup {7} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {7} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 739,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 7,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 8,
+                  "raw_line": "1,Warmup {8} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {8} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 860,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 8,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 9,
+                  "raw_line": "1,Warmup {9} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {9} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 981,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 9,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 10,
+                  "raw_line": "1,Warmup {10} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {10} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1102,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 10,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 11,
+                  "raw_line": "1,Warmup {11} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {11} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1223,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 11,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 12,
+                  "raw_line": "1,Warmup {12} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {12} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1344,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 12,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 13,
+                  "raw_line": "1,Warmup {13} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {13} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1465,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 13,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 14,
+                  "raw_line": "1,Warmup {14} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {14} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1586,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 14,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 15,
+                  "raw_line": "1,Warmup {15} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {15} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1707,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 15,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 16,
+                  "raw_line": "1,Warmup {16} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {16} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1828,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 16,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 17,
+                  "raw_line": "1,Warmup {17} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {17} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 1949,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 17,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 18,
+                  "raw_line": "1,Warmup {18} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {18} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 2070,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 18,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 19,
+                  "raw_line": "1,Warmup {19} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {19} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 2191,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 19,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                },
+                {
+                  "ordinal": 20,
+                  "raw_line": "1,RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 2312,
+                  "phase": {
+                    "kind": "regular",
+                    "day_of_simulation": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 24,
+                  "numeric_records": 96
+                }
+              ]
+            }
+          ]
+        },
+        "effective_state": "Own initial-True Native66 plus the same three authenticated model/weather/shared-CSV inputs on actual new Source Build66. A three File declarations preserve distinct exact ALWAYSON and ALWAYSON-space identities and the real People owner selects the padded col2 identity; B retains two declarations. First-path parse controls and every selected input bit retain accepted64/62; recognizedCSV diagnostics retain the byte Continue route. Exact old224 policies, full physical warmup/regular kernel and independent per-phase ordered binary64 point/SSE/RMSE remain unchanged; People2/Ankle1 raw+bits, regular96 views, six actual Fanger absences and whole EIO/byte-preserving ERR-END/SHD/MTD persist. Historical65 reusedBuild64 and nested64/63/62 attempts are immutable archive-only and excluded from current66 totals. Source role/counts and all physical attempts, phases, samples, warnings and byte positions are derived, never prescribed. Borrowed SQLite/callback quality checks do not claim physical SQLite parity or whole legal Schedule:File completion.",
+        "complete_final_case": {
+          "path": ".runtime/object-expansion/source-schedule-file-exact-names-ab-comparisons-66/case-a-row.json",
+          "sha256": "1f84bf2dd33032666ab9a782240ab40dcb23fd04114552b6f5b5fec3b0daf789",
+          "bytes": 697219
+        },
+        "detailed_per_series_phase_counts_retained_in_complete_proofs": true
+      },
+      {
+        "id": "schedule-file-exact-names-b",
+        "group": "schedule_file_exact_names",
+        "source_build": "schedule-file-exact-names-66",
+        "scope": "B",
+        "actual_Source_build_reused": false,
+        "new_Source_build_created": true,
+        "current66_changed_source_path_count": 6,
+        "current66_functional_production_source_path_count": 2,
+        "input": {
+          "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/input.idf",
+          "sha256": "98966a87e41bd8ebdf53bd37fde768ace00dfa5e6769e410e2f9487f8fbd1030",
+          "bytes": 16978
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/receipt.json",
+          "sha256": "b2951bc6eb0405c4f4208ee89657589aeb24f880c43ef863e93374c93d179d03",
+          "bytes": 62700
+        },
+        "auxiliary_inputs": [
+          {
+            "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/Sidecars/B64.csv",
+            "sha256": "b255150a3a6a7964f023e6b82e3f814362845d295328de213456a765968065d6",
+            "bytes": 201487
+          }
+        ],
+        "current_file_contract": {
+          "File_schedules": [
+            {
+              "source_object_name": "Heating Setpoint",
+              "schedule_type_limits_name": "Temperature",
+              "file_name": "Sidecars/B64.csv",
+              "column_number": 2,
+              "rows_to_skip_at_top": 0,
+              "number_of_hours_of_data": 8760,
+              "column_separator": "Comma",
+              "interpolate_to_timestep": "No",
+              "minutes_per_item": 20,
+              "adjust_schedule_for_daylight_savings": "No",
+              "report_name": "HEATING SETPOINT",
+              "sidecar": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/Sidecars/B64.csv",
+                "sha256": "b255150a3a6a7964f023e6b82e3f814362845d295328de213456a765968065d6",
+                "bytes": 201487
+              },
+              "selected_row_count": 26280,
+              "items_per_hour": 3,
+              "generated_days": 365,
+              "february_29_aliases_28": true,
+              "effective_day_interpolation": "Linear",
+              "selected_column_big_endian_binary64_sha256": "269a4cf1b7309314d8cf98afe8cee7d2b641c3e82427f22295fb9672d386ec0d",
+              "one_shared_file_first_parse_controls": {
+                "source_object_name": "Heating Setpoint",
+                "column_separator": "Comma",
+                "rows_to_skip_at_top": 0,
+                "first_data_row_columns": 2
+              },
+              "authored_ignored_extra_field": {
+                "physical_input_row_1_based": 2,
+                "field_hex": "ff007461696c",
+                "input_operands_only_no_warning_count_or_output_position": true
+              },
+              "source_namespace_identity": {
+                "ASCII_case_fold_without_trim": true,
+                "exact_authored_name": "Heating Setpoint",
+                "input_graph_only_no_thermal_value_or_outcome_seed": true
+              }
+            },
+            {
+              "source_object_name": "Internal Gain Schedule",
+              "schedule_type_limits_name": "Fraction",
+              "file_name": "Sidecars/B64.csv",
+              "column_number": 1,
+              "rows_to_skip_at_top": 0,
+              "number_of_hours_of_data": 8760,
+              "column_separator": "Comma",
+              "interpolate_to_timestep": "Yes",
+              "minutes_per_item": 20,
+              "adjust_schedule_for_daylight_savings": "No",
+              "report_name": "INTERNAL GAIN SCHEDULE",
+              "sidecar": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/Sidecars/B64.csv",
+                "sha256": "b255150a3a6a7964f023e6b82e3f814362845d295328de213456a765968065d6",
+                "bytes": 201487
+              },
+              "selected_row_count": 26280,
+              "items_per_hour": 3,
+              "generated_days": 365,
+              "february_29_aliases_28": true,
+              "effective_day_interpolation": "Average",
+              "selected_column_big_endian_binary64_sha256": "0eb4bb721d3bb6fb3f49709b08be8310040aad28c7203d45220b1e79a72571f7",
+              "one_shared_file_first_parse_controls": {
+                "source_object_name": "Heating Setpoint",
+                "column_separator": "Comma",
+                "rows_to_skip_at_top": 0,
+                "first_data_row_columns": 2
+              },
+              "authored_ignored_extra_field": {
+                "physical_input_row_1_based": 2,
+                "field_hex": "ff007461696c",
+                "input_operands_only_no_warning_count_or_output_position": true
+              },
+              "source_namespace_identity": {
+                "ASCII_case_fold_without_trim": true,
+                "exact_authored_name": "Internal Gain Schedule",
+                "input_graph_only_no_thermal_value_or_outcome_seed": true
+              }
+            }
+          ],
+          "input_operands_only_no_engine_answers": true
+        },
+        "source_explicit_input_custody": {
+          "recorder": {
+            "path": "tools/porting/record_command.py",
+            "sha256": "3dbaf8f78af809a6c11e195800c9a04d5ef961ff6ff49d567fc05cd4c4ee0c32",
+            "bytes": 11614
+          },
+          "input_custody_request": {
+            "path": ".runtime/porting/object-domain-20261020/source-schedule-file-exact-names-b-66/schedule-file-exact-names-b/input-custody-request.json",
+            "sha256": "7ebc00bd800b4d5243da60f412baedafbd6f85bdf8b5f36e1da087fe1abbf61b",
+            "bytes": 2045
+          },
+          "postlaunch_custody": {
+            "path": ".runtime/object-expansion/source-schedule-file-exact-names-b-66-launch/schedule-file-exact-names-b/postlaunch-custody.json",
+            "sha256": "69b76e5cb04feb0bfceb1dc6e45baf5574ec99fd0d5b4e35c1e80c8302fbca30",
+            "bytes": 6797
+          },
+          "ordered_explicit_input_refs": [
+            {
+              "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/input.idf",
+              "sha256": "98966a87e41bd8ebdf53bd37fde768ace00dfa5e6769e410e2f9487f8fbd1030",
+              "bytes": 16978
+            },
+            {
+              "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+              "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+              "bytes": 1623506
+            },
+            {
+              "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/Sidecars/B64.csv",
+              "sha256": "b255150a3a6a7964f023e6b82e3f814362845d295328de213456a765968065d6",
+              "bytes": 201487
+            }
+          ],
+          "same_actual_Native_canonical_input_weather_sidecar": true,
+          "actual_nested_and_outer_before_after_unchanged": true,
+          "actual_command_process_started": true
+        },
+        "actual_exact_schedule_namespace_identity": {
+          "Source": {
+            "padded_epJSON_case": false,
+            "actual_People_owner_name": " PORTED PEOPLE",
+            "actual_People_schedule_field": "Constant-0.0",
+            "actual_File_EIO_graph_names": [
+              "HEATING SETPOINT",
+              "INTERNAL GAIN SCHEDULE"
+            ],
+            "exact_authored_File_names": [
+              "Heating Setpoint",
+              "Internal Gain Schedule"
+            ],
+            "padded_People_reference_checked": false
+          },
+          "Native": {
+            "padded_epJSON_case": false,
+            "actual_People_owner_name": " PORTED PEOPLE",
+            "actual_People_schedule_field": "Constant-0.0",
+            "actual_File_EIO_graph_names": [
+              "HEATING SETPOINT",
+              "INTERNAL GAIN SCHEDULE"
+            ],
+            "exact_authored_File_names": [
+              "Heating Setpoint",
+              "Internal Gain Schedule"
+            ],
+            "padded_People_reference_checked": false
+          }
+        },
+        "Native_calibration_unit": 66,
+        "Native66_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-schedule-file-exact-names-b-66/schedule-file-exact-names-b/receipt.json",
+          "sha256": "4dd49c487ce8c3da0b255d44a1c9943c50e23a8d557dd3e5ce8c1ccea783ee84",
+          "bytes": 6328
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/schedule-file-exact-names-b-66/run-summary.json",
+          "sha256": "2c91604a3370bfaa66eb0c9db10c80576e711ecc6719808f12c35228afc6aa51",
+          "bytes": 61891
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-66/eplus-rs.exe",
+          "sha256": "3e38360d20c641552b1200de6248ac12f176393bafd10a7f5446b0ace194b497",
+          "bytes": 76850703
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/69/69e3b62627a8ae9f89404bac579baf6e04bee9fe4b0d29e3546ec61b980ebf86",
+          "sha256": "69e3b62627a8ae9f89404bac579baf6e04bee9fe4b0d29e3546ec61b980ebf86"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-66/receipt.json",
+          "sha256": "765f75540458d52299a2a1b611576b5c2992d759e39f19016c5660e0e2f8ba3b",
+          "bytes": 4722
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-schedule-file-exact-names-b-comparisons-66/schedule-file-exact-names-b/comparison.json",
+          "sha256": "966f0759354d6df9d5bd1ebcc15efb3e2a441964a53c286c3ec8f5addf9d8c15",
+          "bytes": 2850497
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-schedule-file-exact-names-b-66-launch/schedule-file-exact-names-b/request.json",
+          "sha256": "12593057ae3db0a31cbf7dd46a196e112c234505c4ea798edf586e0bbe37ba9f",
+          "bytes": 8071
+        },
+        "totals": {
+          "series": 105,
+          "samples": 70560,
+          "raw_operand_unequal": 9813,
+          "parsed_binary64_unequal": 9813,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_all_phase_kernel_passed": true,
+        "all_per_phase_old_criteria_passed": true,
+        "per_phase_tolerance_failures": 0,
+        "per_phase_rmse_failures": 0,
+        "phase_summaries_by_engine": {
+          "Source": [
+            {
+              "stream": "eso",
+              "actual_file_absent": false,
+              "physical_file": {
+                "path": ".runtime/porting/object-domain-20261020/runs/schedule-file-exact-names-b-66/eplusrs.eso",
+                "sha256": "675983e03698d2ea68fca8ef116870c1f06edf2f56f7cb58da7adb9331db2c2e",
+                "bytes": 1414760
+              },
+              "series": 105,
+              "samples": 70560,
+              "expected_zone_steps_for_kernel": 672,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "9119ac3b299cd3cb902c8da3c127cb68720ee15e77cdc9214deb6bd8a9ee081e",
+              "environments": [
+                {
+                  "ordinal": 1,
+                  "raw_line": "1,Warmup {1} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {1} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 114,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 2,
+                  "raw_line": "1,Warmup {2} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {2} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 10291,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 2,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 3,
+                  "raw_line": "1,Warmup {3} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {3} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 20468,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 3,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 4,
+                  "raw_line": "1,Warmup {4} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {4} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 30645,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 4,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 5,
+                  "raw_line": "1,Warmup {5} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {5} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 40822,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 5,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 6,
+                  "raw_line": "1,Warmup {6} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {6} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 50999,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 6,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 7,
+                  "raw_line": "1,RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 61176,
+                  "phase": {
+                    "kind": "regular",
+                    "day_of_simulation": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                }
+              ]
+            },
+            {
+              "stream": "mtr",
+              "actual_file_absent": true,
+              "physical_file": null,
+              "series": 0,
+              "samples": 0,
+              "expected_zone_steps_for_kernel": null,
+              "exact_ordered_environment_and_timestamp_rows_sha256": null,
+              "environments": []
+            }
+          ],
+          "Native": [
+            {
+              "stream": "eso",
+              "actual_file_absent": false,
+              "physical_file": {
+                "path": ".runtime/object-expansion/native-schedule-file-exact-names-b/calibration-01/output/nativeout.eso",
+                "sha256": "dde9ff845bff93cc8c740a13615dc54b0109485772d967609f999fd888d72ce8",
+                "bytes": 1414700
+              },
+              "series": 105,
+              "samples": 70560,
+              "expected_zone_steps_for_kernel": 672,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "9119ac3b299cd3cb902c8da3c127cb68720ee15e77cdc9214deb6bd8a9ee081e",
+              "environments": [
+                {
+                  "ordinal": 1,
+                  "raw_line": "1,Warmup {1} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {1} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 114,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 2,
+                  "raw_line": "1,Warmup {2} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {2} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 10291,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 2,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 3,
+                  "raw_line": "1,Warmup {3} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {3} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 20468,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 3,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 4,
+                  "raw_line": "1,Warmup {4} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {4} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 30645,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 4,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 5,
+                  "raw_line": "1,Warmup {5} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {5} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 40822,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 5,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 6,
+                  "raw_line": "1,Warmup {6} RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "Warmup {6} RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 50999,
+                  "phase": {
+                    "kind": "warmup",
+                    "warmup_day": 6,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                },
+                {
+                  "ordinal": 7,
+                  "raw_line": "1,RUN PERIOD 1,  39.74,-105.18,  -7.00,1829.00",
+                  "fields": [
+                    "RUN PERIOD 1",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  "physical_line": 61176,
+                  "phase": {
+                    "kind": "regular",
+                    "day_of_simulation": 1,
+                    "base_environment_title": "RUN PERIOD 1"
+                  },
+                  "timestamp_rows": 96,
+                  "numeric_records": 10080
+                }
+              ]
+            },
+            {
+              "stream": "mtr",
+              "actual_file_absent": true,
+              "physical_file": null,
+              "series": 0,
+              "samples": 0,
+              "expected_zone_steps_for_kernel": null,
+              "exact_ordered_environment_and_timestamp_rows_sha256": null,
+              "environments": []
+            }
+          ]
+        },
+        "effective_state": "Own initial-True Native66 plus the same three authenticated model/weather/shared-CSV inputs on actual new Source Build66. A three File declarations preserve distinct exact ALWAYSON and ALWAYSON-space identities and the real People owner selects the padded col2 identity; B retains two declarations. First-path parse controls and every selected input bit retain accepted64/62; recognizedCSV diagnostics retain the byte Continue route. Exact old224 policies, full physical warmup/regular kernel and independent per-phase ordered binary64 point/SSE/RMSE remain unchanged; People2/Ankle1 raw+bits, regular96 views, six actual Fanger absences and whole EIO/byte-preserving ERR-END/SHD/MTD persist. Historical65 reusedBuild64 and nested64/63/62 attempts are immutable archive-only and excluded from current66 totals. Source role/counts and all physical attempts, phases, samples, warnings and byte positions are derived, never prescribed. Borrowed SQLite/callback quality checks do not claim physical SQLite parity or whole legal Schedule:File completion.",
+        "complete_final_case": {
+          "path": ".runtime/object-expansion/source-schedule-file-exact-names-ab-comparisons-66/case-b-row.json",
+          "sha256": "158d54e8ff75c24a1bbe5569a640deeabea179a9d71db43eecc7c216675ee5ad",
+          "bytes": 215909
+        },
+        "detailed_per_series_phase_counts_retained_in_complete_proofs": true
       }
     ],
     "totals": {
-      "paired_cases": 108,
-      "reported_samples": 2272134,
-      "raw_operand_unequal": 472526,
+      "paired_cases": 110,
+      "reported_samples": 2565414,
+      "raw_operand_unequal": 530085,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -18554,12 +21010,29 @@
           "sha256": "5fed345fb52fba1b58ef42f0474189f3d9740f592602b6743cc89d7f9442bdba",
           "bytes": 76824004
         }
+      },
+      {
+        "id": "schedule-file-exact-names-66",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-66/receipt.json",
+          "sha256": "765f75540458d52299a2a1b611576b5c2992d759e39f19016c5660e0e2f8ba3b",
+          "bytes": 4722
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/69/69e3b62627a8ae9f89404bac579baf6e04bee9fe4b0d29e3546ec61b980ebf86",
+          "sha256": "69e3b62627a8ae9f89404bac579baf6e04bee9fe4b0d29e3546ec61b980ebf86"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-66/eplus-rs.exe",
+          "sha256": "3e38360d20c641552b1200de6248ac12f176393bafd10a7f5446b0ace194b497",
+          "bytes": 76850703
+        }
       }
     ],
     "focused_since_workspace": {
       "passed": 0,
       "logs": [],
-      "scope": "Reset at the actual full workspace milestone."
+      "scope": "Reset at actual full workspace66; no duplicate focused cohort."
     }
   },
   "additional_native_type_calibrations": [

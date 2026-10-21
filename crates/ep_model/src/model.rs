@@ -1916,6 +1916,32 @@ mod tests {
 
         assert_eq!(names.resolve(" zone one "), Some(ZoneId(0)));
         assert_eq!(names.len(), 1);
+
+        // The separate explicit Source schedule policy preserves whitespace;
+        // its case aliases still identify one declaration and insertion ID.
+        let mut source = NameMap::source_schedule_namespace();
+        assert_eq!(source.insert("File", crate::ScheduleId(0)), None);
+        assert_eq!(source.insert(" File ", crate::ScheduleId(1)), None);
+        assert_eq!(source.insert("File ", crate::ScheduleId(2)), None);
+        assert_eq!(
+            source.insert("fIlE", crate::ScheduleId(3)),
+            Some(crate::ScheduleId(0))
+        );
+        assert_eq!(source.resolve("fIlE"), Some(crate::ScheduleId(0)));
+        assert_eq!(source.resolve(" fIlE "), Some(crate::ScheduleId(1)));
+        assert_eq!(source.resolve("file "), Some(crate::ScheduleId(2)));
+        assert_eq!(source.resolve(" File"), None);
+        assert_eq!(source.len(), 3);
+        assert_eq!(
+            source.names(),
+            &[
+                NormalizedName("FILE".into()),
+                NormalizedName(" FILE ".into()),
+                NormalizedName("FILE ".into()),
+            ]
+        );
+        assert_eq!(source.clone().resolve(" file "), Some(crate::ScheduleId(1)));
+        assert_eq!(NormalizedName::new(" File "), NormalizedName("FILE".into()));
     }
 
     #[test]

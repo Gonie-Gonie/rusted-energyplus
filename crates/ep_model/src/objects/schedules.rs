@@ -234,13 +234,13 @@ impl ScheduleFileColumnSeparator {
 ///
 /// This declaration supplies no type limits, defaults, file data, or numerical
 /// schedule values. The actual Source InputProcessor and schedule manager own
-/// those operations. Its typed name retains the existing compiler normalization
-/// boundary; `source_object_name` preserves the exact authored lookup identity.
+/// those operations. Its typed name uses the explicit Source schedule namespace
+/// without trimming; `source_object_name` preserves the exact authored identity.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SourceFileScheduleDeclaration {
     /// Identity shared with all schedule families and typed references.
     pub id: ScheduleId,
-    /// Existing compiler-normalized name, without widening NameMap semantics.
+    /// Source ASCII-uppercase name with all authored whitespace preserved.
     pub name: NormalizedName,
     /// Exact RawModel object name for the actual Source getter.
     pub source_object_name: String,
