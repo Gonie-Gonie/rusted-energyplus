@@ -445,6 +445,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                 controller: self.controller,
                 fan: o.fan,
                 radiation: o.radiation,
+                geometry: o.geometry,
+                history: o.history,
                 psychrometrics: o.psychrometrics,
                 recurring_errors: o.recurring_errors,
                 input: o.input,

@@ -4714,6 +4714,33 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         let mut comfort_fan = crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
                         let mut comfort_psychrometrics =
                             crate::psychrometrics::SourcePsychrometricAccess;
+                        let ids = comfort_reports
+                            .surface_geometry_input
+                            .final_surfaces
+                            .as_deref()
+                            .ok_or("actual comfort history final surfaces")?
+                            .iter()
+                            .map(|surface| {
+                                surface
+                                    .typed_id
+                                    .ok_or("actual comfort history Surface identity")
+                            })
+                            .collect::<Result<Vec<_>, _>>()?;
+                        let mut comfort_history = crate::heat_balance::ctf_thermal_history::CtfThermalHistoryState::new_source_unallocated(ids);
+                        let mut comfort_surface_arrays = crate::heat_balance::ordinary_surface_initialization::SourceSurfaceHeatBalanceArrays::default();
+                        comfort_surface_arrays.allocate(
+                            comfort_history.surface_ids.len(),
+                            comfort_reports
+                                .heat_balance_input_state
+                                .any_internal_heat_source_in_input,
+                            cache
+                                .public_initialization()
+                                .ok_or("actual comfort CTF aggregate")?
+                                .aggregate_after_returned_calls
+                                .simple_ctf_only,
+                            comfort_globals.any_energy_management_system_in_model,
+                            &mut comfort_history,
+                        )?;
                         let mut comfort = SourceThermalComfort::default();
                         let mut comfort_summary = SourceComfortPredefinedSummary::default();
                         {
@@ -4745,6 +4772,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 developer: &comfort_reports.selected_project_data.as_ref().ok_or(ComfortError::Unavailable("comfort actual project"))?.system.developer_flag,
                                 controller: &comfort_controller, fan: &mut comfort_fan,
                                 radiation: comfort_reports.ordinary_solar_radiation.as_ref().ok_or(ComfortError::Unavailable("comfort actual retained radiation"))?,
+                                geometry: &mut comfort_reports.surface_geometry_input, history: &comfort_history,
                                 psychrometrics: &mut comfort_psychrometrics,
                                 recurring_errors: &mut comfort_reports.source_recurring_errors,
                                 input: comfort_reports.selected_input_processor.as_mut().ok_or(ComfortError::Unavailable("comfort genuine IP"))?,

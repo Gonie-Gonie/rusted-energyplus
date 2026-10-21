@@ -133,6 +133,9 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) window_shading_control_list: Vec<i32>,
     /// Actual DataSurfaces.hh712–714 mutable areas, ctor0; GetVertices9387–9389 writes each.
     pub(crate) area: f64,
+    /// Actual SurfaceData.hh825-826 constructor0; CalcSurfaceWeightedMRT owns writes.
+    pub(crate) ae: f64,
+    pub(crate) enclosure_ae_sum: f64,
     pub(crate) gross_area: f64,
     pub(crate) net_area_shadow_calc: f64,
     pub(crate) view_factor_ground: f64,
@@ -177,6 +180,8 @@ impl Default for SurfaceTmpInput {
             has_shade_control: Default::default(),
             window_shading_control_list: Default::default(),
             area: 0.0,
+            ae: 0.0,
+            enclosure_ae_sum: 0.0,
             gross_area: 0.0,
             net_area_shadow_calc: 0.0,
             view_factor_ground: Default::default(),

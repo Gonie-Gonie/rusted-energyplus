@@ -390,6 +390,10 @@ impl CtfInitializationContext<'_> {
                 input,
                 globals,
                 zones,
+                geometry: &reports.surface_geometry_input,
+                radiation: reports.ordinary_solar_radiation.as_ref().ok_or_else(|| {
+                    hb_input_error(unavailable("same actual InitSolar owner before IHG input"))
+                })?,
                 schedules,
                 clock,
                 developer: &system.developer_flag,

@@ -201,7 +201,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
         && (!selected(
             object,
             "mean_radiant_temperature_calculation_type",
-            &["EnclosureAveraged"],
+            &["EnclosureAveraged", "SurfaceWeighted"],
         ) || !selected(
             object,
             "clothing_insulation_calculation_method",
@@ -211,6 +211,17 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
                 "CalculationMethodSchedule",
             ],
         ))
+    {
+        return false;
+    }
+    if fanger
+        && field(object, "mean_radiant_temperature_calculation_type")
+            .is_some_and(|value| text_is(value, &["SurfaceWeighted"]))
+        && !text(object, "surface_name_angle_factor_list_name").is_some_and(|name| {
+            raw.objects
+                .get(&ObjectType("BuildingSurface:Detailed".into()))
+                .is_some_and(|surfaces| surfaces.keys().any(|n| n.0.eq_ignore_ascii_case(name)))
+        })
     {
         return false;
     }

@@ -1,4 +1,4 @@
-//! Literal ordinary-reporting Fanger499-815 and EnclosureAveraged CalcRadTemp2232.
+//! Literal ordinary-reporting Fanger499-815 and bounded CalcRadTemp2232.
 //! Other clothing/MRT/RoomAir and comfort-thermostat routes keep explicit bounds.
 use super::*;
 
@@ -241,26 +241,39 @@ impl SourceThermalComfort {
             .people
             .get(people_at)
             .ok_or(Error::Unavailable("actual CalcRadTemp People"))?;
-        if people.mrt_calc_type != 0 {
-            return Err(Error::Unavailable(
-                "positive Fanger SurfaceWeighted/AngleFactor MRT2276",
-            ));
+        match people.mrt_calc_type {
+            0 => {
+                let enclosure = o
+                    .zones
+                    .spaces
+                    .as_ref()
+                    .and_then(|rows| rows.get(index(people.space_index).ok()?))
+                    .ok_or(Error::Unavailable("actual CalcRadTemp People Space"))?
+                    .radiant_enclosure_num;
+                self.rad_temp = o
+                    .radiation
+                    .radiant_enclosures()
+                    .get(index(enclosure)?)
+                    .ok_or(Error::Unavailable(
+                        "actual CalcRadTemp retained enclosure MRT",
+                    ))?
+                    .mean_radiant_temperature;
+            }
+            1 => {
+                self.rad_temp = self.calc_source_surface_weighted_mrt(
+                    people.surface_ptr,
+                    true,
+                    o.geometry,
+                    o.control,
+                    o.radiation,
+                    o.history,
+                    o.zones,
+                    o.air,
+                    o.backend,
+                )?;
+            }
+            _ => return Err(Error::Unavailable("positive Fanger AngleFactor MRT2279")),
         }
-        let enclosure = o
-            .zones
-            .spaces
-            .as_ref()
-            .and_then(|rows| rows.get(index(people.space_index).ok()?))
-            .ok_or(Error::Unavailable("actual CalcRadTemp People Space"))?
-            .radiant_enclosure_num;
-        self.rad_temp = o
-            .radiation
-            .radiant_enclosures()
-            .get(index(enclosure)?)
-            .ok_or(Error::Unavailable(
-                "actual CalcRadTemp retained enclosure MRT",
-            ))?
-            .mean_radiant_temperature;
         let zone = index(self.zone_num)?;
         let radiation_to_person = fan_value(&o.fan.zone_q_ht_rad_sys_to_person, zone)?
             + fan_value(&o.fan.zone_q_cooling_panel_to_person, zone)?
@@ -279,6 +292,197 @@ impl SourceThermalComfort {
             self.rad_temp -= 273.15;
         }
         Ok(self.rad_temp)
+    }
+
+    /// Literal CalcSurfaceWeightedMRT2105-2198 over the same Surface fields,
+    /// enclosure order and term1 histories. No CalculateZoneMRT array is reused.
+    pub(crate) fn calc_source_surface_weighted_mrt(
+        &mut self,
+        surface_number: i32,
+        average_with_surface: bool,
+        geometry: &mut SurfaceGeometryInputState,
+        control: &SelectedHeatBalanceInputState,
+        radiation: &OrdinarySolarRadiation,
+        history: &CtfThermalHistoryState,
+        zones: &SelectedZoneInputOwners,
+        air: &SourceAirHeatBalance,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<f64, Error> {
+        let surfaces = geometry
+            .final_surfaces
+            .as_deref_mut()
+            .ok_or(Error::Unavailable(
+                "actual SurfaceWeighted final Surface allocation",
+            ))?;
+        if self.first_time_surface_weighted_flag {
+            self.first_time_surface_weighted_error = true;
+            self.first_time_surface_weighted_flag = false;
+            for enclosure in radiation.radiant_enclosures() {
+                let pointers =
+                    enclosure
+                        .source_surface_ptr
+                        .as_deref()
+                        .ok_or(Error::Unavailable(
+                            "actual SurfaceWeighted enclosure SurfacePtr",
+                        ))?;
+                for &number in pointers {
+                    let surface = &mut surfaces
+                        .get_mut(index(number)?)
+                        .ok_or(Error::Unavailable("actual SurfaceWeighted initial Surface"))?
+                        .row;
+                    let emissivity = control
+                        .construction_usage
+                        .get(index(surface.construction)?)
+                        .ok_or(Error::Unavailable("actual SurfaceWeighted construction"))?
+                        .inside_absorp_thermal;
+                    surface.ae = surface.area * emissivity;
+                }
+                for &number in pointers {
+                    surfaces
+                        .get_mut(index(number)?)
+                        .ok_or(Error::Unavailable("actual SurfaceWeighted target"))?
+                        .row
+                        .enclosure_ae_sum = 0.0;
+                    for &other in pointers {
+                        if other == number {
+                            continue;
+                        }
+                        let ae = surfaces
+                            .get(index(other)?)
+                            .ok_or(Error::Unavailable("actual SurfaceWeighted other AE"))?
+                            .row
+                            .ae;
+                        surfaces
+                            .get_mut(index(number)?)
+                            .ok_or(Error::Unavailable("actual SurfaceWeighted sum target"))?
+                            .row
+                            .enclosure_ae_sum += ae;
+                    }
+                }
+            }
+        }
+        let selected = index(surface_number)?;
+        let enclosure_number = surfaces
+            .get(selected)
+            .ok_or(Error::Unavailable(
+                "actual SurfaceWeighted selected Surface",
+            ))?
+            .row
+            .rad_encl_index;
+        let enclosure = radiation
+            .radiant_enclosures()
+            .get(index(enclosure_number)?)
+            .ok_or(Error::Unavailable(
+                "actual SurfaceWeighted selected radiant enclosure",
+            ))?;
+        let pointers = enclosure
+            .source_surface_ptr
+            .as_deref()
+            .ok_or(Error::Unavailable(
+                "actual SurfaceWeighted selected SurfacePtr",
+            ))?;
+        if enclosure.rad_recalc {
+            surfaces
+                .get_mut(selected)
+                .ok_or(Error::Unavailable(
+                    "actual SurfaceWeighted recalculation target",
+                ))?
+                .row
+                .enclosure_ae_sum = 0.0;
+            for &other in pointers {
+                if other == surface_number {
+                    continue;
+                }
+                let surface = &mut surfaces
+                    .get_mut(index(other)?)
+                    .ok_or(Error::Unavailable("actual SurfaceWeighted recalc other"))?
+                    .row;
+                let emissivity = control
+                    .construction_usage
+                    .get(index(surface.construction)?)
+                    .ok_or(Error::Unavailable(
+                        "actual SurfaceWeighted recalc construction",
+                    ))?
+                    .inside_absorp_thermal;
+                surface.ae = surface.area * emissivity;
+                let ae = surface.ae;
+                surfaces
+                    .get_mut(selected)
+                    .ok_or(Error::Unavailable("actual SurfaceWeighted recalc sum"))?
+                    .row
+                    .enclosure_ae_sum += ae;
+            }
+        }
+        let temperature = |number: i32| -> Result<f64, Error> {
+            let id = surfaces
+                .get(index(number)?)
+                .and_then(|surface| surface.typed_id)
+                .ok_or(Error::Unavailable(
+                    "actual SurfaceWeighted typed Surface identity",
+                ))?;
+            let at = history
+                .surface_ids
+                .iter()
+                .position(|candidate| *candidate == id)
+                .ok_or(Error::Unavailable(
+                    "actual SurfaceWeighted same history mapping",
+                ))?;
+            history.normal.inside_temperature[0]
+                .get(at)
+                .copied()
+                .ok_or(Error::Unavailable(
+                    "actual SurfaceWeighted SurfInsideTempHist term1",
+                ))
+        };
+        let mut sum_aet = 0.0;
+        for &other in pointers {
+            if other == surface_number {
+                continue;
+            }
+            sum_aet += surfaces
+                .get(index(other)?)
+                .ok_or(Error::Unavailable("actual SurfaceWeighted AET surface"))?
+                .row
+                .ae
+                * temperature(other)?;
+        }
+        let this_temperature = temperature(surface_number)?;
+        let surface = &surfaces
+            .get(selected)
+            .ok_or(Error::Unavailable("actual SurfaceWeighted retained target"))?
+            .row;
+        let mut result = 0.0;
+        if surface.enclosure_ae_sum > 0.01 {
+            result = sum_aet / surface.enclosure_ae_sum;
+            if average_with_surface {
+                result = 0.5 * (this_temperature + result);
+            }
+        } else if self.first_time_surface_weighted_error {
+            backend.show_warning_error(&format!("CalcSurfaceWeightedMRT: Areas*Inside surface emissivities are summing to zero for Enclosure=\"{}\"", enclosure.name))?;
+            let space = index(surface.space)?;
+            let name = &zones
+                .spaces
+                .as_deref()
+                .and_then(|spaces| spaces.get(space))
+                .ok_or(Error::Unavailable("actual SurfaceWeighted Space name"))?
+                .name;
+            backend.show_continue_error(&format!("As a result, the MAT for Space={} will be used for MRT when calculating the surface weighted MRT.", name))?;
+            backend.show_continue_error(&format!("for Surface={}", surface.name))?;
+            self.first_time_surface_weighted_error = false;
+            result = air
+                .spaces
+                .as_deref()
+                .and_then(|spaces| spaces.get(space))
+                .ok_or(Error::Unavailable(
+                    "actual SurfaceWeighted spaceHeatBalance MAT",
+                ))?
+                .air
+                .mat;
+            if average_with_surface {
+                result = 0.5 * (this_temperature + result);
+            }
+        }
+        Ok(result)
     }
 
     /// Native DynamicClothingModel3190-3211 writes only the current retained

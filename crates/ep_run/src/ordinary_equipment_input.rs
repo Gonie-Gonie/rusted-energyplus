@@ -2668,6 +2668,90 @@ mod source_a_compact_ingress {
                 assert!(resolve_source_b(&invalid).is_err());
             }
         }
+        // SurfaceWeighted retains the actual opaque surface name for the real
+        // getter/enclosure lookup; admission never invents a surface ordinal.
+        let surface_weighted = r#"{
+            "Zone":{"actual zone":{}},
+            "Material:NoMass":{"Wall material":{"roughness":"Rough","thermal_resistance":1}},
+            "Construction":{"Wall construction":{"outside_layer":"Wall material"}},
+            "BuildingSurface:Detailed":{"Wall One":{
+                "surface_type":"Wall","construction_name":"Wall construction",
+                "zone_name":"actual zone","outside_boundary_condition":"Outdoors",
+                "vertices":[
+                    {"vertex_x_coordinate":0,"vertex_y_coordinate":0,"vertex_z_coordinate":0},
+                    {"vertex_x_coordinate":1,"vertex_y_coordinate":0,"vertex_z_coordinate":0},
+                    {"vertex_x_coordinate":1,"vertex_y_coordinate":0,"vertex_z_coordinate":1},
+                    {"vertex_x_coordinate":0,"vertex_y_coordinate":0,"vertex_z_coordinate":1}]}},
+            "Schedule:Constant":{"on":{"hourly_value":1},"activity":{"hourly_value":120},
+                "work":{"hourly_value":0.2},"clothes":{"hourly_value":0.7},"velocity":{"hourly_value":0.1}},
+            "People":{"Surface person":{
+                "zone_or_zonelist_or_space_or_spacelist_name":"actual zone",
+                "number_of_people_schedule_name":"on","activity_level_schedule_name":"activity",
+                "number_of_people":2,"sensible_heat_fraction":0.6,"thermal_comfort_model_1_type":"Fanger",
+                "mean_radiant_temperature_calculation_type":"SurfaceWeighted",
+                "surface_name_angle_factor_list_name":"wALL oNE",
+                "work_efficiency_schedule_name":"work","clothing_insulation_schedule_name":"clothes",
+                "air_velocity_schedule_name":"velocity"}}
+        }"#;
+        let raw = ep_raw_model::parse_epjson_str(surface_weighted)?;
+        resolve_source_a(&raw)?;
+        resolve_source_b(&raw)?;
+        assert!(resolve(&raw).is_err());
+        let compiled = ep_compiler::compile_raw_model(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let typed = compiled.model.ok_or("actual SurfaceWeighted typed model")?;
+        assert_eq!(typed.surfaces.len(), 1);
+        assert_eq!(typed.surfaces[0].name.0, "WALL ONE");
+        for ip in [
+            crate::ordinary_input_processor::resolve_source_a(&raw)?,
+            crate::ordinary_input_processor::resolve_source_b(&raw)?,
+        ] {
+            assert_eq!(
+                ip.source_raw_object_names("BuildingSurface:Detailed")?,
+                ["Wall One"]
+            );
+            let original = ip.source_raw_object_fields("People", "Surface person")?;
+            let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+            for (name, value) in [
+                (
+                    "mean_radiant_temperature_calculation_type",
+                    "SurfaceWeighted",
+                ),
+                ("surface_name_angle_factor_list_name", "wALL oNE"),
+            ] {
+                assert_eq!(original.get(name), Some(&V::String(value.into())));
+                assert_eq!(
+                    hb.objects["People"][0].fields.get(name),
+                    Some(
+                        &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                            value.into()
+                        )
+                    )
+                );
+            }
+        }
+        for (old, new) in [
+            (
+                r#""surface_name_angle_factor_list_name":"wALL oNE""#,
+                r#""surface_name_angle_factor_list_name":"missing surface""#,
+            ),
+            (
+                r#""surface_name_angle_factor_list_name":"wALL oNE""#,
+                r#""surface_name_angle_factor_list_name":"""#,
+            ),
+            (
+                r#""surface_name_angle_factor_list_name":"wALL oNE""#,
+                r#""surface_name_angle_factor_list_name":null"#,
+            ),
+            (r#""surface_name_angle_factor_list_name":"wALL oNE","#, ""),
+            ("SurfaceWeighted", "AngleFactor"),
+        ] {
+            let changed = surface_weighted.replace(old, new);
+            assert_ne!(changed, surface_weighted);
+            let raw = ep_raw_model::parse_epjson_str(&changed)?;
+            assert!(resolve_source_a(&raw).is_err());
+            assert!(resolve_source_b(&raw).is_err());
+        }
         for (field, value) in [
             ("number_of_people", serde_json::json!(-1)),
             ("people_per_floor_area", serde_json::json!(-1)),

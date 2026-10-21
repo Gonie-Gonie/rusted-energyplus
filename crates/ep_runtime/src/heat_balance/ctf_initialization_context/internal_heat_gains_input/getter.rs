@@ -39,6 +39,9 @@ pub(super) struct SourceGainInputOwners<'a, 'b> {
     pub(super) input: &'a mut SelectedInputProcessor,
     pub(super) globals: &'a SelectedHeatBalanceGlobals,
     pub(super) zones: &'a mut SelectedZoneInputOwners,
+    pub(super) geometry:
+        &'a crate::heat_balance::selected_heat_balance_input::surface::SurfaceGeometryInputState,
+    pub(super) radiation: &'a crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation,
     pub(super) schedules: &'a mut SelectedScheduleManager,
     pub(super) clock: Option<&'a WeatherGlobalState>,
     pub(super) developer: &'a bool,

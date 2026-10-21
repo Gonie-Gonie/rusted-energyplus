@@ -1,6 +1,7 @@
 //! Actual ManageThermalComfort105-164 and SimpleASH55 on retained People/Air owners.
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::ctf_reports::PredefinedStringTable;
+use crate::heat_balance::ctf_thermal_history::CtfThermalHistoryState;
 use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance;
 use crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays;
@@ -8,6 +9,7 @@ use crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZ
 use crate::heat_balance::predefined_tables::PredefinedRegistry;
 use crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+use crate::heat_balance::selected_heat_balance_input::surface::SurfaceGeometryInputState;
 use crate::heat_balance::selected_heat_balance_input::{
     HeatBalanceInputError as Error, SelectedHeatBalanceInputState, zone::SelectedZoneInputOwners,
 };
@@ -47,6 +49,8 @@ pub(crate) struct SourceThermalComfortOwners<'a, 'backend, H, D> {
     pub(crate) controller: &'a SourceZoneAirPredictorCorrector,
     pub(crate) fan: &'a mut SourceZoneFanHeatBalanceArrays,
     pub(crate) radiation: &'a OrdinarySolarRadiation,
+    pub(crate) geometry: &'a mut SurfaceGeometryInputState,
+    pub(crate) history: &'a CtfThermalHistoryState,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
     pub(crate) recurring_errors: &'a mut SourceRecurringErrorState,
     pub(crate) input: &'a mut SelectedInputProcessor,

@@ -431,11 +431,82 @@ impl SelectedInternalHeatGains {
             "ANGLEFACTOR" => 2,
             _ => -1,
         };
-        if row.mrt_calc_type != 0 {
-            return Err(unavailable(
-                "positive Fanger non-EnclosureAveraged MRT inputs",
-            ));
+        match row.mrt_calc_type {
+            0 => {}
+            1 => {
+                let surfaces = owners.geometry.final_surfaces.as_deref().ok_or_else(|| {
+                    unavailable("actual final Surface names before People MRT lookup")
+                })?;
+                row.surface_ptr = surfaces
+                    .iter()
+                    .position(|surface| surface.row.name.eq_ignore_ascii_case(&alphas[7]))
+                    .map(|at| {
+                        i32::try_from(at + 1)
+                            .map_err(|_| unavailable("actual People SurfacePtr ordinal"))
+                    })
+                    .transpose()?
+                    .unwrap_or(0);
+                let surface_number = row.surface_ptr;
+                let space_number = row.space_index;
+                if surface_number == 0 {
+                    if first_space {
+                        diagnostic(
+                            owners,
+                            &format!(
+                                "GetInternalHeatGains: People=\"{}\", {}={} invalid Surface Name={}",
+                                alphas[0], local.alpha_field_names[6], alphas[6], alphas[7]
+                            ),
+                            true,
+                        )?;
+                        self.errors_found = true;
+                    }
+                } else {
+                    let surface_enclosure = surfaces
+                        .get(index(surface_number)?)
+                        .ok_or_else(|| unavailable("actual People SurfacePtr row"))?
+                        .row
+                        .rad_encl_index;
+                    let people_enclosure = owners
+                        .zones
+                        .spaces
+                        .as_deref()
+                        .and_then(|spaces| spaces.get(index(space_number).ok()?))
+                        .ok_or_else(|| unavailable("actual People MRT Space enclosure"))?
+                        .radiant_enclosure_num;
+                    if surface_enclosure != people_enclosure {
+                        diagnostic(
+                            owners,
+                            &format!(
+                                "GetInternalHeatGains: People=\"{}\", Surface referenced in {}={} in different enclosure.",
+                                alphas[0], local.alpha_field_names[6], alphas[6]
+                            ),
+                            true,
+                        )?;
+                        let enclosures = owners.radiation.radiant_enclosures();
+                        let surface_name = &enclosures
+                            .get(index(surface_enclosure)?)
+                            .ok_or_else(|| unavailable("actual Surface MRT enclosure name"))?
+                            .name;
+                        let people_name = &enclosures
+                            .get(index(people_enclosure)?)
+                            .ok_or_else(|| unavailable("actual People MRT enclosure name"))?
+                            .name;
+                        owners.backend.show_continue_error(&format!(
+                            "Surface is in Enclosure={} and People is in Enclosure={}",
+                            surface_name, people_name
+                        ))?;
+                        self.errors_found = true;
+                    }
+                }
+            }
+            _ => return Err(unavailable("positive Fanger unsupported MRT inputs")),
         }
+        let row = self
+            .allocations
+            .people
+            .rows
+            .get_mut(person)
+            .ok_or_else(|| unavailable("actual Fanger People after MRT lookup"))?;
         if !local.alpha_field_blanks[8] {
             row.work_eff_sched = owners.schedules.get_source_schedule(&alphas[8])?;
         }

@@ -115,6 +115,9 @@ pub(crate) struct SourceThermalComfort {
     pub(crate) therm_sens_trans_coef: f64,   // Native ThermSensTransCoef
     pub(crate) iter_num: i32,                // Native IterNum
     pub(crate) first_time_flag: bool,
+    /// Separate Native ThermalComfort.hh254/370 state, not InitThermalComfort readiness.
+    pub(crate) first_time_surface_weighted_flag: bool,
+    pub(crate) first_time_surface_weighted_error: bool,
     pub(crate) temporary_six_am_temperature: f64,
     pub(crate) people_num: i32,
     pub(crate) zone_num: i32,
@@ -173,6 +176,8 @@ impl Default for SourceThermalComfort {
             therm_sens_trans_coef: 0.0,
             iter_num: 0,
             first_time_flag: true,
+            first_time_surface_weighted_flag: true,
+            first_time_surface_weighted_error: true,
             temporary_six_am_temperature: 0.0,
             people_num: 0,
             zone_num: 0,
