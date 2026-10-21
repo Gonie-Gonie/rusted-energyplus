@@ -41,8 +41,11 @@ object types; legal-value completion remains tracked per object. Direct Source
 epJSON now retains the first comparator-equivalent member spelling and last
 whole subtree. Two Native convert-only observations and existing dry-run loader
 assertions verify this input behavior. The [input-domain evidence](../../validation/evidence/object-input-domains.json)
-keeps these checks separate from the 114 paired physical cases, whose latest
-accepted Build69 predates this parser change.
+keeps these checks separate from the 116 paired physical cases. The latest
+accepted Build71 uses the current parser and verifies hourly and 20-minute
+`Schedule:File` data on February 29 with distinct leap-day values, per-file
+daylight-saving controls and the next-day schedule handoff. Its controlled
+weather copies February 28 meteorology; full legal-value completion remains open.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA
