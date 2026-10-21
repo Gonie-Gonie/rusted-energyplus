@@ -2330,12 +2330,101 @@ mod source_a_compact_ingress {
             let typed = ep_compiler::compile_raw_model(&raw);
             assert!(!typed.has_errors(), "{:?}", typed.report.diagnostics);
         }
+        // These are original literal JSON operands. The real A/B IP and HB
+        // retain omitted, blank, automatic and numeric sensible forms; only the
+        // genuine runtime getter later selects a sizing operand and default.
+        for (method, expected_method) in [
+            ("People", ep_model::PeopleNumberCalculationMethod::People),
+            (
+                "People/Area",
+                ep_model::PeopleNumberCalculationMethod::PeoplePerArea,
+            ),
+            (
+                "Area/Person",
+                ep_model::PeopleNumberCalculationMethod::AreaPerPerson,
+            ),
+        ] {
+            for (sensible_field, expected_sensible) in [
+                ("", None),
+                (
+                    r#","sensible_heat_fraction":"""#,
+                    Some(V::String("".into())),
+                ),
+                (
+                    r#","sensible_heat_fraction":"Autocalculate""#,
+                    Some(V::String("Autocalculate".into())),
+                ),
+                (
+                    r#","sensible_heat_fraction":0.6"#,
+                    Some(V::Number("0.6".into())),
+                ),
+            ] {
+                let text = format!(
+                    r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}}}},"People":{{"P":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people_calculation_method":"{method}","number_of_people":2.0,"people_per_floor_area":0.5,"floor_area_per_person":4.0{sensible_field}}}}}}}"#
+                );
+                let raw = ep_raw_model::parse_epjson_str(&text)?;
+                resolve_source_a(&raw)?;
+                resolve_source_b(&raw)?;
+                assert!(resolve(&raw).is_err());
+                for ip in [
+                    crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                    crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                ] {
+                    let original = ip.source_raw_object_fields("People", "P")?;
+                    assert_eq!(
+                        original.get("sensible_heat_fraction"),
+                        expected_sensible.as_ref()
+                    );
+                    assert_eq!(
+                        original["number_of_people_calculation_method"],
+                        V::String(method.into())
+                    );
+                    let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                    let fields = &hb.objects["People"][0].fields;
+                    for (name, expected) in [
+                        ("number_of_people", 2.0_f64),
+                        ("people_per_floor_area", 0.5),
+                        ("floor_area_per_person", 4.0),
+                    ] {
+                        let ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(value) = fields[name] else {
+                            return Err("real People sizing HB operand".into());
+                        };
+                        assert_eq!(value.to_bits(), expected.to_bits());
+                    }
+                    match expected_sensible.as_ref() {
+                        None => assert!(!fields.contains_key("sensible_heat_fraction")),
+                        Some(V::String(value)) => assert_eq!(fields.get("sensible_heat_fraction"), Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(value.clone()))),
+                        Some(V::Number(_)) => assert_eq!(fields.get("sensible_heat_fraction"), Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(0.6))),
+                        _ => return Err("authored People sensible test operand".into()),
+                    }
+                }
+                let result = ep_compiler::compile_raw_model(&raw);
+                assert!(
+                    !result.has_errors(),
+                    "{method}: {:?}",
+                    result.report.diagnostics
+                );
+                let model = result.model.ok_or("typed People sizing method")?;
+                assert_eq!(
+                    model.people[0].number_of_people_calculation_method,
+                    expected_method
+                );
+            }
+        }
         for (field, value) in [
             ("number_of_people", serde_json::json!(-1)),
-            ("sensible_heat_fraction", serde_json::json!("Autocalculate")),
+            ("people_per_floor_area", serde_json::json!(-1)),
+            ("floor_area_per_person", serde_json::json!(-1)),
+            ("sensible_heat_fraction", serde_json::json!(null)),
+            ("sensible_heat_fraction", serde_json::json!(1.1)),
+            ("sensible_heat_fraction", serde_json::json!("0.6")),
+            (
+                "sensible_heat_fraction",
+                serde_json::json!("AutocalculateX"),
+            ),
             (
                 "number_of_people_calculation_method",
-                serde_json::json!("People/Area"),
+                serde_json::json!("PeopleX"),
             ),
             ("thermal_comfort_model_1_type", serde_json::json!("Fanger")),
             (

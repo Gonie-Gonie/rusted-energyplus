@@ -83,11 +83,41 @@ impl SelectedInternalHeatGains {
                 )?;
                 total = occupants * activity;
                 if row.user_spec_sens_frac == -99999.0 {
-                    return Err(unavailable(
-                        "actual automatic People sensible temperature branch",
-                    ));
+                    // Native6463 coefficients and exact6657-6660 nesting; no
+                    // Zone MAT substitution, reassociation or fused operation.
+                    const C: [f64; 9] = [
+                        6.4611027,
+                        0.946892,
+                        0.0000255737,
+                        7.139322,
+                        -0.0627909,
+                        0.0000589271,
+                        -0.198550,
+                        0.000940018,
+                        -0.00000149532,
+                    ];
+                    let air_temp = *owners
+                        .latent
+                        .as_deref()
+                        .ok_or_else(|| unavailable("same actual People Space AirHB MAT owner"))?
+                        .space_mat(row.space_index)?;
+                    let room_air = owners
+                        .room_air
+                        .ok_or_else(|| unavailable("same actual People RoomAir owner"))?;
+                    if room_air.any_non_mixing {
+                        return Err(unavailable(
+                            "actual People non-Mixing DispVent/UFAD temperature operands",
+                        ));
+                    }
+                    sensible = occupants
+                        * (C[0]
+                            + activity * (C[1] + activity * C[2])
+                            + air_temp
+                                * ((C[3] + activity * (C[4] + activity * C[5]))
+                                    + air_temp * (C[6] + activity * (C[7] + activity * C[8]))));
+                } else {
+                    sensible = total * row.user_spec_sens_frac;
                 }
-                sensible = total * row.user_spec_sens_frac;
                 if sensible > total {
                     sensible = total;
                 }

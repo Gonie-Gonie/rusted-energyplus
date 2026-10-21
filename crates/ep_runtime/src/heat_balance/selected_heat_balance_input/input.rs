@@ -146,6 +146,13 @@ impl SelectedHeatBalanceInput {
                         None => (default, true),
                         Some(ProjectInputValue::Number(v)) => (*v, false),
                         Some(ProjectInputValue::String(v)) if v.is_empty() => (default, true),
+                        Some(ProjectInputValue::String(v))
+                            if family == "People"
+                                && field.json == "sensible_heat_fraction"
+                                && v.eq_ignore_ascii_case("Autocalculate") =>
+                        {
+                            (-99999.0, false)
+                        }
                         Some(ProjectInputValue::String(_)) => {
                             return Err(HeatBalanceInputError::Unavailable(
                                 "HB numeric autosize/autocalculate",

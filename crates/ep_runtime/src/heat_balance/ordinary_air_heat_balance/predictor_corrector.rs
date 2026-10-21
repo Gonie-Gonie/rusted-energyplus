@@ -38,7 +38,7 @@ pub(crate) use lifecycle::{
     SourceAirThermostatArrays, SourceAirUpdate, SourceZoneAirRegistrationChildren,
     SourceZoneListGroupLoadReports,
 };
-pub(crate) use subsystems::SourceZoneAirSubsystems;
+pub(crate) use subsystems::{SourceRoomAir, SourceZoneAirSubsystems};
 
 pub(crate) struct SourceZoneAirOwners<'a, 'b> {
     pub(crate) zones: &'a mut SelectedZoneInputOwners,

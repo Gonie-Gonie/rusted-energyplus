@@ -36,6 +36,8 @@ pub(crate) struct SourceInitSurfaceOwners<'a, 'backend, H, D> {
     pub(crate) constructions: &'a mut SelectedHeatBalanceInputState,
     pub(crate) radiation: &'a mut OrdinarySolarRadiation,
     pub(crate) air: &'a mut SourceAirHeatBalance,
+    pub(crate) room_air:
+        &'a crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceRoomAir,
     pub(crate) history: &'a mut CtfThermalHistoryState,
     pub(crate) public_ctf: &'a OrderedCtfPublicInitialization,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,

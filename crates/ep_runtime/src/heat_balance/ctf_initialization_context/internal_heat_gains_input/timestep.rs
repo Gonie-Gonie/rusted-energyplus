@@ -45,6 +45,8 @@ pub(crate) trait SourceGainModuleProvider {
 pub(crate) trait SourceGainLatentOwners {
     fn space_latent_gain_mut(&mut self, space: i32) -> Result<&mut f64, E>;
     fn zone_latent_gain_mut(&mut self, zone: i32) -> Result<&mut f64, E>;
+    /// Immutable borrow of the same actual Space AirHB MAT member.
+    fn space_mat(&self, space: i32) -> Result<&f64, E>;
 }
 
 /// Direct access to the actual enclosure, Source Surface ordinal association,
@@ -81,6 +83,10 @@ pub(crate) struct SourceGainStepOwners<'a, 'backend> {
     pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
     pub(crate) modules: &'a mut dyn SourceGainModuleProvider,
     pub(crate) latent: Option<&'a mut dyn SourceGainLatentOwners>,
+    /// Same retained controller owner; unavailable in the old observer lane.
+    pub(crate) room_air: Option<
+        &'a crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceRoomAir,
+    >,
     pub(crate) radiation: Option<&'a mut dyn SourceGainRadiationOwners>,
     pub(crate) zone_generic_gain: SourceZoneGenericGainAllocation<'a>,
 }

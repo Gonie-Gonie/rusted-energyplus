@@ -50,7 +50,10 @@ pub(super) fn admitted_field(name: &str, value: &RawValue) -> bool {
         "fraction_radiant" => {
             number(value).is_some_and(|n| n.is_finite() && (0.0..=1.0).contains(&n))
         }
-        "sensible_heat_fraction" => number(value).is_some_and(|n| (0.0..=1.0).contains(&n)),
+        "sensible_heat_fraction" => {
+            number(value).is_some_and(|n| (0.0..=1.0).contains(&n))
+                || text_is(value, &["", "Autocalculate"])
+        }
         "activity_level_schedule_name" => matches!(value, RawValue::String(_)),
         "carbon_dioxide_generation_rate" => {
             number(value).is_some_and(|n| n.is_finite() && (0.0..=3.82e-07).contains(&n))
@@ -167,11 +170,11 @@ pub(super) fn admitted_field(name: &str, value: &RawValue) -> bool {
     }
 }
 pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
-    if !selected(object, "number_of_people_calculation_method", &["People"])
-        || field(object, "sensible_heat_fraction")
-            .and_then(number)
-            .is_none()
-    {
+    if !selected(
+        object,
+        "number_of_people_calculation_method",
+        &["People", "People/Area", "Area/Person"],
+    ) {
         return false;
     }
     // Without a selected model, Native leaves all auxiliary comfort operands

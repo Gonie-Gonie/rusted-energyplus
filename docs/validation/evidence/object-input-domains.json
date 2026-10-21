@@ -241,8 +241,8 @@
       "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions, its separate Hourly meter and bound object, Zone and implicit-Space thermal/fuel Timestep outputs through the actual ESO dictionary. Positive latent load reaches actual gain caches, zone moisture balance and psychrometric state in Source A. The conditioned Source B route connects these fields through existing NoLimit IdealLoads with no outdoor air and None humidity controls. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
     ],
     "People": [
-      "Direct-Zone People uses the real single implicit Space, retained raw/IP defaults and field counts, and genuine built-in or user occupancy schedules. Direct counts preserve the original JSON-number conversion before the actual getter, design totals, devices, rate/energy updates, Which bindings and nominal reporting. This milestone uses an explicit numeric sensible fraction and no optional comfort models; mandatory SimpleASH55 and the reached comfort/report lifecycle are connected. Unused auxiliary comfort operands retain the original count-sensitive warnings without extra schedule lookups.",
-      "Same-input A/B execution compares People Total Heating Rate/Energy Timestep outputs with every retained output policy. Other object/Zone/Space declarations and signed/zero count branches have connected-owner checks. Built-in Constant-0.0/Constant-1.0 identities remain distinct from user schedule IDs and absence. Per-area/per-person sizing, automatic sensible calculation, optional comfort models, EMS, explicit/multiple Spaces and group expansion, and positive non-Mixing RoomAir remain unsupported by this milestone. This is bounded runtime support, not full People input-domain completion."
+      "Direct-Zone People uses the real single implicit Space, raw/IP defaults and field counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select their actual numeric operand and use the actual Space floor area where required, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts an explicit numeric value or the genuine omitted, empty or Autocalculate default; automatic sensible uses the same live Space MAT and retained Mixing RoomAir, the Native polynomial and ordered clamps. Getter totals, devices, rates/energy, Which bindings, nominal reporting, mandatory SimpleASH55 and the reached no-optional comfort/report paths remain connected. Unconsumed auxiliary comfort operands keep count-sensitive warnings without extra lookups.",
+      "Same-input A/B evidence compares People Total Heating Rate/Energy Timestep streams with every retained policy: A uses People/Area with omitted automatic sensible, and B uses Area/Person with explicit Autocalculate. Direct sizing and numeric sensible retain their earlier A/B proof. Other object/Zone/Space declarations, signed/zero occupancy, sizing diagnostics, independent Space MAT and clamp branches have connected-owner checks. Built-in Constant-0.0/Constant-1.0 remain distinct from user schedule IDs and absence. Optional comfort models, EMS, explicit/multiple Spaces and group expansion, and positive non-Mixing RoomAir remain unsupported. This is bounded runtime support, not full People input-domain completion."
     ]
   },
   "verification": {
@@ -250,37 +250,37 @@
       "passed": 5049,
       "ignored": 2,
       "log": {
-        "path": ".runtime/object-expansion/people-builtin-workspace-tests-49b.log",
-        "sha256": "66b8236ba0a7e1c1b0fe07224a0723549ec1072bf11eccf1a5378bcba74a7b1e",
-        "bytes": 773484
+        "path": ".runtime/object-expansion/people-sizing-auto-workspace-tests-50b.log",
+        "sha256": "4c42cafa41f30c5bef37c0af25464c6d59e49d6cc6057dc46a33541f90af69a9",
+        "bytes": 773376
       },
-      "scope": "Full workspace regression after People runtime connection and explicit typed occupancy schedule identities. Existing owner bodies were extended; no new tests or cohorts. The failed test-only unqualified type reference in the first49 log is preserved separately."
+      "scope": "Full workspace milestone after real People sizing/automatic sensible and live Space MAT/RoomAir connection. Existing owner bodies were extended; no new tests or cohorts. The first50 failed compile log is preserved separately."
     },
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/people-builtin-clippy-49.log",
-        "sha256": "6dfac0f078a34dde000f72c8416396d7bdefd70c80f3d84144e616daebb72dc3",
-        "bytes": 896
+        "path": ".runtime/object-expansion/people-sizing-auto-clippy-50.log",
+        "sha256": "73fd69f1d6bea1a24a6087c1b713b466c57d932c23e16f1cbcb89f4df82666ae",
+        "bytes": 686
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/people-direct-docs-49.log",
-        "sha256": "7506d5a968fd6ce480e34947b23d348120eae34ddff24414972dc9f5ee5191a8",
+        "path": ".runtime/object-expansion/people-sizing-auto-docs-50.log",
+        "sha256": "4a8104e2f52be762d613045873565076bdaf0ad32660752b526631149c62c2da",
         "bytes": 354
       },
-      "clippy_through_build": "people-builtin-reference-49",
+      "clippy_through_build": "people-sizing-auto-50",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
         "log": {
-          "path": ".runtime/object-expansion/people-builtin-native-cohort-check-49.log",
-          "sha256": "4b74a2567eff3e371dea3f11f4306196c5f5cf017d6c1b16a8cce2801e467624",
-          "bytes": 1468108
+          "path": ".runtime/object-expansion/people-sizing-auto-native-cohort-check-50.log",
+          "sha256": "ddc2701c1a7e90c8142d1f32eeb19cef45fe629209e48bb216c04506edf2642a",
+          "bytes": 1468006
         },
-        "scope": "Compile-only verification of existing optional callers after typed People schedule identities changed. Existing feature warnings remain; no optional tests or engines were run.",
-        "through_build": "people-builtin-reference-49"
+        "scope": "Compile-only verification of existing optional callers after the actual Space MAT/RoomAir capability threading. Existing feature warnings remain; no optional tests or engines were run.",
+        "through_build": "people-sizing-auto-50"
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -4453,12 +4453,148 @@
           "sha256": "7b88f4e574c32762c1f7e445d27993c34e0ef038c68d76e10a0fdee1ebebd4d1",
           "bytes": 9251
         }
+      },
+      {
+        "id": "people-sizing-auto-a",
+        "group": "people_sizing_auto",
+        "source_build": "people-sizing-auto-50",
+        "scope": "A",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-sizing-auto-a/calibration-01/input.epJSON",
+          "sha256": "6346bb5815e26ec93ba0432384902200b0b0b3053ce47a73792fe52aebbea47d",
+          "bytes": 52992
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-sizing-auto-a/calibration-01/receipt.json",
+          "sha256": "f618f5c2bce9de707e245960a24c4877b2c71b6cdf72f2d3c0d14c1a7a0a9543",
+          "bytes": 25309
+        },
+        "Native_calibration_unit": 50,
+        "Native50_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-sizing-auto-a-50/people-sizing-auto-a/receipt.json",
+          "sha256": "6dca86a51a60b05292cdee1e54632cff48e1f9ad975cd7c05c7d6e0003df9c42",
+          "bytes": 5778
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-sizing-auto-a-50/run-summary.json",
+          "sha256": "a881fe7a2a080df08b973daf0b75e6332e6be572b552e7902406841701ae1e8c",
+          "bytes": 50655
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-50/eplus-rs.exe",
+          "sha256": "b50d37b183e35d8f0f7599bd73621c3e9d23aca0d44a13370efc8007841b0696",
+          "bytes": 76130023
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/40/40279cb69269691ca8392d647301dc1dd67417e289c7c3fd62a42f7467b734b0",
+          "sha256": "40279cb69269691ca8392d647301dc1dd67417e289c7c3fd62a42f7467b734b0"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-50/receipt.json",
+          "sha256": "1b788b148b67b1d3d9e37f6aabb1a477a5ce33e5cb60dee942404da39610c013",
+          "bytes": 6502
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-sizing-auto-a-comparisons-50/people-sizing-auto-a/comparison.json",
+          "sha256": "228278186fe27921c3361b35da49797dfe619babde602c953af3eb5c0d608c73",
+          "bytes": 671938
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-sizing-auto-a-50-launch/people-sizing-auto-a/request.json",
+          "sha256": "608f19f61dae070946760f6bd3bfb4c8d7684830deab611d69f721155d709e6f",
+          "bytes": 3325
+        },
+        "totals": {
+          "series": 118,
+          "samples": 11040,
+          "raw_operand_unequal": 3385,
+          "parsed_binary64_unequal": 3385,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source50 same-input sizing/Auto comparison against its own sole initial-True Native50, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
+      },
+      {
+        "id": "people-sizing-auto-b",
+        "group": "people_sizing_auto",
+        "source_build": "people-sizing-auto-50",
+        "scope": "B",
+        "input": {
+          "path": ".runtime/object-expansion/native-people-sizing-auto-b/calibration-01/input.idf",
+          "sha256": "6d03e6d774f37abd10592f97bc39c41489c0d75762fcfc84a1567ad95eb017a6",
+          "bytes": 15000
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-people-sizing-auto-b/calibration-01/receipt.json",
+          "sha256": "52aa96362a45655a8ca3a6b3ffd3606faca0e408d38bdf31e49b68c15791d15b",
+          "bytes": 20421
+        },
+        "Native_calibration_unit": 50,
+        "Native50_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-people-sizing-auto-b-50/people-sizing-auto-b/receipt.json",
+          "sha256": "ebcf1c973185ea6692b4066d74d326e0bbc78c18fd4ae6d095c073110c2718ad",
+          "bytes": 5665
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/people-sizing-auto-b-50/run-summary.json",
+          "sha256": "9b8f3188ff2a52906bbdeac0fc87745d6b88d866983c9cef162953076885f8bc",
+          "bytes": 61276
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-50/eplus-rs.exe",
+          "sha256": "b50d37b183e35d8f0f7599bd73621c3e9d23aca0d44a13370efc8007841b0696",
+          "bytes": 76130023
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/40/40279cb69269691ca8392d647301dc1dd67417e289c7c3fd62a42f7467b734b0",
+          "sha256": "40279cb69269691ca8392d647301dc1dd67417e289c7c3fd62a42f7467b734b0"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-50/receipt.json",
+          "sha256": "1b788b148b67b1d3d9e37f6aabb1a477a5ce33e5cb60dee942404da39610c013",
+          "bytes": 6502
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-people-sizing-auto-b-comparisons-50/people-sizing-auto-b/comparison.json",
+          "sha256": "435df77d64b857046443ca7aab391b73eb7100039a74b5d9fbde7ccf22e45a72",
+          "bytes": 356777
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-people-sizing-auto-b-50-launch/people-sizing-auto-b/request.json",
+          "sha256": "9a572a6be048c88844618d8cb8abde186f22b058b5137114c52d2108d8c05a8d",
+          "bytes": 3209
+        },
+        "totals": {
+          "series": 104,
+          "samples": 9984,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source50 same-input sizing/Auto comparison against its own sole initial-True Native50, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
       }
     ],
     "totals": {
-      "paired_cases": 76,
-      "reported_samples": 567750,
-      "raw_operand_unequal": 164383,
+      "paired_cases": 78,
+      "reported_samples": 588774,
+      "raw_operand_unequal": 167768,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -5295,6 +5431,23 @@
           "path": ".runtime/porting/object-domain-20261020/build-49/eplus-rs.exe",
           "sha256": "b692fd8dc4f8ec28f60952a993e12068403dbd2f95953b5c0aaae1466f236f90",
           "bytes": 76116977
+        }
+      },
+      {
+        "id": "people-sizing-auto-50",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-50/receipt.json",
+          "sha256": "1b788b148b67b1d3d9e37f6aabb1a477a5ce33e5cb60dee942404da39610c013",
+          "bytes": 6502
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/40/40279cb69269691ca8392d647301dc1dd67417e289c7c3fd62a42f7467b734b0",
+          "sha256": "40279cb69269691ca8392d647301dc1dd67417e289c7c3fd62a42f7467b734b0"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-50/eplus-rs.exe",
+          "sha256": "b50d37b183e35d8f0f7599bd73621c3e9d23aca0d44a13370efc8007841b0696",
+          "bytes": 76130023
         }
       }
     ],

@@ -194,6 +194,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                         constructions: o.control,
                         radiation: o.radiation,
                         air: o.air,
+                        room_air: &self.controller.subsystems.room_air,
                         history: o.history,
                         public_ctf: &o.ctf.public,
                         globals: o.globals,

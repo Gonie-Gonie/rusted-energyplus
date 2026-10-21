@@ -345,6 +345,7 @@ impl OrdinarySurfaceInitialization {
                 backend: owners.backend,
                 modules: &mut module_provider,
                 latent: Some(owners.air),
+                room_air: Some(owners.room_air),
                 radiation: Some(&mut radiant),
                 zone_generic_gain,
             };

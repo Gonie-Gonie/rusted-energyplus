@@ -139,6 +139,7 @@ impl SourceHvacOwners<'_, '_> {
             backend: self.backend,
             modules: &mut modules,
             latent: Some(self.air),
+            room_air: Some(&self.controller.subsystems.room_air),
             // The actual SuppressRadiationUpdate=true body never reads a radiation sink.
             radiation: None,
             // Actual generic-contaminant false avoids this branch; no fake allocated array.

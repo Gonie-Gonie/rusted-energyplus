@@ -3266,6 +3266,405 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     }),
                 )?;
                 if expected_count == 1.5 {
+                    // Fresh reads from the genuine pre-getter checkpoint. These
+                    // authored Space operands are independent of the Zone area;
+                    // no geometry completion or remainder-space writer is claimed.
+                    let mut read_sizing = |mut candidate: CtfInitializationReports|
+                     -> Result<_, Box<dyn std::error::Error>> {
+                        let (mut state, mut errors, mut console, mut eio, mut eso) = (
+                            ctf_ordinary_output_test_state(),
+                            Vec::new(),
+                            Vec::new(),
+                            Vec::new(),
+                            Vec::new(),
+                        );
+                        let mut clock = people_clock.clone();
+                        clock.warmup_flag = true;
+                        let reached = CtfInitializationContext {
+                            reports: &mut candidate,
+                            eio: &mut eio,
+                            backend: SourceErrorBackend {
+                                state: &mut state,
+                                error_stream: Some(&mut errors),
+                                console: &mut console,
+                                out_unit1: None,
+                                out_unit2: None,
+                                f_message: None,
+                                message_callback: None,
+                                error_callback: None,
+                                sqlite: None,
+                            },
+                        }
+                        .manage_selected_internal_heat_gains_input_with_dictionary(
+                            &people_model,
+                            15,
+                            &mut gain_host,
+                            Some(&clock),
+                            Some(SourceGainDictionaryFile { eso: Some(&mut eso) }),
+                        );
+                        Ok((candidate, state, errors, eio, reached))
+                    };
+                    for (method, selected, area, remainder, expected, warnings) in [
+                        ("People", Some(2.0), 100.0, false, 2.0_f64, 0),
+                        ("People/Area", Some(0.02), 100.0, false, 2.0, 0),
+                        ("Area/Person", Some(50.0), 100.0, false, 2.0, 0),
+                        ("People/Area", Some(-0.0), 100.0, false, -0.0, 0),
+                        ("People/Area", Some(0.02), 0.0, false, 0.0, 1),
+                        ("Area/Person", Some(50.0), 0.0, false, 0.0, 1),
+                        ("People/Area", Some(0.02), 0.0, true, 0.0, 0),
+                        ("People/Area", None, 0.0, false, 0.0, 1),
+                        ("Area/Person", None, 0.0, false, 0.0, 1),
+                    ] {
+                        let mut candidate = people_getter_base.clone();
+                        let zones = candidate
+                            .selected_zone_input
+                            .as_mut()
+                            .ok_or("sizing Zones")?;
+                        zones.zones.as_mut().ok_or("sizing Zone area")?[0].floor_area = 9999.0;
+                        let space = &mut zones.spaces.as_mut().ok_or("sizing Space")?[0];
+                        assert!(!space.is_remainder_space);
+                        space.floor_area = area;
+                        space.is_remainder_space = remainder;
+                        let rows = candidate
+                            .heat_balance_input
+                            .as_mut()
+                            .ok_or("sizing raw")?
+                            .objects
+                            .get_mut("People")
+                            .ok_or("sizing People")?;
+                        let field = match method {
+                            "People" => "number_of_people",
+                            "People/Area" => "people_per_floor_area",
+                            "Area/Person" => "floor_area_per_person",
+                            _ => return Err("authored sizing method".into()),
+                        };
+                        rows[0].fields.insert(
+                            "number_of_people_calculation_method".into(),
+                            ProjectInputValue::String(method.into()),
+                        );
+                        for name in [
+                            "number_of_people",
+                            "people_per_floor_area",
+                            "floor_area_per_person",
+                        ] {
+                            rows[0]
+                                .fields
+                                .insert(name.into(), ProjectInputValue::Number(7.0));
+                        }
+                        if let Some(value) = selected {
+                            rows[0]
+                                .fields
+                                .insert(field.into(), ProjectInputValue::Number(value));
+                        } else {
+                            rows[0].fields.remove(field);
+                        }
+                        rows[1]
+                            .fields
+                            .insert("number_of_people".into(), ProjectInputValue::Number(0.0));
+                        let (candidate, state, errors, _, reached) = read_sizing(candidate)?;
+                        assert!(reached.is_ok(), "{method}/{selected:?}: {reached:?}");
+                        let gains = &candidate.selected_internal_heat_gains;
+                        assert_eq!(
+                            gains.allocations.people.rows[0].number_of_people.to_bits(),
+                            expected.to_bits()
+                        );
+                        assert_eq!(gains.allocations.people.rows[1].number_of_people, 0.0);
+                        assert_eq!(state.tracking.total_warning_errors, warnings);
+                        assert_eq!(state.tracking.total_warning_errors_during_warmup, warnings);
+                        assert_eq!(state.tracking.total_severe_errors, 0);
+                        assert!(!state.warmup_flag);
+                        let text = std::str::from_utf8(&errors)?;
+                        if warnings != 0 {
+                            assert!(text.contains(if selected.is_none() {
+                                "that field is blank.  0 People"
+                            } else {
+                                "Space Floor Area = 0.  0 People"
+                            }));
+                        }
+                    }
+                    // A genuine earlier selected-operand error persists. The
+                    // later blank still warns, while a later nonblank operand
+                    // returns zero before its zero-area warning. UInt64 is first
+                    // projected by the same real JSON-kind child as the frontend.
+                    let projected_negative =
+                        ep_model::classify_source_json_number("18446744073709551615")
+                            .map_err(|_| "sizing UInt64 token")?
+                            .as_f64();
+                    for (method, selected, later_blank, predicate) in [
+                        ("People/Area", projected_negative, true, "[<0.0]=-1.000"),
+                        ("Area/Person", 0.0, false, "[<=0.0]=0.000"),
+                    ] {
+                        let mut candidate = people_getter_base.clone();
+                        candidate
+                            .selected_zone_input
+                            .as_mut()
+                            .ok_or("invalid sizing Zone")?
+                            .spaces
+                            .as_mut()
+                            .ok_or("invalid sizing Space")?[0]
+                            .floor_area = 0.0;
+                        let rows = candidate
+                            .heat_balance_input
+                            .as_mut()
+                            .ok_or("invalid sizing raw")?
+                            .objects
+                            .get_mut("People")
+                            .ok_or("invalid sizing rows")?;
+                        rows[0].fields.insert(
+                            "number_of_people_calculation_method".into(),
+                            ProjectInputValue::String(method.into()),
+                        );
+                        rows[0].fields.insert(
+                            if method == "People/Area" {
+                                "people_per_floor_area"
+                            } else {
+                                "floor_area_per_person"
+                            }
+                            .into(),
+                            ProjectInputValue::Number(selected),
+                        );
+                        rows[1].fields.insert(
+                            "number_of_people_calculation_method".into(),
+                            ProjectInputValue::String("People/Area".into()),
+                        );
+                        if later_blank {
+                            rows[1].fields.remove("people_per_floor_area");
+                        } else {
+                            rows[1].fields.insert(
+                                "people_per_floor_area".into(),
+                                ProjectInputValue::Number(0.02),
+                            );
+                        }
+                        let (candidate, state, errors, eio, reached) = read_sizing(candidate)?;
+                        assert!(reached.is_err(), "invalid selected sizing completed");
+                        assert!(candidate.selected_internal_heat_gains.get_input_flag);
+                        assert!(candidate.selected_internal_heat_gains.errors_found);
+                        assert!(
+                            candidate
+                                .selected_internal_heat_gains
+                                .allocations
+                                .people
+                                .rows
+                                .iter()
+                                .all(|p| p.number_of_people == 0.0)
+                        );
+                        assert_eq!(state.tracking.total_severe_errors, 1);
+                        assert_eq!(state.tracking.total_severe_errors_during_warmup, 1);
+                        assert_eq!(state.tracking.total_warning_errors, i32::from(later_blank));
+                        let text = std::str::from_utf8(&errors)?;
+                        assert!(text.contains(predicate), "{text}");
+                        assert_eq!(
+                            text.matches("that field is blank.  0 People").count(),
+                            usize::from(later_blank)
+                        );
+                        assert!(!text.contains("Space Floor Area = 0"));
+                        assert!(eio.is_empty());
+                    }
+                    // Same actual controller constructor and same allocated
+                    // Space MAT owner. The parent still stops at Refrigeration;
+                    // no cache/radiation/report completion is manufactured.
+                    let run_auto = |candidate: &mut CtfInitializationReports,
+                                    space_mat: Option<f64>|
+                     -> Result<_, Box<dyn std::error::Error>> {
+                        let globals = candidate
+                            .selected_heat_balance_globals
+                            .as_ref()
+                            .ok_or("automatic People globals")?;
+                        let mut air = crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance::default();
+                        if let Some(mat) = space_mat {
+                            air.allocate_source_arrays(globals)?;
+                            air.zones.as_mut().ok_or("automatic Zone MAT")?[0].air.mat = 25.0;
+                            air.spaces.as_mut().ok_or("automatic Space MAT")?[0].air.mat = mat;
+                        }
+                        let controller = crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::default();
+                        assert!(!controller.subsystems.room_air.any_non_mixing);
+                        let mut modules =
+                            crate::heat_balance::selected_gain_modules::SourceGainModules::default(
+                            );
+                        let mut facility = crate::heat_balance::facility_electric_service::FacilityElectricService::new();
+                        let mut provider =
+                            crate::heat_balance::selected_gain_modules::SourceModuleGainProvider {
+                                modules: &mut modules,
+                                input: candidate
+                                    .selected_input_processor
+                                    .as_mut()
+                                    .ok_or("automatic module IP")?,
+                                facility: Some(&mut facility),
+                            };
+                        let (mut state, mut errors, mut console) =
+                            (ctf_ordinary_output_test_state(), Vec::new(), Vec::new());
+                        let mut backend = SourceErrorBackend {
+                            state: &mut state,
+                            error_stream: Some(&mut errors),
+                            console: &mut console,
+                            out_unit1: None,
+                            out_unit2: None,
+                            f_message: None,
+                            message_callback: None,
+                            error_callback: None,
+                            sqlite: None,
+                        };
+                        let mut owners = SourceGainStepOwners {
+                            clock: &people_clock,
+                            globals,
+                            control: &candidate.heat_balance_input_state,
+                            zones: candidate
+                                .selected_zone_input
+                                .as_mut()
+                                .ok_or("automatic People Zones")?,
+                            schedules: candidate
+                                .selected_schedule_manager
+                                .as_ref()
+                                .ok_or("automatic People schedules")?,
+                            backend: &mut backend,
+                            modules: &mut provider,
+                            latent: if space_mat.is_some() {
+                                Some(&mut air)
+                            } else {
+                                None
+                            },
+                            room_air: space_mat.map(|_| &controller.subsystems.room_air),
+                            radiation: None,
+                            zone_generic_gain: SourceZoneGenericGainAllocation::Unavailable,
+                        };
+                        let reached = candidate
+                            .selected_internal_heat_gains
+                            .manage_timestep(&mut owners);
+                        Ok((reached, air))
+                    };
+                    for (sensible_token, mat, expected_sensible) in [
+                        (None, 20.0, 173.20701915999996_f64),
+                        (Some(""), 20.0, 173.20701915999996),
+                        (Some("Autocalculate"), 20.0, 173.20701915999996),
+                        (Some("Autocalculate"), 0.0, 240.0),
+                        (Some("Autocalculate"), 50.0, 0.0),
+                    ] {
+                        let mut candidate = people_getter_base.clone();
+                        let rows = candidate
+                            .heat_balance_input
+                            .as_mut()
+                            .ok_or("automatic raw")?
+                            .objects
+                            .get_mut("People")
+                            .ok_or("automatic People")?;
+                        rows[0]
+                            .fields
+                            .insert("number_of_people".into(), ProjectInputValue::Number(2.0));
+                        rows[1]
+                            .fields
+                            .insert("number_of_people".into(), ProjectInputValue::Number(0.0));
+                        if let Some(value) = sensible_token {
+                            rows[0].fields.insert(
+                                "sensible_heat_fraction".into(),
+                                ProjectInputValue::String(value.into()),
+                            );
+                        } else {
+                            rows[0].fields.remove("sensible_heat_fraction");
+                        }
+                        let mut local = SourceInputProcessorShortCut::default();
+                        let input = candidate
+                            .selected_input_processor
+                            .as_mut()
+                            .ok_or("automatic IP")?;
+                        local.allocate_from_input(input)?;
+                        let values = candidate
+                            .heat_balance_input
+                            .as_ref()
+                            .ok_or("automatic getter raw")?
+                            .get_object_item::<21, 8>("People", 0, input, &mut local)?;
+                        assert_eq!(values.numbers[4], -99999.0);
+                        assert_eq!(
+                            local.numeric_field_blanks[4],
+                            sensible_token != Some("Autocalculate")
+                        );
+                        let (mut candidate, state, _, _, reached) = read_sizing(candidate)?;
+                        assert!(reached.is_ok(), "automatic getter: {reached:?}");
+                        assert_eq!(state.tracking.total_warning_errors, 0);
+                        assert_eq!(
+                            candidate
+                                .selected_internal_heat_gains
+                                .allocations
+                                .people
+                                .rows[0]
+                                .user_spec_sens_frac,
+                            -99999.0
+                        );
+                        let (reached, air) = run_auto(&mut candidate, Some(mat))?;
+                        assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same refrigeration selected official schema definition"))), "automatic parent prefix: {reached:?}");
+                        let person = &candidate
+                            .selected_internal_heat_gains
+                            .allocations
+                            .people
+                            .rows[0];
+                        assert_eq!(person.tot_gain_rate, 240.0);
+                        assert!(
+                            (person.sen_gain_rate - expected_sensible).abs() < 1.0e-11,
+                            "Space MAT {mat}: {}",
+                            person.sen_gain_rate
+                        );
+                        assert_eq!(person.lat_gain_rate, 240.0 - person.sen_gain_rate);
+                        assert_eq!(person.rad_gain_rate, person.sen_gain_rate * 0.3);
+                        assert_eq!(person.con_gain_rate, person.sen_gain_rate * 0.7);
+                        assert_eq!(person.tot_gain_energy, 0.0);
+                        assert_eq!(
+                            air.zones.as_ref().ok_or("unchanged Zone MAT")?[0].air.mat,
+                            25.0
+                        );
+                        assert_eq!(
+                            air.spaces.as_ref().ok_or("actual Space MAT")?[0].air.mat,
+                            mat
+                        );
+                        assert!(
+                            candidate
+                                .selected_internal_heat_gains
+                                .allocations
+                                .space_devices
+                                .as_ref()
+                                .ok_or("automatic cache")?[0]
+                                .devices
+                                .as_ref()
+                                .ok_or("automatic slots")?
+                                .iter()
+                                .all(|d| d.cached_rates == [0.0; 7])
+                        );
+                    }
+                    for occupants in [0.0_f64, projected_negative] {
+                        let mut candidate = people_getter_base.clone();
+                        let rows = candidate
+                            .heat_balance_input
+                            .as_mut()
+                            .ok_or("nonpositive automatic raw")?
+                            .objects
+                            .get_mut("People")
+                            .ok_or("nonpositive automatic rows")?;
+                        for (i, row) in rows.iter_mut().enumerate() {
+                            row.fields.insert(
+                                "number_of_people".into(),
+                                ProjectInputValue::Number(if i == 0 { occupants } else { 0.0 }),
+                            );
+                            row.fields.remove("sensible_heat_fraction");
+                        }
+                        let (mut candidate, _, _, _, reached) = read_sizing(candidate)?;
+                        assert!(reached.is_ok(), "nonpositive automatic getter: {reached:?}");
+                        let (reached, air) = run_auto(&mut candidate, None)?;
+                        assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same refrigeration selected official schema definition"))), "nonpositive automatic prefix: {reached:?}");
+                        let person = &candidate
+                            .selected_internal_heat_gains
+                            .allocations
+                            .people
+                            .rows[0];
+                        assert_eq!(person.num_occ.to_bits(), occupants.to_bits());
+                        for rate in [
+                            person.tot_gain_rate,
+                            person.sen_gain_rate,
+                            person.lat_gain_rate,
+                        ] {
+                            assert_eq!(rate.to_bits(), 0.0_f64.to_bits());
+                        }
+                        assert!(air.spaces.is_none());
+                    }
+                }
+                if expected_count == 1.5 {
                     let mut blank = people_getter_base.clone();
                     blank
                         .heat_balance_input
@@ -3604,6 +4003,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     backend: &mut people_backend,
                     modules: &mut people_provider,
                     latent: Some(&mut people_air),
+                    room_air: None,
                     radiation: None,
                     zone_generic_gain: SourceZoneGenericGainAllocation::Unavailable,
                 };
@@ -3672,6 +4072,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     backend: &mut people_backend,
                     modules: &mut people_provider,
                     latent: Some(&mut people_air),
+                    room_air: None,
                     radiation: None,
                     zone_generic_gain: SourceZoneGenericGainAllocation::Unavailable,
                 };
@@ -5158,7 +5559,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 clock: &clock, globals, control: &reports.heat_balance_input_state,
                 zones: reports.selected_zone_input.as_mut().ok_or("live fuel zones")?,
                 schedules: reports.selected_schedule_manager.as_ref().ok_or("live fuel schedules")?,
-                backend: &mut backend, modules: &mut provider, latent: Some(&mut air), radiation: None,
+                backend: &mut backend, modules: &mut provider, latent: Some(&mut air), room_air: None, radiation: None,
                 zone_generic_gain: crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceZoneGenericGainAllocation::Unavailable,
             };
             let reached = reports
@@ -5222,7 +5623,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     clock: &clock, globals, control: &reports.heat_balance_input_state,
                     zones: reports.selected_zone_input.as_mut().ok_or("latent Zone owner")?,
                     schedules: reports.selected_schedule_manager.as_ref().ok_or("latent schedule owner")?,
-                    backend: &mut backend, modules: &mut provider, latent: None, radiation: None,
+                    backend: &mut backend, modules: &mut provider, latent: None, room_air: None, radiation: None,
                     zone_generic_gain: crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceZoneGenericGainAllocation::Unavailable,
                 };
                 let missing = reports
@@ -5258,7 +5659,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     clock: &clock, globals, control: &reports.heat_balance_input_state,
                     zones: reports.selected_zone_input.as_mut().ok_or("same latent Zone owner")?,
                     schedules: reports.selected_schedule_manager.as_ref().ok_or("same latent schedule owner")?,
-                    backend: &mut backend, modules: &mut provider, latent: Some(&mut air), radiation: None,
+                    backend: &mut backend, modules: &mut provider, latent: Some(&mut air), room_air: None, radiation: None,
                     zone_generic_gain: crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceZoneGenericGainAllocation::Unavailable,
                 };
                 reports

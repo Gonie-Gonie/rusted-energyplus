@@ -29,6 +29,75 @@ fn round(value: f64, precision: usize) -> Result<String, E> {
     crate::heat_balance::source_round_format::round(value, precision)
         .map_err(|e| E::Format(format!("IHG People .{precision}R: {e:?}")))
 }
+// Exact direct/area sizing child, over the selected local numeric operand.
+// It writes no People field until every reached diagnostic has returned.
+fn design_level(
+    errors_found: &mut bool,
+    object: &SourceMiscGainObject,
+    method: usize,
+    space_number: i32,
+    value: f64,
+    blank: bool,
+    field_name: &str,
+    owners: &mut SourceGainInputOwners<'_, '_>,
+) -> Result<f64, E> {
+    if blank {
+        diagnostic(
+            owners,
+            &format!(
+                "GetInternalHeatGains: People=\"{}\", specifies {}, but that field is blank.  0 People will result.",
+                object.name, field_name
+            ),
+            false,
+        )?;
+        return Ok(0.0);
+    }
+    if (method == 1 && value < 0.0) || (method == 2 && value <= 0.0) {
+        diagnostic(
+            owners,
+            &format!(
+                "GetInternalHeatGains: People=\"{}\", invalid {}, value  [{}]={}",
+                object.name,
+                field_name,
+                if method == 1 { "<0.0" } else { "<=0.0" },
+                round(value, 3)?
+            ),
+            true,
+        )?;
+        *errors_found = true;
+    }
+    if *errors_found {
+        return Ok(0.0);
+    }
+    if method == 0 {
+        // The admitted direct Zone has exactly one real implicit Space.
+        return Ok(value * 1.0);
+    }
+    let space = owners
+        .zones
+        .spaces
+        .as_ref()
+        .and_then(|rows| rows.get(index(space_number).ok()?))
+        .ok_or_else(|| unavailable("actual People sizing Space area owner"))?;
+    let area = space.floor_area;
+    let remainder = space.is_remainder_space;
+    let result = if method == 1 {
+        value * area
+    } else {
+        area / value
+    };
+    if area <= 0.0 && !remainder {
+        diagnostic(
+            owners,
+            &format!(
+                "GetInternalHeatGains: People=\"{}\", specifies {}, but Space Floor Area = 0.  0 People will result.",
+                object.name, field_name
+            ),
+            false,
+        )?;
+    }
+    Ok(result)
+}
 impl SelectedInternalHeatGains {
     pub(super) fn read_people(
         &mut self,
@@ -49,11 +118,14 @@ impl SelectedInternalHeatGains {
             local.numeric_args[..8].copy_from_slice(&values.numbers);
             let schedule = owners.schedules.get_source_schedule(&values.alphas[2])?;
             self.people_schedule_check(schedule, 2, &values.alphas, local, owners, false)?;
-            if values.alphas[3] != "PEOPLE" {
-                return Err(unavailable("positive People density sizing method"));
-            }
-            let level_value = values.numbers[0];
-            let level_blank = local.numeric_field_blanks[0];
+            let method = match values.alphas[3].as_str() {
+                "PEOPLE" => 0,
+                "PEOPLE/AREA" => 1,
+                "AREA/PERSON" => 2,
+                _ => return Err(unavailable("invalid People sizing method")),
+            };
+            let level_value = values.numbers[method];
+            let level_blank = local.numeric_field_blanks[method];
             for (position, &space_number) in object.space_nums.iter().enumerate() {
                 let zone_number = owners
                     .zones
@@ -72,19 +144,16 @@ impl SelectedInternalHeatGains {
                 row.space_index = space_number;
                 row.zone_ptr = zone_number;
                 row.sched = schedule;
-                let mut number = 0.0;
-                if level_blank {
-                    diagnostic(
-                        owners,
-                        &format!(
-                            "GetInternalHeatGains: People=\"{}\", specifies {}, but that field is blank.  0 People will result.",
-                            object.name, local.numeric_field_names[0]
-                        ),
-                        false,
-                    )?;
-                } else if !self.errors_found {
-                    number = level_value * 1.0;
-                }
+                let number = design_level(
+                    &mut self.errors_found,
+                    object,
+                    method,
+                    space_number,
+                    level_value,
+                    level_blank,
+                    &local.numeric_field_names[method],
+                    owners,
+                )?;
                 row.number_of_people = number;
                 let schedule = schedule.ok_or_else(|| {
                     unavailable("invalid People schedule before actual dereference")
@@ -132,11 +201,6 @@ impl SelectedInternalHeatGains {
                     } else {
                         -99999.0
                     };
-                if row.user_spec_sens_frac == -99999.0 {
-                    return Err(unavailable(
-                        "actual People automatic sensible gain temperature operands",
-                    ));
-                }
                 row.co2_rate_factor = if values.num_numbers >= 6 && !local.numeric_field_blanks[5] {
                     values.numbers[5]
                 } else {

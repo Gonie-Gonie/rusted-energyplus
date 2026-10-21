@@ -797,6 +797,8 @@ impl GainFactory {
             backend: &mut backend,
             modules: &mut module_provider,
             latent: Some(&mut self.air),
+            // This existing OtherEquipment-only observer owns no controller.
+            room_air: None,
             radiation: Some(&mut radiation),
             zone_generic_gain: SourceZoneGenericGainAllocation::Unallocated,
         };

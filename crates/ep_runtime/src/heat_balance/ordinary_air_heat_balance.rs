@@ -345,6 +345,9 @@ impl SourceAirHeatBalance {
 }
 
 impl SourceGainLatentOwners for SourceAirHeatBalance {
+    fn space_mat(&self, number: i32) -> Result<&f64, Error> {
+        self.source_space_mat(number)
+    }
     fn space_latent_gain_mut(&mut self, number: i32) -> Result<&mut f64, Error> {
         Ok(&mut self
             .spaces
