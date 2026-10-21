@@ -1,6 +1,7 @@
 //! Literal Schedule:File getter, reached filesystem/cache and real annual graph.
 use super::external_data::{
-    NativeExternalDataDiagnostic, NativeExternalDataValue as V, decode_native_csv,
+    NativeBinaryFormat, NativeExternalDataDiagnostic, NativeExternalDataObject,
+    NativeExternalDataValue as V, decode_native_binary_json, decode_native_csv,
     decode_native_text_json,
 };
 use super::minute::SourceScheduleMinuteDiagnostic::{Continue, Severe, Warning};
@@ -414,8 +415,19 @@ impl SelectedScheduleManager {
                     self.unique_processed_external_files
                         .insert(key.clone(), value);
                 } else if matches!(ext.as_str(), "CBOR" | "MSGPACK" | "UBJSON" | "BSON") {
-                    let _opened = std::fs::File::open(&path).map_err(|e| file_io(&path, e))?;
-                    return Err(unavailable("actual FileSystem binary JSON decoder"));
+                    let bytes = files.read_bytes().map_err(|e| file_io(&path, e))?;
+                    let format = match ext.as_str() {
+                        "CBOR" => NativeBinaryFormat::Cbor,
+                        "MSGPACK" => NativeBinaryFormat::MsgPack,
+                        "UBJSON" => NativeBinaryFormat::Ubjson,
+                        "BSON" => NativeBinaryFormat::Bson,
+                        _ => unreachable!("binary file extension was selected above"),
+                    };
+                    let value = decode_native_binary_json(&bytes, format).map_err(|_| {
+                        unavailable("actual FileSystem::readJSON binary parse exception")
+                    })?;
+                    self.unique_processed_external_files
+                        .insert(key.clone(), value);
                 } else {
                     // Native tries CSV and emplaces its partial result before testing errors.
                     let parsed = files
@@ -466,14 +478,14 @@ impl SelectedScheduleManager {
                 .get_mut(&key)
                 .ok_or_else(|| unavailable("actual external parsed cache iterator"))?;
             if matches!(data, V::Null) {
-                *data = V::Object(BTreeMap::new());
+                *data = V::Object(NativeExternalDataObject::new());
             }
             let V::Object(object) = data else {
                 return Err(unavailable(
                     "actual external JSON string-key operator[] type error",
                 ));
             };
-            let columns = object.entry(b"values".to_vec()).or_insert(V::Null);
+            let columns = object.get_or_insert_null(b"values".to_vec());
             let column_count = match columns {
                 V::Null => 0,
                 V::Array(a) => a.len(),

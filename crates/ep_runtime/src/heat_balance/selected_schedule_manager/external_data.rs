@@ -2,15 +2,17 @@
 //!
 //! The live manager owns the resolved-path cache. These values retain the full
 //! parsed file, including unused columns, before a selected column is converted.
-use std::collections::BTreeMap;
-
+mod binary;
 mod csv;
 mod json_text;
+mod object;
+pub(crate) use binary::{NativeBinaryFormat, decode_native_binary_json};
 pub(crate) use csv::{NativeExternalDataDiagnostic, decode_native_csv};
 pub(crate) use json_text::decode_native_text_json;
+pub(crate) use object::NativeExternalDataObject;
 
 /// The actual nlohmann JSON kinds in ScheduleManager's external-file cache.
-/// CSV strings are arbitrary bytes; JSON strings and keys are decoded UTF-8.
+/// CSV and binary strings may be arbitrary bytes; text JSON decodes UTF-8.
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum NativeExternalDataValue {
     Null,
@@ -20,8 +22,12 @@ pub(crate) enum NativeExternalDataValue {
     /// Preserve signed zero and nonfinites produced by Native's CSV parser.
     Real(f64),
     String(Vec<u8>),
+    Binary {
+        bytes: Vec<u8>,
+        subtype: Option<u64>,
+    },
     Array(Vec<Self>),
-    Object(BTreeMap<Vec<u8>, Self>),
+    Object(NativeExternalDataObject),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -37,6 +43,7 @@ impl NativeExternalDataValue {
             Self::Boolean(_) => "boolean",
             Self::Signed(_) | Self::Unsigned(_) | Self::Real(_) => "number",
             Self::String(_) => "string",
+            Self::Binary { .. } => "binary",
             Self::Array(_) => "array",
             Self::Object(_) => "object",
         }

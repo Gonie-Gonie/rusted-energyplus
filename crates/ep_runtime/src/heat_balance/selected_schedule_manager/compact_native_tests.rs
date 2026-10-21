@@ -3482,7 +3482,12 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
     for minutes in [1usize, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60] {
         let count = 8760 * 60 / minutes;
         let values: Vec<i32> = (0..count).map(|at| ((at * 7) % 23) as i32 - 11).collect();
-        let sidecar = serde_json::json!({"values":[[null,true,"unused",[],{},18446744073709551615u64],values]});
+        let mut sidecar = serde_json::json!({"values":[[null,true,"unused",[],{},18446744073709551615u64],values]});
+        if minutes == 60 {
+            let object = sidecar.as_object_mut().ok_or("actual File JSON object")?;
+            let values = object.remove("values").ok_or("actual File columns")?;
+            object.insert("values\0retained tail".into(), values);
+        }
         std::fs::write(directory.join(&basename), serde_json::to_vec(&sidecar)?)?;
         for mode in ["", "No", "Yes"] {
             let declared_hours = if minutes == 60 && mode.is_empty() {
@@ -3907,7 +3912,7 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
     let FileValue::Object(object) = json else {
         return Err("actual JSON object".into());
     };
-    let FileValue::Array(columns) = &object[b"values".as_slice()] else {
+    let FileValue::Array(columns) = object.get(b"values").ok_or("actual JSON values")? else {
         return Err("actual columns".into());
     };
     let FileValue::Array(values) = &columns[0] else {
@@ -3931,6 +3936,20 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
         -1.0
     );
     assert_eq!(selected[1].to_bits(), 0.0f64.to_bits());
+    let alias = decode_native_text_json(br#"{"values\u0000first":[[1]],"values":[[2]]}"#)
+        .expect("Native C-string key equivalence");
+    let FileValue::Object(alias) = alias else {
+        return Err("actual aliased JSON object".into());
+    };
+    assert_eq!(alias.len(), 1);
+    assert_eq!(
+        alias.iter().next().ok_or("actual retained raw key")?.0,
+        b"values\0first"
+    );
+    assert_eq!(
+        alias.get(b"values").ok_or("actual aliased values")?,
+        &FileValue::Array(vec![FileValue::Array(vec![FileValue::Unsigned(2)])])
+    );
     for (bytes, kind) in [
         (b"[1,]".as_slice(), "Syntax"),
         (b"[1e309]".as_slice(), "NumberOverflow"),
@@ -3958,7 +3977,7 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
         let FileValue::Object(object) = parsed.value else {
             return Err("actual CSV object".into());
         };
-        let FileValue::Array(columns) = &object[b"values".as_slice()] else {
+        let FileValue::Array(columns) = object.get(b"values").ok_or("actual CSV values")? else {
             return Err("actual CSV columns".into());
         };
         assert_eq!(columns.len(), 6);
@@ -3985,7 +4004,8 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
     let FileValue::Object(object) = partial.value else {
         return Err("actual partial CSV".into());
     };
-    let FileValue::Array(columns) = &object[b"values".as_slice()] else {
+    let FileValue::Array(columns) = object.get(b"values").ok_or("actual partial CSV values")?
+    else {
         return Err("actual partial columns".into());
     };
     assert_eq!(
@@ -4013,5 +4033,123 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
     let undefined = decode_native_csv(b"\n", b',', 0);
     assert!(undefined.native_undefined_boundary.is_some());
     assert!(undefined.errors.is_empty() && undefined.warnings.is_empty());
+    // One pinned Native matrix covers each binary parser's complete DOM,
+    // including data outside the selected numeric column. It adds no test body.
+    use super::external_data::{NativeBinaryFormat, decode_native_binary_json};
+    fn byte_hex(bytes: &[u8]) -> String {
+        bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+    }
+    fn binary_snapshot(value: &FileValue) -> Value {
+        match value {
+            FileValue::Null => serde_json::json!(["null"]),
+            FileValue::Boolean(value) => serde_json::json!(["boolean", value]),
+            FileValue::Signed(value) => serde_json::json!(["signed", value.to_string()]),
+            FileValue::Unsigned(value) => serde_json::json!(["unsigned", value.to_string()]),
+            FileValue::Real(value) => {
+                serde_json::json!(["real", format!("{:016x}", value.to_bits())])
+            }
+            FileValue::String(bytes) => serde_json::json!(["string", byte_hex(bytes)]),
+            FileValue::Binary { bytes, subtype } => {
+                assert_eq!(
+                    value
+                        .numeric_real64()
+                        .expect_err("binary is not numeric")
+                        .actual,
+                    "binary"
+                );
+                serde_json::json!([
+                    "binary",
+                    byte_hex(bytes),
+                    subtype.map(|value| value.to_string())
+                ])
+            }
+            FileValue::Array(values) => {
+                serde_json::json!([
+                    "array",
+                    values.iter().map(binary_snapshot).collect::<Vec<_>>()
+                ])
+            }
+            FileValue::Object(values) => {
+                // Fixture order is canonical raw bytes, independently of the
+                // patched alphanum order used by Native's actual map.
+                let mut entries: Vec<_> = values.iter().collect();
+                entries.sort_by(|left, right| left.0.cmp(right.0));
+                serde_json::json!([
+                    "object",
+                    entries
+                        .into_iter()
+                        .map(|(key, value)| {
+                            serde_json::json!([byte_hex(key), binary_snapshot(value)])
+                        })
+                        .collect::<Vec<_>>()
+                ])
+            }
+        }
+    }
+    let binary_fixture: Value =
+        serde_json::from_str(include_str!("fixtures/external_binary_native.json"))?;
+    assert_eq!(
+        binary_fixture["source_commit"],
+        "6f2e40d10250a105b49966baa24d843711e61048"
+    );
+    assert_eq!(
+        binary_fixture["json_header"]["sha256"],
+        "8baba4ddf871e448b8ecceb0e8add3c883c42311659e0a1fa517394f34460e75"
+    );
+    assert_eq!(
+        binary_fixture["native_object_comparator"]["sha256"],
+        "0ded396abd0116d34eab3228b0aa02e74851ab53c7bde450cbf9661c55ee9db6"
+    );
+    for case in binary_fixture["cases"]
+        .as_array()
+        .ok_or("Native binary cases")?
+    {
+        let format = match case["format"].as_str().ok_or("Native binary format")? {
+            "cbor" => NativeBinaryFormat::Cbor,
+            "msgpack" => NativeBinaryFormat::MsgPack,
+            "ubjson" => NativeBinaryFormat::Ubjson,
+            "bson" => NativeBinaryFormat::Bson,
+            _ => return Err("unknown Native binary format".into()),
+        };
+        let encoded = case["hex"].as_str().ok_or("Native binary bytes")?;
+        let bytes: Vec<u8> = (0..encoded.len())
+            .step_by(2)
+            .map(|at| u8::from_str_radix(&encoded[at..at + 2], 16))
+            .collect::<Result<_, _>>()?;
+        let parsed = decode_native_binary_json(&bytes, format);
+        if case["error"] == true {
+            assert!(parsed.is_err(), "Native rejected {}", case["name"]);
+        } else {
+            let value = parsed.map_err(|error| format!("{}: {error:?}", case["name"]))?;
+            assert_eq!(
+                binary_snapshot(&value),
+                case["expected"],
+                "{}",
+                case["name"]
+            );
+        }
+    }
+    // Container parsing does not acquire serde_json's default depth fence.
+    for (format, open, close) in [
+        (NativeBinaryFormat::Cbor, 0x81, None),
+        (NativeBinaryFormat::MsgPack, 0x91, None),
+        (NativeBinaryFormat::Ubjson, b'[', Some(b']')),
+    ] {
+        let mut bytes = vec![open; 256];
+        bytes.push(if close.is_some() { b'Z' } else { 0 });
+        if let Some(close) = close {
+            bytes.extend(std::iter::repeat_n(close, 256));
+        }
+        let value = decode_native_binary_json(&bytes, format).expect("Native nested arrays");
+        let mut current = &value;
+        for _ in 0..256 {
+            let FileValue::Array(values) = current else {
+                return Err("actual nested binary array".into());
+            };
+            assert_eq!(values.len(), 1);
+            current = &values[0];
+        }
+        assert!(matches!(current, FileValue::Null | FileValue::Unsigned(0)));
+    }
     Ok(())
 }

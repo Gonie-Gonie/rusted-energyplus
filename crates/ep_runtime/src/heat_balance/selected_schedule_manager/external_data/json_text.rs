@@ -1,7 +1,6 @@
 //! Text readJSON values: comments/BOM, exact integer kinds, direct Real64 data.
 //! Iterative structure parsing adds no serde_json default nesting-depth fence.
-use super::NativeExternalDataValue as Value;
-use std::collections::BTreeMap;
+use super::{NativeExternalDataObject as Object, NativeExternalDataValue as Value};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum NativeExternalJsonErrorKind {
@@ -41,7 +40,7 @@ enum Frame {
         state: ArrayState,
     },
     Object {
-        values: BTreeMap<Vec<u8>, Value>,
+        values: Object,
         key: Option<Vec<u8>>,
         state: ObjectState,
     },
@@ -60,7 +59,7 @@ struct Parser<'a> {
 }
 
 /// Native FileSystem::readJSON's text branch (ignore_comments=true).
-/// Binary JSON formats are separate unported file-host branches.
+/// Binary JSON formats use the separate Native binary decoder.
 pub(crate) fn decode_native_text_json(bytes: &[u8]) -> Result<Value, NativeExternalJsonError> {
     let mut parser = Parser { bytes, at: 0 };
     if bytes.starts_with(b"\xef\xbb\xbf") {
@@ -250,7 +249,7 @@ impl Parser<'_> {
                 Some(b'{') => {
                     self.at += 1;
                     stack.push(Frame::Object {
-                        values: BTreeMap::new(),
+                        values: Object::new(),
                         key: None,
                         state: ObjectState::FirstKeyOrEnd,
                     });

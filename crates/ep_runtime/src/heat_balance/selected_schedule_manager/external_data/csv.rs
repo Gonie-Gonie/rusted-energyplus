@@ -1,6 +1,5 @@
 //! Byte-for-byte token grammar of InputProcessing/CsvParser.cc, not RFC CSV.
 use super::NativeExternalDataValue as Value;
-use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct NativeExternalDataDiagnostic {
@@ -212,13 +211,17 @@ impl Parser<'_> {
                 break;
             }
         }
-        Value::Object(BTreeMap::from([
-            (b"header".to_vec(), Value::Array(header)),
-            (
-                b"values".to_vec(),
-                Value::Array(columns.into_iter().map(Value::Array).collect()),
-            ),
-        ]))
+        Value::Object(
+            [
+                (b"header".to_vec(), Value::Array(header)),
+                (
+                    b"values".to_vec(),
+                    Value::Array(columns.into_iter().map(Value::Array).collect()),
+                ),
+            ]
+            .into_iter()
+            .collect(),
+        )
     }
 
     fn parse_header(&mut self) -> Vec<Value> {

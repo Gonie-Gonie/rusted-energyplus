@@ -1,0 +1,2194 @@
+{
+  "schema": "native-external-binary-value-matrix.v1",
+  "source_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "json_header": {
+    "path": ".reference/energyplus-src/26.1.0/third_party/nlohmann/json.hpp",
+    "sha256": "8baba4ddf871e448b8ecceb0e8add3c883c42311659e0a1fa517394f34460e75",
+    "bytes": 953482
+  },
+  "native_object_comparator": {
+    "path": ".reference/energyplus-src/26.1.0/third_party/doj/alphanum.hpp",
+    "sha256": "0ded396abd0116d34eab3228b0aa02e74851ab53c7bde450cbf9661c55ee9db6",
+    "bytes": 9998
+  },
+  "oracle_source": {
+    "path": ".runtime/object-expansion/unit63-prep/native_binary_oracle02.cpp",
+    "sha256": "3bcca758b342f968c3d2681396e2a119b92de52fa09b3c0f9f94fa1a8e94f826",
+    "bytes": 4959
+  },
+  "oracle_executable": {
+    "path": ".runtime/object-expansion/unit63-prep/native_binary_oracle02.exe",
+    "sha256": "dba4ce0d491d86361475ce5962d1df8b7730fba997fdf56915e4933f56e0cdaa",
+    "bytes": 2112831
+  },
+  "author": {
+    "path": ".runtime/object-expansion/unit63-prep/binary_matrix02.py",
+    "sha256": "0045e49ad66d6a152da704d08f61cbec78dde8841af2e0460420de2bfc020398",
+    "bytes": 18573
+  },
+  "normalization": "array-tagged native kinds; decimal integer strings; f64 lowerhex bits; raw string/key bytes and Binary subtype preserved; Native alphanum key coalescence precedes independent unsigned-byte key sorting",
+  "cases": [
+    {
+      "name": "cbor.uint-widths",
+      "format": "cbor",
+      "hex": "8a0017181818ff19010019ffff1a000100001affffffff1b00000001000000001bffffffffffffffff",
+      "expected": [
+        "array",
+        [
+          [
+            "unsigned",
+            "0"
+          ],
+          [
+            "unsigned",
+            "23"
+          ],
+          [
+            "unsigned",
+            "24"
+          ],
+          [
+            "unsigned",
+            "255"
+          ],
+          [
+            "unsigned",
+            "256"
+          ],
+          [
+            "unsigned",
+            "65535"
+          ],
+          [
+            "unsigned",
+            "65536"
+          ],
+          [
+            "unsigned",
+            "4294967295"
+          ],
+          [
+            "unsigned",
+            "4294967296"
+          ],
+          [
+            "unsigned",
+            "18446744073709551615"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.negative-widths",
+      "format": "cbor",
+      "hex": "8b20373818387f388038ff3901003980003a000100003b00000001000000003b7fffffffffffffff",
+      "expected": [
+        "array",
+        [
+          [
+            "signed",
+            "-1"
+          ],
+          [
+            "signed",
+            "-24"
+          ],
+          [
+            "signed",
+            "-25"
+          ],
+          [
+            "signed",
+            "-128"
+          ],
+          [
+            "signed",
+            "-129"
+          ],
+          [
+            "signed",
+            "-256"
+          ],
+          [
+            "signed",
+            "-257"
+          ],
+          [
+            "signed",
+            "-32769"
+          ],
+          [
+            "signed",
+            "-65537"
+          ],
+          [
+            "signed",
+            "-4294967297"
+          ],
+          [
+            "signed",
+            "-9223372036854775808"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.float-widths-zero-subnormal-nonfinite",
+      "format": "cbor",
+      "hex": "91f90000f98000f90001f903fff93c00f97c00f9fc00f97e00f9fe00fa80000000fa3fc00000fa7f800000fa7fc00000fb8000000000000000fb3ff8000000000000fbfff0000000000000fb7ff8000000000000",
+      "expected": [
+        "array",
+        [
+          [
+            "real",
+            "0000000000000000"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "3e70000000000000"
+          ],
+          [
+            "real",
+            "3f0ff80000000000"
+          ],
+          [
+            "real",
+            "3ff0000000000000"
+          ],
+          [
+            "real",
+            "7ff0000000000000"
+          ],
+          [
+            "real",
+            "fff0000000000000"
+          ],
+          [
+            "real",
+            "7ff8000000000000"
+          ],
+          [
+            "real",
+            "fff8000000000000"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "3ff8000000000000"
+          ],
+          [
+            "real",
+            "7ff0000000000000"
+          ],
+          [
+            "real",
+            "7ff8000000000000"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "3ff8000000000000"
+          ],
+          [
+            "real",
+            "fff0000000000000"
+          ],
+          [
+            "real",
+            "7ff8000000000000"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.nonminimal-length-widths",
+      "format": "cbor",
+      "hex": "907802ff00580200ff980101b801616b01790002ff0059000200ff99000101b90001616b017a00000002ff005a0000000200ff9a0000000101ba00000001616b017b0000000000000002ff005b000000000000000200ff9b000000000000000101bb0000000000000001616b01",
+      "expected": [
+        "array",
+        [
+          [
+            "string",
+            "ff00"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "string",
+            "ff00"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "string",
+            "ff00"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "string",
+            "ff00"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.indefinite-all-containers",
+      "format": "cbor",
+      "hex": "9f7f61616162ff5f410041ffffbf616b9f0102ffffff",
+      "expected": [
+        "array",
+        [
+          [
+            "string",
+            "6162"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "array",
+                  [
+                    [
+                      "unsigned",
+                      "1"
+                    ],
+                    [
+                      "unsigned",
+                      "2"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.nested-indefinite-chunks-and-key",
+      "format": "cbor",
+      "hex": "837f7f6161ffff5f5f4100ffffbf7f616bff01ff",
+      "expected": [
+        "array",
+        [
+          [
+            "string",
+            "61"
+          ],
+          [
+            "binary",
+            "00",
+            null
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.u64max-container-sentinel",
+      "format": "cbor",
+      "hex": "829bffffffffffffffff0102ffbbffffffffffffffff616b01ff",
+      "expected": [
+        "array",
+        [
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ],
+              [
+                "unsigned",
+                "2"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.negative-u64max-native-signed-zero",
+      "format": "cbor",
+      "hex": "3bffffffffffffffff",
+      "expected": [
+        "signed",
+        "0"
+      ]
+    },
+    {
+      "name": "cbor.duplicate-raw-keys",
+      "format": "cbor",
+      "hex": "a46473616d65006473616d65810161ff6200ff60f6",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "null"
+            ]
+          ],
+          [
+            "73616d65",
+            [
+              "array",
+              [
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "ff",
+            [
+              "string",
+              "00ff"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.file-unselected-binary-raw-nonfinite-uint",
+      "format": "cbor",
+      "hex": "a16676616c7565738283fb3fd0000000000000fb3fe0000000000000fb3fe8000000000000854200ff61ff1bfffffffffffffffffb7ff0000000000000fb7ff8000000000000",
+      "expected": [
+        "object",
+        [
+          [
+            "76616c756573",
+            [
+              "array",
+              [
+                [
+                  "array",
+                  [
+                    [
+                      "real",
+                      "3fd0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe8000000000000"
+                    ]
+                  ]
+                ],
+                [
+                  "array",
+                  [
+                    [
+                      "binary",
+                      "00ff",
+                      null
+                    ],
+                    [
+                      "string",
+                      "ff"
+                    ],
+                    [
+                      "unsigned",
+                      "18446744073709551615"
+                    ],
+                    [
+                      "real",
+                      "7ff0000000000000"
+                    ],
+                    [
+                      "real",
+                      "7ff8000000000000"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.trailing",
+      "format": "cbor",
+      "hex": "f600",
+      "error": true
+    },
+    {
+      "name": "cbor.truncated-u64",
+      "format": "cbor",
+      "hex": "1b0000",
+      "error": true
+    },
+    {
+      "name": "cbor.tag-default-rejected",
+      "format": "cbor",
+      "hex": "c6f6",
+      "error": true
+    },
+    {
+      "name": "cbor.nonstring-map-key",
+      "format": "cbor",
+      "hex": "a10102",
+      "error": true
+    },
+    {
+      "name": "cbor.bad-indefinite-chunk",
+      "format": "cbor",
+      "hex": "5f6161ff",
+      "error": true
+    },
+    {
+      "name": "msgpack.integer-widths",
+      "format": "msgpack",
+      "hex": "dc0019001718ccffcd0100cdffffce00010000ceffffffffcf0000000100000000cfffffffffffffffffffe8e7d080d1ff7fd1ff00d1feffd2ffff7fffd2fffeffffd3fffffffeffffffffd38000000000000000d000d10080d200008000d30000000080000000",
+      "expected": [
+        "array",
+        [
+          [
+            "unsigned",
+            "0"
+          ],
+          [
+            "unsigned",
+            "23"
+          ],
+          [
+            "unsigned",
+            "24"
+          ],
+          [
+            "unsigned",
+            "255"
+          ],
+          [
+            "unsigned",
+            "256"
+          ],
+          [
+            "unsigned",
+            "65535"
+          ],
+          [
+            "unsigned",
+            "65536"
+          ],
+          [
+            "unsigned",
+            "4294967295"
+          ],
+          [
+            "unsigned",
+            "4294967296"
+          ],
+          [
+            "unsigned",
+            "18446744073709551615"
+          ],
+          [
+            "signed",
+            "-1"
+          ],
+          [
+            "signed",
+            "-24"
+          ],
+          [
+            "signed",
+            "-25"
+          ],
+          [
+            "signed",
+            "-128"
+          ],
+          [
+            "signed",
+            "-129"
+          ],
+          [
+            "signed",
+            "-256"
+          ],
+          [
+            "signed",
+            "-257"
+          ],
+          [
+            "signed",
+            "-32769"
+          ],
+          [
+            "signed",
+            "-65537"
+          ],
+          [
+            "signed",
+            "-4294967297"
+          ],
+          [
+            "signed",
+            "-9223372036854775808"
+          ],
+          [
+            "signed",
+            "0"
+          ],
+          [
+            "signed",
+            "128"
+          ],
+          [
+            "signed",
+            "32768"
+          ],
+          [
+            "signed",
+            "2147483648"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.float-widths",
+      "format": "msgpack",
+      "hex": "98ca80000000ca3fc00000ca7f800000ca7fc00000cb8000000000000000cb3ff8000000000000cbfff0000000000000cb7ff8000000000000",
+      "expected": [
+        "array",
+        [
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "3ff8000000000000"
+          ],
+          [
+            "real",
+            "7ff0000000000000"
+          ],
+          [
+            "real",
+            "7ff8000000000000"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "3ff8000000000000"
+          ],
+          [
+            "real",
+            "fff0000000000000"
+          ],
+          [
+            "real",
+            "7ff8000000000000"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.length-widths",
+      "format": "msgpack",
+      "hex": "9dd902ff00c40200ffc702ff00ffda0002ff00c5000200ffc80002ff00ffdb00000002ff00c60000000200ffc900000002ff00ffdc000101de0001a16b01dd0000000101df00000001a16b01",
+      "expected": [
+        "array",
+        [
+          [
+            "string",
+            "ff00"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "binary",
+            "00ff",
+            "255"
+          ],
+          [
+            "string",
+            "ff00"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "binary",
+            "00ff",
+            "255"
+          ],
+          [
+            "string",
+            "ff00"
+          ],
+          [
+            "binary",
+            "00ff",
+            null
+          ],
+          [
+            "binary",
+            "00ff",
+            "255"
+          ],
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.fixext-subtypes",
+      "format": "msgpack",
+      "hex": "95d4ff00d5ff0001d6ff00010203d7ff0001020304050607d8ff000102030405060708090a0b0c0d0e0f",
+      "expected": [
+        "array",
+        [
+          [
+            "binary",
+            "00",
+            "255"
+          ],
+          [
+            "binary",
+            "0001",
+            "255"
+          ],
+          [
+            "binary",
+            "00010203",
+            "255"
+          ],
+          [
+            "binary",
+            "0001020304050607",
+            "255"
+          ],
+          [
+            "binary",
+            "000102030405060708090a0b0c0d0e0f",
+            "255"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.duplicate-raw-keys",
+      "format": "msgpack",
+      "hex": "84a473616d6500a473616d659101a1ffa200ffa0c0",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "null"
+            ]
+          ],
+          [
+            "73616d65",
+            [
+              "array",
+              [
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "ff",
+            [
+              "string",
+              "00ff"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.file-unselected-binary-raw-nonfinite-uint",
+      "format": "msgpack",
+      "hex": "81a676616c7565739293cb3fd0000000000000cb3fe0000000000000cb3fe800000000000095c40200ffa1ffcfffffffffffffffffcb7ff0000000000000cb7ff8000000000000",
+      "expected": [
+        "object",
+        [
+          [
+            "76616c756573",
+            [
+              "array",
+              [
+                [
+                  "array",
+                  [
+                    [
+                      "real",
+                      "3fd0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe8000000000000"
+                    ]
+                  ]
+                ],
+                [
+                  "array",
+                  [
+                    [
+                      "binary",
+                      "00ff",
+                      null
+                    ],
+                    [
+                      "string",
+                      "ff"
+                    ],
+                    [
+                      "unsigned",
+                      "18446744073709551615"
+                    ],
+                    [
+                      "real",
+                      "7ff0000000000000"
+                    ],
+                    [
+                      "real",
+                      "7ff8000000000000"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.reserved",
+      "format": "msgpack",
+      "hex": "c1",
+      "error": true
+    },
+    {
+      "name": "msgpack.truncated-u64",
+      "format": "msgpack",
+      "hex": "cf00",
+      "error": true
+    },
+    {
+      "name": "msgpack.trailing",
+      "format": "msgpack",
+      "hex": "c0c0",
+      "error": true
+    },
+    {
+      "name": "msgpack.nonstring-map-key",
+      "format": "msgpack",
+      "hex": "810102",
+      "error": true
+    },
+    {
+      "name": "msgpack.truncated-ext",
+      "format": "msgpack",
+      "hex": "c702ff00",
+      "error": true
+    },
+    {
+      "name": "ubjson.primitives-numeric-widths",
+      "format": "ubjson",
+      "hex": "5b5a544655005517551855ff4901006c0000ffff6c000100004c00000000ffffffff4c0000000100000000485514313834343637343430373337303935353136313569ff69e869e7698049ff7f49ff0049feff6cffff7fff6cfffeffff4cfffffffeffffffff4c8000000000000000448000000000000000447ff0000000000000447ff8000000000000535502ff005d",
+      "expected": [
+        "array",
+        [
+          [
+            "null"
+          ],
+          [
+            "boolean",
+            true
+          ],
+          [
+            "boolean",
+            false
+          ],
+          [
+            "unsigned",
+            "0"
+          ],
+          [
+            "unsigned",
+            "23"
+          ],
+          [
+            "unsigned",
+            "24"
+          ],
+          [
+            "unsigned",
+            "255"
+          ],
+          [
+            "signed",
+            "256"
+          ],
+          [
+            "signed",
+            "65535"
+          ],
+          [
+            "signed",
+            "65536"
+          ],
+          [
+            "signed",
+            "4294967295"
+          ],
+          [
+            "signed",
+            "4294967296"
+          ],
+          [
+            "unsigned",
+            "18446744073709551615"
+          ],
+          [
+            "signed",
+            "-1"
+          ],
+          [
+            "signed",
+            "-24"
+          ],
+          [
+            "signed",
+            "-25"
+          ],
+          [
+            "signed",
+            "-128"
+          ],
+          [
+            "signed",
+            "-129"
+          ],
+          [
+            "signed",
+            "-256"
+          ],
+          [
+            "signed",
+            "-257"
+          ],
+          [
+            "signed",
+            "-32769"
+          ],
+          [
+            "signed",
+            "-65537"
+          ],
+          [
+            "signed",
+            "-4294967297"
+          ],
+          [
+            "signed",
+            "-9223372036854775808"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "7ff0000000000000"
+          ],
+          [
+            "real",
+            "7ff8000000000000"
+          ],
+          [
+            "string",
+            "ff00"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.high-precision-lexer",
+      "format": "ubjson",
+      "hex": "5b485514313834343637343430373337303935353136313548551431383434363734343037333730393535313631364855142d393232333337323033363835343737353830394855022d304855042d302e304855042d30653048550531653330394855062d31653330394855072d31652d393939485509efbbbf20090d0a3120485509310069676e6f7265645d",
+      "expected": [
+        "array",
+        [
+          [
+            "unsigned",
+            "18446744073709551615"
+          ],
+          [
+            "real",
+            "43f0000000000000"
+          ],
+          [
+            "real",
+            "c3e0000000000000"
+          ],
+          [
+            "signed",
+            "0"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "real",
+            "7ff0000000000000"
+          ],
+          [
+            "real",
+            "fff0000000000000"
+          ],
+          [
+            "real",
+            "8000000000000000"
+          ],
+          [
+            "unsigned",
+            "1"
+          ],
+          [
+            "unsigned",
+            "1"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.negative-string-lengths",
+      "format": "ubjson",
+      "hex": "5b5369ff5349ffff536cffffffff534cffffffffffffffff5d",
+      "expected": [
+        "array",
+        [
+          [
+            "string",
+            ""
+          ],
+          [
+            "string",
+            ""
+          ],
+          [
+            "string",
+            ""
+          ],
+          [
+            "string",
+            ""
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.negative-key-length",
+      "format": "ubjson",
+      "hex": "7b69ff55017d",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "unsigned",
+              "1"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.counted-typed-containers",
+      "format": "ubjson",
+      "hex": "5b5b235502550155025b2469235503ff00017b246923550255016101550162025b245a2355025b244e2355035d",
+      "expected": [
+        "array",
+        [
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ],
+              [
+                "unsigned",
+                "2"
+              ]
+            ]
+          ],
+          [
+            "array",
+            [
+              [
+                "signed",
+                "-1"
+              ],
+              [
+                "signed",
+                "0"
+              ],
+              [
+                "signed",
+                "1"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "61",
+                [
+                  "signed",
+                  "1"
+                ]
+              ],
+              [
+                "62",
+                [
+                  "signed",
+                  "2"
+                ]
+              ]
+            ]
+          ],
+          [
+            "array",
+            [
+              [
+                "null"
+              ],
+              [
+                "null"
+              ]
+            ]
+          ],
+          [
+            "array",
+            []
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.invalid-optimized-type-with-zero-count",
+      "format": "ubjson",
+      "hex": "5b5b24582355007b24582355005d",
+      "expected": [
+        "array",
+        [
+          [
+            "array",
+            []
+          ],
+          [
+            "object",
+            []
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.zero-type-sentinel-consumes-markers",
+      "format": "ubjson",
+      "hex": "5b5b2400235502550155027b240023550155016b55015d",
+      "expected": [
+        "array",
+        [
+          [
+            "array",
+            [
+              [
+                "unsigned",
+                "1"
+              ],
+              [
+                "unsigned",
+                "2"
+              ]
+            ]
+          ],
+          [
+            "object",
+            [
+              [
+                "6b",
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.noops-and-ascii-char",
+      "format": "ubjson",
+      "hex": "4e5b4e4300437f4e4e5d4e4e",
+      "expected": [
+        "array",
+        [
+          [
+            "string",
+            "00"
+          ],
+          [
+            "string",
+            "7f"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.duplicate-raw-keys",
+      "format": "ubjson",
+      "hex": "7b550473616d655500550473616d655b55015d5501ff53550200ff55005a7d",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "null"
+            ]
+          ],
+          [
+            "73616d65",
+            [
+              "array",
+              [
+                [
+                  "unsigned",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "ff",
+            [
+              "string",
+              "00ff"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.file-unselected-raw-nonfinite-uint",
+      "format": "ubjson",
+      "hex": "7b550676616c7565735b5b443fd0000000000000443fe0000000000000443fe80000000000005d5b535502ff004855143138343436373434303733373039353531363135447ff0000000000000447ff80000000000005a545d5d5501ff53550769676e6f7265647d",
+      "expected": [
+        "object",
+        [
+          [
+            "76616c756573",
+            [
+              "array",
+              [
+                [
+                  "array",
+                  [
+                    [
+                      "real",
+                      "3fd0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe8000000000000"
+                    ]
+                  ]
+                ],
+                [
+                  "array",
+                  [
+                    [
+                      "string",
+                      "ff00"
+                    ],
+                    [
+                      "unsigned",
+                      "18446744073709551615"
+                    ],
+                    [
+                      "real",
+                      "7ff0000000000000"
+                    ],
+                    [
+                      "real",
+                      "7ff8000000000000"
+                    ],
+                    [
+                      "null"
+                    ],
+                    [
+                      "boolean",
+                      true
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "ff",
+            [
+              "string",
+              "69676e6f726564"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.bjdata-marker-rejected",
+      "format": "ubjson",
+      "hex": "4201",
+      "error": true
+    },
+    {
+      "name": "ubjson.negative-count",
+      "format": "ubjson",
+      "hex": "5b2369ff",
+      "error": true
+    },
+    {
+      "name": "ubjson.typed-without-count",
+      "format": "ubjson",
+      "hex": "5b24545d",
+      "error": true
+    },
+    {
+      "name": "ubjson.counted-close-is-trailing",
+      "format": "ubjson",
+      "hex": "5b2355005d",
+      "error": true
+    },
+    {
+      "name": "ubjson.highprecision-extra-number",
+      "format": "ubjson",
+      "hex": "485503312032",
+      "error": true
+    },
+    {
+      "name": "ubjson.char-outside-ascii",
+      "format": "ubjson",
+      "hex": "43ff",
+      "error": true
+    },
+    {
+      "name": "bson.primitives-and-widths",
+      "format": "bson",
+      "hex": "9d0000000476616c7565730090000000103000000000001031007f00000010320000010000103300ffffffff10340000000080123500000000800000000012360001000000000000001237000000000000000080113800ffffffffffffffff013900000000000000008001313000000000000000f07f01313100000000000000f87f0a313200083133000108313400000231350003000000ff00000000",
+      "expected": [
+        "object",
+        [
+          [
+            "76616c756573",
+            [
+              "array",
+              [
+                [
+                  "signed",
+                  "0"
+                ],
+                [
+                  "signed",
+                  "127"
+                ],
+                [
+                  "signed",
+                  "256"
+                ],
+                [
+                  "signed",
+                  "-1"
+                ],
+                [
+                  "signed",
+                  "-2147483648"
+                ],
+                [
+                  "signed",
+                  "2147483648"
+                ],
+                [
+                  "signed",
+                  "1"
+                ],
+                [
+                  "signed",
+                  "-9223372036854775808"
+                ],
+                [
+                  "unsigned",
+                  "18446744073709551615"
+                ],
+                [
+                  "real",
+                  "8000000000000000"
+                ],
+                [
+                  "real",
+                  "7ff0000000000000"
+                ],
+                [
+                  "real",
+                  "7ff8000000000000"
+                ],
+                [
+                  "null"
+                ],
+                [
+                  "boolean",
+                  true
+                ],
+                [
+                  "boolean",
+                  false
+                ],
+                [
+                  "string",
+                  "ff00"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.binary-subtypes-literal2",
+      "format": "bson",
+      "hex": "330000000476616c7565730026000000053000020000000000ff053100060000000202000000ff0005320001000000ffff0000",
+      "expected": [
+        "object",
+        [
+          [
+            "76616c756573",
+            [
+              "array",
+              [
+                [
+                  "binary",
+                  "00ff",
+                  "0"
+                ],
+                [
+                  "binary",
+                  "02000000ff00",
+                  "2"
+                ],
+                [
+                  "binary",
+                  "ff",
+                  "255"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.document-sizes-ignored",
+      "format": "bson",
+      "hex": "ffffffff1078000100000000",
+      "expected": [
+        "object",
+        [
+          [
+            "78",
+            [
+              "signed",
+              "1"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.array-key-spelling-ignored",
+      "format": "bson",
+      "hex": "270000000476616c756573001a0000001035000100000010780002000000103000030000000000",
+      "expected": [
+        "object",
+        [
+          [
+            "76616c756573",
+            [
+              "array",
+              [
+                [
+                  "signed",
+                  "1"
+                ],
+                [
+                  "signed",
+                  "2"
+                ],
+                [
+                  "signed",
+                  "3"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.string-terminal-and-boolean-byte",
+      "format": "bson",
+      "hex": "1700000002746578740002000000ff7f0879657300ff00",
+      "expected": [
+        "object",
+        [
+          [
+            "74657874",
+            [
+              "string",
+              "ff"
+            ]
+          ],
+          [
+            "796573",
+            [
+              "boolean",
+              true
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.duplicate-raw-keys",
+      "format": "bson",
+      "hex": "2d0000001073616d6500000000000473616d65000c000000103000010000000002ff000300000000ff000a0000",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "null"
+            ]
+          ],
+          [
+            "73616d65",
+            [
+              "array",
+              [
+                [
+                  "signed",
+                  "1"
+                ]
+              ]
+            ]
+          ],
+          [
+            "ff",
+            [
+              "string",
+              "00ff"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.file-unselected-binary-raw-nonfinite-uint",
+      "format": "bson",
+      "hex": "770000000476616c756573006a00000004300026000000013000000000000000d03f013100000000000000e03f013200000000000000e83f0004310039000000053000020000000000ff02310002000000ff00113200ffffffffffffffff013300000000000000f07f013400000000000000f87f000000",
+      "expected": [
+        "object",
+        [
+          [
+            "76616c756573",
+            [
+              "array",
+              [
+                [
+                  "array",
+                  [
+                    [
+                      "real",
+                      "3fd0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe0000000000000"
+                    ],
+                    [
+                      "real",
+                      "3fe8000000000000"
+                    ]
+                  ]
+                ],
+                [
+                  "array",
+                  [
+                    [
+                      "binary",
+                      "00ff",
+                      "0"
+                    ],
+                    [
+                      "string",
+                      "ff"
+                    ],
+                    [
+                      "unsigned",
+                      "18446744073709551615"
+                    ],
+                    [
+                      "real",
+                      "7ff0000000000000"
+                    ],
+                    [
+                      "real",
+                      "7ff8000000000000"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.unsupported-record",
+      "format": "bson",
+      "hex": "16000000076f69640000000000000000000000000000",
+      "error": true
+    },
+    {
+      "name": "bson.negative-string-length",
+      "format": "bson",
+      "hex": "0c000000027300ffffffff00",
+      "error": true
+    },
+    {
+      "name": "bson.negative-binary-length",
+      "format": "bson",
+      "hex": "0d000000056200ffffffff0000",
+      "error": true
+    },
+    {
+      "name": "bson.trailing",
+      "format": "bson",
+      "hex": "050000000000",
+      "error": true
+    },
+    {
+      "name": "bson.truncated-document",
+      "format": "bson",
+      "hex": "05000000",
+      "error": true
+    },
+    {
+      "name": "cbor.native-natural-signedbyte-u32-wrap-keys",
+      "format": "cbor",
+      "hex": "a2686f72646572696e67a6636b31300a626b3202636b30320361ff046180056161066477726170a26b6b31303030303030303030016b6b3532393439363732393602",
+      "expected": [
+        "object",
+        [
+          [
+            "6f72646572696e67",
+            [
+              "object",
+              [
+                [
+                  "61",
+                  [
+                    "unsigned",
+                    "6"
+                  ]
+                ],
+                [
+                  "6b3032",
+                  [
+                    "unsigned",
+                    "3"
+                  ]
+                ],
+                [
+                  "6b3130",
+                  [
+                    "unsigned",
+                    "10"
+                  ]
+                ],
+                [
+                  "6b32",
+                  [
+                    "unsigned",
+                    "2"
+                  ]
+                ],
+                [
+                  "80",
+                  [
+                    "unsigned",
+                    "5"
+                  ]
+                ],
+                [
+                  "ff",
+                  [
+                    "unsigned",
+                    "4"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "77726170",
+            [
+              "object",
+              [
+                [
+                  "6b31303030303030303030",
+                  [
+                    "unsigned",
+                    "2"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "cbor.native-nul-alias-last-value-first-raw-key",
+      "format": "cbor",
+      "hex": "a56c76616c75657300666972737481016676616c75657381026b76616c756573006c6173748103600465007461696c05",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "unsigned",
+              "5"
+            ]
+          ],
+          [
+            "76616c756573006669727374",
+            [
+              "array",
+              [
+                [
+                  "unsigned",
+                  "3"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.native-natural-signedbyte-u32-wrap-keys",
+      "format": "msgpack",
+      "hex": "82a86f72646572696e6786a36b31300aa26b3202a36b303203a1ff04a18005a16106a47772617082ab6b3130303030303030303001ab6b3532393439363732393602",
+      "expected": [
+        "object",
+        [
+          [
+            "6f72646572696e67",
+            [
+              "object",
+              [
+                [
+                  "61",
+                  [
+                    "unsigned",
+                    "6"
+                  ]
+                ],
+                [
+                  "6b3032",
+                  [
+                    "unsigned",
+                    "3"
+                  ]
+                ],
+                [
+                  "6b3130",
+                  [
+                    "unsigned",
+                    "10"
+                  ]
+                ],
+                [
+                  "6b32",
+                  [
+                    "unsigned",
+                    "2"
+                  ]
+                ],
+                [
+                  "80",
+                  [
+                    "unsigned",
+                    "5"
+                  ]
+                ],
+                [
+                  "ff",
+                  [
+                    "unsigned",
+                    "4"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "77726170",
+            [
+              "object",
+              [
+                [
+                  "6b31303030303030303030",
+                  [
+                    "unsigned",
+                    "2"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "msgpack.native-nul-alias-last-value-first-raw-key",
+      "format": "msgpack",
+      "hex": "85ac76616c7565730066697273749101a676616c7565739102ab76616c756573006c6173749103a004a5007461696c05",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "unsigned",
+              "5"
+            ]
+          ],
+          [
+            "76616c756573006669727374",
+            [
+              "array",
+              [
+                [
+                  "unsigned",
+                  "3"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.native-natural-signedbyte-u32-wrap-keys",
+      "format": "ubjson",
+      "hex": "7b55086f72646572696e677b55036b3130550a55026b32550255036b303255035501ff5504550180550555016155067d5504777261707b550b6b313030303030303030305501550b6b3532393439363732393655027d7d",
+      "expected": [
+        "object",
+        [
+          [
+            "6f72646572696e67",
+            [
+              "object",
+              [
+                [
+                  "61",
+                  [
+                    "unsigned",
+                    "6"
+                  ]
+                ],
+                [
+                  "6b3032",
+                  [
+                    "unsigned",
+                    "3"
+                  ]
+                ],
+                [
+                  "6b3130",
+                  [
+                    "unsigned",
+                    "10"
+                  ]
+                ],
+                [
+                  "6b32",
+                  [
+                    "unsigned",
+                    "2"
+                  ]
+                ],
+                [
+                  "80",
+                  [
+                    "unsigned",
+                    "5"
+                  ]
+                ],
+                [
+                  "ff",
+                  [
+                    "unsigned",
+                    "4"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "77726170",
+            [
+              "object",
+              [
+                [
+                  "6b31303030303030303030",
+                  [
+                    "unsigned",
+                    "2"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "ubjson.native-nul-alias-last-value-first-raw-key",
+      "format": "ubjson",
+      "hex": "7b550c76616c7565730066697273745b55015d550676616c7565735b55025d550b76616c756573006c6173745b55035d550055045505007461696c55057d",
+      "expected": [
+        "object",
+        [
+          [
+            "",
+            [
+              "unsigned",
+              "5"
+            ]
+          ],
+          [
+            "76616c756573006669727374",
+            [
+              "array",
+              [
+                [
+                  "unsigned",
+                  "3"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "bson.native-natural-signedbyte-u32-wrap-keys",
+      "format": "bson",
+      "hex": "70000000036f72646572696e670034000000106b3130000a000000106b320002000000106b3032000300000010ff000400000010800005000000106100060000000003777261700027000000106b313030303030303030300001000000106b3532393439363732393600020000000000",
+      "expected": [
+        "object",
+        [
+          [
+            "6f72646572696e67",
+            [
+              "object",
+              [
+                [
+                  "61",
+                  [
+                    "signed",
+                    "6"
+                  ]
+                ],
+                [
+                  "6b3032",
+                  [
+                    "signed",
+                    "3"
+                  ]
+                ],
+                [
+                  "6b3130",
+                  [
+                    "signed",
+                    "10"
+                  ]
+                ],
+                [
+                  "6b32",
+                  [
+                    "signed",
+                    "2"
+                  ]
+                ],
+                [
+                  "80",
+                  [
+                    "signed",
+                    "5"
+                  ]
+                ],
+                [
+                  "ff",
+                  [
+                    "signed",
+                    "4"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "77726170",
+            [
+              "object",
+              [
+                [
+                  "6b31303030303030303030",
+                  [
+                    "signed",
+                    "2"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}
