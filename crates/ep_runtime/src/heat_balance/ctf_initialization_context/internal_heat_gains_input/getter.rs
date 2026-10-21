@@ -396,6 +396,7 @@ impl SelectedInternalHeatGains {
             let level_field = match values.alphas[4].as_str() {
                 "EQUIPMENTLEVEL" => 0,
                 "WATTS/AREA" | "POWER/AREA" => 1,
+                "WATTS/PERSON" | "POWER/PERSON" => 2,
                 _ => return Err(unavailable("positive OtherEquipment sizing method")),
             };
             let level_value = values.numbers[level_field];
@@ -470,14 +471,18 @@ impl SelectedInternalHeatGains {
                         sizing_warning(owners, &message)?;
                     }
                 } else {
-                    if level_field == 1 && level_value < 0.0 {
+                    if (level_field == 1 && level_value < 0.0)
+                        || (level_field == 2 && level_value <= 0.0)
+                    {
                         let value = crate::heat_balance::source_round_format::round(level_value, 3)
                             .map_err(|e| E::Format(format!("IHG design level .3R: {e:?}")))?;
                         sizing_severe(
                             owners,
                             &format!(
-                                "GetInternalHeatGains: OtherEquipment=\"{}\", invalid {}, value  [<0.0]={value}",
-                                object.name, level_name
+                                "GetInternalHeatGains: OtherEquipment=\"{}\", invalid {}, value  [{}]={value}",
+                                object.name,
+                                level_name,
+                                if level_field == 1 { "<0.0" } else { "<=0.0" }
                             ),
                         )?;
                         self.errors_found = true;
@@ -485,7 +490,7 @@ impl SelectedInternalHeatGains {
                     if !self.errors_found {
                         if level_field == 0 {
                             design_level = level_value * 1.0;
-                        } else {
+                        } else if level_field == 1 {
                             let space = owners
                                 .zones
                                 .spaces
@@ -498,6 +503,28 @@ impl SelectedInternalHeatGains {
                                     owners,
                                     &format!(
                                         "GetInternalHeatGains: OtherEquipment=\"{}\", specifies {}, but Space Floor Area = 0.  0 OtherEquipment will result.",
+                                        object.name, level_name
+                                    ),
+                                )?;
+                            }
+                        } else {
+                            let total_occupants = owners
+                                .zones
+                                .spaces
+                                .as_ref()
+                                .and_then(|rows| index(space_number).ok().and_then(|i| rows.get(i)))
+                                .ok_or_else(|| {
+                                    unavailable("same OtherEquipment per-person Space totals")
+                                })?
+                                .total_occupants;
+                            // Native3554 computes before warning and does not
+                            // replace a negative design-total product with zero.
+                            design_level = level_value * total_occupants;
+                            if total_occupants <= 0.0 {
+                                sizing_warning(
+                                    owners,
+                                    &format!(
+                                        "GetInternalHeatGains: OtherEquipment=\"{}\", specifies {}, but Total Occupants = 0.  0 OtherEquipment will result.",
                                         object.name, level_name
                                     ),
                                 )?;

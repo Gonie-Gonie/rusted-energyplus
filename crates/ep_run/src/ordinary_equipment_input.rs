@@ -456,13 +456,33 @@ fn resolve_raw(
                             }
                         } else {
                             source_calendar_ingress
-                                && text_is(field(object, "design_level_calculation_method").unwrap_or(&RawValue::Null), &["Watts/Area", "Power/Area"])
-                                // A genuinely absent selected field reaches the
-                                // real warning/default child. Explicit JSON
-                                // null/strings are not schema-number blanks.
-                                && field(object, "power_per_floor_area")
-                                    .is_none_or(|value| number(value).is_some_and(|n| n >= 0.0))
-                                && field(object, "power_per_person").is_none_or(|value| number(value).is_some())
+                                && (if text_is(
+                                    field(object, "design_level_calculation_method")
+                                        .unwrap_or(&RawValue::Null),
+                                    &["Watts/Area", "Power/Area"],
+                                ) {
+                                    // Missing selected fields reach the real blank
+                                    // child; explicit null/string is not a number.
+                                    field(object, "power_per_floor_area")
+                                        .is_none_or(|value| number(value).is_some_and(|n| n >= 0.0))
+                                        && field(object, "power_per_person")
+                                            .is_none_or(|value| number(value).is_some())
+                                } else if text_is(
+                                    field(object, "design_level_calculation_method")
+                                        .unwrap_or(&RawValue::Null),
+                                    &["Watts/Person", "Power/Person"],
+                                ) {
+                                    field(object, "power_per_person")
+                                        .is_none_or(|value| number(value).is_some_and(|n| n >= 0.0))
+                                        && ["design_level", "power_per_floor_area"].iter().all(
+                                            |name| {
+                                                field(object, name)
+                                                    .is_none_or(|value| number(value).is_some())
+                                            },
+                                        )
+                                } else {
+                                    false
+                                })
                         })
                         && if source_calendar_ingress {
                             let names = ["fraction_latent", "fraction_radiant", "fraction_lost"];
@@ -2238,6 +2258,88 @@ mod source_a_compact_ingress {
                     .get("idf_max_fields"),
                 Some(&V::Number(count.into()))
             );
+        }
+        for method in ["Watts/Person", "Power/Person"] {
+            for (unused, projected) in
+                [("-9", -9.0_f64), ("9", 9.0), ("18446744073709551615", -1.0)]
+            {
+                let text = format!(
+                    r#"{{"Zone":{{"actual zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2,"sensible_heat_fraction":0.6}}}},"OtherEquipment":{{"Per person":{{"zone_or_zonelist_or_space_or_spacelist_name":"actual zone","schedule_name":"on","design_level_calculation_method":"{method}","design_level":-7,"power_per_floor_area":{unused},"power_per_person":3.5}}}}}}"#
+                );
+                let raw = ep_raw_model::parse_epjson_str(&text)?;
+                resolve_source_a(&raw)?;
+                resolve_source_b(&raw)?;
+                assert!(resolve(&raw).is_err());
+                for (source_b, ip) in [
+                    (
+                        false,
+                        crate::ordinary_input_processor::resolve_source_a(&raw)?,
+                    ),
+                    (
+                        true,
+                        crate::ordinary_input_processor::resolve_source_b(&raw)?,
+                    ),
+                ] {
+                    // A retains the existing statistics-only numeric marker;
+                    // the genuine HB projection below still reads the raw number.
+                    let expected = if source_b {
+                        V::Number(unused.into())
+                    } else {
+                        V::OtherScalar
+                    };
+                    assert_eq!(
+                        ip.source_raw_object_fields("OtherEquipment", "Per person")?
+                            .get("power_per_floor_area"),
+                        Some(&expected)
+                    );
+                    let hb = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+                    assert_eq!(hb.objects["OtherEquipment"][0].fields.get("power_per_floor_area"),Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(projected)));
+                }
+                let result = ep_compiler::compile_raw_model(&raw);
+                assert!(
+                    !result.has_errors(),
+                    "{method}: {:?}",
+                    result.report.diagnostics
+                );
+                let typed = result.model.ok_or("typed real per-person operands")?;
+                assert_eq!(
+                    typed.other_equipment[0]
+                        .power_per_floor_area_w_per_m2
+                        .to_bits(),
+                    projected.to_bits()
+                );
+                assert_eq!(typed.other_equipment[0].power_per_person_w, 3.5);
+                if unused == "-9" {
+                    let missing = text.replace(",\"power_per_person\":3.5", "");
+                    assert_ne!(missing, text);
+                    let raw = ep_raw_model::parse_epjson_str(&missing)?;
+                    resolve_source_a(&raw)?;
+                    resolve_source_b(&raw)?;
+                    let result = ep_compiler::compile_raw_model(&raw);
+                    assert!(
+                        !result.has_errors(),
+                        "missing selected operand: {:?}",
+                        result.report.diagnostics
+                    );
+                    assert_eq!(
+                        result
+                            .model
+                            .ok_or("typed missing per-person operand")?
+                            .other_equipment[0]
+                            .power_per_person_w,
+                        0.0
+                    );
+                    for invalid in ["null", "\"3.5\"", "\"\""] {
+                        let text = text.replace(
+                            "\"power_per_person\":3.5",
+                            &format!("\"power_per_person\":{invalid}"),
+                        );
+                        let raw = ep_raw_model::parse_epjson_str(&text)?;
+                        assert!(resolve_source_a(&raw).is_err());
+                        assert!(resolve_source_b(&raw).is_err());
+                    }
+                }
+            }
         }
         // Genuine built-in occupancy stays raw and typed without an authored
         // replacement schedule. Both Source frontends preserve the same name.

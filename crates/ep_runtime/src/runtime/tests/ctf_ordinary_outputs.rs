@@ -3663,6 +3663,433 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         }
                         assert!(air.spaces.is_none());
                     }
+                    // Real People design totals precede OtherEquipment sizing. Current
+                    // occupancy can be zero while the design total remains two.
+                    let person_case = |method: &str,
+                                       selected: Option<f64>,
+                                       counts: Option<[f64; 2]>,
+                                       occupancy: &str,
+                                       fuel: &str,
+                                       prior_error: bool|
+                     -> Result<
+                        CtfInitializationReports,
+                        Box<dyn std::error::Error>,
+                    > {
+                        let mut candidate = people_getter_base.clone();
+                        let raw = candidate
+                            .heat_balance_input
+                            .as_mut()
+                            .ok_or("per-person raw")?;
+                        let people = raw.objects.get_mut("People").ok_or("per-person People")?;
+                        if let Some(counts) = counts {
+                            for (row, count) in people.iter_mut().zip(counts) {
+                                row.fields.insert(
+                                    "number_of_people".into(),
+                                    ProjectInputValue::Number(count),
+                                );
+                                row.fields.insert(
+                                    "number_of_people_schedule_name".into(),
+                                    ProjectInputValue::String(occupancy.into()),
+                                );
+                            }
+                            if prior_error {
+                                people[0].fields.insert(
+                                    "number_of_people_calculation_method".into(),
+                                    ProjectInputValue::String("Area/Person".into()),
+                                );
+                                people[0].fields.insert(
+                                    "floor_area_per_person".into(),
+                                    ProjectInputValue::Number(0.0),
+                                );
+                            }
+                        } else {
+                            people.clear();
+                        }
+                        let mut equipment = failed_gains
+                            .heat_balance_input
+                            .as_ref()
+                            .ok_or("existing raw equipment")?
+                            .objects
+                            .get("OtherEquipment")
+                            .ok_or("existing equipment rows")?[0]
+                            .clone();
+                        equipment.object_name = "Per person equipment".into();
+                        equipment.fields.insert(
+                            "zone_or_zonelist_or_space_or_spacelist_name".into(),
+                            ProjectInputValue::String(zone_name.clone()),
+                        );
+                        equipment.fields.insert(
+                            "design_level_calculation_method".into(),
+                            ProjectInputValue::String(method.into()),
+                        );
+                        equipment
+                            .fields
+                            .insert("fuel_type".into(), ProjectInputValue::String(fuel.into()));
+                        equipment
+                            .fields
+                            .insert("design_level".into(), ProjectInputValue::Number(-7.0));
+                        equipment.fields.insert(
+                            "power_per_floor_area".into(),
+                            ProjectInputValue::Number(-9.0),
+                        );
+                        if let Some(value) = selected {
+                            equipment.fields.insert(
+                                "power_per_person".into(),
+                                ProjectInputValue::Number(value),
+                            );
+                        } else {
+                            equipment.fields.remove("power_per_person");
+                        }
+                        raw.objects.insert("OtherEquipment".into(), vec![equipment]);
+                        let mut old_ip = candidate
+                            .selected_input_processor
+                            .take()
+                            .ok_or("per-person official definitions")?;
+                        let mut definitions = Vec::new();
+                        for family in [
+                            "People",
+                            "Lights",
+                            "ElectricEquipment",
+                            "GasEquipment",
+                            "HotWaterEquipment",
+                            "SteamEquipment",
+                            "OtherEquipment",
+                            "ElectricEquipment:ITE:AirCooled",
+                            "ZoneBaseboard:OutdoorTemperatureControlled",
+                            "ZoneContaminantSourceAndSink:CarbonDioxide",
+                            "Output:Variable",
+                        ] {
+                            let actual = old_ip.get_object_def_max_args(family)?;
+                            definitions.push(SourceObjectDefinition {
+                                object_type: family.into(),
+                                alpha_fields: actual.alphas,
+                                numeric_fields: actual.numerics,
+                                alpha_extensions: 0,
+                                numeric_extensions: 0,
+                                extension: None,
+                            });
+                        }
+                        let mut families = std::collections::BTreeMap::new();
+                        for family in ["People", "OtherEquipment"] {
+                            let objects =
+                                raw.objects.get(family).ok_or("per-person retained rows")?;
+                            families.insert(
+                                family.into(),
+                                SourceInputFamily::Objects(
+                                    objects
+                                        .iter()
+                                        .map(|row| SourceObjectShape {
+                                            object_name: row.object_name.clone(),
+                                            field_sizes: Default::default(),
+                                        })
+                                        .collect(),
+                                ),
+                            );
+                        }
+                        if let Some(family) = old_ip.family("Output:Variable") {
+                            families.insert("Output:Variable".into(), family.clone());
+                        }
+                        candidate.selected_input_processor = Some(
+                            SelectedInputProcessor::from_admitted_input(definitions, families)?,
+                        );
+                        Ok(candidate)
+                    };
+                    let projected_negative =
+                        ep_model::classify_source_json_number("18446744073709551615")
+                            .map_err(|_| "per-person signed design total")?
+                            .as_f64();
+                    for (
+                        method,
+                        selected,
+                        counts,
+                        occupancy,
+                        fuel,
+                        prior_error,
+                        total,
+                        level,
+                        warnings,
+                        severe,
+                    ) in [
+                        (
+                            "Watts/Person",
+                            Some(3.5),
+                            Some([1.5, 0.5]),
+                            "Constant-0.0",
+                            "None",
+                            false,
+                            2.0_f64,
+                            7.0_f64,
+                            0,
+                            0,
+                        ),
+                        (
+                            "Power/Person",
+                            Some(3.5),
+                            Some([1.5, 0.5]),
+                            "Constant-1.0",
+                            "None",
+                            false,
+                            2.0,
+                            7.0,
+                            0,
+                            0,
+                        ),
+                        (
+                            "Watts/Person",
+                            Some(3.5),
+                            None,
+                            "Constant-1.0",
+                            "None",
+                            false,
+                            0.0,
+                            0.0,
+                            1,
+                            0,
+                        ),
+                        (
+                            "Power/Person",
+                            Some(3.5),
+                            Some([0.0, projected_negative]),
+                            "Constant-1.0",
+                            "None",
+                            false,
+                            -1.0,
+                            -3.5,
+                            1,
+                            0,
+                        ),
+                        (
+                            "Watts/Person",
+                            None,
+                            Some([1.5, 0.5]),
+                            "Constant-1.0",
+                            "None",
+                            false,
+                            2.0,
+                            0.0,
+                            1,
+                            0,
+                        ),
+                        (
+                            "Watts/Person",
+                            Some(0.0),
+                            Some([1.5, 0.5]),
+                            "Constant-1.0",
+                            "None",
+                            false,
+                            2.0,
+                            0.0,
+                            0,
+                            1,
+                        ),
+                        (
+                            "Power/Person",
+                            Some(-1.0),
+                            Some([1.5, 0.5]),
+                            "Constant-1.0",
+                            "None",
+                            false,
+                            2.0,
+                            0.0,
+                            0,
+                            1,
+                        ),
+                        (
+                            "Watts/Person",
+                            Some(3.5),
+                            Some([0.0, projected_negative]),
+                            "Constant-1.0",
+                            "Electricity",
+                            false,
+                            -1.0,
+                            -3.5,
+                            1,
+                            1,
+                        ),
+                        (
+                            "Power/Person",
+                            Some(3.5),
+                            Some([0.0, 0.0]),
+                            "Constant-1.0",
+                            "None",
+                            true,
+                            0.0,
+                            0.0,
+                            0,
+                            1,
+                        ),
+                        (
+                            "Power/Person",
+                            None,
+                            Some([0.0, 0.0]),
+                            "Constant-1.0",
+                            "None",
+                            true,
+                            0.0,
+                            0.0,
+                            1,
+                            1,
+                        ),
+                    ] {
+                        let candidate =
+                            person_case(method, selected, counts, occupancy, fuel, prior_error)?;
+                        let (mut candidate, state, errors, eio, reached) = read_sizing(candidate)?;
+                        assert_eq!(
+                            reached.is_ok(),
+                            severe == 0,
+                            "{method}/{selected:?}: {reached:?}"
+                        );
+                        let gains = &candidate.selected_internal_heat_gains;
+                        assert_eq!(gains.get_input_flag, severe != 0);
+                        assert_eq!(gains.errors_found, severe != 0);
+                        let zones = candidate
+                            .selected_zone_input
+                            .as_ref()
+                            .ok_or("per-person totals")?;
+                        assert_eq!(
+                            zones.spaces.as_ref().ok_or("per-person Space total")?[0]
+                                .total_occupants
+                                .to_bits(),
+                            total.to_bits()
+                        );
+                        assert_eq!(
+                            zones.zones.as_ref().ok_or("per-person Zone total")?[0]
+                                .total_occupants
+                                .to_bits(),
+                            total.to_bits()
+                        );
+                        let equipment = &gains
+                            .allocations
+                            .other_equipment
+                            .as_ref()
+                            .ok_or("per-person equipment")?[0];
+                        assert_eq!(equipment.design_level.to_bits(), level.to_bits());
+                        assert_eq!(state.tracking.total_warning_errors, warnings);
+                        assert_eq!(state.tracking.total_warning_errors_during_warmup, warnings);
+                        assert_eq!(state.tracking.total_severe_errors, severe);
+                        assert_eq!(state.tracking.total_severe_errors_during_warmup, severe);
+                        assert!(
+                            !state.warmup_flag,
+                            "actual clock phase stays a borrowed diagnostic operand"
+                        );
+                        let text = std::str::from_utf8(&errors)?;
+                        assert_eq!(
+                            text.matches("Total Occupants = 0.  0 OtherEquipment")
+                                .count(),
+                            usize::from(warnings != 0 && selected.is_some())
+                        );
+                        if selected.is_none() {
+                            assert!(text.contains("specifies power_per_person, but that field is blank.  0 OtherEquipment"));
+                        }
+                        if selected.is_some_and(|value| value <= 0.0) {
+                            assert!(text.contains("invalid power_per_person, value  [<=0.0]="));
+                        }
+                        if fuel == "Electricity" {
+                            assert!(
+                                text.find("Total Occupants = 0").ok_or("total warning")?
+                                    < text
+                                        .find("is not allowed to be negative")
+                                        .ok_or("negative fuel severe")?
+                            );
+                            assert!(
+                                text.contains("... when a fuel type of Electricity is specified.")
+                            );
+                        }
+                        if severe != 0 {
+                            assert!(
+                                text.contains(" **  Fatal  ** GetInternalHeatGains: Errors found")
+                            );
+                            assert!(eio.is_empty(), "nominal follows the real final Fatal");
+                        } else {
+                            assert!(
+                                std::str::from_utf8(&eio)?
+                                    .contains("OtherEquipment Internal Gains Nominal")
+                            );
+                        }
+                        if occupancy == "Constant-0.0" {
+                            // An actual timestep prefix distinguishes design total
+                            // from current occupants; its later Refrig stop stays real.
+                            let (reached, air) = run_auto(&mut candidate, None)?;
+                            assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same refrigeration selected official schema definition"))), "per-person timestep prefix: {reached:?}");
+                            let gains = &candidate.selected_internal_heat_gains;
+                            assert!(
+                                gains
+                                    .allocations
+                                    .people
+                                    .rows
+                                    .iter()
+                                    .all(|row| row.num_occ == 0.0 && row.tot_gain_rate == 0.0)
+                            );
+                            let equipment = &gains
+                                .allocations
+                                .other_equipment
+                                .as_ref()
+                                .ok_or("per-person rates")?[0];
+                            assert_eq!(equipment.rates[0], 7.0);
+                            assert_eq!(equipment.energies[0], 0.0);
+                            assert!(
+                                air.spaces.is_none(),
+                                "failed module still precedes actual latent sinks"
+                            );
+                        }
+                    }
+                    // A real write failure in the new total-occupant warning
+                    // precedes equipment assignment, fractions and nominal rows.
+                    {
+                        let mut candidate = person_case(
+                            "Watts/Person",
+                            Some(3.5),
+                            None,
+                            "Constant-1.0",
+                            "None",
+                            false,
+                        )?;
+                        let (mut state, mut errors, mut console, mut eio, mut eso) = (
+                            ctf_ordinary_output_test_state(),
+                            OrdinaryFailingEio,
+                            Vec::new(),
+                            Vec::new(),
+                            Vec::new(),
+                        );
+                        let mut clock = people_clock.clone();
+                        clock.warmup_flag = true;
+                        let reached = CtfInitializationContext {
+                            reports: &mut candidate,
+                            eio: &mut eio,
+                            backend: SourceErrorBackend {
+                                state: &mut state,
+                                error_stream: Some(&mut errors),
+                                console: &mut console,
+                                out_unit1: None,
+                                out_unit2: None,
+                                f_message: None,
+                                message_callback: None,
+                                error_callback: None,
+                                sqlite: None,
+                            },
+                        }
+                        .manage_selected_internal_heat_gains_input_with_dictionary(
+                            &people_model,
+                            15,
+                            &mut gain_host,
+                            Some(&clock),
+                            Some(SourceGainDictionaryFile {
+                                eso: Some(&mut eso),
+                            }),
+                        );
+                        assert!(matches!(reached, Err(crate::RuntimeError::WarmupOutput(_))));
+                        let gains = &candidate.selected_internal_heat_gains;
+                        assert!(gains.get_input_flag && !gains.errors_found);
+                        let equipment = &gains
+                            .allocations
+                            .other_equipment
+                            .as_ref()
+                            .ok_or("failed per-person row")?[0];
+                        assert_eq!(equipment.design_level, 0.0);
+                        assert_eq!(equipment.fraction_radiant, 0.0);
+                        assert_eq!(state.tracking.total_warning_errors_during_warmup, 1);
+                        assert!(eio.is_empty());
+                    }
                 }
                 if expected_count == 1.5 {
                     let mut blank = people_getter_base.clone();

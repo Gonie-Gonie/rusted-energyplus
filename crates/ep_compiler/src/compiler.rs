@@ -13777,9 +13777,10 @@ impl<'a> Compiler<'a> {
                     0.0,
                 ),
                 power_per_floor_area_w_per_m2: if design_level_calculation_method
-                    == OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel
+                    != OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
                 {
-                    // Native selects Numeric1; finite unused Numeric2 is retained.
+                    // Native selects Numeric1 or Numeric3 for these methods;
+                    // finite unused Numeric2 retains either sign.
                     self.number_default(
                         "OtherEquipment",
                         &name,

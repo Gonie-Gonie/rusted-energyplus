@@ -237,8 +237,8 @@
       "Source A/B retains unknown top-level instance metadata of six JSON kinds after known-property validation. Reserved idf_order, idf_max_fields and idf_max_extensible_fields remain separate; extensible rows and the legacy lane are unchanged. Owner tests check raw/IP retention, while existing nine-family same-input evidence bounds known behavior with harmless metadata. This establishes report-visible owners without claiming new thermal consumers, arbitrary combinations or full family completion. Known numeric/schema bounds, calendar/minutes fields, generic number_value, alpha ProcessNumber and existing BOM/comment/depth/error behavior are unchanged. Full family completion, arbitrary model combinations, unsupported nonfinite/unsafe integer/error paths and Schedule:File/EMS remain unestablished. Historical fixed conformance and cache/performance claims keep their scope; typing and Source admission categories are unchanged."
     ],
     "OtherEquipment": [
-      "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, or multiplies Power/Area and Watts/Area by the genuine post-geometry Space.FloorArea. Finite unselected Numeric2/3 may have either sign; a missing selected operand retains its actual blank warning and zero default. Convective fraction is computed as 1-(latent+radiant+lost), clamped to zero when its absolute residual is at most 0.001, then checked for negativity. Real device caches, radiant enclosures, surface absorption and air/surface heat-balance consumers retain these fields; no report value seeds production.",
-      "Source A/B retains None and thirteen non-Water fuels: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption reach real resource meters; NaturalGas retains Gas-IP predefined columns. Owner bodies cover all thirteen; physical evidence covers Electricity with nonzero latent/radiant/lost fractions, its separate Hourly meter and bound object, Zone and implicit-Space thermal/fuel Timestep outputs through the actual ESO dictionary. Positive latent load reaches actual gain caches, zone moisture balance and psychrometric state in Source A. The conditioned Source B route connects these fields through existing NoLimit IdealLoads with no outdoor air and None humidity controls. Per-person sizing, explicit or multiple Space/grouping and EMS remain unavailable. Direct epJSON numbers follow Native signed/unsigned/float projection, including UInt64MAX to signed-1. Unknown top-level instance members of all six JSON kinds are retained and ignored after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields remain separately recognized. arbitrary models and other fractional combinations retain their stated bounds."
+      "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, multiplies Power/Area or Watts/Area by the genuine post-geometry Space floor area, or multiplies Power/Person or Watts/Person by the actual Space total_occupants written by the People getter. Design occupant totals remain distinct from current scheduled occupancy. Missing selected operands warn and return zero before the prior-error gate; nonblank per-person operands at or below zero produce their Severe before that gate. The per-person product is computed before the nonpositive-occupant warning and retains a negative result for fuel None; existing metered-fuel negative-design Severe/Continue follows. Finite unused numeric operands retain either sign. Convective fraction uses 1-(latent+radiant+lost), clamps an absolute residual at most 0.001 to zero, then checks negativity. Direct epJSON signed/unsigned/float projection, including UInt64MAX to signed-1, and ignored instance metadata of all six JSON kinds remain connected after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields stay separately recognized.",
+      "None and thirteen non-Water fuels are connected: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption use real resource meters, including NaturalGas Gas-IP predefined columns. Owner checks cover all thirteen and sizing/error/write-order branches. Same-input A/B evidence adds per-person sizing with genuine People design totals and different current occupancy while retaining every output policy; earlier evidence covers Electricity, its separate Hourly meter, bound object/Zone/implicit-Space thermal/fuel Timestep dictionaries and nonzero latent/radiant/lost fields. Real device caches, radiant enclosures, surface absorption, moisture balance and psychrometric consumers remain live. Source B retains existing NoLimit IdealLoads with no outdoor air and None humidity controls. Explicit/multiple Spaces, groups and EMS remain unsupported; other model/fraction restrictions remain as stated. This is bounded support, not full OtherEquipment input-domain completion."
     ],
     "People": [
       "Direct-Zone People uses the real single implicit Space, raw/IP defaults and field counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select their actual numeric operand and use the actual Space floor area where required, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts an explicit numeric value or the genuine omitted, empty or Autocalculate default; automatic sensible uses the same live Space MAT and retained Mixing RoomAir, the Native polynomial and ordered clamps. Getter totals, devices, rates/energy, Which bindings, nominal reporting, mandatory SimpleASH55 and the reached no-optional comfort/report paths remain connected. Unconsumed auxiliary comfort operands keep count-sensitive warnings without extra lookups.",
@@ -259,18 +259,18 @@
     "quality": {
       "clippy": "workspace --all-targets -- -D warnings passed",
       "log": {
-        "path": ".runtime/object-expansion/people-sizing-auto-clippy-50.log",
-        "sha256": "73fd69f1d6bea1a24a6087c1b713b466c57d932c23e16f1cbcb89f4df82666ae",
-        "bytes": 686
+        "path": ".runtime/object-expansion/other-equipment-person-clippy-51.log",
+        "sha256": "f765d5ec3e03f8fb394230b7ecfb7103c2eabfcd8c8d38fe7fbb4747f9f298af",
+        "bytes": 794
       },
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/people-sizing-auto-docs-50.log",
-        "sha256": "4a8104e2f52be762d613045873565076bdaf0ad32660752b526631149c62c2da",
+        "path": ".runtime/object-expansion/other-equipment-person-docs-51.log",
+        "sha256": "ec8a295db5abbd6dad049ff0a98d1a6d10013349076b33e52e0c28564df40af9",
         "bytes": 354
       },
-      "clippy_through_build": "people-sizing-auto-50",
+      "clippy_through_build": "other-equipment-person-51",
       "native_cohort_compile": {
         "command": "cargo check -p ep_runtime --locked --tests --features native-controlled-air-cohort",
         "passed": true,
@@ -4589,12 +4589,148 @@
           "passed": true
         },
         "effective_state": "Current Source50 same-input sizing/Auto comparison against its own sole initial-True Native50, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
+      },
+      {
+        "id": "other-equipment-person-a",
+        "group": "other_equipment_person",
+        "source_build": "other-equipment-person-51",
+        "scope": "A",
+        "input": {
+          "path": ".runtime/object-expansion/native-other-equipment-person-a/calibration-01/input.epJSON",
+          "sha256": "7a1f7cf7685ccc7a596e714c0c85d43cd706f13758efd7984b6f7a29a2bd3bc0",
+          "bytes": 53192
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-other-equipment-person-a/calibration-01/receipt.json",
+          "sha256": "bb8d15eb0854b63f0956b9114e346083ed705a85687a0eff67e6354b25b9e077",
+          "bytes": 19692
+        },
+        "Native_calibration_unit": 51,
+        "Native51_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-other-equipment-person-a-51/other-equipment-person-a/receipt.json",
+          "sha256": "5f582aa72e0037690827081eb6a5905545406103dc809206136c0a172649168d",
+          "bytes": 4116
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/other-equipment-person-a-51/run-summary.json",
+          "sha256": "08ada2c66cc32757c136318fdea32349b69787cd3bec1d5777321b0556097f1b",
+          "bytes": 50763
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-51/eplus-rs.exe",
+          "sha256": "f600e5ab05cd69980ebc7be743234900d813769db0a978d4735f8b097a619f6f",
+          "bytes": 76124746
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1c/1c2388b0a3a8228dc5b5925ed52555dc659cb500c7cd818c42d6f000db18398d",
+          "sha256": "1c2388b0a3a8228dc5b5925ed52555dc659cb500c7cd818c42d6f000db18398d"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-51/receipt.json",
+          "sha256": "31dd044ed1496f87d0745f494d93f206eb5ef521a5d21c8a5688ad3b8c95cf41",
+          "bytes": 4818
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-other-equipment-person-a-comparisons-51/other-equipment-person-a/comparison.json",
+          "sha256": "0ff2e5eba4cdca90db7cb86b60109a6ebde794c3dea39e862406fd43be66491c",
+          "bytes": 656308
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-other-equipment-person-a-51-launch/other-equipment-person-a/request.json",
+          "sha256": "ef7f3e065fad339d0120ace64a4f1228f9baafbd4197dea4b20eb356cf180405",
+          "bytes": 3361
+        },
+        "totals": {
+          "series": 118,
+          "samples": 11040,
+          "raw_operand_unequal": 73,
+          "parsed_binary64_unequal": 73,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source51 same-input OtherEquipment per-person comparison against its own sole initial-True Native51, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
+      },
+      {
+        "id": "other-equipment-person-b",
+        "group": "other_equipment_person",
+        "source_build": "other-equipment-person-51",
+        "scope": "B",
+        "input": {
+          "path": ".runtime/object-expansion/native-other-equipment-person-b/calibration-01/input.idf",
+          "sha256": "cfb689b496854ccbea8b77887dee51852fb97f695d855fae5653a98b0f3b500f",
+          "bytes": 15003
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/object-expansion/native-other-equipment-person-b/calibration-01/receipt.json",
+          "sha256": "5ebe4828393a12185e7620c7c09a9d8fa968c7f98bf8c19ef1d74d9345e93611",
+          "bytes": 17191
+        },
+        "Native_calibration_unit": 51,
+        "Native51_executions": 1,
+        "native_initial_validation_passed": true,
+        "source_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/source-other-equipment-person-b-51/other-equipment-person-b/receipt.json",
+          "sha256": "689c4101783e98a60f50dc3ab4c5f085ed7287862912a5ce32adeaf364b7f338",
+          "bytes": 4005
+        },
+        "source_summary": {
+          "path": ".runtime/porting/object-domain-20261020/runs/other-equipment-person-b-51/run-summary.json",
+          "sha256": "974e58e07d79a0542e87aff8b1c7553fa461e4dfc9b26edb84f3a60374f89690",
+          "bytes": 61384
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-51/eplus-rs.exe",
+          "sha256": "f600e5ab05cd69980ebc7be743234900d813769db0a978d4735f8b097a619f6f",
+          "bytes": 76124746
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1c/1c2388b0a3a8228dc5b5925ed52555dc659cb500c7cd818c42d6f000db18398d",
+          "sha256": "1c2388b0a3a8228dc5b5925ed52555dc659cb500c7cd818c42d6f000db18398d"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-51/receipt.json",
+          "sha256": "31dd044ed1496f87d0745f494d93f206eb5ef521a5d21c8a5688ad3b8c95cf41",
+          "bytes": 4818
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/source-other-equipment-person-b-comparisons-51/other-equipment-person-b/comparison.json",
+          "sha256": "49df51354117a1d1c83c73b59f32ff578d35a48d674f54394b6e0520bf22f8d9",
+          "bytes": 354426
+        },
+        "pre_launch_request": {
+          "path": ".runtime/object-expansion/source-other-equipment-person-b-51-launch/other-equipment-person-b/request.json",
+          "sha256": "17574690a78d2b6edc8319d074a86ac6981a783025be830afc199490a847e498",
+          "bytes": 3245
+        },
+        "totals": {
+          "series": 104,
+          "samples": 9984,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "effective_state": "Current Source51 same-input OtherEquipment per-person comparison against its own sole initial-True Native51, unchanged118/104 policies and authentic current physical streams. No inherited correction exception, separate proof-helper conversion, area/MAT/value seed or full People-domain promotion; normal SourceB IDF staging is part of the actual producer."
       }
     ],
     "totals": {
-      "paired_cases": 78,
-      "reported_samples": 588774,
-      "raw_operand_unequal": 167768,
+      "paired_cases": 80,
+      "reported_samples": 609798,
+      "raw_operand_unequal": 167841,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -5449,12 +5585,45 @@
           "sha256": "b50d37b183e35d8f0f7599bd73621c3e9d23aca0d44a13370efc8007841b0696",
           "bytes": 76130023
         }
+      },
+      {
+        "id": "other-equipment-person-51",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-51/receipt.json",
+          "sha256": "31dd044ed1496f87d0745f494d93f206eb5ef521a5d21c8a5688ad3b8c95cf41",
+          "bytes": 4818
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1c/1c2388b0a3a8228dc5b5925ed52555dc659cb500c7cd818c42d6f000db18398d",
+          "sha256": "1c2388b0a3a8228dc5b5925ed52555dc659cb500c7cd818c42d6f000db18398d"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-51/eplus-rs.exe",
+          "sha256": "f600e5ab05cd69980ebc7be743234900d813769db0a978d4735f8b097a619f6f",
+          "bytes": 76124746
+        }
       }
     ],
     "focused_since_workspace": {
-      "passed": 0,
-      "logs": [],
-      "scope": "All existing owner-body checks are contained in the current full workspace milestone."
+      "passed": 3,
+      "logs": [
+        {
+          "path": ".runtime/object-expansion/other-equipment-person-compiler-focused-51.log",
+          "sha256": "7f6927d23ebc8a2b53f64d78b91573a8eb92828c5ebc389c41fbb427e7512f49",
+          "bytes": 919
+        },
+        {
+          "path": ".runtime/object-expansion/other-equipment-person-raw-focused-51b.log",
+          "sha256": "bcce5858196adda4144e8b7f68170985c2d1db9bfd6cb51795c4270662913e3e",
+          "bytes": 1016
+        },
+        {
+          "path": ".runtime/object-expansion/other-equipment-person-runtime-focused-51.log",
+          "sha256": "f1656698ba807087f9a98d2033f96dd701eabb025427bf4369e93f22bf34f744",
+          "bytes": 792
+        }
+      ],
+      "scope": "Three existing compiler, Source A/B raw-ingress and connected gain-owner bodies passed after the retained full workspace50 milestone. No new test bodies or cohorts. The first51 raw-fixture expectation failure is preserved separately."
     }
   },
   "additional_native_type_calibrations": [

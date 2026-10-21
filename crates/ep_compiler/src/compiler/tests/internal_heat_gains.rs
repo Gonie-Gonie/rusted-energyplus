@@ -138,6 +138,26 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
             result.report.diagnostics
         );
     }
+    for method in ["Watts/Person", "Power/Person"] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2}}}},"OtherEquipment":{{"Per person":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"on","design_level_calculation_method":"{method}","design_level":-7,"power_per_floor_area":-9,"power_per_person":3.5}}}}}}"#
+        );
+        let result = compile_raw_model(&parse_epjson_str(&text)?);
+        assert!(
+            !result.has_errors(),
+            "{method}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("typed per-person equipment")?;
+        let row = &typed.other_equipment[0];
+        assert_eq!(
+            row.design_level_calculation_method,
+            ep_model::OtherEquipmentDesignLevelCalculationMethod::WattsPerPerson
+        );
+        assert_eq!(row.design_level_w, -7.0);
+        assert_eq!(row.power_per_floor_area_w_per_m2, -9.0);
+        assert_eq!(row.power_per_person_w, 3.5);
+    }
     // Preserve Native's grouped subtraction at the representable clamp edge.
     // The next lost-fraction float crosses the threshold even though decimal
     // 0.401 itself is just inside after the actual rounded addition.
