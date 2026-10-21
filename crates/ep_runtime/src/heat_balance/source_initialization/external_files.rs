@@ -124,12 +124,20 @@ fn parent_directory(path: &Path) -> io::Result<PathBuf> {
 
 /// Native FileSystem154-199: absolute display path is separate from cache identity.
 fn absolute_path(path: &Path) -> io::Result<PathBuf> {
-    let mut absolute = if path.is_absolute() {
+    let mut absolute = if cfg!(windows) {
+        // MSVC filesystem::absolute calls GetFullPathNameW for every nonempty
+        // spelling; it returns an empty path without a WinAPI call for empty.
+        if path.as_os_str().is_empty() {
+            PathBuf::new()
+        } else {
+            std::path::absolute(path)?
+        }
+    } else if path.is_absolute() {
         path.to_path_buf()
     } else {
         std::env::current_dir()?.join(path)
     };
-    if !absolute.is_absolute() {
+    if !cfg!(windows) && !absolute.is_absolute() {
         return Err(io::Error::new(
             io::ErrorKind::Unsupported,
             "actual Native drive-relative absolute-path expansion",
@@ -140,7 +148,7 @@ fn absolute_path(path: &Path) -> io::Result<PathBuf> {
         absolute = if target.is_absolute() {
             target
         } else {
-            parent_directory(&absolute)?.join(target)
+            SourceExternalInputFiles::append_native_path(&parent_directory(&absolute)?, &target)
         };
     }
     let mut result = PathBuf::new();
@@ -170,6 +178,73 @@ pub(crate) fn display_native_path(path: &Path) -> io::Result<&str> {
 }
 
 impl SourceExternalInputFiles {
+    /// MSVC filesystem::path::operator/ preserves raw root-name spelling.
+    /// This is lexical append only, not absolute conversion or cache identity.
+    pub(crate) fn append_native_path(base: &Path, path: &Path) -> PathBuf {
+        #[cfg(windows)]
+        {
+            use std::os::windows::ffi::{OsStrExt, OsStringExt};
+            let mut left: Vec<u16> = base.as_os_str().encode_wide().collect();
+            let right: Vec<u16> = path.as_os_str().encode_wide().collect();
+            let slash = |ch: u16| ch == u16::from(b'\\') || ch == u16::from(b'/');
+            let drive = |text: &[u16]| {
+                text.len() >= 2
+                    && ((u16::from(b'A')..=u16::from(b'Z')).contains(&text[0])
+                        || (u16::from(b'a')..=u16::from(b'z')).contains(&text[0]))
+                    && text[1] == u16::from(b':')
+            };
+            // Microsoft/STL vs-2022-17.14 _Find_root_name_end: device roots
+            // \\?\, \??\ and \\.\ have three raw root-name code units.
+            let root_name_end = |text: &[u16]| {
+                if drive(text) {
+                    return 2;
+                }
+                if text.len() < 2 || !slash(text[0]) {
+                    return 0;
+                }
+                if text.len() >= 4
+                    && slash(text[3])
+                    && (text.len() == 4 || !slash(text[4]))
+                    && ((slash(text[1])
+                        && (text[2] == u16::from(b'?') || text[2] == u16::from(b'.')))
+                        || (text[1] == u16::from(b'?') && text[2] == u16::from(b'?')))
+                {
+                    return 3;
+                }
+                if text.len() >= 3 && slash(text[1]) && !slash(text[2]) {
+                    return text[3..]
+                        .iter()
+                        .position(|ch| slash(*ch))
+                        .map_or(text.len(), |at| at + 3);
+                }
+                0
+            };
+            let left_root = root_name_end(&left);
+            let right_root = root_name_end(&right);
+            let right_absolute = if drive(&right) {
+                right.len() >= 3 && slash(right[2])
+            } else {
+                right_root != 0
+            };
+            if right_absolute || (right_root != 0 && left[..left_root] != right[..right_root]) {
+                return path.to_path_buf();
+            }
+            if right.get(right_root).is_some_and(|ch| slash(*ch)) {
+                left.truncate(left_root);
+            } else if (left_root == left.len() && left_root >= 3)
+                || (left_root < left.len() && !slash(left[left.len() - 1]))
+            {
+                left.push(u16::from(b'\\'));
+            }
+            left.extend_from_slice(&right[right_root..]);
+            PathBuf::from(std::ffi::OsString::from_wide(&left))
+        }
+        #[cfg(not(windows))]
+        {
+            base.join(path)
+        }
+    }
+
     /// Same CLI input parent, actual current process executable parent, constructor
     /// empty INI/path slots; no sidecar or environment lookup occurs at construction.
     pub(crate) fn new(source_input_file: &Path) -> io::Result<Self> {
@@ -202,25 +277,28 @@ impl SourceExternalInputFiles {
         let input = native_path(original)?;
         let candidates = [
             (input.clone(), "Current Working Directory"),
-            (self.input_dir_path.join(&input), "IDF Directory"),
             (
-                self.exe_directory_path.join(&input),
+                Self::append_native_path(&self.input_dir_path, &input),
+                "IDF Directory",
+            ),
+            (
+                Self::append_native_path(&self.exe_directory_path, &input),
                 "EnergyPlus Executable Directory",
             ),
             (
-                state.env_input_path1.join(&input),
+                Self::append_native_path(&state.env_input_path1, &input),
                 "\"epin\" Environment Variable",
             ),
             (
-                state.env_input_path2.join(&input),
+                Self::append_native_path(&state.env_input_path2, &input),
                 "\"input_path\" Environment Variable",
             ),
             (
-                self.current_working_folder.join(&input),
+                Self::append_native_path(&self.current_working_folder, &input),
                 "INI File Directory",
             ),
             (
-                self.program_path.join(&input),
+                Self::append_native_path(&self.program_path, &input),
                 "\"program\", \"dir\" from INI File",
             ),
         ];

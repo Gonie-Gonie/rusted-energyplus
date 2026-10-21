@@ -3979,6 +3979,117 @@ fn verify_authored_schedule_input_reports(fixture: &Value) -> TestResult<()> {
             && !ip.is_object_unused("Schedule:File", "Missing")
     );
     assert!(!std::str::from_utf8(&files.audit)?.contains("Processing Schedule Input -- Complete"));
+    // Windows lexical append is the MSVC raw-root operation, not PathBuf::join.
+    // This existing body keeps literal parser cases separate from real host IO.
+    if cfg!(windows) {
+        for (base, tail, expected) in [
+            ("", "", ""),
+            ("", "leaf", "leaf"),
+            ("C:", "", "C:"),
+            ("C:", "leaf", "C:leaf"),
+            (r"C:base", "", "C:base\\"),
+            (r"C:\base", "C:leaf", r"C:\base\leaf"),
+            (r"C:\base", "c:leaf", "c:leaf"),
+            (r"C:\base", "D:leaf", "D:leaf"),
+            (r"C:\base", "C:", "C:\\base\\"),
+            (r"C:\base", r"\leaf", r"C:\leaf"),
+            (r"C:\base", "/leaf", "C:/leaf"),
+            ("C:\\base\\", "leaf", r"C:\base\leaf"),
+            (r"C:\base", r"leaf\..\next", r"C:\base\leaf\..\next"),
+            (r"C:\base", r"D:\leaf", r"D:\leaf"),
+            (r"\\server\share\base", r"\leaf", r"\\server\leaf"),
+            (r"\\server", "", "\\\\server\\"),
+            (r"\\?\C:\base", r"\leaf", r"\\?\leaf"),
+            (r"\??\C:\base", r"\leaf", r"\??\leaf"),
+            (r"\\.\pipe", r"\leaf", r"\\.\leaf"),
+            (r"C:\base", r"\??\C:\leaf", r"\??\C:\leaf"),
+        ] {
+            assert_eq!(
+                crate::heat_balance::source_initialization::SourceExternalInputFiles::append_native_path(
+                    Path::new(base), Path::new(tail)
+                ).as_os_str(),
+                Path::new(expected).as_os_str(),
+                "{base:?} / {tail:?}"
+            );
+        }
+        let cwd = std::env::current_dir()?;
+        if let Some(std::path::Component::Prefix(prefix)) = cwd.components().next()
+            && let std::path::Prefix::Disk(_) = prefix.kind()
+            && let Some(std::path::Component::Prefix(temp_prefix)) = directory.components().next()
+            && prefix.as_os_str() == temp_prefix.as_os_str()
+        {
+            let same_bytes = std::fs::read(directory.join(&csv_name))?;
+            let current_name = format!("source-file67-{}-{nonce}.csv", std::process::id());
+            let current_path = cwd.join(&current_name);
+            std::fs::write(&current_path, &same_bytes)?;
+            let mut drive_current_name = prefix.as_os_str().to_os_string();
+            drive_current_name.push(format!(".\\{current_name}"));
+            for candidate in [
+                std::path::PathBuf::from(drive_current_name),
+                std::path::PathBuf::from(&current_name),
+                current_path.clone(),
+            ] {
+                let mut host =
+                    crate::heat_balance::source_initialization::SourceExternalInputFiles::new(
+                        &input_path,
+                    )?;
+                let mut search =
+                    crate::heat_balance::source_initialization::SourceFileSearchState::default();
+                let mut audit = Vec::new();
+                let actual = host.resolve(&candidate, &mut search, &mut audit)?;
+                assert_eq!(
+                    actual.found.as_ref().map(|path| path.as_os_str()),
+                    Some(candidate.as_os_str())
+                );
+                assert!(actual.paths_searched.is_empty());
+                assert_eq!(host.temp_full_file_path.as_os_str(), candidate.as_os_str());
+                assert_eq!(host.read_bytes()?, same_bytes);
+                assert_eq!(
+                    audit,
+                    format!(
+                        "found (Current Working Directory)={}\n",
+                        current_path.display()
+                    )
+                    .as_bytes()
+                );
+            }
+            std::fs::remove_file(&current_path)?;
+            // Missing drive-relative probe one must retain its raw spelling;
+            // probe two appends the same exact drive RHS to the actual input dir.
+            assert!(!cwd.join(&csv_name).try_exists()?);
+            let mut drive_input_name = prefix.as_os_str().to_os_string();
+            drive_input_name.push(&csv_name);
+            let candidate = std::path::PathBuf::from(drive_input_name);
+            let expected = directory.join(&csv_name);
+            let mut host =
+                crate::heat_balance::source_initialization::SourceExternalInputFiles::new(
+                    &input_path,
+                )?;
+            let mut search =
+                crate::heat_balance::source_initialization::SourceFileSearchState::default();
+            let mut audit = Vec::new();
+            let actual = host.resolve(&candidate, &mut search, &mut audit)?;
+            assert_eq!(
+                actual.found.as_ref().map(|path| path.as_os_str()),
+                Some(expected.as_os_str())
+            );
+            assert_eq!(host.temp_full_file_path.as_os_str(), expected.as_os_str());
+            assert_eq!(host.read_bytes()?, same_bytes);
+            assert_eq!(
+                audit,
+                format!(
+                    "not found (Current Working Directory)={}\nfound (IDF Directory)={}\n",
+                    cwd.join(&csv_name).display(),
+                    expected.display()
+                )
+                .as_bytes()
+            );
+            assert_eq!(
+                actual.paths_searched,
+                vec![("Current Working Directory", cwd.clone())]
+            );
+        }
+    }
     std::fs::remove_dir_all(&directory)?;
     // Pure decoders retain actual external-file kinds before selected conversion.
     use super::external_data::{
