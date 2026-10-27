@@ -171,48 +171,19 @@ fn request(schedule: &str, frequency: &str) -> ReportInputs {
     }
 }
 
-#[test]
-fn scheduled_filter_resolves_the_live_schedule_and_rejects_a_missing_reference() -> TestResult {
-    for (key, name, expected, dictionary_name) in [
-        ("*", "FILTER", Some(FILTER), "FILTER"),
-        (
-            "*",
-            "CONSTANT-1.0",
-            Some(SourceScheduleIndex(1)),
-            "Constant-1.0",
-        ),
-        ("*", "ABSENT", None, ""),
-        ("VaLu[ae]", "FILTER", Some(FILTER), "FILTER"),
-    ] {
-        let (mut schedules, mut input) = live_schedules()?;
-        let mut requests = request(name, "HOURLY");
-        requests.output_variables[0].key = key.into();
-        let mut operands = super::SourceReportVariableInput::with_schedules(
-            &requests,
-            &mut input,
-            "",
-            &mut schedules,
-        );
-        let mut output = SourceOutputRegistration::default();
-        let result =
-            output.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new());
-        assert_eq!(result.is_ok(), expected.is_some());
-        assert_eq!(output.requested_variables.len(), 1);
-        assert_eq!(output.requested_variables[0].reporting_schedule, expected);
-        assert!(!input.is_object_unused("Output:Variable", "request"));
-        assert_eq!(
-            schedules.schedules[FILTER.0].is_used,
-            expected == Some(FILTER)
-        );
-        assert!(!schedules.schedules[VALUE.0].is_used);
-        if expected.is_some() {
-            assert_eq!(
-                output.requested_variables[0].reporting_schedule_name,
-                dictionary_name
-            );
-            let mut prescan = SourceOutputPreScan::default();
-            // Actual backend and in-memory sinks, rather than a successful stub.
-            let mut error_state = SourceErrorState {
+// Real authored phase owners and error streams, borrowed at each getter call.
+struct GetterDiagnostics {
+    state: SourceErrorState,
+    errors: Vec<u8>,
+    console: Vec<u8>,
+    globals: crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
+    project: SelectedProjectData,
+    clock: WeatherGlobalState,
+}
+impl GetterDiagnostics {
+    fn new() -> Self {
+        Self {
+            state: SourceErrorState {
                 output_error_header: true,
                 version_string: "authored Rust schedule caller".into(),
                 idd_version_string: "authored typed input".into(),
@@ -242,21 +213,110 @@ fn scheduled_filter_resolves_the_live_schedule_and_rejects_a_missing_reference()
                     total_warning_errors_during_warmup: 0,
                     total_warning_errors_during_sizing: 0,
                 },
-            };
-            let (mut errors, mut console) = (Vec::new(), Vec::new());
-            let mut backend = SourceErrorBackend {
-                state: &mut error_state,
-                error_stream: Some(&mut errors),
-                console: &mut console,
+            },
+            errors: Vec::new(),
+            console: Vec::new(),
+            globals: Default::default(),
+            project: Default::default(),
+            clock: Default::default(),
+        }
+    }
+    fn borrow<'a>(
+        &'a mut self,
+        text: &'a str,
+    ) -> (SourceReportVariableEnvironment<'a>, SourceErrorBackend<'a>) {
+        (
+            SourceReportVariableEnvironment::from_owners(
+                text,
+                &self.globals,
+                &self.project.system.developer_flag,
+                Some(&self.clock),
+            ),
+            SourceErrorBackend {
+                state: &mut self.state,
+                error_stream: Some(&mut self.errors),
+                console: &mut self.console,
                 out_unit1: None,
                 out_unit2: None,
                 f_message: None,
                 message_callback: None,
                 error_callback: None,
                 sqlite: None,
-            };
+            },
+        )
+    }
+}
+
+struct StopWrite {
+    bytes: Vec<u8>,
+    calls: usize,
+    fail_at: usize,
+}
+impl Write for StopWrite {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        self.calls += 1;
+        if self.calls == self.fail_at {
+            return Err(io::Error::other("authored stopped stream"));
+        }
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+#[test]
+fn scheduled_filter_resolves_the_live_schedule_and_rejects_a_missing_reference() -> TestResult {
+    for (key, name, expected, dictionary_name) in [
+        ("*", "FILTER", Some(FILTER), "FILTER"),
+        (
+            "*",
+            "CONSTANT-1.0",
+            Some(SourceScheduleIndex(1)),
+            "Constant-1.0",
+        ),
+        ("*", "ABSENT", None, ""),
+        ("VaLu[ae]", "FILTER", Some(FILTER), "FILTER"),
+    ] {
+        let (mut schedules, mut input) = live_schedules()?;
+        let mut requests = request(name, "HOURLY");
+        requests.output_variables[0].key = key.into();
+        let mut diagnostics = GetterDiagnostics::new();
+        let (environment, mut backend) = diagnostics.borrow("");
+        let mut operands = super::SourceReportVariableInput::with_schedules(
+            &requests,
+            &mut input,
+            environment,
+            &mut schedules,
+            &mut backend,
+        );
+        let mut output = SourceOutputRegistration::default();
+        let result =
+            output.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new());
+        assert_eq!(result.is_ok(), expected.is_some());
+        assert_eq!(output.requested_variables.len(), 1);
+        assert_eq!(output.requested_variables[0].reporting_schedule, expected);
+        assert!(!input.is_object_unused("Output:Variable", "request"));
+        assert_eq!(
+            schedules.schedules[FILTER.0].is_used,
+            expected == Some(FILTER)
+        );
+        assert!(!schedules.schedules[VALUE.0].is_used);
+        if expected.is_some() {
+            assert_eq!(
+                output.requested_variables[0].reporting_schedule_name,
+                dictionary_name
+            );
+            let mut prescan = SourceOutputPreScan::default();
+            // Actual backend and in-memory sinks, rather than a successful stub.
             prescan.add_record(key, "Schedule Value", &mut backend)?;
-            let mut operands = super::SourceReportVariableInput::new(&requests, &mut input, "");
+            let mut operands = super::SourceReportVariableInput::new(
+                &requests,
+                &mut input,
+                environment,
+                &mut backend,
+            );
             let binding = SourceRealOutputBinding::new(
                 SourceRealOutputTarget::Schedule { index: VALUE },
                 &schedules,
@@ -297,14 +357,332 @@ fn scheduled_filter_resolves_the_live_schedule_and_rejects_a_missing_reference()
             assert_eq!(dictionary.variables.len(), 1);
         }
     }
+    use SourceReportFrequency as F;
+    const HEADER: &[u8] =
+        b"! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n";
+    for (text, initial, requested, minimum, effective, warning) in [
+        ("", F::Year, "TIMESTEP", F::Year, F::Year, None),
+        (
+            "Detailed",
+            F::EachCall,
+            "DETAILED",
+            F::EachCall,
+            F::EachCall,
+            None,
+        ),
+        (
+            "Timestep",
+            F::EachCall,
+            "DETAILED",
+            F::TimeStep,
+            F::TimeStep,
+            None,
+        ),
+        ("Hourly", F::EachCall, "TIMESTEP", F::Hour, F::Hour, None),
+        ("Daily", F::EachCall, "TIMESTEP", F::Day, F::Day, None),
+        ("Monthly", F::EachCall, "TIMESTEP", F::Month, F::Month, None),
+        (
+            "RunPeriod",
+            F::EachCall,
+            "TIMESTEP",
+            F::Simulation,
+            F::Simulation,
+            None,
+        ),
+        (
+            "Environment",
+            F::EachCall,
+            "TIMESTEP",
+            F::Simulation,
+            F::Simulation,
+            None,
+        ),
+        ("Annual", F::EachCall, "TIMESTEP", F::Year, F::Year, None),
+        (
+            "hour",
+            F::EachCall,
+            "TIMESTEP",
+            F::Hour,
+            F::Hour,
+            Some(("hour", "Hourly")),
+        ),
+        (
+            "Daily",
+            F::EachCall,
+            "hour",
+            F::Day,
+            F::Day,
+            Some(("HOUR", "Hourly")),
+        ),
+        ("Ho", F::Year, "TIMESTEP", F::Hour, F::Hour, None),
+        ("unknown", F::Year, "TIMESTEP", F::Hour, F::Hour, None),
+        (" Hourly", F::Year, "TIMESTEP", F::Hour, F::Hour, None),
+        ("éé", F::Year, "TIMESTEP", F::Hour, F::Hour, None),
+        ("Hourly", F::Year, "TIMESTEP", F::Year, F::Year, None),
+    ] {
+        let (mut schedules, mut input) = live_schedules()?;
+        let mut requests = request("FILTER", requested);
+        requests.output_variables[0].key = "VaLu[ae]".into();
+        requests.output_variables[0].variable_name = "Schedule Value [scalar]".into();
+        let mut diagnostics = GetterDiagnostics::new();
+        // These are independent real phase cells, deliberately different from
+        // legacy backend fields, so the diagnostic must read the supplied view.
+        diagnostics.clock.warmup_flag = true;
+        diagnostics.globals.doing_sizing = text == "hour";
+        let (environment, mut backend) = diagnostics.borrow(text);
+        let mut operands = super::SourceReportVariableInput::with_schedules(
+            &requests,
+            &mut input,
+            environment,
+            &mut schedules,
+            &mut backend,
+        );
+        let mut output = SourceOutputRegistration {
+            minimum_report_frequency: initial,
+            ..SourceOutputRegistration::default()
+        };
+        let mut eio = Vec::new();
+        output.get_report_variable_input(&mut operands, &Files::default(), &mut eio)?;
+        assert_eq!(output.minimum_report_frequency, minimum, "{text}");
+        assert_eq!(output.requested_variables.len(), 1);
+        let row = &output.requested_variables[0];
+        assert_eq!(row.frequency, effective);
+        assert_eq!(row.key, "VaLu[ae]");
+        assert_eq!(row.name, "Schedule Value");
+        assert_eq!(row.reporting_schedule, Some(FILTER));
+        assert!(!row.used);
+        assert_eq!(
+            row.case_insensitive_pattern.as_ref().map(|r| r.pattern()),
+            Some("(?i)VaLu[ae]")
+        );
+        let expected = if text.is_empty() {
+            Vec::new()
+        } else {
+            let mut bytes = HEADER.to_vec();
+            bytes.extend_from_slice(
+                format!(
+                    " Minimum Reporting Frequency, {},{}\n",
+                    minimum.dictionary_format().2,
+                    text
+                )
+                .as_bytes(),
+            );
+            bytes
+        };
+        assert_eq!(eio, expected);
+        // A second read is a genuine no-op, including an already-consumed IP
+        // request and the two EIO records.
+        output.get_report_variable_input(&mut operands, &Files::default(), &mut eio)?;
+        assert_eq!(output.requested_variables.len(), 1);
+        assert_eq!(eio, expected);
+        assert!(!input.is_object_unused("Output:Variable", "request"));
+        assert!(schedules.schedules[FILTER.0].is_used);
+        assert_eq!(
+            diagnostics.state.tracking.total_warning_errors,
+            i32::from(warning.is_some())
+        );
+        assert_eq!(
+            diagnostics
+                .state
+                .tracking
+                .total_warning_errors_during_warmup,
+            i32::from(warning.is_some() && text != "hour")
+        );
+        assert_eq!(
+            diagnostics
+                .state
+                .tracking
+                .total_warning_errors_during_sizing,
+            i32::from(warning.is_some() && text == "hour")
+        );
+        let error_text = std::str::from_utf8(&diagnostics.errors)?;
+        if let Some((raw, canonical)) = warning {
+            let first = format!(
+                "DetermineFrequency: Entered frequency=\"{raw}\" is not an exact match to key strings."
+            );
+            let second = format!("Frequency={canonical} will be used.");
+            assert!(
+                error_text.find(&first).ok_or("missing frequency warning")?
+                    < error_text
+                        .find(&second)
+                        .ok_or("missing frequency continue")?
+            );
+        } else {
+            assert!(error_text.is_empty());
+        }
+    }
+
+    // Failure prefixes preserve Native flag/assignment/object-getter ordering.
+    for failure in [
+        "legacy-warning-unavailable",
+        "warning-stream",
+        "eio-header",
+        "eio-value",
+    ] {
+        let (mut schedules, mut input) = live_schedules()?;
+        let requests = request("FILTER", "TIMESTEP");
+        let mut diagnostics = GetterDiagnostics::new();
+        let mut stopped_error = StopWrite {
+            bytes: Vec::new(),
+            calls: 0,
+            fail_at: 1,
+        };
+        let text = if failure.starts_with("eio-") {
+            "Daily"
+        } else {
+            "hour"
+        };
+        let (mut environment, mut backend) = diagnostics.borrow(text);
+        if failure == "legacy-warning-unavailable" {
+            environment.diagnostic_flags = None;
+        }
+        if failure == "warning-stream" {
+            backend.error_stream = Some(&mut stopped_error);
+        }
+        let mut operands = super::SourceReportVariableInput::with_schedules(
+            &requests,
+            &mut input,
+            environment,
+            &mut schedules,
+            &mut backend,
+        );
+        let mut eio = StopWrite {
+            bytes: Vec::new(),
+            calls: 0,
+            fail_at: if failure == "eio-header" { 1 } else { 2 },
+        };
+        let mut output = SourceOutputRegistration::default();
+        let error =
+            match output.get_report_variable_input(&mut operands, &Files::default(), &mut eio) {
+                Err(error) => error,
+                Ok(()) => {
+                    return Err(format!("unexpected successful frequency prefix: {failure}").into());
+                }
+            };
+        assert!(!output.get_output_input);
+        assert_eq!(
+            output.minimum_report_frequency,
+            if failure.starts_with("eio-") {
+                F::Day
+            } else {
+                F::EachCall
+            }
+        );
+        assert!(output.requested_variables.is_empty());
+        assert!(matches!(
+            error,
+            OrdinaryRadiationError::Input(_) | OrdinaryRadiationError::Output(_)
+        ));
+        output.get_report_variable_input(&mut operands, &Files::default(), &mut eio)?;
+        assert!(input.is_object_unused("Output:Variable", "request"));
+        assert!(!schedules.schedules[FILTER.0].is_used);
+        if failure == "eio-value" {
+            assert_eq!(eio.bytes, HEADER);
+        } else {
+            assert!(eio.bytes.is_empty());
+        }
+        assert_eq!(
+            eio.calls,
+            if failure == "eio-header" {
+                1
+            } else if failure == "eio-value" {
+                2
+            } else {
+                0
+            }
+        );
+        assert_eq!(
+            diagnostics.state.tracking.total_warning_errors,
+            i32::from(failure == "warning-stream")
+        );
+    }
+
+    // A canonical override does not need unavailable legacy phase cells. A
+    // later abbreviated request does: retain CI/name writes before that stop,
+    // while frequency/schedule retain their original constructor state.
+    {
+        let (mut schedules, mut input) = live_schedules()?;
+        let mut requests = request("FILTER", "hour");
+        requests.output_variables[0].key = "VaLu[ae]".into();
+        requests.output_variables[0].variable_name = "Schedule Value [scalar]".into();
+        let mut diagnostics = GetterDiagnostics::new();
+        let (_, mut backend) = diagnostics.borrow("Daily");
+        let environment = SourceReportVariableEnvironment::new("Daily", None);
+        let mut operands = super::SourceReportVariableInput::with_schedules(
+            &requests,
+            &mut input,
+            environment,
+            &mut schedules,
+            &mut backend,
+        );
+        let mut output = SourceOutputRegistration::default();
+        let mut eio = Vec::new();
+        assert!(
+            output
+                .get_report_variable_input(&mut operands, &Files::default(), &mut eio)
+                .is_err()
+        );
+        assert!(!output.get_output_input);
+        assert_eq!(output.minimum_report_frequency, F::Day);
+        assert_eq!(output.requested_variables.len(), 1);
+        let retained = &output.requested_variables[0];
+        assert_eq!(retained.key, "VaLu[ae]");
+        assert_eq!(retained.name, "Schedule Value");
+        assert_eq!(
+            retained
+                .case_insensitive_pattern
+                .as_ref()
+                .map(|r| r.pattern()),
+            Some("(?i)VaLu[ae]")
+        );
+        assert_eq!(retained.frequency, F::Hour);
+        assert_eq!(retained.reporting_schedule, None);
+        assert!(!retained.used);
+        output.get_report_variable_input(&mut operands, &Files::default(), &mut eio)?;
+        assert!(!input.is_object_unused("Output:Variable", "request"));
+        assert!(!schedules.schedules[FILTER.0].is_used);
+        assert_eq!(diagnostics.state.tracking.total_warning_errors, 0);
+        assert!(diagnostics.errors.is_empty());
+        let mut expected = HEADER.to_vec();
+        expected.extend_from_slice(
+            format!(
+                " Minimum Reporting Frequency, {},Daily\n",
+                F::Day.dictionary_format().2
+            )
+            .as_bytes(),
+        );
+        assert_eq!(eio, expected);
+    }
+
+    // Override effects precede even the zero-object count; the same minimum is
+    // later consumed by the shared Output:Meter frequency helper.
+    let empty = ReportInputs::default();
+    let mut empty_input = SelectedInputProcessor::from_admitted_input(Vec::new(), BTreeMap::new())?;
+    let mut diagnostics = GetterDiagnostics::new();
+    let (environment, mut backend) = diagnostics.borrow("Hourly");
+    let mut operands =
+        super::SourceReportVariableInput::new(&empty, &mut empty_input, environment, &mut backend);
+    let mut output = SourceOutputRegistration::default();
+    let mut eio = Vec::new();
+    output.get_report_variable_input(&mut operands, &Files::default(), &mut eio)?;
+    assert_eq!(output.minimum_report_frequency, F::Hour);
+    assert_eq!(
+        eio,
+        [HEADER, b" Minimum Reporting Frequency,  !Hourly,Hourly\n"].concat()
+    );
+    assert!(output.requested_variables.is_empty());
+
     Ok(())
 }
 
 #[test]
 fn scheduled_filter_without_its_live_owner_stays_rejected() -> TestResult {
+    let mut diagnostics = GetterDiagnostics::new();
+    let (environment, mut backend) = diagnostics.borrow("");
     let (mut schedules, mut input) = live_schedules()?;
     let requests = request("FILTER", "HOURLY");
-    let mut operands = super::SourceReportVariableInput::new(&requests, &mut input, "");
+    let mut operands =
+        super::SourceReportVariableInput::new(&requests, &mut input, environment, &mut backend);
     assert!(
         SourceOutputRegistration::default()
             .get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new())
@@ -323,8 +701,9 @@ fn scheduled_filter_without_its_live_owner_stays_rejected() -> TestResult {
         let mut operands = super::SourceReportVariableInput::with_schedules(
             &requests,
             &mut input,
-            "",
+            environment,
             &mut schedules,
+            &mut backend,
         );
         let mut output = SourceOutputRegistration::default();
         output.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new())?;
@@ -339,8 +718,9 @@ fn scheduled_filter_without_its_live_owner_stays_rejected() -> TestResult {
     let mut operands = super::SourceReportVariableInput::with_schedules(
         &invalid_requests,
         &mut input,
-        "",
+        environment,
         &mut schedules,
+        &mut backend,
     );
     let mut invalid = SourceOutputRegistration::default();
     invalid.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new())?;
@@ -409,8 +789,9 @@ fn scheduled_filter_without_its_live_owner_stays_rejected() -> TestResult {
     let mut operands = super::SourceReportVariableInput::with_schedules(
         &requests,
         &mut request_input,
-        "",
+        environment,
         &mut schedules,
+        &mut backend,
     );
     let mut output = SourceOutputRegistration::default();
     output.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new())?;

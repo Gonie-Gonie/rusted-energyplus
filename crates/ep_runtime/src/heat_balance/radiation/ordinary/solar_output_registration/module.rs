@@ -1,6 +1,5 @@
 //! Actual AllocateModuleArrays1090-2600 reached opaque registration order.
 use super::*;
-use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
     surface::SurfaceClass, zone::SelectedZoneInputOwners,
@@ -329,10 +328,12 @@ pub(crate) fn register_source_solar_module_outputs<
     owners: &SourceSolarOutputOwners<'_>,
     zones: &SelectedZoneInputOwners,
     globals: &SelectedHeatBalanceGlobals,
-    context: &mut SourceSolarOutputRegistrationContext<'_, '_, H, D>,
-    backend: &mut SourceErrorBackend<'_>,
+    context: &mut SourceSolarOutputRegistrationContext<'_, '_, '_, H, D>,
 ) -> Result<(), Error> {
-    backend.display_string("Initializing Zone and Enclosure Report Variables")?;
+    context
+        .input
+        .backend()
+        .display_string("Initializing Zone and Enclosure Report Variables")?;
     for number in 1..=owners.radiation.num_solar_enclosures() {
         let i = index(number)?;
         let key = &owners
@@ -361,7 +362,10 @@ pub(crate) fn register_source_solar_module_outputs<
             }
         }
     }
-    backend.display_string("Initializing Surface (Shading) Report Variables")?;
+    context
+        .input
+        .backend()
+        .display_string("Initializing Surface (Shading) Report Variables")?;
     for number in 1..=owners.geometry.total_surfaces {
         let surface = owners
             .geometry

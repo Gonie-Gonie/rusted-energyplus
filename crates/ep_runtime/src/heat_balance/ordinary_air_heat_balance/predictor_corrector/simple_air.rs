@@ -16,6 +16,8 @@ pub(crate) struct SourceSimpleAirInputOwners<'a, 'backend> {
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) zones: &'a mut SelectedZoneInputOwners,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
+    pub(crate) reporting_diagnostic_flags:
+        Option<crate::heat_balance::error_backend::SourceDiagnosticFlags<'a>>,
     pub(crate) space_controls: &'a SelectedHeatBalanceSpaceControls,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
     pub(crate) fan: &'a mut SourceZoneFanHeatBalanceArrays,

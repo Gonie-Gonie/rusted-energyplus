@@ -28,7 +28,7 @@ impl SourceOutputFileHost for ZoneOutputHost<'_> {
     }
 }
 
-pub(crate) struct ZoneGetterOwners<'a> {
+pub(crate) struct ZoneGetterOwners<'a, 'backend> {
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) globals: &'a mut SelectedHeatBalanceGlobals,
@@ -36,6 +36,9 @@ pub(crate) struct ZoneGetterOwners<'a> {
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) report_input: &'a ReportInputs,
     pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) developer: &'a bool,
+    pub(crate) clock: Option<&'a crate::weather::day::WeatherGlobalState>,
+    pub(crate) backend: &'a mut crate::heat_balance::error_backend::SourceErrorBackend<'backend>,
     pub(crate) minutes_in_time_step: i32,
     pub(crate) host: &'a mut dyn SourceOutputFileHost,
     pub(crate) eio: &'a mut dyn Write,
@@ -47,7 +50,7 @@ impl SelectedZoneInputOwners {
         raw: &SelectedHeatBalanceInput,
         control: &SelectedHeatBalanceInputState,
         model: &TypedModel,
-        owners: &mut ZoneGetterOwners<'_>,
+        owners: &mut ZoneGetterOwners<'_, '_>,
     ) -> Result<(), HeatBalanceInputError> {
         owners.shortcut.current_module_object = "Zone".into();
         let count = owners.input.get_num_objects_found("Zone");
@@ -158,7 +161,10 @@ impl SelectedZoneInputOwners {
             let mut request_input = SourceReportVariableInput::new(
                 owners.report_input,
                 &mut *owners.input,
-                owners.minimum_report_frequency,
+                crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                    owners.minimum_report_frequency, &*owners.globals, owners.developer, owners.clock,
+                ),
+                owners.backend,
             );
             let mut host = ZoneOutputHost(owners.host);
             for (name, units) in [

@@ -80,6 +80,7 @@ pub(crate) struct SourceSolarChildOwners<'a, H, D> {
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) report_inputs: &'a ReportInputs,
     pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) developer: &'a bool,
     pub(crate) registration: &'a mut SourceOutputRegistration,
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) output_host: &'a mut H,
@@ -159,7 +160,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
         let mut requests = SourceReportVariableInput::new(
             self.report_inputs,
             self.input,
-            self.minimum_report_frequency,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                self.minimum_report_frequency, self.globals, self.developer, Some(self.clock),
+            ),
+            backend,
         );
         let mut output = SourceSolarOutputRegistrationContext {
             registration: self.registration,
@@ -170,7 +174,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
             eio: self.eio,
             dictionary_host: self.dictionary_host,
         };
-        register_source_solar_module_outputs(&live, zones, self.globals, &mut output, backend)
+        register_source_solar_module_outputs(&live, zones, self.globals, &mut output)
     }
 
     fn register_sky_diffuse_outputs(
@@ -178,6 +182,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
         solar: &OrdinarySolarRadiation,
         geometry: &SurfaceGeometryInputState,
         detailed_shading: bool,
+        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
         let live = SourceSolarOutputOwners {
             radiation: solar,
@@ -186,7 +191,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
         let mut requests = SourceReportVariableInput::new(
             self.report_inputs,
             self.input,
-            self.minimum_report_frequency,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                self.minimum_report_frequency, self.globals, self.developer, Some(self.clock),
+            ),
+            backend,
         );
         let mut output = SourceSolarOutputRegistrationContext {
             registration: self.registration,

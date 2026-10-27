@@ -18,8 +18,9 @@ use crate::weather::day::WeatherGlobalState;
 use std::convert::Infallible;
 
 /// Actual temporary borrows, including genuine existing equipment/sizing owners.
-pub(crate) struct SourceAirLoopOwners<'a> {
+pub(crate) struct SourceAirLoopOwners<'a, 'backend> {
     pub(crate) input: &'a mut SelectedInputProcessor,
+    pub(crate) backend: &'a mut crate::heat_balance::error_backend::SourceErrorBackend<'backend>,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) hvac: &'a mut SelectedHvacGlobals,
@@ -46,7 +47,7 @@ impl SourceAirLoopData {
     >(
         &mut self,
         first_hvac_iteration: bool,
-        o: &mut SourceAirLoopOwners<'_>,
+        o: &mut SourceAirLoopOwners<'_, '_>,
         output: &mut SourceAirReportRegistrationContext<'_, H, D>,
     ) -> Result<(), Error> {
         if self.get_air_loop_input_flag {

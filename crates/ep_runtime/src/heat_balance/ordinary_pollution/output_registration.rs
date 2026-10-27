@@ -15,7 +15,8 @@ pub(crate) struct SourcePollutionOutputContext<'a, H, D> {
     pub(crate) registration: &'a mut SourceOutputRegistration,
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) reports: &'a ReportInputs,
-    pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) environment:
+        crate::heat_balance::source_output_registration::SourceReportVariableEnvironment<'a>,
     pub(crate) host: &'a mut H,
     pub(crate) dictionary_host: &'a mut D,
 }
@@ -58,7 +59,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
             SourceRealOutputBinding::new(SourceRealOutputTarget::Pollution { field }, pollution)
                 .map_err(Error::Output)?;
         let mut input =
-            SourceReportVariableInput::new(self.reports, input, self.minimum_report_frequency);
+            SourceReportVariableInput::new(self.reports, input, self.environment, backend);
         self.registration
             .setup_bound_general_real(
                 &mut input,
@@ -87,7 +88,6 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                         zone_list_multiplier: 1,
                     }),
                 },
-                backend,
             )
             .map_err(Error::Output)
     }

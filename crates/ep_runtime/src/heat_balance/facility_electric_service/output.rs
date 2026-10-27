@@ -20,6 +20,7 @@ pub(crate) struct SourceFacilityOutputContext<'a, H, D> {
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) reports: &'a ReportInputs,
     pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) developer: &'a bool,
     pub(crate) minutes_in_time_step: i32,
     pub(crate) host: &'a mut H,
     pub(crate) eio: &'a mut dyn std::io::Write,
@@ -151,7 +152,8 @@ impl FacilityElectricService {
             let mut input = SourceReportVariableInput::new(
                 output.reports,
                 o.input,
-                output.minimum_report_frequency,
+                crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(output.minimum_report_frequency, o.globals, output.developer, Some(o.clock)),
+                o.backend,
             );
             let meter = resource.map(|resource| SourceGeneralMeterArguments {
                 resource,
@@ -182,7 +184,6 @@ impl FacilityElectricService {
                         time_step: TimeStepKind::System,
                         meter,
                     },
-                    o.backend,
                 )
                 .map_err(Error::Output)?;
         }

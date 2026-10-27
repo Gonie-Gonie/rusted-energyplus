@@ -33,6 +33,30 @@ impl CtfInitializationContext<'_> {
         host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
         branch: Option<&mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections>,
     ) -> Result<Vec<crate::geometry::InitializedZoneGeometry>, RuntimeError> {
+        self.continue_selected_setup_zone_geometry_with_clock(
+            model,
+            clock,
+            environment,
+            minutes_in_time_step,
+            host,
+            branch,
+            None,
+        )
+    }
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "Forward the actual Source clock and existing geometry/IO owners independently"
+    )]
+    pub(crate) fn continue_selected_setup_zone_geometry_with_clock(
+        &mut self,
+        model: &ep_model::TypedModel,
+        clock: Option<OrdinaryEquipmentInput>,
+        environment: &crate::weather::day::WeatherEnvironmentState,
+        minutes_in_time_step: i32,
+        host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
+        branch: Option<&mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections>,
+        diagnostic_clock: Option<&crate::weather::day::WeatherGlobalState>,
+    ) -> Result<Vec<crate::geometry::InitializedZoneGeometry>, RuntimeError> {
         let reports = &mut *self.reports;
         if reports
             .surface_geometry_input
@@ -234,14 +258,13 @@ impl CtfInitializationContext<'_> {
             let mut output = crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
                 output: &mut reports.output_registration,
                 prescan: &reports.output_prescan,
-                minimum_report_frequency: &reports
-                    .selected_project_data
-                    .as_ref()
-                    .ok_or_else(|| {
-                        hb_input_error(E::Unavailable("same Solar enclosure process settings"))
-                    })?
-                    .system
-                    .minimum_report_frequency,
+                minimum_report_frequency: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                    &reports.selected_project_data.as_ref().ok_or_else(|| hb_input_error(E::Unavailable("same Solar enclosure process settings")))?.system.minimum_report_frequency,
+                    owners.globals,
+                    &reports.selected_project_data.as_ref().ok_or_else(|| hb_input_error(E::Unavailable("same Solar enclosure developer")))?.system.developer_flag,
+                    diagnostic_clock,
+                ),
+                backend: &mut self.backend,
                 minutes_in_time_step,
                 host,
                 eio: self.eio,

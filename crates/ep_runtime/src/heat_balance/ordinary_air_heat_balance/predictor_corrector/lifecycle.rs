@@ -38,6 +38,9 @@ pub(crate) trait SourceZoneAirRegistrationChildren {
         name: &str,
         air: &SourceZoneSpaceHeatBalanceData,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
@@ -53,6 +56,9 @@ pub(crate) trait SourceZoneAirRegistrationChildren {
         list_multiplier: i32,
         demand: &super::demand::SourceSystemSensibleDemand,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
@@ -65,6 +71,9 @@ pub(crate) trait SourceZoneAirRegistrationChildren {
         latent_sizing: bool,
         demand: &super::demand::SourceSystemMoistureDemand,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
@@ -75,6 +84,9 @@ pub(crate) trait SourceZoneAirRegistrationChildren {
         name: &str,
         fan: &super::super::environment::SourceZoneFanHeatBalanceArrays,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,

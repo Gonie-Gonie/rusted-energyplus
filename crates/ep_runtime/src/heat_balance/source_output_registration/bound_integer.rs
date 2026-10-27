@@ -61,7 +61,7 @@ pub(crate) struct SourceRequestedIntegerValue<'a> {
 impl SourceOutputRegistration {
     pub(crate) fn setup_bound_zone_integer(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceIntegerOutputDeclaration<'_>,
         minutes_in_time_step: i32,
@@ -84,7 +84,7 @@ impl SourceOutputRegistration {
     }
     pub(crate) fn setup_bound_integer(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceIntegerOutputDeclaration<'_>,
         minutes_in_time_step: i32,

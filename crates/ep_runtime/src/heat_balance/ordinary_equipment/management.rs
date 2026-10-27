@@ -450,7 +450,7 @@ impl SourceHvacManager {
                             input: o.input,
                             prescan: output.prescan,
                             reports: output.reports,
-                            minimum_report_frequency: output.minimum_report_frequency,
+                            environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(output.minimum_report_frequency, &*o.globals, &o.project.system.developer_flag, Some(&*o.clock)),
                             minutes_in_time_step: o.clock.minutes_in_time_step,
                             host: output.host,
                             dictionary_host: output.dictionary_host,

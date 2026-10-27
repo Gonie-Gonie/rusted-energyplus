@@ -70,6 +70,7 @@ impl GainFactory {
             shortcut: &mut self.reports.input_processor_shortcut,
             report_inputs: &self.model.report_inputs,
             minimum_report_frequency: &project.system.minimum_report_frequency,
+            developer: &project.system.developer_flag,
             registration: &mut self.reports.output_registration,
             prescan: &self.reports.output_prescan,
             output_host: &mut self.files,
@@ -106,6 +107,7 @@ impl GainFactory {
                 shadowing.detailed_sky_diffuse_algorithm,
                 transmittance_varies,
                 &mut children,
+                &mut backend,
             )
             .map_err(|error| {
                 invalid(&format!(

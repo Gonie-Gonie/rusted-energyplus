@@ -615,11 +615,12 @@ pub(crate) fn hb_input_error(
 }
 
 impl CtfInitializationContext<'_> {
-    pub(crate) fn get_selected_zone_data(
+    pub(crate) fn get_selected_zone_data_with_clock(
         &mut self,
         model: &TypedModel,
         minutes_in_time_step: i32,
         host: &mut dyn super::source_output_registration::SourceOutputFileHost,
+        clock: Option<&crate::weather::day::WeatherGlobalState>,
     ) -> Result<(), crate::error::RuntimeError> {
         use super::selected_heat_balance_input::{
             HeatBalanceInputError as E,
@@ -654,6 +655,14 @@ impl CtfInitializationContext<'_> {
                 .ok_or_else(|| hb_input_error(E::Unavailable("missing sole system variables")))?
                 .system
                 .minimum_report_frequency,
+            developer: &reports
+                .selected_project_data
+                .as_ref()
+                .ok_or_else(|| hb_input_error(E::Unavailable("same Zone developer flag")))?
+                .system
+                .developer_flag,
+            clock,
+            backend: &mut self.backend,
             minutes_in_time_step,
             host,
             eio: self.eio,
@@ -689,6 +698,22 @@ impl CtfInitializationContext<'_> {
         minutes: i32,
         host: &mut dyn super::source_output_registration::SourceOutputFileHost,
     ) -> Result<(), crate::RuntimeError> {
+        self.initialize_selected_heat_balance_input_with_clock(
+            model,
+            environment,
+            minutes,
+            host,
+            None,
+        )
+    }
+    pub(crate) fn initialize_selected_heat_balance_input_with_clock(
+        &mut self,
+        model: &TypedModel,
+        environment: &mut crate::weather::day::WeatherEnvironmentState,
+        minutes: i32,
+        host: &mut dyn super::source_output_registration::SourceOutputFileHost,
+        clock: Option<&crate::weather::day::WeatherGlobalState>,
+    ) -> Result<(), crate::RuntimeError> {
         self.get_selected_project_control_data(environment)?;
         self.initialize_source_site_atmosphere(environment)?;
         self.get_selected_material_data(model)?;
@@ -697,6 +722,6 @@ impl CtfInitializationContext<'_> {
         let result = owner.get_at_building_boundary(self);
         self.reports.shadowing_input = Some(owner);
         result?;
-        self.get_selected_zone_data(model, minutes, host)
+        self.get_selected_zone_data_with_clock(model, minutes, host, clock)
     }
 }

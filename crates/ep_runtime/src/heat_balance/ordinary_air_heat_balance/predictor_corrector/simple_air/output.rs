@@ -114,6 +114,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
         controller: &SourceZoneAirPredictorCorrector,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         declaration: Declaration<'_>,
     ) -> Result<(), Error> {
         let Declaration {
@@ -138,8 +141,15 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
         .map_err(Error::Output)?;
         // Borrow the same input only for this actual call. The following nine
         // definition queries need the same owner after this borrow ends.
-        let mut report_input =
-            SourceReportVariableInput::new(self.reports, input, self.minimum_report_frequency);
+        let mut report_input = SourceReportVariableInput::new(
+            self.reports,
+            input,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                self.minimum_report_frequency,
+                reporting_diagnostic_flags,
+            ),
+            backend,
+        );
         self.registration
             .setup_bound_real(
                 &mut report_input,
@@ -156,7 +166,6 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                 binding,
                 self.dictionary_host,
                 SourceRealRegistrationOptions::unmetered(time_step),
-                backend,
             )
             .map_err(Error::Output)
     }
@@ -165,6 +174,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
         controller: &SourceZoneAirPredictorCorrector,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         record: ReportRecord<'_>,
     ) -> Result<(), Error> {
         let ReportRecord {
@@ -248,6 +260,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                 controller,
                 input,
                 backend,
+                reporting_diagnostic_flags,
                 Declaration {
                     field,
                     number,
@@ -265,6 +278,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                 controller,
                 input,
                 backend,
+                reporting_diagnostic_flags,
                 Declaration {
                     field: Field::ImBalance,
                     number,
@@ -296,6 +310,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                 controller,
                 owners.input,
                 owners.backend,
+                owners.reporting_diagnostic_flags,
                 ReportRecord {
                     number,
                     space: false,
@@ -316,6 +331,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                         controller,
                         owners.input,
                         owners.backend,
+                        owners.reporting_diagnostic_flags,
                         ReportRecord {
                             number: space_number,
                             space: true,
@@ -331,6 +347,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                     controller,
                     owners.input,
                     owners.backend,
+                    owners.reporting_diagnostic_flags,
                     Declaration {
                         field: Field::SumEnthalpyM,
                         number,
@@ -346,6 +363,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                     controller,
                     owners.input,
                     owners.backend,
+                    owners.reporting_diagnostic_flags,
                     Declaration {
                         field: Field::SumEnthalpyH,
                         number,
@@ -385,6 +403,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                     controller,
                     owners.input,
                     owners.backend,
+                    owners.reporting_diagnostic_flags,
                     Declaration {
                         field,
                         number,
@@ -402,6 +421,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
             controller,
             owners.input,
             owners.backend,
+            owners.reporting_diagnostic_flags,
             Declaration {
                 field: Field::ZoneTotalExfiltrationHeatLoss,
                 number: 0,
@@ -417,6 +437,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
             controller,
             owners.input,
             owners.backend,
+            owners.reporting_diagnostic_flags,
             Declaration {
                 field: Field::ZoneTotalExhaustHeatLoss,
                 number: 0,

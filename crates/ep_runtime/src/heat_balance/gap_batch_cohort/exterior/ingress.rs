@@ -619,6 +619,7 @@ impl GainFactory {
                     .setup_time_pointer(kind, &mut backend)?;
             }
         }
+        let mut zone_backend = error_backend(&mut error_state, &mut errors, &mut console);
         zones.get_zone_data(
             &SelectedHeatBalanceInput {
                 source_is_epjson: false,
@@ -635,6 +636,9 @@ impl GainFactory {
                 prescan: &prescan,
                 report_input: &report,
                 minimum_report_frequency: &project.system.minimum_report_frequency,
+                developer: &project.system.developer_flag,
+                clock: Some(&weather.global),
+                backend: &mut zone_backend,
                 minutes_in_time_step: weather.global.minutes_in_time_step,
                 host: &mut files,
                 eio: &mut eio,

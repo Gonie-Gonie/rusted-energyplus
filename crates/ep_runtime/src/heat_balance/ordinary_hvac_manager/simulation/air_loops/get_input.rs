@@ -26,7 +26,7 @@ struct AirUniqueNode {
 impl SourceAirLoopData {
     pub(super) fn get_source_air_path_data(
         &mut self,
-        o: &mut SourceAirLoopOwners<'_>,
+        o: &mut SourceAirLoopOwners<'_, '_>,
     ) -> Result<(), Error> {
         let _match_node_name: [String; 3] = std::array::from_fn(|_| String::new());
         let first = o

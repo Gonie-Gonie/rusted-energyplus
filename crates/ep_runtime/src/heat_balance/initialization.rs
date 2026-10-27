@@ -87,6 +87,8 @@ fn initialize_heat_balance_state_with_ctf_coefficients_from_schedule_cache(
                 .ok_or_else(|| RuntimeError::WarmupUnavailable {
                     reason: "source HB input requires its actual context".into(),
                 })?;
+        // This older boundary route has no live WeatherGlobal owner; its early
+        // frequency view remains explicit None. Genuine Source first-input forwards Some(clock).
         actual.initialize_selected_heat_balance_input(
             &model.typed,
             source.environment,

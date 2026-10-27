@@ -30,7 +30,7 @@ impl SourceAirLoopData {
     pub(super) fn initialize_source_air_loops(
         &mut self,
         first: bool,
-        o: &mut SourceAirLoopOwners<'_>,
+        o: &mut SourceAirLoopOwners<'_, '_>,
     ) -> Result<(), Error> {
         let primary = o.hvac.number_of_primary_air_systems;
         o.hvac.air_loop_init = true;
@@ -134,7 +134,10 @@ impl SourceAirLoopData {
         }
         Ok(())
     }
-    fn connect_source_return_nodes(&mut self, o: &SourceAirLoopOwners<'_>) -> Result<(), Error> {
+    fn connect_source_return_nodes(
+        &mut self,
+        o: &SourceAirLoopOwners<'_, '_>,
+    ) -> Result<(), Error> {
         if !*o.equipment.source_equipment_inputs_filled() {
             return Ok(());
         }

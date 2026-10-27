@@ -11,9 +11,9 @@ use crate::heat_balance::source_output_registration::{
     SourceWeatherIntegerOutputField as Integer, SourceWeatherRealOutputField as Real,
 };
 use std::io::Write;
-pub(crate) struct SourceWeatherOutputContext<'a, 'request, H, D> {
+pub(crate) struct SourceWeatherOutputContext<'a, 'request, 'backend, H, D> {
     pub(crate) registration: &'a mut SourceOutputRegistration,
-    pub(crate) input: &'a mut SourceReportVariableInput<'request>,
+    pub(crate) input: &'a mut SourceReportVariableInput<'request, 'backend>,
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) minutes_in_time_step: i32,
     pub(crate) host: &'a mut H,
@@ -30,7 +30,7 @@ pub(crate) fn register_source_weather_outputs<
 >(
     owners: &SourceWeatherOutputOwners<'_>,
     globals: &SelectedHeatBalanceGlobals,
-    c: &mut SourceWeatherOutputContext<'_, '_, H, D>,
+    c: &mut SourceWeatherOutputContext<'_, '_, '_, H, D>,
 ) -> Result<(), Error> {
     for (target, name, units, store) in [
         (

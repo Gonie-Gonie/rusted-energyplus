@@ -141,6 +141,12 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
                 },
                 owners.input,
                 owners.clock.minutes_in_time_step,
+                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &owners.globals.kickoff_simulation,
+                    developer: &owners.project.system.developer_flag,
+                    warmup: &owners.clock.warmup_flag,
+                    doing_sizing: &owners.globals.doing_sizing,
+                }),
                 owners.backend,
                 eio,
             ),
@@ -151,6 +157,13 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
                 },
                 owners.input,
                 owners.clock.minutes_in_time_step,
+                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &owners.globals.kickoff_simulation,
+                    developer: &owners.project.system.developer_flag,
+                    warmup: &owners.clock.warmup_flag,
+                    doing_sizing: &owners.globals.doing_sizing,
+                }),
+                owners.backend,
                 eio,
             ),
             Child::ManageSystemAvailability => manager.manage_source_system_availability(owners),
@@ -170,6 +183,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
             } => {
                 let mut air_loop_owners = SourceAirLoopOwners {
                     input: owners.input,
+                    backend: owners.backend,
                     globals: owners.globals,
                     clock: owners.clock,
                     hvac: owners.hvac,
@@ -235,12 +249,24 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R> SourceZoneAirReg
         name: &str,
         air: &SourceZoneSpaceHeatBalanceData,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
     ) -> Result<(), Error> {
-        self.init_air_output()
-            .register_air(number, space, name, air, clock, input, backend, eio)
+        self.init_air_output().register_air(
+            number,
+            space,
+            name,
+            air,
+            clock,
+            reporting_diagnostic_flags,
+            input,
+            backend,
+            eio,
+        )
     }
     fn register_sensible_demand(
         &mut self,
@@ -253,6 +279,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R> SourceZoneAirReg
         list_multiplier: i32,
         demand: &SourceSystemSensibleDemand,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
@@ -267,6 +296,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R> SourceZoneAirReg
             list_multiplier,
             demand,
             clock,
+            reporting_diagnostic_flags,
             input,
             backend,
             eio,
@@ -280,6 +310,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R> SourceZoneAirReg
         latent_sizing: bool,
         demand: &SourceSystemMoistureDemand,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
@@ -291,6 +324,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R> SourceZoneAirReg
             latent_sizing,
             demand,
             clock,
+            reporting_diagnostic_flags,
             input,
             backend,
             eio,
@@ -302,11 +336,22 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R> SourceZoneAirReg
         name: &str,
         fan: &SourceZoneFanHeatBalanceArrays,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
     ) -> Result<(), Error> {
-        self.init_air_output()
-            .register_thermostat(number, name, fan, clock, input, backend, eio)
+        self.init_air_output().register_thermostat(
+            number,
+            name,
+            fan,
+            clock,
+            reporting_diagnostic_flags,
+            input,
+            backend,
+            eio,
+        )
     }
 }

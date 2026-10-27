@@ -261,7 +261,7 @@ impl SourceOutputRegistration {
     /// Source real overload, default frequency Hour and no meter arguments.
     pub(crate) fn setup_bound_unmetered_zone_real(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,

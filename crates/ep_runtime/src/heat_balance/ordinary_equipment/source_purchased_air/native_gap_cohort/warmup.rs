@@ -169,6 +169,17 @@ impl WarmupFactory {
         let model = identity_model(definition, &control, weather.global.time_steps_in_hour)?;
         let mut zones = SelectedZoneInputOwners::default();
         let mut files = Files::default();
+        let mut zone_backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut error),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
         zones.get_zone_data(
             &SelectedHeatBalanceInput {
                 source_is_epjson: false,
@@ -185,6 +196,9 @@ impl WarmupFactory {
                 prescan: &prescan,
                 report_input: &report,
                 minimum_report_frequency: &project.system.minimum_report_frequency,
+                developer: &project.system.developer_flag,
+                clock: Some(&weather.global),
+                backend: &mut zone_backend,
                 minutes_in_time_step: weather.global.minutes_in_time_step,
                 host: &mut files,
                 eio: &mut eio,
@@ -290,6 +304,7 @@ impl WarmupFactory {
             registration: &mut self.reports.output_registration,
             prescan: &self.prescan,
             minimum_report_frequency: &self.project.system.minimum_report_frequency,
+            developer: &self.project.system.developer_flag,
             output_host: &mut self.files,
             dictionary_host: &mut dictionary,
             eio: &mut self.eio,

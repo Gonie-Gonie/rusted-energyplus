@@ -26,6 +26,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
         name: &str,
         key: &str,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
@@ -38,8 +41,15 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
             detector,
         )
         .map_err(Error::Output)?;
-        let mut input =
-            SourceReportVariableInput::new(self.reports, input, self.minimum_report_frequency);
+        let mut input = SourceReportVariableInput::new(
+            self.reports,
+            input,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                self.minimum_report_frequency,
+                reporting_diagnostic_flags,
+            ),
+            backend,
+        );
         self.registration
             .setup_bound_real(
                 &mut input,
@@ -56,7 +66,6 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>
                 binding,
                 self.dictionary_host,
                 SourceRealRegistrationOptions::unmetered(TimeStepKind::System),
-                backend,
             )
             .map_err(Error::Output)
     }

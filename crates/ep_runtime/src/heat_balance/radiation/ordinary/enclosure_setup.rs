@@ -14,10 +14,12 @@ use crate::heat_balance::source_output_registration::{
 use std::io::Write;
 
 /// Borrow the same real registry, pre-scan, process setting and output host.
-pub(crate) struct EnclosureOutputOwners<'a> {
+pub(crate) struct EnclosureOutputOwners<'a, 'backend> {
     pub(crate) output: &'a mut SourceOutputRegistration,
     pub(crate) prescan: &'a SourceOutputPreScan,
-    pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) minimum_report_frequency:
+        crate::heat_balance::source_output_registration::SourceReportVariableEnvironment<'a>,
+    pub(crate) backend: &'a mut crate::heat_balance::error_backend::SourceErrorBackend<'backend>,
     pub(crate) minutes_in_time_step: i32,
     pub(crate) host: &'a mut dyn SourceOutputFileHost,
     pub(crate) eio: &'a mut dyn Write,
@@ -35,7 +37,7 @@ impl OrdinarySolarRadiation {
         &mut self,
         surface_state: &SurfaceGeometryInputState,
         owners: &mut SurfaceGetterOwners<'_>,
-        output: &mut EnclosureOutputOwners<'_>,
+        output: &mut EnclosureOutputOwners<'_, '_>,
     ) -> Result<(), Error> {
         // Original14784 is the first state effect. Preserve this actual array
         // allocation even if a later represented prerequisite is unavailable.
@@ -169,7 +171,7 @@ impl OrdinarySolarRadiation {
         &mut self,
         surface_state: &SurfaceGeometryInputState,
         owners: &mut SurfaceGetterOwners<'_>,
-        output: &mut EnclosureOutputOwners<'_>,
+        output: &mut EnclosureOutputOwners<'_, '_>,
     ) -> Result<(), Error> {
         // Original14788: allocation precedes AirBoundary/association checks.
         let spaces_count = usize::try_from(owners.globals.num_spaces)
@@ -301,7 +303,7 @@ impl OrdinarySolarRadiation {
     fn finish_enclosure_setup(
         &mut self,
         owners: &mut SurfaceGetterOwners<'_>,
-        output: &mut EnclosureOutputOwners<'_>,
+        output: &mut EnclosureOutputOwners<'_, '_>,
     ) -> Result<(), Error> {
         let zones = owners
             .zones
@@ -321,6 +323,7 @@ impl OrdinarySolarRadiation {
             &owners.model.report_inputs,
             &mut *owners.input,
             output.minimum_report_frequency,
+            output.backend,
         );
         let mut host = ZoneOutputHost(&mut *output.host);
         for enclosure in &mut self.radiant {

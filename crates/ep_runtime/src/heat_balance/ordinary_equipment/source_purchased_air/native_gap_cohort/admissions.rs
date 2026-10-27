@@ -278,7 +278,7 @@ fn simulate(source: &mut Factory, name: &str) -> std::result::Result<(), Error> 
         input: &mut source.input,
         prescan: &source.prescan,
         reports: &source.report,
-        minimum_report_frequency: "",
+        environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(&source.project.system.minimum_report_frequency, &source.globals, &source.project.system.developer_flag, Some(&source.weather.global)),
         minutes_in_time_step: source.weather.global.minutes_in_time_step,
         host: &mut source.files,
         dictionary_host: &mut dictionary,

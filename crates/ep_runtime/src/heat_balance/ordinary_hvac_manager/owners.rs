@@ -102,6 +102,14 @@ impl SourceHvacOwners<'_, '_> {
             space_controls: self.space_controls,
             globals: self.globals,
             clock: self.clock,
+            reporting_diagnostic_flags: Some(
+                crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &self.globals.kickoff_simulation,
+                    developer: &self.project.system.developer_flag,
+                    warmup: &self.clock.warmup_flag,
+                    doing_sizing: &self.globals.doing_sizing,
+                },
+            ),
             environment: self.environment,
             hvac: self.hvac,
             input: self.input,

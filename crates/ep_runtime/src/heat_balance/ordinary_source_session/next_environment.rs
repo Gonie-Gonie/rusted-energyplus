@@ -83,8 +83,11 @@ impl<H: SourceOutputFileHost> SourceWeatherInitializationChildren for FirstWeath
         let mut input = SourceReportVariableInput::with_schedules(
             self.report_inputs,
             owners.input,
-            self.minimum_report_frequency,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                self.minimum_report_frequency, owners.globals, &owners.system.developer_flag, Some(&session.state.global),
+            ),
             self.schedules,
+            owners.backend,
         );
         let mut dictionary_host = DictionaryBorrow {
             files: owners.files,

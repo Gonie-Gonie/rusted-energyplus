@@ -116,7 +116,8 @@ impl OrdinarySurfaceInitialization {
                 let mut input = SourceReportVariableInput::new(
                     owners.report_inputs,
                     owners.input,
-                    owners.minimum_report_frequency,
+                    crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(owners.minimum_report_frequency, owners.globals, &owners.project.system.developer_flag, Some(owners.clock)),
+                    owners.backend,
                 );
                 registration::register_source_surface_outputs(
                     &live,

@@ -38,7 +38,7 @@ impl SelectedScheduleManager {
         D: SourceOutputDictionaryHost,
     >(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         registration: &mut SourceOutputRegistration,
         prescan: &SourceOutputPreScan,
         minutes_in_time_step: i32,

@@ -1,8 +1,9 @@
 //! Actual OutputProcessor::GetReportVariableInput local getter, without shared scratch.
 use super::{
     OrdinaryRadiationError, OrdinaryRadiationUnavailable, SourceOutputFileHost,
-    SourceOutputRegistration, SourceReportFrequency, SourceRequestedVariable,
+    SourceOutputRegistration, SourceRequestedVariable,
 };
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
 use crate::heat_balance::source_output_prescan::{REPORTING_RE2_LOG_ORIGIN, is_key_regex_like};
@@ -10,22 +11,66 @@ use ep_model::{ReportInputs, SourceOutputVariableInput};
 
 /// One temporary borrow of the typed getter operands and the sole real input owner.
 /// No input identity, unused set, argument storage or report request is cloned here.
-pub(crate) struct SourceReportVariableInput<'a> {
+#[derive(Clone, Copy)]
+pub(crate) struct SourceReportVariableEnvironment<'a> {
+    pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) diagnostic_flags: Option<SourceDiagnosticFlags<'a>>,
+}
+
+/// Short getter borrow of the original system string and phase cells.
+impl<'a> SourceReportVariableEnvironment<'a> {
+    pub(crate) fn new(
+        minimum_report_frequency: &'a str,
+        diagnostic_flags: Option<SourceDiagnosticFlags<'a>>,
+    ) -> Self {
+        Self {
+            minimum_report_frequency,
+            diagnostic_flags,
+        }
+    }
+
+    pub(crate) fn from_owners(
+        minimum_report_frequency: &'a str,
+        globals: &'a crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
+        developer: &'a bool,
+        clock: Option<&'a crate::weather::day::WeatherGlobalState>,
+    ) -> Self {
+        Self::new(
+            minimum_report_frequency,
+            clock.map(|clock| SourceDiagnosticFlags {
+                kickoff: &globals.kickoff_simulation,
+                developer,
+                warmup: &clock.warmup_flag,
+                doing_sizing: &globals.doing_sizing,
+            }),
+        )
+    }
+}
+
+pub(crate) struct SourceReportVariableInput<'a, 'backend> {
     reports: &'a ReportInputs,
     processor: &'a mut SelectedInputProcessor,
-    minimum_report_frequency: &'a str,
+    environment: SourceReportVariableEnvironment<'a>,
+    pub(super) backend: &'a mut SourceErrorBackend<'backend>,
     schedules: Option<&'a mut SelectedScheduleManager>,
 }
-impl<'a> SourceReportVariableInput<'a> {
+impl<'a, 'backend> SourceReportVariableInput<'a, 'backend> {
+    /// Reborrow the same backend only at the reached Source effect.
+    pub(crate) fn backend(&mut self) -> &mut SourceErrorBackend<'backend> {
+        self.backend
+    }
+
     pub(crate) fn new(
         reports: &'a ReportInputs,
         processor: &'a mut SelectedInputProcessor,
-        minimum_report_frequency: &'a str,
+        environment: SourceReportVariableEnvironment<'a>,
+        backend: &'a mut SourceErrorBackend<'backend>,
     ) -> Self {
         Self {
             reports,
             processor,
-            minimum_report_frequency,
+            environment,
+            backend,
             schedules: None,
         }
     }
@@ -35,13 +80,15 @@ impl<'a> SourceReportVariableInput<'a> {
     pub(crate) fn with_schedules(
         reports: &'a ReportInputs,
         processor: &'a mut SelectedInputProcessor,
-        minimum_report_frequency: &'a str,
+        environment: SourceReportVariableEnvironment<'a>,
         schedules: &'a mut SelectedScheduleManager,
+        backend: &'a mut SourceErrorBackend<'backend>,
     ) -> Self {
         Self {
             reports,
             processor,
-            minimum_report_frequency,
+            environment,
+            backend,
             schedules: Some(schedules),
         }
     }
@@ -136,40 +183,6 @@ impl LocalArguments {
     }
 }
 
-fn frequency(
-    text: &str,
-    minimum: SourceReportFrequency,
-) -> Result<SourceReportFrequency, OrdinaryRadiationError> {
-    use SourceReportFrequency as F;
-    // determineFrequency returns the Hour default without applying minimum when
-    // there are fewer than four characters, or no recognized four-byte prefix.
-    if text.len() < 4 {
-        return Ok(F::Hour);
-    }
-    let values = [
-        ("DETA", "DETAILED", F::EachCall),
-        ("TIME", "TIMESTEP", F::TimeStep),
-        ("HOUR", "HOURLY", F::Hour),
-        ("DAIL", "DAILY", F::Day),
-        ("MONT", "MONTHLY", F::Month),
-        ("RUNP", "RUNPERIOD", F::Simulation),
-        ("ENVI", "ENVIRONMENT", F::Simulation),
-        ("ANNU", "ANNUAL", F::Year),
-    ];
-    for (prefix, exact, value) in values {
-        if text
-            .get(..4)
-            .is_some_and(|head| head.eq_ignore_ascii_case(prefix))
-        {
-            if !text.eq_ignore_ascii_case(exact) {
-                // Actual warning/continue output is not replaced by acceptance.
-                return Err(OrdinaryRadiationUnavailable::InputBranch.into());
-            }
-            return Ok(value.max(minimum));
-        }
-    }
-    Ok(F::Hour)
-}
 fn variable_name(name: &str) -> &str {
     let Some((without_units, _)) = name.split_once('[') else {
         return name;
@@ -180,9 +193,9 @@ fn variable_name(name: &str) -> &str {
 impl SourceOutputRegistration {
     pub(super) fn get_report_variable_input(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         _host: &impl SourceOutputFileHost,
-        _eio: &mut dyn std::io::Write,
+        eio: &mut dyn std::io::Write,
     ) -> Result<(), OrdinaryRadiationError> {
         // Original allocates all six local arrays even on the already-read return.
         let mut arguments = LocalArguments::default();
@@ -190,11 +203,23 @@ impl SourceOutputRegistration {
             return Ok(());
         }
         self.get_output_input = false;
-        if !input.minimum_report_frequency.is_empty() {
-            // Actual system MinReportFrequency is borrowed from its sole early owner.
-            // determineFrequency/warning/EIO handling is an explicit unported
-            // branch, before object count/getters and before any ReqVar push.
-            return Err(OrdinaryRadiationUnavailable::InputBranch.into());
+        if !input.environment.minimum_report_frequency.is_empty() {
+            let minimum = super::frequency::determine_frequency(
+                input.environment.minimum_report_frequency,
+                self.minimum_report_frequency,
+                input.backend,
+                input.environment.diagnostic_flags.as_ref(),
+            )
+            .map_err(|error| OrdinaryRadiationError::Input(Box::new(error)))?;
+            self.minimum_report_frequency = minimum;
+            super::frequency::write_minimum_frequency_override(
+                eio,
+                minimum,
+                input.environment.minimum_report_frequency,
+            )
+            .map_err(|error| {
+                OrdinaryRadiationError::Output(crate::error::WarmupOutputError::Io(error))
+            })?;
         }
         let current_module_object = String::from("Output:Variable");
         let count = input.validate_count_and_identities(&current_module_object)?;
@@ -224,7 +249,13 @@ impl SourceOutputRegistration {
                     )));
             }
             request.name = variable_name(&arguments.alphas[1]).into();
-            request.frequency = frequency(&arguments.alphas[2], self.minimum_report_frequency)?;
+            request.frequency = super::frequency::determine_frequency(
+                &arguments.alphas[2].to_ascii_uppercase(),
+                self.minimum_report_frequency,
+                input.backend,
+                input.environment.diagnostic_flags.as_ref(),
+            )
+            .map_err(|error| OrdinaryRadiationError::Input(Box::new(error)))?;
             if !arguments.alpha_blanks[3] {
                 // Native OutputProcessor538-545 resolves the actual schedule and
                 // propagates its used flag. Missing references remain rejected;

@@ -16,7 +16,7 @@ pub(crate) struct SourceIntegerOutputDeclaration<'a> {
 impl SourceOutputRegistration {
     pub(crate) fn setup_unmetered_zone_integer(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceIntegerOutputDeclaration<'_>,
         minutes_in_time_step: i32,

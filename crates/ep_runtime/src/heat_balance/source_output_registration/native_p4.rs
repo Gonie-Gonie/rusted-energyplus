@@ -157,7 +157,7 @@ pub(crate) fn native_p4_results(
 impl SourceOutputRegistration {
     pub(crate) fn native_p4_get_report_input(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         host: &impl SourceOutputFileHost,
         eio: &mut dyn std::io::Write,
     ) -> std::result::Result<(), OrdinaryRadiationError> {

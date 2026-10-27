@@ -41,7 +41,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 &mut SourceReportVariableInput::new(
                     o.report_inputs,
                     o.input,
-                    o.minimum_report_frequency,
+                    crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(o.minimum_report_frequency, &*o.globals, &o.project.system.developer_flag, Some(&*o.clock)),
+                    o.backend,
                 ),
                 o.registration,
                 o.prescan,

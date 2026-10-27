@@ -677,23 +677,39 @@ impl Factory {
             surface: Default::default(),
             objects: project_objects(definition, &["Zone"])?,
         };
-        zones.get_zone_data(
-            &raw,
-            &control,
-            &model,
-            &mut ZoneGetterOwners {
-                input: &mut input,
-                shortcut: &mut shortcut,
-                globals: &mut globals,
-                output: &mut registration,
-                prescan: &prescan,
-                report_input: &report,
-                minimum_report_frequency: "",
-                minutes_in_time_step: weather.global.minutes_in_time_step,
-                host: &mut files,
-                eio: &mut eio,
-            },
-        )?;
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut error),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            zones.get_zone_data(
+                &raw,
+                &control,
+                &model,
+                &mut ZoneGetterOwners {
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    globals: &mut globals,
+                    output: &mut registration,
+                    prescan: &prescan,
+                    report_input: &report,
+                    minimum_report_frequency: &project.system.minimum_report_frequency,
+                    developer: &project.system.developer_flag,
+                    clock: Some(&weather.global),
+                    backend: &mut backend,
+                    minutes_in_time_step: weather.global.minutes_in_time_step,
+                    host: &mut files,
+                    eio: &mut eio,
+                },
+            )?;
+        }
         let admitted = OrdinaryEquipmentInput::from_source_family_inventory(inventory, steps)?;
         let mut equipment = OrdinaryEquipment::new_for_source(&model, admitted)?;
         let mut ancillary = hb::ctf_initialization_context::CtfInitializationReports::default();
@@ -1104,7 +1120,7 @@ impl Factory {
                     input: &mut self.input,
                     prescan: &self.prescan,
                     reports: &self.report,
-                    minimum_report_frequency: "",
+                    environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(&self.project.system.minimum_report_frequency, &self.globals, &self.project.system.developer_flag, Some(&self.weather.global)),
                     minutes_in_time_step: self.weather.global.minutes_in_time_step,
                     host: &mut self.files,
                     dictionary_host: &mut dictionary,

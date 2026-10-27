@@ -491,7 +491,7 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
     for (minimum, regex, expected_requests, used) in [
         ("", false, 2, true),
         ("", true, 2, true),
-        ("Daily", false, 0, false),
+        ("Daily", false, 2, true),
     ] {
         let input = ReportInputs {
             output_variables: [
@@ -547,7 +547,14 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
         let mut output = SourceOutputRegistration::default();
         let mut host = AuthoredMtd { opens: 0 };
         let mut eio = Vec::new();
-        let mut operands = SourceReportVariableInput::new(&input, &mut source, minimum);
+        let mut operands = SourceReportVariableInput::new(
+            &input,
+            &mut source,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                minimum, None,
+            ),
+            &mut context.backend,
+        );
         let result = output.setup_unmetered_zone_real(
             &mut operands,
             &SourceOutputPreScan::default(),
@@ -561,7 +568,7 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
             &mut host,
             &mut eio,
         );
-        assert_eq!(result.is_ok(), minimum.is_empty());
+        assert!(result.is_ok());
         assert_eq!(host.opens, 1);
         assert!(output.output_initialized);
         assert!(!output.get_output_input);
@@ -573,8 +580,14 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
             context.reports.input_processor_shortcut, scratch,
             "the real Output getter uses only local 4A/1N argument arrays"
         );
-        assert!(eio.is_empty());
         if minimum.is_empty() {
+            assert!(eio.is_empty());
+        } else {
+            assert_eq!(eio, b"! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n Minimum Reporting Frequency,  !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],Daily\n");
+            assert!(output.requested_variables.iter().all(|row| row.frequency
+                == crate::heat_balance::source_output_registration::SourceReportFrequency::Day));
+        }
+        {
             assert_eq!(output.requested_variables[0].name, "BRACKET");
             assert_eq!(output.requested_variables[1].name, "NO BRACKET \t ");
             if regex {
@@ -592,9 +605,6 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
             assert_eq!(output.requested_variables[1].key, "MiXeD");
             assert_eq!(output.num_real_variables_setup, 1);
             assert_eq!(output.num_total_real_variables, 1);
-        } else {
-            assert!(output.dictionary_variables.is_empty());
-            assert_eq!(output.num_real_variables_setup, 0);
         }
     }
     Ok(())

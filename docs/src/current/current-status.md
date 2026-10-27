@@ -37,47 +37,38 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 ## Running And Comparing
 
 The [example-object union](../generated/example-object-union.md) contains 111
-object types; legal-value completion remains tracked per object. Direct Source
-epJSON now retains the first comparator-equivalent member spelling and last
-whole subtree. Two Native convert-only observations and existing dry-run loader
-assertions verify this input behavior. The [input-domain evidence](../../validation/evidence/object-input-domains.json)
-keeps these checks separate from the 118 paired physical cases. Build71
-uses the current parser and verifies hourly and 20-minute
-`Schedule:File` data on February 29 with distinct leap-day values, per-file
-daylight-saving controls and the next-day schedule handoff. Its controlled
-weather copies February 28 meteorology; full legal-value completion remains open.
+object types; legal-value completion remains tracked per object. The retained
+[input-domain evidence](../../validation/evidence/object-input-domains.json)
+contains 122 paired physical cases and 3,460,782 reported values with zero
+tolerance or RMSE failures. These cases span recorded Source builds; they do
+not establish arbitrary legal object/value combinations.
 
-The [Rust reporting regex port](../../../crates/ep_re2/README.md) has a finite
-comparison of 1,494 Native parse ASTs and 10,607 constructor/match observations.
-Separate prefix/Simplify comparisons cover 2,333 patterns each; finalized program
-comparisons cover 2,352. Their wire fields agree. The default compiler limit now
-uses the pinned official binary's checked boundary. Its later-failing component
-probes add no physical cases. Pre-scan, request construction and registration are
-now connected. Default constructor/invalid-match diagnostics agree on 16 API
-records and 4,906 stderr bytes. Build72 adds two key-only derived 24-hour A/B
-examples: 160 series and 15,144 reported values have zero tolerance or RMSE
-failures. A has 3,536 unequal raw/binary64 values within the original policy;
-B has none. Full dictionaries and ordered timestamps agree. These results do
-not establish full-file or full-object parity.
+Direct Source epJSON retains the first comparator-equivalent member spelling
+and last whole subtree, checked by two Native convert-only observations and
+existing loader assertions. `Schedule:File` comparisons cover hourly and
+20-minute data on February 29, distinct leap-day values, per-file daylight-saving
+controls and the next-day handoff. That controlled weather copies February 28
+meteorology; full schedule-domain completion remains open.
 
-OnePass and anchored-DFA component comparisons agree on all public fields
-and wire bytes for 2,362 pattern groups, including 50,237 searches, 23 resource
-failures and six cache resets. The current Rust cache refactor was checked against
-that retained Native stream without replaying Native. The default constructor
-retains OnePass analysis; matching now uses a persistent anchored-longest DFA
-and the original-context NFA fallback. Official allocation/subtraction code
-establishes the target accounting independently of the separate GCC observer.
-Twenty small groups exercise these owners in the existing table; its two test
-functions finish in about 0.85 seconds. Seven focused reporting-owner tests pass.
+Reporting key matching uses the [Rust RE2 port](../../../crates/ep_re2/README.md)
+at pre-scan, request construction and live registration. Eager OnePass analysis,
+a persistent anchored-longest DFA and the original-context NFA fallback use
+independently checked official-binary accounting. Component comparisons retain
+exact wire results, including resource failures and cache resets. Physical A/B
+regex cases cover 160 series and 15,144 values under the original policy.
+Two further 24-hour cases with a 100,000-byte Zone name cover 192 values and
+reproduce the failed-DFA diagnostics before successful matching. Their complete
+dictionaries and ordered timestamps agree; full-file equality is not claimed.
 
-Build73 adds two same-input comparisons with a 100,000-byte Zone name. Both
-complete the full 24-hour environment: 192 reported values have zero tolerance
-or RMSE failures, with maximum absolute difference 1.17e-14. Dictionaries and
-ordered timestamps agree. The regex request reproduces Native's two failed-DFA
-diagnostics in order before producing the requested output; the literal control
-has none. This is finite cache/fallback evidence. Minimum-report-frequency
-overrides, unbound producers, output backends and general legal-value completion
-remain open.
+`MINREPORTFREQUENCY` now reaches the shared variable/meter frequency parser
+through real reporting owners. It preserves first-call ordering, raw input
+spelling, abbreviation warnings and EIO records. Two same-input 24-hour cases
+with `Hourly` and `hour` compare 192 values across one variable and three meters;
+the maximum absolute difference is 8.66e-15 with zero tolerance or RMSE failures.
+Their dictionaries, clocks, override records and frequency diagnostics agree.
+Other frequency overrides have source and existing-table coverage; this physical
+comparison covers Hourly only. Unbound producers, unsupported output backends
+and general legal-value completion remain open.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA

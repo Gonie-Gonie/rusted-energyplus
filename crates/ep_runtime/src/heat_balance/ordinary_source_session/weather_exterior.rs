@@ -159,6 +159,16 @@ impl OrdinarySourceSession {
                         })?
                         .system
                         .minimum_report_frequency,
+                    developer: &reports
+                        .selected_project_data
+                        .as_ref()
+                        .ok_or_else(|| {
+                            hb_input_error(Error::Unavailable(
+                                "same Project developer flag before Exterior",
+                            ))
+                        })?
+                        .system
+                        .developer_flag,
                     host: output_host,
                     dictionary_host: &mut dictionary_host,
                     eio,

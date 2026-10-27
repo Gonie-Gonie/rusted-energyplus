@@ -63,16 +63,23 @@ impl CtfInitializationContext<'_> {
     ) -> Result<(), RuntimeError> {
         // The existing driver initializes the actual ErrorsFound local, then
         // Project/Site/Material/Frame/Construction/Building Zone input in order.
-        self.initialize_selected_heat_balance_input(model, environment, minutes, output_host)?;
+        self.initialize_selected_heat_balance_input_with_clock(
+            model,
+            environment,
+            minutes,
+            output_host,
+            clock,
+        )?;
 
         // GetBuildingData's real GetSurfaceData/Setup continuation. A different
         // raw geometry route cannot fall through to the legacy typed factory.
-        if !self.prepare_selected_world_surface_geometry(
+        if !self.prepare_selected_world_surface_geometry_with_clock(
             model,
             environment,
             Some(radiation_input),
             minutes,
             output_host,
+            clock,
         )? {
             return Err(hb_input_error(HeatBalanceInputError::Unavailable(
                 "actual Source GetSurfaceData World route required by GetHeatBalanceInput",
@@ -80,13 +87,14 @@ impl CtfInitializationContext<'_> {
         }
         // Setup writes the same Zone volume and its native outdoor bulbs. Its
         // extra Rust geometry return is not a thermal-state initialization seed.
-        let _geometry_return = self.continue_selected_setup_zone_geometry(
+        let _geometry_return = self.continue_selected_setup_zone_geometry_with_clock(
             model,
             Some(equipment_input),
             environment,
             minutes,
             output_host,
             Some(branch),
+            clock,
         )?;
 
         // Actual278-313 includes variable absorptance, incident/scheduled gains,

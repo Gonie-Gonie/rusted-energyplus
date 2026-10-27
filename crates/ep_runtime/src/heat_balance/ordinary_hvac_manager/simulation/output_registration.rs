@@ -72,6 +72,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
         owners: &SourceHvacOutputOwners<'_>,
         input: &mut SelectedInputProcessor,
         minutes_in_time_step: i32,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
     ) -> Result<(), Error> {
@@ -81,6 +84,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
             "HVAC System Solver Iteration Count",
             input,
             minutes_in_time_step,
+            reporting_diagnostic_flags,
+            backend,
             eio,
         )?;
         self.declare_integer(
@@ -89,6 +94,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
             "Air System Solver Iteration Count",
             input,
             minutes_in_time_step,
+            reporting_diagnostic_flags,
+            backend,
             eio,
         )?;
         self.declare_real(
@@ -97,6 +104,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
             "Air System Relief Air Total Heat Loss Energy",
             input,
             minutes_in_time_step,
+            reporting_diagnostic_flags,
             backend,
             eio,
         )?;
@@ -106,6 +114,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
             "HVAC System Total Heat Rejection Energy",
             input,
             minutes_in_time_step,
+            reporting_diagnostic_flags,
             backend,
             eio,
         )
@@ -115,6 +124,10 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
         owners: &SourceHvacOutputOwners<'_>,
         input: &mut SelectedInputProcessor,
         minutes_in_time_step: i32,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
+        backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
     ) -> Result<(), Error> {
         self.declare_integer(
@@ -123,6 +136,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
             "Plant Solver Sub Iteration Count",
             input,
             minutes_in_time_step,
+            reporting_diagnostic_flags,
+            backend,
             eio,
         )?;
         self.declare_integer(
@@ -131,6 +146,8 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
             "Plant Solver Half Loop Calls Count",
             input,
             minutes_in_time_step,
+            reporting_diagnostic_flags,
+            backend,
             eio,
         )
     }
@@ -141,11 +158,22 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
         name: &str,
         input: &mut SelectedInputProcessor,
         minutes_in_time_step: i32,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
+        backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
     ) -> Result<(), Error> {
         let binding = SourceIntegerOutputBinding::new(target, owners).map_err(Error::Output)?;
-        let mut report_input =
-            SourceReportVariableInput::new(self.reports, input, self.minimum_report_frequency);
+        let mut report_input = SourceReportVariableInput::new(
+            self.reports,
+            input,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                self.minimum_report_frequency,
+                reporting_diagnostic_flags,
+            ),
+            backend,
+        );
         self.registration
             .setup_bound_integer(
                 &mut report_input,
@@ -172,13 +200,23 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
         name: &str,
         input: &mut SelectedInputProcessor,
         minutes_in_time_step: i32,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
     ) -> Result<(), Error> {
         let binding =
             SourceRealOutputBinding::new(Real::Hvac { field }, owners).map_err(Error::Output)?;
-        let mut report_input =
-            SourceReportVariableInput::new(self.reports, input, self.minimum_report_frequency);
+        let mut report_input = SourceReportVariableInput::new(
+            self.reports,
+            input,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                self.minimum_report_frequency,
+                reporting_diagnostic_flags,
+            ),
+            backend,
+        );
         self.registration
             .setup_bound_real(
                 &mut report_input,
@@ -195,7 +233,6 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceHvacOutputCon
                 binding,
                 self.dictionary_host,
                 SourceRealRegistrationOptions::unmetered(TimeStepKind::System),
-                backend,
             )
             .map_err(Error::Output)
     }

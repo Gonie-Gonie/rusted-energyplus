@@ -8,7 +8,7 @@ use super::super::selected_heat_balance_input::HeatBalanceInputError;
 use super::SourceErrorBackend;
 
 /// References to the same Globals, SystemVariables and WeatherGlobal cells.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub(crate) struct SourceDiagnosticFlags<'call> {
     pub(crate) kickoff: &'call bool,
     pub(crate) developer: &'call bool,

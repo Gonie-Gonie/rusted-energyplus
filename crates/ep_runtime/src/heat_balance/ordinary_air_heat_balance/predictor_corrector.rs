@@ -51,6 +51,8 @@ pub(crate) struct SourceZoneAirOwners<'a, 'b> {
     pub(crate) space_controls: &'a SelectedHeatBalanceSpaceControls,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
     pub(crate) clock: &'a WeatherGlobalState,
+    pub(crate) reporting_diagnostic_flags:
+        Option<crate::heat_balance::error_backend::SourceDiagnosticFlags<'a>>,
     pub(crate) environment: &'a WeatherEnvironmentState,
     pub(crate) hvac: &'a mut SelectedHvacGlobals,
     pub(crate) input: &'a mut SelectedInputProcessor,

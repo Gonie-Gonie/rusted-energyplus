@@ -55,6 +55,24 @@ impl CtfInitializationContext<'_> {
         minutes_in_time_step: i32,
         host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
     ) -> Result<bool, RuntimeError> {
+        self.prepare_selected_world_surface_geometry_with_clock(
+            model,
+            environment,
+            radiation_input,
+            minutes_in_time_step,
+            host,
+            None,
+        )
+    }
+    pub(crate) fn prepare_selected_world_surface_geometry_with_clock(
+        &mut self,
+        model: &TypedModel,
+        environment: &crate::weather::day::WeatherEnvironmentState,
+        radiation_input: Option<crate::heat_balance::radiation::ordinary::OrdinaryRadiationInput>,
+        minutes_in_time_step: i32,
+        host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
+        clock: Option<&crate::weather::day::WeatherGlobalState>,
+    ) -> Result<bool, RuntimeError> {
         let reports = &mut *self.reports;
         let Some(raw) = reports.heat_balance_input.as_ref() else {
             return Ok(false);
@@ -224,12 +242,13 @@ impl CtfInitializationContext<'_> {
         let mut output = crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
             output: &mut reports.output_registration,
             prescan: &reports.output_prescan,
-            minimum_report_frequency: &reports
-                .selected_project_data
-                .as_ref()
-                .ok_or_else(|| hb_input_error(E::Unavailable("same enclosure process settings")))?
-                .system
-                .minimum_report_frequency,
+            minimum_report_frequency: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                &reports.selected_project_data.as_ref().ok_or_else(|| hb_input_error(E::Unavailable("same enclosure process settings")))?.system.minimum_report_frequency,
+                owners.globals,
+                &reports.selected_project_data.as_ref().ok_or_else(|| hb_input_error(E::Unavailable("same enclosure developer")))?.system.developer_flag,
+                clock,
+            ),
+            backend: &mut self.backend,
             minutes_in_time_step,
             host,
             eio: self.eio,

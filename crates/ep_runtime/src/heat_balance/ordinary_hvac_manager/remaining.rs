@@ -236,6 +236,7 @@ impl SourceOrdinaryHvacRemaining {
                 prescan: output.prescan,
                 reports: output.reports,
                 minimum_report_frequency: output.minimum_report_frequency,
+                developer: &o.project.system.developer_flag,
                 minutes_in_time_step: o.clock.minutes_in_time_step,
                 host: output.host,
                 dictionary_host: output.dictionary_host,
@@ -314,6 +315,14 @@ impl<
             ),
             C::DetectOscillatingZoneTemperature => {
                 let mut owners = SourceOscillationOwners {
+                    reporting_diagnostic_flags: Some(
+                        crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                            kickoff: &o.globals.kickoff_simulation,
+                            developer: &o.project.system.developer_flag,
+                            warmup: &o.clock.warmup_flag,
+                            doing_sizing: &o.globals.doing_sizing,
+                        },
+                    ),
                     globals: o.globals,
                     zones: o.zones,
                     air: o.air,

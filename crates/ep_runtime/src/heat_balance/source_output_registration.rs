@@ -187,7 +187,8 @@ pub use host::SourceMtdFileHost;
 pub(crate) use integer::SourceIntegerOutputDeclaration;
 pub(crate) use oscillation_target::SourceOscillationOutputField;
 pub(crate) use pollution_target::SourceCarbonEquivalentField;
-pub(crate) use requested_input::SourceReportVariableInput;
+pub(crate) use requested_input::{SourceReportVariableEnvironment, SourceReportVariableInput};
+mod frequency;
 
 /// Actual output file/system host, supplied by the real Setup route.
 pub(crate) trait SourceOutputFileHost {
@@ -582,7 +583,7 @@ impl SourceOutputRegistration {
 
     fn prepare_real_registration_details(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,
@@ -606,7 +607,7 @@ impl SourceOutputRegistration {
     }
     fn prepare_real_registration_front(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,
@@ -650,7 +651,7 @@ impl SourceOutputRegistration {
 
     pub(crate) fn prepare_real_registration(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,
@@ -671,7 +672,7 @@ impl SourceOutputRegistration {
     /// Literal no-meter return: dictionary/setup/total writes still occur.
     pub(crate) fn setup_unmetered_zone_real(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,

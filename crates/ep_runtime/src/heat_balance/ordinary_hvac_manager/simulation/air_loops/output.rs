@@ -41,7 +41,7 @@ impl SourceAirLoopData {
     >(
         &mut self,
         first: bool,
-        o: &mut SourceAirLoopOwners<'_>,
+        o: &mut SourceAirLoopOwners<'_, '_>,
         output: &mut SourceAirReportRegistrationContext<'_, H, D>,
     ) -> Result<(), Error> {
         if !self.output_setup_flag {
@@ -64,7 +64,8 @@ impl SourceAirLoopData {
                 let mut report_input = SourceReportVariableInput::new(
                     output.reports,
                     o.input,
-                    output.minimum_report_frequency,
+                    crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(output.minimum_report_frequency, o.globals, &o.project.system.developer_flag, Some(o.clock)),
+                    o.backend,
                 );
                 output
                     .registration

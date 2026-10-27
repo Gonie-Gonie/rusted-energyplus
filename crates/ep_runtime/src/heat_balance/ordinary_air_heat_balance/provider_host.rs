@@ -69,6 +69,14 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
         };
         controller.get_source_air_heat_balance_input(
             &mut SourceSimpleAirInputOwners {
+                reporting_diagnostic_flags: Some(
+                    crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff: &o.globals.kickoff_simulation,
+                        developer: &o.project.system.developer_flag,
+                        warmup: &o.clock.warmup_flag,
+                        doing_sizing: &o.globals.doing_sizing,
+                    },
+                ),
                 input: o.input,
                 zones: o.zones,
                 globals: o.globals,

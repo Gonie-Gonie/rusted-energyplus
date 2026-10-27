@@ -681,7 +681,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             let mut output = crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
                 output: &mut registration,
                 prescan: &prescan,
-                minimum_report_frequency: "",
+                minimum_report_frequency: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new("", None),
+                backend: &mut context.backend,
                 minutes_in_time_step: 15,
                 host: &mut host,
                 eio: &mut registration_eio,
@@ -747,7 +748,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     &mut crate::heat_balance::radiation::ordinary::EnclosureOutputOwners {
                         output: &mut solar_registration,
                         prescan: &prescan,
-                        minimum_report_frequency: "",
+                        minimum_report_frequency: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new("", None),
+                        backend: &mut context.backend,
                         minutes_in_time_step: 15,
                         host: &mut host,
                         eio: &mut registration_eio,
@@ -3199,6 +3201,10 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 people_reports
                     .input_processor_shortcut
                     .allocate_from_input(input)?;
+                let mut zone_backend = SourceErrorBackend {
+                    state: &mut people_state, error_stream: Some(&mut people_errors), console: &mut people_console,
+                    out_unit1: None, out_unit2: None, f_message: None, message_callback: None, error_callback: None, sqlite: None,
+                };
                 people_zones.get_zone_data(
                     people_reports
                         .heat_balance_input
@@ -3214,6 +3220,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         prescan: &people_reports.output_prescan,
                         report_input: &people_model.report_inputs,
                         minimum_report_frequency: "",
+                        developer: &people_reports.selected_project_data.as_ref().ok_or("People Zone project")?.system.developer_flag,
+                        clock: Some(&people_clock),
+                        backend: &mut zone_backend,
                         minutes_in_time_step: 15,
                         host: &mut gain_host,
                         eio: &mut people_eio,
@@ -7004,6 +7013,12 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     space_controls: controls,
                     globals,
                     clock: &clock,
+                    reporting_diagnostic_flags: Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff: &globals.kickoff_simulation,
+                        developer: &reports.selected_project_data.as_ref().ok_or("same corrector project")?.system.developer_flag,
+                        warmup: &clock.warmup_flag,
+                        doing_sizing: &globals.doing_sizing,
+                    }),
                     environment: &weather,
                     hvac: &mut hvac,
                     input: reports
@@ -7291,6 +7306,12 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     space_controls: controls,
                     globals,
                     clock: &project_weather.global,
+                    reporting_diagnostic_flags: Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff: &globals.kickoff_simulation,
+                        developer: &project.system.developer_flag,
+                        warmup: &project_weather.global.warmup_flag,
+                        doing_sizing: &globals.doing_sizing,
+                    }),
                     environment: &project_weather.environment,
                     hvac: &mut hvac,
                     input: reports

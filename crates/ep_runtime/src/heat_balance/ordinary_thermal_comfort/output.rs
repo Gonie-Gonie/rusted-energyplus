@@ -98,7 +98,7 @@ impl SourceThermalComfort {
         )
         .map_err(Error::Output)?;
         let mut input =
-            SourceReportVariableInput::new(o.report_inputs, o.input, o.minimum_report_frequency);
+            SourceReportVariableInput::new(o.report_inputs, o.input, crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(o.minimum_report_frequency, o.globals, o.developer, Some(o.clock)), o.backend);
         o.registration
             .setup_bound_real(
                 &mut input,
@@ -115,7 +115,6 @@ impl SourceThermalComfort {
                 binding,
                 o.dictionary_host,
                 SourceRealRegistrationOptions::unmetered(TimeStepKind::Zone),
-                o.backend,
             )
             .map_err(Error::Output)
     }

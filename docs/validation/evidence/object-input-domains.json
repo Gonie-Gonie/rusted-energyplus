@@ -42,12 +42,12 @@
       "same-input actual2016Feb29Monday lifecycle matches all5352 original samples and exact zero-diagnostic EIO/ERR/END; only three year-bearing DATA PERIODS fields change in existing explicitly synthetic8784-row weather"
     ],
     "Output:Variable": [
-      "real live reporting schedule identity and immutable dictionary name; bound Total Internal and OtherEquipment object/Zone/implicit-Space gain requests reach actual ESO dictionaries and Source A Timestep reporting; People object/Zone/implicit-Space gains bind real Which owners; same-input A/B evidence directly checks People Total Heating Rate/Energy Timestep streams.",
-      "zero OFF; positive/negative ON; EMS current value at both native boundaries",
-      "all seven existing report-frequency consumers and unchanged meter/extrema/count behavior",
-      "actual IO deletion/catalog/extraction; zero samples are not fabricated",
-      "Constant and built-in Constant admission; other explicit physics/output guards retained",
-      "Raw/CI pre-scan and CI-only request matching use pinned Rust RE2 with source-order duplicate/Used/error effects. The retained key-only derived A/B cases pass160 series/15,144 samples. Default anchored-longest DFA now uses actual official-binary accounting, eager OnePass charge and a shared persistent cache at the live reporting owners. Two additional same-input A models with an exact100k Zone name complete192 reported samples under unchanged numeric limits, exact dictionaries/clocks and genuine absent MTR; the pressure branch records exact CI26 thenraw22 LOG811 before the Source fallback. The2362-group same-GCC component reread retains exact wire separately. This finite connection does not establish minimum-report-frequency override, unbound producers, unsupported backends or arbitrary legal object/value combinations."
+      "Four raw/IP request fields retain actual identity/default/blank metadata. Real Which bindings cover current People, Total Internal and OtherEquipment object/Zone/implicit-Space producers within bounded A/B physics.",
+      "Live reporting schedules resolve and mark the same Source ScheduleManager owner used; dictionary names retain identity. Admission includes authored Constant, built-in Constant0/1 and already-accepted detailed schedules through has_source_detailed_reference: Compact, File and Year roots with their retained Day/Week dependencies. Original signed zero/nonzero and EMS current values are reread at both reporting boundaries without changing meter/extrema/count behavior.",
+      "Pinned Rust RE2 owns raw/CI pre-scan, CI-only matching, source-order duplicate/Used/diagnostic effects, official-accounted persistent DFA/OnePass and original-context NFA fallback. Existing regex/DFA physical and component authorities remain separately recorded below.",
+      "The first actual request getter consumes raw MINREPORTFREQUENCY with source-exact frequency prefixes/canonical keys, minimum clamping and ordered override writes. Nonexact warnings use the real borrowed backend and live kickoff/developer/warmup/sizing references. Existing getter tests retain canonical keys, warnings and failure afterstates without new test functions.",
+      "Two accepted Source74 same-input A branches Hourly/hour compare complete24-value Hourly ESO/original72-value MTR, exact dictionaries/24clocks/footer/EOF, exact2-record CRLF EIO overrides and final warning/Continue counts0/1 under unchanged numeric limits; only the named Zone Mean frequency selector is derived.",
+      "Unbound variable producers, unsupported output backends and arbitrary object/value/model combinations retain explicit guards. Finite authorities do not establish whole-object or full original-profile completion."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -1401,6 +1401,97 @@
           "unpaired_official_processes": 2,
           "new_paired_physical_cases": 0
         }
+      },
+      "minimum_report_frequency_74": {
+        "actual_quality": {
+          "path": ".runtime/object-expansion/unit74-prep/minfreq-quality02/receipt.json",
+          "sha256": "c84a544dbbd7ec651ab0349380d0e8ba17cec6241c1befb194df57723494f846",
+          "bytes": 852146
+        },
+        "commands": [
+          {
+            "name": "fmt",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "fmt",
+              "-p",
+              "ep_runtime"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit74-prep/minfreq-quality02/fmt.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "clippy",
+              "-p",
+              "ep_runtime",
+              "--all-targets",
+              "--locked",
+              "--offline",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit74-prep/minfreq-quality02/clippy.log",
+              "sha256": "9a94b934a011a9088435b06d9acdb3b825076be79f1a3ae4802d3403f9fc4f18",
+              "bytes": 490
+            }
+          },
+          {
+            "name": "optional-compile",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "check",
+              "-p",
+              "ep_runtime",
+              "--test",
+              "native_controlled_air_cohort",
+              "--features",
+              "native-controlled-air-cohort",
+              "--locked",
+              "--offline"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit74-prep/minfreq-quality02/optional-compile.log",
+              "sha256": "a2d067ce82cc143d325dbd42383389a73877ff11b6a9ffa287775fac769d2509",
+              "bytes": 1468990
+            }
+          },
+          {
+            "name": "library-tests",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "-p",
+              "ep_runtime",
+              "--lib",
+              "--locked",
+              "--offline"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit74-prep/minfreq-quality02/library-tests.log",
+              "sha256": "d7fc5c215d2036cc2c191e4cc90d4636346497c3aa65f28ed86608aab06b3907",
+              "bytes": 529404
+            }
+          }
+        ],
+        "ep_runtime_default_library": {
+          "passed": 3394,
+          "failed": 0,
+          "ignored": 2
+        },
+        "new_test_functions": 0,
+        "scope": "Actual ep_runtime fmt, strict all-target Clippy, optional native-controlled-air-cohort compilation and default library suite. Existing frequency/getter and owner bodies are extended; not a new full-workspace result."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -1410,7 +1501,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile.",
     "cases": [
       {
         "id": "timestep-8",
@@ -28931,12 +29022,399 @@
           }
         },
         "effective_state": "Same immutable100k-Zone IDF/weather as retained successful official Native; new Source73 full24h A completion for ambiguous regex pressure with retained actual CI26 then raw22 LOG811. Target-derived persistent anchored-longest DFA, exact diagnostics and fallback are connected to real reporting owners. This finite physical branch does not establish every regex/resource input, minimum-report-frequency override, unbound producers, other backends or arbitrary legal object/value combinations."
+      },
+      {
+        "id": "MINREPORTFREQUENCY-HOURLY-A-24H",
+        "group": "minimum_report_frequency",
+        "source_build": "minimum-report-frequency-74",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit72-prep/min-report-frequency-proposal/inputs/hourly/input.idf",
+          "sha256": "fe61d0757b2b116b951a44881c115b8c0103f51280ca5b085bf40321c9187aed",
+          "bytes": 4396
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/min-report-frequency-74/native-01/hourly/command/receipt.json",
+          "sha256": "f06f0025ffbc23d054c3e94503d0bc1f723370e6eebed033ae8bedcacce9e914",
+          "bytes": 7627
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/hourly/command/receipt.json",
+          "sha256": "265ab1dd61a0c82af9a823395d0ecbb3725de42a87d0f462c90334f51f1f0ead",
+          "bytes": 21504
+        },
+        "source_summary": {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/hourly/output/run-summary.json",
+          "sha256": "f7e00443c44fb9eb67e79bb622e45e0c04b6541a2af80b377f5d96fdf47d9b6a",
+          "bytes": 15575
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-74/eplus-rs.exe",
+          "sha256": "05b9434e6a5e72a6c0bd2957fd68e357a65f74d6b06de4e07371a956b3cf1c6c",
+          "bytes": 77869381
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/31/31d0ca8fe32b2834b6a888a74e37733b028a0c5a4f803104deb36c9d53735ea5",
+          "sha256": "31d0ca8fe32b2834b6a888a74e37733b028a0c5a4f803104deb36c9d53735ea5"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-74/receipt.json",
+          "sha256": "d83889a17704caca1d8dd35e78b89ae3bc09b933d4ce5dde3069222abb65fdb7",
+          "bytes": 18767
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/hourly/comparison.json",
+          "sha256": "64f0b9da7567895ed37fc59f9ed8700c5e048f10f8c89e81922b6a84383868d3",
+          "bytes": 17151
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/min-report-frequency-source-proposal/plan.json",
+          "sha256": "8507dab72b6b2ed8c1701cc186ee02e526e6c2cc6cb7482541c93d2ea7285fde",
+          "bytes": 7433
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/min-report-frequency-proposal/inputs/hourly/recipe.json",
+          "sha256": "7f2d864b5324f48c9be34e1dc7eaf0d2bf1daf727d0b4ee2198f1234db027d08",
+          "bytes": 4632
+        },
+        "totals": {
+          "series": 4,
+          "samples": 96,
+          "raw_operand_unequal": 24,
+          "parsed_binary64_unequal": 24,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "Complete sole Zone Mean Hourly series:7exact dictionary entries,1environment,24ordered whole-hour clocks/24finite values, actual catalog/count/footer/EOF.",
+          "MTR": "Complete3original Hourly meter series:9exact dictionary entries,1environment,24ordered whole-hour clocks/72finite values, actual catalog/count/footer/EOF.",
+          "original_full_A58_profile_claim": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "A",
+          "original_row": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "derived_frequency_selector": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Hourly",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "original_meter_policy_rows": [
+            {
+              "meter": "ExteriorLights:Electricity",
+              "units": "J",
+              "frequency": "Hourly",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0,
+              "numeric_comparison_card": "SYS-04",
+              "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+            },
+            {
+              "meter": "EnergyTransfer:Building",
+              "units": "J",
+              "frequency": "Hourly",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0,
+              "numeric_comparison_card": "SYS-04",
+              "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+            },
+            {
+              "meter": "EnergyTransfer:Facility",
+              "units": "J",
+              "frequency": "Hourly",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0,
+              "numeric_comparison_card": "SYS-04",
+              "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+            }
+          ],
+          "numerical_limits_changed": false,
+          "qualification": "Only the named Zone Mean frequency selector changes Timestep to Hourly. Original1e-6/0/1e-6 limits, all3original1J/0/1J meter rows and96physical zone steps at4/hour remain unchanged; no frozen-case promotion."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 8.659739592076221e-15,
+          "max_rmse_delta": 4.810070082743824e-15,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 7,
+              "exact_timestamp_rows": 24,
+              "numeric_records": 24,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "e69f8686f1acb7c4c588be644985f7dde61425dc0c5bb477127b891fb1cd1a5c"
+            },
+            {
+              "stream": "mtr",
+              "exact_dictionary_entries": 9,
+              "exact_timestamp_rows": 24,
+              "numeric_records": 72,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "e69f8686f1acb7c4c588be644985f7dde61425dc0c5bb477127b891fb1cd1a5c"
+            }
+          ]
+        },
+        "minimum_frequency_observation": {
+          "Source_environment_request": {
+            "path": ".runtime/porting/min-report-frequency-74/source-01/hourly/child-environment-request.json",
+            "sha256": "57eb07d0b386808704158745f1128d23ef9fed402bf76d5420d6557244520ca8",
+            "bytes": 1334
+          },
+          "Native_environment_request": {
+            "path": ".runtime/porting/min-report-frequency-74/native-01/hourly/child-environment-request.json",
+            "sha256": "ee1f0cdb6c374e0c69be3e6a3b516b2f178df616d0c7009e7703fe6600e1d56f",
+            "bytes": 2739
+          },
+          "actual_child_override_map": {
+            "MINREPORTFREQUENCY": "Hourly"
+          },
+          "parent_environment_unchanged": true,
+          "Source_EIO_override_records_hex": [
+            "21203c4d696e696d756d205265706f7274696e67204672657175656e637920286f766572726964696e6720696e7075742076616c7565293e2c2056616c75652c20496e7075742056616c75650d0a",
+            "204d696e696d756d205265706f7274696e67204672657175656e63792c202021486f75726c792c486f75726c790d0a"
+          ],
+          "Source_frequency_diagnostic_records_hex": [],
+          "actual_final_warning_count": 0,
+          "actual_Severe_or_Fatal": false,
+          "exact_Native_Source_override_and_frequency_diagnostic_record_bytes": true,
+          "Native_corrected_raw_readback": {
+            "path": ".runtime/porting/min-report-frequency-74/native-01/readback-v2.json",
+            "sha256": "116ec0363da13cb4242e3555dd054302948013c1d4a4774e48517b646c201fe1",
+            "bytes": 7228
+          },
+          "Native_v1_authority_used": false,
+          "qualification": "Exact CRLF-bearing records are read from genuine EIO/ERR files; final warning counts0/1 are separate from wrapper support warnings. Cross-stream Warning-before-EIO order is source-derived, not dynamically traced."
+        },
+        "effective_state": "Actual per-child MINREPORTFREQUENCY=Hourly reaches connected raw option/getter/backend owners. Complete24-hour Hourly ESO/original MTR retain unchanged numeric limits and exact override/warning records. This finite A branch does not establish the original58-series profile, every minimum/model combination, unbound producers or unsupported backends."
+      },
+      {
+        "id": "MINREPORTFREQUENCY-RECOGNIZED-ABBREVIATION-A-24H",
+        "group": "minimum_report_frequency",
+        "source_build": "minimum-report-frequency-74",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit72-prep/min-report-frequency-proposal/inputs/recognized-abbreviation/input.idf",
+          "sha256": "fe61d0757b2b116b951a44881c115b8c0103f51280ca5b085bf40321c9187aed",
+          "bytes": 4396
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/min-report-frequency-74/native-01/recognized-abbreviation/command/receipt.json",
+          "sha256": "1f26c678746119b3a802ab8462bb8db4173112197a850d7c50aa4bc2d89d3108",
+          "bytes": 7813
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/recognized-abbreviation/command/receipt.json",
+          "sha256": "eb9872cad15455ba39f73ac65dd65bc75417125c221cb01cdcad01c8f0436c0d",
+          "bytes": 21742
+        },
+        "source_summary": {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/recognized-abbreviation/output/run-summary.json",
+          "sha256": "d3b85b298f466f1c323c1cc54b04c9d029a8121d026f17496ae539940e75e063",
+          "bytes": 16024
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-74/eplus-rs.exe",
+          "sha256": "05b9434e6a5e72a6c0bd2957fd68e357a65f74d6b06de4e07371a956b3cf1c6c",
+          "bytes": 77869381
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/31/31d0ca8fe32b2834b6a888a74e37733b028a0c5a4f803104deb36c9d53735ea5",
+          "sha256": "31d0ca8fe32b2834b6a888a74e37733b028a0c5a4f803104deb36c9d53735ea5"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-74/receipt.json",
+          "sha256": "d83889a17704caca1d8dd35e78b89ae3bc09b933d4ce5dde3069222abb65fdb7",
+          "bytes": 18767
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/recognized-abbreviation/comparison.json",
+          "sha256": "02da4d8bd35832d95140bf85a3193043751a03db9fccb5ada7b81e737b08e35f",
+          "bytes": 17853
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/min-report-frequency-source-proposal/plan.json",
+          "sha256": "8507dab72b6b2ed8c1701cc186ee02e526e6c2cc6cb7482541c93d2ea7285fde",
+          "bytes": 7433
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/min-report-frequency-proposal/inputs/recognized-abbreviation/recipe.json",
+          "sha256": "9b98ddc23dfddd9ab65effc0a5734d5834a740ca21644f8a577e65b00042dd69",
+          "bytes": 4698
+        },
+        "totals": {
+          "series": 4,
+          "samples": 96,
+          "raw_operand_unequal": 24,
+          "parsed_binary64_unequal": 24,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "Complete sole Zone Mean Hourly series:7exact dictionary entries,1environment,24ordered whole-hour clocks/24finite values, actual catalog/count/footer/EOF.",
+          "MTR": "Complete3original Hourly meter series:9exact dictionary entries,1environment,24ordered whole-hour clocks/72finite values, actual catalog/count/footer/EOF.",
+          "original_full_A58_profile_claim": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "A",
+          "original_row": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "derived_frequency_selector": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Hourly",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "original_meter_policy_rows": [
+            {
+              "meter": "ExteriorLights:Electricity",
+              "units": "J",
+              "frequency": "Hourly",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0,
+              "numeric_comparison_card": "SYS-04",
+              "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+            },
+            {
+              "meter": "EnergyTransfer:Building",
+              "units": "J",
+              "frequency": "Hourly",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0,
+              "numeric_comparison_card": "SYS-04",
+              "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+            },
+            {
+              "meter": "EnergyTransfer:Facility",
+              "units": "J",
+              "frequency": "Hourly",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0,
+              "numeric_comparison_card": "SYS-04",
+              "reference_artifact": "eplusout.mtr (ancillary reporting; no CON-01 numerical comparison)"
+            }
+          ],
+          "numerical_limits_changed": false,
+          "qualification": "Only the named Zone Mean frequency selector changes Timestep to Hourly. Original1e-6/0/1e-6 limits, all3original1J/0/1J meter rows and96physical zone steps at4/hour remain unchanged; no frozen-case promotion."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 8.659739592076221e-15,
+          "max_rmse_delta": 4.810070082743824e-15,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 7,
+              "exact_timestamp_rows": 24,
+              "numeric_records": 24,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "e69f8686f1acb7c4c588be644985f7dde61425dc0c5bb477127b891fb1cd1a5c"
+            },
+            {
+              "stream": "mtr",
+              "exact_dictionary_entries": 9,
+              "exact_timestamp_rows": 24,
+              "numeric_records": 72,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "e69f8686f1acb7c4c588be644985f7dde61425dc0c5bb477127b891fb1cd1a5c"
+            }
+          ]
+        },
+        "minimum_frequency_observation": {
+          "Source_environment_request": {
+            "path": ".runtime/porting/min-report-frequency-74/source-01/recognized-abbreviation/child-environment-request.json",
+            "sha256": "15009218adf5e0908f72dff807d7e014a3520c1d73f15f5c26f3bd307a00f0d5",
+            "bytes": 1381
+          },
+          "Native_environment_request": {
+            "path": ".runtime/porting/min-report-frequency-74/native-01/recognized-abbreviation/child-environment-request.json",
+            "sha256": "f06ebfedb1ed39fa0fd62115d8de08168b917d68da13f08916b9a2dffd8f8f08",
+            "bytes": 2837
+          },
+          "actual_child_override_map": {
+            "MINREPORTFREQUENCY": "hour"
+          },
+          "parent_environment_unchanged": true,
+          "Source_EIO_override_records_hex": [
+            "21203c4d696e696d756d205265706f7274696e67204672657175656e637920286f766572726964696e6720696e7075742076616c7565293e2c2056616c75652c20496e7075742056616c75650d0a",
+            "204d696e696d756d205265706f7274696e67204672657175656e63792c202021486f75726c792c686f75720d0a"
+          ],
+          "Source_frequency_diagnostic_records_hex": [
+            "2020202a2a205761726e696e67202a2a2044657465726d696e654672657175656e63793a20456e7465726564206672657175656e63793d22686f757222206973206e6f7420616e206578616374206d6174636820746f206b657920737472696e67732e0d0a",
+            "2020202a2a2020207e7e7e2020202a2a204672657175656e63793d486f75726c792077696c6c20626520757365642e0d0a"
+          ],
+          "actual_final_warning_count": 1,
+          "actual_Severe_or_Fatal": false,
+          "exact_Native_Source_override_and_frequency_diagnostic_record_bytes": true,
+          "Native_corrected_raw_readback": {
+            "path": ".runtime/porting/min-report-frequency-74/native-01/readback-v2.json",
+            "sha256": "116ec0363da13cb4242e3555dd054302948013c1d4a4774e48517b646c201fe1",
+            "bytes": 7228
+          },
+          "Native_v1_authority_used": false,
+          "qualification": "Exact CRLF-bearing records are read from genuine EIO/ERR files; final warning counts0/1 are separate from wrapper support warnings. Cross-stream Warning-before-EIO order is source-derived, not dynamically traced."
+        },
+        "effective_state": "Actual per-child MINREPORTFREQUENCY=hour reaches connected raw option/getter/backend owners. Complete24-hour Hourly ESO/original MTR retain unchanged numeric limits and exact override/warning records. This finite A branch does not establish the original58-series profile, every minimum/model combination, unbound producers or unsupported backends."
       }
     ],
     "totals": {
-      "paired_cases": 120,
-      "reported_samples": 3460590,
-      "raw_operand_unequal": 710415,
+      "paired_cases": 122,
+      "reported_samples": 3460782,
+      "raw_operand_unequal": 710463,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -30131,6 +30609,23 @@
           "sha256": "a72c82f16f20e35142e8e336fd7340c4a545468be124d72d414dbdb18ff5e735",
           "bytes": 77845527
         }
+      },
+      {
+        "id": "minimum-report-frequency-74",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-74/receipt.json",
+          "sha256": "d83889a17704caca1d8dd35e78b89ae3bc09b933d4ce5dde3069222abb65fdb7",
+          "bytes": 18767
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/31/31d0ca8fe32b2834b6a888a74e37733b028a0c5a4f803104deb36c9d53735ea5",
+          "sha256": "31d0ca8fe32b2834b6a888a74e37733b028a0c5a4f803104deb36c9d53735ea5"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-74/eplus-rs.exe",
+          "sha256": "05b9434e6a5e72a6c0bd2957fd68e357a65f74d6b06de4e07371a956b3cf1c6c",
+          "bytes": 77869381
+        }
       }
     ],
     "focused_since_workspace": {
@@ -30162,8 +30657,8 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 70,
-      "builds_with_accepted_paired_cases": 69,
+      "actual_recorded_builds": 71,
+      "builds_with_accepted_paired_cases": 70,
       "builds_with_only_retained_failed_Source_attempts": 1,
       "failed_attempts_in_paired_case_or_sample_totals": 0
     },
@@ -30252,6 +30747,46 @@
         "bytes": 1635
       },
       "scope": "Two additional full24h A models, one complete reported series each;192 genuine samples plus genuine empty-MTR absence, unchanged numeric limits. Literal control emits no RE2 memory diagnostic; pressure emits exact CI26 thenraw22 LOG811 and still completes matching reported values. The2362-group same-GCC component wire reread is separate from these physical totals. Minimum-frequency override, unbound producers, unsupported backends and arbitrary legal object/value combinations remain open."
+    },
+    "current_minimum_report_frequency_live_pair": {
+      "source_build": "minimum-report-frequency-74",
+      "case_rows": [
+        "MINREPORTFREQUENCY-HOURLY-A-24H",
+        "MINREPORTFREQUENCY-RECOGNIZED-ABBREVIATION-A-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/min-report-frequency-74/source-01/summary.json",
+        "sha256": "e9fed6a745880c4fc68abab75c796641c5ef6791d501bca0d738682f9349077f",
+        "bytes": 1682
+      },
+      "comparisons": [
+        {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/hourly/comparison.json",
+          "sha256": "64f0b9da7567895ed37fc59f9ed8700c5e048f10f8c89e81922b6a84383868d3",
+          "bytes": 17151
+        },
+        {
+          "path": ".runtime/porting/min-report-frequency-74/source-01/recognized-abbreviation/comparison.json",
+          "sha256": "02da4d8bd35832d95140bf85a3193043751a03db9fccb5ada7b81e737b08e35f",
+          "bytes": 17853
+        }
+      ],
+      "Native_launches": {
+        "path": ".runtime/porting/min-report-frequency-74/native-01/launches.json",
+        "sha256": "b0646a519b25f8b2c21520ce60e13c8fe8b857f5f339de31d155b58198888975",
+        "bytes": 1687
+      },
+      "Native_corrected_raw_readback": {
+        "path": ".runtime/porting/min-report-frequency-74/native-01/readback-v2.json",
+        "sha256": "116ec0363da13cb4242e3555dd054302948013c1d4a4774e48517b646c201fe1",
+        "bytes": 7228
+      },
+      "Root_independent_raw_reread": {
+        "path": ".runtime/object-expansion/unit74-prep/root-raw-readback01.json",
+        "sha256": "6857c2b057824690b660a1eb099a82b45b0c6cb247eb0d8651eb9f3fafc26662",
+        "bytes": 1719
+      },
+      "scope": "Two complete same-input24-hour A frequency branches Hourly/hour,4actual series each/192total operands; no full58-profile or arbitrary legal-combination claim."
     }
   },
   "additional_native_type_calibrations": [

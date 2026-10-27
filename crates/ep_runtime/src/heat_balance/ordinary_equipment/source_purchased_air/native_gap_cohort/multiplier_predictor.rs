@@ -403,6 +403,7 @@ fn allocate(
         registration: &mut f.registration,
         prescan: &f.prescan,
         minimum_report_frequency: &f.project.system.minimum_report_frequency,
+        developer: &f.project.system.developer_flag,
         output_host: &mut f.files,
         dictionary_host: &mut dictionary,
         eio: &mut f.eio,
@@ -484,6 +485,14 @@ fn call(f: &mut Factory, operation: FullCall) -> Result<Option<f64>> {
         space_controls: &f.space_controls,
         globals: &f.globals,
         clock: &f.weather.global,
+        reporting_diagnostic_flags: Some(
+            crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &f.globals.kickoff_simulation,
+                developer: &f.project.system.developer_flag,
+                warmup: &f.weather.global.warmup_flag,
+                doing_sizing: &f.globals.doing_sizing,
+            },
+        ),
         environment: &f.weather.environment,
         hvac: &mut f.startup.hvac_globals,
         input: &mut f.input,

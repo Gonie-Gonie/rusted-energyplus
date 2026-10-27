@@ -23,7 +23,7 @@ pub(crate) fn register_source_surface_outputs(
     constructions: &SelectedHeatBalanceInputState,
     advanced_report_variables: bool,
     registration: &mut SourceOutputRegistration,
-    input: &mut SourceReportVariableInput<'_>,
+    input: &mut SourceReportVariableInput<'_, '_>,
     prescan: &SourceOutputPreScan,
     minutes_in_time_step: i32,
     host: &mut impl SourceOutputFileHost,

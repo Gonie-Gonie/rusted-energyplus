@@ -344,6 +344,7 @@ pub(super) fn run() -> Result<usize> {
             space_controls: &space_controls,
             globals: &globals,
             clock: &clock,
+            reporting_diagnostic_flags: None,
             environment: &environment,
             hvac: &mut hvac,
             input: &mut input,

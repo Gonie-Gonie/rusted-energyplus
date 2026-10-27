@@ -1,7 +1,6 @@
 //! Real SetupOutputVariable with actual Zone/System and energy meters.
 use super::bound_real::SourceOutputVariableType;
 use super::*;
-use crate::heat_balance::error_backend::SourceErrorBackend;
 
 #[derive(Clone, Copy)]
 pub(crate) struct SourceRealRegistrationOptions<'a> {
@@ -19,7 +18,7 @@ impl SourceRealRegistrationOptions<'_> {
 impl SourceOutputRegistration {
     pub(crate) fn setup_bound_real(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,
@@ -28,7 +27,6 @@ impl SourceOutputRegistration {
         binding: SourceRealOutputBinding<'_>,
         dictionary_host: &mut impl SourceOutputDictionaryHost,
         options: SourceRealRegistrationOptions<'_>,
-        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), OrdinaryRadiationError> {
         // CheckReportVariable then FindItem precede actual meter validation/DD.
         let (request_indexes, on_the_list) = self.prepare_real_registration_front(
@@ -41,10 +39,12 @@ impl SourceOutputRegistration {
         )?;
         let mut on_meter = options.meter.is_some();
         if on_meter && declaration.store_type == SourceOutputStoreType::Average {
-            backend
+            input
+                .backend
                 .show_severe_error("Meters can only be \"Summed\" variables")
                 .map_err(|e| OrdinaryRadiationError::Input(Box::new(e.into())))?;
-            backend
+            input
+                .backend
                 .show_continue_error(&format!(
                     "..reference variable={}:{}",
                     declaration.key, declaration.name
@@ -180,7 +180,7 @@ impl SourceGeneralRealRegistrationOptions<'_> {
 impl SourceOutputRegistration {
     pub(crate) fn setup_bound_general_real(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,
@@ -189,7 +189,6 @@ impl SourceOutputRegistration {
         binding: SourceRealOutputBinding<'_>,
         dictionary_host: &mut impl SourceOutputDictionaryHost,
         options: SourceGeneralRealRegistrationOptions<'_>,
-        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), OrdinaryRadiationError> {
         self.setup_bound_general_real_optional_dictionary(
             input,
@@ -201,12 +200,11 @@ impl SourceOutputRegistration {
             binding,
             Some(dictionary_host),
             options,
-            backend,
         )
     }
     pub(crate) fn setup_bound_general_real_optional_dictionary(
         &mut self,
-        input: &mut SourceReportVariableInput<'_>,
+        input: &mut SourceReportVariableInput<'_, '_>,
         prescan: &SourceOutputPreScan,
         declaration: SourceRealOutputDeclaration<'_>,
         minutes_in_time_step: i32,
@@ -215,7 +213,6 @@ impl SourceOutputRegistration {
         binding: SourceRealOutputBinding<'_>,
         dictionary_host: Option<&mut dyn SourceOutputDictionaryHost>,
         options: SourceGeneralRealRegistrationOptions<'_>,
-        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), OrdinaryRadiationError> {
         // CheckReportVariable then FindItem precede actual meter validation/DD.
         let (request_indexes, on_the_list) = self.prepare_real_registration_front(
@@ -228,10 +225,12 @@ impl SourceOutputRegistration {
         )?;
         let mut on_meter = options.meter.is_some();
         if on_meter && declaration.store_type == SourceOutputStoreType::Average {
-            backend
+            input
+                .backend
                 .show_severe_error("Meters can only be \"Summed\" variables")
                 .map_err(|e| OrdinaryRadiationError::Input(Box::new(e.into())))?;
-            backend
+            input
+                .backend
                 .show_continue_error(&format!(
                     "..reference variable={}:{}",
                     declaration.key, declaration.name

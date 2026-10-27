@@ -122,6 +122,7 @@ pub(crate) trait SourceSolarChildren {
         solar: &OrdinarySolarRadiation,
         geometry: &SurfaceGeometryInputState,
         detailed_shading: bool,
+        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error>;
     fn calc_daylight_coefficients(
         &mut self,

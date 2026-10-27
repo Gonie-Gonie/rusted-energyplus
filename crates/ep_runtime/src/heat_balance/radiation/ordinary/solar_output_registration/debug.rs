@@ -6,7 +6,7 @@ pub(crate) fn register_source_sky_diffuse_debug_outputs<
 >(
     owners: &SourceSolarOutputOwners<'_>,
     detailed_shading: bool,
-    context: &mut SourceSolarOutputRegistrationContext<'_, '_, H, D>,
+    context: &mut SourceSolarOutputRegistrationContext<'_, '_, '_, H, D>,
 ) -> Result<(), Error> {
     for &number in &owners.geometry.surface_lists.all_exterior_solar {
         let key = &owners

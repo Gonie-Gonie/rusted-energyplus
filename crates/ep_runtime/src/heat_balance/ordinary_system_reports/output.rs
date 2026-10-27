@@ -18,7 +18,8 @@ use ep_model::ReportInputs;
 pub(crate) struct SourceSystemReportsOutputContext<'a, H, D> {
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) reports: &'a ReportInputs,
-    pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) environment:
+        crate::heat_balance::source_output_registration::SourceReportVariableEnvironment<'a>,
     pub(crate) minutes_in_time_step: i32,
     pub(crate) host: &'a mut H,
     pub(crate) eio: &'a mut dyn std::io::Write,
@@ -243,7 +244,7 @@ impl SourceSystemReports {
         )
         .map_err(Error::Output)?;
         let mut report_input =
-            SourceReportVariableInput::new(o.reports, input, o.minimum_report_frequency);
+            SourceReportVariableInput::new(o.reports, input, o.environment, backend);
         registration
             .setup_bound_general_real(
                 &mut report_input,
@@ -263,7 +264,6 @@ impl SourceSystemReports {
                     time_step: TimeStepKind::System,
                     meter: None,
                 },
-                backend,
             )
             .map_err(Error::Output)?;
         Ok(())
@@ -300,7 +300,7 @@ impl SourceSystemReports {
             let binding = SourceRealOutputBinding::new(Target::SystemReports { field }, self)
                 .map_err(Error::Output)?;
             let mut report_input =
-                SourceReportVariableInput::new(o.reports, input, o.minimum_report_frequency);
+                SourceReportVariableInput::new(o.reports, input, o.environment, backend);
             registration
                 .setup_bound_general_real(
                     &mut report_input,
@@ -320,7 +320,6 @@ impl SourceSystemReports {
                         time_step: TimeStepKind::System,
                         meter: None,
                     },
-                    backend,
                 )
                 .map_err(Error::Output)?;
         }

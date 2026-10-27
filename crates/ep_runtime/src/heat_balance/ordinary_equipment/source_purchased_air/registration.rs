@@ -66,7 +66,8 @@ fn register_real<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
     let mut requests = SourceReportVariableInput::new(
         output.reports,
         &mut *output.input,
-        output.minimum_report_frequency,
+        output.environment,
+        backend,
     );
     output
         .registration
@@ -88,7 +89,6 @@ fn register_real<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
                 time_step: TimeStepKind::System,
                 meter,
             },
-            backend,
         )
         .map_err(Error::Output)
 }
@@ -824,7 +824,8 @@ pub(super) fn register_unit<H: SourceOutputFileHost, D: SourceOutputDictionaryHo
         let mut requests = SourceReportVariableInput::new(
             output.reports,
             &mut *output.input,
-            output.minimum_report_frequency,
+            output.environment,
+            backend,
         );
         output
             .registration

@@ -11,7 +11,7 @@ use std::io;
 mod custom;
 mod details;
 mod dictionary;
-mod frequency;
+use super::frequency;
 
 /// Actual per-call retained streams and sole existing RF dictionary vector.
 pub(crate) trait SourceMeterReportingHost: super::SourceOutputReportStreams {
@@ -67,7 +67,7 @@ impl SourceOutputRegistration {
                     &alphas[1].to_ascii_uppercase(),
                     self.minimum_report_frequency,
                     o.backend,
-                    &o.diagnostic_flags,
+                    Some(&o.diagnostic_flags),
                 )?;
                 if !self.setup_source_meter_from_name(
                     &mut alphas[0],

@@ -294,7 +294,8 @@ impl OrdinaryEquipment {
                         let mut requests = SourceReportVariableInput::new(
                             output.reports,
                             &mut *output.input,
-                            output.minimum_report_frequency,
+                            output.environment,
+                            backend,
                         );
                         output
                             .registration
@@ -313,7 +314,6 @@ impl OrdinaryEquipment {
                                 binding,
                                 &mut *output.dictionary_host,
                                 SourceRealRegistrationOptions::unmetered(TimeStepKind::System),
-                                backend,
                             )
                             .map_err(Error::Output)
                     };

@@ -144,7 +144,10 @@ fn declare(
     let mut request = SourceReportVariableInput::new(
         owners.report_inputs,
         owners.input,
-        owners.minimum_report_frequency,
+        crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+            owners.minimum_report_frequency, owners.globals, owners.developer, owners.clock,
+        ),
+        owners.backend,
     );
     owners.registration.setup_bound_general_real_optional_dictionary(
         &mut request, owners.prescan,
@@ -155,7 +158,7 @@ fn declare(
         },
         owners.minutes, &mut GainOutputHost(&mut *owners.host), owners.eio, binding,
         owners.dictionary_host.as_deref_mut().map(|host| host as &mut dyn crate::heat_balance::source_output_registration::SourceOutputDictionaryHost),
-        SourceGeneralRealRegistrationOptions::unmetered(TimeStepKind::Zone), owners.backend,
+        SourceGeneralRealRegistrationOptions::unmetered(TimeStepKind::Zone),
     ).map_err(E::Output)
 }
 
@@ -433,7 +436,10 @@ impl SelectedInternalHeatGains {
         let mut request = SourceReportVariableInput::new(
             owners.report_inputs,
             owners.input,
-            owners.minimum_report_frequency,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                owners.minimum_report_frequency, owners.globals, owners.developer, owners.clock,
+            ),
+            owners.backend,
         );
         owners
             .registration
@@ -452,7 +458,6 @@ impl SelectedInternalHeatGains {
                 binding,
                 owners.dictionary_host.as_mut().map(|host| &mut **host as &mut dyn crate::heat_balance::source_output_registration::SourceOutputDictionaryHost),
                 SourceGeneralRealRegistrationOptions::unmetered(TimeStepKind::Zone),
-                owners.backend,
             )
             .map_err(E::Output)
     }
@@ -508,7 +513,10 @@ impl SelectedInternalHeatGains {
         let mut request = SourceReportVariableInput::new(
             owners.report_inputs,
             owners.input,
-            owners.minimum_report_frequency,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                owners.minimum_report_frequency, owners.globals, owners.developer, owners.clock,
+            ),
+            owners.backend,
         );
         owners
             .registration
@@ -534,7 +542,6 @@ impl SelectedInternalHeatGains {
                     time_step: crate::heat_balance::source_output_registration::TimeStepKind::Zone,
                     meter,
                 },
-                owners.backend,
             )
             .map_err(E::Output)
     }

@@ -546,6 +546,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
             prescan: o.prescan,
             report_inputs: o.report_inputs,
             minimum_report_frequency: o.minimum_report_frequency,
+            developer: &o.project.system.developer_flag,
             host: o.output_host,
             dictionary_host: o.dictionary_host,
             eio: o.eio,

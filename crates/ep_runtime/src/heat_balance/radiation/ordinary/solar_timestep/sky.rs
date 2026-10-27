@@ -231,6 +231,10 @@ impl OrdinarySolarRadiation {
         Ok(())
     }
 
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "Keep the genuine Solar operands, child caller and reached error backend explicit"
+    )]
     pub(crate) fn source_sky_diffuse_solar_shading(
         &mut self,
         geometry: &mut SurfaceGeometryInputState,
@@ -239,6 +243,7 @@ impl OrdinarySolarRadiation {
         detailed_sky_diffuse: bool,
         shading_transmittance_varies: bool,
         children: &mut dyn SourceSolarChildren,
+        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
         let count = surface_count(geometry)?;
         let detailed = detailed_sky_diffuse
@@ -300,7 +305,7 @@ impl OrdinarySolarRadiation {
                 .surf_dif_shdg_ratio_horiz_hrts
                 .fill(1.0)?;
         }
-        children.register_sky_diffuse_outputs(self, geometry, detailed)?;
+        children.register_sky_diffuse_outputs(self, geometry, detailed, backend)?;
         for phi in 0..6 {
             self.solar_timestep.sun_cosines[2] = Some(
                 *self

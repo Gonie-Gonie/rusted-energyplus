@@ -43,7 +43,7 @@ pub(crate) struct SourceNodeReportingOutputContext<'a, H, D> {
     pub(crate) input: &'a mut crate::heat_balance::selected_input_processor::SelectedInputProcessor,
     pub(crate) prescan: &'a super::SourceOutputPreScan,
     pub(crate) reports: &'a ep_model::ReportInputs,
-    pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) environment: super::SourceReportVariableEnvironment<'a>,
     pub(crate) minutes_in_time_step: i32,
     pub(crate) host: &'a mut H,
     pub(crate) dictionary_host: &'a mut D,

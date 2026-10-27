@@ -51,6 +51,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitAirOutput
         row: &Row<'_>,
         declaration: Declaration<'_>,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
@@ -64,8 +67,15 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitAirOutput
             row,
         )
         .map_err(Error::Output)?;
-        let mut report_input =
-            SourceReportVariableInput::new(self.reports, input, self.minimum_report_frequency);
+        let mut report_input = SourceReportVariableInput::new(
+            self.reports,
+            input,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                self.minimum_report_frequency,
+                reporting_diagnostic_flags,
+            ),
+            backend,
+        );
         self.registration
             .setup_bound_real(
                 &mut report_input,
@@ -82,7 +92,6 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitAirOutput
                 binding,
                 self.dictionary_host,
                 declaration.options,
-                backend,
             )
             .map_err(Error::Output)
     }
@@ -97,6 +106,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
         name: &str,
         air: &SourceZoneSpaceHeatBalanceData,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
@@ -144,6 +156,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
                     options: SourceRealRegistrationOptions::unmetered(time_step),
                 },
                 clock,
+                reporting_diagnostic_flags,
                 input,
                 backend,
                 eio,
@@ -162,6 +175,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
         list_multiplier: i32,
         demand: &SourceSystemSensibleDemand,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
@@ -269,6 +285,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
                     },
                 },
                 clock,
+                reporting_diagnostic_flags,
                 input,
                 backend,
                 eio,
@@ -288,6 +305,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
         latent_sizing: bool,
         demand: &SourceSystemMoistureDemand,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
@@ -341,6 +361,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
                     options: SourceRealRegistrationOptions::unmetered(TimeStepKind::System),
                 },
                 clock,
+                reporting_diagnostic_flags,
                 input,
                 backend,
                 eio,
@@ -354,6 +375,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
         name: &str,
         fan: &SourceZoneFanHeatBalanceArrays,
         clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
         input: &mut SelectedInputProcessor,
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn Write,
@@ -374,6 +398,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
                 options: SourceRealRegistrationOptions::unmetered(TimeStepKind::System),
             },
             clock,
+            reporting_diagnostic_flags,
             input,
             backend,
             eio,
@@ -383,8 +408,15 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
             &row,
         )
         .map_err(Error::Output)?;
-        let mut report_input =
-            SourceReportVariableInput::new(self.reports, input, self.minimum_report_frequency);
+        let mut report_input = SourceReportVariableInput::new(
+            self.reports,
+            input,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                self.minimum_report_frequency,
+                reporting_diagnostic_flags,
+            ),
+            backend,
+        );
         self.registration
             .setup_bound_zone_integer(
                 &mut report_input,
@@ -439,6 +471,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
                     options: SourceRealRegistrationOptions::unmetered(time_step),
                 },
                 clock,
+                reporting_diagnostic_flags,
                 input,
                 backend,
                 eio,

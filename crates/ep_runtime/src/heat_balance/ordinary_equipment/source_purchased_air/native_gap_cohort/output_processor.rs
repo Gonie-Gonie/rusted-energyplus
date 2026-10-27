@@ -209,10 +209,22 @@ fn setup(
         return Ok(());
     }
     if which == 2 {
+        let mut backend = SourceErrorBackend {
+            state: &mut s.error_state,
+            error_stream: Some(&mut s.error),
+            console: &mut s.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
         let mut input = op::SourceReportVariableInput::new(
             &s.report,
             &mut s.input,
-            &s.project.system.minimum_report_frequency,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(&s.project.system.minimum_report_frequency, &s.globals, &s.project.system.developer_flag, Some(&s.weather.global)),
+            &mut backend,
         );
         s.registration
             .native_p4_get_report_input(&mut input, &s.files, &mut s.eio)?;
@@ -233,7 +245,8 @@ fn setup(
         let mut input = op::SourceReportVariableInput::new(
             &s.report,
             &mut s.input,
-            &s.project.system.minimum_report_frequency,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(&s.project.system.minimum_report_frequency, &s.globals, &s.project.system.developer_flag, Some(&s.weather.global)),
+            &mut backend,
         );
         let mut dict = op::SourceOutputDictionaryStreams {
             eso: Some(&mut s.eso),
@@ -301,7 +314,6 @@ fn setup(
                     time_step: kind,
                     meter,
                 },
-                &mut backend,
             )?;
         } else {
             let (name, store, kind, slot) = if which == 6 {

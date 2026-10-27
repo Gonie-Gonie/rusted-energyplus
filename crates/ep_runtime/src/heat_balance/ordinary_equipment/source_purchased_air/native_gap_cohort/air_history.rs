@@ -231,6 +231,14 @@ fn call(factory: &mut Factory, operation: &str) -> Result {
         space_controls: &factory.space_controls,
         globals: &factory.globals,
         clock: &factory.weather.global,
+        reporting_diagnostic_flags: Some(
+            crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &factory.globals.kickoff_simulation,
+                developer: &factory.project.system.developer_flag,
+                warmup: &factory.weather.global.warmup_flag,
+                doing_sizing: &factory.globals.doing_sizing,
+            },
+        ),
         environment: &factory.weather.environment,
         hvac: &mut factory.startup.hvac_globals,
         input: &mut factory.input,

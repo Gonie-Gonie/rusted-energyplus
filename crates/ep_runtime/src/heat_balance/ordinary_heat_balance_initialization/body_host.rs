@@ -89,6 +89,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
             registration: o.registration,
             prescan: o.prescan,
             minimum_report_frequency: o.minimum_report_frequency,
+            developer: &o.project.system.developer_flag,
             output_host: o.output_host,
             dictionary_host: o.dictionary_host,
             eio: o.eio,

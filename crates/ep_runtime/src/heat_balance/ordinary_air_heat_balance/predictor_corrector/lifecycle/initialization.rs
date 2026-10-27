@@ -99,6 +99,7 @@ impl SourceZoneAirPredictorCorrector {
                         .ok_or(Error::Unavailable("actual Zone output2446"))?
                         .air,
                     owners.clock,
+                    owners.reporting_diagnostic_flags,
                     owners.input,
                     owners.backend,
                     eio,
@@ -128,6 +129,7 @@ impl SourceZoneAirPredictorCorrector {
                         .and_then(|rows| rows.get(index(number).ok()?))
                         .ok_or(Error::Unavailable("actual Zone sensible output2462"))?,
                     owners.clock,
+                    owners.reporting_diagnostic_flags,
                     owners.input,
                     owners.backend,
                     eio,
@@ -146,6 +148,7 @@ impl SourceZoneAirPredictorCorrector {
                         .and_then(|rows| rows.get(index(number).ok()?))
                         .ok_or(Error::Unavailable("actual Zone moisture output2477"))?,
                     owners.clock,
+                    owners.reporting_diagnostic_flags,
                     owners.input,
                     owners.backend,
                     eio,
@@ -158,6 +161,7 @@ impl SourceZoneAirPredictorCorrector {
                     &z.name,
                     owners.fan,
                     owners.clock,
+                    owners.reporting_diagnostic_flags,
                     owners.input,
                     owners.backend,
                     eio,

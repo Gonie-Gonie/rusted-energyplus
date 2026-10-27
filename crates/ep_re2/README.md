@@ -69,9 +69,8 @@ equality does not inspect that state. Quiet and logged matching use the same
 cache and fallback path, with diagnostics emitted after unlocking the cache.
 Host allocation/internal invariant guards remain a separate fatal port/host
 boundary, with no claim about Native exception or exit-code equivalence.
-Minimum-report-frequency overrides, excluded positive pre-scan families,
-unbound producers and output backends retain their existing boundaries. This is
-finite reporting evidence within Source A/B.
+Excluded positive pre-scan families, unbound producers and output backends retain
+their existing boundaries. This is finite reporting evidence within Source A/B.
 External Options, capture extraction, unanchored/reverse search and CompileSet are
 outside this reporting API. Finite comparisons do not prove full legal domains.
 

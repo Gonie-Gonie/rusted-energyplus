@@ -653,6 +653,7 @@ impl OrdinarySolarRadiation {
                 shadowing.detailed_sky_diffuse_algorithm,
                 transmittance_varies,
                 children,
+                backend,
             )?;
             self.solar_timestep.calc_sky_dif_shading = false;
         }

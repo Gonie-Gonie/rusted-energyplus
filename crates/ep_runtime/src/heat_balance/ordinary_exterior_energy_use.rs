@@ -63,6 +63,7 @@ pub(crate) struct SourceExteriorEnergyOwners<'a, 'backend, H, D> {
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) reports: &'a ReportInputs,
     pub(crate) minimum_report_frequency: &'a str,
+    pub(crate) developer: &'a bool,
     pub(crate) host: &'a mut H,
     pub(crate) dictionary_host: &'a mut D,
     pub(crate) eio: &'a mut dyn std::io::Write,
