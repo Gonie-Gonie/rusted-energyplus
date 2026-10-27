@@ -7,6 +7,7 @@ use super::{
     SurfaceTmpInput,
 };
 use crate::geometry::SurfaceGeometryProperties;
+use crate::heat_balance::error_backend::SourceDiagnosticFlags;
 use ep_model::{
     OutsideBoundaryCondition, Point3, SunExposure, SurfaceId, SurfaceType, WindExposure,
 };
@@ -89,6 +90,7 @@ impl SurfaceGeometryInputState {
         backend: &mut SourceErrorBackend<'_>,
         errors: &mut bool,
         max_solid_window_layers: i32,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
         if *errors {
             // Original1215, before actual Surface allocation.
@@ -262,7 +264,7 @@ impl SurfaceGeometryInputState {
                 ))?;
             }
         }
-        self.reconcile_opaque_surface_boundaries(owners)?;
+        self.reconcile_opaque_surface_boundaries(owners, backend, flags)?;
         // Release the preceding createSpaceSurfaceLists borrow before the
         // Source reconciliation reads real Zone factors, then retain the ranges.
         let spaces = owners.zones.spaces.as_mut().ok_or(Error::Unavailable(
@@ -501,7 +503,9 @@ impl SurfaceGeometryInputState {
                 || row.exterior_solar
                     != (typed.sun_exposure == SunExposure::SunExposed
                         && typed.outside_boundary_condition == OutsideBoundaryCondition::Outdoors)
-                || row.exterior_wind != (typed.wind_exposure == WindExposure::WindExposed)
+                || row.exterior_wind
+                    != (typed.wind_exposure == WindExposure::WindExposed
+                        && boundary != OutsideBoundaryCondition::Surface)
             {
                 return Err(Error::Unavailable(
                     "actual Surface name/class/Zone/Space/Construction/boundary identity",

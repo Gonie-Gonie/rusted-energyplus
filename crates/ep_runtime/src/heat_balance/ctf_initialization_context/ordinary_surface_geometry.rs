@@ -229,6 +229,8 @@ pub struct OrdinaryGeometrySurface<'a> {
     pub air_boundary_surface: bool,
     /// Actual ExtSolar.
     pub ext_solar: bool,
+    /// Actual ExtWind, after any interzone warning mutation.
+    pub ext_wind: bool,
     /// Actual MirroredSurf.
     pub mirrored_surface: bool,
     /// Actual IsShadowing.
@@ -615,6 +617,7 @@ impl CtfInitializationReports {
                 outside_boundary: row.exterior_boundary,
                 air_boundary_surface: row.is_air_boundary_surface,
                 ext_solar: row.exterior_solar,
+                ext_wind: row.exterior_wind,
                 mirrored_surface: row.mirrored_surface,
                 is_shadowing: row.is_shadowing,
                 world_vertices,

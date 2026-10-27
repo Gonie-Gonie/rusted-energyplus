@@ -4,6 +4,7 @@ use super::{
     Error, SourceErrorBackend, SurfaceClass, SurfaceGeometryInputState, SurfaceGetterOwners,
     SurfaceTmpInput,
 };
+use crate::heat_balance::error_backend::SourceDiagnosticFlags;
 
 fn index(number: i32) -> Result<usize, Error> {
     number
@@ -96,6 +97,8 @@ impl SurfaceGeometryInputState {
     pub(crate) fn reconcile_opaque_surface_boundaries(
         &mut self,
         owners: &SurfaceGetterOwners<'_>,
+        backend: &mut SourceErrorBackend<'_>,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
         let rows = self
             .final_surfaces
@@ -267,16 +270,44 @@ impl SurfaceGeometryInputState {
                 ));
             }
             if surface.exterior_solar || adjacent.exterior_solar {
-                return Err(Error::Unavailable(
-                    "positive interzone SunExposed diagnostic2080",
-                ));
+                let flags = flags.ok_or(Error::Unavailable(
+                    "actual interzone SunExposed warning phase owners",
+                ))?;
+                backend.show_source_warning_error(
+                    "GetSurfaceData: Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed",
+                    flags,
+                )?;
+                backend.show_continue_error(&format!(
+                    "  Surface={}, Zone={}",
+                    surface.name, surface.zone_name,
+                ))?;
+                backend.show_continue_error(&format!(
+                    "  Surface={}, Zone={}",
+                    adjacent.name, adjacent.zone_name,
+                ))?;
+                rows[current].row.exterior_solar = false;
+                rows[found].row.exterior_solar = false;
             }
-            if surface.exterior_wind || adjacent.exterior_wind {
-                return Err(Error::Unavailable(
-                    "positive interzone WindExposed diagnostic2094",
-                ));
+            if rows[current].row.exterior_wind || rows[found].row.exterior_wind {
+                let flags = flags.ok_or(Error::Unavailable(
+                    "actual interzone WindExposed warning phase owners",
+                ))?;
+                backend.show_source_warning_error(
+                    "GetSurfaceData: Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed",
+                    flags,
+                )?;
+                backend.show_continue_error(&format!(
+                    "  Surface={}, Zone={}",
+                    rows[current].row.name, rows[current].row.zone_name,
+                ))?;
+                backend.show_continue_error(&format!(
+                    "  Surface={}, Zone={}",
+                    rows[found].row.name, rows[found].row.zone_name,
+                ))?;
+                rows[current].row.exterior_wind = false;
+                rows[found].row.exterior_wind = false;
             }
-            if !reversed_world_vertices(surface, adjacent)? {
+            if !reversed_world_vertices(&rows[current].row, &rows[found].row)? {
                 return Err(Error::Unavailable(
                     "bounded reverse-coincident actual World vertices",
                 ));

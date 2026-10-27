@@ -116,6 +116,17 @@ impl CtfInitializationContext<'_> {
                 .as_ref()
                 .ok_or_else(|| hb_input_error(E::Unavailable("actual surface global owner")))?,
         };
+        let globals = owners.globals;
+        let surface_diagnostic_flags = clock.and_then(|clock| {
+            reports.selected_project_data.as_ref().map(|project| {
+                crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }
+            })
+        });
         let state = &mut reports.surface_geometry_input;
         state
             .initialize_coordinate_owners(&owners)
@@ -145,6 +156,7 @@ impl CtfInitializationContext<'_> {
                     &mut owners,
                     &mut self.backend,
                     &mut reports.heat_balance_input_errors_found,
+                    surface_diagnostic_flags.as_ref(),
                 )
                 .map_err(hb_input_error)?
             {
@@ -201,6 +213,7 @@ impl CtfInitializationContext<'_> {
                 &mut self.backend,
                 &mut reports.heat_balance_input_errors_found,
                 max_solid_window_layers,
+                surface_diagnostic_flags.as_ref(),
             )
             .map_err(hb_input_error)?;
         state
@@ -218,23 +231,12 @@ impl CtfInitializationContext<'_> {
         state
             .read_empty_surface_solar_inputs(&mut owners)
             .map_err(hb_input_error)?;
-        let globals = owners.globals;
-        let irt_flags = clock.and_then(|clock| {
-            reports.selected_project_data.as_ref().map(|project| {
-                crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                    kickoff: &globals.kickoff_simulation,
-                    developer: &project.system.developer_flag,
-                    warmup: &clock.warmup_flag,
-                    doing_sizing: &globals.doing_sizing,
-                }
-            })
-        });
         state
             .build_opaque_surface_lists(
                 &mut owners,
                 &mut self.backend,
                 reports.heat_balance_input_errors_found,
-                irt_flags.as_ref(),
+                surface_diagnostic_flags.as_ref(),
             )
             .map_err(hb_input_error)?;
         state

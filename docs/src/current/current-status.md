@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 131 paired physical cases and 3,540,894 reported values with zero
+contains 133 paired physical cases and 3,561,054 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -68,17 +68,24 @@ agree within the explicitly recorded version-header and line-ending boundaries.
 Explicit Source A also accepts multiple closed opaque Zones, each with its
 implicit Space and no internal gains or equipment. Reciprocal interzone Wall
 pairs require the same single-layer normal or infrared-transparent construction,
-equal Zone factors, opposite coincident vertices and NoSun/NoWind. Three 24-hour
-two-Zone cases cover 30,240 derived values with zero tolerance or RMSE failures;
+equal Zone factors and opposite coincident vertices. Five 24-hour two-Zone
+cases cover 50,400 derived values with zero tolerance or RMSE failures;
 the maximum absolute difference is 1.37e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Explicit
 Spaces, groups, multi-Zone equipment and broader interzone combinations remain open.
 
+Paired Walls accept the legal Sun/Wind exposure enums, omission and empty defaults.
+IDF and direct epJSON comparisons preserve their distinct warning labels and
+surface order; non-external Sun warnings and paired Wind clearing agree with
+Native. Both actual final exposure flags are false, while raw authored fields
+retain their presence and values. The existing input table covers all sixteen
+presence/value combinations without adding test functions.
+
 `Material:InfraredTransparent` now reaches the ordered Source A/B getter and
 single-layer CTF on Ground or Adiabatic boundaries, preserving the Native
-warnings and Invalid roughness. Ground and Adiabatic B comparisons plus a proper
-reciprocal interzone A pair cover 29,664 values with zero tolerance or RMSE
+warnings and Invalid roughness. Ground and Adiabatic B comparisons plus proper
+reciprocal interzone A pairs cover 49,824 values with zero tolerance or RMSE
 failures. Adiabatic values are raw-exact; Ground's maximum absolute difference
 is 4.66e-10. Exterior roughness lookups, Materials reports and used-IRT
 Constructions reports remain excluded. Multi-Zone Ground/Adiabatic IRT uses,

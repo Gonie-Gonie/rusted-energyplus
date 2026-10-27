@@ -1,7 +1,7 @@
 //! Source A's producer-free opaque multi-Zone and explicit paired-Wall stage.
 //! This is input admission only; it supplies no scientific owner values.
 use super::{number, text};
-use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
+use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
 
 pub(super) fn has_multiple_zones(raw: &RawModel) -> bool {
     raw.objects
@@ -75,6 +75,22 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
     validate_surface_pairs(raw)
 }
 
+// Empty exposure strings and absent fields select the schema defaults. Preserve
+// authored presence for the actual getter; other JSON kinds/whitespace are not
+// members of the schema enum and must not pass through a generic blank alias.
+fn legal_exposure(row: &RawObject, field: &str, values: &[&str]) -> bool {
+    match row.fields.get(&FieldName(field.into())) {
+        None => true,
+        Some(RawValue::String(value)) => {
+            value.is_empty()
+                || values
+                    .iter()
+                    .any(|choice| value.eq_ignore_ascii_case(choice))
+        }
+        _ => false,
+    }
+}
+
 // Input-only checks; canonical World coordinates are checked by the typed scope.
 // Native Source getters still produce and validate every scientific owner.
 fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
@@ -111,10 +127,12 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
         }
         for surface in [row, other] {
             if !text(surface, "surface_type").is_some_and(|v| v.eq_ignore_ascii_case("Wall"))
-                || !text(surface, "sun_exposure").is_some_and(|v| v.eq_ignore_ascii_case("NoSun"))
-                || !text(surface, "wind_exposure").is_some_and(|v| v.eq_ignore_ascii_case("NoWind"))
+                || !legal_exposure(surface, "sun_exposure", &["NoSun", "SunExposed"])
+                || !legal_exposure(surface, "wind_exposure", &["NoWind", "WindExposed"])
             {
-                return Err("paired Source Wall requires explicit NoSun and NoWind".into());
+                return Err(
+                    "paired Source Wall requires schema-valid Sun and Wind exposure fields".into(),
+                );
             }
         }
         let zone_name = text(row, "zone_name").ok_or("paired Wall actual Zone")?;

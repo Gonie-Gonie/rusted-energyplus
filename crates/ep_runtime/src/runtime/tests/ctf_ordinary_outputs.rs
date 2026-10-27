@@ -608,7 +608,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         }
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
         raw.initialize_coordinate_owners(&owners)?;
-        raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3)?;
+        raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None)?;
         raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
         // Authored child diagnostic inputs, not a completed Native material or
         // geometry certificate. Real IRT property/getter owners are tested in
@@ -669,6 +669,222 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 let text = std::str::from_utf8(&warning_text)?;
                 assert_eq!(text.matches(" ** Warning **").count(), usize::try_from(warnings)?);
                 assert_eq!(text.contains("For explicit details on each use"), mode == 0);
+            }
+        }
+        // Authored diagnostic child checkpoints, not a Native owner endpoint or
+        // weather simulation. The real backend and real Surface methods retain
+        // their prefix effects when a requested output record cannot be written.
+        struct ExposureRecordWriter {
+            bytes: Vec<u8>,
+            completed_lines: usize,
+            allowed_lines: usize,
+        }
+        impl std::io::Write for ExposureRecordWriter {
+            fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+                if self.completed_lines >= self.allowed_lines {
+                    return Err(std::io::Error::other("authored exposure record failure"));
+                }
+                self.bytes.extend_from_slice(bytes);
+                self.completed_lines += bytes.iter().filter(|&&byte| byte == b'\n').count();
+                Ok(bytes.len())
+            }
+            fn flush(&mut self) -> std::io::Result<()> { Ok(()) }
+        }
+        // Real GetHTSurfaceData row parsing: a non-external Sun request warns
+        // before reading Wind or allocating/returning the vertex prefix.
+        for (sizing, allowed_lines, have_flags) in [
+            (false, usize::MAX, true), (true, usize::MAX, true),
+            (false, 0, true), (false, 1, true), (false, usize::MAX, false),
+        ] {
+            use crate::heat_balance::selected_project_data::{ProjectInputObject, ProjectInputValue as V};
+            use crate::heat_balance::selected_input_processor::{SourceInputFamily, SourceObjectDefinition, SourceObjectShape};
+            use crate::heat_balance::selected_heat_balance_input::surface::{OpaqueSurfaceInput, SelectedSurfaceInput, SurfaceRowPrefix};
+            let surface_name = "AUTHORED SUN WALL";
+            let object = ProjectInputObject {
+                object_name: surface_name.into(), idf_max_fields: None,
+                fields: std::collections::BTreeMap::from([
+                    ("surface_type".into(), V::String("Wall".into())),
+                    ("construction_name".into(), V::String("Wall".into())),
+                    ("zone_name".into(), V::String("AUTHORED SUN ZONE".into())),
+                    ("outside_boundary_condition".into(), V::String("Surface".into())),
+                    ("outside_boundary_condition_object".into(), V::String("AUTHORED OTHER WALL".into())),
+                    ("sun_exposure".into(), V::String("SunExposed".into())),
+                    ("wind_exposure".into(), V::String("WindExposed".into())),
+                    ("view_factor_to_ground".into(), V::Number(0.5)),
+                    ("number_of_vertices".into(), V::Number(4.0)),
+                ]),
+            };
+            let row_input = crate::heat_balance::selected_heat_balance_input::SelectedHeatBalanceInput {
+                source_is_epjson: true,
+                surface: SelectedSurfaceInput {
+                    geometry_rules: Vec::new(),
+                    building_surfaces: vec![OpaqueSurfaceInput {
+                        object, idf_max_extensible_fields: None,
+                        vertices: vec![[0.0,0.0,1.0],[0.0,0.0,0.0],[1.0,0.0,0.0],[1.0,0.0,1.0]],
+                    }],
+                }, objects: Default::default(),
+            };
+            let mut row_ip = SelectedInputProcessor::from_admitted_input(
+                vec![SourceObjectDefinition {
+                    object_type: "BuildingSurface:Detailed".into(), alpha_fields: 9, numeric_fields: 2,
+                    alpha_extensions: 0, numeric_extensions: 3, extension: Some("vertices".into()),
+                }],
+                std::collections::BTreeMap::from([("BuildingSurface:Detailed".into(), SourceInputFamily::Objects(vec![SourceObjectShape {
+                    object_name: surface_name.into(), field_sizes: std::collections::BTreeMap::from([("vertices".into(),4)]),
+                }]))]),
+            )?;
+            let mut row_shortcut = SourceInputProcessorShortCut {
+                alpha_args: vec![String::new();9], numeric_args: vec![0.0;14],
+                alpha_field_names: vec![String::new();9], numeric_field_names: vec![String::new();14],
+                alpha_field_blanks: vec![true;9], numeric_field_blanks: vec![true;14],
+                ..Default::default()
+            };
+            let mut row_zones = owners.zones.clone();
+            row_zones.zones.as_mut().ok_or("authored Sun Zone")?[0].name = "AUTHORED SUN ZONE".into();
+            let mut row_control = owners.control.clone();
+            row_control.construction_usage[0].construction_id = Some(row_control.construction_order[0]);
+            let mut row_globals = owners.globals.clone();
+            row_globals.kickoff_simulation = false; row_globals.doing_sizing = sizing;
+            let row_clock = crate::weather::day::WeatherGlobalState { warmup_flag: true, ..Default::default() };
+            let developer = true;
+            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &row_globals.kickoff_simulation, developer: &developer,
+                warmup: &row_clock.warmup_flag, doing_sizing: &row_globals.doing_sizing,
+            };
+            let mut row_owners = SurfaceGetterOwners {
+                model: owners.model, environment: owners.environment, input: &mut row_ip, shortcut: &mut row_shortcut,
+                zones: &mut row_zones, control: &mut row_control, globals: &row_globals,
+            };
+            let mut row_state = SurfaceGeometryInputState {
+                entered_once: true, total_surfaces: 1, surface_tmp: Some(vec![SurfaceTmpInput::default()]),
+                ..Default::default()
+            };
+            let mut backend_state = ctf_ordinary_output_test_state();
+            backend_state.output_error_header = false;
+            let (mut writer, mut console) = (ExposureRecordWriter { bytes: Vec::new(), completed_lines: 0, allowed_lines }, Vec::new());
+            let mut backend = SourceErrorBackend {
+                state: &mut backend_state, error_stream: Some(&mut writer), console: &mut console,
+                out_unit1: None, out_unit2: None, f_message: None, message_callback: None,
+                error_callback: None, sqlite: None,
+            };
+            let mut errors = false;
+            let result = row_state.read_opaque_row(&row_input, 0, &mut row_owners, &mut backend, &mut errors, have_flags.then_some(&flags));
+            let success = have_flags && allowed_lines >= 2;
+            assert!(!errors);
+            assert_eq!((row_state.next_object,row_state.surfaces_read),(1,1));
+            let actual = &row_state.surface_tmp.as_ref().ok_or("retained actual Sun row")?[0];
+            assert_eq!((actual.name.as_str(),actual.construction,actual.zone),(surface_name,1,1));
+            assert_eq!(actual.exterior_boundary,-999);
+            assert!(!actual.exterior_solar, "the Source Sun branch retains its constructor false");
+            assert_eq!(actual.exterior_wind,success,"Wind is read only after the successful warning and Continue");
+            assert_eq!(row_state.pending_vertices,success.then_some(0));
+            assert_eq!(backend.state.tracking.total_warning_errors,i32::from(have_flags));
+            assert_eq!(backend.state.tracking.total_warning_errors_during_warmup,i32::from(have_flags && !sizing));
+            assert_eq!(backend.state.tracking.total_warning_errors_during_sizing,i32::from(have_flags && sizing));
+            if success { assert!(matches!(result?,SurfaceRowPrefix::BeforeVertices { slot:0,sides:4 })); }
+            else { assert!(result.is_err()); }
+            assert_eq!(writer.completed_lines,if have_flags { allowed_lines.min(2) } else { 0 });
+            if success {
+                assert_eq!(std::str::from_utf8(&writer.bytes)?,
+                    "   ** Warning ** BuildingSurface:Detailed=\"AUTHORED SUN WALL\", sun_exposure=\"SUNEXPOSED\".\n   **   ~~~   ** ..This surface is not exposed to External Environment.  Sun exposure has no effect.\n");
+            }
+        }
+        // Reconciliation starts before typed binding. These natural Source
+        // indices1/2 are authored temporary rows, without fabricated typed IDs.
+        // The real area/orientation helpers prepare the reversed quad operands.
+        for (sun, wind_mask, allowed_lines, have_flags, sizing) in [
+            (false,0,usize::MAX,false,false), (false,1,usize::MAX,true,false),
+            (false,2,usize::MAX,true,true), (false,3,usize::MAX,true,false),
+            (true,0,usize::MAX,true,false), (true,3,usize::MAX,true,false),
+            (false,3,0,true,false), (false,3,1,true,false), (false,3,2,true,false),
+            (true,3,3,true,false), (false,3,usize::MAX,false,false),
+        ] {
+            let template = raw.final_surfaces.as_ref().ok_or("authored pair rows")?.iter()
+                .find(|row| row.row.class==SurfaceClass::Wall).ok_or("authored pair Wall")?;
+            let mut pair_rows = vec![template.clone(),template.clone()];
+            for (i,final_row) in pair_rows.iter_mut().enumerate() {
+                final_row.typed_id = None;
+                let row = &mut final_row.row;
+                row.name = if i==0 { "AUTHORED LEFT WALL" } else { "AUTHORED RIGHT WALL" }.into();
+                row.zone_name = if i==0 { "AUTHORED LEFT ZONE" } else { "AUTHORED RIGHT ZONE" }.into();
+                row.zone = i32::try_from(i+1)?; row.space = row.zone; row.base_surface = row.zone;
+                row.exterior_boundary = -999;
+                row.exterior_boundary_name = if i==0 { "AUTHORED RIGHT WALL" } else { "AUTHORED LEFT WALL" }.into();
+                row.exterior_solar = sun; row.exterior_wind = wind_mask & (1<<i) != 0;
+                if i==1 { row.vertex.as_mut().ok_or("authored reverse vertices")?.reverse(); }
+                let points = row.vertex.as_ref().ok_or("authored pair vertices")?.iter().map(|v| {
+                    let [x_m,y_m,z_m] = v.ok_or("authored written pair vertex")?;
+                    Ok(ep_model::Point3 { x_m,y_m,z_m })
+                }).collect::<Result<Vec<_>,&str>>()?;
+                let normal = crate::geometry::source_normal_area(&points);
+                let orientation = crate::geometry::orientation_from_normal(&points,normal.newell_normal);
+                row.area = normal.gross_area_m2; row.gross_area = normal.gross_area_m2;
+                row.vertex_progress.normal_area = Some(normal);
+                row.vertex_progress.orientation_return = Some(orientation);
+                row.vertex_progress.properties = Some(crate::geometry::finish_get_vertices_properties(normal,orientation));
+            }
+            let mut pair_zones = owners.zones.clone();
+            let first = pair_zones.zones.as_ref().ok_or("authored pair Zones")?[0].clone();
+            pair_zones.zones = Some(vec![first.clone(),first]);
+            for (i,z) in pair_zones.zones.as_mut().ok_or("authored pair Zones")?.iter_mut().enumerate() {
+                z.name = if i==0 { "AUTHORED LEFT ZONE" } else { "AUTHORED RIGHT ZONE" }.into();
+                z.typed_zone_id = None; z.multiplier = 1; z.list_multiplier = 1;
+                z.space_indexes = vec![i32::try_from(i+1)?]; z.num_spaces = 1;
+            }
+            let first = pair_zones.spaces.as_ref().ok_or("authored pair Spaces")?[0].clone();
+            pair_zones.spaces = Some(vec![first.clone(),first]);
+            for (i,sp) in pair_zones.spaces.as_mut().ok_or("authored pair Spaces")?.iter_mut().enumerate() {
+                sp.name = if i==0 { "AUTHORED LEFT ZONE" } else { "AUTHORED RIGHT ZONE" }.into();
+                sp.zone_num = i32::try_from(i+1)?; sp.typed_space_id = None;
+            }
+            let mut pair_control = owners.control.clone();
+            pair_control.construction_usage[0].total_layers = 1;
+            pair_control.construction_usage[0].layer_points = [0;11];
+            pair_control.construction_usage[0].layer_points[0] = 1;
+            let mut pair_globals = owners.globals.clone();
+            pair_globals.num_of_zones = 2; pair_globals.num_spaces = 2;
+            pair_globals.kickoff_simulation = false; pair_globals.doing_sizing = sizing;
+            let pair_clock = crate::weather::day::WeatherGlobalState { warmup_flag: true, ..Default::default() };
+            let developer = true;
+            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &pair_globals.kickoff_simulation, developer: &developer,
+                warmup: &pair_clock.warmup_flag, doing_sizing: &pair_globals.doing_sizing,
+            };
+            let mut pair_ip = owners.input.clone(); let mut pair_shortcut = owners.shortcut.clone();
+            let pair_owners = SurfaceGetterOwners {
+                model: owners.model, environment: owners.environment, input: &mut pair_ip, shortcut: &mut pair_shortcut,
+                zones: &mut pair_zones, control: &mut pair_control, globals: &pair_globals,
+            };
+            let mut pair = raw.clone(); pair.moved_surfaces = 2; pair.total_surfaces = 2; pair.final_surfaces = Some(pair_rows);
+            let mut backend_state = ctf_ordinary_output_test_state(); backend_state.output_error_header = false;
+            let (mut writer,mut console) = (ExposureRecordWriter { bytes:Vec::new(),completed_lines:0,allowed_lines },Vec::new());
+            let mut backend = SourceErrorBackend {
+                state:&mut backend_state,error_stream:Some(&mut writer),console:&mut console,
+                out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+            };
+            let result = pair.reconcile_opaque_surface_boundaries(&pair_owners,&mut backend,have_flags.then_some(&flags));
+            let needed = usize::from(sun)*3 + usize::from(wind_mask!=0)*3;
+            let success = needed==0 || (have_flags && allowed_lines>=needed);
+            let warnings = if !have_flags { 0 } else { usize::from(sun) + usize::from(wind_mask!=0 && (!sun || allowed_lines>=3)) };
+            assert_eq!(backend.state.tracking.total_warning_errors,i32::try_from(warnings)?);
+            assert_eq!(backend.state.tracking.total_warning_errors_during_warmup,if sizing { 0 } else { i32::try_from(warnings)? });
+            assert_eq!(backend.state.tracking.total_warning_errors_during_sizing,if sizing { i32::try_from(warnings)? } else { 0 });
+            let rows = pair.final_surfaces.as_ref().ok_or("retained real pair rows")?;
+            assert_eq!(rows[0].row.exterior_boundary,2,"current Found write precedes warning/availability failures");
+            assert_eq!(rows[1].row.exterior_boundary,if success { 1 } else { -999 },"reciprocal Found write follows all warning effects");
+            for (i,row) in rows.iter().enumerate() {
+                assert_eq!(row.row.exterior_solar,sun && !(have_flags && allowed_lines>=3));
+                assert_eq!(row.row.exterior_wind,(wind_mask & (1<<i)!=0) && !success);
+            }
+            if success { result?; } else { assert!(result.is_err()); }
+            assert_eq!(writer.completed_lines,if have_flags { allowed_lines.min(needed) } else { 0 });
+            if success && needed>0 {
+                let text = std::str::from_utf8(&writer.bytes)?;
+                assert_eq!(text.matches(" ** Warning **").count(),warnings,"the resolved opposing row does not warn again");
+                assert_eq!(text.matches("Surface=AUTHORED LEFT WALL, Zone=AUTHORED LEFT ZONE").count(),warnings);
+                assert_eq!(text.matches("Surface=AUTHORED RIGHT WALL, Zone=AUTHORED RIGHT ZONE").count(),warnings);
+                assert_eq!(text.contains("Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed"),sun);
+                assert_eq!(text.contains("Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed"),wind_mask!=0);
             }
         }
         assert!(raw.final_surfaces.as_ref().ok_or("actual pre-override Surface algorithm rows")?.iter()

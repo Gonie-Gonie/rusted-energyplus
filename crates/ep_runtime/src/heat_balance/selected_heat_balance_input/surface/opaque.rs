@@ -5,6 +5,7 @@ use super::{
     Error, SelectedHeatBalanceInput, SourceErrorBackend, SurfaceClass, SurfaceGeometryInputState,
     SurfaceGetterOwners, SurfaceRowPrefix,
 };
+use crate::heat_balance::error_backend::SourceDiagnosticFlags;
 
 fn invalid(
     backend: &mut SourceErrorBackend<'_>,
@@ -25,6 +26,7 @@ impl SurfaceGeometryInputState {
         owners: &mut SurfaceGetterOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
         errors: &mut bool,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<SurfaceRowPrefix, Error> {
         if !self.entered_once || self.pending_vertices.is_some() || index != self.next_object {
             return Err(Error::Unavailable(
@@ -195,10 +197,16 @@ impl SurfaceGeometryInputState {
         match args[7].as_str() {
             "SUNEXPOSED" => {
                 if row.exterior_boundary != 0 {
-                    backend.show_warning_error(&format!(
-                        "BuildingSurface:Detailed=\"{name}\", {}=\"{}\".",
-                        fields[7], args[7]
+                    let flags = flags.ok_or(Error::Unavailable(
+                        "actual nonexternal SunExposed warning phase owners",
                     ))?;
+                    backend.show_source_warning_error(
+                        &format!(
+                            "BuildingSurface:Detailed=\"{name}\", {}=\"{}\".",
+                            fields[7], args[7]
+                        ),
+                        flags,
+                    )?;
                     backend.show_continue_error("..This surface is not exposed to External Environment.  Sun exposure has no effect.")?;
                 } else {
                     row.exterior_solar = true;

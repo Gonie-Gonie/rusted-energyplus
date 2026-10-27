@@ -558,8 +558,10 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         ("zone_name", json!("Zulu")),
         ("construction_name", json!("Other")),
         ("surface_type", json!("Roof")),
-        ("sun_exposure", json!("SunExposed")),
-        ("wind_exposure", json!("WindExposed")),
+        ("sun_exposure", json!(null)),
+        ("wind_exposure", json!(false)),
+        ("sun_exposure", json!(" ")),
+        ("wind_exposure", json!("Unknown")),
     ] {
         let mut bad = paired.clone();
         bad["BuildingSurface:Detailed"]["Alpha:West"][field] = invalid;
@@ -568,6 +570,67 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             crate::ordinary_equipment_input::resolve_source_a(&raw).is_err(),
             "paired {field} escaped"
         );
+    }
+    // The paired and ordinary Outdoors faces retain authored absence/empty
+    // strings through raw/IP projection. Only the actual getter supplies the
+    // schema defaults; typed input remains the authored exposure selection.
+    for sun in [None, Some(""), Some("NoSun"), Some("SunExposed")] {
+        for wind in [None, Some(""), Some("NoWind"), Some("WindExposed")] {
+            let mut exposures = paired.clone();
+            for name in ["Alpha:West", "Zulu:West"] {
+                let face = exposures["BuildingSurface:Detailed"][name]
+                    .as_object_mut()
+                    .unwrap();
+                for (field, value) in [("sun_exposure", sun), ("wind_exposure", wind)] {
+                    if let Some(value) = value {
+                        face.insert(field.into(), json!(value));
+                    } else {
+                        face.remove(field);
+                    }
+                }
+            }
+            let raw = parse_epjson_str(&exposures.to_string())
+                .expect("schema-valid exposure presence/default matrix");
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)
+                .expect("paired exposure schema values reach actual Source IP");
+            let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+                .expect("unaltered actual raw exposure operands");
+            let compiled = compile_raw_model(&raw);
+            let model = compiled.model.as_ref().expect("typed exposure defaults");
+            for name in ["Alpha:West", "Zulu:West"] {
+                let row = projected
+                    .surface
+                    .building_surfaces
+                    .iter()
+                    .find(|row| row.object.object_name == name)
+                    .unwrap();
+                for (field, value) in [("sun_exposure", sun), ("wind_exposure", wind)] {
+                    assert_eq!(
+                        row.object.fields.get(field),
+                        value.map(|value| ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(value.into())).as_ref(),
+                        "raw/IP authored presence for {name}.{field}"
+                    );
+                }
+                let typed = model
+                    .surfaces
+                    .iter()
+                    .find(|row| row.name.0.eq_ignore_ascii_case(name))
+                    .unwrap();
+                assert_eq!(
+                    typed.sun_exposure == ep_model::SunExposure::SunExposed,
+                    sun != Some("NoSun")
+                );
+                assert_eq!(
+                    typed.wind_exposure == ep_model::WindExposure::WindExposed,
+                    wind != Some("NoWind")
+                );
+            }
+            let selected =
+                inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+            assert!(selected.admissible, "{:?}", selected.violations);
+            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        }
     }
     let mut wrong_order = paired.clone();
     wrong_order["BuildingSurface:Detailed"]["Alpha:West"]["vertices"]

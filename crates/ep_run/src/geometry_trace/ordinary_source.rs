@@ -123,7 +123,8 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             "SolarEnclSurfIndex":row.solar_enclosure_surface_index,
             "SolarEnclIndex":row.solar_enclosure_index, "RadEnclIndex":row.radiant_enclosure_index,
             "sides":row.sides, "heat_transfer_surface":row.heat_transfer_surface,
-            "ext_solar":row.ext_solar, "mirrored_surface":row.mirrored_surface,
+            "ext_solar":row.ext_solar, "ext_wind":row.ext_wind,
+            "mirrored_surface":row.mirrored_surface,
             "is_shadowing":row.is_shadowing, "outside_boundary":row.outside_boundary,
             "air_boundary_surface":row.air_boundary_surface,
             "world_vertex_bits":row.world_vertices.iter().map(|vertex|{
