@@ -167,6 +167,25 @@ impl SurfaceGeometryInputState {
                 row.exterior_boundary = -999;
                 row.exterior_boundary_name = name.clone();
             }
+            "SURFACE" => {
+                // Actual4100-4115: defer the real name lookup until all rows exist.
+                row.exterior_boundary = -999;
+                if owners.shortcut.alpha_field_blanks[6] {
+                    row.exterior_boundary_name = name.clone();
+                    backend.show_severe_error(&format!(
+                        "BuildingSurface:Detailed=\"{name}\", invalid {}=<blank>.",
+                        fields[6]
+                    ))?;
+                    backend.show_continue_error(&format!(
+                        "..{}=\"Surface\" must be non-blank.",
+                        fields[5]
+                    ))?;
+                    backend.show_continue_error(
+                        "..This surface will become an adiabatic surface - no doors/windows allowed."
+                    )?;
+                    // Original4115 has no ErrorsFound write in this branch.
+                }
+            }
             _ => {
                 return Err(Error::Unavailable(
                     "positive unported opaque boundary condition",

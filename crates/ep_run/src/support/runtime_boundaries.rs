@@ -202,7 +202,7 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
     if typed_model.zones.len() > 1
-        && !source_admission.is_some_and(|admission| admission.consumes_disconnected_multizone())
+        && !source_admission.is_some_and(|admission| admission.consumes_multizone())
     {
         diagnostics.error(
             "UnsupportedTopology",

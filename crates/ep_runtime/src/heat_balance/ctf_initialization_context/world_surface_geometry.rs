@@ -170,6 +170,15 @@ impl CtfInitializationContext<'_> {
                 }
             }
         }
+        // Native GetHTSurfaceData4396-4420 completes its real temporary
+        // name/Vertex-size pass before any later empty getter changes IP String.
+        state
+            .check_explicit_pair_vertices(
+                &owners.shortcut.current_module_object,
+                &mut self.backend,
+                &mut reports.heat_balance_input_errors_found,
+            )
+            .map_err(hb_input_error)?;
         state
             .finish_empty_detailed_types(
                 owners.input,

@@ -5,6 +5,7 @@
 
 mod environment;
 mod settings;
+mod surface_pairs;
 
 use ep_compiler::CompileReport;
 use ep_model::{
@@ -25,7 +26,7 @@ pub(crate) use environment::{
 /// Frozen input family selected for card-based porting work.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 pub enum PortingScope {
-    /// Unconditioned opaque Zones; multiple Zones require the disconnected producer-free Source stage.
+    /// Unconditioned opaque Zones; multiple Zones require the bounded producer-free Source stage.
     A,
     /// One fully mixed zone with direct no-OA sensible IdealLoads and hard limits.
     B,
@@ -340,7 +341,7 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                     || spaces.next().is_some()
             }))
     {
-        violations.push("disconnected multi-Zone requires one implicit Space per Zone".into());
+        violations.push("bounded multi-Zone requires one implicit Space per Zone".into());
     }
     if model.zones.len() > 1
         && model.zones.iter().any(|zone| {
@@ -414,18 +415,22 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         }
     }
     for surface in &model.surfaces {
-        if !matches!(
+        if !(matches!(
             surface.outside_boundary_condition,
             OutsideBoundaryCondition::Outdoors
                 | OutsideBoundaryCondition::Adiabatic
                 | OutsideBoundaryCondition::Ground
-        ) {
+        ) || (scope == PortingScope::A
+            && model.zones.len() > 1
+            && surface.outside_boundary_condition == OutsideBoundaryCondition::Surface))
+        {
             violations.push(format!(
                 "{} boundary must be Outdoors, Adiabatic or Ground",
                 surface.name.0
             ));
         }
     }
+    surface_pairs::validate(model, scope, violations);
     match scope {
         PortingScope::A => {
             if !model.ideal_loads_air_systems.is_empty() || !model.zone_thermostats.is_empty() {

@@ -126,7 +126,7 @@ pub enum RuntimeClass {
     None,
     /// One-zone opaque heat-balance compatibility runtime.
     OneZoneHeatBalanceCompatibility,
-    /// Validated Source A disconnected opaque multi-Zone input lane.
+    /// Validated Source A bounded opaque multi-Zone input lane.
     /// No one-Zone capability/evidence or conformance promotion is inherited.
     #[serde(rename = "source-multizone-heat-balance-compatibility")]
     SourceMultiZoneHeatBalanceCompatibility,
@@ -338,7 +338,7 @@ fn runtime_selection_note(
     match run_result_state {
         RunResultState::SupportedCompatibilityRun
             if runtime_class == RuntimeClass::SourceMultiZoneHeatBalanceCompatibility =>
-            "selected explicit Source A disconnected multi-Zone input lane; no one-Zone capability/evidence is inherited and conformance promotion remains disabled".into(),
+            "selected explicit Source A bounded multi-Zone input lane; no one-Zone capability/evidence is inherited and conformance promotion remains disabled".into(),
         RunResultState::SupportedCompatibilityRun => format!(
             "selected runtime '{}' executes the matched capability boundary; conformance_claim remains false for arbitrary runs",
             runtime_class.id()
@@ -510,9 +510,7 @@ pub(crate) fn assess_support_with_source_admission(
                 Vec::new(),
                 Vec::new(),
             )
-        } else if source_admission
-            .is_some_and(|admission| admission.consumes_disconnected_multizone())
-        {
+        } else if source_admission.is_some_and(|admission| admission.consumes_multizone()) {
             (
                 SupportStatus::SupportedCompatibility,
                 RuntimeClass::SourceMultiZoneHeatBalanceCompatibility,

@@ -13,6 +13,7 @@ use super::{
 use std::collections::BTreeMap;
 use std::io::Write;
 
+mod adjacency;
 mod boundary_inputs;
 pub(crate) mod computed_geometry;
 mod convexity;

@@ -492,6 +492,101 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             assert_eq!(zone.spaces.as_slice(), [spaces[0].id]);
         }
     }
+    // Existing two-cube inputs, now touching at x=1. Only the named Wall pair
+    // changes boundary: actual compiler operands remain the source of this
+    // admission check, never a producer of runtime geometry or coupling state.
+    let mut paired = value.clone();
+    for face in paired["BuildingSurface:Detailed"]
+        .as_object_mut()
+        .unwrap()
+        .values_mut()
+    {
+        if face["zone_name"] == "Alpha" {
+            for point in face["vertices"].as_array_mut().unwrap() {
+                point["vertex_x_coordinate"] =
+                    json!(point["vertex_x_coordinate"].as_f64().unwrap() - 9.0);
+            }
+        }
+    }
+    for (name, other) in [("Zulu:East", "Alpha:West"), ("Alpha:West", "Zulu:East")] {
+        paired["BuildingSurface:Detailed"][name]["outside_boundary_condition"] = json!("Surface");
+        paired["BuildingSurface:Detailed"][name]["outside_boundary_condition_object"] =
+            json!(other);
+    }
+    let raw =
+        parse_epjson_str(&paired.to_string()).expect("explicit reciprocal paired Wall inputs");
+    let ip =
+        crate::ordinary_input_processor::resolve_source_a(&raw).expect("real paired Source IP");
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+    let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+        .expect("retained paired raw alpha operands");
+    for (name, target) in [("Zulu:East", "Alpha:West"), ("Alpha:West", "Zulu:East")] {
+        let row = projected
+            .surface
+            .building_surfaces
+            .iter()
+            .find(|row| row.object.object_name == name)
+            .expect("real raw paired row");
+        assert_eq!(
+            row.object.fields["outside_boundary_condition"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                "Surface".into()
+            )
+        );
+        assert_eq!(
+            row.object.fields["outside_boundary_condition_object"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                target.into()
+            )
+        );
+    }
+    let compiled = compile_raw_model(&raw);
+    let model = compiled.model.as_ref().expect("actual typed paired Walls");
+    let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
+    assert_eq!(
+        model
+            .surfaces
+            .iter()
+            .filter(|s| s.outside_boundary_condition == ep_model::OutsideBoundaryCondition::Surface)
+            .count(),
+        2
+    );
+    for (field, invalid) in [
+        ("outside_boundary_condition_object", json!("Missing")),
+        ("zone_name", json!("Zulu")),
+        ("construction_name", json!("Other")),
+        ("surface_type", json!("Roof")),
+        ("sun_exposure", json!("SunExposed")),
+        ("wind_exposure", json!("WindExposed")),
+    ] {
+        let mut bad = paired.clone();
+        bad["BuildingSurface:Detailed"]["Alpha:West"][field] = invalid;
+        let raw = parse_epjson_str(&bad.to_string()).expect("authored invalid paired subset");
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_a(&raw).is_err(),
+            "paired {field} escaped"
+        );
+    }
+    let mut wrong_order = paired.clone();
+    wrong_order["BuildingSurface:Detailed"]["Alpha:West"]["vertices"]
+        .as_array_mut()
+        .unwrap()
+        .swap(1, 3);
+    let raw = parse_epjson_str(&wrong_order.to_string())
+        .expect("authored same-direction paired vertices");
+    let compiled = compile_raw_model(&raw);
+    let selected = inspect_porting_scope(
+        &raw,
+        &compiled.report,
+        compiled.model.as_ref(),
+        PortingScope::A,
+    );
+    assert!(
+        !selected.admissible,
+        "same-direction World vertices must stay fenced"
+    );
 }
 
 #[test]

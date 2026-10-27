@@ -96,9 +96,15 @@ impl SurfaceGeometryInputState {
                 }
             } else {
                 let source_number = super::signed(surface_index + 1)?;
-                if row.exterior_boundary != source_number || row.base_surface != source_number {
-                    // OSCM/FCfactor/Kiva/other positive getters remain excluded. This
-                    // reached boundary retains total/geometric writes above.
+                let paired_interior = row.exterior_boundary > 0
+                    && row.exterior_boundary != source_number
+                    && row.base_surface == source_number;
+                if !paired_interior
+                    && (row.exterior_boundary != source_number || row.base_surface != source_number)
+                {
+                    // Genuine positive opaque Surface pairs write no exterior
+                    // totals here (Original411-445); gross/geometric writes stay.
+                    // OSCM/FCfactor/Kiva/other getters remain excluded.
                     return Err(Error::Unavailable(
                         "non-Outdoors/self-Adiabatic area boundary",
                     ));

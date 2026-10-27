@@ -262,17 +262,12 @@ impl SurfaceGeometryInputState {
                 ))?;
             }
         }
-        for (i, surface) in final_rows.iter_mut().enumerate() {
-            // selected self-Adiabatic reconciliation1785-1794
-            if surface.row.exterior_boundary == -999 {
-                if surface.row.exterior_boundary_name != surface.row.name {
-                    return Err(Error::Unavailable(
-                        "actual non-self interzone reconciliation",
-                    ));
-                }
-                surface.row.exterior_boundary = super::signed(i + 1)?;
-            }
-        }
+        self.reconcile_opaque_surface_boundaries(owners)?;
+        // Release the preceding createSpaceSurfaceLists borrow before the
+        // Source reconciliation reads real Zone factors, then retain the ranges.
+        let spaces = owners.zones.spaces.as_mut().ok_or(Error::Unavailable(
+            "actual Space ranges after reconciliation",
+        ))?;
         for zone in owners
             .zones
             .zones
@@ -421,8 +416,20 @@ impl SurfaceGeometryInputState {
         if rows.len() != owners.model.surfaces.len() {
             return Err(Error::Unavailable("actual final/typed Surface count"));
         }
+        // Snapshot actual final target identity only, without typed/source ID
+        // renumbering, so each same-row typed bind can mutate its own typed_id.
+        let boundary_targets: Vec<_> = rows
+            .iter()
+            .map(|surface| {
+                (
+                    surface.row.name.clone(),
+                    surface.row.exterior_boundary,
+                    surface.row.exterior_boundary_name.clone(),
+                )
+            })
+            .collect();
         let mut ids = std::collections::BTreeSet::new();
-        for surface in rows {
+        for (number, surface) in rows.iter_mut().enumerate() {
             let row = &surface.row;
             let mut matches = owners
                 .model
@@ -465,6 +472,23 @@ impl SurfaceGeometryInputState {
                 OutsideBoundaryCondition::Ground
             } else if row.exterior_boundary == row.base_surface {
                 OutsideBoundaryCondition::Adiabatic
+            } else if row.exterior_boundary > 0 {
+                let target = boundary_targets
+                    .get(index(row.exterior_boundary)?)
+                    .ok_or(Error::Unavailable("actual final paired target ordinal"))?;
+                if row.exterior_boundary_name != target.0
+                    || target.1 != super::signed(number + 1)?
+                    || target.2 != row.name
+                    || typed
+                        .outside_boundary_condition_object
+                        .as_ref()
+                        .is_none_or(|name| !name.0.eq_ignore_ascii_case(&target.0))
+                {
+                    return Err(Error::Unavailable(
+                        "actual reciprocal Source/typed Surface target identity",
+                    ));
+                }
+                OutsideBoundaryCondition::Surface
             } else {
                 return Err(Error::Unavailable("actual supported final boundary"));
             };

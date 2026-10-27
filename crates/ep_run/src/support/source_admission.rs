@@ -9,7 +9,7 @@ pub(crate) struct SourceSupportAdmission {
     /// Exact local alpha fields consumed by genuine GetZoneData and the live
     /// owning-Zone dispatchers. This is not a general Zone-feature exemption.
     zone_convection_overrides_consumed: bool,
-    disconnected_multizone_consumed: bool,
+    multizone_consumed: bool,
 }
 
 impl SourceSupportAdmission {
@@ -143,7 +143,7 @@ impl SourceSupportAdmission {
         Some(Self {
             covered_objects,
             zone_convection_overrides_consumed,
-            disconnected_multizone_consumed: trace.scope == PortingScope::A
+            multizone_consumed: trace.scope == PortingScope::A
                 && raw
                     .objects
                     .get(&ObjectType("Zone".into()))
@@ -151,8 +151,8 @@ impl SourceSupportAdmission {
         })
     }
 
-    pub(super) fn consumes_disconnected_multizone(&self) -> bool {
-        self.disconnected_multizone_consumed
+    pub(super) fn consumes_multizone(&self) -> bool {
+        self.multizone_consumed
     }
 
     pub(super) fn consumes_zone_convection_overrides(&self) -> bool {

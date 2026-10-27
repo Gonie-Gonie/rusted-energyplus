@@ -434,12 +434,13 @@ fn resolve_raw(
                     } else {
                         &["Wall", "Floor", "Roof"]
                     };
+                    let boundaries: &[&str] = if source_multizone_ingress {
+                        &["Outdoors", "Adiabatic", "Ground", "Surface"]
+                    } else {
+                        &["Outdoors", "Adiabatic", "Ground"]
+                    };
                     selected(object, "surface_type", classes)
-                        && selected(
-                            object,
-                            "outside_boundary_condition",
-                            &["Outdoors", "Adiabatic", "Ground"],
-                        )
+                        && selected(object, "outside_boundary_condition", boundaries)
                         && (if text(object, "outside_boundary_condition")
                             .is_some_and(|value| value.eq_ignore_ascii_case("Ground"))
                         {
@@ -447,6 +448,11 @@ fn resolve_raw(
                             // resolve or consume this string for Ground.
                             field(object, "outside_boundary_condition_object")
                                 .is_none_or(|value| matches!(value, RawValue::String(_)))
+                        } else if source_multizone_ingress
+                            && text(object, "outside_boundary_condition")
+                                .is_some_and(|value| value.eq_ignore_ascii_case("Surface"))
+                        {
+                            text(object, "outside_boundary_condition_object").is_some()
                         } else {
                             field(object, "outside_boundary_condition_object").is_none_or(blank)
                         })
@@ -843,7 +849,7 @@ mod tests {
                 .err()
                 .ok_or("multi-Zone positive family escaped")?;
             assert!(
-                error.starts_with("Source A disconnected multi-Zone excludes positive family"),
+                error.starts_with("Source A bounded multi-Zone excludes positive family"),
                 "{family}: {error}"
             );
         }
