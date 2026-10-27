@@ -490,7 +490,7 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
     }
     for (minimum, regex, expected_requests, used) in [
         ("", false, 2, true),
-        ("", true, 1, true),
+        ("", true, 2, true),
         ("Daily", false, 0, false),
     ] {
         let input = ReportInputs {
@@ -561,36 +561,40 @@ fn early_report_scan_is_shared_and_prescanned_owner_is_not_replayed() -> Result<
             &mut host,
             &mut eio,
         );
-        assert_eq!(result.is_ok(), minimum.is_empty() && !regex);
+        assert_eq!(result.is_ok(), minimum.is_empty());
         assert_eq!(host.opens, 1);
         assert!(output.output_initialized);
         assert!(!output.get_output_input);
         assert_eq!(output.time_step_zone_sec.to_bits(), 900.0_f64.to_bits());
         assert_eq!(output.requested_variables.len(), expected_requests);
         assert_eq!(source.is_object_unused("Output:Variable", "first"), !used);
-        assert_eq!(
-            source.is_object_unused("Output:Variable", "second"),
-            regex || !used
-        );
+        assert_eq!(source.is_object_unused("Output:Variable", "second"), !used);
         assert_eq!(
             context.reports.input_processor_shortcut, scratch,
             "the real Output getter uses only local 4A/1N argument arrays"
         );
         assert!(eio.is_empty());
-        if minimum.is_empty() && !regex {
+        if minimum.is_empty() {
             assert_eq!(output.requested_variables[0].name, "BRACKET");
             assert_eq!(output.requested_variables[1].name, "NO BRACKET \t ");
-            assert!(output.requested_variables[0].key.is_empty());
+            if regex {
+                assert_eq!(output.requested_variables[0].key, "bad.regex");
+                assert_eq!(
+                    output.requested_variables[0]
+                        .case_insensitive_pattern
+                        .as_ref()
+                        .map(|pattern| pattern.pattern()),
+                    Some("(?i)bad.regex")
+                );
+            } else {
+                assert!(output.requested_variables[0].key.is_empty());
+            }
             assert_eq!(output.requested_variables[1].key, "MiXeD");
             assert_eq!(output.num_real_variables_setup, 1);
             assert_eq!(output.num_total_real_variables, 1);
         } else {
             assert!(output.dictionary_variables.is_empty());
             assert_eq!(output.num_real_variables_setup, 0);
-            if regex {
-                assert_eq!(output.requested_variables[0].key, "bad.regex");
-                assert!(output.requested_variables[0].name.is_empty());
-            }
         }
     }
     Ok(())

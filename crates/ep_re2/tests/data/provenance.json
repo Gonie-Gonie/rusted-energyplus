@@ -5,7 +5,7 @@
   "rows": 10607,
   "fixture_sha256": "c43d7ad937adb5dba6a51d064977ffe9299595c18dce925e93eff23dc8cf15a9",
   "fixture_bytes": 475119,
-  "Native_kind": "Standalone exact pinned RE2 source build, GCC13.2.0 UCRT; not EnergyPlus DLL or physics. Quiet only suppresses constructor logging.",
+  "Native_kind": "Standalone exact pinned RE2 source build, GCC13.2.0 UCRT; not EnergyPlus DLL or physics. Quiet suppresses diagnostics; grammar and constructor limits retain their unit-build defaults.",
   "Native_build_receipt": {
     "path": ".runtime/object-expansion/unit72-prep/native-unit-build01/review.json",
     "sha256": "f00d3b381705da09de884ff6d927d9ff36e74aa4dd15820271a7fc93347f2626"
@@ -23,8 +23,9 @@
   ],
   "production_or_domain_completion_claim": false,
   "remaining": [
-    "Three reporting owner connections and default RE2 stderr effects",
-    "Same-input unit/physical verification after integration"
+    "Valid-match OnePass/DFA/cache resource diagnostics and target accounting",
+    "Minimum-report-frequency override and remaining live reporting/runtime boundaries",
+    "Full legal-value and object-domain completion"
   ],
   "primary_Unicode_sources": [
     {
@@ -281,5 +282,41 @@
     "heavy_cases_in_default_tests": false,
     "constructor_groups_in_default_table": 1505,
     "production_admission_changed": false
-  }
+  },
+  "default_diagnostics": {
+    "actual_comparison": {
+      "path": ".runtime/object-expansion/unit72-prep/default-log-comparison01/summary.json",
+      "sha256": "21ddb80d97db9c9a7f6ce6dd4fdbce8054d4ded58a4af173f03e8e9c59d3e4e9",
+      "bytes": 1510
+    },
+    "regression_proposal": {
+      "path": ".runtime/object-expansion/unit72-prep/native-log-regression-proposal/proposal.json",
+      "sha256": "01fc27e66c08217fc03a97cb99d7bb997c7d1567685237ff1cf7d628c3401db7",
+      "bytes": 11333
+    },
+    "fixture": {
+      "path": "crates/ep_re2/tests/data/native-diagnostics.tsv",
+      "sha256": "4dd8ab32733e65e7c44bd310d5b66f1acee5dc8a00fda1f4fcfb59dc1d23b1c9",
+      "bytes": 11512
+    },
+    "default_rows": 15,
+    "default_stderr_bytes": 4494,
+    "separate_heavy_compile_observation": true,
+    "API_rows_compared": 16,
+    "total_stderr_bytes_compared": 4906,
+    "physical_EP_cases_added_by_component_probe": 0,
+    "origin": "Explicit actual source-unit build metadata; production owners use separately observed official Windows origin."
+  },
+  "reporting_owner_physical_comparisons": [
+    {
+      "path": ".runtime/porting/reporting-regex-72/comparison-a/comparison.json",
+      "sha256": "52091eb74a0ae6bf35364479e203026d24e30d5e77b47459d87c8f5d671a115f",
+      "bytes": 108612
+    },
+    {
+      "path": ".runtime/porting/reporting-regex-72/comparison-b/comparison.json",
+      "sha256": "d14388a63f34ee6a853783cac0d576f3789a4f43d764bba78c6ba6caecbb3023",
+      "bytes": 174032
+    }
+  ]
 }

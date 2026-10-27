@@ -1,5 +1,8 @@
 //! Authored live-owner cases for Native OutputProcessor538-545,3360,3470.
 use super::super::*;
+use crate::heat_balance::error_backend::{
+    SourceErrorBackend, SourceErrorState, SourceErrorTracking,
+};
 use crate::heat_balance::ordinary_output_control::SourceResultsFrameworkOptions;
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputFamily, SourceObjectDefinition, SourceObjectShape,
@@ -170,13 +173,20 @@ fn request(schedule: &str, frequency: &str) -> ReportInputs {
 
 #[test]
 fn scheduled_filter_resolves_the_live_schedule_and_rejects_a_missing_reference() -> TestResult {
-    for (name, expected, dictionary_name) in [
-        ("FILTER", Some(FILTER), "FILTER"),
-        ("CONSTANT-1.0", Some(SourceScheduleIndex(1)), "Constant-1.0"),
-        ("ABSENT", None, ""),
+    for (key, name, expected, dictionary_name) in [
+        ("*", "FILTER", Some(FILTER), "FILTER"),
+        (
+            "*",
+            "CONSTANT-1.0",
+            Some(SourceScheduleIndex(1)),
+            "Constant-1.0",
+        ),
+        ("*", "ABSENT", None, ""),
+        ("VaLu[ae]", "FILTER", Some(FILTER), "FILTER"),
     ] {
         let (mut schedules, mut input) = live_schedules()?;
-        let requests = request(name, "HOURLY");
+        let mut requests = request(name, "HOURLY");
+        requests.output_variables[0].key = key.into();
         let mut operands = super::SourceReportVariableInput::with_schedules(
             &requests,
             &mut input,
@@ -201,7 +211,51 @@ fn scheduled_filter_resolves_the_live_schedule_and_rejects_a_missing_reference()
                 dictionary_name
             );
             let mut prescan = SourceOutputPreScan::default();
-            prescan.add_record("*", "Schedule Value")?;
+            // Actual backend and in-memory sinks, rather than a successful stub.
+            let mut error_state = SourceErrorState {
+                output_error_header: true,
+                version_string: "authored Rust schedule caller".into(),
+                idd_version_string: "authored typed input".into(),
+                doing_input_processing: false,
+                print_console_output: true,
+                kickoff_simulation: false,
+                developer_flag: false,
+                warmup_flag: false,
+                doing_sizing: false,
+                tracking: SourceErrorTracking {
+                    ask_for_plant_check_on_abort: false,
+                    exit_during_simulations: false,
+                    ask_for_connections_report: false,
+                    ask_for_surfaces_report: false,
+                    total_multiplied_windows: 0,
+                    total_coincident_vertices: 0,
+                    total_degenerate_surfaces: 0,
+                    total_receiving_non_convex_surfaces: 0,
+                    total_casting_non_convex_surfaces: 0,
+                    match_counts: [0; 20],
+                    abort_processing: false,
+                    total_severe_errors: 0,
+                    last_severe_error: String::new(),
+                    total_severe_errors_during_warmup: 0,
+                    total_severe_errors_during_sizing: 0,
+                    total_warning_errors: 0,
+                    total_warning_errors_during_warmup: 0,
+                    total_warning_errors_during_sizing: 0,
+                },
+            };
+            let (mut errors, mut console) = (Vec::new(), Vec::new());
+            let mut backend = SourceErrorBackend {
+                state: &mut error_state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            prescan.add_record(key, "Schedule Value", &mut backend)?;
             let mut operands = super::SourceReportVariableInput::new(&requests, &mut input, "");
             let binding = SourceRealOutputBinding::new(
                 SourceRealOutputTarget::Schedule { index: VALUE },
@@ -225,6 +279,16 @@ fn scheduled_filter_resolves_the_live_schedule_and_rejects_a_missing_reference()
             )?;
             assert_eq!(output.out_vars.len(), 1);
             assert_eq!(output.out_vars[0].schedule, expected);
+            assert!(output.requested_variables[0].used);
+            if key != "*" {
+                assert_eq!(
+                    output.requested_variables[0]
+                        .case_insensitive_pattern
+                        .as_ref()
+                        .map(|pattern| pattern.pattern()),
+                    Some("(?i)VaLu[ae]")
+                );
+            }
             let text = std::str::from_utf8(&dictionary.eso)?;
             assert!(
                 text.ends_with(&format!(" !Hourly,{dictionary_name}\n")),
@@ -269,6 +333,122 @@ fn scheduled_filter_without_its_live_owner_stays_rejected() -> TestResult {
             Some(FILTER)
         );
     }
+    // The actual getter retains invalid CI construction and writes later fields.
+    let mut invalid_requests = request("FILTER", "HOURLY");
+    invalid_requests.output_variables[0].key = "[".into();
+    let mut operands = super::SourceReportVariableInput::with_schedules(
+        &invalid_requests,
+        &mut input,
+        "",
+        &mut schedules,
+    );
+    let mut invalid = SourceOutputRegistration::default();
+    invalid.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new())?;
+    let retained = &invalid.requested_variables[0];
+    assert!(!retained.is_simple_string);
+    let pattern = retained
+        .case_insensitive_pattern
+        .as_ref()
+        .ok_or("CI object not retained")?;
+    assert_eq!(pattern.pattern(), "(?i)[");
+    assert!(!pattern.ok());
+    assert_eq!(retained.name, "Schedule Value");
+    assert_eq!(retained.frequency, SourceReportFrequency::Hour);
+    assert_eq!(retained.reporting_schedule, Some(FILTER));
+    assert!(!retained.used);
+    assert!(
+        invalid
+            .match_report_variables("Schedule Value", "VALUE")
+            .is_empty()
+    );
+    assert!(!invalid.requested_variables[0].used);
+
+    // Four genuine requests preserve first frequency plus live-schedule identity.
+    let mut requests = ReportInputs::default();
+    for (index, (key, frequency, schedule)) in [
+        ("VaLu[ae]", "HOURLY", "FILTER"),
+        ("Value", "HOURLY", "FILTER"),
+        ("VaLu[ae]", "TIMESTEP", "FILTER"),
+        ("VaLu[ae]", "HOURLY", "CONSTANT-1.0"),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let mut row = request(schedule, frequency)
+            .output_variables
+            .into_iter()
+            .next()
+            .ok_or("actual request missing")?;
+        row.object_name = format!("request{index}");
+        row.key = key.into();
+        requests.output_variables.push(row);
+    }
+    let mut request_input = SelectedInputProcessor::from_admitted_input(
+        vec![SourceObjectDefinition {
+            object_type: "Output:Variable".into(),
+            alpha_fields: 4,
+            numeric_fields: 0,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        }],
+        BTreeMap::from([(
+            "Output:Variable".into(),
+            SourceInputFamily::Objects(
+                requests
+                    .output_variables
+                    .iter()
+                    .map(|row| SourceObjectShape {
+                        object_name: row.object_name.clone(),
+                        field_sizes: BTreeMap::new(),
+                    })
+                    .collect(),
+            ),
+        )]),
+    )?;
+    let mut operands = super::SourceReportVariableInput::with_schedules(
+        &requests,
+        &mut request_input,
+        "",
+        &mut schedules,
+    );
+    let mut output = SourceOutputRegistration::default();
+    output.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new())?;
+    assert!(
+        output
+            .requested_variables
+            .iter()
+            .all(|request| !request.used)
+    );
+    assert!(
+        output
+            .match_report_variables("unrelated variable", "VALUE")
+            .is_empty()
+    );
+    assert!(
+        output
+            .requested_variables
+            .iter()
+            .all(|request| !request.used)
+    );
+    assert_eq!(
+        output.match_report_variables("SCHEDULE VALUE", "VALUE"),
+        [0, 2, 3]
+    );
+    assert!(
+        output
+            .requested_variables
+            .iter()
+            .all(|request| request.used)
+    );
+    // Non-simple requested keys have no DataOutputs literal-key escape.
+    assert!(
+        output
+            .match_report_variables("Schedule Value", "VaLu[ae]")
+            .is_empty()
+    );
+    output.get_report_variable_input(&mut operands, &Files::default(), &mut Vec::new())?;
+    assert_eq!(output.requested_variables.len(), 4);
     Ok(())
 }
 

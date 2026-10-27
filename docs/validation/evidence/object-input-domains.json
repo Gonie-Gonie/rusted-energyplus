@@ -1,6 +1,6 @@
 {
   "schema": "object-input-domain-verification.v1",
-  "reviewed_on": "2026-10-22",
+  "reviewed_on": "2026-10-27",
   "corpus": {
     "input_files": 188,
     "idf_files": 176,
@@ -46,7 +46,8 @@
       "zero OFF; positive/negative ON; EMS current value at both native boundaries",
       "all seven existing report-frequency consumers and unchanged meter/extrema/count behavior",
       "actual IO deletion/catalog/extraction; zero samples are not fabricated",
-      "Constant and built-in Constant admission; other explicit physics/output guards retained"
+      "Constant and built-in Constant admission; other explicit physics/output guards retained",
+      "Raw/CI pre-scan and CI-only request matching use pinned Rust RE2 with source-order duplicate/Used/error effects. Two key-only derived A/B physical cases pass 160 series and 15,144 samples under the original policy; valid-match DFA/resource effects and general legal-domain completion remain open."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -165,7 +166,7 @@
     "Schedule:Compact": [
       "Actual Source A/B preserves raw/IP family order and existing numeric presentation. Pending Until values are consumed before directive dispatch; string values use shared Source ProcessNumber, including D/E, successful signed underflow zero, empty/space-only and optional missing field as zero. Unknown item metadata is retained. Integral HH/MM includes genuine blank operands and exact byte0/immediate-colon grammar. Explicit0:0 and statefulMM60 retain every empty segment; MM60 preserves the prior decoded endpoint, with None distinct from Some0. Whole-hour empty warnings and Linear next-segment seeds remain genuine. Explicit null, missing entries, initialMM60 and nonIntegral formatting paths remain bounded.",
       "Immediately after For, Native consumes an interpolation token if it starts INTERPOLATE or does not start UNTIL; substring priority is NO, then AVERAGE, then LINEAR. Bare and prefixed valid selectors populate the actual retained enum. No/Average/Linear use retained minute/day/week/currentVal producers and real type clocks. Optional blank/unknown types and missing For masks retain original warning effects/MissingDay0 pointers. Detailed hasVal/uncached minmax follow actual366week/12day pointers; cached/Constant paths remain unchanged. Child/parent/finalFatal and partial-owner effects stay ordered; Linear endpoint residues are not clamped.",
-      "Through calls the real General routine and leap OrdinalDay. Two-field numeric/month-prefix dates retain canonical month/day validation and ordered separator/stopword normalization. ASCII plain-three-token dates convert all three numbers before selecting year-first, year-last or default0/0; genuine error-zero flags are ignored in that branch and no ValidateMonthDay runs. Checked ordinals0..366 retain folds such as2/30 to61 and invalid-month to0 without inventing a civil date. Non-finite success, unsafe integer casts, signed overflow and out-of-array endpoints remain unavailable. Whole successful finite trunc-zero values, including underflow ±0, retain real MonthDay0/0 empty owners. Annual coverage preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Nth/Last and broader grammar or sibling families remain bounded.",
+      "Through calls the real General routine and leap OrdinalDay. Two-field numeric/month-prefix dates retain canonical month/day validation and ordered separator/stopword normalization. ASCII plain-three-token dates convert all three numbers before selecting year-first, year-last or default0/0; genuine error-zero flags are ignored in that branch and no ValidateMonthDay runs. Checked ordinals0..366 retain folds such as2/30 to61 and invalid-month to0 without inventing a civil date. Non-finite success, unsafe integer casts, signed overflow and out-of-array endpoints remain unavailable. Whole successful finite trunc-zero values, including underflow \u00b10, retain real MonthDay0/0 empty owners. Annual coverage preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Nth/Last and broader grammar or sibling families remain bounded.",
       "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed, two-field numeric/month-prefix and three-number fractional/D/E and folded/zero dates, missing selectors, empty topology, finite-zero and signed-underflow dates, blank/D/E values, integral Until and No-mode empty intervals. Each checks all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. The empty-interval pair preserves unused2 under Fraction0..1 with exactly2Warnings and0Continues/Severe; existing actual-owner bodies separately verify No/Average/Linear1440minute/96step and active Linear-seed limit rejection. Cases name actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim.",
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
@@ -269,7 +270,7 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit72-prep/regex-native-kernel-docs-check-72.log",
+        "path": ".runtime/object-expansion/unit72-prep/regex-reporting-docs-check-72.log",
         "sha256": "e63d1d2b505f99e70149d128000c36c8cded65cc44897950c0759df4d957b11e",
         "bytes": 338
       },
@@ -700,7 +701,7 @@
         "scope": "Actual full workspace70 and strict all-target Clippy70 are reused only after equality of all four changed source files with Build71 archives and current final snapshot custody; no Unit71 test run is invented."
       },
       "re2_component_in_progress": {
-        "status": "native_list_kernel_and_official_cap_implemented_reporting_owners_unconnected",
+        "status": "reporting_owners_connected_finite_AB_verified_valid_match_DFA_effects_open",
         "component": "crates/ep_re2",
         "finite_baseline_comparison": {
           "path": ".runtime/object-expansion/unit72-prep/native-matcher-comparison01/summary.json",
@@ -713,11 +714,88 @@
           "bytes": 2014
         },
         "focused_quality": {
-          "path": ".runtime/object-expansion/unit72-prep/component-quality08/receipt.json",
-          "sha256": "a0abcc6a8eae39acba05ea8e685941677aad81b8d1289bdc43dfec57dd6e6f42",
-          "bytes": 9403
+          "path": ".runtime/object-expansion/unit72-prep/integration-quality-final.json",
+          "sha256": "b0507fd1b7643931988ef04b117db9dd43139c4aeb88150dcf83d976f57424ba",
+          "bytes": 1222
         },
-        "current_unchanged_tested_code_and_fixture_refs": [
+        "metadata_after_known_gap_recording": "Updated README/provenance after actual checks; executable Rust and included table bytes remain those tested and captured by Build72.",
+        "reference_kind": "Exact pinned RE2 source unit build with GCC13.2; separate from EnergyPlus DLL and physical oracle calibrations.",
+        "finite_baseline_unit_inputs": 10168,
+        "finite_baseline_five_API_field_mismatches": 0,
+        "additional_AST_inputs": 7,
+        "additional_AST_mismatches": 0,
+        "new_test_functions": 2,
+        "new_EP_physical_cases": 2,
+        "new_EP_reported_samples": 15144,
+        "new_Source_CLI_build_rows": 1,
+        "Source_reporting_admission_changed": true,
+        "remaining_required_work": [
+          "Valid-match OnePass/DFA/cache resource diagnostics and target accounting",
+          "Minimum-report-frequency override and remaining live reporting/runtime boundaries",
+          "Full legal-value and object-domain completion"
+        ],
+        "full_RE2_or_object_domain_completion": false,
+        "historical_AST_mismatches_closed": 5,
+        "native_parse_AST_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-ast-comparison01/summary.json",
+          "sha256": "b3ce6a7f43b6d3eb0b4fa32275aca3c5351bd30d9ab3c87324c1f8d4bc1259dd",
+          "bytes": 490
+        },
+        "native_parse_AST_records": 1494,
+        "native_parse_AST_field_or_wire_mismatches": 0,
+        "native_rewrite_phase_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-phase-comparison01/summary.json",
+          "sha256": "dc0b0b2075062e6ff64ddfc569fabd356beb58bc76e2bf819bdf3f20d969f95c",
+          "bytes": 5940
+        },
+        "native_rewrite_patterns_per_phase": 2333,
+        "native_rewrite_field_or_wire_mismatches": 0,
+        "retained_rewrite_regression_patterns": 50,
+        "retained_rewrite_regression_rows": 100,
+        "prefix_context_native_observations": {
+          "path": ".runtime/object-expansion/unit72-prep/prefix-context-observations01/receipt.json",
+          "sha256": "90c221e2a55114bad73cc91aecdaaaadcbbb137c8b56ed586088b2afaec6a93f",
+          "bytes": 1071
+        },
+        "current_constructor_match_fixture_rows": 10607,
+        "current_constructor_match_five_API_field_mismatches": 0,
+        "table_test_functions": 2,
+        "full_program_prototype_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-program-comparison01/summary.json",
+          "sha256": "f482b57ca9f7b5ac22485e24388d34487094a8c87e85646375ae5fe31c970f03",
+          "bytes": 962
+        },
+        "final_list_match_prototype_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-final-match-comparison01/summary.json",
+          "sha256": "795c68d674507bf843aac9777c420c10c309421996ad61a525e77929e8727329",
+          "bytes": 561
+        },
+        "official_target_cap_component_evidence": {
+          "path": ".runtime/object-expansion/unit72-prep/official-regex-budget-search01/summary.json",
+          "sha256": "0b834522b328b513ef59cd37ab5def69f4e2e21eb90fd11757f6ecd8ab8a6d5b",
+          "bytes": 8936
+        },
+        "actual_public_default_cap_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/official-default-kernel-comparison01/summary.json",
+          "sha256": "8b458f2178c80a4a85da809ad03aac2163de0099607c48a1a55bd61a12829973",
+          "bytes": 32948
+        },
+        "source_unit_cap_boundary_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-budget-boundary-comparison01/summary.json",
+          "sha256": "94e385b38b354e3d7b9e662a69505b7c8eb6db6771b47ab1d77c4eb3fe7d8c7d",
+          "bytes": 4083
+        },
+        "full_program_prototype_rows": 2352,
+        "full_program_field_or_wire_mismatches": 0,
+        "official_effective_forward_instruction_cap": 698995,
+        "selected_program_fixture_rows": 23,
+        "constructor_groups_in_default_table": 1505,
+        "default_table_test_functions": 2,
+        "default_table_test_seconds": 0.85,
+        "heavy_allocation_cases_in_default_tests": false,
+        "official_budget_probes_are_physical_cases": false,
+        "official_DLL_sizeof_Prog_claim": false,
+        "historical_component_checkpoint_refs": [
           {
             "path": "crates/ep_re2/Cargo.toml",
             "sha256": "db017fac1e98e476776942b55b8addb550781e852315bac53b9049dadf8f9ee3",
@@ -929,97 +1007,311 @@
             "bytes": 4314
           }
         ],
-        "metadata_after_known_gap_recording": [
+        "historical_focused_quality": {
+          "path": ".runtime/object-expansion/unit72-prep/component-quality08/receipt.json",
+          "sha256": "a0abcc6a8eae39acba05ea8e685941677aad81b8d1289bdc43dfec57dd6e6f42",
+          "bytes": 9403
+        },
+        "default_diagnostics": {
+          "actual_comparison": {
+            "path": ".runtime/object-expansion/unit72-prep/default-log-comparison01/summary.json",
+            "sha256": "21ddb80d97db9c9a7f6ce6dd4fdbce8054d4ded58a4af173f03e8e9c59d3e4e9",
+            "bytes": 1510
+          },
+          "regression_proposal": {
+            "path": ".runtime/object-expansion/unit72-prep/native-log-regression-proposal/proposal.json",
+            "sha256": "01fc27e66c08217fc03a97cb99d7bb997c7d1567685237ff1cf7d628c3401db7",
+            "bytes": 11333
+          },
+          "fixture": {
+            "path": "crates/ep_re2/tests/data/native-diagnostics.tsv",
+            "sha256": "4dd8ab32733e65e7c44bd310d5b66f1acee5dc8a00fda1f4fcfb59dc1d23b1c9",
+            "bytes": 11512
+          },
+          "default_rows": 15,
+          "default_stderr_bytes": 4494,
+          "separate_heavy_compile_observation": true,
+          "API_rows_compared": 16,
+          "total_stderr_bytes_compared": 4906,
+          "physical_EP_cases_added_by_component_probe": 0,
+          "origin": "Explicit actual source-unit build metadata; production owners use separately observed official Windows origin."
+        },
+        "actual_reporting_Source_build": {
+          "path": ".runtime/object-expansion/build72-row.json",
+          "sha256": "e253f29fbe3d3edf4f62e2e171ff582efc5d127aacc82c211d2f3efd95c8d981",
+          "bytes": 667
+        },
+        "same_input_physical_pairs": [
+          {
+            "path": ".runtime/porting/reporting-regex-72/comparison-a/comparison.json",
+            "sha256": "52091eb74a0ae6bf35364479e203026d24e30d5e77b47459d87c8f5d671a115f",
+            "bytes": 108612
+          },
+          {
+            "path": ".runtime/porting/reporting-regex-72/comparison-b/comparison.json",
+            "sha256": "d14388a63f34ee6a853783cac0d576f3789a4f43d764bba78c6ba6caecbb3023",
+            "bytes": 174032
+          }
+        ],
+        "current_unchanged_tested_code_and_fixture_refs": [
+          {
+            "path": "crates/ep_re2/Cargo.toml",
+            "sha256": "db017fac1e98e476776942b55b8addb550781e852315bac53b9049dadf8f9ee3",
+            "bytes": 271
+          },
+          {
+            "path": "crates/ep_re2/LICENSE.RE2",
+            "sha256": "6040cda75d90b1738292a631d89934c411ef7ffd543c4d6a1b7edfc8edf29449",
+            "bytes": 1558
+          },
           {
             "path": "crates/ep_re2/README.md",
-            "sha256": "9e9a7c75ad1e175dd7a4609e02dc6ede0a114bb94ba55d6187f1f23c8b966f54",
-            "bytes": 3198
+            "sha256": "23877581489940d8e4756e537a8c9943e9854d8de4eb8c7a563177325d61a73b",
+            "bytes": 4023
+          },
+          {
+            "path": "crates/ep_re2/src/byte_class.rs",
+            "sha256": "0433eea3f22ff56d9ab512016ff9d697368c99ef8cc4fdf2d863725d44ff1eaa",
+            "bytes": 999
+          },
+          {
+            "path": "crates/ep_re2/src/diagnostics.rs",
+            "sha256": "c854b5c8974cc4299bd1addc14bc90a11198566c95374c9527488a8e2ebadf40",
+            "bytes": 6392
+          },
+          {
+            "path": "crates/ep_re2/src/lib.rs",
+            "sha256": "2b8ebe27702813cc82ccb8852517e1c6b31d103ec6956073e5491d61be44936d",
+            "bytes": 7888
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/builder.rs",
+            "sha256": "176a6883c802769a2516e054c1f3c93a29ba1a020b0183c16116d84d2b9350d4",
+            "bytes": 16682
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/equality.rs",
+            "sha256": "019134fd219daf02ef390236c8ff3d6908c1b1fee2ce1a3da50a8db44b7ba8a8",
+            "bytes": 3579
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/factor.rs",
+            "sha256": "7c661134b90d719c36708054cdd27051b0d7db141333235331ec9313ba5b9fed",
+            "bytes": 9534
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/leading.rs",
+            "sha256": "75bb02b0e134caec85c0f9e17a3cba8371089bd81ddc27ddea573108fd18a7f5",
+            "bytes": 5234
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/ranges.rs",
+            "sha256": "34969879a57db1c3ab764e0082acb355e98ca1ad3efcdaca1b0f46f5cb28da2f",
+            "bytes": 3716
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/simplify/coalesce.rs",
+            "sha256": "305e8c8949b91f90bb4cc83e1c1c1debe1554b6b66f63174356290384d135869",
+            "bytes": 8543
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/simplify/factories.rs",
+            "sha256": "014f56855d790a5dc53a12884b59c38817b0a13686cf10402db2c38be6d454e9",
+            "bytes": 2117
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/simplify.rs",
+            "sha256": "c3ccd3599531a4503b67e250e6c9532c35154ae669689d8482df6c2ebcf80b93",
+            "bytes": 10319
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast.rs",
+            "sha256": "e683d8844adeb371b3f3f020fc26ffeae6b68e7ccebc05983f7e430d2d1be6e7",
+            "bytes": 9706
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast_snapshot.rs",
+            "sha256": "046bfbb6e68448045a4ddf8a1a8d79bc2d2116b7b5ad954ee13851138317c39b",
+            "bytes": 16181
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler/anchors.rs",
+            "sha256": "1825f0919cb30c8de30e5114dcfcd854b2e540258462c02861869fe8716b4fe9",
+            "bytes": 2630
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler/graph.rs",
+            "sha256": "a5737da5f12716a30fcdd76ba263f17ce02f70bf745a01227600c5f30157cc3c",
+            "bytes": 6766
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler/range.rs",
+            "sha256": "78c5668e5c0ed23aa894f089551242783784c126421a568bc5358e61bf3c9a2a",
+            "bytes": 9128
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler/walk.rs",
+            "sha256": "837356e808ea6baae6a49f47d6bd5a3a4ccbed1af2e6918da78aad7876479345",
+            "bytes": 6599
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler.rs",
+            "sha256": "9d8a9cfa77216293d9b020cdfc2c23f31d5c7c6b84831739dd852570989bf562",
+            "bytes": 15399
+          },
+          {
+            "path": "crates/ep_re2/src/native_finalize/bytemap.rs",
+            "sha256": "50c43bacc98212d3a76655cad85d91d2de6a16f9271a47325cb0ca98174d16a1",
+            "bytes": 5472
+          },
+          {
+            "path": "crates/ep_re2/src/native_finalize/flatten.rs",
+            "sha256": "d69c5c824b3333003b7a2081ff95437e6929f6fe2c29aba73607b6a3fa12029c",
+            "bytes": 13456
+          },
+          {
+            "path": "crates/ep_re2/src/native_finalize.rs",
+            "sha256": "457268893cc2fea1dfb6efa9b097d3b89a60dfcd3f5aba1d638f500d8375472b",
+            "bytes": 6835
+          },
+          {
+            "path": "crates/ep_re2/src/native_matcher.rs",
+            "sha256": "1eaf5e5eb0121bf69d817f872784d3af2eb3d3a9b15a3788bba4430c788d8fa1",
+            "bytes": 7563
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/character_class.rs",
+            "sha256": "04dbff304d90759848600dc96b12e03b1bcfa34fa6f0a5abfbf7fc214a9ca469",
+            "bytes": 5490
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/escapes.rs",
+            "sha256": "19efc8e5884248ae3b9dd6caf7c6757d86f642d5af5f053ff0d1acd55772b937",
+            "bytes": 3553
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/groups.rs",
+            "sha256": "36b50e656dc8bce5c4596392110364480831e43bc63c76127da02c76184f5c05",
+            "bytes": 4322
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/ranges.rs",
+            "sha256": "0a20f033e9f35482185da3c86bda30e261564b3e1124cd490b0c5f613bbb5467",
+            "bytes": 1098
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/repetition.rs",
+            "sha256": "37662ebdbe71f2c0d5a639a40da70aad3362161b4ea9ccad451c6d84e5bb2d47",
+            "bytes": 1457
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser.rs",
+            "sha256": "35dcf08b28a9a05f8d755f384212e0131e7ec9602769bbd8bace4f54b2f05303",
+            "bytes": 7576
+          },
+          {
+            "path": "crates/ep_re2/src/native_prefix.rs",
+            "sha256": "624933b568ac9aa28dcd99bb655834665adb1fce56d9ac2f0af7010c46692f6a",
+            "bytes": 6005
+          },
+          {
+            "path": "crates/ep_re2/src/native_program_snapshot.rs",
+            "sha256": "e90aa48119878760c5d32b4540d29ea9de952b65bd1538a83c54b7fbe2f89348",
+            "bytes": 12987
+          },
+          {
+            "path": "crates/ep_re2/src/unicode.rs",
+            "sha256": "9de0bafa243a06c1a756ad87304c5c7e9afad17ddfaaa00c92c8b61edad718b3",
+            "bytes": 4768
+          },
+          {
+            "path": "crates/ep_re2/src/unicode_data.rs",
+            "sha256": "56fcbfaff224992ea0dfc4fb6d25a6a7fcc15d4a070a2e201e6dab5491e8c1ef",
+            "bytes": 170389
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-default.tsv",
+            "sha256": "c43d7ad937adb5dba6a51d064977ffe9299595c18dce925e93eff23dc8cf15a9",
+            "bytes": 475119
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-diagnostics.tsv",
+            "sha256": "4dd8ab32733e65e7c44bd310d5b66f1acee5dc8a00fda1f4fcfb59dc1d23b1c9",
+            "bytes": 11512
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-parse-ast.jsonl",
+            "sha256": "addd9c67181cd26e48038a3e78d9bfa62ce73a85fe744de8f3de20d83be8038f",
+            "bytes": 1105799
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-program.tsv",
+            "sha256": "79cd51bdf4372ac5ff6542876dd2c9363e307b7171635c4fae48afcdac69b421",
+            "bytes": 333593
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-rewrite.tsv",
+            "sha256": "4cc0f9ffb24ad5771e04d3f5d54ec5371a0870691f45add63c236b85c10e0d8b",
+            "bytes": 1395602
           },
           {
             "path": "crates/ep_re2/tests/data/provenance.json",
-            "sha256": "d620a6d4eb3551dbcac539c8a5e67878288fb9f285940fc6e97dccc74bcf0a3b",
-            "bytes": 10872
+            "sha256": "dd2e51e076d260b7ea45bcd9e36ba2c0d3e31bf03c8934ec3ee83e555a33127f",
+            "bytes": 12515
+          },
+          {
+            "path": "crates/ep_re2/tests/native_vectors.rs",
+            "sha256": "835c1c7403b3668e91f7838f5ac4c112944670ed6b72d8d137d2226a4b2e4ad8",
+            "bytes": 5057
+          },
+          {
+            "path": "crates/ep_re2/tests/reference/re2_native_ast_observer.cpp",
+            "sha256": "367e474e90bcf15101e9eb8b6276826f89ff04ceccaa6fe8a7974fb1a8df03b0",
+            "bytes": 9406
+          },
+          {
+            "path": "crates/ep_re2/tests/reference/re2_native_phase_observer.cpp",
+            "sha256": "d7f8134183cdd6a32c1db94ba523ea0c84ee4797ac057c22e35601da3332361d",
+            "bytes": 11960
+          },
+          {
+            "path": "crates/ep_re2/tests/reference/re2_native_program_observer.cpp",
+            "sha256": "a81230762499a2d4d163f170c9ef9d4116fce93c8421b13580ac4eb885ab451c",
+            "bytes": 16115
+          },
+          {
+            "path": "crates/ep_re2/tests/reference/re2_unit.cpp",
+            "sha256": "e2b3f8d1783f48fd6a4763fc552913c3bc758881c92ecdbf2c2fd0a34f664c48",
+            "bytes": 4314
           }
         ],
-        "reference_kind": "Exact pinned RE2 source unit build with GCC13.2; separate from EnergyPlus DLL and physical oracle calibrations.",
-        "finite_baseline_unit_inputs": 10168,
-        "finite_baseline_five_API_field_mismatches": 0,
-        "additional_AST_inputs": 7,
-        "additional_AST_mismatches": 0,
-        "new_test_functions": 2,
-        "new_EP_physical_cases": 0,
-        "new_EP_reported_samples": 0,
-        "new_Source_CLI_build_rows": 0,
-        "Source_reporting_admission_changed": false,
-        "remaining_required_work": [
-          "three reporting owner connections with original constructor/write order",
-          "default RE2 stderr effects including CI-failure paths",
-          "same-input physical validation"
-        ],
-        "full_RE2_or_object_domain_completion": false,
-        "historical_AST_mismatches_closed": 5,
-        "native_parse_AST_comparison": {
-          "path": ".runtime/object-expansion/unit72-prep/native-ast-comparison01/summary.json",
-          "sha256": "b3ce6a7f43b6d3eb0b4fa32275aca3c5351bd30d9ab3c87324c1f8d4bc1259dd",
-          "bytes": 490
-        },
-        "native_parse_AST_records": 1494,
-        "native_parse_AST_field_or_wire_mismatches": 0,
-        "native_rewrite_phase_comparison": {
-          "path": ".runtime/object-expansion/unit72-prep/native-phase-comparison01/summary.json",
-          "sha256": "dc0b0b2075062e6ff64ddfc569fabd356beb58bc76e2bf819bdf3f20d969f95c",
-          "bytes": 5940
-        },
-        "native_rewrite_patterns_per_phase": 2333,
-        "native_rewrite_field_or_wire_mismatches": 0,
-        "retained_rewrite_regression_patterns": 50,
-        "retained_rewrite_regression_rows": 100,
-        "prefix_context_native_observations": {
-          "path": ".runtime/object-expansion/unit72-prep/prefix-context-observations01/receipt.json",
-          "sha256": "90c221e2a55114bad73cc91aecdaaaadcbbb137c8b56ed586088b2afaec6a93f",
-          "bytes": 1071
-        },
-        "current_constructor_match_fixture_rows": 10607,
-        "current_constructor_match_five_API_field_mismatches": 0,
-        "table_test_functions": 2,
-        "full_program_prototype_comparison": {
-          "path": ".runtime/object-expansion/unit72-prep/native-program-comparison01/summary.json",
-          "sha256": "f482b57ca9f7b5ac22485e24388d34487094a8c87e85646375ae5fe31c970f03",
-          "bytes": 962
-        },
-        "final_list_match_prototype_comparison": {
-          "path": ".runtime/object-expansion/unit72-prep/native-final-match-comparison01/summary.json",
-          "sha256": "795c68d674507bf843aac9777c420c10c309421996ad61a525e77929e8727329",
-          "bytes": 561
-        },
-        "official_target_cap_component_evidence": {
-          "path": ".runtime/object-expansion/unit72-prep/official-regex-budget-search01/summary.json",
-          "sha256": "0b834522b328b513ef59cd37ab5def69f4e2e21eb90fd11757f6ecd8ab8a6d5b",
-          "bytes": 8936
-        },
-        "actual_public_default_cap_comparison": {
-          "path": ".runtime/object-expansion/unit72-prep/official-default-kernel-comparison01/summary.json",
-          "sha256": "8b458f2178c80a4a85da809ad03aac2163de0099607c48a1a55bd61a12829973",
-          "bytes": 32948
-        },
-        "source_unit_cap_boundary_comparison": {
-          "path": ".runtime/object-expansion/unit72-prep/native-budget-boundary-comparison01/summary.json",
-          "sha256": "94e385b38b354e3d7b9e662a69505b7c8eb6db6771b47ab1d77c4eb3fe7d8c7d",
-          "bytes": 4083
-        },
-        "full_program_prototype_rows": 2352,
-        "full_program_field_or_wire_mismatches": 0,
-        "official_effective_forward_instruction_cap": 698995,
-        "selected_program_fixture_rows": 23,
-        "constructor_groups_in_default_table": 1505,
-        "default_table_test_functions": 2,
-        "default_table_test_seconds": [
-          0.26,
-          0.52
-        ],
-        "heavy_allocation_cases_in_default_tests": false,
-        "official_budget_probes_are_physical_cases": false,
-        "official_DLL_sizeof_Prog_claim": false
+        "current_reporting_owner_refs": [
+          {
+            "path": "Cargo.lock",
+            "sha256": "36a6559faee3c6ce335d302977e3468523c569fe42e7b9fd321439ba8b0fdd80",
+            "bytes": 13365
+          },
+          {
+            "path": "crates/ep_runtime/Cargo.toml",
+            "sha256": "116ba28b6632ff062aa20d69516cce8de6713a8c65eceeb5f29a911bd92693e8",
+            "bytes": 655
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/source_output_prescan.rs",
+            "sha256": "bfce636304d50ef1e7bede57e0334a16f933e8e68015218ab45f596af5d0ac10",
+            "bytes": 15603
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/source_output_registration.rs",
+            "sha256": "91ab6dc77f1a8eaba3dc5003850a04ed723cb134b4519c08704b7fbde7403590",
+            "bytes": 25653
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/source_output_registration/requested_input.rs",
+            "sha256": "f9776318603a97a44d76b5580bbaf0a4573dab9aeab4097c32b670252d6f39c6",
+            "bytes": 10051
+          }
+        ]
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -23060,7 +23352,7 @@
         "current_file_contract": {
           "File_schedules": [
             {
-              "source_object_name": " ",
+              "source_object_name": "\u00a0",
               "schedule_type_limits_name": "Fraction",
               "file_name": "C:Sidecars/A62.csv",
               "column_number": 2,
@@ -23070,7 +23362,7 @@
               "interpolate_to_timestep": "No",
               "minutes_per_item": 60,
               "adjust_schedule_for_daylight_savings": "No",
-              "report_name": " ",
+              "report_name": "\u00a0",
               "sidecar": {
                 "path": ".runtime/object-expansion/native-schedule-file-unicode-names-recheck-a/calibration-01/Sidecars/A62.csv",
                 "sha256": "17df9c1d7193595eb8848eac9f2ed9258d7157b04be20d66a3b2bc37ac4ae082",
@@ -23083,7 +23375,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ba710187157103639ae3f1a54196f38f88da54e796d1810377e74d773fa9259a",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": " ",
+                "source_object_name": "\u00a0",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -23095,7 +23387,7 @@
               },
               "source_namespace_identity": {
                 "ASCII_case_fold_without_trim": true,
-                "exact_authored_name": " ",
+                "exact_authored_name": "\u00a0",
                 "input_graph_only_no_thermal_value_or_outcome_seed": true
               }
             },
@@ -23123,7 +23415,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "748a68098bf9efe140479325df288cb534f8b88b9f1c7df2c4c806a07b6aa00c",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": " ",
+                "source_object_name": "\u00a0",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -23163,7 +23455,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ba710187157103639ae3f1a54196f38f88da54e796d1810377e74d773fa9259a",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": " ",
+                "source_object_name": "\u00a0",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -23223,14 +23515,14 @@
           "Source": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": " ",
+            "actual_People_schedule_field": "\u00a0",
             "actual_File_EIO_graph_names": [
-              " ",
+              "\u00a0",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -23239,14 +23531,14 @@
           "Native": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": " ",
+            "actual_People_schedule_field": "\u00a0",
             "actual_File_EIO_graph_names": [
-              " ",
+              "\u00a0",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -23256,7 +23548,7 @@
         "actual_Windows_File_path_probe_observation": {
           "Source": {
             "actual_File_source_names_in_order": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -23276,7 +23568,7 @@
           },
           "Native": {
             "actual_File_source_names_in_order": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25575,7 +25867,7 @@
         "current_file_contract": {
           "File_schedules": [
             {
-              "source_object_name": " ",
+              "source_object_name": "\u00a0",
               "schedule_type_limits_name": "Fraction",
               "file_name": "C:Sidecars/A62.csv",
               "column_number": 2,
@@ -25585,7 +25877,7 @@
               "interpolate_to_timestep": "No",
               "minutes_per_item": 60,
               "adjust_schedule_for_daylight_savings": "No",
-              "report_name": " ",
+              "report_name": "\u00a0",
               "sidecar": {
                 "path": ".runtime/object-expansion/native-schedule-file-leap-dst-a/calibration-01/Sidecars/A62.csv",
                 "sha256": "a3062b213dda7d5d221c3dacb0434ca6c503963c59fb23e1755ef1333a4f9079",
@@ -25598,7 +25890,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ed3ffa7fe88909af6b83258af81d77719286219b16405c07843a863979368057",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": " ",
+                "source_object_name": "\u00a0",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -25610,7 +25902,7 @@
               },
               "source_namespace_identity": {
                 "ASCII_case_fold_without_trim": true,
-                "exact_authored_name": " ",
+                "exact_authored_name": "\u00a0",
                 "input_graph_only_no_thermal_value_or_outcome_seed": true
               }
             },
@@ -25638,7 +25930,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "4accbb380c64c7c0a692120567e7f3b98ba96a1b4043b817c35be0a23f51576b",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": " ",
+                "source_object_name": "\u00a0",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -25678,7 +25970,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ed3ffa7fe88909af6b83258af81d77719286219b16405c07843a863979368057",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": " ",
+                "source_object_name": "\u00a0",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -25759,14 +26051,14 @@
           "Source": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": " ",
+            "actual_People_schedule_field": "\u00a0",
             "actual_File_EIO_graph_names": [
-              " ",
+              "\u00a0",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25775,14 +26067,14 @@
           "Native": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": " ",
+            "actual_People_schedule_field": "\u00a0",
             "actual_File_EIO_graph_names": [
-              " ",
+              "\u00a0",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25792,7 +26084,7 @@
         "actual_Windows_File_path_probe_observation": {
           "Source": {
             "actual_File_source_names_in_order": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25812,7 +26104,7 @@
           },
           "Native": {
             "actual_File_source_names_in_order": [
-              " ",
+              "\u00a0",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -28094,12 +28386,144 @@
           "bytes": 220258
         },
         "detailed_per_series_phase_counts_retained_in_complete_proofs": true
+      },
+      {
+        "id": "REPORTING-REGEX-DERIVED-A-24H",
+        "group": "reporting_regex",
+        "source_build": "reporting-regex-72",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/regex-a-24h.idf",
+          "sha256": "a23d6386200944569269eb7f13823d9e40579313b3b9d0b9329f9a0f5b4e6943",
+          "bytes": 13625
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/a-24h-native-command/receipt.json",
+          "sha256": "38351fee8dc14bb2db3eddb393095a20f35617e80f7e101ec832681f48efdf6a",
+          "bytes": 7962
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/a-24h-source-command/receipt.json",
+          "sha256": "353d5d46ed7281b96b8ebf43701da07ee2594dd499211d7c8bc5ec7d314b1e36",
+          "bytes": 7056
+        },
+        "source_summary": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/a-24h-source/run-summary.json",
+          "sha256": "da1a57286385e42db81548c374b40aa1b85fd45184ea24ac354f75dc74e5d9ba",
+          "bytes": 32358
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-72/eplus-rs.exe",
+          "sha256": "0f3f720c9765eba2033739967a6271e04e384ffa6af37738b284911c0c346496",
+          "bytes": 77651200
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b1/b188b6984945db62634d4db3cc4ff81dc1b0084903679bee10c68c5ae1ceab0e",
+          "sha256": "b188b6984945db62634d4db3cc4ff81dc1b0084903679bee10c68c5ae1ceab0e"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-72/receipt.json",
+          "sha256": "e89c08dcf08656260686f24cfc73150acded2caa93426d84dccdebfb8bb3ee44",
+          "bytes": 5705
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/reporting-regex-72/comparison-a/comparison.json",
+          "sha256": "52091eb74a0ae6bf35364479e203026d24e30d5e77b47459d87c8f5d671a115f",
+          "bytes": 108612
+        },
+        "totals": {
+          "series": 58,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "samples": 5352,
+          "passed": true
+        },
+        "derivation_plan": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/plan.json",
+          "sha256": "5258dd2e1d219e7521df6cfa52a0e98458aa02dd0d7b5a73168de5dba252936d",
+          "bytes": 48885
+        },
+        "effective_state": "Only Output:Variable key spans change from A-24H. Anchored lowercase alternatives and word boundaries exercise raw/CI construction, duplicate handling and original-text prefix context. The full original named 24h reported profiles, dictionaries and ordered timestamps pass. No full-file, internal-phase or general legal-domain claim."
+      },
+      {
+        "id": "REPORTING-REGEX-DERIVED-B-NOLIMIT-24H",
+        "group": "reporting_regex",
+        "source_build": "reporting-regex-72",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/regex-b-nolimit-24h.idf",
+          "sha256": "e346555366c25d787be87f656c19ae560dfbc0d7a9a616eb1747161b3a7dc1cb",
+          "bytes": 17059
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/b-nolimit-24h-native-command/receipt.json",
+          "sha256": "e70626ac1d8cd2ec3c369b0a4f38f5d3f9266114ea1d3163f28852e2a3b61bf9",
+          "bytes": 8026
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/b-nolimit-24h-source-command/receipt.json",
+          "sha256": "17b4f353ce0c7b8da94576603f94d9bdbc77825cd376d2dc8afd1e194ac6e567",
+          "bytes": 7120
+        },
+        "source_summary": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/b-nolimit-24h-source/run-summary.json",
+          "sha256": "2b820491865f74c63492636e206cf28d7d54eba6d134e8dbdc62fb2d51a4ad23",
+          "bytes": 60965
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-72/eplus-rs.exe",
+          "sha256": "0f3f720c9765eba2033739967a6271e04e384ffa6af37738b284911c0c346496",
+          "bytes": 77651200
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b1/b188b6984945db62634d4db3cc4ff81dc1b0084903679bee10c68c5ae1ceab0e",
+          "sha256": "b188b6984945db62634d4db3cc4ff81dc1b0084903679bee10c68c5ae1ceab0e"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-72/receipt.json",
+          "sha256": "e89c08dcf08656260686f24cfc73150acded2caa93426d84dccdebfb8bb3ee44",
+          "bytes": 5705
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/reporting-regex-72/comparison-b/comparison.json",
+          "sha256": "d14388a63f34ee6a853783cac0d576f3789a4f43d764bba78c6ba6caecbb3023",
+          "bytes": 174032
+        },
+        "totals": {
+          "series": 102,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "samples": 9792,
+          "passed": true
+        },
+        "derivation_plan": {
+          "path": ".runtime/porting/reporting-regex-72/physical-01/plan.json",
+          "sha256": "5258dd2e1d219e7521df6cfa52a0e98458aa02dd0d7b5a73168de5dba252936d",
+          "bytes": 48885
+        },
+        "effective_state": "Only Output:Variable key spans change from B-NOLIMIT-24H. Anchored lowercase alternatives and word boundaries exercise raw/CI construction, duplicate handling and original-text prefix context. The full original named 24h reported profiles, dictionaries and ordered timestamps pass. No full-file, internal-phase or general legal-domain claim."
       }
     ],
     "totals": {
-      "paired_cases": 116,
-      "reported_samples": 3445254,
-      "raw_operand_unequal": 706687,
+      "paired_cases": 118,
+      "reported_samples": 3460398,
+      "raw_operand_unequal": 710223,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -29260,6 +29684,23 @@
           "sha256": "7d901e512244023be5fd2de36523ab84496f0735afb05cc48d07c0515ccd3a0d",
           "bytes": 76848625
         }
+      },
+      {
+        "id": "reporting-regex-72",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-72/receipt.json",
+          "sha256": "e89c08dcf08656260686f24cfc73150acded2caa93426d84dccdebfb8bb3ee44",
+          "bytes": 5705
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b1/b188b6984945db62634d4db3cc4ff81dc1b0084903679bee10c68c5ae1ceab0e",
+          "sha256": "b188b6984945db62634d4db3cc4ff81dc1b0084903679bee10c68c5ae1ceab0e"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-72/eplus-rs.exe",
+          "sha256": "0f3f720c9765eba2033739967a6271e04e384ffa6af37738b284911c0c346496",
+          "bytes": 77651200
+        }
       }
     ],
     "focused_since_workspace": {
@@ -29291,8 +29732,8 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 68,
-      "builds_with_accepted_paired_cases": 67,
+      "actual_recorded_builds": 69,
+      "builds_with_accepted_paired_cases": 68,
       "builds_with_only_retained_failed_Source_attempts": 1,
       "failed_attempts_in_paired_case_or_sample_totals": 0
     },
@@ -29326,6 +29767,26 @@
         "bytes": 38434
       },
       "scope": "Same-input hourly and20-minute genuine8784-hour File data with distinct February29,2016 rows, active per-File Yes/No DST and hour24-nextday consumers; complete original224 full/per-phase/regular criteria remain. Controlled leap EPW copies February28 meteorology. Actual current71 pair only; input-only70 and failed68 are excluded from its physical totals."
+    },
+    "current_reporting_regex_live_pair": {
+      "source_build": "reporting-regex-72",
+      "case_rows": [
+        "REPORTING-REGEX-DERIVED-A-24H",
+        "REPORTING-REGEX-DERIVED-B-NOLIMIT-24H"
+      ],
+      "comparisons": [
+        {
+          "path": ".runtime/porting/reporting-regex-72/comparison-a/comparison.json",
+          "sha256": "52091eb74a0ae6bf35364479e203026d24e30d5e77b47459d87c8f5d671a115f",
+          "bytes": 108612
+        },
+        {
+          "path": ".runtime/porting/reporting-regex-72/comparison-b/comparison.json",
+          "sha256": "d14388a63f34ee6a853783cac0d576f3789a4f43d764bba78c6ba6caecbb3023",
+          "bytes": 174032
+        }
+      ],
+      "scope": "Two successful complete 24h reported profiles; component logging/resource probes are excluded from physical totals. No all-phase, full ancillary or whole-file equality claim."
     }
   },
   "additional_native_type_calibrations": [

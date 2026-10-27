@@ -5,6 +5,7 @@ use super::{
 };
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
+use crate::heat_balance::source_output_prescan::{REPORTING_RE2_LOG_ORIGIN, is_key_regex_like};
 use ep_model::{ReportInputs, SourceOutputVariableInput};
 
 /// One temporary borrow of the typed getter operands and the sole real input owner.
@@ -169,9 +170,6 @@ fn frequency(
     }
     Ok(F::Hour)
 }
-fn is_regex(key: &str) -> bool {
-    key != "*" && key.chars().any(|ch| "*+?()|[]\\.".contains(ch))
-}
 fn variable_name(name: &str) -> &str {
     let Some((without_units, _)) = name.split_once('[') else {
         return name;
@@ -215,11 +213,15 @@ impl SourceOutputRegistration {
             if request.key == "*" {
                 request.key.clear();
             }
-            request.is_simple_string = !is_regex(&request.key);
+            request.is_simple_string = !is_key_regex_like(&request.key);
             if !request.is_simple_string {
-                // Real RE2 compilation/matching is not represented yet. The
-                // pushed request keeps its actual key and constructor defaults.
-                return Err(OrdinaryRadiationUnavailable::InputBranch.into());
+                // Native constructs CI only, with NO ok() guard. An invalid
+                // object is retained before name/frequency/schedule writes.
+                request.case_insensitive_pattern =
+                    Some(std::sync::Arc::new(ep_re2::Re2::new_logged(
+                        &format!("(?i){}", request.key),
+                        REPORTING_RE2_LOG_ORIGIN,
+                    )));
             }
             request.name = variable_name(&arguments.alphas[1]).into();
             request.frequency = frequency(&arguments.alphas[2], self.minimum_report_frequency)?;

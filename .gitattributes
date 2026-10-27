@@ -12,3 +12,6 @@ crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_lu_native_cases.j
 crates/ep_runtime/src/heat_balance/fixtures/ordinary_equipment_native_selected.json binary
 crates/ep_runtime/src/heat_balance/fixtures/ordinary_radiation_producer_native_cases.json binary
 crates/ep_runtime/src/weather_day/fixtures/ordinary_design_day_native.json binary
+
+# An empty final TSV field records an observed zero-byte diagnostic stream.
+crates/ep_re2/tests/data/native-diagnostics.tsv whitespace=-blank-at-eol

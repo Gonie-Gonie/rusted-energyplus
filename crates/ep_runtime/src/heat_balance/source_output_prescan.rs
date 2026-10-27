@@ -6,6 +6,16 @@ use super::selected_input_processor::{
     SelectedInputProcessor, SourceInputFamily, SourceInputProcessorShortCut,
 };
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::Arc;
+
+// Build metadata observed in the pinned official Windows DLL stderr, separate
+// from model values and from UtilityRoutines' error/console stream owners.
+// unit72 official-regex-budget-t698992/stderr.log SHA256 8b7cce9206571b5d88a63965bfafbe2b996b13b36c914dfb4b50b86ecd4403e6.
+pub(crate) const REPORTING_RE2_LOG_ORIGIN: ep_re2::TargetDiagnosticOrigin<'static> =
+    ep_re2::TargetDiagnosticOrigin {
+        source_file: br"D:\a\EnergyPlus\EnergyPlus\third_party\re2\re2\re2.cc",
+        line_ending: b"\r\n",
+    };
 
 /// Raw Output:Variable fields in exact epJSON object-map order.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -43,8 +53,12 @@ pub struct SourceOutputReportingVariable {
     pub key: String,
     /// Name of this inserted record, including its original case.
     pub variable_name: String,
-    /// True in the supported literal-key domain; regex is an explicit boundary.
+    /// Native detector classification; only the exact single-star key is exempt.
     pub is_simple_string: bool,
+    /// Actual raw-pattern construction; absent for a simple string.
+    pub pattern: Option<Arc<ep_re2::Re2>>,
+    /// Separately constructed (?i)-prefixed pattern; absent for a simple string.
+    pub case_insensitive_pattern: Option<Arc<ep_re2::Re2>>,
 }
 
 /// The outer map's first key spelling and its case-insensitive key map.
@@ -81,7 +95,7 @@ pub struct SourceOutputPreScan {
     pub output_variables_for_simulation: BTreeMap<String, SourceOutputVariableKeys>,
 }
 
-/// Actual fatal stop or explicit unrepresented input/regex/storage branch.
+/// Actual fatal/backend stop or explicit unrepresented input/storage branch.
 #[derive(Debug)]
 pub enum SourcePreScanError {
     /// Original PostIPProcessing fatal path, retaining the backend cause.
@@ -132,35 +146,115 @@ fn validate_names<'a>(
     Ok(())
 }
 
+/// Exact DataOutputs::isKeyRegexLike byte detector, shared by both owners.
+pub(crate) fn is_key_regex_like(key: &str) -> bool {
+    key != "*"
+        && key
+            .as_bytes()
+            .iter()
+            .any(|byte| b"*+?()|[]\\.".contains(byte))
+}
+
+// ObjexxFCL::lessthani lowercases ASCII then compares char values. The pinned
+// Windows/GCC and Windows/MSVC targets have signed char. Preserve that scan
+// order even though retained folded String lookup keys use Rust byte ordering.
+// Only comparison operands are folded; compiled patterns retain original bytes.
+fn native_key_order(left: &str, right: &str) -> std::cmp::Ordering {
+    left.bytes()
+        .map(|byte| byte.to_ascii_lowercase() as i8)
+        .cmp(right.bytes().map(|byte| byte.to_ascii_lowercase() as i8))
+}
+
+impl SourceOutputReportingVariable {
+    fn new(
+        key: &str,
+        variable_name: &str,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<Self, SourcePreScanError> {
+        let mut record = Self {
+            key: key.into(),
+            variable_name: variable_name.into(),
+            is_simple_string: !is_key_regex_like(key),
+            pattern: None,
+            case_insensitive_pattern: None,
+        };
+        if record.is_simple_string {
+            return Ok(record);
+        }
+        // Native constructs BOTH objects before testing only raw pattern.ok().
+        record.pattern = Some(Arc::new(ep_re2::Re2::new_logged(
+            key,
+            REPORTING_RE2_LOG_ORIGIN,
+        )));
+        record.case_insensitive_pattern = Some(Arc::new(ep_re2::Re2::new_logged(
+            &format!("(?i){key}"),
+            REPORTING_RE2_LOG_ORIGIN,
+        )));
+        let pattern = record
+            .pattern
+            .as_ref()
+            .ok_or(SourcePreScanError::Unavailable("raw pattern storage"))?;
+        if !pattern.ok() {
+            backend
+                .show_severe_error(&format!(
+                    "Regular expression \"{key}\" for variable name \"{variable_name}\" in input file is incorrect"
+                ))
+                .map_err(|error| SourcePreScanError::Fatal(error.into()))?;
+            backend
+                .show_continue_error_bytes(pattern.error().as_bytes())
+                .map_err(|error| SourcePreScanError::Fatal(error.into()))?;
+            return match backend.show_fatal_error(
+                "Error found in regular expression. Previous error(s) cause program termination.",
+            ) {
+                Ok(never) => match never {},
+                Err(error) => Err(SourcePreScanError::Fatal(error)),
+            };
+        }
+        Ok(record)
+    }
+}
+
 impl SourceOutputPreScan {
-    /// Original addRecordToOutputVariableStructure, for literal keys.
+    /// Original addRecordToOutputVariableStructure, including regex construction.
     ///
     /// # Errors
-    /// Regex construction and signed-counter overflow remain explicit boundaries.
-    pub fn add_record(&mut self, key: &str, variable_name: &str) -> Result<(), SourcePreScanError> {
+    /// Retains reached backend effects/map writes; signed overflow is unavailable.
+    pub fn add_record(
+        &mut self,
+        key: &str,
+        variable_name: &str,
+        backend: &mut SourceErrorBackend<'_>,
+    ) -> Result<(), SourcePreScanError> {
         let name = variable_name
             .split_once('[')
             .map_or(variable_name, |(name, _)| name)
             .trim_end_matches(' ');
-        // DataOutputs constructs a record even when emplace will find a duplicate.
-        if key != "*" && key.contains(['*', '+', '?', '(', ')', '|', '[', ']', '\\', '.']) {
-            return Err(SourcePreScanError::Unavailable(
-                "RE2 output key construction",
-            ));
-        }
-        let record = SourceOutputReportingVariable {
-            key: key.into(),
-            variable_name: name.into(),
-            is_simple_string: true,
-        };
-        let keys = self
+        let name_lookup = name.to_ascii_lowercase();
+        let key_lookup = key.to_ascii_lowercase();
+        // Native finds the outer map first, then constructs even on duplicate
+        // emplace. Invalid duplicates therefore still execute the fatal path.
+        let name_present = self
             .output_variables_for_simulation
-            .entry(name.to_ascii_lowercase())
-            .or_insert_with(|| SourceOutputVariableKeys {
-                variable_name: name.into(),
-                keys: BTreeMap::new(),
-            });
-        keys.keys.entry(key.to_ascii_lowercase()).or_insert(record);
+            .contains_key(&name_lookup);
+        let record = SourceOutputReportingVariable::new(key, name, backend)?;
+        if name_present {
+            self.output_variables_for_simulation
+                .get_mut(&name_lookup)
+                .ok_or(SourcePreScanError::Unavailable("outer variable storage"))?
+                .keys
+                .entry(key_lookup)
+                .or_insert(record);
+        } else {
+            let mut keys = BTreeMap::new();
+            keys.insert(key_lookup, record);
+            self.output_variables_for_simulation.insert(
+                name_lookup,
+                SourceOutputVariableKeys {
+                    variable_name: name.into(),
+                    keys,
+                },
+            );
+        }
         self.num_considered_output_variables =
             self.num_considered_output_variables.checked_add(1).ok_or(
                 SourcePreScanError::Unavailable("NumConsideredOutputVariables signed overflow"),
@@ -168,14 +262,43 @@ impl SourceOutputPreScan {
         Ok(())
     }
 
-    /// Real DataOutputs::FindItemInVariableList lookup against retained pre-scan state.
+    /// Real DataOutputs::FindItemInVariableList against retained raw+CI patterns.
     #[must_use]
     pub fn find_item(&self, key: &str, variable_name: &str) -> bool {
-        self.output_variables_for_simulation
+        let Some(keys) = self
+            .output_variables_for_simulation
             .get(&variable_name.to_ascii_lowercase())
-            .is_some_and(|keys| {
-                keys.keys.contains_key(&key.to_ascii_lowercase()) || keys.keys.contains_key("*")
-            })
+        else {
+            return false;
+        };
+        if keys.keys.contains_key(&key.to_ascii_lowercase()) {
+            return true;
+        }
+        if keys.keys.contains_key("*") {
+            return true;
+        }
+        let mut records: Vec<_> = keys.keys.iter().collect();
+        records.sort_by(|(left, _), (right, _)| native_key_order(left, right));
+        for (_, record) in records {
+            if record.key.eq_ignore_ascii_case(key) {
+                return true;
+            }
+            if record.is_simple_string {
+                continue;
+            }
+            if record.pattern.as_ref().is_some_and(|pattern| {
+                pattern.full_match_logged(key.as_bytes(), REPORTING_RE2_LOG_ORIGIN)
+            }) || record
+                .case_insensitive_pattern
+                .as_ref()
+                .is_some_and(|pattern| {
+                    pattern.full_match_logged(key.as_bytes(), REPORTING_RE2_LOG_ORIGIN)
+                })
+            {
+                return true;
+            }
+        }
+        false
     }
 
     /// Actual selected preScanReportingVariables; it has no once-only guard.
@@ -186,6 +309,7 @@ impl SourceOutputPreScan {
         &mut self,
         input: &SelectedInputProcessor,
         raw: &SourceReportingPreScanInput,
+        backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), SourcePreScanError> {
         self.max_considered_output_variables = 10000;
         validate_names(
@@ -196,7 +320,7 @@ impl SourceOutputPreScan {
                 .map(|object| object.object_name.as_str()),
         )?;
         for object in &raw.variables {
-            self.add_record(&object.key, &object.variable_name)?;
+            self.add_record(&object.key, &object.variable_name, backend)?;
         }
         // Direct epJSON.find/iteration boundaries, not synthetic IP count queries.
         for family in [
@@ -262,5 +386,5 @@ pub fn post_input_processing(
             Err(error) => Err(SourcePreScanError::Fatal(error)),
         };
     }
-    outputs.pre_scan_reporting_variables(input, raw)
+    outputs.pre_scan_reporting_variables(input, raw, backend)
 }

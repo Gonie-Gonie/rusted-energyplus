@@ -135,6 +135,7 @@ dependencies = [
  "chrono",
  "ep_model",
  "ep_platform_math",
+ "ep_re2",
  "serde_json",
 ]
 

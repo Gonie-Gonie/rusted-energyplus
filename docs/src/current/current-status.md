@@ -41,8 +41,8 @@ object types; legal-value completion remains tracked per object. Direct Source
 epJSON now retains the first comparator-equivalent member spelling and last
 whole subtree. Two Native convert-only observations and existing dry-run loader
 assertions verify this input behavior. The [input-domain evidence](../../validation/evidence/object-input-domains.json)
-keeps these checks separate from the 116 paired physical cases. The latest
-accepted Build71 uses the current parser and verifies hourly and 20-minute
+keeps these checks separate from the 118 paired physical cases. Build71
+uses the current parser and verifies hourly and 20-minute
 `Schedule:File` data on February 29 with distinct leap-day values, per-file
 daylight-saving controls and the next-day schedule handoff. Its controlled
 weather copies February 28 meteorology; full legal-value completion remains open.
@@ -52,9 +52,15 @@ comparison of 1,494 Native parse ASTs and 10,607 constructor/match observations.
 Separate prefix/Simplify comparisons cover 2,333 patterns each; finalized program
 comparisons cover 2,352. Their wire fields agree. The default compiler limit now
 uses the pinned official binary's checked boundary. Its later-failing component
-probes add no physical cases. Reporting connections, default stderr effects and
-same-input execution remain in progress. Source regex requests
-remain blocked until those gates and same-input execution checks are complete.
+probes add no physical cases. Pre-scan, request construction and registration are
+now connected. Default constructor/invalid-match diagnostics agree on 16 API
+records and 4,906 stderr bytes. Build72 adds two key-only derived 24-hour A/B
+examples: 160 series and 15,144 reported values have zero tolerance or RMSE
+failures. A has 3,536 unequal raw/binary64 values within the original policy;
+B has none. Full dictionaries and ordered timestamps agree. These results do
+not establish full-file or full-object parity. Valid-match DFA resource effects,
+minimum-report-frequency overrides and the existing runtime boundaries remain
+open.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA

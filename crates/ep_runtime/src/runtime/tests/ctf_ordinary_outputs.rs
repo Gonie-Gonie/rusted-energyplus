@@ -2425,13 +2425,6 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     ),
                 ]),
             )?);
-            requested
-                .output_prescan
-                .add_record("AUTHORED GAIN 0", "Other Equipment Electricity Rate")?;
-            requested
-                .source_results_output_variables
-                .push("actual prior RF entry".into());
-            let sqlite_before = requested.source_sqlite.clone();
             let (mut state, mut error, mut console, mut eio, mut eso) = (
                 ctf_ordinary_output_test_state(),
                 Vec::new(),
@@ -2450,7 +2443,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 2 => Some(SourceGainDictionaryFile { eso: None }),
                 _ => None,
             };
-            let outcome = CtfInitializationContext {
+            let mut requested_context = CtfInitializationContext {
                 reports: &mut requested,
                 eio: &mut eio,
                 backend: SourceErrorBackend {
@@ -2464,8 +2457,15 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     error_callback: None,
                     sqlite: None,
                 },
-            }
-            .manage_selected_internal_heat_gains_input_with_dictionary(
+            };
+            requested_context.reports.output_prescan.add_record(
+                "AUTHORED GAIN 0", "Other Equipment Electricity Rate",
+                &mut requested_context.backend,
+            )?;
+            requested_context.reports.source_results_output_variables
+                .push("actual prior RF entry".into());
+            let sqlite_before = requested_context.reports.source_sqlite.clone();
+            let outcome = requested_context.manage_selected_internal_heat_gains_input_with_dictionary(
                 &requested_model,
                 15,
                 &mut gain_host,
@@ -2713,9 +2713,6 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     ),
                 ]),
             )?);
-            for (key, name, _) in &expected {
-                requested.output_prescan.add_record(key, name)?;
-            }
             let (mut state, mut error, mut console, mut eio, mut eso) = (
                 ctf_ordinary_output_test_state(),
                 Vec::new(),
@@ -2723,7 +2720,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 Vec::new(),
                 Vec::new(),
             );
-            CtfInitializationContext {
+            let mut requested_context = CtfInitializationContext {
                 reports: &mut requested,
                 eio: &mut eio,
                 backend: SourceErrorBackend {
@@ -2737,8 +2734,13 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     error_callback: None,
                     sqlite: None,
                 },
+            };
+            for (key, name, _) in &expected {
+                requested_context.reports.output_prescan.add_record(
+                    key, name, &mut requested_context.backend,
+                )?;
             }
-            .manage_selected_internal_heat_gains_input_with_dictionary(
+            requested_context.manage_selected_internal_heat_gains_input_with_dictionary(
                 &requested_model,
                 15,
                 &mut gain_host,
@@ -3074,15 +3076,6 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         num_alphas: 3,
                         is_epjson: true,
                     }];
-                people_reports
-                    .output_prescan
-                    .add_record("PEOPLE 0", "People Total Heating Rate")?;
-                let people_clock = crate::weather::day::WeatherGlobalState {
-                    time_steps_in_hour: 4,
-                    time_step_zone: 0.25,
-                    time_step_zone_sec: 900.0,
-                    ..Default::default()
-                };
                 let (
                     mut people_state,
                     mut people_errors,
@@ -3096,6 +3089,32 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     Vec::new(),
                     Vec::new(),
                 );
+                {
+                    let mut people_context = CtfInitializationContext {
+                        reports: &mut people_reports,
+                        eio: &mut people_eio,
+                        backend: SourceErrorBackend {
+                            state: &mut people_state,
+                            error_stream: Some(&mut people_errors),
+                            console: &mut people_console,
+                            out_unit1: None,
+                            out_unit2: None,
+                            f_message: None,
+                            message_callback: None,
+                            error_callback: None,
+                            sqlite: None,
+                        },
+                    };
+                    people_context.reports.output_prescan.add_record(
+                        "PEOPLE 0", "People Total Heating Rate", &mut people_context.backend,
+                    )?;
+                }
+                let people_clock = crate::weather::day::WeatherGlobalState {
+                    time_steps_in_hour: 4,
+                    time_step_zone: 0.25,
+                    time_step_zone_sec: 900.0,
+                    ..Default::default()
+                };
                 // Invoke the real GetZoneData child on fresh constructor owners.
                 // Its resilience/predefined allocations are not hand-set flags;
                 // this explicit child fixture does not certify a full geometry run.

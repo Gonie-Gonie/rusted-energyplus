@@ -2,9 +2,13 @@
 use super::*;
 use ep_raw_model::parse_epjson_str;
 use ep_runtime::heat_balance::ctf_initialization_context::CtfInitializationReports;
+use ep_runtime::heat_balance::error_backend::{
+    SourceErrorLevel, SourceErrorState, SourceFatalStop,
+};
 use ep_runtime::heat_balance::selected_input_processor::{
     SelectedInputUnavailable, SourceArgumentCounts, SourceObjectDefinition,
 };
+use ep_runtime::heat_balance::source_output_prescan::SourcePreScanError;
 
 pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::Error>> {
     let base = r#""Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}}"#;
@@ -145,6 +149,7 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
             .collect::<Vec<_>>(),
         ["request2", "request10"]
     );
+    let mut outputs = crate::ctf_initialization_outputs::CtfRunOutputs::new("26.1");
     for input in [
         resolve_source_a(&ordered_raw)?,
         resolve_source_b(&ordered_raw)?,
@@ -161,7 +166,11 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
         );
         let mut prescan =
             ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
-        prescan.pre_scan_reporting_variables(&input, &ordered_projection)?;
+        prescan.pre_scan_reporting_variables(
+            &input,
+            &ordered_projection,
+            &mut outputs.context().backend,
+        )?;
         let first = &prescan.output_variables_for_simulation["case var"];
         assert_eq!(first.variable_name, "Case Var");
         assert_eq!(first.keys["key"].key, "Key");
@@ -170,7 +179,7 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
         mismatched.variables.swap(0, 1);
         assert!(
             prescan
-                .pre_scan_reporting_variables(&input, &mismatched)
+                .pre_scan_reporting_variables(&input, &mismatched, &mut outputs.context().backend)
                 .is_err()
         );
     }
@@ -179,7 +188,11 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
     let legacy_input = resolve(&ordered_raw)?;
     let mut legacy_prescan =
         ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
-    legacy_prescan.pre_scan_reporting_variables(&legacy_input, &legacy)?;
+    legacy_prescan.pre_scan_reporting_variables(
+        &legacy_input,
+        &legacy,
+        &mut outputs.context().backend,
+    )?;
 
     // Direct-JSON pre-scan keeps original spelling separately from getter alphas.
     let raw = parse_epjson_str(&format!(
@@ -205,8 +218,12 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
     assert_eq!(projection.variables[4].variable_name, "case var [W]");
     let input = resolve(&raw)?;
     let unused = input.clone();
-    let mut outputs = crate::ctf_initialization_outputs::CtfRunOutputs::new("26.1");
+    let mut utility_events = Vec::new();
+    let mut capture_error = |_: &mut SourceErrorState, level, bytes: &[u8]| {
+        utility_events.push((level, bytes.to_vec()));
+    };
     let mut context = outputs.context();
+    context.backend.error_callback = Some(&mut capture_error);
     context.reports.initialize_input_processor(input)?;
     context.reports.reporting_prescan_input = Some(projection.clone());
     context.backend.state.doing_input_processing = true;
@@ -244,30 +261,170 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
             .num_considered_output_variables,
         10
     );
-    let retained = context.reports.output_prescan.clone();
+    // This formerly unsupported key is valid; both raw and CI matching work.
+    context.reports.output_prescan.add_record(
+        "bad.regex",
+        "Regex retained",
+        &mut context.backend,
+    )?;
     assert!(
         context
             .reports
             .output_prescan
-            .add_record("bad.regex", "unreached")
-            .is_err()
+            .find_item("badXregex", "REGEX RETAINED")
     );
-    assert_eq!(context.reports.output_prescan, retained);
-    let mut bad_projection = projection;
-    bad_projection.variables[1].key = "bad.regex".into();
-    context.reports.reporting_prescan_input = Some(bad_projection);
-    assert!(context.post_input_processing().is_err());
+    assert!(
+        context
+            .reports
+            .output_prescan
+            .find_item("BADxREGEX", "regex retained")
+    );
+    assert!(
+        !context
+            .reports
+            .output_prescan
+            .find_item("bad/regex/", "Regex retained")
+    );
+    context.reports.output_prescan.add_record(
+        "BAD.REGEX",
+        "REGEX RETAINED",
+        &mut context.backend,
+    )?;
+    let regex = &context
+        .reports
+        .output_prescan
+        .output_variables_for_simulation["regex retained"];
+    assert_eq!(regex.keys.len(), 1);
+    let first = &regex.keys["bad.regex"];
+    assert_eq!(first.key, "bad.regex");
+    assert_eq!(
+        first.pattern.as_ref().map(|pattern| pattern.pattern()),
+        Some("bad.regex")
+    );
+    assert_eq!(
+        first
+            .case_insensitive_pattern
+            .as_ref()
+            .map(|pattern| pattern.pattern()),
+        Some("(?i)bad.regex")
+    );
+    context
+        .reports
+        .output_prescan
+        .add_record("[ab]", "Class retained", &mut context.backend)?;
+    // DataOutputs' exact literal escape precedes its actual regex comparisons.
+    assert!(
+        context
+            .reports
+            .output_prescan
+            .find_item("[ab]", "Class retained")
+    );
+    assert!(
+        context
+            .reports
+            .output_prescan
+            .find_item("A", "Class retained")
+    );
+    assert!(
+        !context
+            .reports
+            .output_prescan
+            .find_item("z", "Class retained")
+    );
     assert_eq!(
         context
             .reports
             .output_prescan
             .num_considered_output_variables,
-        11
+        13
+    );
+    let retained = context.reports.output_prescan.clone();
+    let severe_before = context.backend.state.tracking.total_severe_errors;
+    assert!(matches!(
+        context
+            .reports
+            .output_prescan
+            .add_record("[", "unreached", &mut context.backend),
+        Err(SourcePreScanError::Fatal(SourceFatalStop::Fatal(_)))
+    ));
+    assert_eq!(context.reports.output_prescan, retained);
+    assert_eq!(
+        context.backend.state.tracking.total_severe_errors,
+        severe_before + 1
+    );
+    let mut bad_projection = projection;
+    bad_projection.variables[1].key = "[".into();
+    context.reports.reporting_prescan_input = Some(bad_projection);
+    context.backend.state.doing_input_processing = true;
+    assert!(matches!(
+        context.post_input_processing(),
+        Err(SourcePreScanError::Fatal(SourceFatalStop::Fatal(_)))
+    ));
+    assert_eq!(
+        context
+            .reports
+            .output_prescan
+            .num_considered_output_variables,
+        14
+    );
+    assert_eq!(
+        context
+            .reports
+            .output_prescan
+            .max_considered_output_variables,
+        10000
+    );
+    assert_eq!(
+        context
+            .reports
+            .input_processor_shortcut
+            .current_module_object,
+        "Output:PreprocessorMessage"
+    );
+    assert!(!context.backend.state.doing_input_processing);
+    assert_eq!(
+        context.backend.state.tracking.total_severe_errors,
+        severe_before + 2
+    );
+    assert_eq!(
+        context.backend.state.tracking.last_severe_error,
+        r#"Regular expression "[" for variable name "CASE VAR" in input file is incorrect"#
+    );
+    assert!(
+        context
+            .reports
+            .output_prescan
+            .find_item("BADxREGEX", "Regex retained")
     );
     assert!(!context.reports.output_prescan.find_item("*", "unreached"));
     assert_eq!(
         context.reports.selected_input_processor.as_ref(),
         Some(&unused)
     );
+    assert_eq!(
+        utility_events
+            .iter()
+            .map(|(level, _)| *level)
+            .collect::<Vec<_>>(),
+        [
+            SourceErrorLevel::Severe,
+            SourceErrorLevel::Continue,
+            SourceErrorLevel::Fatal,
+            SourceErrorLevel::Severe,
+            SourceErrorLevel::Continue,
+            SourceErrorLevel::Fatal
+        ]
+    );
+    assert_eq!(utility_events[1].1.as_slice(), b"missing ]: [");
+    assert_eq!(utility_events[4].1.as_slice(), b"missing ]: [");
+    assert_eq!(
+        utility_events[0].1.as_slice(),
+        br#"Regular expression "[" for variable name "unreached" in input file is incorrect"#
+    );
+    assert_eq!(
+        utility_events[2].1.as_slice(),
+        b"Error found in regular expression. Previous error(s) cause program termination."
+    );
+    assert_eq!(utility_events[2], utility_events[5]);
     Ok(())
 }

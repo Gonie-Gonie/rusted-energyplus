@@ -72,5 +72,64 @@ fn pinned_native_constructor_and_full_match_vectors() -> Result<(), String> {
         rows += 1;
     }
     assert_eq!(rows, 10_607);
+
+    // Actual Native records include payload LF/NUL and byte-truncated UTF-8.
+    // The observed source-unit origin is explicit fixture metadata, so no
+    // current checkout path supplies expected diagnostics. The heavy final
+    // compile-budget observation is retained outside this default table.
+    let mut records = include_str!("data/native-diagnostics.tsv").lines();
+    let metadata: Vec<_> = records
+        .next()
+        .ok_or("missing diagnostic origin")?
+        .split('\t')
+        .collect();
+    if metadata.len() != 3 || metadata[0] != "#origin_hex" {
+        return Err("bad diagnostic origin metadata".into());
+    }
+    let source_file = decode_hex(metadata[1])?;
+    let line_ending = decode_hex(metadata[2])?;
+    let origin = ep_re2::TargetDiagnosticOrigin {
+        source_file: &source_file,
+        line_ending: &line_ending,
+    };
+    let mut diagnostic_rows = 0;
+    for (index, line) in records.enumerate() {
+        let fields: Vec<_> = line.split('\t').collect();
+        if fields.len() != 8 {
+            return Err(format!(
+                "bad diagnostic fixture field count at {}",
+                index + 1
+            ));
+        }
+        let pattern = decode_hex(fields[0])?;
+        let pattern = std::str::from_utf8(&pattern).map_err(|error| error.to_string())?;
+        let text = decode_hex(fields[1])?;
+        let mut diagnostics = Vec::new();
+        // Each Native row constructed a fresh expression, including repeats.
+        let expression = Re2::new_logged_to(pattern, origin, &mut diagnostics);
+        let matched = expression.full_match_logged_to(&text, origin, &mut diagnostics);
+        let actual = [
+            u8::from(expression.ok()).to_string(),
+            (expression.status().code as u8).to_string(),
+            hex(expression.error().as_bytes()),
+            hex(expression.status().arg.as_bytes()),
+            u8::from(matched).to_string(),
+        ];
+        let expected: [String; 5] = std::array::from_fn(|at| fields[at + 2].to_owned());
+        assert_eq!(
+            actual,
+            expected,
+            "Native diagnostic API vector {}",
+            index + 1
+        );
+        assert_eq!(
+            diagnostics,
+            decode_hex(fields[7])?,
+            "Native diagnostic bytes vector {}",
+            index + 1
+        );
+        diagnostic_rows += 1;
+    }
+    assert_eq!(diagnostic_rows, 15);
     Ok(())
 }

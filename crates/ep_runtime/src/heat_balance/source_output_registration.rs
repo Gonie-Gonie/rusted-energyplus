@@ -303,6 +303,8 @@ pub(crate) struct SourceRequestedVariable {
     pub(crate) frequency: SourceReportFrequency,
     pub(crate) used: bool,
     pub(crate) is_simple_string: bool,
+    /// Native ReqVar constructor leaves this absent; non-simple input stores CI only.
+    pub(crate) case_insensitive_pattern: Option<std::sync::Arc<ep_re2::Re2>>,
     pub(crate) reporting_schedule: Option<super::selected_schedule_manager::SourceScheduleIndex>,
     /// Immutable name read from that actual schedule for its dictionary suffix.
     /// No schedule values or mutable schedule state are copied here.
@@ -317,6 +319,7 @@ impl Default for SourceRequestedVariable {
             frequency: SourceReportFrequency::Hour,
             used: false,
             is_simple_string: true,
+            case_insensitive_pattern: None,
             reporting_schedule: None,
             reporting_schedule_name: String::new(),
         }
@@ -544,9 +547,24 @@ impl SourceOutputRegistration {
         let mut request_indexes: Vec<usize> = Vec::new();
         for index in 0..self.requested_variables.len() {
             let request = &mut self.requested_variables[index];
-            if !request.name.eq_ignore_ascii_case(name)
-                || !(request.key.is_empty() || request.key.eq_ignore_ascii_case(key))
-            {
+            if !request.name.eq_ignore_ascii_case(name) {
+                continue;
+            }
+            let key_matches = request.key.is_empty()
+                || if request.is_simple_string {
+                    request.key.eq_ignore_ascii_case(key)
+                } else {
+                    request
+                        .case_insensitive_pattern
+                        .as_ref()
+                        .is_some_and(|pattern| {
+                            pattern.full_match_logged(
+                                key.as_bytes(),
+                                super::source_output_prescan::REPORTING_RE2_LOG_ORIGIN,
+                            )
+                        })
+                };
+            if !key_matches {
                 continue;
             }
             request.used = true;

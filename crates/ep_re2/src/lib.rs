@@ -1,6 +1,8 @@
 //! Pure Rust pinned RE2 grammar and boolean full matching for report requests.
-//! Construction limits and production integration remain in progress.
+//! Target construction limits and explicit default diagnostic effects are retained.
 mod byte_class;
+mod diagnostics;
+pub use diagnostics::{Diagnostic, DiagnosticKind, TargetDiagnosticOrigin};
 mod native_ast;
 #[cfg(test)]
 mod native_ast_snapshot;
@@ -110,12 +112,23 @@ pub struct Re2 {
     prefix_foldcase: bool,
 }
 impl Re2 {
-    /// Construct default UTF8/LikePerl with literal inline flags.
+    /// Construct UTF8/LikePerl with literal inline flags and quiet diagnostics.
+    /// Reporting owners use `new_logged` for the default RE2 stderr effects.
     #[must_use]
     pub fn new(pattern: &str) -> Self {
+        Self::new_with_failure_stage(pattern).0
+    }
+
+    fn new_with_failure_stage(
+        pattern: &str,
+    ) -> (Self, Option<diagnostics::ConstructorFailureStage>) {
         let mut prefix = Vec::new();
         let mut prefix_foldcase = false;
-        let compiled = native_parser::parse(pattern).and_then(|mut ast| {
+        let parsed = native_parser::parse(pattern);
+        let parse_failure = parsed
+            .is_err()
+            .then_some(diagnostics::ConstructorFailureStage::Parse);
+        let compiled = parsed.and_then(|mut ast| {
             // Grammar failures retain their actual parser status. Construction
             // failures after Parse use the native constructor's empty-arg
             // ErrorPatternTooLarge result, never an internal port guard status.
@@ -141,17 +154,28 @@ impl Re2 {
             })();
             constructed.map_err(|_| Status::new(ErrorCode::PatternTooLarge, ""))
         });
-        let (status, program) = match compiled {
-            Ok(program) => (Status::new(ErrorCode::Success, ""), Some(Arc::new(program))),
-            Err(status) => (status, None),
+        let (status, program, failure_stage) = match compiled {
+            Ok(program) => (
+                Status::new(ErrorCode::Success, ""),
+                Some(Arc::new(program)),
+                None,
+            ),
+            Err(status) => (
+                status,
+                None,
+                parse_failure.or(Some(diagnostics::ConstructorFailureStage::Compile)),
+            ),
         };
-        Self {
-            pattern: pattern.into(),
-            status,
-            program,
-            prefix,
-            prefix_foldcase,
-        }
+        (
+            Self {
+                pattern: pattern.into(),
+                status,
+                program,
+                prefix,
+                prefix_foldcase,
+            },
+            failure_stage,
+        )
     }
     /// Whether construction succeeded.
     #[must_use]
