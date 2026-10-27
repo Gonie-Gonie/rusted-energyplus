@@ -169,7 +169,7 @@ impl SurfaceGeometryInputState {
                 .get(index(adjacent.construction)?)
                 .ok_or(Error::Unavailable("actual adjacent Source Construction"))?;
             if !(1..=10).contains(&construction.total_layers)
-                || construction.total_layers != adjacent_construction.total_layers
+                || !(1..=10).contains(&adjacent_construction.total_layers)
                 || (construction.type_is_irt && construction.total_layers != 1)
                 || (adjacent_construction.type_is_irt && adjacent_construction.total_layers != 1)
                 || construction.type_is_window
@@ -180,21 +180,52 @@ impl SurfaceGeometryInputState {
                 || adjacent_construction.source_sink_present
             {
                 return Err(Error::Unavailable(
-                    "bounded equal-count opaque Source Constructions",
+                    "bounded opaque Source Construction counts",
                 ));
             }
-            // CheckForReversedLayers15495-15500: same actual LayerPoint takes
-            // the continue fast path at EACH reversed position, including distinct
-            // Construction owners. Different opaque IDs and glass branches stay held.
-            let layers = usize::try_from(construction.total_layers)
-                .map_err(|_| Error::Unavailable("actual paired TotLayers"))?;
-            for layer in 0..layers {
-                let original = construction.layer_points[layer];
-                let reversed = adjacent_construction.layer_points[layers - layer - 1];
-                if original <= 0 || original != reversed {
+            if construction.total_layers != adjacent_construction.total_layers {
+                // Native1851-1871: unequal counts read only the ACTUAL NominalU
+                // owner; there is no layer comparison, warning or latch write
+                // when the difference is within0.001. Nonfinite values remain
+                // an explicit boundary of this bounded normal-opaque stage.
+                if construction.type_is_irt || adjacent_construction.type_is_irt {
                     return Err(Error::Unavailable(
-                        "positive reversed Source LayerPoint comparison",
+                        "unequal-count normal opaque pair domain",
                     ));
+                }
+                let values = owners
+                    .control
+                    .nominal_u
+                    .as_ref()
+                    .ok_or(Error::Unavailable("actual paired NominalU allocation"))?;
+                let current_u = *values
+                    .get(index(surface.construction)?)
+                    .ok_or(Error::Unavailable("actual paired NominalU slot"))?;
+                let found_u = *values
+                    .get(index(adjacent.construction)?)
+                    .ok_or(Error::Unavailable("actual adjacent NominalU slot"))?;
+                if !current_u.is_finite()
+                    || !found_u.is_finite()
+                    || (current_u - found_u).abs() > 0.001
+                {
+                    return Err(Error::Unavailable(
+                        "unequal-count actual NominalU difference",
+                    ));
+                }
+            } else {
+                // CheckForReversedLayers15495-15500: same actual LayerPoint takes
+                // the continue fast path at EACH reversed position, including distinct
+                // Construction owners. Different opaque IDs and glass branches stay held.
+                let layers = usize::try_from(construction.total_layers)
+                    .map_err(|_| Error::Unavailable("actual paired TotLayers"))?;
+                for layer in 0..layers {
+                    let original = construction.layer_points[layer];
+                    let reversed = adjacent_construction.layer_points[layers - layer - 1];
+                    if original <= 0 || original != reversed {
+                        return Err(Error::Unavailable(
+                            "positive reversed Source LayerPoint comparison",
+                        ));
+                    }
                 }
             }
             let zones = owners

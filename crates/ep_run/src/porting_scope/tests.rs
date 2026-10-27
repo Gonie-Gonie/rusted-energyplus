@@ -755,6 +755,29 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         value["Construction"]["STACK REVERSE"] = layers;
         let raw =
             parse_epjson_str(&value.to_string()).expect("unported opaque reverse mismatch inputs");
+        // Unequal normal counts now enter a STRUCTURAL candidate lane; actual
+        // NominalU is deliberately unavailable in this raw/typed scope. This
+        // old differing-count row still fails at runtime with its real U gap.
+        let compiled = compile_raw_model(&raw);
+        if let Some(model) = compiled.model.as_ref() {
+            let counts = ["STACK FORWARD", "STACK REVERSE"].map(|name| {
+                model
+                    .constructions
+                    .iter()
+                    .find(|row| row.name.0.eq_ignore_ascii_case(name))
+                    .map(|row| row.effective_layers().len())
+            });
+            if counts[0]
+                .zip(counts[1])
+                .is_some_and(|(left, right)| left != right)
+            {
+                assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
+                let selected =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+                assert!(selected.admissible, "{:?}", selected.violations);
+                continue;
+            }
+        }
         assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
         assert!(!trace(&value, PortingScope::A).admissible);
     }
@@ -764,6 +787,51 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
     let raw = parse_epjson_str(&nonpalindrome.to_string())
         .expect("same constructor is not automatically reversed");
     assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    // Input-definition algebra only: splitting the stated NoMass resistance
+    // gives a1vs2 normal stack candidate without computing U in admission.
+    let mut unequal = paired.clone();
+    unequal["Material:NoMass"]["HALF OPAQUE85"] = unequal["Material:NoMass"]["Opaque"].clone();
+    unequal["Material:NoMass"]["HALF OPAQUE85"]["thermal_resistance"] = json!(1.0);
+    unequal["Construction"]["UNEQUAL LEFT85"] = json!({"outside_layer":"Opaque"});
+    unequal["Construction"]["UNEQUAL RIGHT85"] =
+        json!({"outside_layer":"HALF OPAQUE85","layer_2":"HALF OPAQUE85"});
+    unequal["BuildingSurface:Detailed"]["Zulu:East"]["construction_name"] = json!("UNEQUAL LEFT85");
+    unequal["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
+        json!("UNEQUAL RIGHT85");
+    let raw = parse_epjson_str(&unequal.to_string()).expect("declared split resistance input");
+    let ip = crate::ordinary_input_processor::resolve_source_a(&raw)
+        .expect("unequal normal count structural admission");
+    let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+        .expect("unchanged raw Construction operands");
+    assert_eq!(
+        projected.objects["Construction"]
+            .iter()
+            .find(|row| row.object_name == "UNEQUAL RIGHT85")
+            .unwrap()
+            .fields["layer_2"],
+        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+            "HALF OPAQUE85".into()
+        )
+    );
+    let compiled = compile_raw_model(&raw);
+    let model = compiled
+        .model
+        .as_ref()
+        .expect("actual normal opaque Constructor IDs");
+    let counts = ["UNEQUAL LEFT85", "UNEQUAL RIGHT85"].map(|name| {
+        model
+            .constructions
+            .iter()
+            .find(|row| row.name.0.eq_ignore_ascii_case(name))
+            .unwrap()
+            .effective_layers()
+            .len()
+    });
+    assert_eq!(counts, [1, 2]);
+    let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
     let mut wrong_order = paired.clone();
     wrong_order["BuildingSurface:Detailed"]["Alpha:West"]["vertices"]
         .as_array_mut()
@@ -854,6 +922,15 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .count(),
         2
     );
+    let mut unequal_irt = irt_pair.clone();
+    unequal_irt["Construction"]["NORMAL TWO85"] =
+        json!({"outside_layer":"Opaque","layer_2":"Opaque"});
+    unequal_irt["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
+        json!("NORMAL TWO85");
+    let raw = parse_epjson_str(&unequal_irt.to_string())
+        .expect("new unequal IRT/normal slice must stay excluded");
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    assert!(!trace(&unequal_irt, PortingScope::A).admissible);
     let mut multilayer_irt = irt_pair.clone();
     multilayer_irt["Construction"]["IRT LINK"] =
         json!({"outside_layer":"WALL IRT", "layer_2":"Opaque", "layer_3":"WALL IRT"});

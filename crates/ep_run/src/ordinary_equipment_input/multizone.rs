@@ -202,7 +202,21 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
             return Err("paired IRT Construction must retain its sole Material layer".into());
         }
         if layers[0].len() != layers[1].len()
-            || !layers[0]
+            && layers.iter().any(|stack| {
+                infrared.is_some_and(|rows| {
+                    stack.iter().any(|material| {
+                        rows.keys()
+                            .any(|name| name.0.eq_ignore_ascii_case(material))
+                    })
+                })
+            })
+        {
+            return Err("unequal-count paired Walls require normal opaque materials".into());
+        }
+        // Count differences defer the numerical U check to the actual Source
+        // getter-owned array. Equal counts retain the established exact reverse.
+        if layers[0].len() == layers[1].len()
+            && !layers[0]
                 .iter()
                 .zip(layers[1].iter().rev())
                 .all(|(left, right)| left.eq_ignore_ascii_case(right))

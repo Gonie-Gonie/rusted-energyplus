@@ -53,13 +53,29 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                             .is_some_and(|(a, b)| {
                                 let left = a.effective_layers();
                                 let right = b.effective_layers();
+                                let relation = if left.len() == right.len() {
+                                    left.iter().eq(right.iter().rev())
+                                } else {
+                                    // Input classification only: never calculate or
+                                    // cache a thermal U value in this typed scope.
+                                    left.iter().chain(right).all(|id| {
+                                        model
+                                            .materials
+                                            .iter()
+                                            .find(|material| material.id == *id)
+                                            .is_some_and(|material| {
+                                                material.kind()
+                                                    != ep_model::MaterialKind::InfraredTransparent
+                                            })
+                                    })
+                                };
                                 a.is_ordinary_opaque()
                                     && b.is_ordinary_opaque()
                                     && !a.has_internal_heat_source()
                                     && !b.has_internal_heat_source()
                                     && (1..=10).contains(&left.len())
-                                    && left.len() == right.len()
-                                    && left.iter().eq(right.iter().rev())
+                                    && (1..=10).contains(&right.len())
+                                    && relation
                             })
                         && zone.zip(other_zone).is_some_and(|(a, b)| {
                             a.multiplier == b.multiplier && a.list_multiplier == b.list_multiplier
@@ -67,7 +83,7 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                         && reversed_coincident(&surface.vertices, &other.vertices)
                 });
         if !valid {
-            violations.push(format!("{} requires the bounded reciprocal Source A Wall pair with exactly reversed opaque Construction layers, equal Zone factors and reversed coincident World vertices", surface.name.0));
+            violations.push(format!("{} requires the bounded reciprocal Source A Wall pair with exactly reversed equal-count opaque layers or unequal normal-opaque counts checked against actual Source NominalU, equal Zone factors and reversed coincident World vertices", surface.name.0));
         }
     }
 }

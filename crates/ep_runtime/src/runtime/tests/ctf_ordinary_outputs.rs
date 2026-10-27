@@ -1039,6 +1039,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             let pair_owners=SurfaceGetterOwners { model:&stack_model,environment:owners.environment,
                 input:&mut stack_input,shortcut:&mut stack_shortcut,zones:&mut zones,control:&mut stack_control,globals:&globals };
             let mut pair=raw.clone();pair.moved_surfaces=2;pair.total_surfaces=2;pair.final_surfaces=Some(rows);
+            let nominal_checkpoint=pair.clone();
             let result=pair.reconcile_opaque_surface_boundaries(&pair_owners,&mut backend,None);
             if succeeds { result?; } else { assert!(result.is_err()); }
             let rows=pair.final_surfaces.as_ref().ok_or("retained actual stack reconciliation rows")?;
@@ -1046,6 +1047,35 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             assert_eq!(rows[1].row.exterior_boundary,if succeeds { 1 } else { -999 });
             assert_eq!(backend.state.tracking.total_warning_errors,before_warnings,
                 "mismatches remain an explicit boundary before unported Native diagnostics");
+            // Authored ACTUAL control.nominal_u checkpoints, not full Native
+            // inputs or getter-produced numerical observations. The surrounding
+            // real Constructor getter supplies all names/IDs/LayerPoints. These
+            // variants ensure the child reads this owner rather than deriving U
+            // from the unchanged typed materials or the nominal-R array.
+            let u_probes: Vec<(Option<Vec<f64>>,bool)> = if left.len()!=right.len() {
+                vec![
+                    (None,false),(Some(vec![]),false),(Some(vec![0.5]),false),
+                    (Some(vec![0.5,0.5]),true),(Some(vec![0.0,0.001]),true),
+                    (Some(vec![0.0,f64::from_bits(0.001_f64.to_bits()+1)]),false),
+                    (Some(vec![f64::NAN,0.5]),false),(Some(vec![0.5,f64::INFINITY]),false),
+                ]
+            } else if succeeds { vec![(None,true)] } else { Vec::new() };
+            for (nominal_u,expected) in u_probes {
+                let mut control=pair_owners.control.clone();control.nominal_u=nominal_u;
+                let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
+                let mut zones=pair_owners.zones.clone();
+                let probe_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                    input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:pair_owners.globals };
+                let mut probe=nominal_checkpoint.clone();
+                let before=backend.state.tracking.clone();
+                let result=probe.reconcile_opaque_surface_boundaries(&probe_owners,&mut backend,None);
+                if expected { result?; } else { assert!(result.is_err()); }
+                let rows=probe.final_surfaces.as_ref().ok_or("actual U-gate child prefix")?;
+                assert_eq!(rows[0].row.exterior_boundary,2);
+                assert_eq!(rows[1].row.exterior_boundary,if expected { 1 } else { -999 });
+                assert!(!probe.surface_error,"unsupported invalid-U branches are not fabricated Native Severe returns");
+                assert_eq!(backend.state.tracking,before,"accepted unequal counts emit no diagnostic");
+            }
         }
         assert!(raw.final_surfaces.as_ref().ok_or("actual pre-override Surface algorithm rows")?.iter()
             .all(|surface| surface.row.heat_transfer_algorithm == crate::heat_balance::selected_heat_balance_input::SelectedHeatTransferModel::Invalid));
