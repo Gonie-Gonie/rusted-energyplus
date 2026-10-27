@@ -414,7 +414,15 @@ fn resolve_raw(
                     )
                 }
                 "BuildingSurface:Detailed" => {
-                    selected(object, "surface_type", &["Wall", "Floor", "Roof"])
+                    // Preserve the authored alpha on the actual Source lane;
+                    // its real getter applies the Native CEILING-to-ROOF alias.
+                    // Unscoped legacy exterior consumers keep their old gate.
+                    let classes: &[&str] = if source_calendar_ingress {
+                        &["Wall", "Floor", "Roof", "Ceiling"]
+                    } else {
+                        &["Wall", "Floor", "Roof"]
+                    };
+                    selected(object, "surface_type", classes)
                         && selected(
                             object,
                             "outside_boundary_condition",

@@ -82,7 +82,7 @@ none
 | docs/src/conformance/support-coverage-report.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
 | docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
 | docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-10-20 |
-| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-10-27 |
+| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-10-28 |
 | docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-10-20 |
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-10-20 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
@@ -95,7 +95,7 @@ none
 | docs/src/generated/object-coverage.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/script-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/variable-coverage.md | generated | Generated References | present | none |  |  |  |
-| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-10-20 |
+| docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-10-28 |
 | docs/src/guides/release-process.md | guide | Guides | n/a | present | active | release | 2026-06-08 |
 | docs/src/guides/run-arbitrary-idf.md | guide | Guides | n/a | present | active | docs | 2026-10-20 |
 | docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-10-07 |

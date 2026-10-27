@@ -1547,6 +1547,9 @@ fn run_with_optional_porting_scope_impl(
                         .map_err(|error| {
                             RunError::new(RunExitCode::OutputExport, error.to_string())
                         })?;
+                        if let Some(snapshot) = source.geometry_snapshot.as_ref() {
+                            crate::geometry_trace::write_runtime_geometry(config, snapshot)?;
+                        }
                     }
                 }
                 timing.push(
@@ -3987,8 +3990,17 @@ fn execute_rust_runtime(
                         .map_err(|error| error.to_string())?;
                 ctf_outputs.complete_source_program(weather)?;
                 let reports = ctf_outputs.read_completed_source_reports()?;
+                let geometry_snapshot = capture_geometry
+                    .then(|| {
+                        crate::geometry_trace::runtime_projection_from_primary(
+                            &model.typed,
+                            ctf_outputs.reports(),
+                        )
+                    })
+                    .transpose()?;
                 return Ok(RuntimeExecutionOutcome::Source(Box::new(
                     SourceRuntimeResult {
+                        geometry_snapshot,
                         reports,
                         scope,
                         native_hour_scope,

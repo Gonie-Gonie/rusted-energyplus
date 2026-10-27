@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-10-20
+last_reviewed: 2026-10-28
 ---
 
 # Developer Workflow
@@ -49,6 +49,10 @@ Inspection and tracing do not establish numerical compatibility. Add
 schedule/weather/psychrometric events are needed. Compare the state fields
 required by the changed behavior. Use [Verify the port](verify-porting.md) for
 same-IDF Oracle/Rust reported-value comparisons.
+
+For Source A/B, `compiled-geometry.json` preserves raw and typed input;
+`geometry-consumers.json` records actual retained Source owners after completion.
+Link surfaces by typed ID. The Source observation contains its own owner fields.
 
 The optional SUR-02 isolated-history checker remains outside the default suite:
 

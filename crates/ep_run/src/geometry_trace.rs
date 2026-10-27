@@ -219,6 +219,28 @@ pub(crate) fn runtime_projection_with_source(
     Ok(artifact)
 }
 
+/// Copy only actual owners retained after the ordinary Source primary returns.
+/// The existing Source serializer is shared with the legacy-state observer.
+/// No legacy timestep, thermal state or GEO-02 snapshot is reconstructed.
+pub(crate) fn runtime_projection_from_primary(
+    model: &TypedModel,
+    reports: &ep_runtime::heat_balance::ctf_initialization_context::CtfInitializationReports,
+) -> Result<Value, String> {
+    let owners = reports
+        .ordinary_primary_surface_geometry(model)
+        .map_err(|error| error.to_string())?
+        .ok_or("completed Source primary has no entered geometry owner")?;
+    Ok(json!({
+        "schema":"geo01-source-runtime-consumers.v1",
+        "phase":"runtime_final_source_geometry",
+        "physics_executed":true, "observer_supplies_inputs":false,
+        "compiled_geometry_artifact":"compiled-geometry.json",
+        "field_origin":"actual retained Source owners after normal program completion and completed ESO/MTR read",
+        "ordinary_source_geometry":ordinary_source::projection(owners),
+        "claim_boundary":"stored-field output only; no legacy thermal state, timestep or geometry computation is reconstructed",
+    }))
+}
+
 pub(crate) fn write_compiled_geometry(
     config: &RunConfig,
     raw: &RawModel,

@@ -2,7 +2,7 @@
 use super::CtfInitializationReports;
 use crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation;
 use crate::heat_balance::selected_heat_balance_input::{
-    HeatBalanceInputError as Error, surface::SurfaceClass,
+    HeatBalanceInputError as Error, surface::SurfaceClass, zone::SelectedZoneInputOwners,
 };
 use crate::heat_balance::state::HeatBalanceState;
 use ep_model::{
@@ -14,9 +14,9 @@ use std::collections::BTreeMap;
 pub struct OrdinarySurfaceGeometry<'a> {
     /// Actual final Source Surface order, independently of physical typed IDs.
     pub surfaces: Vec<OrdinaryGeometrySurface<'a>>,
-    /// Actual same-owner Zone array, moved into the successful state.
+    /// Actual same-owner Zone array from the reached caller storage.
     pub zones: Vec<OrdinaryGeometryZone<'a>>,
-    /// Actual same-owner Space array, moved into the successful state.
+    /// Actual same-owner Space array from the reached caller storage.
     pub spaces: Vec<OrdinaryGeometrySpace<'a>>,
     /// Actual regular Construction order and retained getter names.
     pub constructions: Vec<OrdinaryGeometryConstruction<'a>>,
@@ -24,7 +24,7 @@ pub struct OrdinarySurfaceGeometry<'a> {
     pub materials: Vec<OrdinaryGeometryMaterial<'a>>,
     /// Actual getter-owned uppercase name-to-Source-number map.
     pub material_map: &'a BTreeMap<String, i32>,
-    /// Same Solar owner moved into State; None remains unavailable storage.
+    /// Same actual Solar owner; None remains unavailable storage.
     pub solar: Option<&'a OrdinarySolarRadiation>,
     /// Actual four Construction-indexed nominal arrays; None is unallocated.
     pub nominal_r_for_u: Option<&'a [f64]>,
@@ -334,6 +334,40 @@ impl CtfInitializationReports {
         state: &'a HeatBalanceState,
         model: &'a TypedModel,
     ) -> Result<Option<OrdinarySurfaceGeometry<'a>>, Error> {
+        self.ordinary_surface_geometry_with_owners(
+            model,
+            state.selected_zone_input.as_ref(),
+            state.ordinary_solar_radiation.as_ref(),
+            "same moved Source Zone/Space owner",
+        )
+    }
+
+    /// Borrow final owners retained by the actual ordinary Source primary.
+    /// This observes reports after normal program completion; it constructs no
+    /// legacy heat-balance state and invokes no scientific getter or kernel.
+    ///
+    /// # Errors
+    /// Returns the existing unavailable error for missing retained owners,
+    /// unwritten fields, incomplete arrays or unresolved physical associations.
+    pub fn ordinary_primary_surface_geometry<'a>(
+        &'a self,
+        model: &'a TypedModel,
+    ) -> Result<Option<OrdinarySurfaceGeometry<'a>>, Error> {
+        self.ordinary_surface_geometry_with_owners(
+            model,
+            self.selected_zone_input.as_ref(),
+            self.ordinary_solar_radiation.as_ref(),
+            "actual retained primary Source Zone/Space owner",
+        )
+    }
+
+    fn ordinary_surface_geometry_with_owners<'a>(
+        &'a self,
+        model: &'a TypedModel,
+        zone_owner: Option<&'a SelectedZoneInputOwners>,
+        solar: Option<&'a OrdinarySolarRadiation>,
+        missing_zone_owner: &'static str,
+    ) -> Result<Option<OrdinarySurfaceGeometry<'a>>, Error> {
         let source = &self.surface_geometry_input;
         if !source.entered_once {
             return Ok(None);
@@ -346,10 +380,7 @@ impl CtfInitializationReports {
             .parallel_arrays
             .as_ref()
             .ok_or(Error::Unavailable("actual Source parallel arrays"))?;
-        let owner = state
-            .selected_zone_input
-            .as_ref()
-            .ok_or(Error::Unavailable("same moved Source Zone/Space owner"))?;
+        let owner = zone_owner.ok_or(Error::Unavailable(missing_zone_owner))?;
         let zone_rows = owner
             .zones
             .as_deref()
@@ -631,7 +662,7 @@ impl CtfInitializationReports {
             constructions,
             materials,
             material_map: &material_owner.material_map,
-            solar: state.ordinary_solar_radiation.as_ref(),
+            solar,
             nominal_r_for_u: control.nominal_r_for_u.as_deref(),
             nominal_u: control.nominal_u.as_deref(),
             nominal_u_before_adjusted: control.nominal_u_before_adjusted.as_deref(),

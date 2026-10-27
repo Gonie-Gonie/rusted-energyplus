@@ -1,6 +1,6 @@
 {
   "schema": "object-input-domain-verification.v1",
-  "reviewed_on": "2026-10-27",
+  "reviewed_on": "2026-10-28",
   "corpus": {
     "input_files": 188,
     "idf_files": 176,
@@ -71,7 +71,9 @@
       "larger polygons, geometry repair and other real physics guards retained; all GlobalGeometryRules corners/directions and actual relative Zone/Building transforms now feed canonical world geometry",
       "Ground -1 identity reaches actual getter, final surface mapping, CTF initialization/current-month outside history and nominal-U reporting with zero exterior film",
       "real once-only missing Ground-temperature diagnostics and distinct Zone ground-area totals retain constructor/effect order; Ground SunExposed warns and clears actual solar exposure while independent Wind selection remains",
-      "same-input Ground floor uses all original58 streams and additional exact96 outside-face temperature checks at18C, with all twelve monthly EIO values and zero diagnostics"
+      "same-input Ground floor uses all original58 streams and additional exact96 outside-face temperature checks at18C, with all twelve monthly EIO values and zero diagnostics",
+      "Source-specific raw ingress accepts all four schema class choices Wall/Floor/Roof/Ceiling; raw and typed Ceiling provenance survives until the genuine getter aliases it to retained Roof class3. The unscoped legacy three-class guard and every other geometry/physics boundary remain.",
+      "Two full-profile same-input Ceiling models retain all original A55-variable/3-meter and B102-variable/no-meter policies. The connected current-primary observer reads actual retained Zone/Space/Surface owners after normal completion and own-file read, observing typedID5 to final class3 without synthesizing legacy state/timestep fields. Whole EIO bodies agree after only the first identity record; A ordered DXF records agree except one Program Version payload and EOL encoding, with Default Roof color15 distinct from class3. Native private class is not instrumented."
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -1615,6 +1617,176 @@
         },
         "new_test_functions": 0,
         "scope": "Actual fmt and strict all-target Clippy for ep_run/ep_compiler/ep_runtime; only existing focused test bodies run. No new full-runtime/workspace suite, optional cohort or heavy replay."
+      },
+      "ceiling_primary_geometry_76_77": {
+        "stage76": {
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit76-prep/ceiling-quality01/receipt.json",
+            "sha256": "40e65f6f3d773513adef4b673cc48ffc22a33a4af7c01e724eedc9be45a489a9",
+            "bytes": 3267
+          },
+          "commands": [
+            {
+              "name": "fmt",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "fmt",
+                "-p",
+                "ep_run",
+                "-p",
+                "ep_runtime"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit76-prep/ceiling-quality01/fmt.log",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "bytes": 0
+              }
+            },
+            {
+              "name": "clippy",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "clippy",
+                "-p",
+                "ep_run",
+                "-p",
+                "ep_runtime",
+                "--all-targets",
+                "--locked",
+                "--offline",
+                "--",
+                "-D",
+                "warnings"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit76-prep/ceiling-quality01/clippy.log",
+                "sha256": "3390b8407c383560c9a8aa43d407bd545b3fbb36d22c6f5b29dd59d0d7c4f0e7",
+                "bytes": 588
+              }
+            },
+            {
+              "name": "scope-tests",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_run",
+                "--lib",
+                "porting_scope::tests::",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit76-prep/ceiling-quality01/scope-tests.log",
+                "sha256": "ec1541a9c9bab037cafff6bd32af2eac88e85e4139be93fa3cd67a969b6e7f0d",
+                "bytes": 2746
+              }
+            },
+            {
+              "name": "ingress-tests",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_run",
+                "--lib",
+                "ordinary_equipment_input::tests::",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit76-prep/ceiling-quality01/ingress-tests.log",
+                "sha256": "b7a2177796cb7b28fb3b505811621f0a6b5150e765bc1115e5ca9214716ac009",
+                "bytes": 1089
+              }
+            }
+          ],
+          "focused_tests": {
+            "porting_scope": 19,
+            "ordinary_ingress": 1,
+            "total_passed": 20,
+            "failed": 0
+          }
+        },
+        "stage77": {
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit77-prep/observer-quality01/receipt.json",
+            "sha256": "9ec12b835f87cf1a0949db00e191784de46d97faf743f0b88aa88d4b80a74336",
+            "bytes": 3314
+          },
+          "commands": [
+            {
+              "name": "fmt",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "fmt",
+                "-p",
+                "ep_run",
+                "-p",
+                "ep_runtime"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit77-prep/observer-quality01/fmt.log",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "bytes": 0
+              }
+            },
+            {
+              "name": "clippy",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "clippy",
+                "-p",
+                "ep_run",
+                "-p",
+                "ep_runtime",
+                "--all-targets",
+                "--locked",
+                "--offline",
+                "--",
+                "-D",
+                "warnings"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit77-prep/observer-quality01/clippy.log",
+                "sha256": "df5a30a26868bd990aaca9f14c6c00e8b28599a2a93b0818d5f00f84e7134a69",
+                "bytes": 588
+              }
+            },
+            {
+              "name": "scope-tests",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_run",
+                "--lib",
+                "porting_scope::tests::",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit77-prep/observer-quality01/scope-tests.log",
+                "sha256": "e2d0a1198ff12df39f5328bfe1d36a02b80d50af4215f9f1c3ba8b4f77201f52",
+                "bytes": 2746
+              }
+            }
+          ],
+          "focused_tests": {
+            "porting_scope": 19,
+            "total_passed": 19,
+            "failed": 0
+          }
+        },
+        "new_test_functions": 0,
+        "scope": "Stage76 actual fmt/strict all-target Clippy for ep_run+ep_runtime and existing19scope+1ingress tests precede observer repair. Stage77 final actual fmt/strict all-target Clippy for the same2crates and existing19scope tests pass. The unnecessary legacy Solar predicate extension was removed to exact75 bytes; no current-primary use of the legacy factory is claimed. No full-runtime/workspace/optional-cohort rerun."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -1624,7 +1796,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration. The two Source77 Ceiling-alias models retain every original A55-variable/3-meter and B102-variable/no-meter policy without selector or numerical changes. Actual raw/typed Ceiling links by exact typedID to retained Source Roof class3. Complete EIO body bytes exclude only the first Program Version record; all334 A DXF logical records exclude only one Program Version999 payload and line-ending encoding. Native private class is not observed. Earlier Source76A engine0 was unaccepted solely for a missing current-primary observer artifact; B76 was never launched and no76 samples enter accepted totals.",
     "cases": [
       {
         "id": "timestep-8",
@@ -29880,12 +30052,417 @@
           "genuine_Native_MTR_present": false
         },
         "effective_state": "Actual N6 getter multiplier2/list1 reaches the one-Zone implicit-Space B owners. Existing multiplier-aware intensive/extensive consumers complete all original reported series under unchanged policies and exact Zone EIO/ERR-END0/0. Finite pairs do not establish every integer/model combination, grouping, authored Space or other guarded physics."
+      },
+      {
+        "id": "CEILING-ALIAS-A-24H",
+        "group": "surface_ceiling",
+        "source_build": "ceiling-primary-geometry-77",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit76-prep/ceiling-proposal/A-24H/input.idf",
+          "sha256": "95a87c058ad8095c43a8e435b9338c32f5769267633bf8a403d37de6fb345df8",
+          "bytes": 9278
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/ceiling-76/native-01/A-24H/command/receipt.json",
+          "sha256": "8d98a1d832debe4c11270cdaf8aa5fcf65501d5d25208be1b604d903dbbb987a",
+          "bytes": 8377
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/ceiling-77/source-01/A-24H/command/receipt.json",
+          "sha256": "f5ae3667561ac6e5ce48af8f80a533f014933ea671995beb49085d7796ddeaeb",
+          "bytes": 7355
+        },
+        "source_summary": {
+          "path": ".runtime/porting/ceiling-77/source-01/A-24H/output/run-summary.json",
+          "sha256": "3fbabbb054ff1ad56533ad408bee945a429ad9f0a2944057fd8b5d19201399da",
+          "bytes": 32125
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-77/eplus-rs.exe",
+          "sha256": "866d2abc59cfe4ab75b26cff24fd6bf874deecba1f372dafd33eaf955e01cb0f",
+          "bytes": 77877413
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/a5/a58aaebebf789e1cce368dd02f6d8f567ee51e9a3578e637e7f68c900b5ff0f7",
+          "sha256": "a58aaebebf789e1cce368dd02f6d8f567ee51e9a3578e637e7f68c900b5ff0f7"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-77/receipt.json",
+          "sha256": "a9bf4362dfe760d7cd3f55868ba59b8e1d8f7ee179d7d5b349e3867eab792f6d",
+          "bytes": 4828
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/ceiling-77/source-01/A-24H/comparison.json",
+          "sha256": "eec5e3b83add61750e82fc0e4d3fe962784c7a57614518cc1a6d89877225d412",
+          "bytes": 112669
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit77-prep/ceiling-source-proposal/plan.json",
+          "sha256": "0b1060760583ea78f97d931e5f5c4d07f14164fd4cfb5cbc321c91219e88503a",
+          "bytes": 57340
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit76-prep/ceiling-proposal/A-24H/recipe.json",
+          "sha256": "57d8f79678fec1f73aea4a4f488b07249825b4008ee93bc966e74821d3dc7d98",
+          "bytes": 7367
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All55 original named Timestep variables, exact physical dictionaries/IDs, one environment,96ordered clocks, finite values and catalog/count/footer/EOF.",
+          "MTR": "Original3Hourly series/72values, exact9dictionary rows/24clocks and owner/count/footer/EOF.",
+          "original_full_reported_profile_rows": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "A",
+          "all_original_variable_and_meter_policy_rows": true,
+          "derived_policy_rows": 0,
+          "numerical_limits_changed": false,
+          "qualification": "Only the target BuildingSurface:Detailed surface_type token changes Roof->Ceiling. All original named selectors/atol/rtol/RMSE and96physical zone steps at4/hour remain unchanged; not a frozen input identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 7.429434845107608e-11,
+          "max_rmse_delta": 2.6337275432178338e-11,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 61,
+              "exact_timestamp_rows": 96,
+              "numeric_records": 5280,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a"
+            },
+            {
+              "stream": "mtr",
+              "exact_dictionary_entries": 9,
+              "exact_timestamp_rows": 24,
+              "numeric_records": 72,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "e69f8686f1acb7c4c588be644985f7dde61425dc0c5bb477127b891fb1cd1a5c"
+            }
+          ]
+        },
+        "effective_state": "Actual Source-only four-class ingress preserves raw/typed Ceiling and reaches the genuine getter's Roof alias, retained Zone/implicit-Space/surface/construction owners and ordinary A/B lifecycle. All original full-profile reported streams and policies pass; same-input evidence is finite and does not establish arbitrary legal surface/object combinations.",
+        "ceiling_observation": {
+          "raw_surface_name": "Zn001:Roof001",
+          "raw_surface_type": "Ceiling",
+          "typed_class": "Ceiling",
+          "typed_id": 5,
+          "final_Source_class": 3,
+          "final_Source_typed_id": 5,
+          "final_Source_zone_id": 1,
+          "final_Source_space_id": 1,
+          "final_Source_construction_id": 3,
+          "compiled_geometry": {
+            "path": ".runtime/porting/ceiling-77/source-01/A-24H/output/compiled-geometry.json",
+            "sha256": "ebc21af56cbeb5b410f65cdb1751f4937c814d5ee009a8c8a60f1d691a41912b",
+            "bytes": 21264
+          },
+          "geometry_consumers": {
+            "path": ".runtime/porting/ceiling-77/source-01/A-24H/output/geometry-consumers.json",
+            "sha256": "ef70daa74a56858bb0c4533bbe37c64dd388a65ada5d39422adb747821d00830",
+            "bytes": 31794
+          },
+          "runtime_schema": "geo01-source-runtime-consumers.v1",
+          "runtime_phase": "runtime_final_source_geometry",
+          "unavailable_legacy_fields_absent": true,
+          "Source_completion": {
+            "end": {
+              "path": ".runtime/porting/ceiling-77/source-01/A-24H/output/eplusrs.end",
+              "sha256": "5041f7081f43368b9bce2d8d2b1e2d44cec2aa41023a1c904e7edcf0ffde7e15",
+              "bytes": 98
+            },
+            "err": {
+              "path": ".runtime/porting/ceiling-77/source-01/A-24H/output/eplusrs.err",
+              "sha256": "927f2c579737faffb6aab730d1e751f975562df031b21e521ecbc2f6e64522a7",
+              "bytes": 892
+            },
+            "final_warnings": 0,
+            "severe_or_fatal": false,
+            "warning_and_continue_records_hex": []
+          },
+          "Source_full_EIO": {
+            "path": ".runtime/porting/ceiling-77/source-01/A-24H/output/eplusrs.eio",
+            "sha256": "bfacac1b81654ff96eaea3deb3c505febf607abecf74acbef36724ec7a255b94",
+            "bytes": 15340
+          },
+          "full_EIO_records": 115,
+          "full_EIO_body_sha256": "34d31a44b4369989835de90cfd33020d4e97cbd8688f383546615388571b95f0",
+          "EIO_comparison": "All CRLF body bytes exact after excluding only the first Program Version record; no Surface Details class row is requested.",
+          "DXF": {
+            "artifact": {
+              "path": ".runtime/porting/ceiling-77/source-01/A-24H/output/eplusrs.dxf",
+              "sha256": "ad463f2e8fa5e87affe71ef56d0bc6dd9c3061f61f7f20694afe48b97e32cc85",
+              "bytes": 5392
+            },
+            "logical_lines": 668,
+            "ordered_code_value_pairs": 334,
+            "Program_Version_pair": [
+              "999",
+              "Program Version,rusted-energyplus 0.1.0"
+            ],
+            "line_ending": "LF",
+            "all_other_pairs_sha256": "c23bc83965b2458cfb0b4b37d81ac5bfcbaa191f514ba958eead93e887be657b",
+            "target_entity_sha256": "492fcf2236ba665052c3d72d7007959e2d9eb433795a5de10dbcf9aea9584ccb",
+            "target_default_Roof_color": 15,
+            "target_vertices": 4,
+            "qualification": "Compare all other ordered code/value records exactly. Only the sole 999 Program Version payload and EOL encoding are excluded; whole wire bytes are not claimed equal. Public DXF color is not a private Native class snapshot."
+          },
+          "DXF_comparison": "A: all334 ordered logical code/value pairs exact except the single Program Version999 payload and LF/CRLF encoding; Default Roof color15 is distinct from class3. B: genuine physical absence on both sides.",
+          "Native_raw_readback": {
+            "path": ".runtime/porting/ceiling-76/native-01/readback.json",
+            "sha256": "9f26103ecdce71c7b84be09e5af2a8b6137ee647d4ebab6d9175dff606e4dae9",
+            "bytes": 10545
+          },
+          "Native_private_class_observed": false,
+          "Native_private_MTR_counter_observed": false,
+          "Source_MTR_owner": {
+            "deleted_empty": false,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ceiling-77\\source-01\\A-24H\\output\\eplusrs.mtr",
+            "reported_numeric_records": 72,
+            "series": 3,
+            "series_samples": [
+              {
+                "frequency": "hourly",
+                "key": null,
+                "kind": "meter",
+                "name": "ExteriorLights:Electricity",
+                "report_id": 25,
+                "samples": 24,
+                "store_type": "sum",
+                "units": "J"
+              },
+              {
+                "frequency": "hourly",
+                "key": null,
+                "kind": "meter",
+                "name": "EnergyTransfer:Building",
+                "report_id": 112,
+                "samples": 24,
+                "store_type": "sum",
+                "units": "J"
+              },
+              {
+                "frequency": "hourly",
+                "key": null,
+                "kind": "meter",
+                "name": "EnergyTransfer:Facility",
+                "report_id": 100,
+                "samples": 24,
+                "store_type": "sum",
+                "units": "J"
+              }
+            ],
+            "stream": "mtr"
+          },
+          "Source_MTR_present": true,
+          "genuine_Native_MTR_present": true,
+          "qualification": "Current-primary observer copies real retained Source owners only after normal completion and completed-stream read. No legacy factory execution, synthetic HeatBalanceState/timestep/GEO-02/internal-gains projection or Native private class is claimed."
+        }
+      },
+      {
+        "id": "CEILING-ALIAS-B-NOLIMIT-24H",
+        "group": "surface_ceiling",
+        "source_build": "ceiling-primary-geometry-77",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit76-prep/ceiling-proposal/B-NOLIMIT-24H/input.idf",
+          "sha256": "b3afb58c0092d188c8320bf70f3576d9dfd834e38436514437e0c6e214a87b62",
+          "bytes": 13028
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/ceiling-76/native-01/B-NOLIMIT-24H/command/receipt.json",
+          "sha256": "8d5b6a6bb309efa549b37e63aff5a784334eea66f4bb0e844250407f308848c8",
+          "bytes": 8492
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/command/receipt.json",
+          "sha256": "79caee57c222d7ed0e34fbd8cb17e09337d96686899b666f204f53205ad39ad6",
+          "bytes": 7469
+        },
+        "source_summary": {
+          "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/output/run-summary.json",
+          "sha256": "7bf978dbfa32770fd4a2e407a5952facf87d1b484ee6ffd726796583902ceedc",
+          "bytes": 60741
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-77/eplus-rs.exe",
+          "sha256": "866d2abc59cfe4ab75b26cff24fd6bf874deecba1f372dafd33eaf955e01cb0f",
+          "bytes": 77877413
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/a5/a58aaebebf789e1cce368dd02f6d8f567ee51e9a3578e637e7f68c900b5ff0f7",
+          "sha256": "a58aaebebf789e1cce368dd02f6d8f567ee51e9a3578e637e7f68c900b5ff0f7"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-77/receipt.json",
+          "sha256": "a9bf4362dfe760d7cd3f55868ba59b8e1d8f7ee179d7d5b349e3867eab792f6d",
+          "bytes": 4828
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/comparison.json",
+          "sha256": "37c15edeba4e563f41eaff01bcdc9a94091729921fc83f955e92d4f82888b93a",
+          "bytes": 167260
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit77-prep/ceiling-source-proposal/plan.json",
+          "sha256": "0b1060760583ea78f97d931e5f5c4d07f14164fd4cfb5cbc321c91219e88503a",
+          "bytes": 57340
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit76-prep/ceiling-proposal/B-NOLIMIT-24H/recipe.json",
+          "sha256": "35321c59ff7ce36756eaf2a46ff183d2894360807bad1a26d5fffe9ebfe55c7c",
+          "bytes": 7413
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All102 original named Timestep variables, exact physical dictionaries/IDs, one environment,96ordered clocks, finite values and catalog/count/footer/EOF.",
+          "MTR": "Genuine completed Native MTR absence and actual Source deleted_empty=true/0records/0series/[]; no file or rows fabricated.",
+          "original_full_reported_profile_rows": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "B",
+          "all_original_variable_and_meter_policy_rows": true,
+          "derived_policy_rows": 0,
+          "numerical_limits_changed": false,
+          "qualification": "Only the target BuildingSurface:Detailed surface_type token changes Roof->Ceiling. All original named selectors/atol/rtol/RMSE and96physical zone steps at4/hour remain unchanged; not a frozen input identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 0.0,
+          "max_rmse_delta": 0.0,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 108,
+              "exact_timestamp_rows": 96,
+              "numeric_records": 9792,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a"
+            },
+            {
+              "stream": "mtr",
+              "deleted_empty": true,
+              "numeric_records": 0
+            }
+          ]
+        },
+        "effective_state": "Actual Source-only four-class ingress preserves raw/typed Ceiling and reaches the genuine getter's Roof alias, retained Zone/implicit-Space/surface/construction owners and ordinary A/B lifecycle. All original full-profile reported streams and policies pass; same-input evidence is finite and does not establish arbitrary legal surface/object combinations.",
+        "ceiling_observation": {
+          "raw_surface_name": "ROOF",
+          "raw_surface_type": "Ceiling",
+          "typed_class": "Ceiling",
+          "typed_id": 5,
+          "final_Source_class": 3,
+          "final_Source_typed_id": 5,
+          "final_Source_zone_id": 1,
+          "final_Source_space_id": 1,
+          "final_Source_construction_id": 1,
+          "compiled_geometry": {
+            "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/output/compiled-geometry.json",
+            "sha256": "618a18660976c8a88e0989ccf66ba67226c6a37778ffec1938642919b17b8dd8",
+            "bytes": 20752
+          },
+          "geometry_consumers": {
+            "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/output/geometry-consumers.json",
+            "sha256": "40122301b40bef95856e341530c651875415627e9548428a4ad6c0099bc93b45",
+            "bytes": 28076
+          },
+          "runtime_schema": "geo01-source-runtime-consumers.v1",
+          "runtime_phase": "runtime_final_source_geometry",
+          "unavailable_legacy_fields_absent": true,
+          "Source_completion": {
+            "end": {
+              "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/output/eplusrs.end",
+              "sha256": "daaa2cb721d4d7489ee01c827f30bc9a7cb805fc6c5dbb4520967956db41f912",
+              "bytes": 98
+            },
+            "err": {
+              "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/output/eplusrs.err",
+              "sha256": "22466582485c73a05cf667c5159a223e80959c648842364fcf81a290778c112b",
+              "bytes": 892
+            },
+            "final_warnings": 0,
+            "severe_or_fatal": false,
+            "warning_and_continue_records_hex": []
+          },
+          "Source_full_EIO": {
+            "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/output/eplusrs.eio",
+            "sha256": "6d283484ff6ec9f699710dd39ab33d490d80900a42fd0c197cd26d0d07beb980",
+            "bytes": 12652
+          },
+          "full_EIO_records": 91,
+          "full_EIO_body_sha256": "bad0c443f8352e7458af89675692233955f6ff60c532d5538d49d1593a39527c",
+          "EIO_comparison": "All CRLF body bytes exact after excluding only the first Program Version record; no Surface Details class row is requested.",
+          "DXF": null,
+          "DXF_comparison": "A: all334 ordered logical code/value pairs exact except the single Program Version999 payload and LF/CRLF encoding; Default Roof color15 is distinct from class3. B: genuine physical absence on both sides.",
+          "Native_raw_readback": {
+            "path": ".runtime/porting/ceiling-76/native-01/readback.json",
+            "sha256": "9f26103ecdce71c7b84be09e5af2a8b6137ee647d4ebab6d9175dff606e4dae9",
+            "bytes": 10545
+          },
+          "Native_private_class_observed": false,
+          "Native_private_MTR_counter_observed": false,
+          "Source_MTR_owner": {
+            "deleted_empty": true,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\ceiling-77\\source-01\\B-NOLIMIT-24H\\output\\eplusrs.mtr",
+            "reported_numeric_records": 0,
+            "series": 0,
+            "series_samples": [],
+            "stream": "mtr"
+          },
+          "Source_MTR_present": false,
+          "genuine_Native_MTR_present": false,
+          "qualification": "Current-primary observer copies real retained Source owners only after normal completion and completed-stream read. No legacy factory execution, synthetic HeatBalanceState/timestep/GEO-02/internal-gains projection or Native private class is claimed."
+        }
       }
     ],
     "totals": {
-      "paired_cases": 124,
-      "reported_samples": 3475926,
-      "raw_operand_unequal": 713999,
+      "paired_cases": 126,
+      "reported_samples": 3491070,
+      "raw_operand_unequal": 717535,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -31114,6 +31691,40 @@
           "sha256": "5e39a8786a11965fc2da862fd7206f84a7130f62d46ac6246d933bbd35337b33",
           "bytes": 77867845
         }
+      },
+      {
+        "id": "ceiling-76",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-76/receipt.json",
+          "sha256": "cbc791d0e35e7d586c3b6977d0e91ec4d6dce17f296a738d322a8eb0b8862100",
+          "bytes": 4521
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3e/3e3e7bb6cb8dae10d7e25381a4de4c0196a9d541dbdbe47aa497ed07072c9aad",
+          "sha256": "3e3e7bb6cb8dae10d7e25381a4de4c0196a9d541dbdbe47aa497ed07072c9aad"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-76/eplus-rs.exe",
+          "sha256": "9cdbf619a0bf788ea778a65be26c365e78e18fd54289a5b9e09941563181276e",
+          "bytes": 77866193
+        }
+      },
+      {
+        "id": "ceiling-primary-geometry-77",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-77/receipt.json",
+          "sha256": "a9bf4362dfe760d7cd3f55868ba59b8e1d8f7ee179d7d5b349e3867eab792f6d",
+          "bytes": 4828
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/a5/a58aaebebf789e1cce368dd02f6d8f567ee51e9a3578e637e7f68c900b5ff0f7",
+          "sha256": "a58aaebebf789e1cce368dd02f6d8f567ee51e9a3578e637e7f68c900b5ff0f7"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-77/eplus-rs.exe",
+          "sha256": "866d2abc59cfe4ab75b26cff24fd6bf874deecba1f372dafd33eaf955e01cb0f",
+          "bytes": 77877413
+        }
       }
     ],
     "focused_since_workspace": {
@@ -31145,10 +31756,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 72,
-      "builds_with_accepted_paired_cases": 71,
+      "actual_recorded_builds": 74,
+      "builds_with_accepted_paired_cases": 72,
       "builds_with_only_retained_failed_Source_attempts": 1,
-      "failed_attempts_in_paired_case_or_sample_totals": 0
+      "failed_attempts_in_paired_case_or_sample_totals": 0,
+      "builds_with_only_retained_unaccepted_observer_attempts": 1,
+      "builds_with_only_unaccepted_Source_attempts": 2,
+      "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
+      "qualification": "74 actual recorded builds partition into72 with accepted pairs,1 retained engine-failed-only build68(exit6), and1 retained observer-unaccepted-only build76(engine0). The two unaccepted-only builds contribute no accepted cases or samples."
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",
@@ -31330,6 +31945,173 @@
       ],
       "list_multiplier": 1,
       "scope": "One actual Zone/implicit Space and existing A/B physics. Defined signed-int range is not a schema maximum. Two full-profile multiplier2 pairs plus separate1/2/i32MAX owner checks do not establish arbitrary combinations or Group/List/Space execution."
+    },
+    "retained_unaccepted_Source_observer_attempts": [
+      {
+        "unit": 76,
+        "scope": "A",
+        "source_build": "ceiling-76",
+        "build_row": {
+          "path": ".runtime/object-expansion/build76-row.json",
+          "sha256": "b6be15530c6f183d230103b4ac8f484c8b8edf21c0d420e628e18309475f2a23",
+          "bytes": 659
+        },
+        "summary": {
+          "path": ".runtime/porting/ceiling-76/source-01/summary.json",
+          "sha256": "cb46cd0e25411a0cf81f2eb01291d4812b1dd53833e119bcb5ebe36ec4695ece",
+          "bytes": 1471
+        },
+        "comparison": {
+          "path": ".runtime/porting/ceiling-76/source-01/A-24H/comparison.json",
+          "sha256": "57a73205ee2efe35f6d58bbf7a4b00ce175e2e86397efe1ea298749eaae7aeec",
+          "bytes": 2090
+        },
+        "actual_Source_receipt": {
+          "path": ".runtime/porting/ceiling-76/source-01/A-24H/command/receipt.json",
+          "sha256": "4128a2fa5ad902d8a1322311323e38af0b9ed4c4bc38d1a12f7af0fad6883d17",
+          "bytes": 7047
+        },
+        "source_summary": {
+          "path": ".runtime/porting/ceiling-76/source-01/A-24H/output/run-summary.json",
+          "sha256": "776d2617d1d378051616eadba7cefa67dd87437b19dac3ec15b21a0259ee850d",
+          "bytes": 32125
+        },
+        "sealed_validation_plan": {
+          "path": ".runtime/object-expansion/unit76-prep/ceiling-source-proposal/plan.json",
+          "sha256": "14ee01632dd60faa6263dbc8758b52fe90072cb95b6eda14e65b8c0a2dc9677f",
+          "bytes": 52729
+        },
+        "actual_Source_executions": 1,
+        "Source_A_executions": 1,
+        "Source_B_executions": 0,
+        "engine_exit_code": 0,
+        "normal_engine_completion": true,
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "missing_runtime_trace_path": ".runtime/porting/ceiling-76/source-01/A-24H/output/geometry-consumers.json",
+        "unlaunched_B_directory": ".runtime/porting/ceiling-76/source-01/B-NOLIMIT-24H",
+        "immutable_artifact_refs": [
+          {
+            "path": ".runtime/object-expansion/unit76-prep/ceiling-source-proposal/proposal.json",
+            "sha256": "3ae33de83aa8eb5a691582f7193e22b24699bb18486613b13eb4d67c45bada0d",
+            "bytes": 955
+          },
+          {
+            "path": ".runtime/object-expansion/unit76-prep/ceiling-source-proposal/plan.json",
+            "sha256": "14ee01632dd60faa6263dbc8758b52fe90072cb95b6eda14e65b8c0a2dc9677f",
+            "bytes": 52729
+          },
+          {
+            "path": ".runtime/object-expansion/unit76-prep/ceiling-source-proposal/run_source_ceiling.py",
+            "sha256": "6646a7b5bb2573e39deda6eeb185bb682adf252558ca7bf5dbb7d3e2bded3e1e",
+            "bytes": 36698
+          },
+          {
+            "path": ".runtime/porting/ceiling-76/source-01/summary.json",
+            "sha256": "cb46cd0e25411a0cf81f2eb01291d4812b1dd53833e119bcb5ebe36ec4695ece",
+            "bytes": 1471
+          },
+          {
+            "path": ".runtime/porting/ceiling-76/source-01/A-24H/comparison.json",
+            "sha256": "57a73205ee2efe35f6d58bbf7a4b00ce175e2e86397efe1ea298749eaae7aeec",
+            "bytes": 2090
+          },
+          {
+            "path": ".runtime/porting/ceiling-76/source-01/A-24H/command/receipt.json",
+            "sha256": "4128a2fa5ad902d8a1322311323e38af0b9ed4c4bc38d1a12f7af0fad6883d17",
+            "bytes": 7047
+          },
+          {
+            "path": ".runtime/porting/ceiling-76/source-01/A-24H/source-launch.json",
+            "sha256": "3901d67349409b16ec96e917a0e2f31418ac24a1a6b4a1f9e7150d066733f1f6",
+            "bytes": 3193
+          },
+          {
+            "path": ".runtime/porting/object-domain-20261020/build-76/eplus-rs.exe",
+            "sha256": "9cdbf619a0bf788ea778a65be26c365e78e18fd54289a5b9e09941563181276e",
+            "bytes": 77866193
+          },
+          {
+            "path": ".runtime/porting/object-domain-20261020/build-76/receipt.json",
+            "sha256": "cbc791d0e35e7d586c3b6977d0e91ec4d6dce17f296a738d322a8eb0b8862100",
+            "bytes": 4521
+          },
+          {
+            "path": ".runtime/porting/source-objects/3e/3e3e7bb6cb8dae10d7e25381a4de4c0196a9d541dbdbe47aa497ed07072c9aad",
+            "sha256": "3e3e7bb6cb8dae10d7e25381a4de4c0196a9d541dbdbe47aa497ed07072c9aad"
+          },
+          {
+            "path": ".runtime/porting/ceiling-76/source-01/A-24H/output/run-summary.json",
+            "sha256": "776d2617d1d378051616eadba7cefa67dd87437b19dac3ec15b21a0259ee850d",
+            "bytes": 32125
+          },
+          {
+            "path": ".runtime/porting/ceiling-76/source-01/A-24H/output/compiled-geometry.json",
+            "sha256": "0a8e74874dc0921c45635db5deff0fad313c532e36f7debab368f5d0cb23f44a",
+            "bytes": 21264
+          }
+        ],
+        "classification": "Unaccepted observer/trace availability, not engine or physics failure. A completed engine0 and was rejected for the absent current-primary geometry-consumers.json; B was never launched. Changed code/build77 is separately recorded; old76 artifacts and actors are not replayed."
+      }
+    ],
+    "current_Ceiling_alias_live_pair": {
+      "source_build": "ceiling-primary-geometry-77",
+      "case_rows": [
+        "CEILING-ALIAS-A-24H",
+        "CEILING-ALIAS-B-NOLIMIT-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/ceiling-77/source-01/summary.json",
+        "sha256": "66b22d019b639e64a986d247924b91427715c6fccd25957c973d459e34ee22f0",
+        "bytes": 1797
+      },
+      "comparisons": [
+        {
+          "path": ".runtime/porting/ceiling-77/source-01/A-24H/comparison.json",
+          "sha256": "eec5e3b83add61750e82fc0e4d3fe962784c7a57614518cc1a6d89877225d412",
+          "bytes": 112669
+        },
+        {
+          "path": ".runtime/porting/ceiling-77/source-01/B-NOLIMIT-24H/comparison.json",
+          "sha256": "37c15edeba4e563f41eaff01bcdc9a94091729921fc83f955e92d4f82888b93a",
+          "bytes": 167260
+        }
+      ],
+      "Native_index": {
+        "path": ".runtime/porting/ceiling-76/native-01/launches.json",
+        "sha256": "c0d09c148814066e3278067e5db56f46f1ca5fa40555dcbd7277050b3d7a3dd3",
+        "bytes": 1910
+      },
+      "Native_raw_readback": {
+        "path": ".runtime/porting/ceiling-76/native-01/readback.json",
+        "sha256": "9f26103ecdce71c7b84be09e5af2a8b6137ee647d4ebab6d9175dff606e4dae9",
+        "bytes": 10545
+      },
+      "Native_replays": 0,
+      "actual_Native_reference_processes": 2,
+      "actual_new_Source_processes": 2,
+      "code_ingress_proposal": {
+        "path": ".runtime/object-expansion/unit76-prep/ceiling-proposal/proposal.json",
+        "sha256": "b027792e526df7ccbc7251477936137d060da4cc2456bf1bb1e74bc559075517",
+        "bytes": 14250
+      },
+      "current_primary_observer_proposal": {
+        "path": ".runtime/object-expansion/unit77-prep/source-geometry-observer-proposal/proposal.json",
+        "sha256": "056dac186c3bc54d097f3d99095f14cb29d17341663ea440cad85c6edf2dbc4c",
+        "bytes": 11606
+      },
+      "validation_proposal": {
+        "path": ".runtime/object-expansion/unit77-prep/ceiling-source-proposal/proposal.json",
+        "sha256": "1c418d2d5a4374604f959691804c3b375b0af90c34ce8acd55584bb403b3adf7",
+        "bytes": 1265
+      },
+      "raw_and_typed_surface_type": "Ceiling",
+      "actual_final_Source_class": 3,
+      "actual_Default_DXF_Roof_color": 15,
+      "Native_private_class_observed": false,
+      "historical76_classification": "One unaccepted A observer attempt with normal engine0; B never launched; zero accepted pairs/samples. Distinct from historical68 engine6 failure.",
+      "scope": "Two actual one-Zone/implicit-Space original-profile A/B derived Ceiling models only. Full scientific policies unchanged. Current-primary retained-owner trace is connected; no legacy factory execution or unavailable synthetic state fields. Other geometry/physics/object-combination gates remain."
     }
   },
   "additional_native_type_calibrations": [

@@ -8,6 +8,8 @@ use serde_json::{Value, json};
 use std::path::Path;
 
 pub(super) struct SourceRuntimeResult {
+    /// Optional output-only copy made while the final Source owners are live.
+    pub geometry_snapshot: Option<Value>,
     pub reports: SourceReportedStreams,
     pub scope: SourceReportedRunScope,
     pub native_hour_scope: usize,

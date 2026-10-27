@@ -78,8 +78,23 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         calculate_selected_approximate_view_factors,
     };
 
-    for count in [6, 10, 7] {
-        let mut value = input(PortingScope::A);
+    let weather = single_day_weather_fixture();
+    for (scope, count, roof_type) in
+        [PortingScope::A, PortingScope::B]
+            .into_iter()
+            .flat_map(|scope| {
+                [
+                    (6, "Roof"),
+                    (10, "Roof"),
+                    (7, "Roof"),
+                    (6, "Ceiling"),
+                    (10, "Ceiling"),
+                    (7, "Ceiling"),
+                ]
+                .map(move |(count, roof_type)| (scope, count, roof_type))
+            })
+    {
+        let mut value = input(scope);
         if count == 10 {
             let surfaces = value["BuildingSurface:Detailed"].as_object_mut().unwrap();
             let mut additions = Vec::new();
@@ -111,15 +126,41 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             second["vertices"] = json!([points[0], points[2], points[3]]);
             surfaces.insert("Roof:Second".into(), second);
         }
+        // Keep the fourth schema enum in the authored input and typed owner.
+        // Only the genuine runtime getter may replace its local alpha by ROOF.
+        for surface in value["BuildingSurface:Detailed"]
+            .as_object_mut()
+            .unwrap()
+            .values_mut()
+        {
+            if surface["surface_type"] == "Roof" {
+                surface["surface_type"] = json!(roof_type);
+            }
+        }
         let raw = parse_epjson_str(&value.to_string()).expect("closed authored opaque faces");
         let compiled = compile_raw_model(&raw);
         let model = compiled
             .model
             .as_ref()
             .expect("compiled closed opaque faces");
-        let scope = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
-        assert!(scope.admissible, "{count}: {:?}", scope.violations);
-        let input = crate::ordinary_input_processor::resolve(&raw).expect("Source raw input");
+        let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+        assert!(
+            admitted.admissible,
+            "{scope:?}/{count}/{roof_type}: {:?}",
+            admitted.violations
+        );
+        let input = match scope {
+            PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&raw),
+            PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+        }
+        .expect("Source raw input");
+        if scope == PortingScope::A {
+            assert_eq!(
+                crate::ordinary_equipment_input::resolve(&raw).is_ok(),
+                roof_type == "Roof",
+                "unscoped legacy admission retains its original three-class gate"
+            );
+        }
         assert_eq!(
             input.get_num_objects_found("BuildingSurface:Detailed"),
             count
@@ -131,6 +172,63 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         {
             assert!(input.has_object("BuildingSurface:Detailed", name));
         }
+        let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &input)
+            .expect("actual raw surface getter operands");
+        assert_eq!(projected.surface.building_surfaces.len(), count);
+        for row in &projected.surface.building_surfaces {
+            let name = &row.object.object_name;
+            let authored = value["BuildingSurface:Detailed"][name]["surface_type"]
+                .as_str()
+                .unwrap();
+            assert_eq!(
+                row.object.fields["surface_type"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    authored.into()
+                ),
+                "the raw IP projection must retain {authored} for {name}"
+            );
+            let typed = model
+                .surfaces
+                .iter()
+                .find(|surface| surface.name.0.eq_ignore_ascii_case(name))
+                .unwrap();
+            assert_eq!(
+                Some(typed.surface_type),
+                match authored {
+                    "Wall" => Some(ep_model::SurfaceType::Wall),
+                    "Floor" => Some(ep_model::SurfaceType::Floor),
+                    "Roof" => Some(ep_model::SurfaceType::Roof),
+                    "Ceiling" => Some(ep_model::SurfaceType::Ceiling),
+                    _ => None,
+                }
+            );
+        }
+        let environment = super::environment::environment_from_weather(
+            model,
+            &weather,
+            "embedded opaque enum weather",
+        )
+        .expect("actual Source environment");
+        assert!(validate_porting_environment(&environment).is_empty());
+        admitted.environment = Some(environment);
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                .expect("actual validated opaque enum Source admission");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(
+            support.allows_rust_runtime(),
+            "{scope:?}/{count}/{roof_type}: {:?}",
+            support.diagnostics
+        );
 
         let layout = InsideConvectionLayout::from_typed_model(model).expect("Source associations");
         assert_eq!(layout.groups().len(), 1);
@@ -217,11 +315,12 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
                 .all(|s| s.surface_type == ep_model::SurfaceType::Wall)
         );
         assert_eq!(surfaces[walls].surface_type, ep_model::SurfaceType::Floor);
-        assert!(
-            surfaces[walls + 1..]
-                .iter()
-                .all(|s| s.surface_type == ep_model::SurfaceType::Roof)
-        );
+        assert!(surfaces[walls + 1..].iter().all(|s| s.surface_type
+            == if roof_type == "Ceiling" {
+                ep_model::SurfaceType::Ceiling
+            } else {
+                ep_model::SurfaceType::Roof
+            }));
         // This is the actual shared CalcApproximateViewFactors kernel, before
         // Fix/ScriptF and runtime activation; no initialized owner is fabricated.
         let factors = calculate_selected_approximate_view_factors(
