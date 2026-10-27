@@ -6,9 +6,15 @@ pub use diagnostics::{Diagnostic, DiagnosticKind, TargetDiagnosticOrigin};
 mod native_ast;
 #[cfg(test)]
 mod native_ast_snapshot;
+#[cfg(test)]
+mod native_automata_snapshot;
 mod native_compiler;
+#[cfg(test)]
+mod native_dfa;
 mod native_finalize;
 mod native_matcher;
+#[cfg(test)]
+mod native_onepass;
 mod native_parser;
 mod native_prefix;
 #[cfg(test)]

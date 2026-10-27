@@ -86,6 +86,7 @@ fn pinned_native_parse_ast_vectors() -> Result<(), String> {
         "Native rewrite fixture must cover both phases"
     );
     crate::native_program_snapshot::check_vectors()?;
+    crate::native_automata_snapshot::check_vectors()?;
     Ok(())
 }
 

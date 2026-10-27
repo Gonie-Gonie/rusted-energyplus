@@ -270,7 +270,7 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit72-prep/regex-reporting-docs-check-72.log",
+        "path": ".runtime/object-expansion/unit72-prep/regex-automata-components-docs-check-72.log",
         "sha256": "e63d1d2b505f99e70149d128000c36c8cded65cc44897950c0759df4d957b11e",
         "bytes": 338
       },
@@ -701,7 +701,7 @@
         "scope": "Actual full workspace70 and strict all-target Clippy70 are reused only after equality of all four changed source files with Build71 archives and current final snapshot custody; no Unit71 test run is invented."
       },
       "re2_component_in_progress": {
-        "status": "reporting_owners_connected_finite_AB_verified_valid_match_DFA_effects_open",
+        "status": "reporting_owners_connected_same_GCC_automata_verified_official_DFA_accounting_open",
         "component": "crates/ep_re2",
         "finite_baseline_comparison": {
           "path": ".runtime/object-expansion/unit72-prep/native-matcher-comparison01/summary.json",
@@ -718,7 +718,7 @@
           "sha256": "b0507fd1b7643931988ef04b117db9dd43139c4aeb88150dcf83d976f57424ba",
           "bytes": 1222
         },
-        "metadata_after_known_gap_recording": "Updated README/provenance after actual checks; executable Rust and included table bytes remain those tested and captured by Build72.",
+        "metadata_after_known_gap_recording": "README/current-status/evidence updated after focused test-only checks. Runtime production functions remain the Build72 path; the current test-only Rust additions are not claimed to match the historical whole Build72 snapshot.",
         "reference_kind": "Exact pinned RE2 source unit build with GCC13.2; separate from EnergyPlus DLL and physical oracle calibrations.",
         "finite_baseline_unit_inputs": 10168,
         "finite_baseline_five_API_field_mismatches": 0,
@@ -730,8 +730,9 @@
         "new_Source_CLI_build_rows": 1,
         "Source_reporting_admission_changed": true,
         "remaining_required_work": [
-          "Valid-match OnePass/DFA/cache resource diagnostics and target accounting",
-          "Minimum-report-frequency override and remaining live reporting/runtime boundaries",
+          "Official DFA state/header/atomic memory accounting and resource behavior",
+          "Connect verified automata to default reporting owners after target accounting",
+          "Minimum-report-frequency overrides and remaining live reporting/runtime branches",
           "Full legal-value and object-domain completion"
         ],
         "full_RE2_or_object_domain_completion": false,
@@ -791,7 +792,7 @@
         "selected_program_fixture_rows": 23,
         "constructor_groups_in_default_table": 1505,
         "default_table_test_functions": 2,
-        "default_table_test_seconds": 0.85,
+        "default_table_test_seconds": 0.81,
         "heavy_allocation_cases_in_default_tests": false,
         "official_budget_probes_are_physical_cases": false,
         "official_DLL_sizeof_Prog_claim": false,
@@ -1066,8 +1067,8 @@
           },
           {
             "path": "crates/ep_re2/README.md",
-            "sha256": "23877581489940d8e4756e537a8c9943e9854d8de4eb8c7a563177325d61a73b",
-            "bytes": 4023
+            "sha256": "0c6e7b4c8a3fd4e8fe3de5185ab895aeb832fbdc225357c45857eba7ec96e1da",
+            "bytes": 4499
           },
           {
             "path": "crates/ep_re2/src/byte_class.rs",
@@ -1081,8 +1082,8 @@
           },
           {
             "path": "crates/ep_re2/src/lib.rs",
-            "sha256": "2b8ebe27702813cc82ccb8852517e1c6b31d103ec6956073e5491d61be44936d",
-            "bytes": 7888
+            "sha256": "8be8bc6ef1d6a0c13ffa42094d4e243324651ae21ad75d330c0ab5ecda95b0a9",
+            "bytes": 7993
           },
           {
             "path": "crates/ep_re2/src/native_ast/builder.rs",
@@ -1131,8 +1132,13 @@
           },
           {
             "path": "crates/ep_re2/src/native_ast_snapshot.rs",
-            "sha256": "046bfbb6e68448045a4ddf8a1a8d79bc2d2116b7b5ad954ee13851138317c39b",
-            "bytes": 16181
+            "sha256": "1f41d670b47fb037a15c5f02f9ba26fd009eaf223a825ffdc0efab8e11b12855",
+            "bytes": 16236
+          },
+          {
+            "path": "crates/ep_re2/src/native_automata_snapshot.rs",
+            "sha256": "ecc4afd6b270067ba03f96f64f3ea124b11735e011f88abe45d13f2030c7f621",
+            "bytes": 11868
           },
           {
             "path": "crates/ep_re2/src/native_compiler/anchors.rs",
@@ -1160,6 +1166,11 @@
             "bytes": 15399
           },
           {
+            "path": "crates/ep_re2/src/native_dfa.rs",
+            "sha256": "0d226cf3319572d869f3d6fc22f73578df34292565dcd0f94a337885cf900b96",
+            "bytes": 27777
+          },
+          {
             "path": "crates/ep_re2/src/native_finalize/bytemap.rs",
             "sha256": "50c43bacc98212d3a76655cad85d91d2de6a16f9271a47325cb0ca98174d16a1",
             "bytes": 5472
@@ -1178,6 +1189,11 @@
             "path": "crates/ep_re2/src/native_matcher.rs",
             "sha256": "1eaf5e5eb0121bf69d817f872784d3af2eb3d3a9b15a3788bba4430c788d8fa1",
             "bytes": 7563
+          },
+          {
+            "path": "crates/ep_re2/src/native_onepass.rs",
+            "sha256": "b05b640a11a8e4d294a5271f5bcd76547748e898aab65a173c2812a5e3d0792a",
+            "bytes": 14853
           },
           {
             "path": "crates/ep_re2/src/native_parser/character_class.rs",
@@ -1228,6 +1244,21 @@
             "path": "crates/ep_re2/src/unicode_data.rs",
             "sha256": "56fcbfaff224992ea0dfc4fb6d25a6a7fcc15d4a070a2e201e6dab5491e8c1ef",
             "bytes": 170389
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-automata-operands.rs",
+            "sha256": "53da2212e3e99a079d64ee8f2c02012986bbac67705cfce29204bc219383d8f3",
+            "bytes": 24829
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-automata-provenance.json",
+            "sha256": "2e2a30a24ebe2e30792f4a89828fed2156beaaaf61e8004b9ae2330d5c4175c8",
+            "bytes": 5963
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-automata.jsonl",
+            "sha256": "3bde5fb8ad0ef8831f408ee3583aa6da7037fae2c7d7c57ed21567076d875514",
+            "bytes": 239626
           },
           {
             "path": "crates/ep_re2/tests/data/native-default.tsv",
@@ -1311,7 +1342,65 @@
             "sha256": "f9776318603a97a44d76b5580bbaf0a4573dab9aeab4097c32b670252d6f39c6",
             "bytes": 10051
           }
-        ]
+        ],
+        "automata_test_components": {
+          "actual_public_comparison": {
+            "path": ".runtime/object-expansion/unit72-prep/automata-comparison01/summary.json",
+            "sha256": "8259bb1951cb217a37fa5dd0f45eb8e9cf25a331df5ee4fc2029a4362aa0f903",
+            "bytes": 1384
+          },
+          "Native_observations": {
+            "path": ".runtime/object-expansion/unit72-prep/automata-observations01/native.summary.json",
+            "sha256": "4841296aa02ea54f8224047a4867c148b0a8a9a63c90c3941ca31af3f348814c",
+            "bytes": 886
+          },
+          "same_GCC_layout": {
+            "path": ".runtime/object-expansion/unit72-prep/native-type-layout-build01/selected-type-facts.json",
+            "sha256": "df0b1866e5ebf0e05248d46e8e71ab60951860e8abce7417adef22b333a44787",
+            "bytes": 20095
+          },
+          "focused_quality": {
+            "path": ".runtime/object-expansion/unit72-prep/automata-quality01/receipt.json",
+            "sha256": "29ae1ccd119ff84a6eaae389843c9e23bbbafe6c21d143a05572e3ef9bb4b695",
+            "bytes": 10862
+          },
+          "regression_provenance": {
+            "path": "crates/ep_re2/tests/data/native-automata-provenance.json",
+            "sha256": "2e2a30a24ebe2e30792f4a89828fed2156beaaaf61e8004b9ae2330d5c4175c8",
+            "bytes": 5963
+          },
+          "actual_groups": 2362,
+          "actual_search_calls": 50237,
+          "actual_resource_failures": 23,
+          "actual_cache_resets": 6,
+          "field_differences": 0,
+          "wire_bytes_equal": true,
+          "default_groups": 20,
+          "default_queries": 861,
+          "default_table_functions": 2,
+          "default_table_seconds": 0.81,
+          "new_test_functions": 0,
+          "production_automata_connection": false,
+          "official_DFA_layout_claim": false,
+          "new_paired_physical_cases": 0,
+          "new_reported_samples": 0,
+          "scope": "Only cfg(test) source-accounting modules and observed Native goldens were added. Existing runtime/run results are reused because production matching paths are unchanged; no new Source CLI build or physical pair is claimed."
+        },
+        "official_OnePass_header_gate": {
+          "actual_inference": {
+            "path": ".runtime/porting/reporting-regex-72/official-onepass-header01/inference.json",
+            "sha256": "1f59f86b3d15b48496b10d9472f8902f915b909f7cef6587151eaddf507d6f06",
+            "bytes": 5635
+          },
+          "inferred_header_bytes": 4,
+          "source_gated_inference": true,
+          "direct_private_sizeof_claim": false,
+          "default_cap_gate_proved": true,
+          "official_Prog_size_claim": false,
+          "official_DFA_costs_established": false,
+          "unpaired_official_processes": 2,
+          "new_paired_physical_cases": 0
+        }
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",

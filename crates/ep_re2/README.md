@@ -53,7 +53,7 @@ source observer agrees on all 16 API records and 4,906 stderr bytes, including a
 post-parse compile failure. These are component observations, separate from the
 two successful physical pairs.
 
-Valid-match OnePass/DFA cache accounting and resource stderr remain unported;
+Production OnePass/DFA cache accounting and resource stderr remain unconnected;
 the anchored NFA supplies boolean matching. Minimum-report-frequency overrides,
 excluded positive pre-scan families, unbound producers and output backends retain
 their existing boundaries. This is finite reporting evidence within Source A/B.
@@ -64,3 +64,10 @@ Reference observers compile with the pinned CMake RE2_SOURCES22-unit list.
 Constructor input is pattern_hex<TAB>text_hex; parse/program input is pattern hex
 per line. The phase observer also takes required_prefix or simplify. All use
 explicit byte lengths.
+
+Test-only source accounting also retains the matched OnePass/longest-DFA components.
+The existing Native AST table checks 20 ordinary groups (861 ordered queries)
+against actual public Native records, using explicit same-GCC DWARF layout data.
+The heavy 2,362-group comparison remains external. These cfg(test) modules and
+reset traces add no production owner, official DLL layout, physical case or
+full-domain claim; production boolean execution remains the anchored NFA.

@@ -1,0 +1,201 @@
+{
+  "schema": "pinned-native-public-automata-golden.v1",
+  "scope": "cfg(test) same-GCC source accounting only",
+  "Native_receipt": {
+    "path": ".runtime/object-expansion/unit72-prep/automata-observations01/native.receipt.json",
+    "bytes": 1788,
+    "sha256": "f48ba3481d2510a174f9294e974c1cfb3982fbb6bf4438bbbb333a03abc2670d"
+  },
+  "Native_stdin": {
+    "path": ".runtime/object-expansion/unit72-prep/automata-observations01/inputs.tsv",
+    "bytes": 1504303,
+    "sha256": "28c0c5be0ad48a5a8632a21b7155e61b760f4e821638db3e78889e066c7e9505"
+  },
+  "Native_stdout": {
+    "path": ".runtime/object-expansion/unit72-prep/automata-observations01/native.stdout.jsonl",
+    "bytes": 15889615,
+    "sha256": "3903f5867c71dd12a1f4073e7c7b4c300f2628b0082c1193e82650aeebdd75f4"
+  },
+  "actual_full_comparison": {
+    "path": ".runtime/object-expansion/unit72-prep/automata-comparison01/summary.json",
+    "bytes": 1384,
+    "sha256": "8259bb1951cb217a37fa5dd0f45eb8e9cf25a331df5ee4fc2029a4362aa0f903"
+  },
+  "selection_program_observer": {
+    "path": ".runtime/object-expansion/unit72-prep/native-program-observations01/stdout.jsonl",
+    "bytes": 11082778,
+    "sha256": "82361d2e2599867ceefa5b50d8c407ae6ddd0e8691026f8caac6911f60229b12"
+  },
+  "actual_compiled_Rust_source_stage": {
+    "path": ".runtime/object-expansion/unit72-prep/rust-automata-unit02/stage.json",
+    "bytes": 12441,
+    "sha256": "1343d5f4ce2076a0695e2943731e66bf43b9728022ff4dd10ec5c326a9121551"
+  },
+  "actual_Rust_build": {
+    "path": ".runtime/object-expansion/unit72-prep/rust-automata-build02/receipt.json",
+    "bytes": 12087,
+    "sha256": "4f03e509c4ff69b7fcc94d2739189b3ac7ef13ed90b40e79e6f778287f561f15"
+  },
+  "same_GCC_DWARF": {
+    "path": ".runtime/object-expansion/unit72-prep/native-type-layout-build01/selected-type-facts.json",
+    "bytes": 20095,
+    "sha256": "df0b1866e5ebf0e05248d46e8e71ab60951860e8abce7417adef22b333a44787"
+  },
+  "selected_groups": [
+    {
+      "capture_ordinal_zero_based": 0,
+      "pattern_hex": "",
+      "queries": 43,
+      "actual_program_size": 4,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 1,
+      "pattern_hex": "61",
+      "queries": 43,
+      "actual_program_size": 5,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 3,
+      "pattern_hex": "2e",
+      "queries": 43,
+      "actual_program_size": 12,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 5,
+      "pattern_hex": "2e2a",
+      "queries": 43,
+      "actual_program_size": 12,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 7,
+      "pattern_hex": "5e6124",
+      "queries": 43,
+      "actual_program_size": 4,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 8,
+      "pattern_hex": "283f6d295e6124",
+      "queries": 43,
+      "actual_program_size": 7,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 9,
+      "pattern_hex": "5c41615c7a",
+      "queries": 43,
+      "actual_program_size": 4,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 10,
+      "pattern_hex": "617c62",
+      "queries": 43,
+      "actual_program_size": 5,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 11,
+      "pattern_hex": "283f3a617c6162292a",
+      "queries": 43,
+      "actual_program_size": 7,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 12,
+      "pattern_hex": "28617c6161292a62",
+      "queries": 44,
+      "actual_program_size": 10,
+      "maximum_context_bytes": 500
+    },
+    {
+      "capture_ordinal_zero_based": 13,
+      "pattern_hex": "2828613f292a292a",
+      "queries": 43,
+      "actual_program_size": 18,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 15,
+      "pattern_hex": "28612a292b",
+      "queries": 43,
+      "actual_program_size": 8,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 18,
+      "pattern_hex": "617b322c347d",
+      "queries": 43,
+      "actual_program_size": 10,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 37,
+      "pattern_hex": "283f692961",
+      "queries": 43,
+      "actual_program_size": 5,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 39,
+      "pattern_hex": "283f693a612962",
+      "queries": 43,
+      "actual_program_size": 6,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 44,
+      "pattern_hex": "283f503c783e6129",
+      "queries": 43,
+      "actual_program_size": 7,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 64,
+      "pattern_hex": "5b612d635d",
+      "queries": 43,
+      "actual_program_size": 5,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 81,
+      "pattern_hex": "5c43",
+      "queries": 43,
+      "actual_program_size": 5,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 86,
+      "pattern_hex": "5c622e2a",
+      "queries": 43,
+      "actual_program_size": 13,
+      "maximum_context_bytes": 17
+    },
+    {
+      "capture_ordinal_zero_based": 107,
+      "pattern_hex": "5c507b416e797d",
+      "queries": 43,
+      "actual_program_size": 1,
+      "maximum_context_bytes": 17
+    }
+  ],
+  "selected_queries": 861,
+  "Native_golden_values_copied_verbatim": true,
+  "heavy_groups_in_default_tests": false,
+  "new_test_functions": 0,
+  "production_defaults_or_values_seeded": false,
+  "golden": {
+    "path": "native-automata.jsonl",
+    "bytes": 239626,
+    "sha256": "3bde5fb8ad0ef8831f408ee3583aa6da7037fae2c7d7c57ed21567076d875514"
+  },
+  "operands": {
+    "path": "native-automata-operands.rs",
+    "bytes": 24829,
+    "sha256": "53da2212e3e99a079d64ee8f2c02012986bbac67705cfce29204bc219383d8f3"
+  }
+}

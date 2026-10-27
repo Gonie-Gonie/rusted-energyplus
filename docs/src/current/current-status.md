@@ -62,6 +62,14 @@ not establish full-file or full-object parity. Valid-match DFA resource effects,
 minimum-report-frequency overrides and the existing runtime boundaries remain
 open.
 
+Test-only OnePass and anchored-DFA components now agree on all public fields
+and wire bytes for 2,362 pattern groups, including 50,237 searches, 23 resource
+failures and six cache resets. Twenty small groups extend the existing table
+test; its two functions still finish in about 0.8 seconds. Separate successful
+official runs and a positive logging control identify the OnePass header and
+complete its cap-based budget gate proof. Official DFA accounting and runtime
+connection remain open; these component probes add no paired physical cases.
+
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA
 sensible PurchasedAir binding. The completed porting route is selected with
