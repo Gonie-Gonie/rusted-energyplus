@@ -547,7 +547,11 @@ fn source_layer_inputs(
         match (materials.material_groups.get(&id), material.definition) {
             (Some(SourceMaterialGroup::Regular), MaterialDefinition::Regular(_))
             | (Some(SourceMaterialGroup::Regular), MaterialDefinition::NoMass(_))
-            | (Some(SourceMaterialGroup::AirGap), MaterialDefinition::AirGap(_)) => {}
+            | (Some(SourceMaterialGroup::AirGap), MaterialDefinition::AirGap(_))
+            | (
+                Some(SourceMaterialGroup::IrTransparent),
+                MaterialDefinition::InfraredTransparent(_),
+            ) => {}
             _ => {
                 return Err(Error::Unavailable(
                     "actual opaque Material group/physical property view",

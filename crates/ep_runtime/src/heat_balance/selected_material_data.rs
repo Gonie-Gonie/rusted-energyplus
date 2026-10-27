@@ -1,6 +1,6 @@
 //! Actual selected GetMaterialData, with borrowed sole physical properties.
 use super::ctf_initialization_context::CtfInitializationContext;
-use super::error_backend::SourceErrorBackend;
+use super::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use super::report_scan::{
     ReportScanFailure, ReportScanState, SourceReportScanInput, try_scan_for_reports_with_input,
 };
@@ -37,6 +37,7 @@ pub(super) struct MaterialDataOwners<'a, 'b> {
     backend: &'a mut SourceErrorBackend<'b>,
     eio: &'a mut dyn Write,
     errors_found: &'a mut bool,
+    diagnostic_flags: Option<SourceDiagnosticFlags<'a>>,
 }
 
 // The selected FrameAndDivider domain has no elements. Keeping an empty
@@ -313,7 +314,55 @@ impl SelectedMaterialData {
             self.resistance_only.insert(id, true); // Actual368; never a NoMass alias.
         }
         o.shortcut.current_module_object = "Material:InfraredTransparent".into();
-        require_zero(self.num_irts, "positive Material:InfraredTransparent")?;
+        if usize::try_from(self.num_irts).ok() != Some(raw.infrared_transparent.len()) {
+            return Err(unavailable("IRT raw/IP count"));
+        }
+        for object in &raw.infrared_transparent {
+            raw.get_infrared_item(object, o)?;
+            let name = o.shortcut.alpha_args[0].clone();
+            // Native checks the map before allocation or any typed-ID binding.
+            if self.material_map.contains_key(&name) {
+                let flags = o
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual IRT duplicate diagnostic phase owners"))?;
+                o.backend.show_source_severe_error(
+                    &format!("GetMaterialData: Material:InfraredTransparent = {name}, duplicate name."), flags,
+                ).map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                *o.errors_found = true;
+                continue;
+            }
+            let id = typed_id(o.model, &name, MaterialKind::InfraredTransparent)?;
+            let position = self.insert(&name, id, SourceMaterialGroup::IrTransparent)?;
+            self.resistance_only.insert(id, true); // Material.cc406.
+            self.nominal_r[position] = 0.01; // NominalR=Resistance at407.
+            // The sole typed IRT variant supplies the exact fixed properties;
+            // no duplicate property cache or roughness fallback is created.
+            let material = o
+                .model
+                .materials
+                .iter()
+                .find(|row| row.id == id)
+                .ok_or_else(|| unavailable("IRT physical owner"))?;
+            let MaterialDefinition::InfraredTransparent(_) = material.definition else {
+                return Err(unavailable("IRT physical variant"));
+            };
+            same(
+                material
+                    .thermal_resistance()
+                    .ok_or_else(|| unavailable("IRT resistance"))?,
+                0.01,
+            )?;
+            let properties = material
+                .surface_properties()
+                .ok_or_else(|| unavailable("IRT absorptance properties"))?;
+            same(properties.thermal_absorptance, 0.9999)?;
+            same(properties.solar_absorptance, 1.0)?;
+            same(properties.visible_absorptance, 1.0)?;
+            if material.roughness().is_some() {
+                return Err(unavailable("IRT genuine Invalid roughness"));
+            }
+        }
         macro_rules! empty {
             ($member:ident, $family:literal) => {{
                 o.shortcut.current_module_object = $family.into();
@@ -388,6 +437,7 @@ impl CtfInitializationContext<'_> {
     pub(crate) fn get_selected_material_data(
         &mut self,
         model: &TypedModel,
+        clock: Option<&crate::weather::day::WeatherGlobalState>,
     ) -> Result<(), RuntimeError> {
         let reports = &mut *self.reports;
         let input = reports
@@ -402,7 +452,19 @@ impl CtfInitializationContext<'_> {
             .selected_heat_balance_globals
             .as_ref()
             .ok_or_else(|| unavailable("missing actual early globals"))?;
+        let diagnostic_flags = clock.and_then(|clock| {
+            reports
+                .selected_project_data
+                .as_ref()
+                .map(|project| SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                })
+        });
         let mut owners = MaterialDataOwners {
+            diagnostic_flags,
             model,
             input,
             shortcut: &mut reports.input_processor_shortcut,

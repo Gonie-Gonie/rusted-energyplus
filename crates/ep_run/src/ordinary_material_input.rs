@@ -28,7 +28,12 @@ fn resolve_ordered(
         source_is_epjson: raw.is_epjson(),
         ..SelectedMaterialInput::default()
     };
-    for family in ["Material", "Material:NoMass", "Material:AirGap"] {
+    for family in [
+        "Material",
+        "Material:NoMass",
+        "Material:AirGap",
+        "Material:InfraredTransparent",
+    ] {
         let rows = if source_order {
             raw.source_ordered_instances(family)?
         } else {
@@ -62,6 +67,11 @@ fn resolve_ordered(
                 if matches!(field.0.as_str(), "idf_order" | "idf_max_extensible_fields") {
                     continue;
                 }
+                // Name-only IRT ignores additional JSON members; the real
+                // raw/IP owners retain them rather than making them operands.
+                if family == "Material:InfraredTransparent" {
+                    continue;
+                }
                 let value = match value {
                     RawValue::String(value) => ProjectInputValue::String(value.clone()),
                     RawValue::Number(text) => {
@@ -83,7 +93,10 @@ fn resolve_ordered(
                 fields.insert(field.0.clone(), value);
             }
             if !raw.is_epjson()
-                && matches!(family, "Material:NoMass" | "Material:AirGap")
+                && matches!(
+                    family,
+                    "Material:NoMass" | "Material:AirGap" | "Material:InfraredTransparent"
+                )
                 && idf_max_fields.is_none()
             {
                 return Err(format!("actual {family} IDF physical field count absent"));
@@ -98,6 +111,7 @@ fn resolve_ordered(
             "Material" => result.regular = values,
             "Material:NoMass" => result.no_mass = values,
             "Material:AirGap" => result.air_gaps = values,
+            "Material:InfraredTransparent" => result.infrared_transparent = values,
             _ => unreachable!("literal selected material family"),
         }
     }

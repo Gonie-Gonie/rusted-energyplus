@@ -14,7 +14,7 @@ fn input(public: &CtfPublicCoefficientStorage) -> CtfConstructionReport<'_> {
         }],
         public,
         absorptance: [0.9, 0.9, 0.7, 0.7],
-        outside_roughness: MaterialSurfaceRoughness::Smooth,
+        outside_roughness: Some(MaterialSurfaceRoughness::Smooth),
     }
 }
 
@@ -124,6 +124,12 @@ fn layer_reporting_uses_real_columns_and_empty_registry_has_no_effect()
     assert_eq!(entries[1].index_column, 93);
     assert_eq!(entries[0].object_name, "DECLARED NINTH");
     assert_eq!(entries[1].char_entry.as_slice(), b"SECOND");
+    // Native reportLayers precedes the text-report Scan and never reads IRT's
+    // Invalid roughness. Its actual table writes must remain identical.
+    report.outside_roughness = None;
+    let mut invalid_roughness_table = PredefinedStringTable::default();
+    report_ctf_layers(&report, &[81, 93], &mut invalid_roughness_table)?;
+    assert_eq!(invalid_roughness_table, table);
     let mut partial = PredefinedStringTable::default();
     assert_eq!(
         report_ctf_layers(&report, &[81], &mut partial),
@@ -192,6 +198,16 @@ fn eio_rows_keep_declared_counter_descending_terms_and_zero_flux_omission()
     assert_eq!(rows[6].split(',').count(), 6);
     assert_eq!(rows[8].split(',').count(), 5);
     assert!(!rows[8].contains("12345"));
+    let mut invalid_roughness = report.clone();
+    invalid_roughness.outside_roughness = None;
+    let mut undefined_text = Vec::new();
+    assert!(matches!(
+        report_ctf_transfer_function(&invalid_roughness, &mut undefined_text),
+        Err(CtfReportError::Unavailable(
+            CtfReportUnavailable::UndefinedRoughness
+        ))
+    ));
+    assert!(undefined_text.is_empty());
     Ok(())
 }
 

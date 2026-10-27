@@ -72,6 +72,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
                 ("thermal_resistance".into(), Value::Number(0.2)),
             ]),
         }],
+        infrared_transparent: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -130,6 +131,12 @@ fn get_materials(
         ("Material", &raw.regular, 2, 7),
         ("Material:NoMass", &raw.no_mass, 2, 4),
         ("Material:AirGap", &raw.air_gaps, 1, 1),
+        (
+            "Material:InfraredTransparent",
+            &raw.infrared_transparent,
+            1,
+            0,
+        ),
     ];
     let definitions = families
         .iter()
@@ -205,6 +212,7 @@ fn get_materials(
             backend: &mut backend,
             eio: &mut eio,
             errors_found: &mut errors_found,
+            diagnostic_flags: None,
         },
     )?;
     assert!(!errors_found);
@@ -341,6 +349,79 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             }
         }
     }
+    // Extend the same real ordered getter/CTF-owner test with the name-only
+    // fourth opaque family, keeping its genuine group and Invalid roughness.
+    for epjson in [false, true] {
+        let (mut model, mut raw) = fixture(epjson, 0.15);
+        let id = MaterialId(3);
+        model.materials.push(Material {
+            id,
+            name: NormalizedName::new("Mixed IRT"),
+            definition: MaterialDefinition::InfraredTransparent(
+                ep_model::InfraredTransparentMaterial,
+            ),
+        });
+        model
+            .ctf_report_names
+            .materials
+            .push((id, "MIXED IRT".into()));
+        raw.infrared_transparent.push(ProjectInputObject {
+            object_name: "MiXeD IRT".into(),
+            idf_max_fields: (!epjson).then_some(1),
+            fields: BTreeMap::new(),
+        });
+        let (data, input, shortcut) =
+            get_materials(&model, &raw).expect("actual name-only IRT getter");
+        assert_eq!(data.num_irts, 1);
+        assert_eq!(
+            data.materials,
+            [MaterialId(0), MaterialId(1), MaterialId(2), id]
+        );
+        assert_eq!(data.material_map["MIXED IRT"], 4);
+        assert_eq!(
+            data.material_groups[&id],
+            SourceMaterialGroup::IrTransparent
+        );
+        assert!(data.resistance_only[&id]);
+        assert_eq!(data.nominal_r[3].to_bits(), 0.01_f64.to_bits());
+        assert!(!input.is_object_unused("Material:InfraredTransparent", "MiXeD IRT"));
+        assert_eq!(shortcut.alpha_args, ["MIXED IRT", ""]);
+        assert_eq!(
+            shortcut.alpha_field_names,
+            [if epjson { "name" } else { "Name" }, ""]
+        );
+        assert_eq!(shortcut.alpha_field_blanks, [false, true]);
+        assert!(
+            shortcut
+                .numeric_args
+                .iter()
+                .all(|value| value.to_bits() == 0)
+        );
+        assert!(shortcut.numeric_field_blanks.iter().all(|value| *value));
+        assert!(shortcut.numeric_field_names.iter().all(String::is_empty));
+        let irt = &model.materials[3];
+        assert_eq!(irt.roughness(), None);
+        let properties = irt.surface_properties().expect("fixed IRT properties");
+        assert_eq!(
+            properties.thermal_absorptance.to_bits(),
+            0.9999_f64.to_bits()
+        );
+        assert_eq!(properties.solar_absorptance.to_bits(), 1.0_f64.to_bits());
+        assert_eq!(properties.visible_absorptance.to_bits(), 1.0_f64.to_bits());
+        let layers = material_layer_inputs(&[irt]).expect("same genuine IRT base defaults for CTF");
+        assert_eq!(layers.len(), 1);
+        assert_eq!(
+            [
+                layers[0].thickness,
+                layers[0].conductivity,
+                layers[0].density,
+                layers[0].specific_heat
+            ],
+            [0.0; 4]
+        );
+        assert_eq!(layers[0].resistance.to_bits(), data.nominal_r[3].to_bits());
+        assert_eq!(layers[0].resistance_only, data.resistance_only[&id]);
+    }
 }
 
 #[test]
@@ -368,5 +449,181 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
             get_materials(&model, &raw).is_err(),
             "AirGap must never borrow NoMass identity"
         );
+    }
+    // A cross-family duplicate has no IRT typed owner. The native map check
+    // must emit its one Severe before typed binding, then continue on success.
+    struct BrokenDiagnostic;
+    impl std::io::Write for BrokenDiagnostic {
+        fn write(&mut self, _: &[u8]) -> std::io::Result<usize> {
+            Err(std::io::Error::other("authored IRT diagnostic failure"))
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    for failure in [false, true] {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let id = MaterialId(3);
+        model.materials.push(Material {
+            id,
+            name: NormalizedName::new("IRT AFTER"),
+            definition: MaterialDefinition::InfraredTransparent(
+                ep_model::InfraredTransparentMaterial,
+            ),
+        });
+        model
+            .ctf_report_names
+            .materials
+            .push((id, "IRT AFTER".into()));
+        raw.infrared_transparent = ["nO mAsS", "IRT AFTER"]
+            .into_iter()
+            .map(|name| ProjectInputObject {
+                object_name: name.into(),
+                fields: BTreeMap::new(),
+                idf_max_fields: None,
+            })
+            .collect();
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            (
+                "Material:InfraredTransparent",
+                &raw.infrared_transparent,
+                1,
+                0,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(name, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*name).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(name, rows, _, _)| {
+                (
+                    name.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|name| (name.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes)
+            .expect("actual duplicate raw families");
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut
+            .allocate_from_input(&input)
+            .expect("same real shared arrays");
+        let globals = SelectedHeatBalanceGlobals {
+            doing_sizing: true,
+            ..Default::default()
+        };
+        let clock = crate::weather::day::WeatherGlobalState {
+            warmup_flag: true,
+            ..Default::default()
+        };
+        let developer = true;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state(); // Its legacy sizing/warmup fields stay false.
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut broken = BrokenDiagnostic;
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let outcome = {
+            let stream: &mut dyn std::io::Write = if failure { &mut broken } else { &mut text };
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert_eq!(state.tracking.total_severe_errors, 1);
+        assert_eq!(state.tracking.total_severe_errors_during_sizing, 1);
+        assert_eq!(state.tracking.total_severe_errors_during_warmup, 0);
+        assert_eq!(data.material_map["NO MASS"], 2);
+        assert_eq!(
+            data.material_groups[&MaterialId(1)],
+            SourceMaterialGroup::Regular
+        );
+        assert!(!input.is_object_unused("Material:InfraredTransparent", "nO mAsS"));
+        assert_eq!(
+            input.is_object_unused("Material:InfraredTransparent", "IRT AFTER"),
+            failure
+        );
+        assert_eq!(
+            errors_found, !failure,
+            "native ErrorsFound assignment follows successful Severe"
+        );
+        if failure {
+            assert!(outcome.is_err());
+            assert_eq!(data.materials.len(), 3);
+            assert_eq!(shortcut.alpha_args[0], "NO MASS");
+            assert!(
+                shortcut
+                    .numeric_args
+                    .iter()
+                    .all(|value| value.to_bits() == 0)
+            );
+            assert!(
+                state.tracking.last_severe_error.is_empty(),
+                "last-text write follows successful diagnostic output"
+            );
+        } else {
+            outcome.expect("one Severe then native continue");
+            assert_eq!(data.materials.len(), 4);
+            assert_eq!(data.material_map["IRT AFTER"], 4);
+            let message =
+                "GetMaterialData: Material:InfraredTransparent = NO MASS, duplicate name.";
+            assert_eq!(state.tracking.last_severe_error, message);
+            let text = std::str::from_utf8(&text).expect("actual error bytes");
+            assert_eq!(text.matches(message).count(), 1);
+            assert!(
+                !text.contains(" **   ~~~   **"),
+                "duplicate-name helper emits no Continue"
+            );
+        }
     }
 }

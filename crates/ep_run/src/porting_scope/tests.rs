@@ -1590,6 +1590,158 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 .any(|d| d.code == "DuplicateName" && d.object_type == FAMILY)
         );
     }
+    // The same real opaque input-owner chain now retains name-only IRT.
+    // This is admission/custody evidence, not a physical run or seeded result.
+    for scope in [PortingScope::A, PortingScope::B] {
+        for boundary in ["Ground", "Adiabatic"] {
+            let mut value = input(scope);
+            value["Material:InfraredTransparent"] =
+                json!({"MiXeD IRT":{"unconsumed_metadata":[{"value":true}]}});
+            value["Construction"]["IRT CON"] = json!({"outside_layer":"MiXeD IRT"});
+            value["BuildingSurface:Detailed"]["Floor"]["construction_name"] = json!("IRT CON");
+            value["BuildingSurface:Detailed"]["Floor"]["outside_boundary_condition"] =
+                json!(boundary);
+            let raw = parse_epjson_str(&value.to_string())
+                .expect("name-only IRT with genuine raw metadata");
+            let compiled = compile_raw_model(&raw);
+            let model = compiled.model.as_ref().expect("one-layer typed IRT");
+            let material = model
+                .materials
+                .iter()
+                .find(|row| row.kind() == ep_model::MaterialKind::InfraredTransparent)
+                .unwrap();
+            assert_eq!(material.roughness(), None);
+            assert_eq!(
+                model
+                    .ctf_report_names
+                    .materials
+                    .iter()
+                    .find(|(id, _)| *id == material.id)
+                    .unwrap()
+                    .1,
+                "MIXED IRT"
+            );
+            let ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .expect("defined Source IRT use");
+            assert!(ip.has_object("Material:InfraredTransparent", "MiXeD IRT"));
+            let projected = crate::ordinary_material_input::resolve_source(&raw, &ip)
+                .expect("real IRT raw operands");
+            assert_eq!(projected.infrared_transparent.len(), 1);
+            assert_eq!(projected.infrared_transparent[0].object_name, "MiXeD IRT");
+            assert!(
+                projected.infrared_transparent[0].fields.is_empty(),
+                "unknown raw metadata must not become a physical operand"
+            );
+            let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+            assert!(admitted.admissible, "{:?}", admitted.violations);
+            let environment = super::environment::environment_from_weather(
+                model,
+                &weather,
+                "embedded IRT weather",
+            )
+            .unwrap();
+            assert!(validate_porting_environment(&environment).is_empty());
+            admitted.environment = Some(environment);
+            let admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                    .expect("all actual Source custody checks");
+            let support = crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission),
+            );
+            assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+            if scope == PortingScope::A {
+                assert!(
+                    crate::ordinary_equipment_input::resolve(&raw).is_err(),
+                    "legacy IRT remains fenced"
+                );
+            }
+            for report in ["Materials", "Constructions"] {
+                let mut rejected = value.clone();
+                rejected["Output:Constructions"] = json!({"Report":{"details_type_1":report}});
+                let rejected = parse_epjson_str(&rejected.to_string()).unwrap();
+                assert!(
+                    match scope {
+                        PortingScope::A =>
+                            crate::ordinary_input_processor::resolve_source_a(&rejected),
+                        PortingScope::B =>
+                            crate::ordinary_input_processor::resolve_source_b(&rejected),
+                    }
+                    .is_err(),
+                    "reached Native Invalid roughness report must stay explicit"
+                );
+            }
+            let mut outdoors = value.clone();
+            outdoors["BuildingSurface:Detailed"]["Floor"]["outside_boundary_condition"] =
+                json!("Outdoors");
+            let outdoors = parse_epjson_str(&outdoors.to_string()).unwrap();
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&outdoors),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&outdoors),
+                }
+                .is_err()
+            );
+            let mut unused = value.clone();
+            unused["BuildingSurface:Detailed"]["Floor"]["construction_name"] = json!("Opaque");
+            unused["Output:Constructions"] = json!({"Report":{"details_type_1":"Constructions"}});
+            let unused = parse_epjson_str(&unused.to_string()).unwrap();
+            assert!(
+                match scope {
+                    PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&unused),
+                    PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&unused),
+                }
+                .is_ok(),
+                "unused IRT does not enter reportTransferFunction"
+            );
+        }
+    }
+    // Actual staged-IDF recovery must reach the same Source IP/material
+    // projector; direct epJSON deliberately has no recovered IDF metadata.
+    let epjson = r#"{"Zone":{"z":{}},"Material:InfraredTransparent":{"A":{},"Z":{}}}"#;
+    let idf = "Zone,z;Material:InfraredTransparent,Z;Material:InfraredTransparent,A;";
+    for staged in [false, true] {
+        let raw = if staged {
+            ep_raw_model::parse_epjson_str_with_idf_order(epjson, idf)
+        } else {
+            parse_epjson_str(epjson)
+        }
+        .expect("actual direct/staged IRT input");
+        assert_eq!(
+            raw.has_idf_declaration_order("Material:InfraredTransparent"),
+            staged
+        );
+        for scope in [PortingScope::A, PortingScope::B] {
+            let ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .expect("real Source IRT ingress");
+            let projected = crate::ordinary_material_input::resolve_source(&raw, &ip)
+                .expect("retained genuine IRT IDF order and field count");
+            assert_eq!(projected.source_is_epjson, !staged);
+            let rows = &projected.infrared_transparent;
+            assert_eq!(
+                rows.iter()
+                    .map(|row| row.object_name.as_str())
+                    .collect::<Vec<_>>(),
+                if staged { ["Z", "A"] } else { ["A", "Z"] }
+            );
+            assert!(
+                rows.iter()
+                    .all(|row| row.idf_max_fields == staged.then_some(1) && row.fields.is_empty())
+            );
+        }
+    }
 }
 
 #[test]

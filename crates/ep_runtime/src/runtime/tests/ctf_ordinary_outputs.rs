@@ -609,7 +609,68 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
         raw.initialize_coordinate_owners(&owners)?;
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3)?;
-        raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors)?;
+        raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
+        // Authored child diagnostic inputs, not a completed Native material or
+        // geometry certificate. Real IRT property/getter owners are tested in
+        // selected_material_data; these rows isolate warning prefix custody.
+        for mode in 0..4 {
+            let mut warning_raw = raw.clone();
+            warning_raw.surface_lists = Default::default();
+            let mut warning_zones = owners.zones.clone();
+            for zone in warning_zones.zones.as_mut().ok_or("warning Zone owner")? {
+                zone.ht_surface_list.clear(); zone.iz_surface_list.clear();
+                zone.ht_non_window_surface_list.clear(); zone.ht_window_surface_list.clear();
+            }
+            let mut warning_control = owners.control.clone();
+            warning_control.construction_usage.get_mut(0).ok_or("warning construction owner")?.type_is_irt = true;
+            warning_control.construction_usage[0].outside_roughness = None;
+            let mut warning_input = owners.input.clone();
+            let mut warning_shortcut = owners.shortcut.clone();
+            let mut warning_globals = owners.globals.clone();
+            warning_globals.kickoff_simulation = false;
+            warning_globals.doing_sizing = mode == 1;
+            warning_globals.display_extra_warnings = mode == 1;
+            let warning_clock = crate::weather::day::WeatherGlobalState { warmup_flag: true, ..Default::default() };
+            let developer = true;
+            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &warning_globals.kickoff_simulation, developer: &developer,
+                warmup: &warning_clock.warmup_flag, doing_sizing: &warning_globals.doing_sizing,
+            };
+            let mut warning_owners = SurfaceGetterOwners {
+                model: owners.model, environment: owners.environment,
+                input: &mut warning_input, shortcut: &mut warning_shortcut,
+                zones: &mut warning_zones, control: &mut warning_control, globals: &warning_globals,
+            };
+            // The legacy backend phase cells remain false. Different live phase
+            // cells must control the actual Source warning counters instead.
+            let mut warning_state = ctf_ordinary_output_test_state();
+            let (mut warning_text, mut warning_console) = (Vec::new(), Vec::new());
+            let mut broken = OrdinaryFailingEio;
+            let error_stream: &mut dyn std::io::Write = if mode == 2 { &mut broken } else { &mut warning_text };
+            let mut warning_backend = SourceErrorBackend {
+                state: &mut warning_state, error_stream: Some(error_stream), console: &mut warning_console,
+                out_unit1: None, out_unit2: None, f_message: None, message_callback: None,
+                error_callback: None, sqlite: None,
+            };
+            let result = warning_raw.build_opaque_surface_lists(
+                &mut warning_owners, &mut warning_backend, false, (mode != 3).then_some(&flags),
+            );
+            let warnings = if mode == 1 { i32::try_from(total)? } else { i32::from(mode != 3) };
+            assert_eq!(warning_backend.state.tracking.total_warning_errors, warnings);
+            assert_eq!(warning_backend.state.tracking.total_warning_errors_during_sizing, if mode == 1 { warnings } else { 0 });
+            assert_eq!(warning_backend.state.tracking.total_warning_errors_during_warmup, if mode == 1 { 0 } else { warnings });
+            assert_eq!(warning_raw.surface_lists.all_ht.len(), total, "list effects precede every warning/availability failure");
+            if mode >= 2 {
+                assert!(result.is_err());
+                assert!(warning_raw.surface_lists.filters.iter().all(Vec::is_empty), "filter writes follow successful warning/Continue only");
+            } else {
+                result?;
+                assert!(warning_raw.surface_lists.filters.iter().any(|rows| !rows.is_empty()));
+                let text = std::str::from_utf8(&warning_text)?;
+                assert_eq!(text.matches(" ** Warning **").count(), usize::try_from(warnings)?);
+                assert_eq!(text.contains("For explicit details on each use"), mode == 0);
+            }
+        }
         assert!(raw.final_surfaces.as_ref().ok_or("actual pre-override Surface algorithm rows")?.iter()
             .all(|surface| surface.row.heat_transfer_algorithm == crate::heat_balance::selected_heat_balance_input::SelectedHeatTransferModel::Invalid));
         raw.report_surface_input_diagnostics(&mut context.backend)?;

@@ -56,6 +56,10 @@ fn prepare<'a>(
             (Some(SourceMaterialGroup::Regular), MaterialDefinition::Regular(_))
             | (Some(SourceMaterialGroup::Regular), MaterialDefinition::NoMass(_)) => false,
             (Some(SourceMaterialGroup::AirGap), MaterialDefinition::AirGap(_)) => true,
+            (
+                Some(SourceMaterialGroup::IrTransparent),
+                MaterialDefinition::InfraredTransparent(_),
+            ) => false,
             _ => return Err(CtfReportUnavailable::Material(id)),
         };
         let input =
@@ -89,9 +93,13 @@ fn prepare<'a>(
             usage.outside_absorp_solar,
             usage.inside_absorp_solar,
         ],
-        outside_roughness: usage
-            .outside_roughness
-            .ok_or(CtfReportUnavailable::Association)?,
+        // reportLayers precedes ScanForReports and never reads roughness.
+        // Carry genuine IRT Invalid until a text report is actually reached.
+        outside_roughness: match usage.outside_roughness {
+            Some(value) => Some(value),
+            None if usage.type_is_irt => None,
+            None => return Err(CtfReportUnavailable::Association),
+        },
     })
 }
 pub(super) fn complete(

@@ -49,6 +49,10 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "Material:AirGap",
         name_field_index: 0,
     },
+    IdfOrderTarget {
+        object_type: "Material:InfraredTransparent",
+        name_field_index: 0,
+    },
     // SimulationManager::GetProjectData uses real IDF max-field counts.
     IdfOrderTarget {
         object_type: "Version",
@@ -464,6 +468,7 @@ pub fn apply_idf_declaration_order(
                     target.object_type,
                     "Material:NoMass"
                         | "Material:AirGap"
+                        | "Material:InfraredTransparent"
                         | "Building"
                         | "Construction"
                         | "Zone"
@@ -1816,6 +1821,11 @@ mod unnamed_report_order_tests {
                 "Material:AirGap",
                 "Material:AirGap,Z,0.15;Material:AirGap,A;",
                 Some([2, 2]),
+            ),
+            (
+                "Material:InfraredTransparent",
+                "Material:InfraredTransparent,Z;Material:InfraredTransparent,A;",
+                Some([1, 1]),
             ),
             (
                 "Zone",

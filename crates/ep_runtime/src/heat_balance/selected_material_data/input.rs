@@ -14,6 +14,8 @@ pub struct SelectedMaterialInput {
     pub no_mass: Vec<ProjectInputObject>,
     /// Actual getObjectItem order for Material:AirGap.
     pub air_gaps: Vec<ProjectInputObject>,
+    /// Actual name-only getObjectItem order for Material:InfraredTransparent.
+    pub infrared_transparent: Vec<ProjectInputObject>,
 }
 
 pub(super) fn alpha<'a>(
@@ -45,6 +47,48 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_infrared_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(), RuntimeError> {
+        if !self.source_is_epjson && object.idf_max_fields.is_none() {
+            return Err(unavailable("missing actual IRT IDF field count"));
+        }
+        if !owners
+            .input
+            .has_object("Material:InfraredTransparent", &object.object_name)
+        {
+            return Err(unavailable("IRT raw/IP identity"));
+        }
+        let s = &mut owners.shortcut;
+        if s.alpha_args.is_empty()
+            || s.alpha_field_blanks.is_empty()
+            || s.alpha_field_names.is_empty()
+        {
+            return Err(unavailable("actual complete IRT shared alpha allocation"));
+        }
+        // All six passed arrays reset even though IRT has zero numeric fields.
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("Material:InfraredTransparent", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = if self.source_is_epjson {
+            "name"
+        } else {
+            "Name"
+        }
+        .into();
+        Ok(())
+    }
+
     pub(super) fn get_air_gap_item(
         &self,
         object: &ProjectInputObject,

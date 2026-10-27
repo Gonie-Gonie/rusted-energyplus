@@ -216,6 +216,9 @@ pub fn material_layer_inputs(
                         value.thermal_resistance_m2_k_per_w,
                         true,
                     ),
+                    // Material.cc406-413 leaves native mass fields at base0,
+                    // writes ROnly=true and fixed Resistance=0.01 for IRT.
+                    MaterialDefinition::InfraredTransparent(_) => (0.0, 0.0, 0.0, 0.0, 0.01, true),
                     _ => return Err(CtfLayerScopeError::UnsupportedMaterial(material.id)),
                 };
             Ok(CtfLayerInput {

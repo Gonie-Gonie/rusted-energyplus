@@ -25,6 +25,8 @@ pub enum CtfReportUnavailable {
     Association,
     /// A selected ordinary no-source construction is required.
     UnsupportedConstruction,
+    /// Native text reporting indexes the roughness-name array at Invalid=-1.
+    UndefinedRoughness,
     /// The real public suffix has no returned owner.
     PublicOwnerUnavailable,
     /// Actual material ID whose selected loader projection is missing or unsupported.
@@ -353,8 +355,8 @@ pub struct CtfConstructionReport<'a> {
     pub public: &'a CtfPublicCoefficientStorage,
     /// Outside thermal, inside thermal, outside solar and inside solar absorptance.
     pub absorptance: [f64; 4],
-    /// Actual selected outside-material roughness.
-    pub outside_roughness: MaterialSurfaceRoughness,
+    /// Actual selected outside-material roughness; None is native Invalid=-1.
+    pub outside_roughness: Option<MaterialSurfaceRoughness>,
 }
 
 /// Reuse actual compiled ordinary members and the same returned public row.
@@ -426,7 +428,7 @@ pub fn prepare_ctf_construction_report<'a>(
             outside_properties.solar_absorptance,
             inside_properties.solar_absorptance,
         ],
-        outside_roughness,
+        outside_roughness: Some(outside_roughness),
     })
 }
 
@@ -498,7 +500,11 @@ pub fn report_ctf_transfer_function(
         f(report.absorptance[1], 8, 3),
         f(report.absorptance[2], 8, 3),
         f(report.absorptance[3], 8, 3),
-        roughness_name(report.outside_roughness)
+        roughness_name(
+            report
+                .outside_roughness
+                .ok_or(CtfReportUnavailable::UndefinedRoughness)?
+        )
     );
     sink.write_all(row.as_bytes())?;
     for material in &report.layers {

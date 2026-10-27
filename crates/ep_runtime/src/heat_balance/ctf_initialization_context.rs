@@ -716,7 +716,7 @@ impl CtfInitializationContext<'_> {
     ) -> Result<(), crate::RuntimeError> {
         self.get_selected_project_control_data(environment)?;
         self.initialize_source_site_atmosphere(environment)?;
-        self.get_selected_material_data(model)?;
+        self.get_selected_material_data(model, clock)?;
         self.read_selected_construction_arguments(model)?;
         let mut owner = super::selected_heat_balance_input::shadowing::SourceShadowingInput::new();
         let result = owner.get_at_building_boundary(self);

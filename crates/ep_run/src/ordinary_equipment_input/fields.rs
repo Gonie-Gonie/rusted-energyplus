@@ -24,6 +24,7 @@ pub(super) fn admitted_field(
             | "Material"
             | "Material:NoMass"
             | "Material:AirGap"
+            | "Material:InfraredTransparent"
             | "Version"
             | "HeatBalanceAlgorithm"
             | "Timestep"

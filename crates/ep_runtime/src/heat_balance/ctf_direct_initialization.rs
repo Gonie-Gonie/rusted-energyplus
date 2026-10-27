@@ -184,7 +184,7 @@ impl CtfInitReportProvider for DirectReportProvider<'_> {
             }],
             public: self.storage,
             absorptance: input.absorptance,
-            outside_roughness: input.outside_roughness,
+            outside_roughness: Some(input.outside_roughness),
         })
     }
 }

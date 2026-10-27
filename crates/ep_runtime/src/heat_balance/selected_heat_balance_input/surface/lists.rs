@@ -3,6 +3,7 @@ use super::super::{SelectedConstructionUsage, SelectedHeatBalanceInputState};
 use super::{
     Error, SourceErrorBackend, SurfaceClass, SurfaceGeometryInputState, SurfaceGetterOwners,
 };
+use crate::heat_balance::error_backend::SourceDiagnosticFlags;
 
 // Native enum Invalid=-1 is not an array index; Num=11 is its length.
 #[derive(Clone, Copy)]
@@ -234,6 +235,7 @@ impl SurfaceGeometryInputState {
         &self,
         owners: &SurfaceGetterOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
         if !owners
             .control
@@ -268,11 +270,17 @@ impl SurfaceGeometryInputState {
                     .checked_add(1)
                     .ok_or(Error::Unavailable("Source IRT count int capacity"))?;
             } else {
-                backend.show_warning_error(&format!("GetSurfaceData: Surface=\"{}\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)", row.name))?;
+                let flags = flags.ok_or(Error::Unavailable(
+                    "actual IRT surface warning phase owners",
+                ))?;
+                backend.show_source_warning_error(&format!("GetSurfaceData: Surface=\"{}\" uses InfraredTransparent construction in a non-interzone surface. (illegal use)", row.name), flags)?;
             }
         }
         if count > 0 {
-            backend.show_warning_error(&format!("GetSurfaceData: Surfaces use InfraredTransparent constructions {count} in non-interzone surfaces. (illegal use)"))?;
+            let flags = flags.ok_or(Error::Unavailable(
+                "actual IRT aggregate warning phase owners",
+            ))?;
+            backend.show_source_warning_error(&format!("GetSurfaceData: Surfaces use InfraredTransparent constructions {count} in non-interzone surfaces. (illegal use)"), flags)?;
             backend.show_continue_error(
                 "For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;",
             )?;
@@ -373,6 +381,7 @@ impl SurfaceGeometryInputState {
         owners: &mut SurfaceGetterOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
         errors_found: bool,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
         self.set_surface_eco_roof_flags(owners.control)?;
         let total = usize::try_from(self.total_surfaces)
@@ -381,7 +390,7 @@ impl SurfaceGeometryInputState {
             .map_err(|_| Error::Unavailable("Source TotWindows list reserve"))?;
         self.surface_lists.reserve_source_lists(total, windows)?;
         self.populate_opaque_surface_lists(owners, errors_found)?;
-        self.check_surface_irt_uses(owners, backend)?;
+        self.check_surface_irt_uses(owners, backend, flags)?;
         self.populate_source_surface_filters(owners.control, total)
     }
 }

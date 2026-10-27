@@ -524,16 +524,20 @@ impl CtfInitializationReports {
                 let surface = material.surface_properties().ok_or(Error::Unavailable(
                     "actual validated opaque Material properties",
                 ))?;
-                let roughness = material
-                    .roughness()
-                    .ok_or(Error::Unavailable("actual validated Material roughness"))?;
+                let roughness = match material.roughness() {
+                    Some(value) => roughness_code(value),
+                    None if material_owner.source_group_at(source_number)?
+                        == crate::heat_balance::selected_material_data::SourceMaterialGroup::IrTransparent
+                        && material.kind() == ep_model::MaterialKind::InfraredTransparent => -1,
+                    None => return Err(Error::Unavailable("actual validated Material roughness")),
+                };
                 Ok(OrdinaryGeometryMaterial {
                     source_number,
                     typed_id: *id,
                     map_key,
                     group_code: material_owner.source_group_at(source_number)? as i32,
                     nominal_r: material_owner.nominal_r[n],
-                    roughness_code: roughness_code(roughness),
+                    roughness_code: roughness,
                     thermal_absorptance: surface.thermal_absorptance,
                     solar_absorptance: surface.solar_absorptance,
                     visible_absorptance: surface.visible_absorptance,

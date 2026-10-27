@@ -99,11 +99,11 @@ impl SelectedConstructionUsage {
         self.outside_absorp_thermal = mat_outside
             .thermal_absorptance()
             .ok_or(Error::Unavailable("CheckAndSet outside thermal property"))?;
-        self.outside_roughness = Some(
-            mat_outside
-                .roughness()
-                .ok_or(Error::Unavailable("CheckAndSet outside roughness property"))?,
-        );
+        self.outside_roughness = match mat_outside.roughness() {
+            Some(value) => Some(value),
+            None if mat_outside.kind() == ep_model::MaterialKind::InfraredTransparent => None,
+            None => return Err(Error::Unavailable("CheckAndSet outside roughness property")),
+        };
         // Original760+ follows all opaque scalar/roughness assignments.
         let outside_group = materials.data.source_group_at(outside)?;
         if outside_group == Group::AirGap

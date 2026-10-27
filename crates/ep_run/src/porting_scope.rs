@@ -181,6 +181,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Material"
             | "Material:NoMass"
             | "Material:AirGap"
+            | "Material:InfraredTransparent"
             | "Construction"
             | "Zone"
             | "BuildingSurface:Detailed"

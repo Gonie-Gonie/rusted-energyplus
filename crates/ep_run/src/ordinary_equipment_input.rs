@@ -30,6 +30,7 @@ fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
 }
 
 mod fields;
+mod infrared;
 mod people;
 mod source_b;
 use fields::{admitted_field, required_fields};
@@ -58,6 +59,8 @@ fn resolve_raw(
             continue;
         }
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
+        let source_irt_family =
+            source_calendar_ingress && family.0 == "Material:InfraredTransparent";
         let source_people_family = source_calendar_ingress && family.0 == "People";
         let source_angle_family = source_calendar_ingress && family.0 == "ComfortViewFactorAngles";
         let source_compact_family = source_calendar_ingress
@@ -117,6 +120,7 @@ fn resolve_raw(
                 | "ZoneAirHeatBalanceAlgorithm"
                 | "Output:Variable"
         ) && !source_b_family
+            && !source_irt_family
             && !source_calendar_family
             && !source_compact_family
             && !source_people_family
@@ -216,6 +220,7 @@ fn resolve_raw(
                             "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
                         )
                         && match family.0.as_str() {
+                            "Material:InfraredTransparent" if source_irt_family => true,
                             "People" if source_people_family => !people::known_field(&field.0),
                             "Output:Diagnostics" => field.0 != "diagnostics",
                             "ScheduleTypeLimits" => !matches!(
@@ -479,6 +484,7 @@ fn resolve_raw(
                         .and_then(number)
                         .is_some_and(|value| value >= 0.0)
                 }
+                "Material:InfraredTransparent" => source_irt_family,
                 "People" => source_people_family && people::admitted_object(raw, object),
                 "OtherEquipment" => {
                     (selected(object, "fuel_type", &["None"])
@@ -585,6 +591,9 @@ fn resolve_raw(
                 ));
             }
         }
+    }
+    if source_calendar_ingress {
+        infrared::validate_defined_uses(raw)?;
     }
     // GetProjectData distinguishes an absent object (4) from its schema field
     // default (6), and normalizes positive non-divisors before building owners.

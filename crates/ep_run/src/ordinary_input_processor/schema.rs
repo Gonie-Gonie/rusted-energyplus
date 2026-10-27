@@ -191,6 +191,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("Material", 2, 7, 0, 0, None),
         ("Material:NoMass", 2, 4, 0, 0, None),
         ("Material:AirGap", 1, 1, 0, 0, None),
+        ("Material:InfraredTransparent", 1, 0, 0, 0, None),
         ("OtherEquipment", 6, 7, 0, 0, None),
         ("Output:Constructions", 2, 0, 0, 0, None),
         ("Output:Diagnostics", 0, 0, 1, 0, Some("diagnostics")),

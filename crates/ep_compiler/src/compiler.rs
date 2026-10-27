@@ -4377,6 +4377,10 @@ impl<'a> Compiler<'a> {
                 continue;
             };
 
+            model
+                .ctf_report_names
+                .materials
+                .push((id, name.to_ascii_uppercase()));
             model.materials.push(Material {
                 id,
                 name: normalized_name,

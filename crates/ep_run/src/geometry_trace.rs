@@ -15,6 +15,7 @@ const SELECTED_OBJECTS: &[&str] = &[
     "Zone",
     "GlobalGeometryRules",
     "BuildingSurface:Detailed",
+    "Material:InfraredTransparent",
     "GeometryTransform",
     "Compliance:Building",
 ];

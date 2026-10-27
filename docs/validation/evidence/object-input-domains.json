@@ -251,6 +251,11 @@
     ],
     "ComfortViewFactorAngles": [
       "ComfortViewFactorAngles remains RawOnly and uses the genuine Source A/B raw/IP getter without a TypedModel arena. Original blank, whitespace and case-variant names, JSON or declaration order, optional partial rows and harmless instance/row metadata retain raw custody; reserved IDF metadata stays separate. Six shared arrays reset within actual schema-derived capacity, preserving numeric origins, field names, blank flags, counts and exact usage identities. IDF delimiter and parsed-value events retain independent fixed/extensible counts and the true-EOF unattached-array behavior. Every list, including unused lists, reaches ordered Surface/enclosure and sum checks before the first Fatal; first retained uppercase-name People association precedes the second Fatal. Actual construction absorptance, angle factors and term1 surface histories feed AngleFactor MRT and the shared radiant-HVAC correction. Same-input A/B evidence bounds these paths; arbitrary list/model combinations and full family completion remain outside this claim."
+    ],
+    "Material:InfraredTransparent": [
+      "Bounded Source A/B code admission now consumes the actual name-only raw/IP getter and fixed ROnly/resistance0.01/absorptance0.9999,1,1 properties in the existing sole material owner. Staged IDF preserves actual declaration order and physical field counts; direct epJSON remains unannotated. Unconsumed instance metadata stays raw/IP data, not a physical operand.",
+      "Single-layer IRT construction uses genuine group9 and native Invalid roughness, represented as material Roughness=-1 and construction OutsideRoughness=None without an invented valid enum. Existing resistive CTF/layer and actual surface/Zone/Space/report owners are connected. Used IRT is restricted to Ground or selfAdiabatic; Materials reports with any IRT and Constructions text reports with used IRT are excluded before undefined native roughness-name indexing.",
+      "Quantitative evidence is B-only: two same-input Ground/Adiabatic models each retain all original102variables/9792samples and unchanged policies. EIO body records are exact after only the first ProgramVersion identity; ERR records are exact after only the first identity/final elapsed-time payload, retaining actual Warning/Continue/finalIRTcategory/Warmup/Sizing state. SourceA admission/getter owner tests are not an A physical pair. Intended interzone, Outdoors/report/CondFD/window/Space/grouping and arbitrary combinations remain bounded."
     ]
   },
   "verification": {
@@ -1787,6 +1792,266 @@
         },
         "new_test_functions": 0,
         "scope": "Stage76 actual fmt/strict all-target Clippy for ep_run+ep_runtime and existing19scope+1ingress tests precede observer repair. Stage77 final actual fmt/strict all-target Clippy for the same2crates and existing19scope tests pass. The unnecessary legacy Solar predicate extension was removed to exact75 bytes; no current-primary use of the legacy factory is claimed. No full-runtime/workspace/optional-cohort rerun."
+      },
+      "infrared_defined_use_78_79": {
+        "stage78": {
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/receipt.json",
+            "sha256": "d4d1af9698943da08777a9be7c15fe502e3bec2d587ec4821092164cfc3748ce",
+            "bytes": 10353
+          },
+          "commands": [
+            {
+              "name": "fmt",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "fmt",
+                "-p",
+                "ep_compiler",
+                "-p",
+                "ep_run",
+                "-p",
+                "ep_runtime"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/fmt.log",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "bytes": 0
+              }
+            },
+            {
+              "name": "clippy",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "clippy",
+                "-p",
+                "ep_compiler",
+                "-p",
+                "ep_run",
+                "-p",
+                "ep_runtime",
+                "--all-targets",
+                "--locked",
+                "--offline",
+                "--",
+                "-D",
+                "warnings"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/clippy.log",
+                "sha256": "bf25316ea6b4629551d89a53eae941903e8aa580e07e0da5b4d3af3a1a9c0ae7",
+                "bytes": 750
+              }
+            },
+            {
+              "name": "scope-tests",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_run",
+                "--lib",
+                "porting_scope::tests::",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/scope-tests.log",
+                "sha256": "1af9f07e7499ff0dcef0ad36e0a4c5b4a7e2a463e313248a0d54cca1f7b85ab6",
+                "bytes": 2854
+              }
+            },
+            {
+              "name": "material-tests",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_runtime",
+                "--lib",
+                "selected_material_data::air_gap_tests::",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/material-tests.log",
+                "sha256": "5af6b512b3c1195ab4ac232564a940aed5f9619a0362eb71587f8d3de1ef7e56",
+                "bytes": 975
+              }
+            },
+            {
+              "name": "ctf-report-tests",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_runtime",
+                "--lib",
+                "heat_balance::ctf_reports::tests::",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/ctf-report-tests.log",
+                "sha256": "1ecc1b7fd30fa5f07cf6e3fddaef2fa9cbf1401037041db2a78142b8d49b8029",
+                "bytes": 1470
+              }
+            },
+            {
+              "name": "runtime-owner-test",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_runtime",
+                "--lib",
+                "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/runtime-owner-test.log",
+                "sha256": "022e2f6169fdce7175104acb46350fcb40d59f25697ee949a345aebe27dd1b46",
+                "bytes": 685
+              }
+            },
+            {
+              "name": "optional-compile",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "check",
+                "-p",
+                "ep_runtime",
+                "--test",
+                "native_controlled_air_cohort",
+                "--features",
+                "native-controlled-air-cohort",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit78-prep/infrared-quality01/optional-compile.log",
+                "sha256": "d6639a0b8668be1e03cae1a6e9f2589cbd0030f7f25cea5d15c2f1022c50b1c7",
+                "bytes": 1468990
+              }
+            }
+          ],
+          "focused_tests": {
+            "scope": 19,
+            "material_getter": 2,
+            "ctf_reports": 8,
+            "runtime_owner": 1,
+            "total_passed": 30,
+            "failed": 0
+          }
+        },
+        "stage79": {
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit79-prep/idf-irt-quality01/receipt.json",
+            "sha256": "56e193231f05dcf87caadfec9cd92f074bf822a10008d0f89ede9b7e8d6e215f",
+            "bytes": 3499
+          },
+          "commands": [
+            {
+              "name": "fmt",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "fmt",
+                "-p",
+                "ep_raw_model",
+                "-p",
+                "ep_run"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit79-prep/idf-irt-quality01/fmt.log",
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "bytes": 0
+              }
+            },
+            {
+              "name": "clippy",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "clippy",
+                "-p",
+                "ep_raw_model",
+                "-p",
+                "ep_run",
+                "--all-targets",
+                "--locked",
+                "--offline",
+                "--",
+                "-D",
+                "warnings"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit79-prep/idf-irt-quality01/clippy.log",
+                "sha256": "f485f139357edf4ee9fde992ffe46b44552eca0610ed1450ab43607f891861bc",
+                "bytes": 700
+              }
+            },
+            {
+              "name": "idf-order-tests",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_raw_model",
+                "--lib",
+                "idf_order::",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit79-prep/idf-irt-quality01/idf-order-tests.log",
+                "sha256": "ac11aed21e5ef5082005c9a9c3e51545fc84b58d5f244d501fc8c47cd9104b3f",
+                "bytes": 1867
+              }
+            },
+            {
+              "name": "source-idf-projection-test",
+              "argv": [
+                "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+                "test",
+                "-p",
+                "ep_run",
+                "--lib",
+                "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support",
+                "--locked",
+                "--offline"
+              ],
+              "exit_code": 0,
+              "log": {
+                "path": ".runtime/object-expansion/unit79-prep/idf-irt-quality01/source-idf-projection-test.log",
+                "sha256": "86e478f40dd14e2e5596dc2687785c3ea66f08118629b21d9e5bcab0ff8a64c3",
+                "bytes": 999
+              }
+            }
+          ],
+          "focused_tests": {
+            "raw_idf_order": 13,
+            "Source_material_projection": 1,
+            "total_passed": 14,
+            "failed": 0
+          }
+        },
+        "new_test_functions": 0,
+        "scope": "Actual78 fmt/strict all-target Clippy ep_compiler+ep_run+ep_runtime,30existing focused tests and optional native-controlled-air compile-only check. Actual79 fmt/strict all-target Clippy ep_raw_model+ep_run,13existing raw IDF tests+1existing Source projection test. Reuse unchanged78 material/CTF/runtime quality; no new full-runtime/workspace/cohort execution or Native replay.",
+        "independent_current_build_Source_custody": {
+          "path": ".runtime/object-expansion/unit79-prep/runtime-build-source-custody79.json",
+          "sha256": "c5743595be76043408ef80d651d0dd5c8b33b6fc5a3ab59e5bbb8e51f8967733",
+          "bytes": 9199
+        }
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -1796,7 +2061,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration. The two Source77 Ceiling-alias models retain every original A55-variable/3-meter and B102-variable/no-meter policy without selector or numerical changes. Actual raw/typed Ceiling links by exact typedID to retained Source Roof class3. Complete EIO body bytes exclude only the first Program Version record; all334 A DXF logical records exclude only one Program Version999 payload and line-ending encoding. Native private class is not observed. Earlier Source76A engine0 was unaccepted solely for a missing current-primary observer artifact; B76 was never launched and no76 samples enter accepted totals.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration. The two Source77 Ceiling-alias models retain every original A55-variable/3-meter and B102-variable/no-meter policy without selector or numerical changes. Actual raw/typed Ceiling links by exact typedID to retained Source Roof class3. Complete EIO body bytes exclude only the first Program Version record; all334 A DXF logical records exclude only one Program Version999 payload and line-ending encoding. Native private class is not observed. Earlier Source76A engine0 was unaccepted solely for a missing current-primary observer artifact; B76 was never launched and no76 samples enter accepted totals. The two Source79 IRT B models each retain all original102Timestepvariable policies/9792values with no selector or numerical changes, genuine absent MTR/DXF, all EIO records (91 total) except the first ProgramVersion record, and exact ERR body after only its first identity and final elapsed-time payload. Actual Warning/Continue, finalIRTcategory and Warmup/Sizing state remain included. Native78 is reused without replay. Source78 Ground engine6 stopped for missing IDF metadata before physical output, with no Adiabatic launch or accepted numerical evidence; actual changed code/build79 is separate.",
     "cases": [
       {
         "id": "timestep-8",
@@ -30457,12 +30722,483 @@
           "genuine_Native_MTR_present": false,
           "qualification": "Current-primary observer copies real retained Source owners only after normal completion and completed-stream read. No legacy factory execution, synthetic HeatBalanceState/timestep/GEO-02/internal-gains projection or Native private class is claimed."
         }
+      },
+      {
+        "id": "B-IRT-GROUND-24H",
+        "group": "material_infrared_transparent",
+        "source_build": "infrared-idf-metadata-79",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit78-prep/infrared-proposal/B-IRT-GROUND-24H/input.idf",
+          "sha256": "0687a14e20bd0c2c166fc18bf7f2ea27da162148a5c79572356e1ddf4db38a1f",
+          "bytes": 13145
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/infrared-78/native-01/B-IRT-GROUND-24H/command/receipt.json",
+          "sha256": "07cfacdd3e40432d0ba4c0bf205cd5a44557fb3ffc9e02242b5f98f6e0f40e26",
+          "bytes": 8180
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/command/receipt.json",
+          "sha256": "97e3cbb8f4792d557f32d9b62f52251cdb49fd93f46986c180c0bec83cf1027c",
+          "bytes": 10945
+        },
+        "source_summary": {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/output/run-summary.json",
+          "sha256": "ef58d4f5d33f452d0726dd14b62e727e977f8271fea16203e3df7967436aa8d5",
+          "bytes": 60846
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-79/eplus-rs.exe",
+          "sha256": "c08ceb239015ac7f90539a9286b15f723d275a3a22fd01c1c7d899494615eb03",
+          "bytes": 77922651
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1b314e9ec67063f39df2be7c3006056dbda3208ba4cde2ca51fe175c1b4c7df3",
+          "sha256": "1b314e9ec67063f39df2be7c3006056dbda3208ba4cde2ca51fe175c1b4c7df3"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-79/receipt.json",
+          "sha256": "4306f3e587272ca922c1316088f51bdc544cd680f85f5adfc83059c0210b6670",
+          "bytes": 8249
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/comparison.json",
+          "sha256": "b74fb608401b32b88f801ee59b0f834f5e6db6e97812971a46feb7ed10eaf3c4",
+          "bytes": 182317
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit79-prep/infrared-source-proposal/plan.json",
+          "sha256": "a2b6f319bdaabe2370ceaf4b2d6e0aaf74e21c9ffe057c81b78b3325d2ac470e",
+          "bytes": 60575
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit78-prep/infrared-proposal/B-IRT-GROUND-24H/recipe.json",
+          "sha256": "c160078e435e43db1049572455acdb3d8602508ca5ba7ca0e830aa72eab582b2",
+          "bytes": 7735
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 4367,
+          "parsed_binary64_unequal": 4367,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All102 original named Timestep variables, exact physical dictionaries/IDs, one environment,96ordered clocks, finite values and catalog/count/footer/EOF.",
+          "MTR": "Genuine completed Native MTR absence and actual Source deleted_empty=true/0records/0series/[]; no file or rows fabricated.",
+          "original_full_reported_profile_rows": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "B",
+          "all_original_variable_and_meter_policy_rows": true,
+          "derived_policy_rows": 0,
+          "numerical_limits_changed": false,
+          "qualification": "Only the declared FLOOR construction/boundary tokens and appended name-only IRT material/single-layer construction change. All original B selectors/atol/rtol/RMSE and96physical steps at4/hour remain unchanged; not a frozen input identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 4.656612873077393e-10,
+          "max_rmse_delta": 1.3468712739913047e-10,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 108,
+              "exact_timestamp_rows": 96,
+              "numeric_records": 9792,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a"
+            },
+            {
+              "stream": "mtr",
+              "deleted_empty": true,
+              "numeric_records": 0
+            }
+          ]
+        },
+        "effective_state": "Actual Source B full normal lifecycle on oneZone/implicitSpace, sole-layer IRT FLOOR with Ground boundary. All102 original reported variables pass unchanged policies; quantitative evidence is limited to this finite defined-use input. Source A/B code admission does not establish an A physical pair, intended interzone use or arbitrary legal combinations.",
+        "IRT_observation": {
+          "boundary": "Ground",
+          "material_name": "IRT MATERIAL 78",
+          "material_Source_number": 2,
+          "material_typed_id": 1,
+          "actual_material_group": 9,
+          "material_Invalid_roughness": -1,
+          "NominalR": {
+            "value": 0.01,
+            "value_bits": "3f847ae147ae147b"
+          },
+          "validated_typed_properties": {
+            "AbsorpSolar": {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000"
+            },
+            "AbsorpThermal": {
+              "value": 0.9999,
+              "value_bits": "3fefff2e48e8a71e"
+            },
+            "AbsorpVisible": {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000"
+            },
+            "Roughness": -1
+          },
+          "construction_name": "IRT CONSTRUCTION 78",
+          "construction_Source_number": 2,
+          "construction_typed_id": 1,
+          "TypeIsIRT": true,
+          "TotLayers": 1,
+          "LayerPoint": {
+            "lower": 1,
+            "size": 11,
+            "upper": 11,
+            "values": [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "OutsideRoughness": null,
+          "target_raw_name": "FLOOR",
+          "target_typed_id": 4,
+          "final_Source_surface_id": 5,
+          "final_Source_class": 2,
+          "final_Source_boundary": -1,
+          "Source_Zone_id": 1,
+          "Source_Space_id": 1,
+          "compiled_geometry": {
+            "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/output/compiled-geometry.json",
+            "sha256": "048c818f76e563097cf078aa6d3b38933cd58d44caf8b1f929a2d22572130385",
+            "bytes": 20943
+          },
+          "geometry_consumers": {
+            "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/output/geometry-consumers.json",
+            "sha256": "636f717474eee893cad007073719274b4e303191de915d7b3c95cb77391ceef1",
+            "bytes": 29504
+          },
+          "Source_converted": {
+            "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/output/input/converted.epJSON",
+            "sha256": "495c895e3ec9b5b95f405076df461385b883f3a58822f0f8840a7c68e2c0a130",
+            "bytes": 37911
+          },
+          "current_primary_only": true,
+          "unavailable_legacy_fields_absent": true,
+          "completion": {
+            "end": {
+              "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/output/eplusrs.end",
+              "sha256": "f411fb9807fdd27a70d0c6b85d792f65a89a2f3eccdfab0acc2c4e7d95e78a9a",
+              "bytes": 98
+            },
+            "err": {
+              "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/output/eplusrs.err",
+              "sha256": "61879fcd3744b3bdb2124050a1f28e04ba8ac50855f56eb196e30aa70dc06062",
+              "bytes": 1903
+            },
+            "final_warnings": 2,
+            "severe_or_fatal": false,
+            "warning_and_continue_records_hex": [
+              "2020202a2a205761726e696e67202a2a20476574485453757266616365446174613a205375726661636573207769746820696e7465726661636520746f2047726f756e6420666f756e6420627574206e6f202247726f756e642054656d70657261747572657322207765726520696e7075742e0d0a",
+              "2020202a2a2020207e7e7e2020202a2a20466f756e6420666972737420696e20737572666163653d464c4f4f520d0a",
+              "2020202a2a2020207e7e7e2020202a2a2044656661756c74732c20636f6e7374616e74207468726f7567686f7574207468652079656172206f66202831382e30292077696c6c20626520757365642e0d0a",
+              "2020202a2a205761726e696e67202a2a2047657453757266616365446174613a2053757266616365732075736520496e6672617265645472616e73706172656e7420636f6e737472756374696f6e73203120696e206e6f6e2d696e7465727a6f6e652073757266616365732e2028696c6c6567616c20757365290d0a",
+              "2020202a2a2020207e7e7e2020202a2a20466f72206578706c696369742064657461696c73206f6e2065616368207573652c20757365204f75747075743a446961676e6f73746963732c446973706c617945787472615761726e696e67733b0d0a"
+            ],
+            "warmup_sizing_summary_records_hex": [
+              "2020202a2a2a2a2a2a2a2a2a2a2a2a2a20456e65726779506c7573205761726d7570204572726f722053756d6d6172792e20447572696e67205761726d75703a2030205761726e696e673b203020536576657265204572726f72732e0d0a",
+              "2020202a2a2a2a2a2a2a2a2a2a2a2a2a20456e65726779506c75732053697a696e67204572726f722053756d6d6172792e20447572696e672053697a696e673a2030205761726e696e673b203020536576657265204572726f72732e0d0a"
+            ],
+            "full_ERR_nonidentity_nonduration_sha256": "25fbed59aac5a7c08d3e360288859181f8630e029f5cc33d204ab08496de9c65",
+            "full_ERR_nonidentity_nonduration_records": 25
+          },
+          "full_EIO": {
+            "artifact": {
+              "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/output/eplusrs.eio",
+              "sha256": "7c6a630af3b45f6db257f7fac17a39f77149ec0263f0f71ee506f4e63f2cb8ff",
+              "bytes": 12652
+            },
+            "records": 91,
+            "body_sha256": "9ab0fc9a76b7bd71cd2be62662ed21b40504fded35c57ecf3b61c5429d614f77",
+            "comparison": "All CRLF body records exact after only first ProgramVersion identity."
+          },
+          "ERR_comparison": "All actual CRLF ERR records exact after only first identity and final elapsed-time payload; Warning/Continue/finalIRTcategory/Warmup/Sizing retained.",
+          "actual_Source_MTR_owner": {
+            "deleted_empty": true,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\infrared-79\\source-01\\B-IRT-GROUND-24H\\output\\eplusrs.mtr",
+            "reported_numeric_records": 0,
+            "series": 0,
+            "series_samples": [],
+            "stream": "mtr"
+          },
+          "genuine_Native_MTR_present": false,
+          "Source_MTR_present": false,
+          "Source_and_Native_DXF_present": false,
+          "Native_private_MaterialBase_or_construction_or_CTF_observed": false,
+          "ROnly_private_member_observed": false,
+          "qualification": "Existing current-primary observer copies actual retained Source owner links. Native private owners/ROnly are not instrumented; ROnly is established separately by the source getter/existing owner test, not fabricated in trace."
+        }
+      },
+      {
+        "id": "B-IRT-ADIABATIC-24H",
+        "group": "material_infrared_transparent",
+        "source_build": "infrared-idf-metadata-79",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit78-prep/infrared-proposal/B-IRT-ADIABATIC-24H/input.idf",
+          "sha256": "af9035fda36c5442a1bf4c3ab5c11407729b9c9d100219591e7b82546efa2bbc",
+          "bytes": 13148
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/infrared-78/native-01/B-IRT-ADIABATIC-24H/command/receipt.json",
+          "sha256": "4a795d05da512b52867a3fad984b780e9c213fb6b1ad92b1263b52313f4625d0",
+          "bytes": 8221
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/command/receipt.json",
+          "sha256": "056be0f3b53f0023f3123b66999c25ee5778e4e633412c6674b80a1bcdca27ab",
+          "bytes": 10987
+        },
+        "source_summary": {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/output/run-summary.json",
+          "sha256": "775e2b0c8adde273932729d8520bae9e2d969b177aba7f4bd419eee70d60a958",
+          "bytes": 60919
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-79/eplus-rs.exe",
+          "sha256": "c08ceb239015ac7f90539a9286b15f723d275a3a22fd01c1c7d899494615eb03",
+          "bytes": 77922651
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1b314e9ec67063f39df2be7c3006056dbda3208ba4cde2ca51fe175c1b4c7df3",
+          "sha256": "1b314e9ec67063f39df2be7c3006056dbda3208ba4cde2ca51fe175c1b4c7df3"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-79/receipt.json",
+          "sha256": "4306f3e587272ca922c1316088f51bdc544cd680f85f5adfc83059c0210b6670",
+          "bytes": 8249
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/comparison.json",
+          "sha256": "5b0176c4f99b51711fd06dfb41b5857ec302ec0c9a4a5ddb64286d1d3b15e1be",
+          "bytes": 175106
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit79-prep/infrared-source-proposal/plan.json",
+          "sha256": "a2b6f319bdaabe2370ceaf4b2d6e0aaf74e21c9ffe057c81b78b3325d2ac470e",
+          "bytes": 60575
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit78-prep/infrared-proposal/B-IRT-ADIABATIC-24H/recipe.json",
+          "sha256": "8cb8e720c59e7d41e94841103272e0ea7209433afcc0ae143bbbaf4ff3ad55c6",
+          "bytes": 7756
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All102 original named Timestep variables, exact physical dictionaries/IDs, one environment,96ordered clocks, finite values and catalog/count/footer/EOF.",
+          "MTR": "Genuine completed Native MTR absence and actual Source deleted_empty=true/0records/0series/[]; no file or rows fabricated.",
+          "original_full_reported_profile_rows": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "B",
+          "all_original_variable_and_meter_policy_rows": true,
+          "derived_policy_rows": 0,
+          "numerical_limits_changed": false,
+          "qualification": "Only the declared FLOOR construction/boundary tokens and appended name-only IRT material/single-layer construction change. All original B selectors/atol/rtol/RMSE and96physical steps at4/hour remain unchanged; not a frozen input identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 0.0,
+          "max_rmse_delta": 0.0,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 108,
+              "exact_timestamp_rows": 96,
+              "numeric_records": 9792,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a"
+            },
+            {
+              "stream": "mtr",
+              "deleted_empty": true,
+              "numeric_records": 0
+            }
+          ]
+        },
+        "effective_state": "Actual Source B full normal lifecycle on oneZone/implicitSpace, sole-layer IRT FLOOR with Adiabatic boundary. All102 original reported variables pass unchanged policies; quantitative evidence is limited to this finite defined-use input. Source A/B code admission does not establish an A physical pair, intended interzone use or arbitrary legal combinations.",
+        "IRT_observation": {
+          "boundary": "Adiabatic",
+          "material_name": "IRT MATERIAL 78",
+          "material_Source_number": 2,
+          "material_typed_id": 1,
+          "actual_material_group": 9,
+          "material_Invalid_roughness": -1,
+          "NominalR": {
+            "value": 0.01,
+            "value_bits": "3f847ae147ae147b"
+          },
+          "validated_typed_properties": {
+            "AbsorpSolar": {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000"
+            },
+            "AbsorpThermal": {
+              "value": 0.9999,
+              "value_bits": "3fefff2e48e8a71e"
+            },
+            "AbsorpVisible": {
+              "value": 1.0,
+              "value_bits": "3ff0000000000000"
+            },
+            "Roughness": -1
+          },
+          "construction_name": "IRT CONSTRUCTION 78",
+          "construction_Source_number": 2,
+          "construction_typed_id": 1,
+          "TypeIsIRT": true,
+          "TotLayers": 1,
+          "LayerPoint": {
+            "lower": 1,
+            "size": 11,
+            "upper": 11,
+            "values": [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "OutsideRoughness": null,
+          "target_raw_name": "FLOOR",
+          "target_typed_id": 4,
+          "final_Source_surface_id": 5,
+          "final_Source_class": 2,
+          "final_Source_boundary": 5,
+          "Source_Zone_id": 1,
+          "Source_Space_id": 1,
+          "compiled_geometry": {
+            "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/output/compiled-geometry.json",
+            "sha256": "7dc9196fcbb932ea66ce379a1d3b9e1a3e06ca44f8cd081f003c7fe4d60f16d3",
+            "bytes": 20955
+          },
+          "geometry_consumers": {
+            "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/output/geometry-consumers.json",
+            "sha256": "1da058ebb9a7cd55d3000f3404e10828a171bb2f86b143ba3503175b77771124",
+            "bytes": 29503
+          },
+          "Source_converted": {
+            "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/output/input/converted.epJSON",
+            "sha256": "be015596b11cdeea8d8eec9243b909b4115e53a090b042b4f1bffa8ffbeb5ecb",
+            "bytes": 37914
+          },
+          "current_primary_only": true,
+          "unavailable_legacy_fields_absent": true,
+          "completion": {
+            "end": {
+              "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/output/eplusrs.end",
+              "sha256": "c8f154104906752b01f638d80bdf28c688c7cbe11536ecf9ab92823b0cd796ab",
+              "bytes": 98
+            },
+            "err": {
+              "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/output/eplusrs.err",
+              "sha256": "379493e3748bb0805044bd83d2294053c792b603f49f7002d2e5f1f4fb838e7e",
+              "bytes": 1658
+            },
+            "final_warnings": 1,
+            "severe_or_fatal": false,
+            "warning_and_continue_records_hex": [
+              "2020202a2a205761726e696e67202a2a2047657453757266616365446174613a2053757266616365732075736520496e6672617265645472616e73706172656e7420636f6e737472756374696f6e73203120696e206e6f6e2d696e7465727a6f6e652073757266616365732e2028696c6c6567616c20757365290d0a",
+              "2020202a2a2020207e7e7e2020202a2a20466f72206578706c696369742064657461696c73206f6e2065616368207573652c20757365204f75747075743a446961676e6f73746963732c446973706c617945787472615761726e696e67733b0d0a"
+            ],
+            "warmup_sizing_summary_records_hex": [
+              "2020202a2a2a2a2a2a2a2a2a2a2a2a2a20456e65726779506c7573205761726d7570204572726f722053756d6d6172792e20447572696e67205761726d75703a2030205761726e696e673b203020536576657265204572726f72732e0d0a",
+              "2020202a2a2a2a2a2a2a2a2a2a2a2a2a20456e65726779506c75732053697a696e67204572726f722053756d6d6172792e20447572696e672053697a696e673a2030205761726e696e673b203020536576657265204572726f72732e0d0a"
+            ],
+            "full_ERR_nonidentity_nonduration_sha256": "cb4c267317390bef424eb0da32997505ba6f8f84bd9c800ccdd9896a0a17dc58",
+            "full_ERR_nonidentity_nonduration_records": 22
+          },
+          "full_EIO": {
+            "artifact": {
+              "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/output/eplusrs.eio",
+              "sha256": "f08f6d0be3617799506c8bfaa10562fb64ee718c810f04cb29ebdf5488f9bd86",
+              "bytes": 12652
+            },
+            "records": 91,
+            "body_sha256": "0d83858976ce28e18b3f474e6137b575a48aa70d80885940ec89a6af1d0c689d",
+            "comparison": "All CRLF body records exact after only first ProgramVersion identity."
+          },
+          "ERR_comparison": "All actual CRLF ERR records exact after only first identity and final elapsed-time payload; Warning/Continue/finalIRTcategory/Warmup/Sizing retained.",
+          "actual_Source_MTR_owner": {
+            "deleted_empty": true,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\infrared-79\\source-01\\B-IRT-ADIABATIC-24H\\output\\eplusrs.mtr",
+            "reported_numeric_records": 0,
+            "series": 0,
+            "series_samples": [],
+            "stream": "mtr"
+          },
+          "genuine_Native_MTR_present": false,
+          "Source_MTR_present": false,
+          "Source_and_Native_DXF_present": false,
+          "Native_private_MaterialBase_or_construction_or_CTF_observed": false,
+          "ROnly_private_member_observed": false,
+          "qualification": "Existing current-primary observer copies actual retained Source owner links. Native private owners/ROnly are not instrumented; ROnly is established separately by the source getter/existing owner test, not fabricated in trace."
+        }
       }
     ],
     "totals": {
-      "paired_cases": 126,
-      "reported_samples": 3491070,
-      "raw_operand_unequal": 717535,
+      "paired_cases": 128,
+      "reported_samples": 3510654,
+      "raw_operand_unequal": 721902,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -31725,6 +32461,40 @@
           "sha256": "866d2abc59cfe4ab75b26cff24fd6bf874deecba1f372dafd33eaf955e01cb0f",
           "bytes": 77877413
         }
+      },
+      {
+        "id": "infrared-defined-use-78",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-78/receipt.json",
+          "sha256": "34372860eda8eb2cdd93f3d2aabc28c10ae03ba28fd7c9127f8c647cc0d9c4c3",
+          "bytes": 8159
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/fb/fbecdb08bc3ba7692a271a4fa2561c3b9e1ab028eb71eff9407928e4432b041a",
+          "sha256": "fbecdb08bc3ba7692a271a4fa2561c3b9e1ab028eb71eff9407928e4432b041a"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-78/eplus-rs.exe",
+          "sha256": "bce618d24571a0131ffd3005c8c3fe3f901a40175bce410c75699c43267fde0d",
+          "bytes": 77922651
+        }
+      },
+      {
+        "id": "infrared-idf-metadata-79",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-79/receipt.json",
+          "sha256": "4306f3e587272ca922c1316088f51bdc544cd680f85f5adfc83059c0210b6670",
+          "bytes": 8249
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1b/1b314e9ec67063f39df2be7c3006056dbda3208ba4cde2ca51fe175c1b4c7df3",
+          "sha256": "1b314e9ec67063f39df2be7c3006056dbda3208ba4cde2ca51fe175c1b4c7df3"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-79/eplus-rs.exe",
+          "sha256": "c08ceb239015ac7f90539a9286b15f723d275a3a22fd01c1c7d899494615eb03",
+          "bytes": 77922651
+        }
       }
     ],
     "focused_since_workspace": {
@@ -31753,17 +32523,152 @@
         "admitted_cases": 0,
         "admitted_samples": 0,
         "historical_live_authorities_replayed": false
+      },
+      {
+        "unit": 78,
+        "scope": "B",
+        "source_build": "infrared-defined-use-78",
+        "build_row": {
+          "path": ".runtime/object-expansion/build78-row.json",
+          "sha256": "36cbb16c1da1f510f0dd7f7316a9b59231f89380b9473d589031c22a6b9b42c7",
+          "bytes": 672
+        },
+        "failed_summary": {
+          "path": ".runtime/porting/infrared-78/source-01/summary.json",
+          "sha256": "c429f6d398da097c4481eff1983c964981d6fd0eb497c2638ad5c134da6e717e",
+          "bytes": 1527
+        },
+        "failed_comparison": {
+          "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/comparison.json",
+          "sha256": "fe186143977b743bbeb76554f078ff5f7f4066638bb96c5e317fc75e9dc604af",
+          "bytes": 1964
+        },
+        "actual_Source_receipt": {
+          "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/command/receipt.json",
+          "sha256": "c92dd14ba7803629f2baad2f17752ae9d17ae202151272326275f0e1228e14b1",
+          "bytes": 10854
+        },
+        "source_summary": {
+          "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/output/run-summary.json",
+          "sha256": "caa1b43c9630a725c3d797a9bbac53b36ca4d2675078bd94cddaf48603797b10",
+          "bytes": 24540
+        },
+        "diagnostics": {
+          "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/output/diagnostics.json",
+          "sha256": "2f2091b5a804bfae509f22cf3bbc3f12a86f538e084bb30915ba47d433073bfd",
+          "bytes": 789
+        },
+        "sealed_validation_plan": {
+          "path": ".runtime/object-expansion/unit78-prep/infrared-source-proposal/plan.json",
+          "sha256": "58215d7d861422f956af9aadf6e9882c4fd89ef4d50cd13f53010040b8540dbe",
+          "bytes": 52951
+        },
+        "immutable_artifact_refs": [
+          {
+            "path": ".runtime/object-expansion/unit78-prep/infrared-source-proposal/run_source_irt.py",
+            "sha256": "0523407628b9ac84cedc43e016bd4e7fe49f05b3933c44a303ce6d2bae6a8413",
+            "bytes": 38416
+          },
+          {
+            "path": ".runtime/object-expansion/unit78-prep/infrared-source-proposal/plan.json",
+            "sha256": "58215d7d861422f956af9aadf6e9882c4fd89ef4d50cd13f53010040b8540dbe",
+            "bytes": 52951
+          },
+          {
+            "path": ".runtime/object-expansion/unit78-prep/infrared-source-proposal/proposal.json",
+            "sha256": "130c9065281d814874ba22c81b6969a7ef9a8f5ffbcf61262d34918cd8ff6bff",
+            "bytes": 1441
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/summary.json",
+            "sha256": "c429f6d398da097c4481eff1983c964981d6fd0eb497c2638ad5c134da6e717e",
+            "bytes": 1527
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/comparison.json",
+            "sha256": "fe186143977b743bbeb76554f078ff5f7f4066638bb96c5e317fc75e9dc604af",
+            "bytes": 1964
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/source-launch.json",
+            "sha256": "a527bdfeebde488d15a341eb4a87418fffe04edfee9f6b1ab6761d998acf361a",
+            "bytes": 3309
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/command/receipt.json",
+            "sha256": "c92dd14ba7803629f2baad2f17752ae9d17ae202151272326275f0e1228e14b1",
+            "bytes": 10854
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/output/run-summary.json",
+            "sha256": "caa1b43c9630a725c3d797a9bbac53b36ca4d2675078bd94cddaf48603797b10",
+            "bytes": 24540
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/output/diagnostics.json",
+            "sha256": "2f2091b5a804bfae509f22cf3bbc3f12a86f538e084bb30915ba47d433073bfd",
+            "bytes": 789
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/output/eplusrs.err",
+            "sha256": "7d29427d14dae9779b55b12133a03a36fe1b8e703e03311b5bca853f13f41f5a",
+            "bytes": 295
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/output/compiled-geometry.json",
+            "sha256": "4b9d9b0f756cb34f41c29640e45dc8eada4eb533edaefb48326332ab749e7b5e",
+            "bytes": 20825
+          },
+          {
+            "path": ".runtime/object-expansion/build78-row.json",
+            "sha256": "36cbb16c1da1f510f0dd7f7316a9b59231f89380b9473d589031c22a6b9b42c7",
+            "bytes": 672
+          },
+          {
+            "path": ".runtime/porting/object-domain-20261020/build-78/receipt.json",
+            "sha256": "34372860eda8eb2cdd93f3d2aabc28c10ae03ba28fd7c9127f8c647cc0d9c4c3",
+            "bytes": 8159
+          },
+          {
+            "path": ".runtime/porting/source-objects/fb/fbecdb08bc3ba7692a271a4fa2561c3b9e1ab028eb71eff9407928e4432b041a",
+            "sha256": "fbecdb08bc3ba7692a271a4fa2561c3b9e1ab028eb71eff9407928e4432b041a",
+            "bytes": 1897052
+          },
+          {
+            "path": ".runtime/porting/object-domain-20261020/build-78/eplus-rs.exe",
+            "sha256": "bce618d24571a0131ffd3005c8c3fe3f901a40175bce410c75699c43267fde0d",
+            "bytes": 77922651
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/command/stdout.log",
+            "sha256": "f6b6df1b1302618c6dea64adea7ff795a3a677a952c50ab918c0d1373c41e602",
+            "bytes": 708
+          },
+          {
+            "path": ".runtime/porting/infrared-78/source-01/B-IRT-GROUND-24H/command/stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          }
+        ],
+        "actual_Source_executions": 1,
+        "Ground_executions": 1,
+        "Adiabatic_executions": 0,
+        "exit_code": 6,
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "classification": "Input-order/provenance failure before physical execution, RuntimeConvergenceFailure: actual Material IDF order unavailable: Material:InfraredTransparent. This is not a numerical tolerance failure. Adiabatic78 never launched; no Source78 retry/Native replay or fabricated stream rows."
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 74,
-      "builds_with_accepted_paired_cases": 72,
-      "builds_with_only_retained_failed_Source_attempts": 1,
+      "actual_recorded_builds": 76,
+      "builds_with_accepted_paired_cases": 73,
+      "builds_with_only_retained_failed_Source_attempts": 2,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
-      "builds_with_only_unaccepted_Source_attempts": 2,
+      "builds_with_only_unaccepted_Source_attempts": 3,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "74 actual recorded builds partition into72 with accepted pairs,1 retained engine-failed-only build68(exit6), and1 retained observer-unaccepted-only build76(engine0). The two unaccepted-only builds contribute no accepted cases or samples."
+      "qualification": "76 actual recorded builds partition into73 with accepted pairs,2 engine-failed-only builds68/78(exit6), and1 observer-unaccepted-only build76(engine0). Build78 failed before physical input-order completion; none of these unaccepted attempts contribute accepted cases/samples."
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",
@@ -32112,6 +33017,85 @@
       "Native_private_class_observed": false,
       "historical76_classification": "One unaccepted A observer attempt with normal engine0; B never launched; zero accepted pairs/samples. Distinct from historical68 engine6 failure.",
       "scope": "Two actual one-Zone/implicit-Space original-profile A/B derived Ceiling models only. Full scientific policies unchanged. Current-primary retained-owner trace is connected; no legacy factory execution or unavailable synthetic state fields. Other geometry/physics/object-combination gates remain."
+    },
+    "current_InfraredTransparent_live_pair": {
+      "source_build": "infrared-idf-metadata-79",
+      "case_rows": [
+        "B-IRT-GROUND-24H",
+        "B-IRT-ADIABATIC-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/infrared-79/source-01/summary.json",
+        "sha256": "9cfee77c1bb4abbc4aedb81090d89e58b039e687944d1a5562bc8d354e749dd7",
+        "bytes": 8640
+      },
+      "comparisons": [
+        {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-GROUND-24H/comparison.json",
+          "sha256": "b74fb608401b32b88f801ee59b0f834f5e6db6e97812971a46feb7ed10eaf3c4",
+          "bytes": 182317
+        },
+        {
+          "path": ".runtime/porting/infrared-79/source-01/B-IRT-ADIABATIC-24H/comparison.json",
+          "sha256": "5b0176c4f99b51711fd06dfb41b5857ec302ec0c9a4a5ddb64286d1d3b15e1be",
+          "bytes": 175106
+        }
+      ],
+      "Native_index": {
+        "path": ".runtime/porting/infrared-78/native-01/launches.json",
+        "sha256": "5b528119a50d47390fc9f55bcdf51dc902096f79be9f99f8d3cc45568c93ea47",
+        "bytes": 1981
+      },
+      "Native_raw_readback": {
+        "path": ".runtime/object-expansion/unit78-prep/native-raw-readback01.json",
+        "sha256": "79b481b6b5bc0a960778c76f3d8ed5820d1c696f0c4db9b504355035d033fbbc",
+        "bytes": 9680
+      },
+      "Root_independent_full_raw_reread": {
+        "path": ".runtime/object-expansion/unit79-prep/root-raw-readback01.json",
+        "sha256": "68e27c28ab74b41afc4380dc1f7dbe7baf16b825f032178b0b8f5a5933513e89",
+        "bytes": 69610
+      },
+      "Runtime_independent_build_Source_custody": {
+        "path": ".runtime/object-expansion/unit79-prep/runtime-build-source-custody79.json",
+        "sha256": "c5743595be76043408ef80d651d0dd5c8b33b6fc5a3ab59e5bbb8e51f8967733",
+        "bytes": 9199
+      },
+      "author_independent_raw_audit": {
+        "path": ".runtime/object-expansion/unit79-prep/infrared-evidence-proposal/author-actual-audit.json",
+        "sha256": "8c561bcfc45e2c97215d833fccce210f08960c1e3d69144ff3dc87db241b2985",
+        "bytes": 1375
+      },
+      "code_admission_proposal": {
+        "path": ".runtime/object-expansion/unit78-prep/infrared-proposal/proposal.json",
+        "sha256": "b771e9adb4adb483c9df4736a6ab474656c5be80838fb5da813b37d51fb2f11a",
+        "bytes": 28533
+      },
+      "IDF_annotation_fix": {
+        "path": ".runtime/object-expansion/unit79-prep/idf-irt-proposal/proposal.json",
+        "sha256": "e31c7641f2af11445df4aa8446cec544af08986abfb2cd69dad8e4f968d4de42",
+        "bytes": 5295
+      },
+      "validation_proposal": {
+        "path": ".runtime/object-expansion/unit79-prep/infrared-source-proposal/proposal.json",
+        "sha256": "f371862b01ff49a61bfa834c3c66362851b27ffeb880a36d6076c679015a3647",
+        "bytes": 1749
+      },
+      "code_admission": "bounded Source A/B defined-use route",
+      "physical_evidence_scopes": [
+        "B",
+        "B"
+      ],
+      "Native_replays": 0,
+      "Source78_retries": 0,
+      "historical_failed78_summary": {
+        "path": ".runtime/porting/infrared-78/source-01/summary.json",
+        "sha256": "c429f6d398da097c4481eff1983c964981d6fd0eb497c2638ad5c134da6e717e",
+        "bytes": 1527
+      },
+      "historical78_accepted_pairs": 0,
+      "historical78_accepted_samples": 0,
+      "scope": "Only two full original B102variable/no-meter Ground/Adiabatic IRT pairs are quantified. Existing source/getter/owner tests support SourceA/B code admission; no A physical pair or broader intended-interzone/exterior/report/CondFD/window/Space/grouping combination is promoted."
     }
   },
   "additional_native_type_calibrations": [

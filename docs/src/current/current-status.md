@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 126 paired physical cases and 3,491,070 reported values with zero
+contains 128 paired physical cases and 3,510,654 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -64,6 +64,14 @@ the actual getter assigns its Roof class. Surface/full tracing now exports
 the retained current Source geometry after successful completion. Two full-profile
 Ceiling comparisons pass the original policies; their EIO bodies and DXF geometry
 agree within the explicitly recorded version-header and line-ending boundaries.
+
+`Material:InfraredTransparent` now reaches the ordered Source A/B getter and
+single-layer CTF on Ground or Adiabatic boundaries, preserving the Native
+warnings and Invalid roughness. Two 24-hour B comparisons cover 19,584 values
+with zero tolerance or RMSE failures. Adiabatic values are raw-exact; Ground's
+maximum absolute difference is 4.66e-10. Exterior roughness lookups, Materials
+reports and used-IRT Constructions reports remain excluded. Interzone, CondFD
+and broader object combinations remain open.
 
 Reporting key matching uses the [Rust RE2 port](../../../crates/ep_re2/README.md)
 at pre-scan, request construction and live registration. Eager OnePass analysis,

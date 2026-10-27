@@ -85,6 +85,9 @@ impl SourceSupportAdmission {
         }
         let covered_objects = [
             "HeatBalanceAlgorithm",
+            // Ordered IRT getter/ROnly CTF properties; the same raw resolver
+            // checks safe Source uses before this consumed-family marker.
+            "Material:InfraredTransparent",
             "SimulationControl",
             "SurfaceConvectionAlgorithm:Inside",
             "SurfaceConvectionAlgorithm:Outside",
