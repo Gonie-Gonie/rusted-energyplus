@@ -1,0 +1,150 @@
+{
+  "schema": "pinned-RE2-default-unit-vectors.v1",
+  "pinned_EnergyPlus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
+  "pinned_RE2_Unicode_version": "14.0.0",
+  "rows": 10168,
+  "fixture_sha256": "cae223bd54679f03272ba80a8f502f982dd77113c29eaf4d39387229045dfbbb",
+  "fixture_bytes": 462155,
+  "Native_kind": "Standalone exact pinned RE2 source build, GCC13.2.0 UCRT; not EnergyPlus DLL or physics. Quiet only suppresses constructor logging.",
+  "Native_build_receipt": {
+    "path": ".runtime/object-expansion/unit72-prep/native-unit-build01/review.json",
+    "sha256": "f00d3b381705da09de884ff6d927d9ff36e74aa4dd15820271a7fc93347f2626"
+  },
+  "comparison": {
+    "path": ".runtime/object-expansion/unit72-prep/comparison02/summary.json",
+    "sha256": "3318f8805f962bc53f3d7123b2d8926bb8327dac2e9bc298d727b629199126de"
+  },
+  "constructor_fields": [
+    "ok",
+    "error_code",
+    "error_bytes",
+    "error_arg_bytes",
+    "full_match"
+  ],
+  "production_or_domain_completion_claim": false,
+  "remaining": [
+    "Native AST shape/flags/factoring and simplification",
+    "Exact construction/program-memory budget",
+    "Production prescan/request/registration integration",
+    "Same-input EnergyPlus physical comparison after integration"
+  ],
+  "primary_Unicode_sources": [
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/RE2/re2/unicode_groups.cc",
+      "sha256": "83aa241e4c5330c7919bcfc838a165b334d79046b4e5431e810f5a9d5e2f8bd9",
+      "bytes": 124977
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/RE2/re2/unicode_casefold.cc",
+      "sha256": "64ca9ac88ceaa9833f07570dc44fd2892b75cfe1d1b3a2ce3cb348e8761a273a",
+      "bytes": 13575
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/RE2/re2/perl_groups.cc",
+      "sha256": "9202c5d6bcc10e4b134a331ddfddd4dc6a41d51505126aff25c74a1ed032e243",
+      "bytes": 3087
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/RE2/re2/parse.cc",
+      "sha256": "5d1259c9148611024aa04f372704adb8d02b5c88b4245c50648b2a674abc420c",
+      "bytes": 76186
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/RE2/re2/unicode_casefold.h",
+      "sha256": "7ae4d01b99ba1a629985090a254fb2493cb4bce49e90a9fa2db2011ff2bd4338",
+      "bytes": 2562
+    },
+    {
+      "path": ".reference/energyplus-src/26.1.0/third_party/RE2/re2/unicode_groups.h",
+      "sha256": "5d0683c7be1e96c6d72509a371c2b8dd10771d644c90c1c9821a5ec567effc1b",
+      "bytes": 1548
+    }
+  ],
+  "primary_license": {
+    "path": ".reference/energyplus-src/26.1.0/third_party/RE2/LICENSE",
+    "sha256": "6040cda75d90b1738292a631d89934c411ef7ffd543c4d6a1b7edfc8edf29449",
+    "bytes": 1558
+  },
+  "table_counts": {
+    "unicode_groups": 197,
+    "perl_groups": 6,
+    "posix_groups": 28,
+    "unicode_group_intervals": 5750,
+    "case_fold_intervals": 367,
+    "case_fold_runes": 2878,
+    "maximum_cycle_length": 4
+  },
+  "primary_reference_observer_sha256": "e2b3f8d1783f48fd6a4763fc552913c3bc758881c92ecdbf2c2fd0a34f664c48",
+  "additional_AST_discriminator_observations": {
+    "scope": "Native AST discriminator observations, not completion",
+    "input": {
+      "path": ".runtime/object-expansion/unit72-prep/ast-discriminators01/input.tsv",
+      "sha256": "9a6ad87362bda493ca53b757294ce2d46d8e9ae028700fd3f0c6a9e9155bc8e8",
+      "bytes": 392
+    },
+    "Native_executable": {
+      "path": ".runtime/object-expansion/unit72-prep/native-unit-build01/re2_native_unit.exe",
+      "sha256": "e1bca0cd0850a85123372a2fdf10a1c50954223087c8ecc2841b8c251a42c35c",
+      "bytes": 5278270
+    },
+    "Rust_executable": {
+      "path": ".runtime/object-expansion/unit72-prep/rust-unit-build02/regex-unit-probe.exe",
+      "sha256": "288ba651b909fcb54f37cff60b29f8df7b7d5c5f95b3b9b4c9708c96db556716",
+      "bytes": 1581071
+    },
+    "rows": [
+      {
+        "pattern": "a|(?i:a)",
+        "text_hex": "41",
+        "Native": "1\t0\t\t\t0",
+        "Rust": "1\t0\t\t\t1",
+        "equal": false
+      },
+      {
+        "pattern": "(?i:a)|a",
+        "text_hex": "41",
+        "Native": "1\t0\t\t\t1",
+        "Rust": "1\t0\t\t\t1",
+        "equal": true
+      },
+      {
+        "pattern": "(?i)(?-i:a)|a",
+        "text_hex": "41",
+        "Native": "1\t0\t\t\t0",
+        "Rust": "1\t0\t\t\t1",
+        "equal": false
+      },
+      {
+        "pattern": "(?i)a|(?-i:a)",
+        "text_hex": "41",
+        "Native": "1\t0\t\t\t1",
+        "Rust": "1\t0\t\t\t1",
+        "equal": true
+      },
+      {
+        "pattern": "[\\x{80}-\\x{FFFF}]|[\\x{10000}-\\x{10FFFF}]",
+        "text_hex": "f4908080",
+        "Native": "1\t0\t\t\t1",
+        "Rust": "1\t0\t\t\t0",
+        "equal": false
+      },
+      {
+        "pattern": "[\\x{80}-\\x{FFFF}]|\\P{Any}|[\\x{10000}-\\x{10FFFF}]",
+        "text_hex": "f4908080",
+        "Native": "1\t0\t\t\t1",
+        "Rust": "1\t0\t\t\t0",
+        "equal": false
+      },
+      {
+        "pattern": "a[\\x{80}-\\x{FFFF}]|a[\\x{10000}-\\x{10FFFF}]",
+        "text_hex": "61f4908080",
+        "Native": "1\t0\t\t\t1",
+        "Rust": "1\t0\t\t\t0",
+        "equal": false
+      }
+    ],
+    "physical_EP_executions": 0
+  },
+  "additional_AST_mismatches": 5,
+  "quality_state": "in_progress_with_known_AST_mismatches"
+}

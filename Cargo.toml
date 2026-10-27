@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/ep_cli",
     "crates/ep_raw_model",
+    "crates/ep_re2",
     "crates/ep_model",
     "crates/ep_compiler",
     "crates/ep_runtime",

@@ -269,7 +269,7 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit71-prep/leap-dst-docs-check-71.log",
+        "path": ".runtime/object-expansion/unit72-prep/regex-component-docs-check-72.log",
         "sha256": "e63d1d2b505f99e70149d128000c36c8cded65cc44897950c0759df4d957b11e",
         "bytes": 338
       },
@@ -698,6 +698,135 @@
         "new_quality_cohort_or_commands": 0,
         "optional_Native_compile_rerun": false,
         "scope": "Actual full workspace70 and strict all-target Clippy70 are reused only after equality of all four changed source files with Build71 archives and current final snapshot custody; no Unit71 test run is invented."
+      },
+      "re2_component_in_progress": {
+        "status": "in_progress_with_known_AST_mismatches",
+        "component": "crates/ep_re2",
+        "finite_baseline_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/comparison02/summary.json",
+          "sha256": "3318f8805f962bc53f3d7123b2d8926bb8327dac2e9bc298d727b629199126de",
+          "bytes": 3588
+        },
+        "known_AST_observations": {
+          "path": ".runtime/object-expansion/unit72-prep/ast-discriminators01/observations.json",
+          "sha256": "b52832b07cf5092142dac2a3831267ea7e8e1d6f4d52892a7c094bbd7ecea351",
+          "bytes": 2014
+        },
+        "focused_quality": {
+          "path": ".runtime/object-expansion/unit72-prep/component-quality02/receipt.json",
+          "sha256": "37448f6b8e4388f5ac5cf7003155865532f31a90c807940ab5cafe1889d7458b",
+          "bytes": 5001
+        },
+        "current_unchanged_tested_code_and_fixture_refs": [
+          {
+            "path": "crates/ep_re2/Cargo.toml",
+            "sha256": "db017fac1e98e476776942b55b8addb550781e852315bac53b9049dadf8f9ee3",
+            "bytes": 271
+          },
+          {
+            "path": "crates/ep_re2/LICENSE.RE2",
+            "sha256": "6040cda75d90b1738292a631d89934c411ef7ffd543c4d6a1b7edfc8edf29449",
+            "bytes": 1558
+          },
+          {
+            "path": "crates/ep_re2/src/byte_class.rs",
+            "sha256": "a87d380f028cd8f7a021396b1bdbcb65a2cb8bd5f936552d8fc6f685778f4605",
+            "bytes": 7595
+          },
+          {
+            "path": "crates/ep_re2/src/lib.rs",
+            "sha256": "a9078950cf1aad668144560e2e7ad8e3c7e519fe074de56027b1a5ba9fb74e0a",
+            "bytes": 5391
+          },
+          {
+            "path": "crates/ep_re2/src/parser/character_class.rs",
+            "sha256": "3d1a1d9f52862d4c46b4e50c32b06a5bd1b9175209aafec0c191fdb58a5f9a5a",
+            "bytes": 5462
+          },
+          {
+            "path": "crates/ep_re2/src/parser/escapes.rs",
+            "sha256": "91a2c86c500308855d4fc7e84340a0e182dae8303d27afb70560f037ba3f7327",
+            "bytes": 3556
+          },
+          {
+            "path": "crates/ep_re2/src/parser/groups.rs",
+            "sha256": "f971b5b3d89bb9957b2237a8f2d11f0c9af16a44b1715dba816d1a7bfa254e5d",
+            "bytes": 3702
+          },
+          {
+            "path": "crates/ep_re2/src/parser/ranges.rs",
+            "sha256": "8cd57871200168191a5ebd56efe5fcd66305c693c2d540271c2a058bafe1f9ec",
+            "bytes": 1101
+          },
+          {
+            "path": "crates/ep_re2/src/parser/state.rs",
+            "sha256": "0bba67150374b4a88b699a50102986b0947b3642b4837399d78b61d3130de4d7",
+            "bytes": 6778
+          },
+          {
+            "path": "crates/ep_re2/src/parser.rs",
+            "sha256": "5f4ca814dd9dee8ae7ad0094870a9cc580cbf232a56e245afaf6aa394457355b",
+            "bytes": 8809
+          },
+          {
+            "path": "crates/ep_re2/src/program.rs",
+            "sha256": "5fc3a275fd459a26a19759e97a17312456bc80164c9edc3afde9dd3e8c47c249",
+            "bytes": 17434
+          },
+          {
+            "path": "crates/ep_re2/src/unicode.rs",
+            "sha256": "693bbf974d4371f996e9dd5fac53c23c1a5bc0e7b70e9aef37073bdc3d14e312",
+            "bytes": 4527
+          },
+          {
+            "path": "crates/ep_re2/src/unicode_data.rs",
+            "sha256": "56fcbfaff224992ea0dfc4fb6d25a6a7fcc15d4a070a2e201e6dab5491e8c1ef",
+            "bytes": 170389
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-default.tsv",
+            "sha256": "cae223bd54679f03272ba80a8f502f982dd77113c29eaf4d39387229045dfbbb",
+            "bytes": 462155
+          },
+          {
+            "path": "crates/ep_re2/tests/native_vectors.rs",
+            "sha256": "eb013d240a928fab29031b238166a4b7bb4e77843840e945324db0febc81209d",
+            "bytes": 2173
+          },
+          {
+            "path": "crates/ep_re2/tests/reference/re2_unit.cpp",
+            "sha256": "e2b3f8d1783f48fd6a4763fc552913c3bc758881c92ecdbf2c2fd0a34f664c48",
+            "bytes": 4314
+          }
+        ],
+        "metadata_after_known_gap_recording": [
+          {
+            "path": "crates/ep_re2/README.md",
+            "sha256": "f6bf385cd8247fde836aca95abbb4b433e802eeca70967444e742e6ab29e4c75",
+            "bytes": 3042
+          },
+          {
+            "path": "crates/ep_re2/tests/data/provenance.json",
+            "sha256": "5866d6b8f6de3e954a553f399a76a1446743685d35720884ed3e31f0b5bb9d81",
+            "bytes": 5273
+          }
+        ],
+        "reference_kind": "Exact pinned RE2 source unit build with GCC13.2; separate from EnergyPlus DLL and physical oracle calibrations.",
+        "finite_baseline_unit_inputs": 10168,
+        "finite_baseline_five_API_field_mismatches": 0,
+        "additional_AST_inputs": 7,
+        "additional_AST_mismatches": 5,
+        "new_test_functions": 1,
+        "new_EP_physical_cases": 0,
+        "new_EP_reported_samples": 0,
+        "new_Source_CLI_build_rows": 0,
+        "Source_reporting_admission_changed": false,
+        "remaining_required_work": [
+          "Native AST factoring/class-stage metadata",
+          "exact constructor memory budget",
+          "three production caller integrations"
+        ],
+        "full_RE2_or_object_domain_completion": false
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",

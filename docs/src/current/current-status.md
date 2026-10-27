@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-27
 ---
 
 # Current Status
@@ -46,6 +46,11 @@ accepted Build71 uses the current parser and verifies hourly and 20-minute
 `Schedule:File` data on February 29 with distinct leap-day values, per-file
 daylight-saving controls and the next-day schedule handoff. Its controlled
 weather copies February 28 meteorology; full legal-value completion remains open.
+
+The [Rust reporting regex port](../../../crates/ep_re2/README.md) has a finite
+constructor/matching unit comparison. Native AST fidelity, construction limits
+and the three production connections remain in progress. Source regex requests
+remain blocked until those gates and same-input execution checks are complete.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA

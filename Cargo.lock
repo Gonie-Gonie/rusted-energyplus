@@ -110,6 +110,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "ep_re2"
+version = "0.1.0"
+
+[[package]]
 name = "ep_run"
 version = "0.1.0"
 dependencies = [
