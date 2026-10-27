@@ -2,7 +2,10 @@
 use super::{text, text_is};
 use ep_raw_model::{ObjectType, RawModel};
 use std::collections::BTreeSet;
-pub(super) fn validate_defined_uses(raw: &RawModel) -> Result<(), String> {
+pub(super) fn validate_defined_uses(
+    raw: &RawModel,
+    validated_paired_wall_stage: bool,
+) -> Result<(), String> {
     let Some(materials) = raw
         .objects
         .get(&ObjectType("Material:InfraredTransparent".into()))
@@ -52,13 +55,20 @@ pub(super) fn validate_defined_uses(raw: &RawModel) -> Result<(), String> {
                 continue;
             }
             used = true;
-            // Ground/self-Adiabatic do not invoke indexed exterior roughness.
+            // Keep the existing one-Zone A/B Ground/self-Adiabatic route.
+            // Newly admitted Source A2+ IRT uses are ONLY the proven reciprocal
+            // Surface pairs; do not broaden multi-Zone Ground/Adiabatic uses.
+            // This flag comes after the caller's existing raw-pair proof.
             if !text(surface, "outside_boundary_condition").is_some_and(|value| {
-                ["Ground", "Adiabatic"]
-                    .iter()
-                    .any(|kind| value.eq_ignore_ascii_case(kind))
+                if validated_paired_wall_stage {
+                    value.eq_ignore_ascii_case("Surface")
+                } else {
+                    ["Ground", "Adiabatic"]
+                        .iter()
+                        .any(|kind| value.eq_ignore_ascii_case(kind))
+                }
             }) {
-                return Err("Source used IRT currently requires Ground or Adiabatic to avoid undefined Native exterior roughness indexing".into());
+                return Err("Source used IRT requires the existing one-Zone Ground/Adiabatic route or a validated Source A paired Wall use".into());
             }
         }
     }

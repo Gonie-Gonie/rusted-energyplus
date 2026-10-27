@@ -606,7 +606,7 @@ fn resolve_raw(
         }
     }
     if source_calendar_ingress {
-        infrared::validate_defined_uses(raw)?;
+        infrared::validate_defined_uses(raw, source_multizone_ingress)?;
     }
     // GetProjectData distinguishes an absent object (4) from its schema field
     // default (6), and normalizes positive non-divisors before building owners.
@@ -837,7 +837,6 @@ mod tests {
             "ZoneHVAC:EquipmentList",
             "ZoneHVAC:IdealLoadsAirSystem",
             "ZoneControl:Thermostat",
-            "Material:InfraredTransparent",
             "FenestrationSurface:Detailed",
             "InternalMass",
             "Construction:AirBoundary",

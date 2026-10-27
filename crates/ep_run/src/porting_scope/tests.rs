@@ -587,6 +587,104 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         !selected.admissible,
         "same-direction World vertices must stay fenced"
     );
+    // Proper IRT use changes only the paired Construction/material operands.
+    // These assertions inspect genuine raw/IP and typed properties; no full
+    // Source getter, physical outcome or unexposed ROnly member is simulated.
+    let mut irt_pair = paired.clone();
+    irt_pair
+        .as_object_mut()
+        .unwrap()
+        .remove("Output:Constructions");
+    irt_pair["Material:InfraredTransparent"] = json!({"WALL IRT":{}});
+    irt_pair["Construction"]["IRT LINK"] = json!({"outside_layer":"WALL IRT"});
+    for name in ["Zulu:East", "Alpha:West"] {
+        irt_pair["BuildingSurface:Detailed"][name]["construction_name"] = json!("IRT LINK");
+    }
+    let raw = parse_epjson_str(&irt_pair.to_string()).expect("actual name-only paired IRT input");
+    let ip = crate::ordinary_input_processor::resolve_source_a(&raw)
+        .expect("defined proper IRT pair Source IP");
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+    let material_input = crate::ordinary_material_input::resolve_source(&raw, &ip)
+        .expect("actual IRT raw/IP custody");
+    assert!(material_input.source_is_epjson);
+    assert_eq!(material_input.infrared_transparent.len(), 1);
+    assert_eq!(
+        material_input.infrared_transparent[0].object_name,
+        "WALL IRT"
+    );
+    assert!(material_input.infrared_transparent[0].fields.is_empty());
+    assert!(
+        material_input.infrared_transparent[0]
+            .idf_max_fields
+            .is_none()
+    );
+    let compiled = compile_raw_model(&raw);
+    let model = compiled
+        .model
+        .as_ref()
+        .expect("actual one-layer paired IRT typed owners");
+    let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
+    let material = model
+        .materials
+        .iter()
+        .find(|m| m.kind() == ep_model::MaterialKind::InfraredTransparent)
+        .expect("actual IRT material");
+    assert_eq!(
+        material.thermal_resistance().unwrap().to_bits(),
+        0.01_f64.to_bits()
+    );
+    assert!(material.roughness().is_none());
+    let properties = material
+        .surface_properties()
+        .expect("fixed IRT absorptances");
+    assert_eq!(
+        properties.thermal_absorptance.to_bits(),
+        0.9999_f64.to_bits()
+    );
+    assert_eq!(properties.solar_absorptance.to_bits(), 1.0_f64.to_bits());
+    assert_eq!(properties.visible_absorptance.to_bits(), 1.0_f64.to_bits());
+    let construction = model
+        .constructions
+        .iter()
+        .find(|c| c.name == ep_model::NormalizedName::new("IRT LINK"))
+        .expect("actual IRT Construction");
+    assert_eq!(construction.layers, [material.id]);
+    assert_eq!(
+        model
+            .surfaces
+            .iter()
+            .filter(|s| s.construction == construction.id)
+            .count(),
+        2
+    );
+    for report in ["Materials", "Constructions"] {
+        let mut invalid = irt_pair.clone();
+        invalid["Output:Constructions"] = json!({"Report":{"details_type_1":report}});
+        let raw = parse_epjson_str(&invalid.to_string()).expect("IRT undefined text-report branch");
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_a(&raw).is_err(),
+            "{report} must stay fenced"
+        );
+    }
+    let mut outdoor = irt_pair.clone();
+    outdoor["BuildingSurface:Detailed"]["Zulu:West"]["construction_name"] = json!("IRT LINK");
+    let raw = parse_epjson_str(&outdoor.to_string()).expect("IRT additional Outdoors use");
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    let mut extra_adiabatic = irt_pair.clone();
+    extra_adiabatic["BuildingSurface:Detailed"]["Zulu:Floor"]["outside_boundary_condition"] =
+        json!("Adiabatic");
+    extra_adiabatic["BuildingSurface:Detailed"]["Zulu:Floor"]["construction_name"] =
+        json!("IRT LINK");
+    let raw = parse_epjson_str(&extra_adiabatic.to_string())
+        .expect("IRT additional multi-Zone Adiabatic use");
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    let mut invalid_pair = irt_pair;
+    invalid_pair["BuildingSurface:Detailed"]["Alpha:West"]["outside_boundary_condition_object"] =
+        json!("Missing");
+    let raw = parse_epjson_str(&invalid_pair.to_string()).expect("IRT invalid actual pair target");
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
 }
 
 #[test]

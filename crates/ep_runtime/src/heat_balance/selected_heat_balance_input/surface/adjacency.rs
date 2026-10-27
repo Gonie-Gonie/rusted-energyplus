@@ -170,15 +170,13 @@ impl SurfaceGeometryInputState {
                 || adjacent_construction.total_layers != 1
                 || construction.type_is_window
                 || adjacent_construction.type_is_window
-                || construction.type_is_irt
-                || adjacent_construction.type_is_irt
                 || construction.type_is_air_boundary
                 || adjacent_construction.type_is_air_boundary
                 || construction.source_sink_present
                 || adjacent_construction.source_sink_present
             {
                 return Err(Error::Unavailable(
-                    "bounded same single-layer normal Source Construction",
+                    "bounded same single-layer Source Construction",
                 ));
             }
             // CheckForReversedLayers15495-15500: same actual LayerPoint takes

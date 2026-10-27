@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 130 paired physical cases and 3,530,814 reported values with zero
+contains 131 paired physical cases and 3,540,894 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -67,21 +67,22 @@ agree within the explicitly recorded version-header and line-ending boundaries.
 
 Explicit Source A also accepts multiple closed opaque Zones, each with its
 implicit Space and no internal gains or equipment. Reciprocal interzone Wall
-pairs require the same single-layer normal construction, equal Zone factors,
-opposite coincident vertices and NoSun/NoWind. Two 24-hour two-Zone cases cover
-20,160 derived values with zero tolerance or RMSE failures; the connected case's
-maximum absolute difference is 5.80e-12. Actual Zone/Space and enclosure links,
+pairs require the same single-layer normal or infrared-transparent construction,
+equal Zone factors, opposite coincident vertices and NoSun/NoWind. Three 24-hour
+two-Zone cases cover 30,240 derived values with zero tolerance or RMSE failures;
+the maximum absolute difference is 1.37e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Explicit
 Spaces, groups, multi-Zone equipment and broader interzone combinations remain open.
 
 `Material:InfraredTransparent` now reaches the ordered Source A/B getter and
 single-layer CTF on Ground or Adiabatic boundaries, preserving the Native
-warnings and Invalid roughness. Two 24-hour B comparisons cover 19,584 values
-with zero tolerance or RMSE failures. Adiabatic values are raw-exact; Ground's
-maximum absolute difference is 4.66e-10. Exterior roughness lookups, Materials
-reports and used-IRT Constructions reports remain excluded. Interzone, CondFD
-and broader object combinations remain open.
+warnings and Invalid roughness. Ground and Adiabatic B comparisons plus a proper
+reciprocal interzone A pair cover 29,664 values with zero tolerance or RMSE
+failures. Adiabatic values are raw-exact; Ground's maximum absolute difference
+is 4.66e-10. Exterior roughness lookups, Materials reports and used-IRT
+Constructions reports remain excluded. Multi-Zone Ground/Adiabatic IRT uses,
+CondFD and broader object combinations remain open.
 
 Reporting key matching uses the [Rust RE2 port](../../../crates/ep_re2/README.md)
 at pre-scan, request construction and live registration. Eager OnePass analysis,

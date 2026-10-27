@@ -36,6 +36,7 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 | "Material"
                 | "Material:NoMass"
                 | "Material:AirGap"
+                | "Material:InfraredTransparent"
                 | "Construction"
                 | "Zone"
                 | "GlobalGeometryRules"
