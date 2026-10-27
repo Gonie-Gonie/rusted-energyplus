@@ -23,9 +23,8 @@
   ],
   "production_or_domain_completion_claim": false,
   "remaining": [
-    "Native forward compiler/finalization and exact constructor memory budget",
-    "Production prescan/request/registration integration",
-    "Same-input EnergyPlus physical comparison after integration"
+    "Three reporting owner connections and default RE2 stderr effects",
+    "Same-input unit/physical verification after integration"
   ],
   "primary_Unicode_sources": [
     {
@@ -234,5 +233,53 @@
       "five_API_field_mismatches": 0,
       "constructor_fixture_total_rows": 10607
     }
+  },
+  "native_program_kernel": {
+    "full_graph_comparison": {
+      "path": ".runtime/object-expansion/unit72-prep/native-program-comparison01/summary.json",
+      "sha256": "f482b57ca9f7b5ac22485e24388d34487094a8c87e85646375ae5fe31c970f03",
+      "bytes": 962
+    },
+    "full_graph_rows": 2352,
+    "full_graph_field_or_wire_mismatches": 0,
+    "final_list_match_comparison": {
+      "path": ".runtime/object-expansion/unit72-prep/native-final-match-comparison01/summary.json",
+      "sha256": "795c68d674507bf843aac9777c420c10c309421996ad61a525e77929e8727329",
+      "bytes": 561
+    },
+    "five_API_rows": 10607,
+    "five_API_mismatches": 0,
+    "selected_program_fixture": {
+      "path": "crates/ep_re2/tests/data/native-program.tsv",
+      "sha256": "79cd51bdf4372ac5ff6542876dd2c9363e307b7171635c4fae48afcdac69b421",
+      "bytes": 333593
+    },
+    "selected_program_rows": 23,
+    "reference_observer": {
+      "path": "crates/ep_re2/tests/reference/re2_native_program_observer.cpp",
+      "sha256": "a81230762499a2d4d163f170c9ef9d4116fce93c8421b13580ac4eb885ab451c",
+      "bytes": 16115
+    },
+    "official_effective_cap": 698995,
+    "official_cap_evidence": {
+      "path": ".runtime/object-expansion/unit72-prep/official-regex-budget-search01/summary.json",
+      "sha256": "0b834522b328b513ef59cd37ab5def69f4e2e21eb90fd11757f6ecd8ab8a6d5b",
+      "bytes": 8936
+    },
+    "public_default_boundary_comparison": {
+      "path": ".runtime/object-expansion/unit72-prep/official-default-kernel-comparison01/summary.json",
+      "sha256": "8b458f2178c80a4a85da809ad03aac2163de0099607c48a1a55bd61a12829973",
+      "bytes": 32948
+    },
+    "source_unit_boundary_comparison": {
+      "path": ".runtime/object-expansion/unit72-prep/native-budget-boundary-comparison01/summary.json",
+      "sha256": "94e385b38b354e3d7b9e662a69505b7c8eb6db6771b47ab1d77c4eb3fe7d8c7d",
+      "bytes": 4083
+    },
+    "source_unit_cap": 698996,
+    "DLL_sizeof_claim": false,
+    "heavy_cases_in_default_tests": false,
+    "constructor_groups_in_default_table": 1505,
+    "production_admission_changed": false
   }
 }

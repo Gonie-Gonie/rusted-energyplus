@@ -49,10 +49,11 @@ weather copies February 28 meteorology; full legal-value completion remains open
 
 The [Rust reporting regex port](../../../crates/ep_re2/README.md) has a finite
 comparison of 1,494 Native parse ASTs and 10,607 constructor/match observations.
-Separate RequiredPrefix and Simplify comparisons cover 2,333 patterns each;
-original/result sharing, cache changes and wire bytes agree. The five known
-AST differences are closed. Exact compiler limits and the three production
-connections remain in progress. Source regex requests
+Separate prefix/Simplify comparisons cover 2,333 patterns each; finalized program
+comparisons cover 2,352. Their wire fields agree. The default compiler limit now
+uses the pinned official binary's checked boundary. Its later-failing component
+probes add no physical cases. Reporting connections, default stderr effects and
+same-input execution remain in progress. Source regex requests
 remain blocked until those gates and same-input execution checks are complete.
 
 The current compatibility-mode arbitrary runtime covers the official

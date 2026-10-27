@@ -1,64 +1,54 @@
 # Rust reporting regex port
 
-This is an **unconnected, in-progress** Rust port of the RE2 constructor and
-boolean `FullMatch` used by EnergyPlus reporting. Source reporting still blocks
-regex keys. This crate adds no supported object or physical conformance case.
+This **unconnected, in-progress** Rust port supplies the constructor/status and
+boolean FullMatch used by reporting. Source reporting still blocks regex keys.
+It adds no supported object or physical conformance case.
 
-The primary source is EnergyPlus 26.1.0 commit
-`6f2e40d10250a105b49966baa24d843711e61048`, `third_party/RE2`.
-`LICENSE.RE2` retains its license. Production code uses Rust and the standard
-library; C++ files under `tests/reference/` are test-only reference observers.
+Primary: EnergyPlus26.1.0 commit6f2e40d10250a105b49966baa24d843711e61048,
+third_party/RE2. LICENSE.RE2 retains its license. Production uses Rust and std;
+C++ files under tests/reference are test-only observers.
 
-The default UTF8/LikePerl parser retains the Native AST: operation kinds, full
-flags, class-builder versus finished-class stage, simple caches, capture-name
-identity, ordered children and the three alternation-factoring rounds. An arena
-and explicit stacks handle user depth without recursive ownership. Unicode14
-groups/folding come from the pinned source, independent of host Unicode data.
-Native Coalesce/Simplify retains cache writes, shared repeated children, flags,
-capture-name changes and nested optional expansion. Required-prefix selection
-precedes suffix simplification. Matching retains the original text context after
-prefix removal, so later word boundaries and anchors see the correct bytes.
-The boolean matcher preserves byte operations, surrogate rune encodings,
-Native broad-class noncanonical-byte acceptance, ASCII word boundaries and
-newline assertions. Captures are parsed; reporting requests boolean membership.
+Native AST kinds, flags, class construction stage, caches, capture-name identity,
+ordered factoring, Coalesce/Simplify and required-prefix selection are retained.
+Unicode14 groups/folding use pinned tables. Compilation preserves allocation
+order, patch lists, UTF8 suffix caches/tries, nullable repetition, bounded anchor
+extraction, Optimize, ordered Flatten, list hints and bytemap batches. The old
+semantic IR/compiler and separate byte-class matcher are removed. Execution uses
+Native finalized lists, raw bytes and the original assertion context after prefix
+removal. Captures are parsed; reporting requests no extracted captures.
 
-Two table tests keep the comparison load small:
+Default forward cap698,995 comes from the pinned official binary's adjacent
+checked-constructor boundary, with the exact2xcap walk budget. The separate GCC
+unit cap is698,996; its observed Prog432-byte size is NOT the official DLL layout.
+Runtime supplies no guessed C++ size or DFA metadata. Explicit-layout metadata is
+test-only; both paths share graph passes. Boolean execution uses an anchored NFA,
+without unanchored prefix caches, OnePass or DFA caches.
 
-- 1,494 actual Native parse records compare every serialized field and ordered
-  sharing identity: 1,445 successful ASTs, 49 parse errors and 3,597 reachable
-  nodes. The same test checks 100 actual rewrite observations over 50 selected
-  patterns, including deep nesting. Separate complete phase comparisons cover
-  2,333 patterns each for RequiredPrefix and Simplify with every field and wire
-  byte equal. Phase observations retain original/result sharing and cache changes.
-- 10,607 actual Native constructor/match observations compare `ok`, error code,
-  error bytes, error-argument bytes and full-match result. The seven added
-  regressions close all five previously recorded AST-order/class-union
-  differences, including `a|(?i:a)` against `A` and permissive broad UTF8 paths.
-  Another 432 observations cover prefix assertion context, ASCII folding, NUL,
-  surrogate bytes and conservative anchor handling.
+Two table functions compare1,494 actual parse records,100 rewrite records,
+23 selected complete program records and10,607 constructor/match rows. Adjacent
+rows reuse one immutable expression:1,505 constructions still check every row's
+ok/code/error/error-argument/match fields. Separately retained complete comparisons
+cover2,333 prefix/Simplify patterns each,2,352 programs and10,607 finalized-list
+matches, all zero-difference. Heavy allocation probes stay outside default tests.
 
-Fixtures and observation provenance live under `tests/data/`. These finite
-comparisons establish regression coverage, not completion of every legal input.
+Official budget models intentionally stop at a later All-No fatal after prescan.
+They establish checked raw-constructor admission, never successful simulation,
+physical conformance, private sizeof or separately observed CI-constructor ok.
+Fixtures and observation/source provenance are under tests/data.
 
 ```text
 cargo test -p ep_re2 --locked
 cargo clippy -p ep_re2 --all-targets --locked -- -D warnings
 ```
 
-Required work before reporting admission:
+Before reporting admission, connect pre-scan, request construction and registration
+with original writes/diagnostic order, including default RE2 stderr effects, then
+verify same-input unit and physical runs. The C++ constructor observer uses Quiet
+for logging only; status/match agreement does not establish production logging.
+External Options, capture extraction, unanchored/reverse search and CompileSet are
+outside this reporting API. Finite comparisons do not prove full legal domains.
 
-1. Complete and compare Native forward compilation/finalization and exact
-   constructor/program-memory accounting. The current boolean lowering does
-   not establish Native program-graph or allocation identity.
-2. Connect the pre-scan, request-construction and registration owners, retaining
-   their different constructor, diagnostic and write order.
-3. Verify those connections with same-input unit and physical EnergyPlus runs.
-
-External RE2 Options and capture extraction are outside the reporting API target.
-To reproduce reference observations, compile the relevant C++ observer with the
-pinned CMake `RE2_SOURCES` list of 22 translation units. The constructor observer
-accepts `pattern_hex<TAB>text_hex`; the parse and phase observers accept one
-pattern hex per line. The phase observer requires `required_prefix` or `simplify`
-as its sole argument. Both use explicit byte lengths. The constructor observer's Quiet option
-changes logging only. The recorded GCC13.2 source-unit build is separate from
-the pinned EnergyPlus DLL and physical oracle comparisons.
+Reference observers compile with the pinned CMake RE2_SOURCES22-unit list.
+Constructor input is pattern_hex<TAB>text_hex; parse/program input is pattern hex
+per line. The phase observer also takes required_prefix or simplify. All use
+explicit byte lengths.

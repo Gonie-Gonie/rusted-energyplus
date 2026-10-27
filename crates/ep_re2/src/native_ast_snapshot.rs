@@ -85,6 +85,7 @@ fn pinned_native_parse_ast_vectors() -> Result<(), String> {
         seen_phases.into_iter().all(|seen| seen),
         "Native rewrite fixture must cover both phases"
     );
+    crate::native_program_snapshot::check_vectors()?;
     Ok(())
 }
 
@@ -103,7 +104,7 @@ fn allocation() -> Status {
 
 /// The only fmt::Write failure is allocation; a failed record is never returned.
 #[derive(Default)]
-struct Output(String);
+pub(crate) struct Output(pub(crate) String);
 impl fmt::Write for Output {
     fn write_str(&mut self, text: &str) -> fmt::Result {
         self.0.try_reserve(text.len()).map_err(|_| fmt::Error)?;
@@ -117,7 +118,7 @@ macro_rules! emit {
     };
 }
 
-fn hex(output: &mut Output, bytes: &[u8]) -> Result<(), Status> {
+pub(crate) fn hex(output: &mut Output, bytes: &[u8]) -> Result<(), Status> {
     const DIGITS: &[u8; 16] = b"0123456789abcdef";
     let extra = bytes.len().checked_mul(2).ok_or_else(allocation)?;
     output.0.try_reserve(extra).map_err(|_| allocation())?;
@@ -180,7 +181,7 @@ fn emit_class(output: &mut Output, ranges: &[(u32, u32)]) -> Result<(), Status> 
 
 /// One raw node/payload serializer, optionally wrapped as a multi-root graph.
 /// Single-root record() requests the original bare array wire representation.
-fn emit_nodes(
+pub(crate) fn emit_nodes(
     output: &mut Output,
     arena: &Arena,
     roots: &[Option<Id>],

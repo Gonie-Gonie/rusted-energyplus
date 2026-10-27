@@ -269,7 +269,7 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit72-prep/regex-native-rewrite-docs-check-72.log",
+        "path": ".runtime/object-expansion/unit72-prep/regex-native-kernel-docs-check-72.log",
         "sha256": "e63d1d2b505f99e70149d128000c36c8cded65cc44897950c0759df4d957b11e",
         "bytes": 338
       },
@@ -700,7 +700,7 @@
         "scope": "Actual full workspace70 and strict all-target Clippy70 are reused only after equality of all four changed source files with Build71 archives and current final snapshot custody; no Unit71 test run is invented."
       },
       "re2_component_in_progress": {
-        "status": "native_parse_prefix_and_simplify_compared_exact_compiler_and_callers_unfinished",
+        "status": "native_list_kernel_and_official_cap_implemented_reporting_owners_unconnected",
         "component": "crates/ep_re2",
         "finite_baseline_comparison": {
           "path": ".runtime/object-expansion/unit72-prep/native-matcher-comparison01/summary.json",
@@ -713,9 +713,9 @@
           "bytes": 2014
         },
         "focused_quality": {
-          "path": ".runtime/object-expansion/unit72-prep/component-quality06/receipt.json",
-          "sha256": "79c075e4387f11bbd84046be3b319676f92259da5104dd0fb1e3fd4991e3efbd",
-          "bytes": 7600
+          "path": ".runtime/object-expansion/unit72-prep/component-quality08/receipt.json",
+          "sha256": "a0abcc6a8eae39acba05ea8e685941677aad81b8d1289bdc43dfec57dd6e6f42",
+          "bytes": 9403
         },
         "current_unchanged_tested_code_and_fixture_refs": [
           {
@@ -730,13 +730,13 @@
           },
           {
             "path": "crates/ep_re2/src/byte_class.rs",
-            "sha256": "a87d380f028cd8f7a021396b1bdbcb65a2cb8bd5f936552d8fc6f685778f4605",
-            "bytes": 7595
+            "sha256": "0433eea3f22ff56d9ab512016ff9d697368c99ef8cc4fdf2d863725d44ff1eaa",
+            "bytes": 999
           },
           {
             "path": "crates/ep_re2/src/lib.rs",
-            "sha256": "7475b9886dbd979e7200315027d155870f7171117dd0c566342743fa7d9957b5",
-            "bytes": 6787
+            "sha256": "05fbcbc5b45ec7aaecf59c020c1fa5fc1daa2a2f266c8deb1112bf6a6ef25ac0",
+            "bytes": 7068
           },
           {
             "path": "crates/ep_re2/src/native_ast/builder.rs",
@@ -785,13 +785,53 @@
           },
           {
             "path": "crates/ep_re2/src/native_ast_snapshot.rs",
-            "sha256": "ac3ea29f44a76c355cc9c8ff9fffb44141b41101f13794b4be21a31ccd484299",
-            "bytes": 16083
+            "sha256": "046bfbb6e68448045a4ddf8a1a8d79bc2d2116b7b5ad954ee13851138317c39b",
+            "bytes": 16181
           },
           {
-            "path": "crates/ep_re2/src/native_lower.rs",
-            "sha256": "b02c074c9fcca85439193c409d3f8ce9f0ba46ed95452b7cb8c1a1d352078f2b",
-            "bytes": 5426
+            "path": "crates/ep_re2/src/native_compiler/anchors.rs",
+            "sha256": "1825f0919cb30c8de30e5114dcfcd854b2e540258462c02861869fe8716b4fe9",
+            "bytes": 2630
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler/graph.rs",
+            "sha256": "a5737da5f12716a30fcdd76ba263f17ce02f70bf745a01227600c5f30157cc3c",
+            "bytes": 6766
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler/range.rs",
+            "sha256": "78c5668e5c0ed23aa894f089551242783784c126421a568bc5358e61bf3c9a2a",
+            "bytes": 9128
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler/walk.rs",
+            "sha256": "837356e808ea6baae6a49f47d6bd5a3a4ccbed1af2e6918da78aad7876479345",
+            "bytes": 6599
+          },
+          {
+            "path": "crates/ep_re2/src/native_compiler.rs",
+            "sha256": "9d8a9cfa77216293d9b020cdfc2c23f31d5c7c6b84831739dd852570989bf562",
+            "bytes": 15399
+          },
+          {
+            "path": "crates/ep_re2/src/native_finalize/bytemap.rs",
+            "sha256": "50c43bacc98212d3a76655cad85d91d2de6a16f9271a47325cb0ca98174d16a1",
+            "bytes": 5472
+          },
+          {
+            "path": "crates/ep_re2/src/native_finalize/flatten.rs",
+            "sha256": "d69c5c824b3333003b7a2081ff95437e6929f6fe2c29aba73607b6a3fa12029c",
+            "bytes": 13456
+          },
+          {
+            "path": "crates/ep_re2/src/native_finalize.rs",
+            "sha256": "457268893cc2fea1dfb6efa9b097d3b89a60dfcd3f5aba1d638f500d8375472b",
+            "bytes": 6835
+          },
+          {
+            "path": "crates/ep_re2/src/native_matcher.rs",
+            "sha256": "1eaf5e5eb0121bf69d817f872784d3af2eb3d3a9b15a3788bba4430c788d8fa1",
+            "bytes": 7563
           },
           {
             "path": "crates/ep_re2/src/native_parser/character_class.rs",
@@ -825,13 +865,13 @@
           },
           {
             "path": "crates/ep_re2/src/native_prefix.rs",
-            "sha256": "908aaf1c041c66afebad6cf45a7864324b1a68110fb87b4ed9eaed8388069cde",
-            "bytes": 5898
+            "sha256": "624933b568ac9aa28dcd99bb655834665adb1fce56d9ac2f0af7010c46692f6a",
+            "bytes": 6005
           },
           {
-            "path": "crates/ep_re2/src/program.rs",
-            "sha256": "d6de4e3df0253de3ba20628f660c24e146824dbbd9d3fa33869a356e7930e217",
-            "bytes": 17684
+            "path": "crates/ep_re2/src/native_program_snapshot.rs",
+            "sha256": "e90aa48119878760c5d32b4540d29ea9de952b65bd1538a83c54b7fbe2f89348",
+            "bytes": 12987
           },
           {
             "path": "crates/ep_re2/src/unicode.rs",
@@ -854,14 +894,19 @@
             "bytes": 1105799
           },
           {
+            "path": "crates/ep_re2/tests/data/native-program.tsv",
+            "sha256": "79cd51bdf4372ac5ff6542876dd2c9363e307b7171635c4fae48afcdac69b421",
+            "bytes": 333593
+          },
+          {
             "path": "crates/ep_re2/tests/data/native-rewrite.tsv",
             "sha256": "4cc0f9ffb24ad5771e04d3f5d54ec5371a0870691f45add63c236b85c10e0d8b",
             "bytes": 1395602
           },
           {
             "path": "crates/ep_re2/tests/native_vectors.rs",
-            "sha256": "e4f28b7c76dc5bb5b7eb99ce6635ab304796d454ab1a9384cc3c3c69a961117c",
-            "bytes": 2173
+            "sha256": "745f0586092b9ceea747a989fb9b1bd45009b5e8891b9f0e9abbe864341e3da0",
+            "bytes": 2658
           },
           {
             "path": "crates/ep_re2/tests/reference/re2_native_ast_observer.cpp",
@@ -874,6 +919,11 @@
             "bytes": 11960
           },
           {
+            "path": "crates/ep_re2/tests/reference/re2_native_program_observer.cpp",
+            "sha256": "a81230762499a2d4d163f170c9ef9d4116fce93c8421b13580ac4eb885ab451c",
+            "bytes": 16115
+          },
+          {
             "path": "crates/ep_re2/tests/reference/re2_unit.cpp",
             "sha256": "e2b3f8d1783f48fd6a4763fc552913c3bc758881c92ecdbf2c2fd0a34f664c48",
             "bytes": 4314
@@ -882,13 +932,13 @@
         "metadata_after_known_gap_recording": [
           {
             "path": "crates/ep_re2/README.md",
-            "sha256": "9f247b323befeae5dc3487fc7aa8e61866cf8f42570bc3a7efdc12c5a2d0083e",
-            "bytes": 3805
+            "sha256": "9e9a7c75ad1e175dd7a4609e02dc6ede0a114bb94ba55d6187f1f23c8b966f54",
+            "bytes": 3198
           },
           {
             "path": "crates/ep_re2/tests/data/provenance.json",
-            "sha256": "81715ce4c27793fb6dfc0b6f2f93ea0d69c14eaa3425ec228ad9650e63cc3cd5",
-            "bytes": 8840
+            "sha256": "d620a6d4eb3551dbcac539c8a5e67878288fb9f285940fc6e97dccc74bcf0a3b",
+            "bytes": 10872
           }
         ],
         "reference_kind": "Exact pinned RE2 source unit build with GCC13.2; separate from EnergyPlus DLL and physical oracle calibrations.",
@@ -902,8 +952,8 @@
         "new_Source_CLI_build_rows": 0,
         "Source_reporting_admission_changed": false,
         "remaining_required_work": [
-          "exact Native forward compiler/finalization and constructor memory budget",
-          "three production caller integrations",
+          "three reporting owner connections with original constructor/write order",
+          "default RE2 stderr effects including CI-failure paths",
           "same-input physical validation"
         ],
         "full_RE2_or_object_domain_completion": false,
@@ -931,7 +981,45 @@
         },
         "current_constructor_match_fixture_rows": 10607,
         "current_constructor_match_five_API_field_mismatches": 0,
-        "table_test_functions": 2
+        "table_test_functions": 2,
+        "full_program_prototype_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-program-comparison01/summary.json",
+          "sha256": "f482b57ca9f7b5ac22485e24388d34487094a8c87e85646375ae5fe31c970f03",
+          "bytes": 962
+        },
+        "final_list_match_prototype_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-final-match-comparison01/summary.json",
+          "sha256": "795c68d674507bf843aac9777c420c10c309421996ad61a525e77929e8727329",
+          "bytes": 561
+        },
+        "official_target_cap_component_evidence": {
+          "path": ".runtime/object-expansion/unit72-prep/official-regex-budget-search01/summary.json",
+          "sha256": "0b834522b328b513ef59cd37ab5def69f4e2e21eb90fd11757f6ecd8ab8a6d5b",
+          "bytes": 8936
+        },
+        "actual_public_default_cap_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/official-default-kernel-comparison01/summary.json",
+          "sha256": "8b458f2178c80a4a85da809ad03aac2163de0099607c48a1a55bd61a12829973",
+          "bytes": 32948
+        },
+        "source_unit_cap_boundary_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-budget-boundary-comparison01/summary.json",
+          "sha256": "94e385b38b354e3d7b9e662a69505b7c8eb6db6771b47ab1d77c4eb3fe7d8c7d",
+          "bytes": 4083
+        },
+        "full_program_prototype_rows": 2352,
+        "full_program_field_or_wire_mismatches": 0,
+        "official_effective_forward_instruction_cap": 698995,
+        "selected_program_fixture_rows": 23,
+        "constructor_groups_in_default_table": 1505,
+        "default_table_test_functions": 2,
+        "default_table_test_seconds": [
+          0.26,
+          0.52
+        ],
+        "heavy_allocation_cases_in_default_tests": false,
+        "official_budget_probes_are_physical_cases": false,
+        "official_DLL_sizeof_Prog_claim": false
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",

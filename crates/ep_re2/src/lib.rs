@@ -4,10 +4,13 @@ mod byte_class;
 mod native_ast;
 #[cfg(test)]
 mod native_ast_snapshot;
-mod native_lower;
+mod native_compiler;
+mod native_finalize;
+mod native_matcher;
 mod native_parser;
 mod native_prefix;
-mod program;
+#[cfg(test)]
+mod native_program_snapshot;
 mod unicode;
 use std::sync::Arc;
 
@@ -102,7 +105,7 @@ impl Status {
 pub struct Re2 {
     pattern: String,
     status: Status,
-    program: Option<Arc<program::Program>>,
+    program: Option<Arc<native_finalize::ExecutableProgram>>,
     prefix: Vec<u8>,
     prefix_foldcase: bool,
 }
@@ -112,18 +115,32 @@ impl Re2 {
     pub fn new(pattern: &str) -> Self {
         let mut prefix = Vec::new();
         let mut prefix_foldcase = false;
-        let compiled = native_parser::parse(pattern)
-            .and_then(|mut ast| {
-                // RE2::Init extracts the required prefix BEFORE simplifying
-                // and compiling the suffix. Preserve the actual retained IDs.
+        let compiled = native_parser::parse(pattern).and_then(|mut ast| {
+            // Grammar failures retain their actual parser status. Construction
+            // failures after Parse use the native constructor's empty-arg
+            // ErrorPatternTooLarge result, never an internal port guard status.
+            let constructed = (|| {
                 let selected = ast.arena.required_prefix(ast.root)?;
                 prefix = selected.bytes;
                 prefix_foldcase = selected.foldcase;
-                let suffix = selected.suffix.unwrap_or(ast.root);
+                let suffix = if selected.found {
+                    selected
+                        .suffix
+                        .ok_or_else(|| Status::new(ErrorCode::InternalError, ""))?
+                } else {
+                    ast.root
+                };
                 let simplified = ast.arena.simplify(suffix)?;
-                native_lower::lower(&ast, simplified)
-            })
-            .and_then(program::Program::compile);
+                let front = native_compiler::compile_forward_with_instruction_cap(
+                    &mut ast.arena,
+                    suffix,
+                    simplified,
+                    native_compiler::OFFICIAL_DEFAULT_FORWARD_INSTRUCTION_CAP,
+                )?;
+                native_finalize::finalize_executable(front)
+            })();
+            constructed.map_err(|_| Status::new(ErrorCode::PatternTooLarge, ""))
+        });
         let (status, program) = match compiled {
             Ok(program) => (Status::new(ErrorCode::Success, ""), Some(Arc::new(program))),
             Err(status) => (status, None),
@@ -179,45 +196,16 @@ impl Re2 {
         if !equal {
             return false;
         }
-        self.program
-            .as_ref()
-            .is_some_and(|program| program.full_match(text, self.prefix.len()))
+        self.program.as_ref().is_some_and(|program| {
+            native_matcher::full_match(
+                native_matcher::ProgramView {
+                    instructions: &program.instructions,
+                    start: program.start,
+                    anchor_start: program.anchor_start,
+                },
+                text,
+                self.prefix.len(),
+            )
+        })
     }
-}
-
-pub(crate) type NodeId = usize;
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) enum Node {
-    Empty,
-    NoMatch,
-    Literal(u32),
-    AnyByte,
-    Class(Vec<(u32, u32)>),
-    Concat(Vec<NodeId>),
-    Alternate(Vec<NodeId>),
-    Repeat {
-        child: NodeId,
-        min: u32,
-        max: Option<u32>,
-    },
-    Assert(Assertion),
-    Capture {
-        child: NodeId,
-        index: u32,
-    },
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum Assertion {
-    BeginText,
-    EndText,
-    BeginLine,
-    EndLine,
-    WordBoundary,
-    NotWordBoundary,
-}
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct Parsed {
-    pub nodes: Vec<Node>,
-    pub root: NodeId,
-    pub captures: u32,
 }

@@ -32,15 +32,27 @@ fn hex(bytes: &[u8]) -> String {
 fn pinned_native_constructor_and_full_match_vectors() -> Result<(), String> {
     let data = include_str!("data/native-default.tsv");
     let mut rows = 0;
+    // Adjacent rows reuse one immutable compiled expression. Every observed
+    // API field and text match is still checked against the actual Native row.
+    let mut previous: Option<(&str, Re2)> = None;
     for (index, line) in data.lines().enumerate() {
         let fields: Vec<_> = line.split('\t').collect();
         if fields.len() != 7 {
             return Err(format!("bad fixture field count at {}", index + 1));
         }
-        let pattern = decode_hex(fields[0])?;
+        if previous
+            .as_ref()
+            .is_none_or(|(encoded, _)| *encoded != fields[0])
+        {
+            let pattern = decode_hex(fields[0])?;
+            let pattern = std::str::from_utf8(&pattern).map_err(|e| e.to_string())?;
+            previous = Some((fields[0], Re2::new(pattern)));
+        }
+        let expression = &previous
+            .as_ref()
+            .ok_or("missing compiled unit expression")?
+            .1;
         let text = decode_hex(fields[1])?;
-        let pattern = std::str::from_utf8(&pattern).map_err(|e| e.to_string())?;
-        let expression = Re2::new(pattern);
         let actual = [
             u8::from(expression.ok()).to_string(),
             (expression.status().code as u8).to_string(),

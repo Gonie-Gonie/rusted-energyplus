@@ -120,9 +120,12 @@ impl Arena {
     /// Exact RequiredPrefixForAccel selection. Inspect the initial concat's
     /// first child, then look through each Capture and at most one immediate
     /// first-concat child after that Capture. Never join literal fragments.
-    #[expect(
-        dead_code,
-        reason = "Retained compiler acceleration API; exact compiler integration is pending"
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "Prefix acceleration metadata is observed only in tests; anchored boolean FullMatch does not execute an unanchored accelerator"
+        )
     )]
     pub(crate) fn required_prefix_for_accel(&self, root: Id) -> Result<AccelPrefix, Status> {
         let cleared = AccelPrefix::default();
