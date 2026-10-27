@@ -41,14 +41,18 @@ pub(crate) struct ListsAndByteMap {
     pub original_compile_input_root: crate::native_ast::Id,
 }
 
-/// Private boolean FullMatch kernel. No guessed Native ABI, DFA budget or
-/// bit-state limit is attached to this executable instruction image.
+/// Immutable boolean FullMatch image. Target accounting is supplied separately
+/// by native_target; no Rust struct size substitutes for a Native scalar.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct ExecutableProgram {
     pub instructions: Vec<Inst>,
     pub finalized_instructions: usize,
     pub start: u32,
+    pub start_unanchored: u32,
     pub anchor_start: bool,
+    pub anchor_end: bool,
+    pub list_count: u32,
+    pub list_heads_present: bool,
     pub inst_count: [u32; 8],
     pub bytemap_range: u32,
     pub bytemap: [u8; 256],
@@ -146,7 +150,11 @@ pub(crate) fn finalize_executable(mut front: FrontEnd) -> Result<ExecutableProgr
         finalized_instructions: lists.instructions.len(),
         instructions: lists.instructions,
         start: lists.start,
+        start_unanchored: lists.start_unanchored,
         anchor_start: front.graph.anchor_start,
+        anchor_end: front.graph.anchor_end,
+        list_count: lists.list_count,
+        list_heads_present: lists.list_heads.is_some(),
         inst_count: lists.inst_count,
         bytemap_range,
         bytemap,

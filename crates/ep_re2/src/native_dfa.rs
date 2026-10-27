@@ -1,8 +1,7 @@
 // Copyright 2008 The RE2 Authors. All Rights Reserved.
 // Rust port of pinned RE2 dfa.cc; BSD license: RE2-LICENSE.
 //! Forward anchored longest-DFA subset for no-capture FullMatch.
-//! Test-only source accounting; no official-layout or production admission.
-#![cfg(test)]
+//! Persistent cache state is owned; immutable program views are call-scoped.
 use crate::native_compiler::{Inst, InstOp};
 use std::collections::HashMap;
 
@@ -76,13 +75,18 @@ impl SearchResult {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct CacheFacts {
     pub init_failed: bool,
+    #[cfg(test)]
     pub longest_max_mem: i64,
     /// None iff the source returned BEFORE assigning state_budget_.
     pub state_budget: Option<i64>,
     pub remaining_mem: i64,
+    #[cfg(test)]
     pub cached_states: usize,
+    #[cfg(test)]
     pub cache_resets: u64,
+    #[cfg(test)]
     pub state_computations: u64,
+    #[cfg(test)]
     pub slow_bailouts: u64,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -171,14 +175,14 @@ struct Scratch {
 
 /// Persistent kLongestMatch cache. Construct lazily at source GetDFA, after
 /// owner prefix/anchor/OnePass-skip checks. Sequential calls retain this cache.
-/// An eventual shared owner must serialize access; concurrency hooks are absent.
+/// The shared Re2 owner serializes access; there is no retained graph borrow.
+#[cfg(test)]
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct ObserverResetEvent {
     pub state_budget: i64,
     pub state_cache_size: usize,
 }
-pub(crate) struct LongestDfa<'a> {
-    program: ProgramView<'a>,
+pub(crate) struct LongestDfa {
     layout: DfaLayout,
     scratch: Option<Scratch>,
     states: Vec<State>,
@@ -186,6 +190,7 @@ pub(crate) struct LongestDfa<'a> {
     /// Anchored forward StartInfos (source start_ indices 1,3,5,7).
     starts: [Option<StateId>; 4],
     facts: CacheFacts,
+    #[cfg(test)]
     observer_events: Vec<ObserverResetEvent>,
 }
 fn filled<T: Clone>(n: usize, value: T) -> Result<Vec<T>, DfaError> {
@@ -358,11 +363,11 @@ fn run_byte(p: ProgramView<'_>, s: &mut Scratch, byte: u16, flags: u32) -> Resul
     Ok(matched)
 }
 
-impl<'a> LongestDfa<'a> {
+impl LongestDfa {
     /// dfa.cc423-470,1802-1806: forward longest gets half the ALREADY adjusted
     /// budget. Explicit observations supply every private Native layout scalar.
     pub(crate) fn new(
-        p: ProgramView<'a>,
+        p: ProgramView<'_>,
         post_onepass_dfa_mem: i64,
         layout: DfaLayout,
     ) -> Result<Self, DfaError> {
@@ -415,7 +420,6 @@ impl<'a> LongestDfa<'a> {
             })
         };
         Ok(Self {
-            program: p,
             layout,
             scratch,
             states: Vec::new(),
@@ -423,20 +427,28 @@ impl<'a> LongestDfa<'a> {
             starts: [None; 4],
             facts: CacheFacts {
                 init_failed,
+                #[cfg(test)]
                 longest_max_mem: max_mem,
                 state_budget: (budget >= 0).then_some(budget),
                 remaining_mem: budget,
+                #[cfg(test)]
                 cached_states: 0,
+                #[cfg(test)]
                 cache_resets: 0,
+                #[cfg(test)]
                 state_computations: 0,
+                #[cfg(test)]
                 slow_bailouts: 0,
             },
+            #[cfg(test)]
             observer_events: Vec::new(),
         })
     }
+    #[cfg(test)]
     pub(crate) fn take_observer_events(&mut self) -> Vec<ObserverResetEvent> {
         std::mem::take(&mut self.observer_events)
     }
+    #[cfg(test)]
     #[expect(
         dead_code,
         reason = "Retained source cache accounting is outside the public regression wire"
@@ -447,14 +459,18 @@ impl<'a> LongestDfa<'a> {
             ..self.facts
         }
     }
-    fn cache_state(&mut self, inst: Vec<i32>, flag: u32) -> Result<Option<StateId>, DfaError> {
+    fn cache_state(
+        &mut self,
+        p: ProgramView<'_>,
+        inst: Vec<i32>,
+        flag: u32,
+    ) -> Result<Option<StateId>, DfaError> {
         let key = Key { inst, flag };
         if let Some(&id) = self.cache.get(&key) {
             return Ok(Some(StateId::Live(id)));
         }
         let bytes = i128::from(self.layout.state_bytes)
-            + i128::from(self.program.bytemap_range + 1)
-                * i128::from(self.layout.atomic_state_pointer_bytes)
+            + i128::from(p.bytemap_range + 1) * i128::from(self.layout.atomic_state_pointer_bytes)
             + key.inst.len() as i128 * i128::from(self.layout.int_bytes)
             + CACHE_OVERHEAD;
         let bytes = i64::try_from(bytes).map_err(|_| DfaError::AccountingOverflow)?;
@@ -463,7 +479,7 @@ impl<'a> LongestDfa<'a> {
             return Ok(None);
         }
         self.facts.remaining_mem -= bytes;
-        let next = filled(self.program.bytemap_range as usize + 1, None)?;
+        let next = filled(p.bytemap_range as usize + 1, None)?;
         let stored_key = Key {
             inst: copied(&key.inst)?,
             flag,
@@ -483,7 +499,11 @@ impl<'a> LongestDfa<'a> {
         Ok(Some(StateId::Live(id)))
     }
     // dfa.cc595-725 specialized only by fixed kLongestMatch.
-    fn cache_queue(&mut self, mut flag: u32) -> Result<Option<StateId>, DfaError> {
+    fn cache_queue(
+        &mut self,
+        p: ProgramView<'_>,
+        mut flag: u32,
+    ) -> Result<Option<StateId>, DfaError> {
         let q = &self.scratch.as_ref().ok_or(DfaError::SourceInvariant)?.q0;
         let mut inst = Vec::new();
         inst.try_reserve_exact(q.seen.len())
@@ -502,22 +522,17 @@ impl<'a> LongestDfa<'a> {
                 }
                 continue;
             }
-            let ip = instruction(self.program, id)?;
+            let ip = instruction(p, id)?;
             if ip.opcode() == InstOp::AltMatch && !saw_mark && flag & MATCH != 0 {
                 return Ok(Some(StateId::Full));
             }
-            if instruction(
-                self.program,
-                id.checked_sub(1).ok_or(DfaError::SourceInvariant)?,
-            )?
-            .last()
-            {
+            if instruction(p, id.checked_sub(1).ok_or(DfaError::SourceInvariant)?)?.last() {
                 inst.push(id as i32);
             }
             if ip.opcode() == InstOp::EmptyWidth {
                 need |= ip.payload;
             }
-            if ip.opcode() == InstOp::Match && !self.program.anchor_end {
+            if ip.opcode() == InstOp::Match && !p.anchor_end {
                 saw_match = true;
             }
         }
@@ -534,15 +549,15 @@ impl<'a> LongestDfa<'a> {
             group.sort_unstable();
         }
         flag |= need << NEED_SHIFT;
-        self.cache_state(inst, flag)
+        self.cache_state(p, inst, flag)
     }
-    fn state_to_queue(&mut self, id: usize) -> Result<(), DfaError> {
+    fn state_to_queue(&mut self, p: ProgramView<'_>, id: usize) -> Result<(), DfaError> {
         let state = self.states.get(id).ok_or(DfaError::SourceInvariant)?;
         let s = self.scratch.as_mut().ok_or(DfaError::SourceInvariant)?;
         s.q0.clear();
         for &id in &state.key.inst {
             add_to_queue(
-                self.program,
+                p,
                 &mut s.stack,
                 s.stack_limit,
                 &mut s.q0,
@@ -552,14 +567,19 @@ impl<'a> LongestDfa<'a> {
         }
         Ok(())
     }
-    fn byte_class(&self, byte: u16) -> usize {
+    fn byte_class(p: ProgramView<'_>, byte: u16) -> usize {
         if byte == END_BYTE {
-            self.program.bytemap_range as usize
+            p.bytemap_range as usize
         } else {
-            usize::from(self.program.bytemap[usize::from(byte)])
+            usize::from(p.bytemap[usize::from(byte)])
         }
     }
-    fn run_state(&mut self, id: StateId, byte: u16) -> Result<Option<StateId>, DfaError> {
+    fn run_state(
+        &mut self,
+        p: ProgramView<'_>,
+        id: StateId,
+        byte: u16,
+    ) -> Result<Option<StateId>, DfaError> {
         let StateId::Live(at) = id else {
             return if id == StateId::Full {
                 Ok(Some(id))
@@ -567,13 +587,16 @@ impl<'a> LongestDfa<'a> {
                 Err(DfaError::SourceInvariant)
             };
         };
-        let class = self.byte_class(byte);
+        let class = Self::byte_class(p, byte);
         if let Some(id) = self.states.get(at).ok_or(DfaError::SourceInvariant)?.next[class] {
             return Ok(Some(id));
         }
-        self.facts.state_computations += 1;
+        #[cfg(test)]
+        {
+            self.facts.state_computations += 1;
+        }
         let state_flag = self.states[at].key.flag;
-        self.state_to_queue(at)?;
+        self.state_to_queue(p, at)?;
         let need = state_flag >> NEED_SHIFT;
         let mut before = state_flag & EMPTY_MASK;
         let old_before = before;
@@ -593,9 +616,9 @@ impl<'a> LongestDfa<'a> {
         };
         let s = self.scratch.as_mut().ok_or(DfaError::SourceInvariant)?;
         if before & !old_before & need != 0 {
-            run_empty(self.program, s, before)?;
+            run_empty(p, s, before)?;
         }
-        let matched = run_byte(self.program, s, byte, after)?;
+        let matched = run_byte(p, s, byte, after)?;
         let mut flag = after;
         if matched {
             flag |= MATCH;
@@ -603,25 +626,31 @@ impl<'a> LongestDfa<'a> {
         if is_word {
             flag |= LAST_WORD;
         }
-        let next = self.cache_queue(flag)?;
+        let next = self.cache_queue(p, flag)?;
         self.states[at].next[class] = next;
         Ok(next)
     }
     fn reset(&mut self) -> Result<(), DfaError> {
         // Public Native hook precedes cache mutation (dfa.cc1170-1173).
-        let event = ObserverResetEvent {
-            state_budget: self.facts.state_budget.ok_or(DfaError::SourceInvariant)?,
-            state_cache_size: self.cache.len(),
-        };
-        self.observer_events
-            .try_reserve(1)
-            .map_err(|_| DfaError::HostAllocation)?;
-        self.observer_events.push(event);
+        #[cfg(test)]
+        {
+            let event = ObserverResetEvent {
+                state_budget: self.facts.state_budget.ok_or(DfaError::SourceInvariant)?,
+                state_cache_size: self.cache.len(),
+            };
+            self.observer_events
+                .try_reserve(1)
+                .map_err(|_| DfaError::HostAllocation)?;
+            self.observer_events.push(event);
+        }
         self.starts.fill(None);
         self.states.clear();
         self.cache.clear();
         self.facts.remaining_mem = self.facts.state_budget.ok_or(DfaError::SourceInvariant)?;
-        self.facts.cache_resets += 1;
+        #[cfg(test)]
+        {
+            self.facts.cache_resets += 1;
+        }
         Ok(())
     }
     fn save(&self, state: StateId) -> Result<Saved, DfaError> {
@@ -636,27 +665,32 @@ impl<'a> LongestDfa<'a> {
             special => Ok(Saved::Special(special)),
         }
     }
-    fn restore(&mut self, saved: Saved) -> Result<Option<StateId>, DfaError> {
+    fn restore(&mut self, p: ProgramView<'_>, saved: Saved) -> Result<Option<StateId>, DfaError> {
         match saved {
             Saved::Special(id) => Ok(Some(id)),
-            Saved::Ordinary(key) => self.cache_state(key.inst, key.flag),
+            Saved::Ordinary(key) => self.cache_state(p, key.inst, key.flag),
         }
     }
-    fn analyze(&mut self, index: usize, flags: u32) -> Result<Option<StateId>, DfaError> {
+    fn analyze(
+        &mut self,
+        p: ProgramView<'_>,
+        index: usize,
+        flags: u32,
+    ) -> Result<Option<StateId>, DfaError> {
         if let Some(start) = self.starts[index] {
             return Ok(Some(start));
         }
         let s = self.scratch.as_mut().ok_or(DfaError::SourceInvariant)?;
         s.q0.clear();
         add_to_queue(
-            self.program,
+            p,
             &mut s.stack,
             s.stack_limit,
             &mut s.q0,
-            self.program.start as i32,
+            p.start as i32,
             flags,
         )?;
-        let result = self.cache_queue(flags)?;
+        let result = self.cache_queue(p, flags)?;
         self.starts[index] = result;
         Ok(result)
     }
@@ -678,6 +712,7 @@ impl<'a> LongestDfa<'a> {
     /// budget/reset/slow routes set failed; owner emits LOG811 and falls back.
     pub(crate) fn search_full(
         &mut self,
+        program: ProgramView<'_>,
         context: &[u8],
         begin: usize,
         end: usize,
@@ -685,9 +720,7 @@ impl<'a> LongestDfa<'a> {
         if begin > end || end > context.len() {
             return Err(DfaError::InvalidRange);
         }
-        if (self.program.anchor_start && begin != 0)
-            || (self.program.anchor_end && end != context.len())
-        {
+        if (program.anchor_start && begin != 0) || (program.anchor_end && end != context.len()) {
             return Ok(SearchResult::ordinary(false, None));
         }
         if self.facts.init_failed {
@@ -702,11 +735,11 @@ impl<'a> LongestDfa<'a> {
         } else {
             (3, 0)
         };
-        let mut start = match self.analyze(index, flags)? {
+        let mut start = match self.analyze(program, index, flags)? {
             Some(start) => start,
             None => {
                 self.reset()?;
-                let Some(start) = self.analyze(index, flags)? else {
+                let Some(start) = self.analyze(program, index, flags)? else {
                     return Ok(SearchResult::failed());
                 };
                 start
@@ -724,28 +757,31 @@ impl<'a> LongestDfa<'a> {
         while p != end {
             let byte = u16::from(context[p]);
             p += 1;
-            let next = match self.run_state(state, byte)? {
+            let next = match self.run_state(program, state, byte)? {
                 Some(next) => next,
                 None => {
                     // dfa.cc1418: default bail_when_slow=true. First reset is
                     // allowed; p is already AFTER the current input byte.
                     if reset_p.is_some_and(|prior| p - prior < 10 * self.states.len()) {
-                        self.facts.slow_bailouts += 1;
+                        #[cfg(test)]
+                        {
+                            self.facts.slow_bailouts += 1;
+                        }
                         return Ok(SearchResult::failed());
                     }
                     reset_p = Some(p);
                     let save_start = self.save(start)?;
                     let save_state = self.save(state)?;
                     self.reset()?;
-                    let Some(restored_start) = self.restore(save_start)? else {
+                    let Some(restored_start) = self.restore(program, save_start)? else {
                         return Ok(SearchResult::failed());
                     };
                     start = restored_start;
-                    let Some(restored_state) = self.restore(save_state)? else {
+                    let Some(restored_state) = self.restore(program, save_state)? else {
                         return Ok(SearchResult::failed());
                     };
                     state = restored_state;
-                    let Some(next) = self.run_state(state, byte)? else {
+                    let Some(next) = self.run_state(program, state, byte)? else {
                         return Ok(SearchResult::failed());
                     };
                     next
@@ -771,17 +807,17 @@ impl<'a> LongestDfa<'a> {
         } else {
             u16::from(context[end])
         };
-        let next = match self.run_state(state, byte)? {
+        let next = match self.run_state(program, state, byte)? {
             Some(next) => next,
             None => {
                 // The final-byte reset saves s ONLY and has NO slow bailout.
                 let saved = self.save(state)?;
                 self.reset()?;
-                let Some(restored) = self.restore(saved)? else {
+                let Some(restored) = self.restore(program, saved)? else {
                     return Ok(SearchResult::failed());
                 };
                 state = restored;
-                let Some(next) = self.run_state(state, byte)? else {
+                let Some(next) = self.run_state(program, state, byte)? else {
                     return Ok(SearchResult::failed());
                 };
                 next

@@ -228,7 +228,22 @@ fn record(pattern: &str, queries: &[Query], layout: Layout) -> Result<String, St
                 }
                 dfa.as_mut()
                     .ok_or("missing reached DFA owner")?
-                    .search_full(&query.context, query.begin, query.end)
+                    .search_full(
+                        native_dfa::ProgramView {
+                            instructions: &program.instructions,
+                            start: program.start,
+                            start_unanchored: program.start_unanchored,
+                            anchor_start: program.anchor_start,
+                            anchor_end: program.anchor_end,
+                            list_count: program.list_count,
+                            inst_count: program.inst_count,
+                            bytemap_range: program.bytemap_range,
+                            bytemap: &program.bytemap,
+                        },
+                        &query.context,
+                        query.begin,
+                        query.end,
+                    )
                     .map_err(|error| format!("Rust DFA observation error: {error:?}"))?
             };
             emit!(
@@ -296,6 +311,7 @@ pub(crate) fn check_vectors() -> Result<(), String> {
     let expected = include_str!("../tests/data/native-automata.jsonl");
     assert_eq!(fixtures::OPERANDS.len(), 20);
     assert_eq!(expected.lines().count(), fixtures::OPERANDS.len());
+    let mut reached_persistent_cache = false;
     for (ordinal, ((pattern, operands, native_onepass), expected)) in
         fixtures::OPERANDS.iter().zip(expected.lines()).enumerate()
     {
@@ -314,6 +330,34 @@ pub(crate) fn check_vectors() -> Result<(), String> {
             "Native OnePass result through default constructor group {}",
             ordinal + 1,
         );
+        // Existing Native constructor/match rows check acceptance. These
+        // ordered operands additionally exercise owner identity/persistence
+        // and logging parity without creating another expectation catalog.
+        let clone = expression.clone();
+        let untouched = crate::Re2::new(pattern);
+        assert!(std::sync::Arc::ptr_eq(&expression.dfa, &clone.dfa));
+        for &(context, _, _) in *operands {
+            let quiet = expression.full_match(context);
+            let mut logs = Vec::new();
+            let logged = clone.full_match_logged_to(
+                context,
+                crate::TargetDiagnosticOrigin {
+                    source_file: b"component-test-origin",
+                    line_ending: b"\n",
+                },
+                &mut logs,
+            );
+            assert_eq!(quiet, logged);
+            // All these actual ordinary groups have at most18 instructions;
+            // their Native records have no cache-budget failures.
+            assert!(logs.is_empty());
+        }
+        reached_persistent_cache |= match expression.dfa.lock() {
+            Ok(owner) => owner.is_some(),
+            Err(poisoned) => poisoned.into_inner().is_some(),
+        };
+        assert_eq!(expression, untouched);
+        assert_eq!(expression, clone);
         let queries = operands
             .iter()
             .map(|&(context, begin, end)| Query {
@@ -330,5 +374,6 @@ pub(crate) fn check_vectors() -> Result<(), String> {
             ordinal + 1
         );
     }
+    assert!(reached_persistent_cache);
     Ok(())
 }

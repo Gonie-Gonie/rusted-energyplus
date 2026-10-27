@@ -47,7 +47,7 @@
       "all seven existing report-frequency consumers and unchanged meter/extrema/count behavior",
       "actual IO deletion/catalog/extraction; zero samples are not fabricated",
       "Constant and built-in Constant admission; other explicit physics/output guards retained",
-      "Raw/CI pre-scan and CI-only request matching use pinned Rust RE2 with source-order duplicate/Used/error effects. Two key-only derived A/B physical cases pass 160 series and 15,144 samples under the original policy; valid-match DFA/resource effects and general legal-domain completion remain open."
+      "Raw/CI pre-scan and CI-only request matching use pinned Rust RE2 with source-order duplicate/Used/error effects. The retained key-only derived A/B cases pass160 series/15,144 samples. Default anchored-longest DFA now uses actual official-binary accounting, eager OnePass charge and a shared persistent cache at the live reporting owners. Two additional same-input A models with an exact100k Zone name complete192 reported samples under unchanged numeric limits, exact dictionaries/clocks and genuine absent MTR; the pressure branch records exact CI26 thenraw22 LOG811 before the Source fallback. The2362-group same-GCC component reread retains exact wire separately. This finite connection does not establish minimum-report-frequency override, unbound producers, unsupported backends or arbitrary legal object/value combinations."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -1410,7 +1410,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality.",
     "cases": [
       {
         "id": "timestep-8",
@@ -28607,12 +28607,336 @@
           "bytes": 48885
         },
         "effective_state": "Only Output:Variable key spans change from B-NOLIMIT-24H. Anchored lowercase alternatives and word boundaries exercise raw/CI construction, duplicate handling and original-text prefix context. The full original named 24h reported profiles, dictionaries and ordered timestamps pass. No full-file, internal-phase or general legal-domain claim."
+      },
+      {
+        "id": "REPORTING-DFA-LITERAL-CONTROL-A-24H",
+        "group": "reporting_dfa",
+        "source_build": "reporting-dfa-73",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit72-prep/official-accounting-proposal/literal-control.idf",
+          "sha256": "664505aedf27944d2e0d4596e996b222a2e8f5c8010af95350509bda43d216a6",
+          "bytes": 1003844
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/literal-control/command.receipt.json",
+          "sha256": "4877f32284fab44cdacfba4593311a9a9bb742d2778e00741286fde96dc5c255",
+          "bytes": 6157
+        },
+        "native_receipt_schema": "actual-official-zone-pilot-command72.v1",
+        "retained_Native_review": {
+          "path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/literal-control/review.json",
+          "sha256": "f04ff415dfa71b9ba29016cf6e79d318a91e703e6d6aa32e08cc1177e01b5155",
+          "bytes": 3159
+        },
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/literal-control/command/receipt.json",
+          "sha256": "55a8474b678bda26c3c246429854e246a2e323b2376dcf5998af85c1781d565c",
+          "bytes": 6328
+        },
+        "source_summary": {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/literal-control/output/run-summary.json",
+          "sha256": "858d77dd838ea6b26f9f12d74a97982cb5398dddef00d59ec2fd302b663e619d",
+          "bytes": 115044
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-73/eplus-rs.exe",
+          "sha256": "a72c82f16f20e35142e8e336fd7340c4a545468be124d72d414dbdb18ff5e735",
+          "bytes": 77845527
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/04/04e953e8153dc04ab7728b23e28d3db3bc5a1fbe469622f7c42dc99d421d061b",
+          "sha256": "04e953e8153dc04ab7728b23e28d3db3bc5a1fbe469622f7c42dc99d421d061b"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-73/receipt.json",
+          "sha256": "49d72267dcc79b5a350d7bc5ffadbbcdb67bd543db77a7bf9cc89b13fd6e110a",
+          "bytes": 4837
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/literal-control/comparison.json",
+          "sha256": "2f11caa837230dcb4854195a7bd3ea10e2dd931b75d92a706e954523da760e3f",
+          "bytes": 407667
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/source-zone-pilot-proposal/plan.json",
+          "sha256": "44bc952f64903d7bd9d84230183f1329ed045aa99277364c27e1b20b72a412f6",
+          "bytes": 5852
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/official-accounting-proposal/proposal.json",
+          "sha256": "2a2fc3b27e293d1e3564e2ebd04f439c5f756d7739c47b6c14441225f90163be",
+          "bytes": 4847
+        },
+        "totals": {
+          "series": 1,
+          "samples": 96,
+          "raw_operand_unequal": 96,
+          "parsed_binary64_unequal": 96,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "Complete sole requested Zone Mean Air Temperature timestep stream: seven exact dictionary entries, ordered environment and96 timestamp rows, all96 finite numeric operands, count/footer/EOF.",
+          "MTR": "No meter requests; genuine physical absence on both sides. Source catalog retains deleted_empty=true,0 records,0 series,[]; no empty stream or sample is fabricated.",
+          "original_full_A58_profile_claim": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "A",
+          "original_row": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "derived_key_selector": {
+            "bytes": 100000,
+            "sha256": "f241ceede47007ed856be240993e05bcf8d51e11f3692d42b02081547ff177fa"
+          },
+          "numerical_limits_changed": false,
+          "qualification": "Only the named selector follows the actual derived Zone. Original atol OR rtol and sequential binary64 RMSE are unchanged; this is not a frozen or original-key policy identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.1657341758564144e-14,
+          "rmse_delta": 4.99818753811832e-15,
+          "exact_dictionary_entries": 7,
+          "exact_timestamp_rows": 96,
+          "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a",
+          "full_requested_key_bytes": 100000,
+          "full_requested_key_sha256": "f241ceede47007ed856be240993e05bcf8d51e11f3692d42b02081547ff177fa",
+          "full_Zone_bytes": 100000,
+          "full_Zone_sha256": "f241ceede47007ed856be240993e05bcf8d51e11f3692d42b02081547ff177fa"
+        },
+        "actual_DFA_records": {
+          "Source": [],
+          "Native": [],
+          "ordered_RE2_record_bytes_equal": true,
+          "whole_process_stderr_equal": false,
+          "qualification": "Native CLI additionally writes its36-byte completion line; no whole-stderr equality claim."
+        },
+        "empty_MTR_observation": {
+          "Source_owner": {
+            "deleted_empty": true,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reporting-dfa-73\\source-zone-pilot01\\literal-control\\output\\eplusrs.mtr",
+            "reported_numeric_records": 0,
+            "series": 0,
+            "series_samples": [],
+            "stream": "mtr"
+          },
+          "Source_file_absent": true,
+          "Native_path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/literal-control/output/probeout.mtr",
+          "Native_file_absent": true,
+          "Native_private_record_counter_observed": false,
+          "primary_rule": {
+            "source": {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+              "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+              "bytes": 168527
+            },
+            "lines": "1943-1951",
+            "qualification": "Actual absent MTR after genuine successful normal CLI with no meter request; source normal closeout deletes when StdMeterRecordCount is zero. Native counter and deletion trace were not instrumented."
+          }
+        },
+        "effective_state": "Same immutable100k-Zone IDF/weather as retained successful official Native; new Source73 full24h A completion for literal exact100k key control. Target-derived persistent anchored-longest DFA, exact diagnostics and fallback are connected to real reporting owners. This finite physical branch does not establish every regex/resource input, minimum-report-frequency override, unbound producers, other backends or arbitrary legal object/value combinations."
+      },
+      {
+        "id": "REPORTING-DFA-AMBIGUOUS-CACHE-A-24H",
+        "group": "reporting_dfa",
+        "source_build": "reporting-dfa-73",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit72-prep/official-accounting-proposal/ambiguous-cache.idf",
+          "sha256": "6f701d3251f5ac2f8a5ade6760cefdc7bde3309323d74dcd2587633f3a7c017f",
+          "bytes": 903866
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/ambiguous-cache/command.receipt.json",
+          "sha256": "1befa8e8dbd2908e23fbb48d172216deb9f80515c67cfbe13abb0234ccba02bb",
+          "bytes": 7055
+        },
+        "native_receipt_schema": "actual-official-zone-pilot-command72.v1",
+        "retained_Native_review": {
+          "path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/ambiguous-cache/review.json",
+          "sha256": "aae4aa042da876da9d92d3024f059361275b515e05c593b92068c4966578d125",
+          "bytes": 4208
+        },
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/ambiguous-cache/command/receipt.json",
+          "sha256": "f1f51d08b62cbfa60295a5e2be4d08b01ea8476fb6ddba8926850ab8a201cedd",
+          "bytes": 6327
+        },
+        "source_summary": {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/ambiguous-cache/output/run-summary.json",
+          "sha256": "4f70cfdcc1132477dfc337aded632b0b1e8da64753ae1cfc33f71e6346f4f7e5",
+          "bytes": 115045
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-73/eplus-rs.exe",
+          "sha256": "a72c82f16f20e35142e8e336fd7340c4a545468be124d72d414dbdb18ff5e735",
+          "bytes": 77845527
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/04/04e953e8153dc04ab7728b23e28d3db3bc5a1fbe469622f7c42dc99d421d061b",
+          "sha256": "04e953e8153dc04ab7728b23e28d3db3bc5a1fbe469622f7c42dc99d421d061b"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-73/receipt.json",
+          "sha256": "49d72267dcc79b5a350d7bc5ffadbbcdb67bd543db77a7bf9cc89b13fd6e110a",
+          "bytes": 4837
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/ambiguous-cache/comparison.json",
+          "sha256": "6402e5fff5ad14fd2cbe2a184e9f78e28ca012cfafa3b79a14a451abf3d32d94",
+          "bytes": 407922
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/source-zone-pilot-proposal/plan.json",
+          "sha256": "44bc952f64903d7bd9d84230183f1329ed045aa99277364c27e1b20b72a412f6",
+          "bytes": 5852
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit72-prep/official-accounting-proposal/proposal.json",
+          "sha256": "2a2fc3b27e293d1e3564e2ebd04f439c5f756d7739c47b6c14441225f90163be",
+          "bytes": 4847
+        },
+        "totals": {
+          "series": 1,
+          "samples": 96,
+          "raw_operand_unequal": 96,
+          "parsed_binary64_unequal": 96,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "Complete sole requested Zone Mean Air Temperature timestep stream: seven exact dictionary entries, ordered environment and96 timestamp rows, all96 finite numeric operands, count/footer/EOF.",
+          "MTR": "No meter requests; genuine physical absence on both sides. Source catalog retains deleted_empty=true,0 records,0 series,[]; no empty stream or sample is fabricated.",
+          "original_full_A58_profile_claim": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "A",
+          "original_row": {
+            "key": "ZONE ONE",
+            "variable": "Zone Mean Air Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "sampling_stage": "zone",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "derived_key_selector": {
+            "bytes": 100000,
+            "sha256": "f241ceede47007ed856be240993e05bcf8d51e11f3692d42b02081547ff177fa"
+          },
+          "numerical_limits_changed": false,
+          "qualification": "Only the named selector follows the actual derived Zone. Original atol OR rtol and sequential binary64 RMSE are unchanged; this is not a frozen or original-key policy identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.1657341758564144e-14,
+          "rmse_delta": 4.99818753811832e-15,
+          "exact_dictionary_entries": 7,
+          "exact_timestamp_rows": 96,
+          "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a",
+          "full_requested_key_bytes": 22,
+          "full_requested_key_sha256": "18356730032a46f8369c461f72831612b4a59e0588eab651c907f480ed975eff",
+          "full_Zone_bytes": 100000,
+          "full_Zone_sha256": "f241ceede47007ed856be240993e05bcf8d51e11f3692d42b02081547ff177fa"
+        },
+        "actual_DFA_records": {
+          "Source": [
+            [
+              26,
+              30,
+              28,
+              3
+            ],
+            [
+              22,
+              30,
+              28,
+              3
+            ]
+          ],
+          "Native": [
+            [
+              26,
+              30,
+              28,
+              3
+            ],
+            [
+              22,
+              30,
+              28,
+              3
+            ]
+          ],
+          "ordered_RE2_record_bytes_equal": true,
+          "whole_process_stderr_equal": false,
+          "qualification": "Native CLI additionally writes its36-byte completion line; no whole-stderr equality claim."
+        },
+        "empty_MTR_observation": {
+          "Source_owner": {
+            "deleted_empty": true,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\reporting-dfa-73\\source-zone-pilot01\\ambiguous-cache\\output\\eplusrs.mtr",
+            "reported_numeric_records": 0,
+            "series": 0,
+            "series_samples": [],
+            "stream": "mtr"
+          },
+          "Source_file_absent": true,
+          "Native_path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/ambiguous-cache/output/probeout.mtr",
+          "Native_file_absent": true,
+          "Native_private_record_counter_observed": false,
+          "primary_rule": {
+            "source": {
+              "path": ".reference/energyplus-src/26.1.0/src/EnergyPlus/SimulationManager.cc",
+              "sha256": "bff6379ea2b54f91cc344b617f9b713c7ed44d9f2e0fed263ce6d30ca3cff685",
+              "bytes": 168527
+            },
+            "lines": "1943-1951",
+            "qualification": "Actual absent MTR after genuine successful normal CLI with no meter request; source normal closeout deletes when StdMeterRecordCount is zero. Native counter and deletion trace were not instrumented."
+          }
+        },
+        "effective_state": "Same immutable100k-Zone IDF/weather as retained successful official Native; new Source73 full24h A completion for ambiguous regex pressure with retained actual CI26 then raw22 LOG811. Target-derived persistent anchored-longest DFA, exact diagnostics and fallback are connected to real reporting owners. This finite physical branch does not establish every regex/resource input, minimum-report-frequency override, unbound producers, other backends or arbitrary legal object/value combinations."
       }
     ],
     "totals": {
-      "paired_cases": 118,
-      "reported_samples": 3460398,
-      "raw_operand_unequal": 710223,
+      "paired_cases": 120,
+      "reported_samples": 3460590,
+      "raw_operand_unequal": 710415,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -29790,6 +30114,23 @@
           "sha256": "0f3f720c9765eba2033739967a6271e04e384ffa6af37738b284911c0c346496",
           "bytes": 77651200
         }
+      },
+      {
+        "id": "reporting-dfa-73",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-73/receipt.json",
+          "sha256": "49d72267dcc79b5a350d7bc5ffadbbcdb67bd543db77a7bf9cc89b13fd6e110a",
+          "bytes": 4837
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/04/04e953e8153dc04ab7728b23e28d3db3bc5a1fbe469622f7c42dc99d421d061b",
+          "sha256": "04e953e8153dc04ab7728b23e28d3db3bc5a1fbe469622f7c42dc99d421d061b"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-73/eplus-rs.exe",
+          "sha256": "a72c82f16f20e35142e8e336fd7340c4a545468be124d72d414dbdb18ff5e735",
+          "bytes": 77845527
+        }
       }
     ],
     "focused_since_workspace": {
@@ -29821,8 +30162,8 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 69,
-      "builds_with_accepted_paired_cases": 68,
+      "actual_recorded_builds": 70,
+      "builds_with_accepted_paired_cases": 69,
       "builds_with_only_retained_failed_Source_attempts": 1,
       "failed_attempts_in_paired_case_or_sample_totals": 0
     },
@@ -29876,6 +30217,41 @@
         }
       ],
       "scope": "Two successful complete 24h reported profiles; component logging/resource probes are excluded from physical totals. No all-phase, full ancillary or whole-file equality claim."
+    },
+    "current_reporting_dfa_live_pair": {
+      "source_build": "reporting-dfa-73",
+      "case_rows": [
+        "REPORTING-DFA-LITERAL-CONTROL-A-24H",
+        "REPORTING-DFA-AMBIGUOUS-CACHE-A-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/summary.json",
+        "sha256": "cef0a3204ea9c5e4e52bca60cdfccedb593272429064c2e3a1851ff4ae19ff2c",
+        "bytes": 1601
+      },
+      "comparisons": [
+        {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/literal-control/comparison.json",
+          "sha256": "2f11caa837230dcb4854195a7bd3ea10e2dd931b75d92a706e954523da760e3f",
+          "bytes": 407667
+        },
+        {
+          "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/ambiguous-cache/comparison.json",
+          "sha256": "6402e5fff5ad14fd2cbe2a184e9f78e28ca012cfafa3b79a14a451abf3d32d94",
+          "bytes": 407922
+        }
+      ],
+      "target_binary_accounting": {
+        "path": ".runtime/object-expansion/unit72-prep/official-dfa-binary01/selected-binary-facts.json",
+        "sha256": "2ae2132210144bbe3571e0d1595256a4f46a2eef935a931257812f3e5609425a",
+        "bytes": 396364
+      },
+      "current_owned_component_reread": {
+        "path": ".runtime/object-expansion/unit72-prep/owned-dfa-reread-comparison01/summary.json",
+        "sha256": "1cd9545b05e32e03a9282d3d462c347043c64c7a57aa4384e939015b893b2c57",
+        "bytes": 1635
+      },
+      "scope": "Two additional full24h A models, one complete reported series each;192 genuine samples plus genuine empty-MTR absence, unchanged numeric limits. Literal control emits no RE2 memory diagnostic; pressure emits exact CI26 thenraw22 LOG811 and still completes matching reported values. The2362-group same-GCC component wire reread is separate from these physical totals. Minimum-frequency override, unbound producers, unsupported backends and arbitrary legal object/value combinations remain open."
     }
   },
   "additional_native_type_calibrations": [

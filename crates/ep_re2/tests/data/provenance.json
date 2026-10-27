@@ -23,7 +23,6 @@
   ],
   "production_or_domain_completion_claim": false,
   "remaining": [
-    "Valid-match DFA/cache resource diagnostics and target accounting",
     "Minimum-report-frequency override and remaining live reporting/runtime boundaries",
     "Full legal-value and object-domain completion"
   ],
@@ -369,5 +368,80 @@
     ],
     "scope": "Two genuine successful Native-only processes; actual failed-DFA owner events and ESO membership/output. No private dispatch trace, official ABI/K inference or paired Source comparison.",
     "paired_physical_cases_added": 0
+  },
+  "official_target_DFA_accounting": {
+    "scope": "Pinned official Windows DLL forward-longest accounting constants read from Source-corresponding allocation, subtraction and indexing instructions; not complete C++ layout or Rust heap size.",
+    "proposal": {
+      "path": ".runtime/object-expansion/unit72-prep/official-dfa-binary-proposal/proposal.json",
+      "sha256": "19c6a962435f13b80b049191092468f9d84a2296886a9271b5c670bb44c7e461",
+      "bytes": 6274
+    },
+    "actual_extracted_facts": {
+      "path": ".runtime/object-expansion/unit72-prep/official-dfa-binary01/selected-binary-facts.json",
+      "sha256": "2ae2132210144bbe3571e0d1595256a4f46a2eef935a931257812f3e5609425a",
+      "bytes": 396364
+    },
+    "official_scalars": {
+      "Prog": 440,
+      "Inst": 8,
+      "DFA": 208,
+      "State_header": 16,
+      "atomic_State_pointer": 8,
+      "int": 4,
+      "list_head": 2
+    },
+    "Source_literal_cache_overhead": 40,
+    "same_GCC_fixture_unchanged": {
+      "Prog": 432,
+      "DFA": 200
+    }
+  },
+  "production_DFA_connection": {
+    "scope": "Persistent shared anchored-longest FullMatch cache, actual post-OnePass budget, original prefix/context/skip gates, logged failed-DFA event before NFA fallback; quiet and logged APIs share matching.",
+    "proposal": {
+      "path": ".runtime/object-expansion/unit72-prep/production-dfa-proposal/proposal.json",
+      "sha256": "81c1d50a92b8e16f10c126f3a6be2dbb90d63d61b77f3ab8d117699db079dde7",
+      "bytes": 9558
+    },
+    "focused_quality": {
+      "path": ".runtime/object-expansion/unit72-prep/production-dfa-quality02/receipt.json",
+      "sha256": "1781b8e1e9b1e23a946d279d243fe6ca3db22eb26de3a99521f6a5ad696375f9",
+      "bytes": 13084
+    },
+    "current_component_reread": {
+      "path": ".runtime/object-expansion/unit72-prep/owned-dfa-reread-comparison01/summary.json",
+      "sha256": "1cd9545b05e32e03a9282d3d462c347043c64c7a57aa4384e939015b893b2c57",
+      "bytes": 1635
+    },
+    "Native_replays_in_component_reread": 0,
+    "new_test_functions": 0,
+    "kernel_test_functions_passed": 2,
+    "reporting_owner_tests_passed": 7,
+    "source_build": {
+      "path": ".runtime/object-expansion/build73-row.json",
+      "sha256": "7aee0e28c173e381e6eb0e49cac6af7834bfdfad758787a821b068695ad98a82",
+      "bytes": 665
+    },
+    "physical_branch_comparisons": {
+      "path": ".runtime/porting/reporting-dfa-73/source-zone-pilot01/summary.json",
+      "sha256": "cef0a3204ea9c5e4e52bca60cdfccedb593272429064c2e3a1851ff4ae19ff2c",
+      "bytes": 1601
+    },
+    "physical_cases_added": 2,
+    "reported_values": 192,
+    "raw_operand_unequal": 192,
+    "parsed_binary64_unequal": 192,
+    "maximum_absolute_delta": 1.1657341758564144e-14,
+    "tolerance_failures": 0,
+    "RMSE_failures": 0,
+    "pressure_actual_DFA_log_order": [
+      "CI",
+      "raw"
+    ],
+    "literal_control_DFA_logs": 0,
+    "host_invariant_boundary": "Separate port/host fatal, never ordinary Native failed/no-match; no exact Native exception or exit-code equivalence claim.",
+    "full_domain_or_full_file_equality_claim": false,
+    "whole_process_stderr_equal": false,
+    "process_stderr_difference": "Native adds a 36-byte EnergyPlus Completed Successfully CRLF line; actual RE2 LOG811 records agree byte-for-byte."
   }
 }

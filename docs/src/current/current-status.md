@@ -58,25 +58,26 @@ records and 4,906 stderr bytes. Build72 adds two key-only derived 24-hour A/B
 examples: 160 series and 15,144 reported values have zero tolerance or RMSE
 failures. A has 3,536 unequal raw/binary64 values within the original policy;
 B has none. Full dictionaries and ordered timestamps agree. These results do
-not establish full-file or full-object parity. Valid-match DFA resource effects,
-minimum-report-frequency overrides and the existing runtime boundaries remain
-open.
+not establish full-file or full-object parity.
 
-OnePass and test-only anchored-DFA components agree on all public fields
+OnePass and anchored-DFA component comparisons agree on all public fields
 and wire bytes for 2,362 pattern groups, including 50,237 searches, 23 resource
-failures and six cache resets. The default constructor now eagerly retains its
-OnePass result, node image and charge, using the proven official cap-based gate.
-Twenty small groups check that connection in the existing table; its two test
-functions still finish in about 0.8 seconds. Seven focused reporting-owner tests
-also pass. Boolean execution remains the anchored NFA. These checks add no Source
-CLI build or paired physical cases beyond Build72.
+failures and six cache resets. The current Rust cache refactor was checked against
+that retained Native stream without replaying Native. The default constructor
+retains OnePass analysis; matching now uses a persistent anchored-longest DFA
+and the original-context NFA fallback. Official allocation/subtraction code
+establishes the target accounting independently of the separate GCC observer.
+Twenty small groups exercise these owners in the existing table; its two test
+functions finish in about 0.85 seconds. Seven focused reporting-owner tests pass.
 
-Separate official runs identify the OnePass header and prove its budget gate.
-An actual 100,000-byte Zone name also reaches default failed-DFA diagnostics:
-the literal control and regex request both produce the same 96 timestamped ESO
-values. This demonstrates the official fallback output; official DFA accounting
-and its runtime connection remain open. These Native-only observations add no
-paired Source cases or full-domain claim.
+Build73 adds two same-input comparisons with a 100,000-byte Zone name. Both
+complete the full 24-hour environment: 192 reported values have zero tolerance
+or RMSE failures, with maximum absolute difference 1.17e-14. Dictionaries and
+ordered timestamps agree. The regex request reproduces Native's two failed-DFA
+diagnostics in order before producing the requested output; the literal control
+has none. This is finite cache/fallback evidence. Minimum-report-frequency
+overrides, unbound producers, output backends and general legal-value completion
+remain open.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA

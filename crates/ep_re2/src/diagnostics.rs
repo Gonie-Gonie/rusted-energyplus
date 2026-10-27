@@ -22,6 +22,8 @@ pub enum DiagnosticKind {
     Compile,
     /// FullMatch called on an invalid expression.
     InvalidFullMatch,
+    /// Forward anchored longest DFA exhausted its target cache budget.
+    DfaOutOfMemory,
 }
 
 /// Actual diagnostic payload bytes, independent of target framing metadata.
@@ -55,6 +57,7 @@ impl Diagnostic {
             DiagnosticKind::Parse => 205,
             DiagnosticKind::Compile => 226,
             DiagnosticKind::InvalidFullMatch => 885,
+            DiagnosticKind::DfaOutOfMemory => 811,
         }
     }
 
@@ -88,6 +91,22 @@ impl Diagnostic {
         Self {
             kind: DiagnosticKind::InvalidFullMatch,
             payload,
+        }
+    }
+
+    /// Forward DFA resource-failure payload, before the acceptance fallback.
+    pub fn dfa_out_of_memory(
+        pattern_length: usize,
+        program_size: usize,
+        list_count: u32,
+        bytemap_range: u32,
+    ) -> Self {
+        Self {
+            kind: DiagnosticKind::DfaOutOfMemory,
+            payload: format!(
+                "DFA out of memory: pattern length {pattern_length}, program size {program_size}, list count {list_count}, bytemap range {bytemap_range}"
+            )
+            .into_bytes(),
         }
     }
 
@@ -151,29 +170,22 @@ impl Re2 {
         regex
     }
 
-    /// Match with default invalid-expression logging to the supplied stderr.
+    /// Match with default invalid-expression and DFA resource logging.
     pub fn full_match_logged_to<W: Write + ?Sized>(
         &self,
         text: &[u8],
         origin: TargetDiagnosticOrigin<'_>,
         writer: &mut W,
     ) -> bool {
-        // FullMatchN373 -> DoMatch884/885 guards invalid state BEFORE Match's
-        // prefix logic. It returns here, so Match624 is not a second log.
-        if !self.ok() {
-            Diagnostic::invalid_full_match(self.error().as_bytes()).write_to(origin, writer);
-            return false;
-        }
-        self.full_match(text)
+        let mut emit = |diagnostic: Diagnostic| diagnostic.write_to(origin, writer);
+        self.full_match_with_diagnostic(text, Some(&mut emit))
     }
 
-    /// Match with default invalid-expression logging to process stderr.
+    /// Match with default invalid-expression and DFA resource stderr logging.
     pub fn full_match_logged(&self, text: &[u8], origin: TargetDiagnosticOrigin<'_>) -> bool {
-        if !self.ok() {
-            Diagnostic::invalid_full_match(self.error().as_bytes())
-                .write_to(origin, &mut std::io::stderr().lock());
-            return false;
-        }
-        self.full_match(text)
+        let mut emit = |diagnostic: Diagnostic| {
+            diagnostic.write_to(origin, &mut std::io::stderr().lock());
+        };
+        self.full_match_with_diagnostic(text, Some(&mut emit))
     }
 }

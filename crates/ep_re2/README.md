@@ -3,7 +3,9 @@
 This Rust port supplies constructor/status and boolean FullMatch to the Source
 reporting pre-scan, request getter and registration. Two key-only derived A/B
 examples verify 160 series and 15,144 reported values under the original policy,
-with zero point or RMSE failures. Full legal-domain completion remains open.
+with zero point or RMSE failures. Two further full-day comparisons retain a
+100,000-byte Zone name and verify 192 values plus actual failed-DFA diagnostics
+and fallback output. Full legal-domain completion remains open.
 
 Primary: EnergyPlus26.1.0 commit6f2e40d10250a105b49966baa24d843711e61048,
 third_party/RE2. LICENSE.RE2 retains its license. Production uses Rust and std;
@@ -21,12 +23,18 @@ removal. Captures are parsed; reporting requests no extracted captures.
 Default forward cap698,995 comes from the pinned official binary's adjacent
 checked-constructor boundary, with the exact2xcap walk budget. The separate GCC
 unit cap is698,996; its observed Prog432-byte size is NOT the official DLL layout.
-Runtime supplies no guessed C++ size or DFA metadata. Explicit-layout metadata is
-test-only; both paths share graph passes. The default constructor eagerly retains
-OnePass analysis, nodes and charge on the immutable compiled program. The proven
-header4/cap gate uses actual finalized size and byte classes, without choosing an
-exact private remaining-DFA-memory scalar. Boolean execution still uses the
-anchored NFA, without unanchored prefix acceleration or a production DFA cache.
+The official DLL's independent allocation/subtraction chain establishes its
+Prog440/Inst8/DFA208/State16/atomic-pointer8/int4 accounting. The separate GCC
+fixture keeps its own explicit Prog432/DFA200 scalars. Both paths share graph
+passes. The default constructor eagerly retains OnePass analysis, nodes and
+actual charge on the immutable compiled program. Its proven header4/cap gate
+remains unchanged; lazy DFA accounting subtracts the actual flattened storage,
+optional list heads and successful OnePass charge from the default allowance.
+Boolean FullMatch uses a persistent forward anchored-longest DFA, with the
+original text assertion context after prefix removal. Successful OnePass analysis
+skips that cache for original texts of at most16 bytes. On budget/reset/slow
+failure, logged matching emits the pinned line811 payload before the existing
+NFA boolean fallback; quiet matching takes the same fallback without LOG.
 
 Two table functions compare 1,494 actual parse records, 100 rewrite records,
 23 selected complete program records and 10,607 constructor/match rows. Adjacent
@@ -54,12 +62,16 @@ source order. Quiet APIs serve component tests; reporting uses explicit default
 logging with observed Windows build-origin metadata. A separate default-options
 source observer agrees on all 16 API records and 4,906 stderr bytes, including a
 post-parse compile failure. These are component observations, separate from the
-two successful physical pairs.
+two Build72 physical pairs.
 
-Production DFA cache accounting and its resource stderr remain unconnected;
-OnePass analysis does not promote that behavior. Minimum-report-frequency overrides,
-excluded positive pre-scan families, unbound producers and output backends retain
-their existing boundaries. This is finite reporting evidence within Source A/B.
+Cloned expressions share serialized owned DFA cache state; immutable expression
+equality does not inspect that state. Quiet and logged matching use the same
+cache and fallback path, with diagnostics emitted after unlocking the cache.
+Host allocation/internal invariant guards remain a separate fatal port/host
+boundary, with no claim about Native exception or exit-code equivalence.
+Minimum-report-frequency overrides, excluded positive pre-scan families,
+unbound producers and output backends retain their existing boundaries. This is
+finite reporting evidence within Source A/B.
 External Options, capture extraction, unanchored/reverse search and CompileSet are
 outside this reporting API. Finite comparisons do not prove full legal domains.
 
@@ -74,6 +86,10 @@ The existing Native AST table checks 20 ordinary groups (861 ordered queries)
 against actual public Native records, using explicit same-GCC DWARF layout data.
 The same table also checks eager default-constructor OnePass flags against those
 actual Native results; every selected program is within the proven small-size
-gate. The heavy 2,362-group comparison remains external. The cfg(test) exact-scalar
-and DFA/reset paths add no official DLL layout, physical case or full-domain
-claim; production boolean execution remains the anchored NFA.
+gate. The same ordinary groups exercise clone persistence, equality after
+matching and quiet/logged owner parity. An external current-source reread of all
+2,362 groups agrees on every public field, complete wire bytes and stderr, with
+no Native replay. The cfg(test) exact-scalar wire and reset tracer retain the same-GCC
+component scope; they do not establish the independently measured official DLL
+layout, a new physical case or a full-domain claim. Reverse/unanchored/capture
+execution and prefix acceleration remain outside this boolean reporting API.

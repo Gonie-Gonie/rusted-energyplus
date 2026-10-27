@@ -78,13 +78,6 @@ impl Scratch {
     }
 }
 
-#[cfg_attr(
-    not(test),
-    expect(
-        dead_code,
-        reason = "Exact Native list metadata is retained for the test observer; boolean FullMatch consumes instructions and start"
-    )
-)]
 pub(super) struct Lists {
     pub instructions: Vec<Inst>,
     pub start: u32,
