@@ -269,7 +269,7 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit72-prep/regex-native-ast-docs-check-72.log",
+        "path": ".runtime/object-expansion/unit72-prep/regex-native-rewrite-docs-check-72.log",
         "sha256": "e63d1d2b505f99e70149d128000c36c8cded65cc44897950c0759df4d957b11e",
         "bytes": 338
       },
@@ -700,7 +700,7 @@
         "scope": "Actual full workspace70 and strict all-target Clippy70 are reused only after equality of all four changed source files with Build71 archives and current final snapshot custody; no Unit71 test run is invented."
       },
       "re2_component_in_progress": {
-        "status": "native_parse_AST_and_known_differences_closed_simplify_and_constructor_unfinished",
+        "status": "native_parse_prefix_and_simplify_compared_exact_compiler_and_callers_unfinished",
         "component": "crates/ep_re2",
         "finite_baseline_comparison": {
           "path": ".runtime/object-expansion/unit72-prep/native-matcher-comparison01/summary.json",
@@ -713,9 +713,9 @@
           "bytes": 2014
         },
         "focused_quality": {
-          "path": ".runtime/object-expansion/unit72-prep/component-quality04/receipt.json",
-          "sha256": "415a651eb6dec4300352a0341cf039cd576c9511bd876eddad381e3824d5e575",
-          "bytes": 6510
+          "path": ".runtime/object-expansion/unit72-prep/component-quality06/receipt.json",
+          "sha256": "79c075e4387f11bbd84046be3b319676f92259da5104dd0fb1e3fd4991e3efbd",
+          "bytes": 7600
         },
         "current_unchanged_tested_code_and_fixture_refs": [
           {
@@ -735,8 +735,8 @@
           },
           {
             "path": "crates/ep_re2/src/lib.rs",
-            "sha256": "675f41500ba3e9222df1dc32ca225864cbbff478fcb13f778e6d39d581beb2e0",
-            "bytes": 5564
+            "sha256": "7475b9886dbd979e7200315027d155870f7171117dd0c566342743fa7d9957b5",
+            "bytes": 6787
           },
           {
             "path": "crates/ep_re2/src/native_ast/builder.rs",
@@ -764,14 +764,29 @@
             "bytes": 3716
           },
           {
+            "path": "crates/ep_re2/src/native_ast/simplify/coalesce.rs",
+            "sha256": "305e8c8949b91f90bb4cc83e1c1c1debe1554b6b66f63174356290384d135869",
+            "bytes": 8543
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/simplify/factories.rs",
+            "sha256": "014f56855d790a5dc53a12884b59c38817b0a13686cf10402db2c38be6d454e9",
+            "bytes": 2117
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast/simplify.rs",
+            "sha256": "c3ccd3599531a4503b67e250e6c9532c35154ae669689d8482df6c2ebcf80b93",
+            "bytes": 10319
+          },
+          {
             "path": "crates/ep_re2/src/native_ast.rs",
-            "sha256": "4855e41258512f52d7dacf135f8973c13dd516194d00a4ebf1353ff33f93f8b7",
-            "bytes": 9692
+            "sha256": "e683d8844adeb371b3f3f020fc26ffeae6b68e7ccebc05983f7e430d2d1be6e7",
+            "bytes": 9706
           },
           {
             "path": "crates/ep_re2/src/native_ast_snapshot.rs",
-            "sha256": "3fa467a7339e8ea376877ca7b0de9feed9aa850623be14f4a63dd85f30a026b6",
-            "bytes": 10194
+            "sha256": "ac3ea29f44a76c355cc9c8ff9fffb44141b41101f13794b4be21a31ccd484299",
+            "bytes": 16083
           },
           {
             "path": "crates/ep_re2/src/native_lower.rs",
@@ -809,9 +824,14 @@
             "bytes": 7576
           },
           {
+            "path": "crates/ep_re2/src/native_prefix.rs",
+            "sha256": "908aaf1c041c66afebad6cf45a7864324b1a68110fb87b4ed9eaed8388069cde",
+            "bytes": 5898
+          },
+          {
             "path": "crates/ep_re2/src/program.rs",
-            "sha256": "5fc3a275fd459a26a19759e97a17312456bc80164c9edc3afde9dd3e8c47c249",
-            "bytes": 17434
+            "sha256": "d6de4e3df0253de3ba20628f660c24e146824dbbd9d3fa33869a356e7930e217",
+            "bytes": 17684
           },
           {
             "path": "crates/ep_re2/src/unicode.rs",
@@ -825,8 +845,8 @@
           },
           {
             "path": "crates/ep_re2/tests/data/native-default.tsv",
-            "sha256": "ace897b6c4087a2bb75a957b0b2f57530e2b0e5947629fc1a9c4ca97bdc6dd35",
-            "bytes": 462603
+            "sha256": "c43d7ad937adb5dba6a51d064977ffe9299595c18dce925e93eff23dc8cf15a9",
+            "bytes": 475119
           },
           {
             "path": "crates/ep_re2/tests/data/native-parse-ast.jsonl",
@@ -834,14 +854,24 @@
             "bytes": 1105799
           },
           {
+            "path": "crates/ep_re2/tests/data/native-rewrite.tsv",
+            "sha256": "4cc0f9ffb24ad5771e04d3f5d54ec5371a0870691f45add63c236b85c10e0d8b",
+            "bytes": 1395602
+          },
+          {
             "path": "crates/ep_re2/tests/native_vectors.rs",
-            "sha256": "3ab4836257f137fa32f1e06485246e0a74487485084f13be02b759a4d09429bc",
+            "sha256": "e4f28b7c76dc5bb5b7eb99ce6635ab304796d454ab1a9384cc3c3c69a961117c",
             "bytes": 2173
           },
           {
             "path": "crates/ep_re2/tests/reference/re2_native_ast_observer.cpp",
             "sha256": "367e474e90bcf15101e9eb8b6276826f89ff04ceccaa6fe8a7974fb1a8df03b0",
             "bytes": 9406
+          },
+          {
+            "path": "crates/ep_re2/tests/reference/re2_native_phase_observer.cpp",
+            "sha256": "d7f8134183cdd6a32c1db94ba523ea0c84ee4797ac057c22e35601da3332361d",
+            "bytes": 11960
           },
           {
             "path": "crates/ep_re2/tests/reference/re2_unit.cpp",
@@ -852,13 +882,13 @@
         "metadata_after_known_gap_recording": [
           {
             "path": "crates/ep_re2/README.md",
-            "sha256": "e70c6f35f9d2db6ba2a9768b8f3e51369797d3c1985bc82911e14daaca4d72bf",
-            "bytes": 3034
+            "sha256": "9f247b323befeae5dc3487fc7aa8e61866cf8f42570bc3a7efdc12c5a2d0083e",
+            "bytes": 3805
           },
           {
             "path": "crates/ep_re2/tests/data/provenance.json",
-            "sha256": "e95a084306049f4ef7d0e41d545c798adac8b8008de9afc88d947eeb9f288be3",
-            "bytes": 6828
+            "sha256": "81715ce4c27793fb6dfc0b6f2f93ea0d69c14eaa3425ec228ad9650e63cc3cd5",
+            "bytes": 8840
           }
         ],
         "reference_kind": "Exact pinned RE2 source unit build with GCC13.2; separate from EnergyPlus DLL and physical oracle calibrations.",
@@ -872,8 +902,7 @@
         "new_Source_CLI_build_rows": 0,
         "Source_reporting_admission_changed": false,
         "remaining_required_work": [
-          "Native simplification and required-prefix stages",
-          "exact constructor memory budget",
+          "exact Native forward compiler/finalization and constructor memory budget",
           "three production caller integrations",
           "same-input physical validation"
         ],
@@ -885,7 +914,24 @@
           "bytes": 490
         },
         "native_parse_AST_records": 1494,
-        "native_parse_AST_field_or_wire_mismatches": 0
+        "native_parse_AST_field_or_wire_mismatches": 0,
+        "native_rewrite_phase_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-phase-comparison01/summary.json",
+          "sha256": "dc0b0b2075062e6ff64ddfc569fabd356beb58bc76e2bf819bdf3f20d969f95c",
+          "bytes": 5940
+        },
+        "native_rewrite_patterns_per_phase": 2333,
+        "native_rewrite_field_or_wire_mismatches": 0,
+        "retained_rewrite_regression_patterns": 50,
+        "retained_rewrite_regression_rows": 100,
+        "prefix_context_native_observations": {
+          "path": ".runtime/object-expansion/unit72-prep/prefix-context-observations01/receipt.json",
+          "sha256": "90c221e2a55114bad73cc91aecdaaaadcbbb137c8b56ed586088b2afaec6a93f",
+          "bytes": 1071
+        },
+        "current_constructor_match_fixture_rows": 10607,
+        "current_constructor_match_five_API_field_mismatches": 0,
+        "table_test_functions": 2
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",

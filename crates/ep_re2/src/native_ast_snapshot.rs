@@ -34,10 +34,61 @@ fn pinned_native_parse_ast_vectors() -> Result<(), String> {
         rows += 1;
     }
     assert_eq!(rows, 1_494);
+
+    // One compact table retains actual Native outputs for both later phases.
+    // Keep this in the same test so the raw payload writer has one fixture lane.
+    let mut rewrite_rows = 0;
+    let mut seen_phases = [false; 2];
+    for (ordinal, row) in include_str!("../tests/data/native-rewrite.tsv")
+        .lines()
+        .enumerate()
+    {
+        let mut columns = row.splitn(3, '\t');
+        let phase = columns
+            .next()
+            .ok_or_else(|| format!("missing rewrite phase at row {}", ordinal + 1))?;
+        match phase {
+            "required_prefix" => seen_phases[0] = true,
+            "simplify" => seen_phases[1] = true,
+            _ => return Err(format!("invalid rewrite phase at row {}", ordinal + 1)),
+        }
+        let encoded = columns
+            .next()
+            .ok_or_else(|| format!("missing rewrite pattern at row {}", ordinal + 1))?;
+        let expected = columns
+            .next()
+            .ok_or_else(|| format!("missing rewrite observation at row {}", ordinal + 1))?;
+        if !encoded.len().is_multiple_of(2) {
+            return Err("odd rewrite fixture hex".into());
+        }
+        let bytes: Result<Vec<_>, _> = (0..encoded.len())
+            .step_by(2)
+            .map(|at| u8::from_str_radix(&encoded[at..at + 2], 16))
+            .collect();
+        let bytes = bytes.map_err(|error| error.to_string())?;
+        let pattern = std::str::from_utf8(&bytes).map_err(|error| error.to_string())?;
+        let actual = phase_record(pattern, phase).map_err(|error| error.text())?;
+        assert_eq!(
+            actual.trim_end_matches('\n'),
+            expected,
+            "Native {} rewrite row {}",
+            phase,
+            ordinal + 1
+        );
+        rewrite_rows += 1;
+    }
+    assert!(
+        rewrite_rows > 0,
+        "Native rewrite fixture must contain observations"
+    );
+    assert!(
+        seen_phases.into_iter().all(|seen| seen),
+        "Native rewrite fixture must cover both phases"
+    );
     Ok(())
 }
 
-use crate::native_ast::{Ast, Id, MAX_RUNE, Op, flags};
+use crate::native_ast::{Arena, Ast, Id, MAX_RUNE, Op, flags};
 use crate::{ErrorCode, Status};
 use std::collections::HashMap;
 use std::fmt::{self, Write as _};
@@ -127,16 +178,27 @@ fn emit_class(output: &mut Output, ranges: &[(u32, u32)]) -> Result<(), Status> 
     Ok(())
 }
 
-fn emit_nodes(output: &mut Output, ast: &Ast) -> Result<(), Status> {
+/// One raw node/payload serializer, optionally wrapped as a multi-root graph.
+/// Single-root record() requests the original bare array wire representation.
+fn emit_nodes(
+    output: &mut Output,
+    arena: &Arena,
+    roots: &[Option<Id>],
+    graph: bool,
+) -> Result<(), Status> {
     let mut normalized: HashMap<Id, usize> = HashMap::new();
     let mut ordered: Vec<Id> = Vec::new();
     let mut pending: Vec<Id> = Vec::new();
-    push(&mut pending, ast.root)?;
+    for &root in roots.iter().rev() {
+        if let Some(root) = root {
+            push(&mut pending, root)?;
+        }
+    }
     while let Some(id) = pending.pop() {
         if normalized.contains_key(&id) {
             continue;
         }
-        let node = ast.arena.node(id)?;
+        let node = arena.node(id)?;
         normalized.try_reserve(1).map_err(|_| allocation())?;
         normalized.insert(id, ordered.len());
         push(&mut ordered, id)?;
@@ -148,9 +210,27 @@ fn emit_nodes(output: &mut Output, ast: &Ast) -> Result<(), Status> {
     // Data addresses are internal hash keys only, never serialized. Explicit
     // Arc::ptr_eq verifies the name identity rule of the sealed Native schema.
     let mut names: HashMap<*const u8, (usize, &Arc<str>)> = HashMap::new();
+    if graph {
+        emit!(output, "{{\"roots\":[");
+        for (index, root) in roots.iter().enumerate() {
+            if index != 0 {
+                emit!(output, ",");
+            }
+            if let Some(root) = root {
+                emit!(
+                    output,
+                    "{}",
+                    normalized.get(root).copied().ok_or_else(internal)?
+                );
+            } else {
+                emit!(output, "null");
+            }
+        }
+        emit!(output, "],\"nodes\":");
+    }
     emit!(output, "[");
     for (identity, &id) in ordered.iter().enumerate() {
-        let node = ast.arena.node(id)?;
+        let node = arena.node(id)?;
         if identity != 0 {
             emit!(output, ",");
         }
@@ -236,6 +316,9 @@ fn emit_nodes(output: &mut Output, ast: &Ast) -> Result<(), Status> {
         emit!(output, "}}}}");
     }
     emit!(output, "]");
+    if graph {
+        emit!(output, "}}");
+    }
     Ok(())
 }
 
@@ -273,10 +356,86 @@ pub(crate) fn record(pattern: &str, result: &Result<Ast, Status>) -> Result<Stri
     }
     emit!(&mut output, ",\"nodes\":");
     if let Some(ast) = ast {
-        emit_nodes(&mut output, ast)?;
+        emit_nodes(&mut output, &ast.arena, &[Some(ast.root)], false)?;
     } else {
         emit!(&mut output, "[]");
     }
     emit!(&mut output, "}}\n");
+    Ok(output.0)
+}
+
+/// Serialize a fresh parse and exactly one selected Native rewrite operation.
+/// Both pre-phase and combined post-phase graphs use emit_nodes' sole payload
+/// switch. Result/original sharing is observed within the combined graph only.
+pub(crate) fn phase_record(pattern: &str, phase: &str) -> Result<String, Status> {
+    if !matches!(phase, "required_prefix" | "simplify") {
+        return Err(internal());
+    }
+    let mut parsed = crate::native_parser::parse(pattern);
+    let success = Status::new(ErrorCode::Success, "");
+    let status = match &parsed {
+        Ok(_) => &success,
+        Err(status) => status,
+    };
+    let mut output = Output::default();
+    emit!(
+        &mut output,
+        "{{\"schema\":\"pinned-re2-native-phase.v1\",\"pattern_hex\":\""
+    );
+    hex(&mut output, pattern.as_bytes())?;
+    emit!(
+        &mut output,
+        "\",\"input_parse_flags\":{},\"phase\":\"{}\",\"parse\":{{\"ok\":{},\"status\":{{\"ok\":{},\"code\":{},\"text_hex\":\"",
+        flags::LIKE_PERL,
+        phase,
+        parsed.is_ok(),
+        status.code == ErrorCode::Success,
+        status.code as u8
+    );
+    hex(&mut output, status.text().as_bytes())?;
+    emit!(&mut output, "\",\"error_arg_hex\":\"");
+    hex(&mut output, status.arg.as_bytes())?;
+    emit!(&mut output, "\"}},\"graph\":");
+    match &parsed {
+        Ok(ast) => emit_nodes(&mut output, &ast.arena, &[Some(ast.root)], true)?,
+        Err(_) => emit_nodes(&mut output, &Arena::default(), &[None], true)?,
+    }
+    emit!(&mut output, "}},\"stage\":{{");
+    match &mut parsed {
+        Err(_) => emit!(&mut output, "\"called\":false"),
+        Ok(ast) => {
+            let original = ast.root;
+            let result = if phase == "required_prefix" {
+                let prefix = ast.arena.required_prefix(original)?;
+                emit!(
+                    &mut output,
+                    "\"called\":true,\"found\":{},\"prefix_hex\":\"",
+                    prefix.found
+                );
+                hex(&mut output, &prefix.bytes)?;
+                emit!(
+                    &mut output,
+                    "\",\"prefix_bytes\":{},\"foldcase\":{},",
+                    prefix.bytes.len(),
+                    prefix.foldcase
+                );
+                prefix.suffix
+            } else {
+                // This branch is Simplify on a fresh Parse, never a suffix
+                // selected by RequiredPrefix in the same record.
+                let result = ast.arena.simplify(original)?;
+                emit!(&mut output, "\"called\":true,");
+                Some(result)
+            };
+            emit!(
+                &mut output,
+                "\"result_present\":{},\"result_same_as_original\":{},\"graph\":",
+                result.is_some(),
+                result == Some(original)
+            );
+            emit_nodes(&mut output, &ast.arena, &[Some(original), result], true)?;
+        }
+    }
+    emit!(&mut output, "}}}}\n");
     Ok(output.0)
 }

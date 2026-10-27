@@ -14,6 +14,10 @@ flags, class-builder versus finished-class stage, simple caches, capture-name
 identity, ordered children and the three alternation-factoring rounds. An arena
 and explicit stacks handle user depth without recursive ownership. Unicode14
 groups/folding come from the pinned source, independent of host Unicode data.
+Native Coalesce/Simplify retains cache writes, shared repeated children, flags,
+capture-name changes and nested optional expansion. Required-prefix selection
+precedes suffix simplification. Matching retains the original text context after
+prefix removal, so later word boundaries and anchors see the correct bytes.
 The boolean matcher preserves byte operations, surrogate rune encodings,
 Native broad-class noncanonical-byte acceptance, ASCII word boundaries and
 newline assertions. Captures are parsed; reporting requests boolean membership.
@@ -22,11 +26,16 @@ Two table tests keep the comparison load small:
 
 - 1,494 actual Native parse records compare every serialized field and ordered
   sharing identity: 1,445 successful ASTs, 49 parse errors and 3,597 reachable
-  nodes. The reference observer does not simplify or construct a RE2 matcher.
-- 10,175 actual Native constructor/match observations compare `ok`, error code,
+  nodes. The same test checks 100 actual rewrite observations over 50 selected
+  patterns, including deep nesting. Separate complete phase comparisons cover
+  2,333 patterns each for RequiredPrefix and Simplify with every field and wire
+  byte equal. Phase observations retain original/result sharing and cache changes.
+- 10,607 actual Native constructor/match observations compare `ok`, error code,
   error bytes, error-argument bytes and full-match result. The seven added
   regressions close all five previously recorded AST-order/class-union
   differences, including `a|(?i:a)` against `A` and permissive broad UTF8 paths.
+  Another 432 observations cover prefix assertion context, ASCII folding, NUL,
+  surrogate bytes and conservative anchor handling.
 
 Fixtures and observation provenance live under `tests/data/`. These finite
 comparisons establish regression coverage, not completion of every legal input.
@@ -38,9 +47,9 @@ cargo clippy -p ep_re2 --all-targets --locked -- -D warnings
 
 Required work before reporting admission:
 
-1. Complete and compare Native simplification, required-prefix selection and
-   exact constructor/program-memory accounting. The current boolean lowering
-   does not establish Native program-graph or allocation identity.
+1. Complete and compare Native forward compilation/finalization and exact
+   constructor/program-memory accounting. The current boolean lowering does
+   not establish Native program-graph or allocation identity.
 2. Connect the pre-scan, request-construction and registration owners, retaining
    their different constructor, diagnostic and write order.
 3. Verify those connections with same-input unit and physical EnergyPlus runs.
@@ -48,7 +57,8 @@ Required work before reporting admission:
 External RE2 Options and capture extraction are outside the reporting API target.
 To reproduce reference observations, compile the relevant C++ observer with the
 pinned CMake `RE2_SOURCES` list of 22 translation units. The constructor observer
-accepts `pattern_hex<TAB>text_hex`; the parse observer accepts one pattern hex
-per line. Both use explicit byte lengths. The constructor observer's Quiet option
+accepts `pattern_hex<TAB>text_hex`; the parse and phase observers accept one
+pattern hex per line. The phase observer requires `required_prefix` or `simplify`
+as its sole argument. Both use explicit byte lengths. The constructor observer's Quiet option
 changes logging only. The recorded GCC13.2 source-unit build is separate from
 the pinned EnergyPlus DLL and physical oracle comparisons.

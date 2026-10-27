@@ -11,6 +11,7 @@ mod equality;
 mod factor;
 mod leading;
 mod ranges;
+mod simplify;
 pub(crate) use builder::{Builder, Unary};
 
 pub(crate) type Id = usize;

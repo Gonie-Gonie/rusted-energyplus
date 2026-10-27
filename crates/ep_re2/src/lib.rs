@@ -1,11 +1,12 @@
 //! Pure Rust pinned RE2 grammar and boolean full matching for report requests.
-//! Native simplification, construction limits and production integration remain in progress.
+//! Construction limits and production integration remain in progress.
 mod byte_class;
 mod native_ast;
 #[cfg(test)]
 mod native_ast_snapshot;
 mod native_lower;
 mod native_parser;
+mod native_prefix;
 mod program;
 mod unicode;
 use std::sync::Arc;
@@ -102,13 +103,26 @@ pub struct Re2 {
     pattern: String,
     status: Status,
     program: Option<Arc<program::Program>>,
+    prefix: Vec<u8>,
+    prefix_foldcase: bool,
 }
 impl Re2 {
     /// Construct default UTF8/LikePerl with literal inline flags.
     #[must_use]
     pub fn new(pattern: &str) -> Self {
+        let mut prefix = Vec::new();
+        let mut prefix_foldcase = false;
         let compiled = native_parser::parse(pattern)
-            .and_then(|ast| native_lower::lower(&ast, ast.root))
+            .and_then(|mut ast| {
+                // RE2::Init extracts the required prefix BEFORE simplifying
+                // and compiling the suffix. Preserve the actual retained IDs.
+                let selected = ast.arena.required_prefix(ast.root)?;
+                prefix = selected.bytes;
+                prefix_foldcase = selected.foldcase;
+                let suffix = selected.suffix.unwrap_or(ast.root);
+                let simplified = ast.arena.simplify(suffix)?;
+                native_lower::lower(&ast, simplified)
+            })
             .and_then(program::Program::compile);
         let (status, program) = match compiled {
             Ok(program) => (Status::new(ErrorCode::Success, ""), Some(Arc::new(program))),
@@ -118,6 +132,8 @@ impl Re2 {
             pattern: pattern.into(),
             status,
             program,
+            prefix,
+            prefix_foldcase,
         }
     }
     /// Whether construction succeeded.
@@ -147,9 +163,25 @@ impl Re2 {
     /// Boolean FullMatch with explicit byte lengths and no captures.
     #[must_use]
     pub fn full_match(&self, text: &[u8]) -> bool {
+        let Some(head) = text.get(..self.prefix.len()) else {
+            return false;
+        };
+        // re2.cc599-610 folds only the text operand; the parser's prefix is
+        // already ASCII lowercase. Explicit lengths retain embedded NUL.
+        let equal = if self.prefix_foldcase {
+            self.prefix
+                .iter()
+                .zip(head)
+                .all(|(&a, &b)| a == b.to_ascii_lowercase())
+        } else {
+            self.prefix == head
+        };
+        if !equal {
+            return false;
+        }
         self.program
             .as_ref()
-            .is_some_and(|program| program.full_match(text))
+            .is_some_and(|program| program.full_match(text, self.prefix.len()))
     }
 }
 

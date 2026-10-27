@@ -59,6 +59,6 @@ fn pinned_native_constructor_and_full_match_vectors() -> Result<(), String> {
         );
         rows += 1;
     }
-    assert_eq!(rows, 10_175);
+    assert_eq!(rows, 10_607);
     Ok(())
 }

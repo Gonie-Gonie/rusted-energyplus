@@ -381,13 +381,18 @@ impl Program {
         })
     }
 
-    pub(crate) fn full_match(&self, text: &[u8]) -> bool {
+    pub(crate) fn full_match(&self, text: &[u8], start: usize) -> bool {
+        if start > text.len() {
+            return false;
+        }
         // Consumption advances 1..4 bytes. Five rolling queues retain future
         // positions without allocating a queue for every byte of a long key.
         let mut pending: [Vec<usize>; 5] = std::array::from_fn(|_| Vec::new());
-        pending[0].push(self.start);
+        pending[start % 5].push(self.start);
         let mut visited = vec![usize::MAX; self.instructions.len()];
-        for position in 0..=text.len() {
+        // Native passes the suffix search slice AND the whole original text
+        // context. Assertions after a stripped prefix must see its last byte.
+        for position in start..=text.len() {
             let mut stack = std::mem::take(&mut pending[position % 5]);
             while let Some(index) = stack.pop() {
                 let Some(seen) = visited.get_mut(index) else {

@@ -2,9 +2,9 @@
   "schema": "pinned-RE2-default-unit-vectors.v1",
   "pinned_EnergyPlus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
   "pinned_RE2_Unicode_version": "14.0.0",
-  "rows": 10175,
-  "fixture_sha256": "ace897b6c4087a2bb75a957b0b2f57530e2b0e5947629fc1a9c4ca97bdc6dd35",
-  "fixture_bytes": 462603,
+  "rows": 10607,
+  "fixture_sha256": "c43d7ad937adb5dba6a51d064977ffe9299595c18dce925e93eff23dc8cf15a9",
+  "fixture_bytes": 475119,
   "Native_kind": "Standalone exact pinned RE2 source build, GCC13.2.0 UCRT; not EnergyPlus DLL or physics. Quiet only suppresses constructor logging.",
   "Native_build_receipt": {
     "path": ".runtime/object-expansion/unit72-prep/native-unit-build01/review.json",
@@ -23,8 +23,7 @@
   ],
   "production_or_domain_completion_claim": false,
   "remaining": [
-    "Native simplification after the now-retained parse AST",
-    "Exact construction/program-memory budget",
+    "Native forward compiler/finalization and exact constructor memory budget",
     "Production prescan/request/registration integration",
     "Same-input EnergyPlus physical comparison after integration"
   ],
@@ -186,5 +185,54 @@
     "mismatches": 0,
     "prior_known_differences_closed": 5,
     "simplification_and_compiler_budget_complete": false
+  },
+  "native_rewrite_phases": {
+    "actual_summary": {
+      "path": ".runtime/object-expansion/unit72-prep/native-phase-comparison01/summary.json",
+      "sha256": "dc0b0b2075062e6ff64ddfc569fabd356beb58bc76e2bf819bdf3f20d969f95c",
+      "bytes": 5940
+    },
+    "actual_Native_build": {
+      "path": ".runtime/object-expansion/unit72-prep/native-phase-build01/review.json",
+      "sha256": "ba39a5c97aa77c86dab5090de5127e79e2d204234c1e9b9239a8a68aad833dd6",
+      "bytes": 16759
+    },
+    "actual_Rust_build": {
+      "path": ".runtime/object-expansion/unit72-prep/rust-native-phase-build01/receipt.json",
+      "sha256": "51c77285765fa7cd1549cbf5f9cfa3270d7a74fe9e13502f16df579127bea284",
+      "bytes": 11744
+    },
+    "rows_per_phase": 2333,
+    "field_or_wire_mismatches": 0,
+    "retained_regression_patterns": 50,
+    "retained_regression_rows": 100,
+    "fixture": {
+      "path": "crates/ep_re2/tests/data/native-rewrite.tsv",
+      "sha256": "4cc0f9ffb24ad5771e04d3f5d54ec5371a0870691f45add63c236b85c10e0d8b",
+      "bytes": 1395602
+    },
+    "reference_observer": {
+      "path": "crates/ep_re2/tests/reference/re2_native_phase_observer.cpp",
+      "sha256": "d7f8134183cdd6a32c1db94ba523ea0c84ee4797ac057c22e35601da3332361d",
+      "bytes": 11960
+    },
+    "scope": "Finite separate fresh-Parse phases; exact constructor compilation and production integration unfinished"
+  },
+  "prefix_context_constructor_vectors": {
+    "observation": {
+      "path": ".runtime/object-expansion/unit72-prep/prefix-context-observations01/receipt.json",
+      "sha256": "90c221e2a55114bad73cc91aecdaaaadcbbb137c8b56ed586088b2afaec6a93f",
+      "bytes": 1071
+    },
+    "added_rows": 432,
+    "Rust_comparison": {
+      "focused_quality": {
+        "path": ".runtime/object-expansion/unit72-prep/component-quality06/receipt.json",
+        "sha256": "79c075e4387f11bbd84046be3b319676f92259da5104dd0fb1e3fd4991e3efbd",
+        "bytes": 7600
+      },
+      "five_API_field_mismatches": 0,
+      "constructor_fixture_total_rows": 10607
+    }
   }
 }
