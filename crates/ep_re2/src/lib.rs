@@ -1,7 +1,11 @@
 //! Pure Rust pinned RE2 grammar and boolean full matching for report requests.
-//! AST fidelity, construction limits and production integration remain in progress.
+//! Native simplification, construction limits and production integration remain in progress.
 mod byte_class;
-mod parser;
+mod native_ast;
+#[cfg(test)]
+mod native_ast_snapshot;
+mod native_lower;
+mod native_parser;
 mod program;
 mod unicode;
 use std::sync::Arc;
@@ -103,7 +107,9 @@ impl Re2 {
     /// Construct default UTF8/LikePerl with literal inline flags.
     #[must_use]
     pub fn new(pattern: &str) -> Self {
-        let compiled = parser::parse(pattern).and_then(program::Program::compile);
+        let compiled = native_parser::parse(pattern)
+            .and_then(|ast| native_lower::lower(&ast, ast.root))
+            .and_then(program::Program::compile);
         let (status, program) = match compiled {
             Ok(program) => (Status::new(ErrorCode::Success, ""), Some(Arc::new(program))),
             Err(status) => (status, None),

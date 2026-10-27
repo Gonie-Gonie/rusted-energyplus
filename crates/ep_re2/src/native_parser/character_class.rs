@@ -1,14 +1,14 @@
 // Copyright 2006 The RE2 Authors. All Rights Reserved.
-// Derived from RE2 under its BSD-style license; see crate LICENSE.RE2.
+// Derived from RE2 under its BSD-style license; see ../RE2-LICENSE.
 //! Native ParseCharClass/ParseUnicodeGroup/AddUGroup, default ClassNL mode.
-use super::{Parser, Status, ranges};
+use super::{Parser, Status, flags, ranges};
 use crate::ErrorCode;
 
 impl Parser<'_> {
     pub(super) fn apply_group(&self, source: &[(u32, u32)], positive: bool) -> Vec<(u32, u32)> {
         // Default LikePerl sets ClassNL. Inline i/m/s/U cannot clear it; explicit
         // ranges also force it in Native AddRangeFlags. Fold BEFORE negating.
-        let group = if self.flags.fold_case {
+        let group = if self.builder.flags() & flags::FOLD_CASE != 0 {
             crate::unicode::fold_ranges(source)
         } else {
             source.to_vec()

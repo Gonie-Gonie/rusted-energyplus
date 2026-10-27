@@ -2,9 +2,9 @@
   "schema": "pinned-RE2-default-unit-vectors.v1",
   "pinned_EnergyPlus_commit": "6f2e40d10250a105b49966baa24d843711e61048",
   "pinned_RE2_Unicode_version": "14.0.0",
-  "rows": 10168,
-  "fixture_sha256": "cae223bd54679f03272ba80a8f502f982dd77113c29eaf4d39387229045dfbbb",
-  "fixture_bytes": 462155,
+  "rows": 10175,
+  "fixture_sha256": "ace897b6c4087a2bb75a957b0b2f57530e2b0e5947629fc1a9c4ca97bdc6dd35",
+  "fixture_bytes": 462603,
   "Native_kind": "Standalone exact pinned RE2 source build, GCC13.2.0 UCRT; not EnergyPlus DLL or physics. Quiet only suppresses constructor logging.",
   "Native_build_receipt": {
     "path": ".runtime/object-expansion/unit72-prep/native-unit-build01/review.json",
@@ -23,7 +23,7 @@
   ],
   "production_or_domain_completion_claim": false,
   "remaining": [
-    "Native AST shape/flags/factoring and simplification",
+    "Native simplification after the now-retained parse AST",
     "Exact construction/program-memory budget",
     "Production prescan/request/registration integration",
     "Same-input EnergyPlus physical comparison after integration"
@@ -146,5 +146,45 @@
     "physical_EP_executions": 0
   },
   "additional_AST_mismatches": 5,
-  "quality_state": "in_progress_with_known_AST_mismatches"
+  "quality_state": "in_progress_with_known_AST_mismatches",
+  "native_parse_AST": {
+    "reference_observer": {
+      "path": "crates/ep_re2/tests/reference/re2_native_ast_observer.cpp",
+      "sha256": "367e474e90bcf15101e9eb8b6276826f89ff04ceccaa6fe8a7974fb1a8df03b0",
+      "bytes": 9406
+    },
+    "fixture": {
+      "path": "crates/ep_re2/tests/data/native-parse-ast.jsonl",
+      "sha256": "addd9c67181cd26e48038a3e78d9bfa62ce73a85fe744de8f3de20d83be8038f",
+      "bytes": 1105799
+    },
+    "actual_patterns": 1494,
+    "actual_successful_ASTs": 1445,
+    "actual_parse_errors": 49,
+    "actual_reachable_nodes": 3597,
+    "Native_receipt": {
+      "path": ".runtime/object-expansion/unit72-prep/native-ast-observations01/receipt.json",
+      "sha256": "058677a7e7978ca99b9c19d5655c9975ff190385206a5caf781af53b47193e4d",
+      "bytes": 1523
+    },
+    "Rust_comparison": {
+      "path": ".runtime/object-expansion/unit72-prep/native-ast-comparison01/summary.json",
+      "sha256": "b3ce6a7f43b6d3eb0b4fa32275aca3c5351bd30d9ab3c87324c1f8d4bc1259dd",
+      "bytes": 490
+    },
+    "all_record_fields_and_wire_bytes_equal": true,
+    "production_completion": false
+  },
+  "AST_discriminator_closure": {
+    "comparison": {
+      "path": ".runtime/object-expansion/unit72-prep/native-matcher-comparison01/summary.json",
+      "sha256": "29ad3f7b9ee86eb5937e9ee6f5c9c37059ffb50c6f58d612383108721f561384",
+      "bytes": 2717
+    },
+    "baseline_rows": 10168,
+    "additional_rows": 7,
+    "mismatches": 0,
+    "prior_known_differences_closed": 5,
+    "simplification_and_compiler_budget_complete": false
+  }
 }

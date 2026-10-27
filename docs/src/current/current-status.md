@@ -48,7 +48,8 @@ daylight-saving controls and the next-day schedule handoff. Its controlled
 weather copies February 28 meteorology; full legal-value completion remains open.
 
 The [Rust reporting regex port](../../../crates/ep_re2/README.md) has a finite
-constructor/matching unit comparison. Native AST fidelity, construction limits
+comparison of 1,494 Native parse ASTs and 10,175 constructor/match observations.
+The five known AST differences are closed. Simplification, construction limits
 and the three production connections remain in progress. Source regex requests
 remain blocked until those gates and same-input execution checks are complete.
 

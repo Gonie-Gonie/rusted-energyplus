@@ -165,7 +165,7 @@
     "Schedule:Compact": [
       "Actual Source A/B preserves raw/IP family order and existing numeric presentation. Pending Until values are consumed before directive dispatch; string values use shared Source ProcessNumber, including D/E, successful signed underflow zero, empty/space-only and optional missing field as zero. Unknown item metadata is retained. Integral HH/MM includes genuine blank operands and exact byte0/immediate-colon grammar. Explicit0:0 and statefulMM60 retain every empty segment; MM60 preserves the prior decoded endpoint, with None distinct from Some0. Whole-hour empty warnings and Linear next-segment seeds remain genuine. Explicit null, missing entries, initialMM60 and nonIntegral formatting paths remain bounded.",
       "Immediately after For, Native consumes an interpolation token if it starts INTERPOLATE or does not start UNTIL; substring priority is NO, then AVERAGE, then LINEAR. Bare and prefixed valid selectors populate the actual retained enum. No/Average/Linear use retained minute/day/week/currentVal producers and real type clocks. Optional blank/unknown types and missing For masks retain original warning effects/MissingDay0 pointers. Detailed hasVal/uncached minmax follow actual366week/12day pointers; cached/Constant paths remain unchanged. Child/parent/finalFatal and partial-owner effects stay ordered; Linear endpoint residues are not clamped.",
-      "Through calls the real General routine and leap OrdinalDay. Two-field numeric/month-prefix dates retain canonical month/day validation and ordered separator/stopword normalization. ASCII plain-three-token dates convert all three numbers before selecting year-first, year-last or default0/0; genuine error-zero flags are ignored in that branch and no ValidateMonthDay runs. Checked ordinals0..366 retain folds such as2/30 to61 and invalid-month to0 without inventing a civil date. Non-finite success, unsafe integer casts, signed overflow and out-of-array endpoints remain unavailable. Whole successful finite trunc-zero values, including underflow \u00b10, retain real MonthDay0/0 empty owners. Annual coverage preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Nth/Last and broader grammar or sibling families remain bounded.",
+      "Through calls the real General routine and leap OrdinalDay. Two-field numeric/month-prefix dates retain canonical month/day validation and ordered separator/stopword normalization. ASCII plain-three-token dates convert all three numbers before selecting year-first, year-last or default0/0; genuine error-zero flags are ignored in that branch and no ValidateMonthDay runs. Checked ordinals0..366 retain folds such as2/30 to61 and invalid-month to0 without inventing a civil date. Non-finite success, unsafe integer casts, signed overflow and out-of-array endpoints remain unavailable. Whole successful finite trunc-zero values, including underflow ±0, retain real MonthDay0/0 empty owners. Annual coverage preserves inactive periods, rejects overlap/incomplete years/repeated366 and validates only reachable values. Nth/Last and broader grammar or sibling families remain bounded.",
       "Same-input B102 cases cover interpolation, Compact control4, optional types, fixed, two-field numeric/month-prefix and three-number fractional/D/E and folded/zero dates, missing selectors, empty topology, finite-zero and signed-underflow dates, blank/D/E values, integral Until and No-mode empty intervals. Each checks all102/9792 operands under unchanged named policies, actual96 profiles, nominal/day-group EIO, wholeSHD, full ERR-END, warmup/sizing and genuine deleted-emptyMTR. The empty-interval pair preserves unused2 under Fraction0..1 with exactly2Warnings and0Continues/Severe; existing actual-owner bodies separately verify No/Average/Linear1440minute/96step and active Linear-seed limit rejection. Cases name actual tested builds; no arbitrary calendar/model/control physics or full-object completion claim.",
       "RawModel performs full existing JSON validation before preserving original Number tokens and decoded nonnumeric shapes; decoded duplicate keys replace whole subtrees, and discarded overflow still fails. Schedule numeric getters apply Native int64 conversion to integer storage (uint64MAX becomes-1); finite float-origin values never wrap. Compact alpha retains signed integer text or the existing Milo formatter.",
       "Existing parser/compiler bodies check literal lexemes, kinds and bits across the six schedule numeric families: numeric-0 selects Integer0, -0.0/-0e0 retain Float negative zero, and quoted-0 remains alpha ProcessNumber. Actual SourceB and SourceA Compact/regular IP retain Number; SourceA TypeLimits/Constant statistics remain OtherScalar while their genuine RawModel frontend declarations are checked separately. These are consumer/unit checks, not physical sign-bit instrumentation.",
@@ -269,7 +269,7 @@
       "format": "cargo fmt --all -- --check passed",
       "documentation": "docs generator --check and full mdBook docs-check passed",
       "documentation_log": {
-        "path": ".runtime/object-expansion/unit72-prep/regex-component-docs-check-72.log",
+        "path": ".runtime/object-expansion/unit72-prep/regex-native-ast-docs-check-72.log",
         "sha256": "e63d1d2b505f99e70149d128000c36c8cded65cc44897950c0759df4d957b11e",
         "bytes": 338
       },
@@ -700,12 +700,12 @@
         "scope": "Actual full workspace70 and strict all-target Clippy70 are reused only after equality of all four changed source files with Build71 archives and current final snapshot custody; no Unit71 test run is invented."
       },
       "re2_component_in_progress": {
-        "status": "in_progress_with_known_AST_mismatches",
+        "status": "native_parse_AST_and_known_differences_closed_simplify_and_constructor_unfinished",
         "component": "crates/ep_re2",
         "finite_baseline_comparison": {
-          "path": ".runtime/object-expansion/unit72-prep/comparison02/summary.json",
-          "sha256": "3318f8805f962bc53f3d7123b2d8926bb8327dac2e9bc298d727b629199126de",
-          "bytes": 3588
+          "path": ".runtime/object-expansion/unit72-prep/native-matcher-comparison01/summary.json",
+          "sha256": "29ad3f7b9ee86eb5937e9ee6f5c9c37059ffb50c6f58d612383108721f561384",
+          "bytes": 2717
         },
         "known_AST_observations": {
           "path": ".runtime/object-expansion/unit72-prep/ast-discriminators01/observations.json",
@@ -713,9 +713,9 @@
           "bytes": 2014
         },
         "focused_quality": {
-          "path": ".runtime/object-expansion/unit72-prep/component-quality02/receipt.json",
-          "sha256": "37448f6b8e4388f5ac5cf7003155865532f31a90c807940ab5cafe1889d7458b",
-          "bytes": 5001
+          "path": ".runtime/object-expansion/unit72-prep/component-quality04/receipt.json",
+          "sha256": "415a651eb6dec4300352a0341cf039cd576c9511bd876eddad381e3824d5e575",
+          "bytes": 6510
         },
         "current_unchanged_tested_code_and_fixture_refs": [
           {
@@ -735,38 +735,78 @@
           },
           {
             "path": "crates/ep_re2/src/lib.rs",
-            "sha256": "a9078950cf1aad668144560e2e7ad8e3c7e519fe074de56027b1a5ba9fb74e0a",
-            "bytes": 5391
+            "sha256": "675f41500ba3e9222df1dc32ca225864cbbff478fcb13f778e6d39d581beb2e0",
+            "bytes": 5564
           },
           {
-            "path": "crates/ep_re2/src/parser/character_class.rs",
-            "sha256": "3d1a1d9f52862d4c46b4e50c32b06a5bd1b9175209aafec0c191fdb58a5f9a5a",
-            "bytes": 5462
+            "path": "crates/ep_re2/src/native_ast/builder.rs",
+            "sha256": "176a6883c802769a2516e054c1f3c93a29ba1a020b0183c16116d84d2b9350d4",
+            "bytes": 16682
           },
           {
-            "path": "crates/ep_re2/src/parser/escapes.rs",
-            "sha256": "91a2c86c500308855d4fc7e84340a0e182dae8303d27afb70560f037ba3f7327",
-            "bytes": 3556
+            "path": "crates/ep_re2/src/native_ast/equality.rs",
+            "sha256": "019134fd219daf02ef390236c8ff3d6908c1b1fee2ce1a3da50a8db44b7ba8a8",
+            "bytes": 3579
           },
           {
-            "path": "crates/ep_re2/src/parser/groups.rs",
-            "sha256": "f971b5b3d89bb9957b2237a8f2d11f0c9af16a44b1715dba816d1a7bfa254e5d",
-            "bytes": 3702
+            "path": "crates/ep_re2/src/native_ast/factor.rs",
+            "sha256": "7c661134b90d719c36708054cdd27051b0d7db141333235331ec9313ba5b9fed",
+            "bytes": 9534
           },
           {
-            "path": "crates/ep_re2/src/parser/ranges.rs",
-            "sha256": "8cd57871200168191a5ebd56efe5fcd66305c693c2d540271c2a058bafe1f9ec",
-            "bytes": 1101
+            "path": "crates/ep_re2/src/native_ast/leading.rs",
+            "sha256": "75bb02b0e134caec85c0f9e17a3cba8371089bd81ddc27ddea573108fd18a7f5",
+            "bytes": 5234
           },
           {
-            "path": "crates/ep_re2/src/parser/state.rs",
-            "sha256": "0bba67150374b4a88b699a50102986b0947b3642b4837399d78b61d3130de4d7",
-            "bytes": 6778
+            "path": "crates/ep_re2/src/native_ast/ranges.rs",
+            "sha256": "34969879a57db1c3ab764e0082acb355e98ca1ad3efcdaca1b0f46f5cb28da2f",
+            "bytes": 3716
           },
           {
-            "path": "crates/ep_re2/src/parser.rs",
-            "sha256": "5f4ca814dd9dee8ae7ad0094870a9cc580cbf232a56e245afaf6aa394457355b",
-            "bytes": 8809
+            "path": "crates/ep_re2/src/native_ast.rs",
+            "sha256": "4855e41258512f52d7dacf135f8973c13dd516194d00a4ebf1353ff33f93f8b7",
+            "bytes": 9692
+          },
+          {
+            "path": "crates/ep_re2/src/native_ast_snapshot.rs",
+            "sha256": "3fa467a7339e8ea376877ca7b0de9feed9aa850623be14f4a63dd85f30a026b6",
+            "bytes": 10194
+          },
+          {
+            "path": "crates/ep_re2/src/native_lower.rs",
+            "sha256": "b02c074c9fcca85439193c409d3f8ce9f0ba46ed95452b7cb8c1a1d352078f2b",
+            "bytes": 5426
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/character_class.rs",
+            "sha256": "04dbff304d90759848600dc96b12e03b1bcfa34fa6f0a5abfbf7fc214a9ca469",
+            "bytes": 5490
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/escapes.rs",
+            "sha256": "19efc8e5884248ae3b9dd6caf7c6757d86f642d5af5f053ff0d1acd55772b937",
+            "bytes": 3553
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/groups.rs",
+            "sha256": "36b50e656dc8bce5c4596392110364480831e43bc63c76127da02c76184f5c05",
+            "bytes": 4322
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/ranges.rs",
+            "sha256": "0a20f033e9f35482185da3c86bda30e261564b3e1124cd490b0c5f613bbb5467",
+            "bytes": 1098
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser/repetition.rs",
+            "sha256": "37662ebdbe71f2c0d5a639a40da70aad3362161b4ea9ccad451c6d84e5bb2d47",
+            "bytes": 1457
+          },
+          {
+            "path": "crates/ep_re2/src/native_parser.rs",
+            "sha256": "35dcf08b28a9a05f8d755f384212e0131e7ec9602769bbd8bace4f54b2f05303",
+            "bytes": 7576
           },
           {
             "path": "crates/ep_re2/src/program.rs",
@@ -775,8 +815,8 @@
           },
           {
             "path": "crates/ep_re2/src/unicode.rs",
-            "sha256": "693bbf974d4371f996e9dd5fac53c23c1a5bc0e7b70e9aef37073bdc3d14e312",
-            "bytes": 4527
+            "sha256": "9de0bafa243a06c1a756ad87304c5c7e9afad17ddfaaa00c92c8b61edad718b3",
+            "bytes": 4768
           },
           {
             "path": "crates/ep_re2/src/unicode_data.rs",
@@ -785,13 +825,23 @@
           },
           {
             "path": "crates/ep_re2/tests/data/native-default.tsv",
-            "sha256": "cae223bd54679f03272ba80a8f502f982dd77113c29eaf4d39387229045dfbbb",
-            "bytes": 462155
+            "sha256": "ace897b6c4087a2bb75a957b0b2f57530e2b0e5947629fc1a9c4ca97bdc6dd35",
+            "bytes": 462603
+          },
+          {
+            "path": "crates/ep_re2/tests/data/native-parse-ast.jsonl",
+            "sha256": "addd9c67181cd26e48038a3e78d9bfa62ce73a85fe744de8f3de20d83be8038f",
+            "bytes": 1105799
           },
           {
             "path": "crates/ep_re2/tests/native_vectors.rs",
-            "sha256": "eb013d240a928fab29031b238166a4b7bb4e77843840e945324db0febc81209d",
+            "sha256": "3ab4836257f137fa32f1e06485246e0a74487485084f13be02b759a4d09429bc",
             "bytes": 2173
+          },
+          {
+            "path": "crates/ep_re2/tests/reference/re2_native_ast_observer.cpp",
+            "sha256": "367e474e90bcf15101e9eb8b6276826f89ff04ceccaa6fe8a7974fb1a8df03b0",
+            "bytes": 9406
           },
           {
             "path": "crates/ep_re2/tests/reference/re2_unit.cpp",
@@ -802,31 +852,40 @@
         "metadata_after_known_gap_recording": [
           {
             "path": "crates/ep_re2/README.md",
-            "sha256": "f6bf385cd8247fde836aca95abbb4b433e802eeca70967444e742e6ab29e4c75",
-            "bytes": 3042
+            "sha256": "e70c6f35f9d2db6ba2a9768b8f3e51369797d3c1985bc82911e14daaca4d72bf",
+            "bytes": 3034
           },
           {
             "path": "crates/ep_re2/tests/data/provenance.json",
-            "sha256": "5866d6b8f6de3e954a553f399a76a1446743685d35720884ed3e31f0b5bb9d81",
-            "bytes": 5273
+            "sha256": "e95a084306049f4ef7d0e41d545c798adac8b8008de9afc88d947eeb9f288be3",
+            "bytes": 6828
           }
         ],
         "reference_kind": "Exact pinned RE2 source unit build with GCC13.2; separate from EnergyPlus DLL and physical oracle calibrations.",
         "finite_baseline_unit_inputs": 10168,
         "finite_baseline_five_API_field_mismatches": 0,
         "additional_AST_inputs": 7,
-        "additional_AST_mismatches": 5,
-        "new_test_functions": 1,
+        "additional_AST_mismatches": 0,
+        "new_test_functions": 2,
         "new_EP_physical_cases": 0,
         "new_EP_reported_samples": 0,
         "new_Source_CLI_build_rows": 0,
         "Source_reporting_admission_changed": false,
         "remaining_required_work": [
-          "Native AST factoring/class-stage metadata",
+          "Native simplification and required-prefix stages",
           "exact constructor memory budget",
-          "three production caller integrations"
+          "three production caller integrations",
+          "same-input physical validation"
         ],
-        "full_RE2_or_object_domain_completion": false
+        "full_RE2_or_object_domain_completion": false,
+        "historical_AST_mismatches_closed": 5,
+        "native_parse_AST_comparison": {
+          "path": ".runtime/object-expansion/unit72-prep/native-ast-comparison01/summary.json",
+          "sha256": "b3ce6a7f43b6d3eb0b4fa32275aca3c5351bd30d9ab3c87324c1f8d4bc1259dd",
+          "bytes": 490
+        },
+        "native_parse_AST_records": 1494,
+        "native_parse_AST_field_or_wire_mismatches": 0
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -22867,7 +22926,7 @@
         "current_file_contract": {
           "File_schedules": [
             {
-              "source_object_name": "\u00a0",
+              "source_object_name": " ",
               "schedule_type_limits_name": "Fraction",
               "file_name": "C:Sidecars/A62.csv",
               "column_number": 2,
@@ -22877,7 +22936,7 @@
               "interpolate_to_timestep": "No",
               "minutes_per_item": 60,
               "adjust_schedule_for_daylight_savings": "No",
-              "report_name": "\u00a0",
+              "report_name": " ",
               "sidecar": {
                 "path": ".runtime/object-expansion/native-schedule-file-unicode-names-recheck-a/calibration-01/Sidecars/A62.csv",
                 "sha256": "17df9c1d7193595eb8848eac9f2ed9258d7157b04be20d66a3b2bc37ac4ae082",
@@ -22890,7 +22949,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ba710187157103639ae3f1a54196f38f88da54e796d1810377e74d773fa9259a",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": "\u00a0",
+                "source_object_name": " ",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -22902,7 +22961,7 @@
               },
               "source_namespace_identity": {
                 "ASCII_case_fold_without_trim": true,
-                "exact_authored_name": "\u00a0",
+                "exact_authored_name": " ",
                 "input_graph_only_no_thermal_value_or_outcome_seed": true
               }
             },
@@ -22930,7 +22989,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "748a68098bf9efe140479325df288cb534f8b88b9f1c7df2c4c806a07b6aa00c",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": "\u00a0",
+                "source_object_name": " ",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -22970,7 +23029,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ba710187157103639ae3f1a54196f38f88da54e796d1810377e74d773fa9259a",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": "\u00a0",
+                "source_object_name": " ",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -23030,14 +23089,14 @@
           "Source": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": "\u00a0",
+            "actual_People_schedule_field": " ",
             "actual_File_EIO_graph_names": [
-              "\u00a0",
+              " ",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -23046,14 +23105,14 @@
           "Native": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": "\u00a0",
+            "actual_People_schedule_field": " ",
             "actual_File_EIO_graph_names": [
-              "\u00a0",
+              " ",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -23063,7 +23122,7 @@
         "actual_Windows_File_path_probe_observation": {
           "Source": {
             "actual_File_source_names_in_order": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -23083,7 +23142,7 @@
           },
           "Native": {
             "actual_File_source_names_in_order": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25382,7 +25441,7 @@
         "current_file_contract": {
           "File_schedules": [
             {
-              "source_object_name": "\u00a0",
+              "source_object_name": " ",
               "schedule_type_limits_name": "Fraction",
               "file_name": "C:Sidecars/A62.csv",
               "column_number": 2,
@@ -25392,7 +25451,7 @@
               "interpolate_to_timestep": "No",
               "minutes_per_item": 60,
               "adjust_schedule_for_daylight_savings": "No",
-              "report_name": "\u00a0",
+              "report_name": " ",
               "sidecar": {
                 "path": ".runtime/object-expansion/native-schedule-file-leap-dst-a/calibration-01/Sidecars/A62.csv",
                 "sha256": "a3062b213dda7d5d221c3dacb0434ca6c503963c59fb23e1755ef1333a4f9079",
@@ -25405,7 +25464,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ed3ffa7fe88909af6b83258af81d77719286219b16405c07843a863979368057",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": "\u00a0",
+                "source_object_name": " ",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -25417,7 +25476,7 @@
               },
               "source_namespace_identity": {
                 "ASCII_case_fold_without_trim": true,
-                "exact_authored_name": "\u00a0",
+                "exact_authored_name": " ",
                 "input_graph_only_no_thermal_value_or_outcome_seed": true
               }
             },
@@ -25445,7 +25504,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "4accbb380c64c7c0a692120567e7f3b98ba96a1b4043b817c35be0a23f51576b",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": "\u00a0",
+                "source_object_name": " ",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -25485,7 +25544,7 @@
               "effective_day_interpolation": "No",
               "selected_column_big_endian_binary64_sha256": "ed3ffa7fe88909af6b83258af81d77719286219b16405c07843a863979368057",
               "one_shared_file_first_parse_controls": {
-                "source_object_name": "\u00a0",
+                "source_object_name": " ",
                 "column_separator": "Comma",
                 "rows_to_skip_at_top": 1,
                 "first_data_row_columns": 3
@@ -25566,14 +25625,14 @@
           "Source": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": "\u00a0",
+            "actual_People_schedule_field": " ",
             "actual_File_EIO_graph_names": [
-              "\u00a0",
+              " ",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25582,14 +25641,14 @@
           "Native": {
             "Unicode_whitespace_only_epJSON_case": true,
             "actual_People_owner_name": " PORTED PEOPLE",
-            "actual_People_schedule_field": "\u00a0",
+            "actual_People_schedule_field": " ",
             "actual_File_EIO_graph_names": [
-              "\u00a0",
+              " ",
               "ALWAYSON",
               "ALWAYSON "
             ],
             "exact_authored_File_names": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25599,7 +25658,7 @@
         "actual_Windows_File_path_probe_observation": {
           "Source": {
             "actual_File_source_names_in_order": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],
@@ -25619,7 +25678,7 @@
           },
           "Native": {
             "actual_File_source_names_in_order": [
-              "\u00a0",
+              " ",
               "AlwaysOn",
               "AlwaysOn "
             ],

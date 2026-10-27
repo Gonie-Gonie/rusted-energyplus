@@ -1,7 +1,7 @@
 // Copyright 2006 The RE2 Authors. All Rights Reserved.
-// Derived from RE2 under its BSD-style license; see crate LICENSE.RE2.
+// Derived from RE2 under its BSD-style license; see ../RE2-LICENSE.
 //! Pinned ParsePerlFlags and Unicode-category capture-name validation.
-use super::{Parser, Status};
+use super::{Parser, Status, flags};
 use crate::ErrorCode;
 
 impl Parser<'_> {
@@ -23,12 +23,12 @@ impl Parser<'_> {
             if !valid_capture_name(name) {
                 return Err(self.error(ErrorCode::BadNamedCapture, start, after));
             }
-            self.open_group(true)?;
+            self.builder.open_group(true, Some(name))?;
             self.position = after;
             return Ok(());
         }
 
-        let mut flags = self.flags;
+        let mut bits = self.builder.flags();
         let mut negative = false;
         let mut saw_flags = false;
         loop {
@@ -40,22 +40,38 @@ impl Parser<'_> {
                 105 => {
                     // i
                     saw_flags = true;
-                    flags.fold_case = !negative;
+                    if negative {
+                        bits &= !flags::FOLD_CASE;
+                    } else {
+                        bits |= flags::FOLD_CASE;
+                    }
                 }
                 109 => {
-                    // m
+                    // m is the opposite of Native OneLine.
                     saw_flags = true;
-                    flags.multiline = !negative;
+                    if negative {
+                        bits |= flags::ONE_LINE;
+                    } else {
+                        bits &= !flags::ONE_LINE;
+                    }
                 }
                 115 => {
                     // s
                     saw_flags = true;
-                    flags.dot_newline = !negative;
+                    if negative {
+                        bits &= !flags::DOT_NL;
+                    } else {
+                        bits |= flags::DOT_NL;
+                    }
                 }
                 85 => {
                     // U
                     saw_flags = true;
-                    flags.non_greedy = !negative;
+                    if negative {
+                        bits &= !flags::NON_GREEDY;
+                    } else {
+                        bits |= flags::NON_GREEDY;
+                    }
                 }
                 45 => {
                     // -
@@ -68,14 +84,14 @@ impl Parser<'_> {
                 58 | 41 => {
                     // : or )
                     if rune == 58 {
-                        // Save OLD flags at the group's marker, before installing
-                        // the scoped changes, exactly as Native DoLeftParenNoCapture.
-                        self.open_group(false)?;
+                        // Native saves OLD bits before installing scoped edits,
+                        // including before the negative-without-flags error.
+                        self.builder.open_group(false, None)?;
                     }
                     if negative && !saw_flags {
                         return Err(self.error(ErrorCode::BadPerlOp, start, self.position));
                     }
-                    self.flags = flags;
+                    self.builder.set_flags(bits);
                     return Ok(());
                 }
                 _ => return Err(self.error(ErrorCode::BadPerlOp, start, self.position)),

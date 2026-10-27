@@ -1,5 +1,5 @@
 // Copyright 2006 The RE2 Authors. All Rights Reserved.
-// Derived from RE2 under its BSD-style license; see crate LICENSE.RE2.
+// Derived from RE2 under its BSD-style license; see ../RE2-LICENSE.
 //! Character-class union/complement; ranges retain the Native Rune domain.
 use super::RUNE_MAX;
 

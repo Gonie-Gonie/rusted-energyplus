@@ -136,3 +136,9 @@ pub(crate) fn fold_ranges(input: &[(u32, u32)]) -> Vec<(u32, u32)> {
     }
     ranges
 }
+
+// Add this read-only wrapper inside the existing crate::unicode module.
+// It reuses the already pinned private LookupCaseFold port and table.
+pub(crate) fn case_fold_row(rune: u32) -> Option<(u32, u32, i32)> {
+    lookup(rune).copied()
+}
