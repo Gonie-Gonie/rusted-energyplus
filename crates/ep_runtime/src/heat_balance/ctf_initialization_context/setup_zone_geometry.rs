@@ -85,33 +85,9 @@ impl CtfInitializationContext<'_> {
             .selected_zone_input
             .as_ref()
             .ok_or_else(|| hb_input_error(E::Unavailable("actual equipment Zone/Space owner")))?;
-        let zones = source_zones
-            .zones
-            .as_ref()
-            .ok_or_else(|| hb_input_error(E::Unavailable("actual equipment Zone allocation")))?;
-        let spaces = source_zones
-            .spaces
-            .as_ref()
-            .ok_or_else(|| hb_input_error(E::Unavailable("actual equipment Space allocation")))?;
-        if model.zones.len() != 1
-            || model.spaces.len() != 1
-            || zones.len() != 1
-            || spaces.len() != 1
-            || globals.num_of_zones != 1
-            || globals.num_spaces != 1
-        {
-            return Err(hb_input_error(E::Unavailable(
-                "selected actual equipment allocation operands",
-            )));
-        }
-        if zones[0].typed_zone_id != Some(model.zones[0].id)
-            || spaces[0].typed_space_id != Some(model.spaces[0].id)
-            || spaces[0].zone_num != 1
-        {
-            return Err(hb_input_error(E::Unavailable(
-                "same physical equipment Source associations",
-            )));
-        }
+        let (zone_ids, space_ids) = source_zones
+            .source_implicit_space_ids(model, globals)
+            .map_err(hb_input_error)?;
         let clock = clock.ok_or_else(|| {
             hb_input_error(E::Unavailable(
                 "actual effective equipment timestep operand",
@@ -119,7 +95,7 @@ impl CtfInitializationContext<'_> {
         })?;
         if reports.source_zone_equipment.is_none() {
             reports.source_zone_equipment = Some(
-                OrdinaryEquipment::new_for_source(model, clock)
+                OrdinaryEquipment::new_for_source_ordered(model, clock, &zone_ids, &space_ids)
                     .map_err(|error| equipment_error(error, &mut self.backend))?,
             );
         }

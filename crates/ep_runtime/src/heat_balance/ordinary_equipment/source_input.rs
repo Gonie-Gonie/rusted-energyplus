@@ -46,6 +46,59 @@ impl OrdinaryEquipment {
         Self::new_owners(None, &[model.zones[0].id], &[model.spaces[0].id])
     }
 
+    /// Actual SetupZoneGeometry supplies paired physical IDs in Source array
+    /// order. The compiler's container order does not define Source ordinals.
+    pub(crate) fn new_for_source_ordered(
+        model: &ep_model::TypedModel,
+        clock: OrdinaryEquipmentInput,
+        zone_ids: &[ZoneId],
+        space_ids: &[SpaceId],
+    ) -> Result<Self, Unavailable> {
+        if zone_ids.is_empty()
+            || zone_ids.len() != space_ids.len()
+            || zone_ids.len() != model.zones.len()
+            || space_ids.len() != model.spaces.len()
+            || model.timestep.number_of_timesteps_per_hour as usize != clock.timesteps_per_hour
+            || (zone_ids.len() > 1 && clock.supplied.iter().flatten().any(|&count| count != 0))
+        {
+            return Err(Unavailable::GeometryOrTimestep);
+        }
+        let mut typed_zones = model
+            .zones
+            .iter()
+            .map(|zone| (zone.id, zone))
+            .collect::<std::collections::BTreeMap<_, _>>();
+        let mut typed_spaces = model
+            .spaces
+            .iter()
+            .map(|space| (space.id, space))
+            .collect::<std::collections::BTreeMap<_, _>>();
+        if typed_zones.len() != model.zones.len() || typed_spaces.len() != model.spaces.len() {
+            return Err(Unavailable::GeometryOrTimestep);
+        }
+        for (&zone_id, &space_id) in zone_ids.iter().zip(space_ids) {
+            let zone = typed_zones
+                .remove(&zone_id)
+                .ok_or(Unavailable::GeometryOrTimestep)?;
+            let space = typed_spaces
+                .remove(&space_id)
+                .ok_or(Unavailable::GeometryOrTimestep)?;
+            if space.origin != ep_model::SpaceOrigin::AutoZoneDefault
+                || space.zone != zone_id
+                || zone.spaces.as_slice() != [space_id]
+            {
+                return Err(Unavailable::GeometryOrTimestep);
+            }
+        }
+        if !typed_zones.is_empty() || !typed_spaces.is_empty() {
+            return Err(Unavailable::GeometryOrTimestep);
+        }
+        if zone_ids.len() == 1 {
+            return Self::new_for_source(model, clock);
+        }
+        Self::new_owners(None, zone_ids, space_ids)
+    }
+
     pub(crate) fn get_zone_equipment_source(
         &mut self,
         input: &mut SelectedInputProcessor,
@@ -60,6 +113,15 @@ impl OrdinaryEquipment {
             || clock.timesteps_per_hour == 0
             || clock.timesteps_per_hour > 60
             || 60 % clock.timesteps_per_hour != 0
+            || (self.zone_ids.len() > 1
+                && (usize::try_from(globals.num_of_zones).ok() != Some(self.zone_ids.len())
+                    || usize::try_from(globals.num_spaces).ok() != Some(self.space_ids.len())
+                    || owners.zones.len() != self.zone_ids.len()
+                    || owners
+                        .zones
+                        .iter()
+                        .zip(&self.zone_ids)
+                        .any(|(zone, &id)| zone.typed_zone_id != Some(id))))
         {
             return Err(Unavailable::InconsistentOwner);
         }

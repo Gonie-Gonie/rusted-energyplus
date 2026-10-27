@@ -31,6 +31,7 @@ fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
 
 mod fields;
 mod infrared;
+mod multizone;
 mod people;
 mod source_b;
 use fields::{admitted_field, required_fields};
@@ -54,6 +55,11 @@ fn resolve_raw(
     source_b_ingress: bool,
     source_calendar_ingress: bool,
 ) -> Result<OrdinaryEquipmentInput, String> {
+    let source_multizone_ingress =
+        source_calendar_ingress && !source_b_ingress && multizone::has_multiple_zones(raw);
+    if source_multizone_ingress {
+        multizone::validate(raw)?;
+    }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
             continue;
@@ -152,6 +158,7 @@ fn resolve_raw(
                 | "OutputControl:Table:Style"
                 | "ZoneAirHeatBalanceAlgorithm"
         ) && objects.len() != 1
+            && !(source_multizone_ingress && family.0 == "Zone")
         {
             return Err(format!("ordinary equipment requires unique {}", family.0));
         }
@@ -616,20 +623,27 @@ fn resolve_raw(
         .transpose()?;
     let timestep = ep_model::TimestepConfig::from_energyplus_input(requested, false)
         .number_of_timesteps_per_hour as usize;
-    let zone_name = raw
+    let zones = raw
         .objects
         .get(&ObjectType("Zone".into()))
-        .filter(|objects| objects.len() == 1)
-        .and_then(|objects| objects.keys().next())
-        .ok_or("ordinary equipment requires one actual Zone")?;
+        .filter(|objects| !objects.is_empty())
+        .filter(|objects| source_multizone_ingress || objects.len() == 1)
+        .ok_or("ordinary equipment requires actual admitted Zone rows")?;
     // Consumer-specific actual Constant schedule references; no schedule-name or
     // case-name list. The compiler still validates type limits and associations.
     for family in ["OtherEquipment", "Exterior:Lights", "Output:Variable"] {
         if let Some(objects) = raw.objects.get(&ObjectType(family.into())) {
             for object in objects.values() {
                 if family == "OtherEquipment"
-                    && !text(object, "zone_or_zonelist_or_space_or_spacelist_name")
-                        .is_some_and(|name| name.eq_ignore_ascii_case(&zone_name.0))
+                    && !text(object, "zone_or_zonelist_or_space_or_spacelist_name").is_some_and(
+                        |name| {
+                            zones.len() == 1
+                                && zones
+                                    .keys()
+                                    .next()
+                                    .is_some_and(|zone| name.eq_ignore_ascii_case(&zone.0))
+                        },
+                    )
                 {
                     return Err("ordinary OtherEquipment requires the direct actual Zone".into());
                 }
@@ -793,6 +807,46 @@ mod tests {
             RawValue::Number("-1".into()),
         );
         assert!(resolve(&converted).is_err());
+        let multi = r#"{"Zone":{"Zulu":{},"Alpha":{}}}"#;
+        let raw = parse_epjson_str(multi)?;
+        assert!(resolve_source_a(&raw).is_ok());
+        assert!(resolve_source_b(&raw).is_err());
+        assert!(resolve(&raw).is_err());
+        for family in [
+            "People",
+            "OtherEquipment",
+            "Exterior:Lights",
+            "ComfortViewFactorAngles",
+            "Lights",
+            "ElectricEquipment",
+            "GasEquipment",
+            "HotWaterEquipment",
+            "SteamEquipment",
+            "ZoneList",
+            "ZoneGroup",
+            "Space",
+            "SpaceList",
+            "ZoneProperty:LocalEnvironment",
+            "ZoneHVAC:EquipmentConnections",
+            "ZoneHVAC:EquipmentList",
+            "ZoneHVAC:IdealLoadsAirSystem",
+            "ZoneControl:Thermostat",
+            "Material:InfraredTransparent",
+            "FenestrationSurface:Detailed",
+            "InternalMass",
+            "Construction:AirBoundary",
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(multi)?;
+            value[family] = serde_json::json!({"positive":{}});
+            let raw = parse_epjson_str(&value.to_string())?;
+            let error = resolve_source_a(&raw)
+                .err()
+                .ok_or("multi-Zone positive family escaped")?;
+            assert!(
+                error.starts_with("Source A disconnected multi-Zone excludes positive family"),
+                "{family}: {error}"
+            );
+        }
         let base = r#""Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}}"#;
         for (name, addition, accepted) in [
             ("absent queries", "", true),

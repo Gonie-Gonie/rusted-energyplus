@@ -3592,7 +3592,11 @@ fn prepare_runtime_inputs(
     // The already-admitted CLI scope selects Source explicitly. Ordinary
     // calls retain the existing compatibility path and never enter a retry.
     match (scope, runtime_class) {
+        (None, RuntimeClass::SourceMultiZoneHeatBalanceCompatibility) => {
+            return Err("multi-Zone Source runtime requires validated explicit scope A".into());
+        }
         (None, _)
+        | (Some(crate::PortingScope::A), RuntimeClass::SourceMultiZoneHeatBalanceCompatibility)
         | (Some(crate::PortingScope::A), RuntimeClass::OneZoneHeatBalanceCompatibility)
         | (Some(crate::PortingScope::B), RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility) => {
         }
@@ -5533,6 +5537,9 @@ fn execute_rust_runtime(
                 purchased_air_calc_heating_outdoor_air_maximum_flow_continue_warning_timestamp_call_lifecycle: None,
                 purchased_air_calc_heating_outdoor_air_maximum_flow_first_warning_guard_else_branch_entry_lifecycle: None,
             })))
+        }
+        RuntimeClass::SourceMultiZoneHeatBalanceCompatibility => {
+            Err("multi-Zone Source class cannot fall through to a legacy runtime".into())
         }
         RuntimeClass::None => Err("no runtime selected".to_string()),
     }
@@ -7974,6 +7981,7 @@ fn validate_runtime_selection(
 ) -> Result<(), String> {
     if run_result_state == RunResultState::SupportedCompatibilityRun
         && !runtime_class.conformance_promotion_allowed()
+        && runtime_class != RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
     {
         return Err(format!(
             "diagnostic runtime '{}' cannot execute as a release compatibility run",
@@ -7987,6 +7995,7 @@ fn runtime_class_requires_weather(runtime_class: RuntimeClass) -> bool {
     matches!(
         runtime_class,
         RuntimeClass::OneZoneHeatBalanceCompatibility
+            | RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
             | RuntimeClass::HeatBalanceZoneAirDiagnostic
             | RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
     )
@@ -8650,6 +8659,9 @@ mod tests {
     #[test]
     fn direct_zone_coupled_runtime_requires_weather_axis() {
         assert!(runtime_class_requires_weather(
+            RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+        ));
+        assert!(runtime_class_requires_weather(
             RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
         ));
         assert!(!runtime_class_requires_weather(
@@ -8659,6 +8671,16 @@ mod tests {
 
     #[test]
     fn release_compatibility_rejects_diagnostic_runtime_before_execution() {
+        assert!(
+            validate_runtime_selection(
+                RunResultState::SupportedCompatibilityRun,
+                RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+            )
+            .is_ok()
+        );
+        assert!(
+            !RuntimeClass::SourceMultiZoneHeatBalanceCompatibility.conformance_promotion_allowed()
+        );
         assert!(
             validate_runtime_selection(
                 RunResultState::SupportedCompatibilityRun,

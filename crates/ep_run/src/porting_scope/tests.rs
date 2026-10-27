@@ -353,6 +353,145 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             assert!((sum - 1.0).abs() < 1e-12);
         }
     }
+    // Two legal disconnected opaque Zones take an explicit Source-only lane.
+    // No typed IDs/vectors are edited to manufacture an order discrepancy.
+    let mut value = input(PortingScope::A);
+    let zone = value["Zone"]["Zone"].clone();
+    value["Zone"] = json!({"Zulu":zone.clone(),"Alpha":zone});
+    value["Zone"]["Alpha"]["volume"] = json!(2.0);
+    value["Zone"]["Alpha"]["floor_area"] = json!(2.0);
+    let faces = value["BuildingSurface:Detailed"]
+        .as_object()
+        .unwrap()
+        .clone();
+    let mut surfaces = serde_json::Map::new();
+    for (zone, shift, scale) in [("Zulu", 0.0, 1.0), ("Alpha", 10.0, 2.0)] {
+        for (name, face) in &faces {
+            let mut face = face.clone();
+            face["zone_name"] = json!(zone);
+            for point in face["vertices"].as_array_mut().unwrap() {
+                point["vertex_x_coordinate"] =
+                    json!(shift + scale * point["vertex_x_coordinate"].as_f64().unwrap());
+            }
+            surfaces.insert(format!("{zone}:{name}"), face);
+        }
+    }
+    value["BuildingSurface:Detailed"] = Value::Object(surfaces);
+    let raw = parse_epjson_str(&value.to_string()).expect("two disconnected authored cubes");
+    let compiled = compile_raw_model(&raw);
+    let model = compiled.model.as_ref().expect("two real compiled Zones");
+    let mut selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
+    assert!(
+        !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B).admissible
+    );
+    let input =
+        crate::ordinary_input_processor::resolve_source_a(&raw).expect("multi-Zone Source IP");
+    let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &input)
+        .expect("actual Zone/Surface operands");
+    assert_eq!(projected.objects["Zone"].len(), 2);
+    assert_eq!(projected.surface.building_surfaces.len(), 12);
+    selected.environment = Some(
+        super::environment::environment_from_weather(
+            model,
+            &weather,
+            "authored disconnected Zones",
+        )
+        .expect("actual multi-Zone environment"),
+    );
+    let admission = crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+        .expect("narrow SourceA topology admission");
+    let support = crate::support::assess_support_with_source_admission(
+        &raw,
+        &compiled.report,
+        Some(model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&admission),
+    );
+    assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+    assert_eq!(
+        support.runtime_class,
+        crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+    );
+    assert_eq!(
+        support.runtime_class.id(),
+        "source-multizone-heat-balance-compatibility"
+    );
+    assert_eq!(
+        serde_json::to_value(support.runtime_class).expect("Source class wire"),
+        json!("source-multizone-heat-balance-compatibility")
+    );
+    assert!(support.matched_capability_ids.is_empty());
+    assert!(!support.runtime_class.conformance_promotion_allowed());
+    let legacy = assess_support(
+        &raw,
+        &compiled.report,
+        Some(model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+    assert!(!legacy.allows_rust_runtime());
+    assert!(
+        legacy
+            .diagnostics
+            .diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "UnsupportedTopology")
+    );
+
+    // Actual compiler and raw-to-IP projection already share each format's Source
+    // order. Legal reverse-lexical IDF declarations prove that fact, without
+    // renumbering IDs or reordering the compiled vectors for this test.
+    let converted = r#"{"Zone":{"Alpha":{},"Zulu":{}}}"#;
+    for staged in [false, true] {
+        let raw = if staged {
+            ep_raw_model::parse_epjson_str_with_idf_order(converted, "Zone,Zulu;Zone,Alpha;")
+        } else {
+            parse_epjson_str(converted)
+        }
+        .expect("actual direct/staged Zone input");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled.model.as_ref().expect("actual compiler Zone order");
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)
+            .expect("actual ordered Source IP");
+        let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+            .expect("actual ordered Zone projection");
+        let expected = if staged {
+            ["Zulu", "Alpha"]
+        } else {
+            ["Alpha", "Zulu"]
+        };
+        assert_eq!(
+            projected.objects["Zone"]
+                .iter()
+                .map(|row| row.object_name.as_str())
+                .collect::<Vec<_>>(),
+            expected
+        );
+        assert_eq!(
+            model
+                .zones
+                .iter()
+                .map(|row| row.name.clone())
+                .collect::<Vec<_>>(),
+            expected.map(ep_model::NormalizedName::new)
+        );
+        for zone in &model.zones {
+            let spaces: Vec<_> = model
+                .spaces
+                .iter()
+                .filter(|space| space.zone == zone.id)
+                .collect();
+            assert_eq!(spaces.len(), 1);
+            assert_eq!(spaces[0].origin, ep_model::SpaceOrigin::AutoZoneDefault);
+            assert_eq!(zone.spaces.as_slice(), [spaces[0].id]);
+        }
+    }
 }
 
 #[test]

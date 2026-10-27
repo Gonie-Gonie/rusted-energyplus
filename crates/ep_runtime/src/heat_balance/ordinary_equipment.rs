@@ -957,7 +957,12 @@ impl OrdinaryEquipment {
         zone_ids: &[ZoneId],
         space_ids: &[SpaceId],
     ) -> Result<Self, Unavailable> {
-        if zone_ids.len() != 1 || space_ids.len() != 1 {
+        // The legacy projection remains singleton. The Source constructor has
+        // already proved the complete ordered Zone/implicit-Space bijection.
+        if zone_ids.is_empty()
+            || zone_ids.len() != space_ids.len()
+            || (input.is_some() && zone_ids.len() != 1)
+        {
             return Err(Unavailable::GeometryOrTimestep);
         }
         Ok(Self {
@@ -1197,14 +1202,14 @@ impl OrdinaryEquipment {
                 .priority_simulation_order
                 .as_ref()
                 .is_none_or(|rows| !rows.is_empty())
-            || self
-                .equipment_availability
-                .as_ref()
-                .is_none_or(|rows| rows.as_slice() != [0])
+            || self.equipment_availability.as_ref().is_none_or(|rows| {
+                rows.len() != zones.len() || rows.iter().any(|&value| value != 0)
+            })
             || self.equipment_lists.as_ref().is_none_or(|rows| {
-                rows.len() != 1
-                    || !rows[0].name.is_empty()
-                    || rows[0].number_of_equipment_types != 0
+                rows.len() != zones.len()
+                    || rows
+                        .iter()
+                        .any(|row| !row.name.is_empty() || row.number_of_equipment_types != 0)
             })
             || self.nodes.physical.is_some()
             || self.nodes.number_of_nodes != 0
@@ -1269,16 +1274,26 @@ impl OrdinaryEquipment {
             .zone_config
             .as_ref()
             .ok_or(Unavailable::InconsistentOwner)?;
-        if configs.iter().any(|row| {
-            row.zone_name != "Uncontrolled Zone"
-                || !row.equipment_list_name.is_empty()
-                || row.equipment_list_index != 1
-                || row.zone_node != 0
-                || row.inlet_nodes != 0
-                || row.exhaust_nodes != 0
-                || row.return_nodes != 0
-                || row.is_controlled
-        }) {
+        if configs.len() != zones.len()
+            || configs.iter().enumerate().any(|(index, row)| {
+                // Native509-514 repeatedly FindItems the first empty list name.
+                // For N uncontrolled Zones the first config receives N; subsequent
+                // configs retain their constructor-zero index. Legacy stays N=1.
+                let expected_list_index = if source_gains.is_some() {
+                    if index == 0 { zones.len() } else { 0 }
+                } else {
+                    1
+                };
+                row.zone_name != "Uncontrolled Zone"
+                    || !row.equipment_list_name.is_empty()
+                    || row.equipment_list_index != expected_list_index
+                    || row.zone_node != 0
+                    || row.inlet_nodes != 0
+                    || row.exhaust_nodes != 0
+                    || row.return_nodes != 0
+                    || row.is_controlled
+            })
+        {
             return Err(Unavailable::InconsistentOwner);
         }
         let view = self.config_view()?;

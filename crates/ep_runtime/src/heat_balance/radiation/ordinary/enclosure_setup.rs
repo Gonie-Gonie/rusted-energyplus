@@ -1,5 +1,5 @@
 //! Actual selected SurfaceGeometry2857 radiant and797 solar enclosure setup.
-//! Opaque one-Zone/implicit-Space only; AirBoundary producers remain excluded.
+//! Opaque implicit-Space Zones; AirBoundary producers remain excluded.
 use super::{OrdinarySolarRadiation, RadiantRadiationEnclosure, SolarRadiationEnclosure};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_heat_balance_input::surface::{
@@ -54,6 +54,14 @@ impl OrdinarySolarRadiation {
                 "positive Construction:AirBoundary grouping",
             ));
         }
+        // Retain the earlier one-Zone child fixture/compatibility domain.
+        // New multi-Zone enclosure setup requires the actual Source identity
+        // bijection before mutating any Zone/Space enclosure associations.
+        if spaces_count != 1 || owners.globals.num_of_zones != 1 {
+            owners
+                .zones
+                .source_implicit_space_ids(owners.model, owners.globals)?;
+        }
         let zones = owners
             .zones
             .zones
@@ -64,15 +72,12 @@ impl OrdinarySolarRadiation {
             .spaces
             .as_mut()
             .ok_or(Error::Unavailable("same Space enclosure owner"))?;
-        // This is the existing ordinary Solar binding domain, not a new raw
-        // admission rule. No positive explicit Space/air-boundary is enabled.
-        if spaces_count != 1
+        if spaces_count == 0
             || spaces.len() != spaces_count
-            || zones.len() != 1
-            || owners.globals.num_of_zones != 1
+            || usize::try_from(owners.globals.num_of_zones).ok() != Some(zones.len())
         {
             return Err(Error::Unavailable(
-                "one-Zone implicit-Space enclosure domain",
+                "actual implicit-Space enclosure allocation",
             ));
         }
         let surfaces = surface_state
@@ -187,6 +192,14 @@ impl OrdinarySolarRadiation {
                 "positive Construction:AirBoundary solar grouping",
             ));
         }
+        // Retain the earlier one-Zone child fixture/compatibility domain.
+        // New multi-Zone enclosure setup requires the actual Source identity
+        // bijection before mutating any Zone/Space enclosure associations.
+        if spaces_count != 1 || owners.globals.num_of_zones != 1 {
+            owners
+                .zones
+                .source_implicit_space_ids(owners.model, owners.globals)?;
+        }
         let zones = owners
             .zones
             .zones
@@ -197,13 +210,12 @@ impl OrdinarySolarRadiation {
             .spaces
             .as_mut()
             .ok_or(Error::Unavailable("same Space solar enclosure owner"))?;
-        if spaces_count != 1
+        if spaces_count == 0
             || spaces.len() != spaces_count
-            || zones.len() != 1
-            || owners.globals.num_of_zones != 1
+            || usize::try_from(owners.globals.num_of_zones).ok() != Some(zones.len())
         {
             return Err(Error::Unavailable(
-                "one-Zone implicit-Space solar enclosure domain",
+                "actual implicit-Space enclosure allocation",
             ));
         }
         let surfaces = surface_state

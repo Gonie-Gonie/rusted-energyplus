@@ -201,7 +201,9 @@ pub(super) fn assess_typed_runtime_boundaries(
             "no Zone objects are available for the current runtime",
         );
     }
-    if typed_model.zones.len() > 1 {
+    if typed_model.zones.len() > 1
+        && !source_admission.is_some_and(|admission| admission.consumes_disconnected_multizone())
+    {
         diagnostics.error(
             "UnsupportedTopology",
             "support",

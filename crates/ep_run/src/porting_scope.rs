@@ -25,7 +25,7 @@ pub(crate) use environment::{
 /// Frozen input family selected for card-based porting work.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 pub enum PortingScope {
-    /// One unconditioned, opaque, fully mixed zone.
+    /// Unconditioned opaque Zones; multiple Zones require the disconnected producer-free Source stage.
     A,
     /// One fully mixed zone with direct no-OA sensible IdealLoads and hard limits.
     B,
@@ -97,6 +97,15 @@ pub fn inspect_porting_scope(
         if !objects.is_empty() && !permitted_object(&kind.0, scope) {
             violations.push(format!("{} is outside scope {}", kind.0, scope.id()));
         }
+    }
+    if scope == PortingScope::A
+        && raw
+            .objects
+            .get(&ep_raw_model::ObjectType("Zone".into()))
+            .is_some_and(|rows| rows.len() > 1)
+        && let Err(error) = crate::ordinary_equipment_input::resolve_source_a(raw)
+    {
+        violations.push(error);
     }
     validate_project_controls(raw, &settings, &mut violations);
     if object_counts.contains_key("SizingPeriod:DesignDay")
@@ -317,8 +326,33 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
     if model.version != ep_model::Version::oracle_26_1_0() {
         violations.push("effective engine must match the locked EnergyPlus 26.1.0".into());
     }
-    if model.zones.len() != 1 {
-        violations.push("exactly one opaque zone is required".into());
+    if model.zones.is_empty() || (scope == PortingScope::B && model.zones.len() != 1) {
+        violations
+            .push("Source A requires positive opaque Zones; Source B requires exactly one".into());
+    }
+    if model.zones.len() > 1
+        && (model.spaces.len() != model.zones.len()
+            || model.zones.iter().any(|zone| {
+                let mut spaces = model.spaces.iter().filter(|space| space.zone == zone.id);
+                !spaces
+                    .next()
+                    .is_some_and(|space| space.origin == ep_model::SpaceOrigin::AutoZoneDefault)
+                    || spaces.next().is_some()
+            }))
+    {
+        violations.push("disconnected multi-Zone requires one implicit Space per Zone".into());
+    }
+    if model.zones.len() > 1
+        && model.zones.iter().any(|zone| {
+            !model.surfaces.iter().any(|surface| {
+                surface.zone == zone.id && surface.surface_type != ep_model::SurfaceType::Floor
+            })
+        })
+    {
+        // The ungrouped Source enclosure loop is generic. A mixture of
+        // floor-only and other Spaces enters a separate grouped/remainder
+        // producer that remains outside this stage.
+        violations.push("multi-Zone requires a non-floor opaque enclosure for every Zone".into());
     }
     if model.building.is_none()
         || model.global_geometry_rules.is_none()

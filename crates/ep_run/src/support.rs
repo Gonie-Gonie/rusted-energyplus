@@ -126,6 +126,10 @@ pub enum RuntimeClass {
     None,
     /// One-zone opaque heat-balance compatibility runtime.
     OneZoneHeatBalanceCompatibility,
+    /// Validated Source A disconnected opaque multi-Zone input lane.
+    /// No one-Zone capability/evidence or conformance promotion is inherited.
+    #[serde(rename = "source-multizone-heat-balance-compatibility")]
+    SourceMultiZoneHeatBalanceCompatibility,
     /// Legacy heat-balance zone-air diagnostic runtime.
     HeatBalanceZoneAirDiagnostic,
     /// Direct-zone HeatBalance/PurchasedAir coupled compatibility runtime.
@@ -143,6 +147,9 @@ impl RuntimeClass {
         match self {
             Self::None => "none",
             Self::OneZoneHeatBalanceCompatibility => "one-zone-heat-balance-compatibility",
+            Self::SourceMultiZoneHeatBalanceCompatibility => {
+                "source-multizone-heat-balance-compatibility"
+            }
             Self::HeatBalanceZoneAirDiagnostic => "heat-balance-zone-air-diagnostic",
             Self::IdealLoadsDirectZoneCoupledCompatibility => {
                 "ideal-loads-direct-zone-coupled-compatibility"
@@ -157,6 +164,7 @@ impl RuntimeClass {
     pub const fn selected_algorithm_lane_id(self) -> &'static str {
         match self {
             Self::OneZoneHeatBalanceCompatibility
+            | Self::SourceMultiZoneHeatBalanceCompatibility
             | Self::IdealLoadsDirectZoneCoupledCompatibility => "compatibility-source-order",
             Self::HeatBalanceZoneAirDiagnostic
             | Self::IdealLoadsFixtureDemandDiagnostic
@@ -328,6 +336,9 @@ fn runtime_selection_note(
     run_result_state: RunResultState,
 ) -> String {
     match run_result_state {
+        RunResultState::SupportedCompatibilityRun
+            if runtime_class == RuntimeClass::SourceMultiZoneHeatBalanceCompatibility =>
+            "selected explicit Source A disconnected multi-Zone input lane; no one-Zone capability/evidence is inherited and conformance promotion remains disabled".into(),
         RunResultState::SupportedCompatibilityRun => format!(
             "selected runtime '{}' executes the matched capability boundary; conformance_claim remains false for arbitrary runs",
             runtime_class.id()
@@ -496,6 +507,15 @@ pub(crate) fn assess_support_with_source_admission(
             (
                 SupportStatus::Unsupported,
                 RuntimeClass::None,
+                Vec::new(),
+                Vec::new(),
+            )
+        } else if source_admission
+            .is_some_and(|admission| admission.consumes_disconnected_multizone())
+        {
+            (
+                SupportStatus::SupportedCompatibility,
+                RuntimeClass::SourceMultiZoneHeatBalanceCompatibility,
                 Vec::new(),
                 Vec::new(),
             )

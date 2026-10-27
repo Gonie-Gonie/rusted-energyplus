@@ -17,6 +17,7 @@ use ep_model::{
 use std::io::Write;
 
 mod input;
+mod source_binding;
 mod storage;
 pub(crate) use storage::{SelectedZoneData, SelectedZoneInputOwners, ZonePredefined};
 

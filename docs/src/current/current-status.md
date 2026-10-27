@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 128 paired physical cases and 3,510,654 reported values with zero
+contains 129 paired physical cases and 3,520,734 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -64,6 +64,14 @@ the actual getter assigns its Roof class. Surface/full tracing now exports
 the retained current Source geometry after successful completion. Two full-profile
 Ceiling comparisons pass the original policies; their EIO bodies and DXF geometry
 agree within the explicitly recorded version-header and line-ending boundaries.
+
+Explicit Source A also accepts multiple disconnected closed opaque Zones,
+each with its implicit Space and no internal gains or equipment. A two-Zone
+24-hour comparison covers 105 derived selectors and 10,080 raw-exact values;
+EIO, completion diagnostics and DXF agree within recorded identity and EOL
+boundaries. Actual Zone/Space and enclosure links are retained. This separate
+runtime class inherits no one-Zone capabilities or conformance promotion.
+Interzone boundaries, explicit Spaces, groups and multi-Zone equipment remain open.
 
 `Material:InfraredTransparent` now reaches the ordered Source A/B getter and
 single-layer CTF on Ground or Adiabatic boundaries, preserving the Native
