@@ -13,7 +13,6 @@ mod native_compiler;
 mod native_dfa;
 mod native_finalize;
 mod native_matcher;
-#[cfg(test)]
 mod native_onepass;
 mod native_parser;
 mod native_prefix;
@@ -156,7 +155,21 @@ impl Re2 {
                     simplified,
                     native_compiler::OFFICIAL_DEFAULT_FORWARD_INSTRUCTION_CAP,
                 )?;
-                native_finalize::finalize_executable(front)
+                let mut program = native_finalize::finalize_executable(front)?;
+                // RE2::Init eagerly calls Prog::IsOnePass after CompileToProg.
+                // Keep both true/false outcomes and actual image/charge on the
+                // immutable compiled Arc; default DFA accounting remains open.
+                program.onepass = Some(native_onepass::analyze_default(
+                    native_onepass::ProgramView {
+                        instructions: &program.instructions,
+                        start: program.start,
+                        inst_count: program.inst_count,
+                        bytemap: &program.bytemap,
+                        bytemap_range: program.bytemap_range,
+                    },
+                    program.finalized_instructions,
+                )?);
+                Ok::<_, Status>(program)
             })();
             constructed.map_err(|_| Status::new(ErrorCode::PatternTooLarge, ""))
         });

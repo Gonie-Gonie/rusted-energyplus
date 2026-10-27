@@ -1,7 +1,6 @@
 // Copyright 2008 The RE2 Authors. All Rights Reserved.
 // Rust port of pinned onepass.cc146-188,350-616. BSD: LICENSE.RE2.
 //! Constructor OnePass analysis/accounting, without capture matching.
-#![cfg(test)]
 use crate::native_compiler::{Inst, InstOp};
 use crate::{ErrorCode, Status};
 
@@ -15,6 +14,7 @@ const MATCH_WINS: u32 = 1 << EMPTY_SHIFT;
 const IMPOSSIBLE: u32 = (1 << 4) | (1 << 5);
 
 /// Observed SAME-target sizeof scalars. No Rust/default/official layout guess.
+#[cfg(test)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct OnePassLayout {
     pub one_state_bytes: u32,
@@ -34,6 +34,108 @@ pub(crate) struct OnePassNode {
     pub matchcond: u32,
     pub actions: Vec<u32>,
 }
+/// Production keeps proven cap inputs, never an invented exact DFA allowance.
+/// Exact scalar before/after accounting exists only for the same-build observer.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) enum BudgetAccounting {
+    DefaultCap {
+        instruction_cap: u32,
+        finalized_instructions: usize,
+    },
+    #[cfg(test)]
+    NativeScalar { before: i64, after: i64 },
+}
+impl BudgetAccounting {
+    fn charge(&mut self, _amount: i64) -> Result<(), Status> {
+        match self {
+            Self::DefaultCap { .. } => Ok(()),
+            #[cfg(test)]
+            Self::NativeScalar { before, after } => {
+                *after = before.checked_sub(_amount).ok_or_else(internal)?;
+                Ok(())
+            }
+        }
+    }
+    #[cfg(test)]
+    fn native_after(&self) -> Result<i64, Status> {
+        match self {
+            Self::NativeScalar { after, .. } => Ok(*after),
+            Self::DefaultCap { .. } => Err(internal()),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+enum BudgetPolicy {
+    DefaultCap {
+        finalized_instructions: usize,
+    },
+    #[cfg(test)]
+    NativeScalar {
+        dfa_mem: i64,
+        layout: OnePassLayout,
+    },
+}
+impl BudgetPolicy {
+    fn accounting(self) -> BudgetAccounting {
+        match self {
+            Self::DefaultCap {
+                finalized_instructions,
+            } => BudgetAccounting::DefaultCap {
+                instruction_cap: crate::native_compiler::OFFICIAL_DEFAULT_FORWARD_INSTRUCTION_CAP,
+                finalized_instructions,
+            },
+            #[cfg(test)]
+            Self::NativeScalar { dfa_mem, .. } => BudgetAccounting::NativeScalar {
+                before: dfa_mem,
+                after: dfa_mem,
+            },
+        }
+    }
+    fn shape(self) -> (u32, u32) {
+        match self {
+            // Official H4 inference plus primary uint32 action words. This
+            // supplies no Prog/DFA/State layout or exact remaining allowance.
+            Self::DefaultCap { .. } => (4, 4),
+            #[cfg(test)]
+            Self::NativeScalar { layout, .. } => (layout.one_state_bytes, layout.uint32_bytes),
+        }
+    }
+    fn count_matches(self, actual: usize) -> bool {
+        match self {
+            Self::DefaultCap {
+                finalized_instructions,
+            } => finalized_instructions == actual,
+            #[cfg(test)]
+            Self::NativeScalar { .. } => true,
+        }
+    }
+    fn admits(self, classes: u32, max_nodes: u32, _state_size: u32) -> Result<bool, Status> {
+        match self {
+            Self::DefaultCap {
+                finalized_instructions,
+            } => {
+                // Finalized SIZE<=512 includes the actual 2*N BitState charge;
+                // the proven default bound still makes this budget gate pass.
+                if finalized_instructions <= 512 {
+                    return Ok(true);
+                }
+                // With larger N no list_heads are allocated. H4 makes the
+                // threshold divisible8, eliminating the unknown 0..7 residual:
+                // C-N >= 2*(B+1)*M. Signed/wide arithmetic also handles N>C.
+                let spare =
+                    i128::from(crate::native_compiler::OFFICIAL_DEFAULT_FORWARD_INSTRUCTION_CAP)
+                        - i128::try_from(finalized_instructions).map_err(|_| internal())?;
+                let threshold = 2 * (i128::from(classes) + 1) * i128::from(max_nodes);
+                Ok(spare >= threshold)
+            }
+            #[cfg(test)]
+            Self::NativeScalar { dfa_mem, .. } => {
+                Ok(dfa_mem / 4 / i64::from(_state_size) >= i64::from(max_nodes))
+            }
+        }
+    }
+}
 /// None means the source did not reach that local's initialization. Failed
 /// analysis retains no OnePass image and never subtracts its scratch memory.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -45,11 +147,10 @@ pub(crate) struct OnePassAnalysis {
     pub allocated_nodes: Option<u32>,
     pub nodes: Option<Vec<OnePassNode>>,
     pub charged_bytes: i64,
-    pub dfa_mem_before: i64,
-    pub dfa_mem_after: i64,
+    pub accounting: BudgetAccounting,
 }
 impl OnePassAnalysis {
-    fn initial(dfa_mem: i64) -> Self {
+    fn initial(policy: BudgetPolicy) -> Self {
         Self {
             is_one_pass: false,
             max_nodes: None,
@@ -58,18 +159,19 @@ impl OnePassAnalysis {
             allocated_nodes: None,
             nodes: None,
             charged_bytes: 0,
-            dfa_mem_before: dfa_mem,
-            dfa_mem_after: dfa_mem,
+            accounting: policy.accounting(),
         }
     }
 }
 
 /// Per-Prog did_onepass_/onepass_nodes_ retention. This owner must stay bound to
 /// one immutable finalized graph and its single remaining-DFA-memory scalar.
+#[cfg(test)]
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct OnePassState {
     analysis: Option<OnePassAnalysis>,
 }
+#[cfg(test)]
 impl OnePassState {
     /// Cache BOTH successful and rejected analyses. Later reads do not touch
     /// dfa_mem, reproducing the first source did_onepass_ guard.
@@ -81,7 +183,7 @@ impl OnePassState {
     ) -> Result<&OnePassAnalysis, Status> {
         if self.analysis.is_none() {
             let analysis = analyze(program, *dfa_mem, layout)?;
-            *dfa_mem = analysis.dfa_mem_after;
+            *dfa_mem = analysis.accounting.native_after()?;
             self.analysis = Some(analysis);
         }
         self.analysis.as_ref().ok_or_else(internal)
@@ -184,29 +286,47 @@ fn stack_push(stack: &mut Vec<InstCond>, size: u32, value: InstCond) -> Result<(
     Ok(())
 }
 
-/// Invoke ONCE per compiled expression, after finalization. The constructor
-/// caches this result (native did_onepass_) and uses dfa_mem_after thereafter;
-/// retrieving it again must not reanalyze or subtract the charge again.
-/// Ok(false) is native rejection. Err is host allocation or invalid integration
-/// /undefined C++ arithmetic domain, never an invented source rejection branch.
-#[expect(
-    clippy::manual_is_multiple_of,
-    reason = "Literal pinned OnePass divisibility predicate retained from the compiled source unit"
-)]
+/// Eager default-constructor analysis. Retain this exact true/false result,
+/// nodes and charge on the immutable compiled program; no scalar is invented.
+pub(crate) fn analyze_default(
+    program: ProgramView<'_>,
+    finalized_instructions: usize,
+) -> Result<OnePassAnalysis, Status> {
+    analyze_with_policy(
+        program,
+        BudgetPolicy::DefaultCap {
+            finalized_instructions,
+        },
+    )
+}
+
+/// Same-build explicit scalar observer API; its before/after wire is unchanged.
+#[cfg(test)]
 pub(crate) fn analyze(
     program: ProgramView<'_>,
     dfa_mem: i64,
     layout: OnePassLayout,
 ) -> Result<OnePassAnalysis, Status> {
-    let mut result = OnePassAnalysis::initial(dfa_mem);
+    analyze_with_policy(program, BudgetPolicy::NativeScalar { dfa_mem, layout })
+}
+
+/// Both policies share the exact source traversal and node charge. False is
+/// source rejection; host/invariant errors remain separate from that outcome.
+fn analyze_with_policy(
+    program: ProgramView<'_>,
+    policy: BudgetPolicy,
+) -> Result<OnePassAnalysis, Status> {
+    let mut result = OnePassAnalysis::initial(policy);
     if program.start == 0 {
         return Ok(result);
     }
+    let (header_bytes, action_bytes) = policy.shape();
     if program.instructions.is_empty()
         || program.instructions.len() > i32::MAX as usize
-        || layout.uint32_bytes != 4
-        || layout.one_state_bytes < layout.uint32_bytes
-        || layout.one_state_bytes % layout.uint32_bytes != 0
+        || !policy.count_matches(program.instructions.len())
+        || action_bytes != 4
+        || header_bytes < action_bytes
+        || header_bytes % action_bytes != 0
         || !(1..=256).contains(&program.bytemap_range)
         || program
             .bytemap
@@ -220,15 +340,15 @@ pub(crate) fn analyze(
         .ok_or_else(internal)?;
     let state_size = program
         .bytemap_range
-        .checked_mul(layout.uint32_bytes)
-        .and_then(|bytes| bytes.checked_add(layout.one_state_bytes))
+        .checked_mul(action_bytes)
+        .and_then(|bytes| bytes.checked_add(header_bytes))
         .ok_or_else(internal)?;
     if max_nodes > i32::MAX as u32 || state_size > i32::MAX as u32 {
         return Err(internal());
     }
     result.max_nodes = Some(max_nodes);
     result.state_size = Some(state_size);
-    if max_nodes >= 65_000 || dfa_mem / 4 / i64::from(state_size) < i64::from(max_nodes) {
+    if max_nodes >= 65_000 || !policy.admits(program.bytemap_range, max_nodes, state_size)? {
         return Ok(result);
     }
     let stack_size = program.inst_count[InstOp::Capture as usize]
@@ -387,9 +507,7 @@ pub(crate) fn analyze(
         return Err(internal());
     }
     result.charged_bytes = i64::from(charged);
-    result.dfa_mem_after = dfa_mem
-        .checked_sub(result.charged_bytes)
-        .ok_or_else(internal)?;
+    result.accounting.charge(result.charged_bytes)?;
     result.is_one_pass = true;
     result.nodes = Some(nodes);
     Ok(result)

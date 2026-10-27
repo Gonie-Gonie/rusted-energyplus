@@ -296,9 +296,24 @@ pub(crate) fn check_vectors() -> Result<(), String> {
     let expected = include_str!("../tests/data/native-automata.jsonl");
     assert_eq!(fixtures::OPERANDS.len(), 20);
     assert_eq!(expected.lines().count(), fixtures::OPERANDS.len());
-    for (ordinal, ((pattern, operands), expected)) in
+    for (ordinal, ((pattern, operands, native_onepass), expected)) in
         fixtures::OPERANDS.iter().zip(expected.lines()).enumerate()
     {
+        // All selected programs have N<=18, so the independently proven
+        // small-program gate passes for both official and same-GCC budgets.
+        // Compare the eager default constructor to an actual Native result.
+        let expression = crate::Re2::new(pattern);
+        let retained = expression
+            .program
+            .as_ref()
+            .and_then(|program| program.onepass.as_ref())
+            .ok_or("default constructor did not retain OnePass analysis")?;
+        assert_eq!(
+            retained.is_one_pass,
+            *native_onepass,
+            "Native OnePass result through default constructor group {}",
+            ordinal + 1,
+        );
         let queries = operands
             .iter()
             .map(|&(context, begin, end)| Query {

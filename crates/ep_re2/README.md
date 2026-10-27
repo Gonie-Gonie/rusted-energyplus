@@ -22,8 +22,11 @@ Default forward cap698,995 comes from the pinned official binary's adjacent
 checked-constructor boundary, with the exact2xcap walk budget. The separate GCC
 unit cap is698,996; its observed Prog432-byte size is NOT the official DLL layout.
 Runtime supplies no guessed C++ size or DFA metadata. Explicit-layout metadata is
-test-only; both paths share graph passes. Boolean execution uses an anchored NFA,
-without unanchored prefix caches, OnePass or DFA caches.
+test-only; both paths share graph passes. The default constructor eagerly retains
+OnePass analysis, nodes and charge on the immutable compiled program. The proven
+header4/cap gate uses actual finalized size and byte classes, without choosing an
+exact private remaining-DFA-memory scalar. Boolean execution still uses the
+anchored NFA, without unanchored prefix acceleration or a production DFA cache.
 
 Two table functions compare 1,494 actual parse records, 100 rewrite records,
 23 selected complete program records and 10,607 constructor/match rows. Adjacent
@@ -53,8 +56,8 @@ source observer agrees on all 16 API records and 4,906 stderr bytes, including a
 post-parse compile failure. These are component observations, separate from the
 two successful physical pairs.
 
-Production OnePass/DFA cache accounting and resource stderr remain unconnected;
-the anchored NFA supplies boolean matching. Minimum-report-frequency overrides,
+Production DFA cache accounting and its resource stderr remain unconnected;
+OnePass analysis does not promote that behavior. Minimum-report-frequency overrides,
 excluded positive pre-scan families, unbound producers and output backends retain
 their existing boundaries. This is finite reporting evidence within Source A/B.
 External Options, capture extraction, unanchored/reverse search and CompileSet are
@@ -65,9 +68,12 @@ Constructor input is pattern_hex<TAB>text_hex; parse/program input is pattern he
 per line. The phase observer also takes required_prefix or simplify. All use
 explicit byte lengths.
 
-Test-only source accounting also retains the matched OnePass/longest-DFA components.
+Test-only exact-scalar accounting retains the same OnePass traversal and the
+matched longest-DFA component.
 The existing Native AST table checks 20 ordinary groups (861 ordered queries)
 against actual public Native records, using explicit same-GCC DWARF layout data.
-The heavy 2,362-group comparison remains external. These cfg(test) modules and
-reset traces add no production owner, official DLL layout, physical case or
-full-domain claim; production boolean execution remains the anchored NFA.
+The same table also checks eager default-constructor OnePass flags against those
+actual Native results; every selected program is within the proven small-size
+gate. The heavy 2,362-group comparison remains external. The cfg(test) exact-scalar
+and DFA/reset paths add no official DLL layout, physical case or full-domain
+claim; production boolean execution remains the anchored NFA.

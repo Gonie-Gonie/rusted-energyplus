@@ -62,13 +62,21 @@ not establish full-file or full-object parity. Valid-match DFA resource effects,
 minimum-report-frequency overrides and the existing runtime boundaries remain
 open.
 
-Test-only OnePass and anchored-DFA components now agree on all public fields
+OnePass and test-only anchored-DFA components agree on all public fields
 and wire bytes for 2,362 pattern groups, including 50,237 searches, 23 resource
-failures and six cache resets. Twenty small groups extend the existing table
-test; its two functions still finish in about 0.8 seconds. Separate successful
-official runs and a positive logging control identify the OnePass header and
-complete its cap-based budget gate proof. Official DFA accounting and runtime
-connection remain open; these component probes add no paired physical cases.
+failures and six cache resets. The default constructor now eagerly retains its
+OnePass result, node image and charge, using the proven official cap-based gate.
+Twenty small groups check that connection in the existing table; its two test
+functions still finish in about 0.8 seconds. Seven focused reporting-owner tests
+also pass. Boolean execution remains the anchored NFA. These checks add no Source
+CLI build or paired physical cases beyond Build72.
+
+Separate official runs identify the OnePass header and prove its budget gate.
+An actual 100,000-byte Zone name also reaches default failed-DFA diagnostics:
+the literal control and regex request both produce the same 96 timestamped ESO
+values. This demonstrates the official fallback output; official DFA accounting
+and its runtime connection remain open. These Native-only observations add no
+paired Source cases or full-domain claim.
 
 The current compatibility-mode arbitrary runtime covers the official
 `1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA

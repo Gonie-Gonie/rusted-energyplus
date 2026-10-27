@@ -46,8 +46,14 @@ pub(crate) struct ListsAndByteMap {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct ExecutableProgram {
     pub instructions: Vec<Inst>,
+    pub finalized_instructions: usize,
     pub start: u32,
     pub anchor_start: bool,
+    pub inst_count: [u32; 8],
+    pub bytemap_range: u32,
+    pub bytemap: [u8; 256],
+    /// None before the constructor's eager call; Some retains true or false.
+    pub onepass: Option<crate::native_onepass::OnePassAnalysis>,
 }
 
 #[cfg(test)]
@@ -135,11 +141,16 @@ pub(crate) fn finalize(
 /// unobserved sizeof or size_t width. Both Some(unit ABI) and None(official cap)
 /// front ends may produce this private boolean-only image.
 pub(crate) fn finalize_executable(mut front: FrontEnd) -> Result<ExecutableProgram, Status> {
-    let (lists, _, _) = finalize_lists(&mut front.graph)?;
+    let (lists, bytemap, bytemap_range) = finalize_lists(&mut front.graph)?;
     Ok(ExecutableProgram {
+        finalized_instructions: lists.instructions.len(),
         instructions: lists.instructions,
         start: lists.start,
         anchor_start: front.graph.anchor_start,
+        inst_count: lists.inst_count,
+        bytemap_range,
+        bytemap,
+        onepass: None,
     })
 }
 

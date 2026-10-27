@@ -1,7 +1,7 @@
 // Actual submitted operands and same-GCC layout; test-only fixture, not production defaults.
 pub(super) const LAYOUT: super::Layout = super::Layout { prog: 432, inst: 8, int: 4, uint32: 4, uint16: 2, size_t: 8, pointer: 8, one_state: 4, dfa: 200, dfa_state: 16, atomic_state_pointer: 8 };
 type QueryInput = (&'static [u8], usize, usize);
-type GroupInput = (&'static str, &'static [QueryInput]);
+type GroupInput = (&'static str, &'static [QueryInput], bool);
 pub(super) const OPERANDS: &[GroupInput] = &[
     ("", &[
         (b"", 0, 0),
@@ -47,7 +47,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("a", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -92,7 +92,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     (".", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -137,7 +137,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     (".*", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -182,7 +182,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("^a$", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -227,7 +227,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("(?m)^a$", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -272,7 +272,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("\\Aa\\z", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -317,7 +317,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("a|b", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -362,7 +362,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("(?:a|ab)*", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -407,7 +407,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("(a|aa)*b", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -453,7 +453,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], false),
     ("((a?)*)*", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -498,7 +498,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], false),
     ("(a*)+", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -543,7 +543,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], false),
     ("a{2,4}", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -588,7 +588,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("(?i)a", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -633,7 +633,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("(?i:a)b", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -678,7 +678,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("(?P<x>a)", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -723,7 +723,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("[a-c]", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -768,7 +768,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("\\C", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -813,7 +813,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("\\b.*", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -858,7 +858,7 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], true),
     ("\\P{Any}", &[
         (b"", 0, 0),
         (b"a", 0, 1),
@@ -903,5 +903,5 @@ pub(super) const OPERANDS: &[GroupInput] = &[
         (b"abc", 3, 3),
         (b"abcx", 3, 4),
         (b"abc ", 3, 3),
-    ]),
+    ], false),
 ];

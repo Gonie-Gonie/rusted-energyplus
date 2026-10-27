@@ -23,7 +23,7 @@
   ],
   "production_or_domain_completion_claim": false,
   "remaining": [
-    "Valid-match OnePass/DFA/cache resource diagnostics and target accounting",
+    "Valid-match DFA/cache resource diagnostics and target accounting",
     "Minimum-report-frequency override and remaining live reporting/runtime boundaries",
     "Full legal-value and object-domain completion"
   ],
@@ -318,5 +318,56 @@
       "sha256": "d14388a63f34ee6a853783cac0d576f3789a4f43d764bba78c6ba6caecbb3023",
       "bytes": 174032
     }
-  ]
+  ],
+  "default_constructor_onepass": {
+    "scope": "Eager production analysis after finalization; exact result/image/charge retained on immutable program. Boolean NFA unchanged; no production DFA or new physical claim.",
+    "accounting": "DefaultCap retains official C and actual finalized N, without an exact remaining-memory scalar. Same-build NativeScalar wire remains test-only.",
+    "official_header_inference": {
+      "path": ".runtime/porting/reporting-regex-72/official-onepass-header01/inference.json",
+      "sha256": "1f59f86b3d15b48496b10d9472f8902f915b909f7cef6587151eaddf507d6f06",
+      "bytes": 5635
+    },
+    "cap_gate_source_proof": {
+      "path": ".runtime/object-expansion/unit72-prep/official-onepass-gate-proof-proposal/proposal.json",
+      "sha256": "f2d9969e45a269f940bc297fe8c05966cd0bbfffa1326d8249c99c017e62b811",
+      "bytes": 6241
+    },
+    "adopted_proposal": {
+      "path": ".runtime/object-expansion/unit72-prep/production-onepass-proposal/proposal.json",
+      "sha256": "2cc81cac0149cc9900b8943d711fd66655b51ac4a2d91f16c89f51dfe583050c",
+      "bytes": 4532
+    },
+    "focused_quality": {
+      "path": ".runtime/object-expansion/unit72-prep/production-onepass-quality02/receipt.json",
+      "sha256": "d73a72b01d8c03161fa67a02c6efcf5e72faf33ce3df8ee88c84b42a133a9feb",
+      "bytes": 12890
+    },
+    "retained_default_groups": 20,
+    "new_test_functions": 0,
+    "kernel_test_functions_passed": 2,
+    "reporting_owner_tests_passed": 7,
+    "new_Source_CLI_builds": 0,
+    "paired_physical_cases_added": 0
+  },
+  "official_long_zone_fallback_observation": {
+    "literal_control": {
+      "path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/literal-control/review.json",
+      "sha256": "f04ff415dfa71b9ba29016cf6e79d318a91e703e6d6aa32e08cc1177e01b5155",
+      "bytes": 3159
+    },
+    "regex_pressure": {
+      "path": ".runtime/porting/reporting-regex-72/official-zone-pilot01/ambiguous-cache/review.json",
+      "sha256": "aae4aa042da876da9d92d3024f059361275b515e05c593b92068c4966578d125",
+      "bytes": 4208
+    },
+    "actual_Zone_key_bytes": 100000,
+    "actual_target_values_each": 96,
+    "timestamps_and_value_text_equal": true,
+    "actual_pressure_failed_DFA_logs_in_order": [
+      "CI",
+      "raw"
+    ],
+    "scope": "Two genuine successful Native-only processes; actual failed-DFA owner events and ESO membership/output. No private dispatch trace, official ABI/K inference or paired Source comparison.",
+    "paired_physical_cases_added": 0
+  }
 }
