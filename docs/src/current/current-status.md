@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 122 paired physical cases and 3,460,782 reported values with zero
+contains 124 paired physical cases and 3,475,926 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -49,6 +49,14 @@ existing loader assertions. `Schedule:File` comparisons cover hourly and
 20-minute data on February 29, distinct leap-day values, per-file daylight-saving
 controls and the next-day handoff. That controlled weather copies February 28
 meteorology; full schedule-domain completion remains open.
+
+Within the bounded one-Zone A/B route, `Zone.multiplier` accepts the Native
+signed owner's positive range, `1..=2147483647`. The actual getter, aggregate
+demand, air balance, meters and reports retain the live factor; per-Zone
+intensive state keeps its original meaning. Group/list factors remain one.
+Two multiplier-2 models compare their complete original profiles: 15,144 values
+have zero tolerance or RMSE failures, with exact Zone Information records,
+dictionaries and clocks. This finite evidence retains the other model limits.
 
 Reporting key matching uses the [Rust RE2 port](../../../crates/ep_re2/README.md)
 at pre-scan, request construction and live registration. Eager OnePass analysis,

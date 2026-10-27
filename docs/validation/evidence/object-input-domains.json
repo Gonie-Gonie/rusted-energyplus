@@ -126,7 +126,9 @@
       "narrow validated Source-admission fact covers only these consumed local alphas; legacy, unsupported enums, other Zone features and surface overrides stay bounded",
       "existing enum table checks all3x4 local selections with differing globals across A/B, actual raw/IP/projection/environment custody and legacy rejection",
       "same-input localSimple/MoWitt case matches original58/5352 and exact globalTARP/DOE-2 versus ZoneSimple/MoWitt EIO; the sole Native initial spelling-readback failure is retained with an independently complete corrected verifier",
-      "one-Zone implicit-Space geometry and multiplier1 remain runtime boundaries; grouping, authored Space partitions and positive local-environment consumers are not promoted"
+      "One-Zone implicit-Space Source now admits actual integer multipliers1..i32MAX with list_multiplier1, the existing compiler/getter defined signed-int range. The schema has no maximum; this is not a new schema limit. ZoneList/ZoneGroup, authored Space partitions, local-environment and other guarded physics remain unpromoted.",
+      "Source-linked consumer proof retains original multiplier products/divisions in predicted/sequenced demand, inlet sums/flow/moisture corrections, internal-gain meter factors, geometry/predefined/tabular area and ceiling ACH terms. Per-physical-Zone state is not blanket-scaled; PurchasedAir meter defaults stay1 because upstream equipment demand is already aggregate.",
+      "Two actual Source75 multiplier2 A/B pairs complete all58/5352 and102/9792 original profiles with unchanged policy rows, exact complete Zone EIO header/record2/list1 and ERR/END0/0. B retains genuine MTR absence with actual Source deleted-empty0owner. A retains fuelNone/+352/-352W; nonzero internal-fuel scaling is not established by this physical case. Separate authored live EnergyTransfer/shared normal-meter tests check factors1/2/i32MAX; they do not exercise OtherEquipment fuel registration."
     ],
     "Site:Location": [
       "Five finite numeric fields retain official latitude[-90,90], longitude[-180,180], timezone[-12,14], elevation[-300,8900) and omitted-zero defaults; nonblank named identity and raw keep-weather-file flag are retained.",
@@ -1492,6 +1494,127 @@
         },
         "new_test_functions": 0,
         "scope": "Actual ep_runtime fmt, strict all-target Clippy, optional native-controlled-air-cohort compilation and default library suite. Existing frequency/getter and owner bodies are extended; not a new full-workspace result."
+      },
+      "zone_multiplier_75": {
+        "actual_quality": {
+          "path": ".runtime/object-expansion/unit75-prep/multiplier-quality01/receipt.json",
+          "sha256": "1b425dc1ab0712328954ccb1eb25e238e5e61fcd5b82fe75fadc478b9cbd905d",
+          "bytes": 4349
+        },
+        "commands": [
+          {
+            "name": "fmt",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "fmt",
+              "-p",
+              "ep_run",
+              "-p",
+              "ep_compiler",
+              "-p",
+              "ep_runtime"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit75-prep/multiplier-quality01/fmt.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "clippy",
+              "-p",
+              "ep_run",
+              "-p",
+              "ep_compiler",
+              "-p",
+              "ep_runtime",
+              "--all-targets",
+              "--locked",
+              "--offline",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit75-prep/multiplier-quality01/clippy.log",
+              "sha256": "c0a41fe6a806d98dfb5120d6e0478dc59770424a626c70944439b147083cdc2a",
+              "bytes": 696
+            }
+          },
+          {
+            "name": "scope-tests",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "-p",
+              "ep_run",
+              "--lib",
+              "porting_scope::tests::",
+              "--locked",
+              "--offline"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit75-prep/multiplier-quality01/scope-tests.log",
+              "sha256": "5183dec838fd233d7c9c9c0dbc1b7f55b30f5631d3f268babfa0ac07ca031d72",
+              "bytes": 2640
+            }
+          },
+          {
+            "name": "compiler-zone-tests",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "-p",
+              "ep_compiler",
+              "--lib",
+              "compiler::tests::zone::",
+              "--locked",
+              "--offline"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit75-prep/multiplier-quality01/compiler-zone-tests.log",
+              "sha256": "36e568957fe13b50fdf0ab8ed287d681fba1365a57dc6427ae490a43d70f874d",
+              "bytes": 1267
+            }
+          },
+          {
+            "name": "meter-owner-test",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "-p",
+              "ep_runtime",
+              "--lib",
+              "heat_balance::source_output_registration::requested_input::scheduled_filter_tests::scheduled_filter_is_read_again_at_zone_handoff_and_does_not_filter_meter_energy",
+              "--locked",
+              "--offline",
+              "--",
+              "--exact"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit75-prep/multiplier-quality01/meter-owner-test.log",
+              "sha256": "c4294a96ad06f09ea43dad529cc6acf3387c6f41d0023b3be6f4e0d91a9c34b7",
+              "bytes": 867
+            }
+          }
+        ],
+        "focused_tests": {
+          "porting_scope": 19,
+          "compiler_zone": 5,
+          "live_meter_owner": 1,
+          "total_passed": 25,
+          "failed": 0
+        },
+        "new_test_functions": 0,
+        "scope": "Actual fmt and strict all-target Clippy for ep_run/ep_compiler/ep_runtime; only existing focused test bodies run. No new full-runtime/workspace suite, optional cohort or heavy replay."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -1501,7 +1624,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration.",
     "cases": [
       {
         "id": "timestep-8",
@@ -29409,12 +29532,360 @@
           "qualification": "Exact CRLF-bearing records are read from genuine EIO/ERR files; final warning counts0/1 are separate from wrapper support warnings. Cross-stream Warning-before-EIO order is source-derived, not dynamically traced."
         },
         "effective_state": "Actual per-child MINREPORTFREQUENCY=hour reaches connected raw option/getter/backend owners. Complete24-hour Hourly ESO/original MTR retain unchanged numeric limits and exact override/warning records. This finite A branch does not establish the original58-series profile, every minimum/model combination, unbound producers or unsupported backends."
+      },
+      {
+        "id": "ZONE-MULTIPLIER-2-A-24H",
+        "group": "zone_multiplier",
+        "source_build": "zone-multiplier-75",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-proposal/A-24H/input.idf",
+          "sha256": "4374f89de1fdf57cb82b387db624f691d6326f543dc9900fa7ffd4c91844c939",
+          "bytes": 9275
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/zone-multiplier-75/native-01/A-24H/command/receipt.json",
+          "sha256": "e88c92d338bc36d26d78efabe7837e1720a43921a83e5e1a3066b9246f316389",
+          "bytes": 8122
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/A-24H/command/receipt.json",
+          "sha256": "4283b987056a5138afc43fc422589161d147d8379a29d1fef288ffd4e04b9c12",
+          "bytes": 7271
+        },
+        "source_summary": {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/A-24H/output/run-summary.json",
+          "sha256": "1e72ee327bca773cab8e1501f9aaad7280705395d8b7c05dfe368f3a32f87940",
+          "bytes": 32334
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-75/eplus-rs.exe",
+          "sha256": "5e39a8786a11965fc2da862fd7206f84a7130f62d46ac6246d933bbd35337b33",
+          "bytes": 77867845
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/23/23d8eb17301a469bc3c1d089a3a4295a2367cf33edd2983fe0bef211cc762385",
+          "sha256": "23d8eb17301a469bc3c1d089a3a4295a2367cf33edd2983fe0bef211cc762385"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-75/receipt.json",
+          "sha256": "f70060fa0f6800bcc82088e2e89d87a590e8e688fd5622203cadb97e47f0f71a",
+          "bytes": 4672
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/A-24H/comparison.json",
+          "sha256": "25691a5358b18cc63b78525ee2089baaf97e0693d0798205df9b5c92f9eea707",
+          "bytes": 100069
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-source-proposal/plan.json",
+          "sha256": "e86ccc29fa27afad646a29eb1f04ea8fae83ac057438db3bee93edbdb22d3b86",
+          "bytes": 50417
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-proposal/A-24H/recipe.json",
+          "sha256": "202f046f46016a12020e90951ce2d5f6390ad45ab38d85020ff70f4d28f5fa4c",
+          "bytes": 6114
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3536,
+          "parsed_binary64_unequal": 3536,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All55 original named Timestep variables, exact physical dictionaries/IDs, one environment,96ordered clocks, finite values and catalog/count/footer/EOF.",
+          "MTR": "Original3Hourly series/72values, exact9dictionary rows/24clocks and owner/count/footer/EOF.",
+          "original_full_reported_profile_rows": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "A",
+          "all_original_variable_and_meter_policy_rows": true,
+          "derived_policy_rows": 0,
+          "numerical_limits_changed": false,
+          "qualification": "Only the Zone multiplier byte changes1->2. All original named selectors/atol/rtol/RMSE and96physical zone steps at4/hour remain unchanged; not a frozen input identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 7.429434845107608e-11,
+          "max_rmse_delta": 2.6337275432178338e-11,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 61,
+              "exact_timestamp_rows": 96,
+              "numeric_records": 5280,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a"
+            },
+            {
+              "stream": "mtr",
+              "exact_dictionary_entries": 9,
+              "exact_timestamp_rows": 24,
+              "numeric_records": 72,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "e69f8686f1acb7c4c588be644985f7dde61425dc0c5bb477127b891fb1cd1a5c"
+            }
+          ]
+        },
+        "multiplier_observation": {
+          "actual_Zone_multiplier": 2,
+          "actual_list_multiplier": 1,
+          "complete_Zone_EIO_header_and_record_bytes_equal": true,
+          "Source_Zone_EIO": {
+            "artifact": {
+              "path": ".runtime/porting/zone-multiplier-75/source-01/A-24H/output/eplusrs.eio",
+              "sha256": "1f21bf30ed13d5141418e04a2ab8b8992190f66fafb6a41135495de7f25b9c27",
+              "bytes": 15340
+            },
+            "header_hex": "21203c5a6f6e6520496e666f726d6174696f6e3e2c5a6f6e65204e616d652c4e6f7274682041786973207b6465677d2c4f726967696e20582d436f6f7264696e617465207b6d7d2c4f726967696e20592d436f6f7264696e617465207b6d7d2c4f726967696e205a2d436f6f7264696e617465207b6d7d2c43656e74726f696420582d436f6f7264696e617465207b6d7d2c43656e74726f696420592d436f6f7264696e617465207b6d7d2c43656e74726f6964205a2d436f6f7264696e617465207b6d7d2c547970652c5a6f6e65204d756c7469706c6965722c5a6f6e65204c697374204d756c7469706c6965722c4d696e696d756d2058207b6d7d2c4d6178696d756d2058207b6d7d2c4d696e696d756d2059207b6d7d2c4d6178696d756d2059207b6d7d2c4d696e696d756d205a207b6d7d2c4d6178696d756d205a207b6d7d2c4365696c696e6720486569676874207b6d7d2c566f6c756d65207b6d337d2c5a6f6e6520496e7369646520436f6e76656374696f6e20416c676f726974686d207b53696d706c652d44657461696c65642d4365696c696e6744696666757365722d54726f6d626557616c6c7d2c5a6f6e65204f75747369646520436f6e76656374696f6e20416c676f726974686d207b53696d706c652d44657461696c65642d546172702d4d6f576974742d444f452d322d424c4153547d2c20466c6f6f722041726561207b6d327d2c4578746572696f722047726f73732057616c6c2041726561207b6d327d2c4578746572696f72204e65742057616c6c2041726561207b6d327d2c4578746572696f722057696e646f772041726561207b6d327d2c204e756d626572206f662053757266616365732c204e756d626572206f662053756253757266616365732c204e756d626572206f662053686164696e672053756253757266616365732c202050617274206f6620546f74616c204275696c64696e6720417265610d0a",
+            "row_hex": "205a6f6e6520496e666f726d6174696f6e2c205a4f4e45204f4e452c302e302c302e30302c302e30302c302e30302c372e36322c372e36322c322e32392c312c322c312c302e30302c31352e32342c302e30302c31352e32342c302e30302c342e35372c342e35372c313036312e38382c544152502c444f452d322c3233322e32362c3237382e37312c3237382e37312c302e30302c362c302c302c5965730d0a",
+            "actual_Zone_multiplier": 2,
+            "actual_list_multiplier": 1
+          },
+          "Source_completion": {
+            "end": {
+              "path": ".runtime/porting/zone-multiplier-75/source-01/A-24H/output/eplusrs.end",
+              "sha256": "055fdfe7101e81515af69892d7bda751cc09e9d9e5178a21457ee8a91a5c986d",
+              "bytes": 98
+            },
+            "err": {
+              "path": ".runtime/porting/zone-multiplier-75/source-01/A-24H/output/eplusrs.err",
+              "sha256": "6ffe8af26f549d5fd97e274e90e242baca33c2bbe9b3fdd58680654ba60c5bf8",
+              "bytes": 892
+            },
+            "final_warnings": 0,
+            "severe_or_fatal": false,
+            "warning_and_continue_records_hex": []
+          },
+          "Native_raw_readback": {
+            "path": ".runtime/porting/zone-multiplier-75/native-01/readback.json",
+            "sha256": "f3e9e1e5726ce1214f920e391997be9b0ff56a9ae82bed83b6ee0b0e0b52dc6f",
+            "bytes": 9080
+          },
+          "Native_private_MTR_counter_observed": false,
+          "Source_MTR_owner": {
+            "deleted_empty": false,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\zone-multiplier-75\\source-01\\A-24H\\output\\eplusrs.mtr",
+            "reported_numeric_records": 72,
+            "series": 3,
+            "series_samples": [
+              {
+                "frequency": "hourly",
+                "key": null,
+                "kind": "meter",
+                "name": "ExteriorLights:Electricity",
+                "report_id": 25,
+                "samples": 24,
+                "store_type": "sum",
+                "units": "J"
+              },
+              {
+                "frequency": "hourly",
+                "key": null,
+                "kind": "meter",
+                "name": "EnergyTransfer:Building",
+                "report_id": 112,
+                "samples": 24,
+                "store_type": "sum",
+                "units": "J"
+              },
+              {
+                "frequency": "hourly",
+                "key": null,
+                "kind": "meter",
+                "name": "EnergyTransfer:Facility",
+                "report_id": 100,
+                "samples": 24,
+                "store_type": "sum",
+                "units": "J"
+              }
+            ],
+            "stream": "mtr"
+          },
+          "Source_MTR_present": true,
+          "genuine_Native_MTR_present": true
+        },
+        "effective_state": "Actual N6 getter multiplier2/list1 reaches the one-Zone implicit-Space A owners. Existing multiplier-aware intensive/extensive consumers complete all original reported series under unchanged policies and exact Zone EIO/ERR-END0/0. Finite pairs do not establish every integer/model combination, grouping, authored Space or other guarded physics.",
+        "physical_qualification": "Original OtherEquipment objects remain fuelNone and+352/-352W. This physical case does not prove nonzero internal fuel-meter scaling; the separate actual existing live meter-owner test checks1/2/i32MAX."
+      },
+      {
+        "id": "ZONE-MULTIPLIER-2-B-NOLIMIT-24H",
+        "group": "zone_multiplier",
+        "source_build": "zone-multiplier-75",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-proposal/B-NOLIMIT-24H/input.idf",
+          "sha256": "5ff7772d700a481497e4d031a31db8d7d375e16aafa74e1b3d257977e0f47496",
+          "bytes": 13025
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/zone-multiplier-75/native-01/B-NOLIMIT-24H/command/receipt.json",
+          "sha256": "db85d3c3bed1cb4423bf219885eca4ea3047783031fdbec44a28822114c94534",
+          "bytes": 8235
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/B-NOLIMIT-24H/command/receipt.json",
+          "sha256": "7621fe67d19d65137b380f4a7199b442658ab569afb8dfe0215ac5efe1fa0ada",
+          "bytes": 7387
+        },
+        "source_summary": {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/B-NOLIMIT-24H/output/run-summary.json",
+          "sha256": "f874b4593afc0eaf8f8d469a9c584115b6dc1a70534a69fe531c640b2028e7af",
+          "bytes": 60935
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-75/eplus-rs.exe",
+          "sha256": "5e39a8786a11965fc2da862fd7206f84a7130f62d46ac6246d933bbd35337b33",
+          "bytes": 77867845
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/23/23d8eb17301a469bc3c1d089a3a4295a2367cf33edd2983fe0bef211cc762385",
+          "sha256": "23d8eb17301a469bc3c1d089a3a4295a2367cf33edd2983fe0bef211cc762385"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-75/receipt.json",
+          "sha256": "f70060fa0f6800bcc82088e2e89d87a590e8e688fd5622203cadb97e47f0f71a",
+          "bytes": 4672
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/B-NOLIMIT-24H/comparison.json",
+          "sha256": "31b23f65cc7c7f40f1d11ce02697789bdaf43bc2241b871055961db075fa8d97",
+          "bytes": 155647
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-source-proposal/plan.json",
+          "sha256": "e86ccc29fa27afad646a29eb1f04ea8fae83ac057438db3bee93edbdb22d3b86",
+          "bytes": 50417
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-proposal/B-NOLIMIT-24H/recipe.json",
+          "sha256": "292211ae350faae4fe2c13c55be3b08350663aa56b40995d625cc27b558f34d6",
+          "bytes": 6169
+        },
+        "totals": {
+          "series": 102,
+          "samples": 9792,
+          "raw_operand_unequal": 0,
+          "parsed_binary64_unequal": 0,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All102 original named Timestep variables, exact physical dictionaries/IDs, one environment,96ordered clocks, finite values and catalog/count/footer/EOF.",
+          "MTR": "Genuine completed Native MTR absence and actual Source deleted_empty=true/0records/0series/[]; no file or rows fabricated.",
+          "original_full_reported_profile_rows": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "profile": "B",
+          "all_original_variable_and_meter_policy_rows": true,
+          "derived_policy_rows": 0,
+          "numerical_limits_changed": false,
+          "qualification": "Only the Zone multiplier byte changes1->2. All original named selectors/atol/rtol/RMSE and96physical zone steps at4/hour remain unchanged; not a frozen input identity."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 0.0,
+          "max_rmse_delta": 0.0,
+          "streams": [
+            {
+              "stream": "eso",
+              "exact_dictionary_entries": 108,
+              "exact_timestamp_rows": 96,
+              "numeric_records": 9792,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a"
+            },
+            {
+              "stream": "mtr",
+              "deleted_empty": true,
+              "numeric_records": 0
+            }
+          ]
+        },
+        "multiplier_observation": {
+          "actual_Zone_multiplier": 2,
+          "actual_list_multiplier": 1,
+          "complete_Zone_EIO_header_and_record_bytes_equal": true,
+          "Source_Zone_EIO": {
+            "artifact": {
+              "path": ".runtime/porting/zone-multiplier-75/source-01/B-NOLIMIT-24H/output/eplusrs.eio",
+              "sha256": "69e20d6bb6b20247a736dd448a88a322100c9acc778221454c5a6f6f8e589922",
+              "bytes": 12652
+            },
+            "header_hex": "21203c5a6f6e6520496e666f726d6174696f6e3e2c5a6f6e65204e616d652c4e6f7274682041786973207b6465677d2c4f726967696e20582d436f6f7264696e617465207b6d7d2c4f726967696e20592d436f6f7264696e617465207b6d7d2c4f726967696e205a2d436f6f7264696e617465207b6d7d2c43656e74726f696420582d436f6f7264696e617465207b6d7d2c43656e74726f696420592d436f6f7264696e617465207b6d7d2c43656e74726f6964205a2d436f6f7264696e617465207b6d7d2c547970652c5a6f6e65204d756c7469706c6965722c5a6f6e65204c697374204d756c7469706c6965722c4d696e696d756d2058207b6d7d2c4d6178696d756d2058207b6d7d2c4d696e696d756d2059207b6d7d2c4d6178696d756d2059207b6d7d2c4d696e696d756d205a207b6d7d2c4d6178696d756d205a207b6d7d2c4365696c696e6720486569676874207b6d7d2c566f6c756d65207b6d337d2c5a6f6e6520496e7369646520436f6e76656374696f6e20416c676f726974686d207b53696d706c652d44657461696c65642d4365696c696e6744696666757365722d54726f6d626557616c6c7d2c5a6f6e65204f75747369646520436f6e76656374696f6e20416c676f726974686d207b53696d706c652d44657461696c65642d546172702d4d6f576974742d444f452d322d424c4153547d2c20466c6f6f722041726561207b6d327d2c4578746572696f722047726f73732057616c6c2041726561207b6d327d2c4578746572696f72204e65742057616c6c2041726561207b6d327d2c4578746572696f722057696e646f772041726561207b6d327d2c204e756d626572206f662053757266616365732c204e756d626572206f662053756253757266616365732c204e756d626572206f662053686164696e672053756253757266616365732c202050617274206f6620546f74616c204275696c64696e6720417265610d0a",
+            "row_hex": "205a6f6e6520496e666f726d6174696f6e2c205a4f4e45204f4e452c302e302c302e30302c302e30302c302e30302c302e35302c302e35302c302e35302c312c322c312c302e30302c312e30302c302e30302c312e30302c302e30302c312e30302c312e30302c312e30302c544152502c444f452d322c312e30302c342e30302c342e30302c302e30302c362c302c302c5965730d0a",
+            "actual_Zone_multiplier": 2,
+            "actual_list_multiplier": 1
+          },
+          "Source_completion": {
+            "end": {
+              "path": ".runtime/porting/zone-multiplier-75/source-01/B-NOLIMIT-24H/output/eplusrs.end",
+              "sha256": "65d8727f5d496ca33de85b54ee247bc03dd0571f77e38facca3511b55429bd01",
+              "bytes": 98
+            },
+            "err": {
+              "path": ".runtime/porting/zone-multiplier-75/source-01/B-NOLIMIT-24H/output/eplusrs.err",
+              "sha256": "d47c074629d4574cb29937597af8b81a0f327a1bb77bfc0b405ea0e16ff112e1",
+              "bytes": 892
+            },
+            "final_warnings": 0,
+            "severe_or_fatal": false,
+            "warning_and_continue_records_hex": []
+          },
+          "Native_raw_readback": {
+            "path": ".runtime/porting/zone-multiplier-75/native-01/readback.json",
+            "sha256": "f3e9e1e5726ce1214f920e391997be9b0ff56a9ae82bed83b6ee0b0e0b52dc6f",
+            "bytes": 9080
+          },
+          "Native_private_MTR_counter_observed": false,
+          "Source_MTR_owner": {
+            "deleted_empty": true,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\zone-multiplier-75\\source-01\\B-NOLIMIT-24H\\output\\eplusrs.mtr",
+            "reported_numeric_records": 0,
+            "series": 0,
+            "series_samples": [],
+            "stream": "mtr"
+          },
+          "Source_MTR_present": false,
+          "genuine_Native_MTR_present": false
+        },
+        "effective_state": "Actual N6 getter multiplier2/list1 reaches the one-Zone implicit-Space B owners. Existing multiplier-aware intensive/extensive consumers complete all original reported series under unchanged policies and exact Zone EIO/ERR-END0/0. Finite pairs do not establish every integer/model combination, grouping, authored Space or other guarded physics."
       }
     ],
     "totals": {
-      "paired_cases": 122,
-      "reported_samples": 3460782,
-      "raw_operand_unequal": 710463,
+      "paired_cases": 124,
+      "reported_samples": 3475926,
+      "raw_operand_unequal": 713999,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -30626,6 +31097,23 @@
           "sha256": "05b9434e6a5e72a6c0bd2957fd68e357a65f74d6b06de4e07371a956b3cf1c6c",
           "bytes": 77869381
         }
+      },
+      {
+        "id": "zone-multiplier-75",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-75/receipt.json",
+          "sha256": "f70060fa0f6800bcc82088e2e89d87a590e8e688fd5622203cadb97e47f0f71a",
+          "bytes": 4672
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/23/23d8eb17301a469bc3c1d089a3a4295a2367cf33edd2983fe0bef211cc762385",
+          "sha256": "23d8eb17301a469bc3c1d089a3a4295a2367cf33edd2983fe0bef211cc762385"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-75/eplus-rs.exe",
+          "sha256": "5e39a8786a11965fc2da862fd7206f84a7130f62d46ac6246d933bbd35337b33",
+          "bytes": 77867845
+        }
       }
     ],
     "focused_since_workspace": {
@@ -30657,8 +31145,8 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 71,
-      "builds_with_accepted_paired_cases": 70,
+      "actual_recorded_builds": 72,
+      "builds_with_accepted_paired_cases": 71,
       "builds_with_only_retained_failed_Source_attempts": 1,
       "failed_attempts_in_paired_case_or_sample_totals": 0
     },
@@ -30787,6 +31275,61 @@
         "bytes": 1719
       },
       "scope": "Two complete same-input24-hour A frequency branches Hourly/hour,4actual series each/192total operands; no full58-profile or arbitrary legal-combination claim."
+    },
+    "current_Zone_multiplier_live_pair": {
+      "source_build": "zone-multiplier-75",
+      "case_rows": [
+        "ZONE-MULTIPLIER-2-A-24H",
+        "ZONE-MULTIPLIER-2-B-NOLIMIT-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/zone-multiplier-75/source-01/summary.json",
+        "sha256": "60a4ca15c3977b3b66b75ab3ac5842df146c67574ad805abc33cb8e0cf63d36c",
+        "bytes": 1795
+      },
+      "comparisons": [
+        {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/A-24H/comparison.json",
+          "sha256": "25691a5358b18cc63b78525ee2089baaf97e0693d0798205df9b5c92f9eea707",
+          "bytes": 100069
+        },
+        {
+          "path": ".runtime/porting/zone-multiplier-75/source-01/B-NOLIMIT-24H/comparison.json",
+          "sha256": "31b23f65cc7c7f40f1d11ce02697789bdaf43bc2241b871055961db075fa8d97",
+          "bytes": 155647
+        }
+      ],
+      "Native_index": {
+        "path": ".runtime/porting/zone-multiplier-75/native-01/launches.json",
+        "sha256": "5ddd4293c88860bc9f0eda2554cf04a59cce4af9c72bee0eb915fd16fbe8a18c",
+        "bytes": 1982
+      },
+      "Native_raw_readback": {
+        "path": ".runtime/porting/zone-multiplier-75/native-01/readback.json",
+        "sha256": "f3e9e1e5726ce1214f920e391997be9b0ff56a9ae82bed83b6ee0b0e0b52dc6f",
+        "bytes": 9080
+      },
+      "Root_independent_raw_reread": {
+        "path": ".runtime/object-expansion/unit75-prep/root-raw-readback01.json",
+        "sha256": "1b9bf3071abb4a268c869185c045d9bc7d387df629d87979a08b29f85a7250c2",
+        "bytes": 37700
+      },
+      "consumer_source_proof": {
+        "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-proposal/consumer-audit.json",
+        "sha256": "c34aac4e56fa1340a25f38aa39333008986c259046f249b61077658b7cb31a90",
+        "bytes": 17278
+      },
+      "code_admission_proposal": {
+        "path": ".runtime/object-expansion/unit75-prep/zone-multiplier-proposal/proposal.json",
+        "sha256": "1c7bfc2fa5529943acddda581ab7b6c834c65d1129a582cbb7d402d2f12f4f17",
+        "bytes": 4737
+      },
+      "Source_defined_scalar_range": [
+        1,
+        2147483647
+      ],
+      "list_multiplier": 1,
+      "scope": "One actual Zone/implicit Space and existing A/B physics. Defined signed-int range is not a schema maximum. Two full-profile multiplier2 pairs plus separate1/2/i32MAX owner checks do not establish arbitrary combinations or Group/List/Space execution."
     }
   },
   "additional_native_type_calibrations": [

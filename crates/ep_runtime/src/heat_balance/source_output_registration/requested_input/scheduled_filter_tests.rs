@@ -1074,43 +1074,53 @@ fn scheduled_filter_reads_live_ems_override_without_changing_schedule_report_val
 
 #[test]
 fn scheduled_filter_is_read_again_at_zone_handoff_and_does_not_filter_meter_energy() -> TestResult {
-    let (mut schedules, _) = live_schedules()?;
-    let mut output = output(
-        SourceReportFrequency::Hour,
-        SourceOutputStoreType::Sum,
-        true,
-    );
-    let mut update = Update::new();
-    let mut files = Files::default();
-    output.initialize_output(15, &mut files)?;
-    output.attach_source_energy_transfer_meters(
-        SourceOutputUnits::J,
-        SourceEnergyTransferMeterArguments {
-            end_use: SourceMeterEndUse::Heating,
-            end_use_subcategory: "",
-            zone_name: "",
-            zone_multiplier: 1,
-            zone_list_multiplier: 1,
-        },
-        0,
-    )?;
-    output.meter_values = vec![0.0; output.meters.meters.len()];
-    output.out_vars[0].time_step_type = TimeStepKind::System;
-    update.hvac.time_step_sys = 0.25;
-    schedules.schedules[VALUE.0].current_value = 8.0;
-    update.step(&mut output, &schedules, TimeStepKind::System, &mut files)?;
-    assert_eq!(output.out_vars[0].this_time_step_count, 1);
-    schedules.schedules[FILTER.0].current_value = 0.0;
-    update.clock.end_hour_flag = true;
-    update.step(&mut output, &schedules, TimeStepKind::Zone, &mut files)?;
-    assert_eq!(files.reported_values()?, vec![0.0]);
-    assert_eq!(output.out_vars[0].external_interface_time_step_value, 8.0);
-    assert!(!output.meters.meters.is_empty());
-    for meter in &output.meters.meters {
-        assert_eq!(
-            meter.periods[SourceReportFrequency::Simulation as usize].value,
-            8.0
+    for multiplier in [1_i32, 2, i32::MAX] {
+        let (mut schedules, _) = live_schedules()?;
+        let mut output = output(
+            SourceReportFrequency::Hour,
+            SourceOutputStoreType::Sum,
+            true,
         );
+        // Authored registered-variable factors exercise the real live meter path;
+        // the source-backed getter/cohort and physical cases own input custody.
+        output.out_vars[0].zone_multiplier = multiplier;
+        let mut update = Update::new();
+        let mut files = Files::default();
+        output.initialize_output(15, &mut files)?;
+        output.attach_source_energy_transfer_meters(
+            SourceOutputUnits::J,
+            SourceEnergyTransferMeterArguments {
+                end_use: SourceMeterEndUse::Heating,
+                end_use_subcategory: "",
+                zone_name: "",
+                zone_multiplier: multiplier,
+                zone_list_multiplier: 1,
+            },
+            0,
+        )?;
+        output.meter_values = vec![0.0; output.meters.meters.len()];
+        output.out_vars[0].time_step_type = TimeStepKind::System;
+        update.hvac.time_step_sys = 0.25;
+        schedules.schedules[VALUE.0].current_value = 8.0;
+        assert_eq!(
+            output.instant_source_meter_value(0, TimeStepKind::System, &schedules)?,
+            8.0 * f64::from(multiplier),
+        );
+        update.step(&mut output, &schedules, TimeStepKind::System, &mut files)?;
+        assert_eq!(output.out_vars[0].this_time_step_count, 1);
+        schedules.schedules[FILTER.0].current_value = 0.0;
+        update.clock.end_hour_flag = true;
+        update.step(&mut output, &schedules, TimeStepKind::Zone, &mut files)?;
+        assert_eq!(files.reported_values()?, vec![0.0]);
+        assert_eq!(output.out_vars[0].external_interface_time_step_value, 8.0);
+        assert!(!output.meters.meters.is_empty());
+        for meter in &output.meters.meters {
+            assert_eq!(
+                meter.periods[SourceReportFrequency::Simulation as usize].value,
+                8.0 * f64::from(multiplier)
+            );
+        }
     }
+
     Ok(())
 }

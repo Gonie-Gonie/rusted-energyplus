@@ -519,6 +519,92 @@ fn default_controls_and_source_adjustments_are_observable() {
             );
         }
     }
+    // This field is consumed by the same real raw/IP/getter owners. Admission
+    // covers its Native-defined integer range, rather than one example scalar.
+    let weather = single_day_weather_fixture();
+    for scope in [PortingScope::A, PortingScope::B] {
+        for multiplier in [1_u32, 2, 3, 65_535, i32::MAX as u32] {
+            let mut authored = input(scope);
+            authored["Zone"]["Zone"]["multiplier"] = json!(multiplier);
+            let raw = parse_epjson_str(&authored.to_string()).expect("actual Zone multiplier");
+            let compiled = compile_raw_model(&raw);
+            let model = compiled
+                .model
+                .as_ref()
+                .expect("Native-defined typed multiplier");
+            assert_eq!(model.zones[0].multiplier, multiplier);
+            assert_eq!(model.zones[0].list_multiplier, 1);
+            let ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .expect("actual multiplier input owner");
+            let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+                .expect("real retained Zone numeric operand");
+            assert_eq!(
+                projected.objects["Zone"][0].fields.get("multiplier"),
+                Some(
+                    &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                        f64::from(multiplier)
+                    )
+                ),
+            );
+            let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+            assert!(
+                admitted.admissible,
+                "{scope:?}/{multiplier}: {:?}",
+                admitted.violations
+            );
+            assert_eq!(admitted.production["conformance_claim"], false);
+            admitted.environment = Some(
+                super::environment::environment_from_weather(
+                    model,
+                    &weather,
+                    "embedded Zone multiplier weather",
+                )
+                .expect("same genuine EPW/calendar operands"),
+            );
+            let admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+                    .expect("all real Source admission guards");
+            let actual = crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission),
+            );
+            assert!(
+                actual.allows_rust_runtime(),
+                "{scope:?}/{multiplier}: {:?}",
+                actual.diagnostics
+            );
+            // The independent group restriction is not broadened by a positive
+            // Zone multiplier, including the largest representable scalar.
+            let mut grouped = model.clone();
+            grouped.zones[0].list_multiplier = 2;
+            let group_trace = inspect_porting_scope(&raw, &compiled.report, Some(&grouped), scope);
+            assert!(!group_trace.admissible);
+            assert!(
+                group_trace
+                    .violations
+                    .iter()
+                    .any(|v| v.contains("ZoneGroup/list"))
+            );
+        }
+        for multiplier in [json!(0), json!(-1), json!(1.5), json!(2147483648_u64)] {
+            let mut authored = input(scope);
+            authored["Zone"]["Zone"]["multiplier"] = multiplier;
+            let raw = parse_epjson_str(&authored.to_string()).expect("numeric raw multiplier");
+            let compiled = compile_raw_model(&raw);
+            assert!(compiled.has_errors());
+            assert!(compiled.model.is_none());
+            assert!(!inspect_porting_scope(&raw, &compiled.report, None, scope).admissible);
+        }
+    }
 }
 
 #[test]

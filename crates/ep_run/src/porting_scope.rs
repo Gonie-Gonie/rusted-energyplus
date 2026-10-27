@@ -351,9 +351,16 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         }
     }
     for zone in &model.zones {
-        if zone.multiplier != 1 || zone.list_multiplier != 1 {
+        // The real getter stores Zone N6 in a Native signed int. All live
+        // one-Zone consumers retain this factor; the schema itself has no max.
+        // Keep the defined-conversion boundary and the independent group gate.
+        if zone.multiplier == 0 || zone.multiplier > i32::MAX as u32 {
+            violations.push("zone multiplier must fit a positive Native signed int".into());
+        }
+        if zone.list_multiplier != 1 {
             violations.push(
-                "zone/group multipliers other than one are outside the selected inputs".into(),
+                "ZoneGroup/list multipliers other than one remain outside the selected inputs"
+                    .into(),
             );
         }
         if !matches!(

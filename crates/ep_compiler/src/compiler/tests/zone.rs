@@ -245,6 +245,12 @@ fn zone_rejects_invalid_names_ranges_types_and_enums() -> Result<(), Box<dyn std
             Some("multiplier"),
         ),
         (
+            r#"{"Zone":{"Above Native Range":{"multiplier":2147483648}}}"#,
+            "InvalidNumericRange",
+            "Above Native Range",
+            Some("multiplier"),
+        ),
+        (
             r#"{"Zone":{"Bad Inside":{"zone_inside_convection_algorithm":"Unknown"}}}"#,
             "InvalidEnumValue",
             "Bad Inside",
