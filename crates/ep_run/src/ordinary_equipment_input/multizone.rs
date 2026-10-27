@@ -91,6 +91,26 @@ fn legal_exposure(row: &RawObject, field: &str, values: &[&str]) -> bool {
     }
 }
 
+// Actual contiguous input references, not a construction/property producer.
+// Native opaque reversal compares material identity; equal thermal values of
+// differently named materials never substitute for the same layer reference.
+fn construction_layers(row: &RawObject) -> Result<Vec<&str>, String> {
+    let mut layers =
+        vec![text(row, "outside_layer").ok_or("paired Wall actual outside Material reference")?];
+    let mut ended = false;
+    for number in 2..=10 {
+        match row.fields.get(&FieldName(format!("layer_{number}"))) {
+            None => ended = true,
+            Some(RawValue::String(value)) if value.is_empty() => ended = true,
+            Some(RawValue::String(value)) if !ended && !value.trim().is_empty() => {
+                layers.push(value);
+            }
+            _ => return Err("paired Walls require contiguous actual Material references".into()),
+        }
+    }
+    Ok(layers)
+}
+
 // Input-only checks; canonical World coordinates are checked by the typed scope.
 // Native Source getters still produce and validate every scientific owner.
 fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
@@ -101,6 +121,9 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
         return Ok(());
     };
     let constructions = raw.objects.get(&ObjectType("Construction".into()));
+    let infrared = raw
+        .objects
+        .get(&ObjectType("Material:InfraredTransparent".into()));
     let zones = raw.objects.get(&ObjectType("Zone".into()));
     for (name, row) in surfaces {
         if !text(row, "outside_boundary_condition")
@@ -155,25 +178,36 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
         if multiplier(zone_name).is_none() || multiplier(zone_name) != multiplier(other_zone_name) {
             return Err("paired Walls require equal actual Zone multipliers".into());
         }
-        let construction =
-            text(row, "construction_name").ok_or("paired Wall actual Construction")?;
-        if !text(other, "construction_name").is_some_and(|v| v.eq_ignore_ascii_case(construction)) {
-            return Err("paired Walls require the same single-layer Construction".into());
+        let mut layers = Vec::with_capacity(2);
+        for surface in [row, other] {
+            let name =
+                text(surface, "construction_name").ok_or("paired Wall actual Construction")?;
+            let (_, construction) = constructions
+                .and_then(|rows| {
+                    rows.iter()
+                        .find(|(key, _)| key.0.eq_ignore_ascii_case(name))
+                })
+                .ok_or("paired Wall actual Construction target")?;
+            layers.push(construction_layers(construction)?);
         }
-        let Some((_, construction)) = constructions.and_then(|rows| {
-            rows.iter()
-                .find(|(name, _)| name.0.eq_ignore_ascii_case(construction))
-        }) else {
-            return Err("paired Wall actual Construction target".into());
-        };
-        if text(construction, "outside_layer").is_none()
-            || construction.fields.iter().any(|(field, value)| {
-                field.0.starts_with("layer_")
-                    && !matches!(value, RawValue::String(v) if v.trim().is_empty())
-                    && !matches!(value, RawValue::Null)
-            })
+        if layers.iter().any(|stack| {
+            stack.len() > 1
+                && infrared.is_some_and(|rows| {
+                    stack.iter().any(|material| {
+                        rows.keys()
+                            .any(|name| name.0.eq_ignore_ascii_case(material))
+                    })
+                })
+        }) {
+            return Err("paired IRT Construction must retain its sole Material layer".into());
+        }
+        if layers[0].len() != layers[1].len()
+            || !layers[0]
+                .iter()
+                .zip(layers[1].iter().rev())
+                .all(|(left, right)| left.eq_ignore_ascii_case(right))
         {
-            return Err("paired Walls require one actual construction layer".into());
+            return Err("paired Walls require exactly reversed opaque Material references".into());
         }
     }
     Ok(())

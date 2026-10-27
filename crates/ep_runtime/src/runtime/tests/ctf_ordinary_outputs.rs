@@ -887,6 +887,166 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 assert_eq!(text.contains("Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed"),wind_mask!=0);
             }
         }
+        // Authored reached material checkpoints feed the REAL Construction
+        // getter below. Its real LayerPoint/MaterialMap association, not a
+        // typed-ordinal cast or thermal-property comparison, then reaches the
+        // actual reconciliation child. No completed Native/CTF endpoint is claimed.
+        let stack_cases: &[(&[i32], &[i32], bool, bool)] = &[
+            (&[1], &[1], false, true),
+            (&[1,2], &[2,1], false, true),
+            (&[1,2,3], &[3,2,1], false, true),
+            (&[1,2,3,1,2,3,1,2,3,1], &[1,3,2,1,3,2,1,3,2,1], false, true),
+            (&[1,2,1], &[1,2,1], true, true),
+            (&[1,2], &[1,2], false, false),
+            (&[1,2], &[2,1], true, false),
+            (&[1,2], &[3,2,1], false, false),
+            (&[1,2], &[2,3], false, false),
+        ];
+        for &(left, right, same_constructor, succeeds) in stack_cases {
+            use crate::heat_balance::selected_heat_balance_input::ConstructionMaterialOwners;
+            use crate::heat_balance::selected_material_data::{SelectedMaterialData, SourceMaterialGroup};
+            use crate::heat_balance::selected_project_data::{ProjectInputObject, ProjectInputValue};
+            use crate::heat_balance::selected_input_processor::{SourceObjectDefinition, SourceObjectShape, SourceInputFamily};
+            let names = ["STACK MAT ONE", "STACK MAT TWO", "STACK MAT THREE"];
+            let mut stack_model = owners.model.clone();
+            let original = stack_model.materials[0].clone();
+            stack_model.materials = names.iter().enumerate().map(|(index,name)| {
+                let mut material = original.clone();
+                material.id = MaterialId(u32::try_from(index)?);
+                material.name = NormalizedName::new(name);
+                Ok(material)
+            }).collect::<Result<Vec<_>,std::num::TryFromIntError>>()?;
+            stack_model.material_names=Default::default();
+            for material in &stack_model.materials {
+                assert!(stack_model.material_names.insert(&material.name.0,material.id).is_none());
+            }
+            assert!(matches!(original.definition,ep_model::MaterialDefinition::NoMass(_)),
+                "the authored reached Material checkpoint is genuinely resistance-only");
+            stack_model.ctf_report_names.materials = stack_model.materials.iter()
+                .zip(names).map(|(material,name)|(material.id,name.into())).collect();
+            let original = stack_model.constructions[0].clone();
+            stack_model.constructions.clear();
+            for (index,(name,points)) in [("STACK LEFT",left),("STACK RIGHT",right)].into_iter().enumerate() {
+                let mut construction = original.clone();
+                construction.id = ConstructionId(u32::try_from(index)?);
+                construction.name = NormalizedName::new(name);
+                construction.layers = points.iter().map(|point| u32::try_from(point-1).map(MaterialId))
+                    .collect::<Result<Vec<_>,_>>()?;
+                construction.outside_layer=construction.layers.first().copied();
+                stack_model.constructions.push(construction);
+            }
+            stack_model.construction_names=Default::default();
+            for construction in &stack_model.constructions {
+                assert!(stack_model.construction_names.insert(&construction.name.0,construction.id).is_none());
+            }
+            stack_model.ctf_report_names.constructions = vec![
+                (ConstructionId(0),"STACK LEFT".into()),(ConstructionId(1),"STACK RIGHT".into())];
+            let mut material_checkpoint = SelectedMaterialData::default();
+            for (index,material) in stack_model.materials.iter().enumerate() {
+                material_checkpoint.materials.push(material.id);
+                material_checkpoint.nominal_r.push(material.thermal_resistance().ok_or("authored reached material resistance")?);
+                material_checkpoint.material_map.insert(names[index].into(),i32::try_from(index+1)?);
+                material_checkpoint.material_groups.insert(material.id,SourceMaterialGroup::Regular);
+                material_checkpoint.resistance_only.insert(material.id,true);
+            }
+            let mut objects = Vec::new();
+            for (name,points) in [("STACK LEFT",left),("STACK RIGHT",right)] {
+                let mut fields = std::collections::BTreeMap::new();
+                for (index,point) in points.iter().enumerate() {
+                    let field = if index==0 { "outside_layer".into() } else { format!("layer_{}",index+1) };
+                    fields.insert(field,ProjectInputValue::String(names[usize::try_from(point-1)?].into()));
+                }
+                objects.push(ProjectInputObject { object_name:name.into(),fields,idf_max_fields:None });
+            }
+            let construction_raw = crate::heat_balance::selected_heat_balance_input::SelectedHeatBalanceInput {
+                source_is_epjson:true,objects:std::collections::BTreeMap::from([("Construction".into(),objects)]),
+                ..Default::default()
+            };
+            let mut stack_input = SelectedInputProcessor::from_admitted_input(
+                vec![SourceObjectDefinition { object_type:"Construction".into(),alpha_fields:11,numeric_fields:0,
+                    alpha_extensions:0,numeric_extensions:0,extension:None }],
+                std::collections::BTreeMap::from([("Construction".into(),SourceInputFamily::Objects(
+                    ["STACK LEFT","STACK RIGHT"].map(|name|SourceObjectShape {
+                        object_name:name.into(),field_sizes:Default::default()
+                    }).into()))]),
+            )?;
+            let mut stack_shortcut = SourceInputProcessorShortCut::default();
+            stack_shortcut.allocate_from_input(&stack_input)?;
+            let mut bounds = crate::heat_balance::selected_simulation_startup::SelectedConstructionBounds::default();
+            bounds.set_preconstruction_input_parameters(&stack_input)?;
+            let mut stack_control = SelectedHeatBalanceInputState::default();
+            let (mut stack_errors,mut stack_console) = (Vec::new(),Vec::new());
+            let mut stack_state = ctf_ordinary_output_test_state(); stack_state.output_error_header=false;
+            let mut backend = SourceErrorBackend {
+                state:&mut stack_state,error_stream:Some(&mut stack_errors),console:&mut stack_console,
+                out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+            };
+            let mut errors = false;
+            stack_control.read_regular_construction_arguments(
+                &construction_raw,ConstructionMaterialOwners { model:&stack_model,data:&material_checkpoint,bounds:&bounds },
+                &mut stack_input,&mut stack_shortcut,&mut String::new(),&mut backend,&mut errors,
+            )?;
+            assert!(!errors);
+            for (name,expected) in [("STACK LEFT",left),("STACK RIGHT",right)] {
+                let row = stack_control.construction_usage.iter().find(|row|row.name==name)
+                    .ok_or("actual constructed stack")?;
+                assert_eq!(row.total_layers, i32::try_from(expected.len())?);
+                assert_eq!(&row.layer_points[..expected.len()],expected);
+            }
+            let before_warnings = backend.state.tracking.total_warning_errors;
+            let template = raw.final_surfaces.as_ref().ok_or("authored stack pair")?.iter()
+                .find(|row|row.row.class==SurfaceClass::Wall).ok_or("authored stack Wall")?;
+            let mut rows = vec![template.clone(),template.clone()];
+            for (index,final_row) in rows.iter_mut().enumerate() {
+                final_row.typed_id=None;
+                let row=&mut final_row.row;
+                row.name=if index==0 { "STACK LEFT WALL" } else { "STACK RIGHT WALL" }.into();
+                row.zone_name=if index==0 { "STACK LEFT ZONE" } else { "STACK RIGHT ZONE" }.into();
+                row.zone=i32::try_from(index+1)?;row.space=row.zone;row.base_surface=row.zone;
+                row.exterior_boundary = -999;
+                row.exterior_boundary_name=if index==0 { "STACK RIGHT WALL" } else { "STACK LEFT WALL" }.into();
+                let name=if index==0 || same_constructor { "STACK LEFT" } else { "STACK RIGHT" };
+                row.construction=i32::try_from(stack_control.construction_usage.iter()
+                    .position(|row|row.name==name).ok_or("actual stack construction number")?+1)?;
+                row.exterior_solar=false;row.exterior_wind=false;
+                if index==1 { row.vertex.as_mut().ok_or("authored stack reverse vertices")?.reverse(); }
+                let points=row.vertex.as_ref().ok_or("authored stack vertices")?.iter().map(|vertex| {
+                    let [x_m,y_m,z_m]=vertex.ok_or("authored written stack vertex")?;
+                    Ok(ep_model::Point3 { x_m,y_m,z_m })
+                }).collect::<Result<Vec<_>,&str>>()?;
+                let normal=crate::geometry::source_normal_area(&points);
+                let orientation=crate::geometry::orientation_from_normal(&points,normal.newell_normal);
+                row.area=normal.gross_area_m2;row.gross_area=normal.gross_area_m2;
+                row.vertex_progress.normal_area=Some(normal);
+                row.vertex_progress.orientation_return=Some(orientation);
+                row.vertex_progress.properties=Some(crate::geometry::finish_get_vertices_properties(normal,orientation));
+            }
+            let mut zones=owners.zones.clone();
+            let first=zones.zones.as_ref().ok_or("authored stack Zones")?[0].clone();
+            zones.zones=Some(vec![first.clone(),first]);
+            for (index,row) in zones.zones.as_mut().ok_or("authored stack Zones")?.iter_mut().enumerate() {
+                row.name=if index==0 { "STACK LEFT ZONE" } else { "STACK RIGHT ZONE" }.into();
+                row.typed_zone_id=None;row.multiplier=1;row.list_multiplier=1;
+                row.num_spaces=1;row.space_indexes=vec![i32::try_from(index+1)?];
+            }
+            let first=zones.spaces.as_ref().ok_or("authored stack Spaces")?[0].clone();
+            zones.spaces=Some(vec![first.clone(),first]);
+            for (index,row) in zones.spaces.as_mut().ok_or("authored stack Spaces")?.iter_mut().enumerate() {
+                row.name=if index==0 { "STACK LEFT ZONE" } else { "STACK RIGHT ZONE" }.into();
+                row.zone_num=i32::try_from(index+1)?;row.typed_space_id=None;
+            }
+            let mut globals=owners.globals.clone();globals.num_of_zones=2;globals.num_spaces=2;
+            let pair_owners=SurfaceGetterOwners { model:&stack_model,environment:owners.environment,
+                input:&mut stack_input,shortcut:&mut stack_shortcut,zones:&mut zones,control:&mut stack_control,globals:&globals };
+            let mut pair=raw.clone();pair.moved_surfaces=2;pair.total_surfaces=2;pair.final_surfaces=Some(rows);
+            let result=pair.reconcile_opaque_surface_boundaries(&pair_owners,&mut backend,None);
+            if succeeds { result?; } else { assert!(result.is_err()); }
+            let rows=pair.final_surfaces.as_ref().ok_or("retained actual stack reconciliation rows")?;
+            assert_eq!(rows[0].row.exterior_boundary,2);
+            assert_eq!(rows[1].row.exterior_boundary,if succeeds { 1 } else { -999 });
+            assert_eq!(backend.state.tracking.total_warning_errors,before_warnings,
+                "mismatches remain an explicit boundary before unported Native diagnostics");
+        }
         assert!(raw.final_surfaces.as_ref().ok_or("actual pre-override Surface algorithm rows")?.iter()
             .all(|surface| surface.row.heat_transfer_algorithm == crate::heat_balance::selected_heat_balance_input::SelectedHeatTransferModel::Invalid));
         raw.report_surface_input_diagnostics(&mut context.backend)?;

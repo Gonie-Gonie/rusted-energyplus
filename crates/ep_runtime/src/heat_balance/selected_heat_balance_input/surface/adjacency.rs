@@ -168,9 +168,10 @@ impl SurfaceGeometryInputState {
                 .construction_usage
                 .get(index(adjacent.construction)?)
                 .ok_or(Error::Unavailable("actual adjacent Source Construction"))?;
-            if surface.construction != adjacent.construction
-                || construction.total_layers != 1
-                || adjacent_construction.total_layers != 1
+            if !(1..=10).contains(&construction.total_layers)
+                || construction.total_layers != adjacent_construction.total_layers
+                || (construction.type_is_irt && construction.total_layers != 1)
+                || (adjacent_construction.type_is_irt && adjacent_construction.total_layers != 1)
                 || construction.type_is_window
                 || adjacent_construction.type_is_window
                 || construction.type_is_air_boundary
@@ -179,11 +180,12 @@ impl SurfaceGeometryInputState {
                 || adjacent_construction.source_sink_present
             {
                 return Err(Error::Unavailable(
-                    "bounded same single-layer Source Construction",
+                    "bounded equal-count opaque Source Constructions",
                 ));
             }
             // CheckForReversedLayers15495-15500: same actual LayerPoint takes
-            // the continue fast path; distinct material/glass branches stay held.
+            // the continue fast path at EACH reversed position, including distinct
+            // Construction owners. Different opaque IDs and glass branches stay held.
             let layers = usize::try_from(construction.total_layers)
                 .map_err(|_| Error::Unavailable("actual paired TotLayers"))?;
             for layer in 0..layers {

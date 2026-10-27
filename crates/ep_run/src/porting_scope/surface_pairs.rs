@@ -35,6 +35,10 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                         .constructions
                         .iter()
                         .find(|c| c.id == surface.construction);
+                    let adjacent_construction = model
+                        .constructions
+                        .iter()
+                        .find(|c| c.id == other.construction);
                     let zone = model.zones.iter().find(|z| z.id == surface.zone);
                     let other_zone = model.zones.iter().find(|z| z.id == other.zone);
                     other.outside_boundary_condition == OutsideBoundaryCondition::Surface
@@ -44,17 +48,26 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                         && other.space != surface.space
                         && surface.surface_type == SurfaceType::Wall
                         && other.surface_type == SurfaceType::Wall
-                        && surface.construction == other.construction
-                        && construction.is_some_and(|c| {
-                            c.layers.len() == 1 && c.internal_heat_source.is_none()
-                        })
+                        && construction
+                            .zip(adjacent_construction)
+                            .is_some_and(|(a, b)| {
+                                let left = a.effective_layers();
+                                let right = b.effective_layers();
+                                a.is_ordinary_opaque()
+                                    && b.is_ordinary_opaque()
+                                    && !a.has_internal_heat_source()
+                                    && !b.has_internal_heat_source()
+                                    && (1..=10).contains(&left.len())
+                                    && left.len() == right.len()
+                                    && left.iter().eq(right.iter().rev())
+                            })
                         && zone.zip(other_zone).is_some_and(|(a, b)| {
                             a.multiplier == b.multiplier && a.list_multiplier == b.list_multiplier
                         })
                         && reversed_coincident(&surface.vertices, &other.vertices)
                 });
         if !valid {
-            violations.push(format!("{} requires the bounded reciprocal Source A Wall pair with identical single-layer Construction, equal Zone factors and reversed coincident World vertices", surface.name.0));
+            violations.push(format!("{} requires the bounded reciprocal Source A Wall pair with exactly reversed opaque Construction layers, equal Zone factors and reversed coincident World vertices", surface.name.0));
         }
     }
 }

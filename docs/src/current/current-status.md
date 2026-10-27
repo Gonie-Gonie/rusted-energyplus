@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 133 paired physical cases and 3,561,054 reported values with zero
+contains 134 paired physical cases and 3,571,134 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -67,13 +67,19 @@ agree within the explicitly recorded version-header and line-ending boundaries.
 
 Explicit Source A also accepts multiple closed opaque Zones, each with its
 implicit Space and no internal gains or equipment. Reciprocal interzone Wall
-pairs require the same single-layer normal or infrared-transparent construction,
-equal Zone factors and opposite coincident vertices. Five 24-hour two-Zone
-cases cover 50,400 derived values with zero tolerance or RMSE failures;
+pairs accept exactly reversed opaque stacks of one to ten layers; an
+infrared-transparent construction retains its sole layer. They require equal
+Zone factors and opposite coincident vertices. Six 24-hour two-Zone
+cases cover 60,480 derived values with zero tolerance or RMSE failures;
 the maximum absolute difference is 1.37e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Explicit
 Spaces, groups, multi-Zone equipment and broader interzone combinations remain open.
+
+The distinct reversed two-layer case also matches all emitted CTF records.
+Its original 30-day warmup allowance failed in Native; a separate input changes
+only that allowance to 100 days and converges after 32, with unchanged convergence
+tolerances. The original failed reference remains unaccepted.
 
 Paired Walls accept the legal Sun/Wind exposure enums, omission and empty defaults.
 IDF and direct epJSON comparisons preserve their distinct warning labels and

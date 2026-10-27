@@ -632,6 +632,138 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
         }
     }
+    // Input-owned exact reverse stacks, not thermal-property equivalence.
+    // The compiler creates all natural Material/Construction IDs; no vectors or
+    // IDs are rearranged to manufacture a Source-order mismatch.
+    let material_names = [
+        "STACK A", "STACK B", "STACK C", "STACK D", "STACK E", "STACK F", "STACK G", "STACK H",
+        "STACK I", "STACK J",
+    ];
+    let construction_value = |names: &[&str]| {
+        Value::Object(
+            names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        if index == 0 {
+                            "outside_layer".into()
+                        } else {
+                            format!("layer_{}", index + 1)
+                        },
+                        json!(name),
+                    )
+                })
+                .collect(),
+        )
+    };
+    let mut stacks = paired.clone();
+    let material = stacks["Material:NoMass"]["Opaque"].clone();
+    for name in material_names {
+        // Identical physical properties deliberately do not make distinct
+        // Native material identities interchangeable in the reverse check.
+        stacks["Material:NoMass"][name] = material.clone();
+    }
+    for (count, same_construction) in [(1, false), (2, false), (3, false), (10, false), (3, true)] {
+        let names = if same_construction {
+            vec![material_names[0], material_names[1], material_names[0]]
+        } else {
+            material_names[..count].to_vec()
+        };
+        let reversed = names.iter().rev().copied().collect::<Vec<_>>();
+        let mut value = stacks.clone();
+        value["Construction"]["STACK FORWARD"] = construction_value(&names);
+        value["Construction"]["STACK REVERSE"] = construction_value(&reversed);
+        value["BuildingSurface:Detailed"]["Zulu:East"]["construction_name"] =
+            json!("STACK FORWARD");
+        value["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
+            json!(if same_construction {
+                "STACK FORWARD"
+            } else {
+                "STACK REVERSE"
+            });
+        let raw =
+            parse_epjson_str(&value.to_string()).expect("actual reversed opaque input layers");
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)
+            .expect("exact reversed stacks reach real Source IP");
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+            .expect("authored Construction layer operands remain unchanged");
+        for (name, expected) in [("STACK FORWARD", &names), ("STACK REVERSE", &reversed)] {
+            let row = projected.objects["Construction"]
+                .iter()
+                .find(|row| row.object_name == name)
+                .unwrap();
+            for (index, material) in expected.iter().enumerate() {
+                let field = if index == 0 {
+                    "outside_layer".into()
+                } else {
+                    format!("layer_{}", index + 1)
+                };
+                assert_eq!(
+                    row.fields[&field],
+                    ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                        (*material).into()
+                    )
+                );
+            }
+        }
+        let compiled = compile_raw_model(&raw);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("real typed opaque reverse stack owners");
+        let faces = ["Zulu:East", "Alpha:West"].map(|name| {
+            model
+                .surfaces
+                .iter()
+                .find(|surface| surface.name.0.eq_ignore_ascii_case(name))
+                .unwrap()
+        });
+        let constructors = faces.map(|face| {
+            model
+                .constructions
+                .iter()
+                .find(|construction| construction.id == face.construction)
+                .unwrap()
+        });
+        assert_eq!(constructors[0].effective_layers().len(), count);
+        assert!(
+            constructors[0]
+                .effective_layers()
+                .iter()
+                .eq(constructors[1].effective_layers().iter().rev())
+        );
+        assert_eq!(constructors[0].id == constructors[1].id, same_construction);
+        let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(selected.admissible, "{:?}", selected.violations);
+    }
+    let mut invalid_stacks = stacks;
+    invalid_stacks["Construction"]["STACK FORWARD"] = construction_value(&material_names[..2]);
+    invalid_stacks["BuildingSurface:Detailed"]["Zulu:East"]["construction_name"] =
+        json!("STACK FORWARD");
+    invalid_stacks["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
+        json!("STACK REVERSE");
+    for layers in [
+        construction_value(&material_names[..2]), // same order, equal nominal U
+        construction_value(&material_names[..3]), // unequal count
+        construction_value(&[material_names[1], material_names[2]]), // equal properties, different opaque ID
+        json!({"outside_layer":material_names[0],"layer_3":material_names[1]}), // actual gap
+    ] {
+        let mut value = invalid_stacks.clone();
+        value["Construction"]["STACK REVERSE"] = layers;
+        let raw =
+            parse_epjson_str(&value.to_string()).expect("unported opaque reverse mismatch inputs");
+        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+        assert!(!trace(&value, PortingScope::A).admissible);
+    }
+    let mut nonpalindrome = invalid_stacks;
+    nonpalindrome["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
+        json!("STACK FORWARD");
+    let raw = parse_epjson_str(&nonpalindrome.to_string())
+        .expect("same constructor is not automatically reversed");
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
     let mut wrong_order = paired.clone();
     wrong_order["BuildingSurface:Detailed"]["Alpha:West"]["vertices"]
         .as_array_mut()
@@ -721,6 +853,16 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .filter(|s| s.construction == construction.id)
             .count(),
         2
+    );
+    let mut multilayer_irt = irt_pair.clone();
+    multilayer_irt["Construction"]["IRT LINK"] =
+        json!({"outside_layer":"WALL IRT", "layer_2":"Opaque", "layer_3":"WALL IRT"});
+    let raw =
+        parse_epjson_str(&multilayer_irt.to_string()).expect("authored multi-layer IRT input");
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    assert!(
+        !trace(&multilayer_irt, PortingScope::A).admissible,
+        "a palindromic stack must not broaden the genuine IRT sole-layer rule"
     );
     for report in ["Materials", "Constructions"] {
         let mut invalid = irt_pair.clone();
