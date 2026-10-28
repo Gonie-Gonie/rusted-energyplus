@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 142 paired physical cases and 3,699,390 reported values with zero
+contains 143 paired physical cases and 3,727,446 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -70,6 +70,10 @@ implicit Space. Direct OtherEquipment can target each Zone with all thirteen
 non-Water fuels or thermal-only None and genuine built-in or authored schedules.
 Direct People supports all three sizing
 methods with live count, sensible/latent/radiant gains and humidity consumers.
+Source typed OtherEquipment names preserve authored whitespace with ASCII case
+folding. A direct-epJSON public-output witness distinguishes "A", " A ",
+and "A " under unchanged numeric policies. Constant's missing-type-limit
+warning uses the input format's field title.
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
 the getter's Ceiling alias. Exact reverse Material
@@ -77,9 +81,9 @@ identity retains the Native fast path; differing counts or layer identities use
 an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
 retain Native's warning sequence. Infrared-transparent constructions retain
 their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
-factors and opposite coincident vertices. Fourteen 24-hour two-Zone
-cases cover 188,736 derived values with zero tolerance or RMSE failures;
-the maximum absolute difference is 1.64e-11. Actual Zone/Space and enclosure links,
+factors and opposite coincident vertices. Fifteen 24-hour two-Zone
+cases cover 216,792 derived values with zero tolerance or RMSE failures;
+the maximum absolute difference is below 1.83e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Explicit
 Spaces, groups, multi-Zone HVAC and broader interzone combinations remain open.

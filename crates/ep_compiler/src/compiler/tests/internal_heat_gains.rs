@@ -240,6 +240,110 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
             result.report.diagnostics
         );
     }
+    // Unit93: direct epJSON keys retain their actual whitespace identity.
+    // Source JSON order is natural; no IDF trim or fabricated IDs supply it.
+    let exact_names = parse_epjson_str(
+        r#"{
+        "Zone":{"Direct Zone":{}},"Schedule:Constant":{"On":{"hourly_value":1}},
+        "OtherEquipment":{
+            "A":{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"On","design_level":3},
+            " A ":{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"On","design_level":7},
+            "A ":{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"On","design_level":11}
+        }}"#,
+    )?;
+    assert!(exact_names.is_epjson());
+    let result = super::super::compile_raw_model_for_source(&exact_names);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let typed = result
+        .model
+        .ok_or("actual Source OtherEquipment exact names")?;
+    assert_eq!(typed.other_equipment.len(), 3);
+    for (row, (name, level)) in
+        typed
+            .other_equipment
+            .iter()
+            .zip([(" A ", 7.0), ("A", 3.0), ("A ", 11.0)])
+    {
+        assert_eq!(row.name.0, name);
+        assert_eq!(row.design_level_w, level);
+        assert_eq!(
+            typed
+                .other_equipment_names
+                .resolve(&name.to_ascii_lowercase()),
+            Some(row.id)
+        );
+        assert_eq!(
+            typed.other_equipment_names.names()[row.id.0 as usize],
+            row.name
+        );
+        assert_eq!(
+            row.schedule,
+            Some(ep_model::InternalGainScheduleReference::User(
+                ep_model::ScheduleId(0)
+            ))
+        );
+    }
+    assert_eq!(typed.other_equipment_names.resolve(" A"), None);
+    assert_eq!(typed.schedules.len(), 1);
+    assert_eq!(ep_model::NormalizedName::new(" A ").0, "A");
+    let legacy = compile_raw_model(&exact_names);
+    assert!(
+        legacy
+            .report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "DuplicateName" && d.object_type == "OtherEquipment"),
+        "unscoped compilation keeps its established trimmed-name boundary"
+    );
+    for (json_name, actual_name) in [
+        (" a ", " A "),
+        (r"\tA\t", "\tA\t"),
+        (r"\u000b", "\u{000b}"),
+        (r"\u00a0", "\u{00a0}"),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"On":{{"hourly_value":1}}}},"OtherEquipment":{{"{json_name}":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"On","design_level":7}}}}}}"#
+        );
+        let raw = parse_epjson_str(&text)?;
+        let result = super::super::compile_raw_model_for_source(&raw);
+        assert!(
+            !result.has_errors(),
+            "{json_name}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("Source schema-valid exact gain name")?;
+        assert_eq!(typed.other_equipment[0].name.0, actual_name);
+        assert_eq!(
+            typed.other_equipment_names.resolve(actual_name),
+            Some(typed.other_equipment[0].id)
+        );
+    }
+    let single = parse_epjson_str(
+        r#"{"Zone":{"Direct Zone":{}},"OtherEquipment":{" a ":{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","design_level":7}}}"#,
+    )?;
+    let legacy = compile_raw_model(&single)
+        .model
+        .ok_or("unchanged legacy single gain name")?;
+    assert_eq!(legacy.other_equipment[0].name.0, "A");
+    assert_eq!(
+        legacy.other_equipment_names.resolve(" A "),
+        Some(legacy.other_equipment[0].id)
+    );
+    for json_name in ["", r" \t\r\f", r"A\nB"] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"OtherEquipment":{{"{json_name}":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","design_level":7}}}}}}"#
+        );
+        let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?);
+        assert!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "InvalidName" && d.object_type == "OtherEquipment"),
+            "{json_name}: {:?}",
+            result.report.diagnostics
+        );
+    }
     for method in ["Watts/Person", "Power/Person"] {
         let text = format!(
             r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2}}}},"OtherEquipment":{{"Per person":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"on","design_level_calculation_method":"{method}","design_level":-7,"power_per_floor_area":-9,"power_per_person":3.5}}}}}}"#

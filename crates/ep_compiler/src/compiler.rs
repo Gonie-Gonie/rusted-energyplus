@@ -678,12 +678,13 @@ impl<'a> Compiler<'a> {
             ..TypedModel::default()
         };
         if self.source_file_declarations {
-            // The explicit Source route shares four exact whitespace-preserving
-            // schedule namespaces; IDs and all other typed maps are unchanged.
+            // Explicit Source schedules and OtherEquipment preserve authored
+            // whitespace. Every unselected map and legacy ID policy is unchanged.
             model.schedule_names = NameMap::source_schedule_namespace();
             model.day_schedule_names = NameMap::source_schedule_namespace();
             model.week_schedule_names = NameMap::source_schedule_namespace();
             model.schedule_type_limit_names = NameMap::source_schedule_namespace();
+            model.other_equipment_names = NameMap::source_exact_namespace();
         }
 
         self.parse_building(&mut model);
@@ -13742,6 +13743,25 @@ impl<'a> Compiler<'a> {
 
     fn parse_other_equipment(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("OtherEquipment") {
+            // Official epJSON pattern ^.*\S.*$ under default RE2: no LF,
+            // and at least one byte outside HT/LF/FF/CR/space. VT and Unicode
+            // whitespace are valid name bytes; only the explicit Source lane
+            // uses this schema boundary and exact-name namespace.
+            if self.source_file_declarations
+                && (name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' ')))
+            {
+                self.error(
+                    "InvalidName",
+                    "OtherEquipment",
+                    Some(&name),
+                    None,
+                    "OtherEquipment name must match the actual epJSON name pattern".into(),
+                );
+                continue;
+            }
             let Some(zone_name) = self.required_string(
                 "OtherEquipment",
                 &name,
@@ -13832,7 +13852,7 @@ impl<'a> Compiler<'a> {
 
             model.other_equipment.push(OtherEquipment {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.other_equipment_names.normalized_name(&name),
                 fuel_type,
                 zone,
                 schedule,

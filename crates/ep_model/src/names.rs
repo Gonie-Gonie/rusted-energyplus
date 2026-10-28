@@ -21,7 +21,7 @@ enum NameNormalization {
 }
 
 /// Compile-time name map from EnergyPlus names to typed IDs.
-/// Defaults preserve legacy trimming; the explicit Source schedule policy keeps
+/// Defaults preserve legacy trimming; explicitly selected Source namespaces keep
 /// every authored whitespace byte while applying the same ASCII case folding.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct NameMap<T> {
@@ -42,9 +42,16 @@ impl<T> Default for NameMap<T> {
 
 impl<T: Copy> NameMap<T> {
     /// Constructs the exact-name namespace for explicit Source schedule maps.
-    /// Other typed maps and legacy compilation must keep `Default`.
+    /// This established API keeps the same name and reference behavior.
     #[must_use]
     pub fn source_schedule_namespace() -> Self {
+        Self::source_exact_namespace()
+    }
+
+    /// Constructs an explicitly selected Source object namespace.
+    /// Preserve every authored whitespace byte; legacy maps keep `Default`.
+    #[must_use]
+    pub fn source_exact_namespace() -> Self {
         Self {
             normalization: NameNormalization::SourceScheduleAsciiUpper,
             ..Self::default()

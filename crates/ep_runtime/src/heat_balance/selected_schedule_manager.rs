@@ -708,7 +708,8 @@ impl SelectedScheduleManager {
                         "blank or unknown type warning",
                     ))?;
                 // Native1988-1994 invokes the real UtilityRoutines helpers.
-                // cAlphaFields(2) is the pinned Constant schema field below;
+                // InputProcessor.cc1052 supplies the JSON key or IDF field
+                // title as cAlphaFields(2), using the actual loader format.
                 // no absent type is replaced by a declared ScheduleTypeLimits.
                 backend
                     .show_warning_error(&format!(
@@ -716,9 +717,14 @@ impl SelectedScheduleManager {
                         row.name,
                     ))
                     .map_err(super::selected_heat_balance_input::HeatBalanceInputError::from)?;
+                let type_field = if declarations.source_is_epjson == Some(true) {
+                    "schedule_type_limits_name"
+                } else {
+                    "Schedule Type Limits Name"
+                };
                 let field_message = match row.type_name.as_deref().filter(|name| !name.is_empty()) {
-                    None => "Schedule Type Limits Name is empty.".to_owned(),
-                    Some(name) => format!("Schedule Type Limits Name = {name}, item not found."),
+                    None => format!("{type_field} is empty."),
+                    Some(name) => format!("{type_field} = {name}, item not found."),
                 };
                 backend
                     .show_continue_error(&field_message)

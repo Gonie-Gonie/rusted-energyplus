@@ -286,6 +286,91 @@ fn compact_primary_and_empty_hour_match_native_reported_timestep_bits() -> TestR
             }
         }
     }
+    // Constant's actual getObjectItem diagnostic labels follow the loader
+    // format for both empty and unresolved type references. The legacy caller
+    // without a format owner retains its existing IDF title.
+    for source_is_epjson in [Some(true), Some(false), None] {
+        for unknown in [false, true] {
+            let mut constant_fixture = fixture.clone();
+            constant_fixture["object_order"]["ScheduleTypeLimits"] = serde_json::json!([]);
+            constant_fixture["object_order"]["Schedule:Constant"] =
+                serde_json::json!(["Diagnostic Constant"]);
+            let mut raw = serde_json::json!({"Schedule:Constant": {
+                "Diagnostic Constant": {"hourly_value":3.5}
+            }});
+            if unknown {
+                raw["Schedule:Constant"]["Diagnostic Constant"]["schedule_type_limits_name"] =
+                    serde_json::json!("Unknown Type");
+            }
+            let mut input = processor(&constant_fixture, &raw)?;
+            let mut declarations = schedule_declarations(&constant_fixture, &raw)?;
+            declarations.source_is_epjson = source_is_epjson;
+            let mut manager = SelectedScheduleManager::default();
+            manager.init_constant_state(0)?;
+            let (mut state, mut errors, mut console) =
+                (interpolation_error_state(), Vec::new(), Vec::new());
+            let (kickoff, developer, warmup, sizing) = (false, false, false, false);
+            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &kickoff,
+                developer: &developer,
+                warmup: &warmup,
+                doing_sizing: &sizing,
+            };
+            {
+                let mut backend = crate::heat_balance::error_backend::SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                manager.process_schedule_input_with_live_backend(
+                    &mut input,
+                    &declarations,
+                    steps,
+                    &mut MemoryAudit::default(),
+                    &mut backend,
+                    &flags,
+                )?;
+            }
+            let field = if source_is_epjson == Some(true) {
+                "schedule_type_limits_name"
+            } else {
+                "Schedule Type Limits Name"
+            };
+            let message = if unknown {
+                format!("{field} = UNKNOWN TYPE, item not found.")
+            } else {
+                format!("{field} is empty.")
+            };
+            assert_eq!(
+                std::str::from_utf8(&errors)?.lines().collect::<Vec<_>>(),
+                [
+                    "Program Version,authored caller,authored input".to_owned(),
+                    "   ** Warning ** ProcessScheduleInput: Schedule:Constant = DIAGNOSTIC CONSTANT".to_owned(),
+                    format!("   **   ~~~   ** {message}"),
+                    "   **   ~~~   ** Schedule will not be validated.".to_owned(),
+                ]
+            );
+            assert_eq!(state.tracking.total_warning_errors, 1);
+            assert_eq!(state.tracking.total_severe_errors, 0);
+            let number = manager
+                .get_source_schedule("DIAGNOSTIC CONSTANT")?
+                .ok_or("actual Constant diagnostic owner")?;
+            assert!(manager.schedules[number.0].schedule_type_number.is_none());
+            assert_eq!(manager.source_current_schedule_value(number)?, 3.5);
+            let super::SelectedScheduleData::Constant { timestep_values } =
+                &manager.schedules[number.0].data
+            else {
+                return Err("actual Constant representation changed".into());
+            };
+            assert_eq!(timestep_values, &vec![3.5; 96]);
+        }
+    }
     verify_authored_compact_modes_and_diagnostic_prefix(&fixture)?;
     verify_authored_regular_schedule_graph(&fixture)?;
     verify_authored_interval_list_week_graph(&fixture)?;

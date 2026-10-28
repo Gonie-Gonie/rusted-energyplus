@@ -165,13 +165,14 @@ fn resolve_raw(
         for (name, object) in objects {
             // These unnamed singletons have no authored Name. Their official
             // epJSON patterns accept arbitrary keys; keep exact IP identity.
-            // Exact official schedule pattern ^.*\S.*$ under default RE2:
+            // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
             // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
             // or Unicode whitespace. Other families keep their old boundary.
             let blank_name = if source_calendar_ingress
                 && matches!(
                     family.0.as_str(),
-                    "ScheduleTypeLimits"
+                    "OtherEquipment"
+                        | "ScheduleTypeLimits"
                         | "Schedule:Constant"
                         | "Schedule:Compact"
                         | "Schedule:File"
@@ -1010,6 +1011,86 @@ mod tests {
             let mut invalid = gains.clone();
             invalid["OtherEquipment"]["A gain"]["schedule_name"] = serde_json::json!(reference);
             assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        // Unit93: genuine direct epJSON names and output keys are distinct.
+        // The raw/IP/HB producers preserve bytes; only Source typed identity
+        // changes, while unscoped typed compilation retains its old boundary.
+        let names = serde_json::json!({"Zone":{"Z":{}},"Schedule:Constant":{"On":{"hourly_value":1}},
+            "OtherEquipment":{
+                "A":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"On","design_level":3},
+                " A ":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"On","design_level":7},
+                "A ":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"On","design_level":11}},
+            "Output:Variable":{
+                "r1":{"key_value":"A","variable_name":"Other Equipment Total Heating Rate","reporting_frequency":"Timestep"},
+                "r2":{"key_value":" A ","variable_name":"Other Equipment Total Heating Rate","reporting_frequency":"Timestep"},
+                "r3":{"key_value":"A ","variable_name":"Other Equipment Total Heating Rate","reporting_frequency":"Timestep"}}});
+        let raw = parse_epjson_str(&names.to_string())?;
+        assert!(raw.is_epjson());
+        resolve_source_a(&raw)?;
+        resolve_source_b(&raw)?;
+        // Existing raw legacy admission did not collapse names; its compiler
+        // still rejects this trimmed collision, rather than silently aliasing.
+        resolve(&raw)?;
+        assert!(ep_compiler::compile_raw_model(&raw).has_errors());
+        for source_b in [false, true] {
+            let ip = if source_b {
+                crate::ordinary_input_processor::resolve_source_b(&raw)?
+            } else {
+                crate::ordinary_input_processor::resolve_source_a(&raw)?
+            };
+            let hb = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+            let result = ep_compiler::compile_raw_model_for_source(&raw);
+            assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+            let typed = result.model.ok_or("Source exact gain-name typed owner")?;
+            assert_eq!(typed.other_equipment.len(), 3);
+            for (row, (name, level)) in
+                hb.objects["OtherEquipment"]
+                    .iter()
+                    .zip([(" A ", 7.0), ("A", 3.0), ("A ", 11.0)])
+            {
+                assert_eq!(row.object_name, name);
+                assert!(ip.has_object("OtherEquipment", name));
+                assert_eq!(
+                    row.fields["design_level"],
+                    ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                        level
+                    )
+                );
+                let id = typed
+                    .other_equipment_names
+                    .resolve(name)
+                    .ok_or("exact Source gain ID")?;
+                let gain = &typed.other_equipment[id.0 as usize];
+                assert_eq!(gain.name.0, name);
+                assert_eq!(gain.design_level_w, level);
+            }
+            assert_eq!(typed.other_equipment_names.resolve(" A"), None);
+            assert_eq!(
+                typed
+                    .report_inputs
+                    .output_variables
+                    .iter()
+                    .map(|v| v.key.as_str())
+                    .collect::<Vec<_>>(),
+                vec!["A", " A ", "A "]
+            );
+        }
+        for name in ["\u{000b}", "\u{00a0}", "\tA\t"] {
+            let mut actual = names.clone();
+            actual["OtherEquipment"] = serde_json::json!({(name):{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"On","design_level":7}});
+            let raw = parse_epjson_str(&actual.to_string())?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            let typed = ep_compiler::compile_raw_model_for_source(&raw)
+                .model
+                .ok_or("Source actual name pattern")?;
+            assert_eq!(typed.other_equipment[0].name.0, name.to_ascii_uppercase());
+        }
+        for name in ["", " \t\r\u{000c}", "A\nB"] {
+            let mut invalid = names.clone();
+            invalid["OtherEquipment"] = serde_json::json!({(name):{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"On","design_level":7}});
+            let raw = parse_epjson_str(&invalid.to_string())?;
+            assert!(resolve_source_a(&raw).is_err() && resolve_source_b(&raw).is_err());
         }
         // Unit91 composes the existing People sizing/field/reference rules
         // with real direct Zone names; no comfort or CO2 default is replaced.
