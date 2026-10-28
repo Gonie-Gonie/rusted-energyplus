@@ -251,9 +251,8 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
     let Some(zones) = raw.objects.get(&ObjectType("Zone".into())) else {
         return false;
     };
-    if zones.len() != 1
-        || !text(object, "zone_or_zonelist_or_space_or_spacelist_name")
-            .is_some_and(|target| zones.keys().any(|n| n.0.eq_ignore_ascii_case(target)))
+    if !text(object, "zone_or_zonelist_or_space_or_spacelist_name")
+        .is_some_and(|target| zones.keys().any(|n| n.0.eq_ignore_ascii_case(target)))
     {
         return false;
     }

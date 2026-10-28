@@ -1,4 +1,4 @@
-//! Source A's bounded opaque multi-Zone, OtherEquipment and paired-surface stage.
+//! Source A's bounded opaque multi-Zone, direct-gain and paired-surface stage.
 //! This is input admission only; it supplies no scientific owner values.
 use super::{number, text};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
@@ -62,6 +62,7 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 | "Output:Surfaces:List"
                 | "Output:Constructions"
                 | "OtherEquipment"
+                | "People"
                 | "Output:Meter"
                 | "Output:Meter:MeterFileOnly"
                 | "OutputControl:Table:Style"

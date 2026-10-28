@@ -551,6 +551,124 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         )
         .admissible
     );
+    // Unit91: the three existing People sizing methods retain actual direct
+    // Zone bindings on the same Source-only topology. This is raw/IP/typed
+    // admission evidence; the runtime getter owns computed design occupants.
+    for (method, field, typed_method) in [
+        (
+            "People",
+            "number_of_people",
+            ep_model::PeopleNumberCalculationMethod::People,
+        ),
+        (
+            "People/Area",
+            "people_per_floor_area",
+            ep_model::PeopleNumberCalculationMethod::PeoplePerArea,
+        ),
+        (
+            "Area/Person",
+            "floor_area_per_person",
+            ep_model::PeopleNumberCalculationMethod::AreaPerPerson,
+        ),
+    ] {
+        let mut people_case = value.clone();
+        people_case["Schedule:Constant"]["Activity"] = json!({"hourly_value":120});
+        people_case["People"] = json!({
+            "A occupants":{"zone_or_zonelist_or_space_or_spacelist_name":"Zulu",
+                "number_of_people_schedule_name":"On","activity_level_schedule_name":"Activity",
+                "number_of_people_calculation_method":method,field:1.5,
+                "fraction_radiant":0.3,"sensible_heat_fraction":0.6},
+            "Z occupants":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha",
+                "number_of_people_schedule_name":"On","activity_level_schedule_name":"Activity",
+                "number_of_people_calculation_method":method,field:3.0,
+                "fraction_radiant":0.3,"sensible_heat_fraction":0.6}
+        });
+        let people_raw = parse_epjson_str(&people_case.to_string())
+            .expect("actual two-Zone direct People raw input");
+        let people_ip = crate::ordinary_input_processor::resolve_source_a(&people_raw)
+            .expect("actual two-Zone People input processor");
+        let people_input =
+            crate::ordinary_heat_balance_input::resolve_source(&people_raw, &people_ip)
+                .expect("unchanged actual People getter operands");
+        let people_compiled = compile_raw_model(&people_raw);
+        let people_model = people_compiled
+            .model
+            .as_ref()
+            .expect("typed two-Zone People");
+        assert_eq!(people_model.people.len(), 2);
+        assert_eq!(people_input.objects["People"].len(), 2);
+        for (name, target) in [("A occupants", "Zulu"), ("Z occupants", "Alpha")] {
+            let row = people_model
+                .people
+                .iter()
+                .find(|row| row.name == ep_model::NormalizedName::new(name))
+                .expect("actual typed People identity");
+            let zone = people_model
+                .zones
+                .iter()
+                .find(|row| row.name == ep_model::NormalizedName::new(target))
+                .expect("actual typed target Zone");
+            assert_eq!(row.zone, zone.id);
+            assert_eq!(row.number_of_people_calculation_method, typed_method);
+            let input = people_input.objects["People"]
+                .iter()
+                .find(|row| row.object_name == name)
+                .expect("actual People raw projection");
+            assert!(!input.fields.contains_key("carbon_dioxide_generation_rate"));
+        }
+        let mut people_scope = inspect_porting_scope(
+            &people_raw,
+            &people_compiled.report,
+            Some(people_model),
+            PortingScope::A,
+        );
+        assert!(people_scope.admissible, "{:?}", people_scope.violations);
+        people_scope.environment = Some(
+            super::environment::environment_from_weather(
+                people_model,
+                &weather,
+                "authored two-Zone People",
+            )
+            .expect("real People environment"),
+        );
+        let admission = crate::support::SourceSupportAdmission::from_validated_scope(
+            &people_raw,
+            &people_scope,
+        )
+        .expect("validated People Source scope");
+        let supported = crate::support::assess_support_with_source_admission(
+            &people_raw,
+            &people_compiled.report,
+            Some(people_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(
+            supported.allows_rust_runtime(),
+            "{:?}",
+            supported.diagnostics
+        );
+        assert_eq!(
+            supported.runtime_class,
+            crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+        );
+        assert!(supported.matched_capability_ids.is_empty());
+        assert!(!supported.runtime_class.conformance_promotion_allowed());
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&people_raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&people_raw).is_err());
+        assert!(
+            !inspect_porting_scope(
+                &people_raw,
+                &people_compiled.report,
+                Some(people_model),
+                PortingScope::B
+            )
+            .admissible
+        );
+    }
     // Actual compiler and raw-to-IP projection already share each format's Source
     // order. Legal reverse-lexical IDF declarations prove that fact, without
     // renumbering IDs or reordering the compiled vectors for this test.

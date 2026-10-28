@@ -816,7 +816,6 @@ mod tests {
         assert!(resolve_source_b(&raw).is_err());
         assert!(resolve(&raw).is_err());
         for family in [
-            "People",
             "Exterior:Lights",
             "ComfortViewFactorAngles",
             "Lights",
@@ -955,6 +954,104 @@ mod tests {
             invalid["OtherEquipment"]["A gain"]["zone_or_zonelist_or_space_or_spacelist_name"] =
                 serde_json::json!(target);
             assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        // Unit91 composes the existing People sizing/field/reference rules
+        // with real direct Zone names; no comfort or CO2 default is replaced.
+        let mut occupants: serde_json::Value = serde_json::from_str(multi)?;
+        occupants["Schedule:Constant"] = serde_json::json!({
+            "On":{"hourly_value":1}, "Activity":{"hourly_value":120},
+            "Work":{"hourly_value":0.2}, "Clothes":{"hourly_value":0.7},
+            "Velocity":{"hourly_value":0.1}
+        });
+        occupants["People"] = serde_json::json!({
+            "A occupants":{"zone_or_zonelist_or_space_or_spacelist_name":"Zulu",
+                "number_of_people_schedule_name":"On",
+                "activity_level_schedule_name":"Activity",
+                "number_of_people":1.5,"fraction_radiant":0.3,
+                "sensible_heat_fraction":0.6},
+            "Z occupants":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha",
+                "number_of_people_schedule_name":"On",
+                "activity_level_schedule_name":"Activity",
+                "number_of_people":3.0,"fraction_radiant":0.3,
+                "sensible_heat_fraction":0.6}
+        });
+        for (method, field) in [
+            ("People", "number_of_people"),
+            ("People/Area", "people_per_floor_area"),
+            ("Area/Person", "floor_area_per_person"),
+        ] {
+            for fanger in [false, true] {
+                let mut actual = occupants.clone();
+                for (name, amount) in [("A occupants", 1.5), ("Z occupants", 3.0)] {
+                    actual["People"][name]["number_of_people_calculation_method"] =
+                        serde_json::json!(method);
+                    actual["People"][name][field] = serde_json::json!(amount);
+                    if fanger {
+                        for (field, value) in [
+                            ("thermal_comfort_model_1_type", "Fanger"),
+                            ("work_efficiency_schedule_name", "Work"),
+                            ("clothing_insulation_schedule_name", "Clothes"),
+                            ("air_velocity_schedule_name", "Velocity"),
+                        ] {
+                            actual["People"][name][field] = serde_json::json!(value);
+                        }
+                    }
+                }
+                let raw = parse_epjson_str(&actual.to_string())?;
+                assert!(resolve_source_a(&raw).is_ok(), "{method}, Fanger={fanger}");
+                assert!(resolve_source_b(&raw).is_err());
+                assert!(resolve(&raw).is_err());
+                let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+                let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+                assert_eq!(projected.objects["People"].len(), 2);
+                for (name, target, amount) in [
+                    ("A occupants", "Zulu", 1.5_f64),
+                    ("Z occupants", "Alpha", 3.0_f64),
+                ] {
+                    let row = projected.objects["People"]
+                        .iter()
+                        .find(|row| row.object_name == name)
+                        .ok_or("actual direct People projection")?;
+                    use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+                    assert_eq!(
+                        row.fields["zone_or_zonelist_or_space_or_spacelist_name"],
+                        P::String(target.into())
+                    );
+                    assert_eq!(row.fields[field], P::Number(amount));
+                    assert!(!row.fields.contains_key("carbon_dioxide_generation_rate"));
+                    assert_eq!(
+                        row.fields.contains_key("thermal_comfort_model_1_type"),
+                        fanger
+                    );
+                }
+            }
+        }
+        for target in ["Missing", "ZoneList", "Alpha Space"] {
+            let mut invalid = occupants.clone();
+            invalid["People"]["A occupants"]["zone_or_zonelist_or_space_or_spacelist_name"] =
+                serde_json::json!(target);
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        for (field, value) in [
+            (
+                "number_of_people_calculation_method",
+                serde_json::json!("Unknown"),
+            ),
+            (
+                "number_of_people_schedule_name",
+                serde_json::json!("Missing"),
+            ),
+            ("activity_level_schedule_name", serde_json::json!("Missing")),
+            ("fraction_radiant", serde_json::json!(1.1)),
+            ("carbon_dioxide_generation_rate", serde_json::json!(3.83e-7)),
+            ("thermal_comfort_model_1_type", serde_json::json!("Pierce")),
+        ] {
+            let mut invalid = occupants.clone();
+            invalid["People"]["A occupants"][field] = value;
+            assert!(
+                resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err(),
+                "{field}"
+            );
         }
         let base = r#""Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}}"#;
         for (name, addition, accepted) in [
