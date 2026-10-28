@@ -46,8 +46,12 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                         && other.id != surface.id
                         && other.zone != surface.zone
                         && other.space != surface.space
-                        && surface.surface_type == SurfaceType::Wall
-                        && other.surface_type == SurfaceType::Wall
+                        && matches!(
+                            (surface.surface_type, other.surface_type),
+                            (SurfaceType::Wall, SurfaceType::Wall)
+                                | (SurfaceType::Roof | SurfaceType::Ceiling, SurfaceType::Floor)
+                                | (SurfaceType::Floor, SurfaceType::Roof | SurfaceType::Ceiling)
+                        )
                         && construction
                             .zip(adjacent_construction)
                             .is_some_and(|(a, b)| {
@@ -65,7 +69,12 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                                                 != ep_model::MaterialKind::InfraredTransparent
                                         })
                                 });
-                                let relation = exact_reverse || normal;
+                                // Roof/Floor is the Native warning-free relation,
+                                // not class equality. Preserve the IRT Wall lane.
+                                let irt_wall_domain = normal
+                                    || (surface.surface_type == SurfaceType::Wall
+                                        && other.surface_type == SurfaceType::Wall);
+                                let relation = (exact_reverse || normal) && irt_wall_domain;
                                 a.is_ordinary_opaque()
                                     && b.is_ordinary_opaque()
                                     && !a.has_internal_heat_source()
@@ -80,7 +89,7 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                         && reversed_coincident(&surface.vertices, &other.vertices)
                 });
         if !valid {
-            violations.push(format!("{} requires the bounded reciprocal Source A Wall pair with exactly reversed IRT layers or normal opaque layers checked against actual Source groups and NominalU, equal Zone factors and reversed coincident World vertices", surface.name.0));
+            violations.push(format!("{} requires the bounded reciprocal Source A opaque pair with exactly reversed Wall-only IRT layers or normal opaque layers checked against actual Source groups and NominalU, equal Zone factors and reversed coincident World vertices", surface.name.0));
         }
     }
 }

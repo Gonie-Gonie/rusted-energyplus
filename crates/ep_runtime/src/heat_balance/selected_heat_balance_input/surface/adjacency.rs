@@ -167,14 +167,20 @@ impl SurfaceGeometryInputState {
                 ));
             }
             if surface.zone == adjacent.zone
-                || surface.class != SurfaceClass::Wall
-                || adjacent.class != SurfaceClass::Wall
+                || !matches!(
+                    surface.class,
+                    SurfaceClass::Wall | SurfaceClass::Floor | SurfaceClass::Roof
+                )
+                || !matches!(
+                    adjacent.class,
+                    SurfaceClass::Wall | SurfaceClass::Floor | SurfaceClass::Roof
+                )
                 || surface.base_surface != number
                 || adjacent.base_surface != super::signed(found + 1)?
                 || adjacent.exterior_boundary_name != surface.name
             {
                 return Err(Error::Unavailable(
-                    "bounded explicit reciprocal interzone Wall domain",
+                    "bounded explicit reciprocal interzone opaque class domain",
                 ));
             }
             let construction = owners
@@ -187,6 +193,14 @@ impl SurfaceGeometryInputState {
                 .construction_usage
                 .get(index(adjacent.construction)?)
                 .ok_or(Error::Unavailable("actual adjacent Source Construction"))?;
+            // Ceiling already passed the real getter's CEILING-to-ROOF alias.
+            // Only normal opaque classes expand; never extend the IRT Wall lane
+            // through a prelatched or exact-identity construction shortcut.
+            if (construction.type_is_irt || adjacent_construction.type_is_irt)
+                && (surface.class != SurfaceClass::Wall || adjacent.class != SurfaceClass::Wall)
+            {
+                return Err(Error::Unavailable("existing IRT paired Wall-only domain"));
+            }
             // Native1842/1846 continue AFTER current Found but BEFORE all
             // layer/area/exposure checks and the opposing reciprocal write.
             if construction.reverse_construction_num_layers_warning
@@ -374,10 +388,11 @@ impl SurfaceGeometryInputState {
                 .as_ref()
                 .ok_or(Error::Unavailable("actual adjacent GetVertices properties"))?;
             if !properties.tilt_deg.is_finite()
-                || !properties.azimuth_deg.is_finite()
-                || !properties.sin_tilt.is_finite()
+                || (!matches!(surface.class, SurfaceClass::Roof | SurfaceClass::Floor)
+                    && (!properties.azimuth_deg.is_finite() || !properties.sin_tilt.is_finite()))
                 || !adjacent_properties.tilt_deg.is_finite()
-                || !adjacent_properties.azimuth_deg.is_finite()
+                || (!matches!(surface.class, SurfaceClass::Roof | SurfaceClass::Floor)
+                    && !adjacent_properties.azimuth_deg.is_finite())
             {
                 return Err(Error::Unavailable(
                     "finite actual paired Source orientation",
@@ -386,8 +401,23 @@ impl SurfaceGeometryInputState {
             if ((adjacent_properties.tilt_deg + properties.tilt_deg).abs() - 180.0).abs() > 1.0 {
                 return Err(Error::Unavailable("positive interzone tilt diagnostic1993"));
             }
-            if ((properties.azimuth_deg - adjacent_properties.azimuth_deg).abs() - 180.0).abs()
-                > 1.0
+            // Native2007-2036 has class-warning effects for the other opaque
+            // combinations. Hold them at their reached point, after tilt and
+            // every earlier86 effect; do not silently omit those diagnostics.
+            if !matches!(
+                (surface.class, adjacent.class),
+                (SurfaceClass::Wall, SurfaceClass::Wall)
+                    | (SurfaceClass::Roof, SurfaceClass::Floor)
+                    | (SurfaceClass::Floor, SurfaceClass::Roof)
+            ) {
+                return Err(Error::Unavailable(
+                    "positive interzone class-mismatch diagnostics2007",
+                ));
+            }
+            // Native2037 never reads azimuth or SinTilt for current Roof/Floor.
+            if !matches!(surface.class, SurfaceClass::Roof | SurfaceClass::Floor)
+                && ((properties.azimuth_deg - adjacent_properties.azimuth_deg).abs() - 180.0).abs()
+                    > 1.0
                 && (properties.sin_tilt.abs() > 0.5 || owners.globals.display_extra_warnings)
             {
                 return Err(Error::Unavailable(

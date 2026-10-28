@@ -1,4 +1,4 @@
-//! Source A's producer-free opaque multi-Zone and explicit paired-Wall stage.
+//! Source A's producer-free opaque multi-Zone and explicit paired-surface stage.
 //! This is input admission only; it supplies no scientific owner values.
 use super::{number, text};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
@@ -95,8 +95,10 @@ fn legal_exposure(row: &RawObject, field: &str, values: &[&str]) -> bool {
 // Native opaque reversal compares material identity; equal thermal values of
 // differently named materials never substitute for the same layer reference.
 fn construction_layers(row: &RawObject) -> Result<Vec<&str>, String> {
-    let mut layers =
-        vec![text(row, "outside_layer").ok_or("paired Wall actual outside Material reference")?];
+    let mut layers = vec![
+        text(row, "outside_layer")
+            .ok_or("paired opaque surface actual outside Material reference")?,
+    ];
     let mut ended = false;
     for number in 2..=10 {
         match row.fields.get(&FieldName(format!("layer_{number}"))) {
@@ -105,7 +107,11 @@ fn construction_layers(row: &RawObject) -> Result<Vec<&str>, String> {
             Some(RawValue::String(value)) if !ended && !value.trim().is_empty() => {
                 layers.push(value);
             }
-            _ => return Err("paired Walls require contiguous actual Material references".into()),
+            _ => {
+                return Err(
+                    "paired opaque surfaces require contiguous actual Material references".into(),
+                );
+            }
         }
     }
     Ok(layers)
@@ -149,19 +155,41 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
             return Err("paired Surface names must be explicitly reciprocal".into());
         }
         for surface in [row, other] {
-            if !text(surface, "surface_type").is_some_and(|v| v.eq_ignore_ascii_case("Wall"))
-                || !legal_exposure(surface, "sun_exposure", &["NoSun", "SunExposed"])
+            if !text(surface, "surface_type").is_some_and(|value| {
+                ["Wall", "Floor", "Roof", "Ceiling"]
+                    .iter()
+                    .any(|kind| value.eq_ignore_ascii_case(kind))
+            }) || !legal_exposure(surface, "sun_exposure", &["NoSun", "SunExposed"])
                 || !legal_exposure(surface, "wind_exposure", &["NoWind", "WindExposed"])
             {
                 return Err(
-                    "paired Source Wall requires schema-valid Sun and Wind exposure fields".into(),
+                    "paired Source opaque surface requires schema-valid class, Sun and Wind exposure fields".into(),
                 );
             }
         }
-        let zone_name = text(row, "zone_name").ok_or("paired Wall actual Zone")?;
-        let other_zone_name = text(other, "zone_name").ok_or("paired Wall adjacent Zone")?;
+        let current_class =
+            text(row, "surface_type").ok_or("paired opaque surface actual class")?;
+        let other_class =
+            text(other, "surface_type").ok_or("paired opaque surface adjacent class")?;
+        let is_roof = |value: &str| {
+            ["Roof", "Ceiling"]
+                .iter()
+                .any(|kind| value.eq_ignore_ascii_case(kind))
+        };
+        if !((current_class.eq_ignore_ascii_case("Wall")
+            && other_class.eq_ignore_ascii_case("Wall"))
+            || (is_roof(current_class) && other_class.eq_ignore_ascii_case("Floor"))
+            || (current_class.eq_ignore_ascii_case("Floor") && is_roof(other_class)))
+        {
+            return Err(
+                "paired opaque class-mismatch warnings remain outside this Source stage".into(),
+            );
+        }
+        let zone_name = text(row, "zone_name").ok_or("paired opaque surface actual Zone")?;
+        let other_zone_name =
+            text(other, "zone_name").ok_or("paired opaque surface adjacent Zone")?;
         if zone_name.eq_ignore_ascii_case(other_zone_name) {
-            return Err("paired Walls require distinct Zones/implicit Spaces".into());
+            return Err("paired opaque surfaces require distinct Zones/implicit Spaces".into());
         }
         let multiplier = |zone_name: &str| {
             zones
@@ -176,19 +204,37 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
                 })
         };
         if multiplier(zone_name).is_none() || multiplier(zone_name) != multiplier(other_zone_name) {
-            return Err("paired Walls require equal actual Zone multipliers".into());
+            return Err("paired opaque surfaces require equal actual Zone multipliers".into());
         }
         let mut layers = Vec::with_capacity(2);
         for surface in [row, other] {
-            let name =
-                text(surface, "construction_name").ok_or("paired Wall actual Construction")?;
+            let name = text(surface, "construction_name")
+                .ok_or("paired opaque surface actual Construction")?;
             let (_, construction) = constructions
                 .and_then(|rows| {
                     rows.iter()
                         .find(|(key, _)| key.0.eq_ignore_ascii_case(name))
                 })
-                .ok_or("paired Wall actual Construction target")?;
+                .ok_or("paired opaque surface actual Construction target")?;
             layers.push(construction_layers(construction)?);
+        }
+        // Only normal opaque classes expand here. The existing IRT route
+        // remains Wall-only even though its separate use guard accepts Surface.
+        let uses_irt = layers.iter().any(|stack| {
+            infrared.is_some_and(|rows| {
+                stack.iter().any(|material| {
+                    rows.keys()
+                        .any(|name| name.0.eq_ignore_ascii_case(material))
+                })
+            })
+        });
+        if uses_irt
+            && [row, other].iter().any(|surface| {
+                !text(surface, "surface_type")
+                    .is_some_and(|value| value.eq_ignore_ascii_case("Wall"))
+            })
+        {
+            return Err("IRT paired surfaces retain the existing Wall-only domain".into());
         }
         if layers.iter().any(|stack| {
             stack.len() > 1
@@ -211,7 +257,9 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
                 })
             })
         {
-            return Err("unequal-count paired Walls require normal opaque materials".into());
+            return Err(
+                "unequal-count paired opaque surfaces require normal opaque materials".into(),
+            );
         }
         // Only the established IRT path still requires exact identity here.
         // Normal opaque mismatches defer BOTH real groups and U to Source.
@@ -231,7 +279,8 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
             })
         {
             return Err(
-                "IRT paired Walls require the existing exact reverse Material identity".into(),
+                "IRT paired opaque surfaces require the existing exact reverse Material identity"
+                    .into(),
             );
         }
     }

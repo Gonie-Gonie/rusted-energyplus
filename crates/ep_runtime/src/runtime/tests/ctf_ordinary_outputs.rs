@@ -1077,6 +1077,138 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 assert_eq!(backend.state.tracking,before,"accepted unequal counts emit no diagnostic");
             }
 
+            if left==[1,2] && right==[2,1] && !same_constructor {
+                // Unit87 authored class-specific child checkpoints retain real
+                // getter Construction IDs/LayerPoints, not full Native endpoints.
+                for (first_class,second_class,wind,unavailable_azimuth) in [
+                    (SurfaceClass::Roof,SurfaceClass::Floor,false,false),
+                    (SurfaceClass::Roof,SurfaceClass::Floor,true,false),
+                    (SurfaceClass::Floor,SurfaceClass::Roof,true,false),
+                    (SurfaceClass::Roof,SurfaceClass::Floor,false,true),
+                ] {
+                    let up=[[0.0,3.0,2.5],[0.0,0.0,2.5],[4.0,0.0,2.5],[4.0,3.0,2.5]];
+                    let mut pair=nominal_checkpoint.clone();
+                    let rows=pair.final_surfaces.as_mut().ok_or("horizontal pair checkpoint")?;
+                    for (index,row) in rows.iter_mut().enumerate() {
+                        row.original_class=if index==0 { first_class } else { second_class };
+                        row.row.class=row.original_class;row.row.exterior_wind=wind;
+                        let downward=if index==0 { first_class==SurfaceClass::Floor } else { first_class!=SurfaceClass::Floor };
+                        let mut vertices=up.to_vec();
+                        if downward { vertices.reverse(); }
+                        if index==1 { vertices.rotate_left(1); }
+                        row.row.vertex=Some(vertices.iter().copied().map(Some).collect());
+                        let points=vertices.iter().map(|&[x_m,y_m,z_m]|ep_model::Point3 { x_m,y_m,z_m }).collect::<Vec<_>>();
+                        let normal=crate::geometry::source_normal_area(&points);
+                        let orientation=crate::geometry::orientation_from_normal(&points,normal.newell_normal);
+                        row.row.area=normal.gross_area_m2;row.row.gross_area=normal.gross_area_m2;
+                        row.row.vertex_progress.normal_area=Some(normal);
+                        row.row.vertex_progress.orientation_return=Some(orientation);
+                        let mut properties=crate::geometry::finish_get_vertices_properties(normal,orientation);
+                        if unavailable_azimuth {
+                            // Authored unconsumed child operands prove Native2037's
+                            // Roof/Floor no-read branch, not physical NaN outputs.
+                            properties.azimuth_deg=f64::NAN;properties.sin_tilt=f64::NAN;
+                        }
+                        row.row.vertex_progress.properties=Some(properties);
+                    }
+                    let tilts=rows.iter().map(|row|row.row.vertex_progress.properties.as_ref()
+                        .map(|p|p.tilt_deg).ok_or("horizontal actual tilt")).collect::<Result<Vec<_>,_>>()?;
+                    assert_eq!(tilts,if first_class==SurfaceClass::Roof { vec![0.0,180.0] } else { vec![180.0,0.0] });
+                    assert_eq!(rows[0].row.area,12.0);assert_eq!(rows[1].row.area,12.0);
+                    let mut control=pair_owners.control.clone();control.nominal_u=None;
+                    let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
+                    let mut zones=pair_owners.zones.clone();let mut globals=pair_owners.globals.clone();
+                    globals.display_extra_warnings=true;globals.kickoff_simulation=false;globals.doing_sizing=false;
+                    let clock=crate::weather::day::WeatherGlobalState { warmup_flag:true,..Default::default() };
+                    let developer=true;
+                    let flags=crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff:&globals.kickoff_simulation,developer:&developer,warmup:&clock.warmup_flag,doing_sizing:&globals.doing_sizing,
+                    };
+                    let mut class_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                        input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:&globals };
+                    let (mut writer,mut console)=(Vec::new(),Vec::new());
+                    let mut state=ctf_ordinary_output_test_state();state.output_error_header=false;
+                    let mut backend=SourceErrorBackend {
+                        state:&mut state,error_stream:Some(&mut writer),console:&mut console,
+                        out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+                    };
+                    pair.reconcile_opaque_surface_boundaries(&mut class_owners,&mut backend,wind.then_some(&flags),None)?;
+                    let rows=pair.final_surfaces.as_ref().ok_or("retained horizontal pair")?;
+                    assert_eq!((rows[0].row.class,rows[1].row.class),(first_class,second_class));
+                    assert_eq!((rows[0].row.exterior_boundary,rows[1].row.exterior_boundary),(2,1));
+                    assert!(rows.iter().all(|row|!row.row.exterior_wind));
+                    for row in rows {
+                        assert!(!row.expected_wind_exposure(wind,true)?);
+                        if unavailable_azimuth {
+                            let properties=row.row.vertex_progress.properties.as_ref().ok_or("retained unavailable azimuth")?;
+                            assert!(properties.azimuth_deg.is_nan() && properties.sin_tilt.is_nan());
+                        }
+                    }
+                    assert_eq!(pair.iz_const_diff_message,Some(false));assert!(!pair.surface_error);
+                    assert!(class_owners.control.nominal_u.is_none(),"exact reversed IDs require neither U nor groups");
+                    assert!(class_owners.control.construction_usage.iter().all(|row|
+                        !row.reverse_construction_num_layers_warning && !row.reverse_construction_layers_order_warning));
+                    assert_eq!(backend.state.tracking.total_warning_errors,i32::from(wind));
+                    assert_eq!(backend.state.tracking.total_warning_errors_during_warmup,i32::from(wind));
+                    assert_eq!(backend.state.tracking.total_severe_errors,0);
+                    let text=std::str::from_utf8(&writer)?;
+                    assert_eq!(text.lines().count(),if wind { 3 } else { 0 });
+                    assert_eq!(text.contains("Interzone surfaces cannot be \"WindExposed\""),wind);
+                }
+            }
+            if left==[1] && right==[1] && !same_constructor {
+                // Explicitly authored TypeIsIRT/latch entry checkpoints isolate
+                // the IRT Wall-only fence; changing these flags is not a completed
+                // IRT Material getter/Native endpoint. Real getter one-layer IDs
+                // remain untouched. Each negative class relation is otherwise valid.
+                for (first_class,second_class,irt_mask,latched,expected) in [
+                    (SurfaceClass::Wall,SurfaceClass::Wall,3,false,true),
+                    (SurfaceClass::Roof,SurfaceClass::Floor,1,false,false),
+                    (SurfaceClass::Roof,SurfaceClass::Floor,2,false,false),
+                    (SurfaceClass::Floor,SurfaceClass::Roof,3,false,false),
+                    (SurfaceClass::Roof,SurfaceClass::Floor,1,true,false),
+                    (SurfaceClass::Floor,SurfaceClass::Roof,2,true,false),
+                ] {
+                    let mut pair=nominal_checkpoint.clone();
+                    for (index,row) in pair.final_surfaces.as_mut().ok_or("IRT class checkpoint")?.iter_mut().enumerate() {
+                        row.original_class=if index==0 { first_class } else { second_class };
+                        row.row.class=row.original_class;row.row.exterior_wind = !expected;
+                    }
+                    let mut control=pair_owners.control.clone();control.nominal_u=None;
+                    for (index,row) in control.construction_usage.iter_mut().enumerate() {
+                        row.type_is_irt=irt_mask & (1<<index)!=0;
+                        if row.type_is_irt { row.outside_roughness=None; }
+                        row.reverse_construction_layers_order_warning=latched;
+                    }
+                    let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
+                    let mut zones=pair_owners.zones.clone();
+                    let mut class_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                        input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:pair_owners.globals };
+                    let (mut writer,mut console)=(Vec::new(),Vec::new());
+                    let mut state=ctf_ordinary_output_test_state();state.output_error_header=false;
+                    let before=state.tracking.clone();
+                    let mut backend=SourceErrorBackend {
+                        state:&mut state,error_stream:Some(&mut writer),console:&mut console,
+                        out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+                    };
+                    let result=pair.reconcile_opaque_surface_boundaries(&mut class_owners,&mut backend,None,None);
+                    if expected { result?; } else {
+                        assert!(matches!(result,Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                            "existing IRT paired Wall-only domain"))),"IRT class fence precedes persistent-latch skips");
+                    }
+                    let rows=pair.final_surfaces.as_ref().ok_or("IRT class-fence prefix")?;
+                    assert_eq!((rows[0].row.exterior_boundary,rows[1].row.exterior_boundary),(2,if expected { 1 } else { -999 }));
+                    for row in rows { assert_eq!(row.row.exterior_wind,!expected); }
+                    if expected { assert!(!rows[0].expected_wind_exposure(false,true)?); }
+                    else { assert!(rows[0].expected_wind_exposure(true,true).is_err()); }
+                    assert_eq!(pair.iz_const_diff_message,Some(false));
+                    assert!(!pair.surface_error,"bounded IRT class rejection does not fabricate a Native Severe");
+                    assert_eq!(backend.state.tracking,before);
+                    assert!(class_owners.control.construction_usage.iter().all(|row|
+                        row.reverse_construction_layers_order_warning==latched && !row.reverse_construction_num_layers_warning));
+                    assert!(writer.is_empty());
+                }
+            }
             if left==[1,2] && right==[1,2] && !same_constructor {
                 // Unit86 authored child checkpoints: the real getter above supplies
                 // Construction names, Source IDs and LayerPoint arrays. Warning

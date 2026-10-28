@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 136 paired physical cases and 3,592,830 reported values with zero
+contains 137 paired physical cases and 3,602,910 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -66,14 +66,15 @@ Ceiling comparisons pass the original policies; their EIO bodies and DXF geometr
 agree within the explicitly recorded version-header and line-ending boundaries.
 
 Explicit Source A also accepts multiple closed opaque Zones, each with its
-implicit Space and no internal gains or equipment. Reciprocal interzone Wall
-pairs accept normal opaque stacks of one to ten layers. Exact reverse Material
+implicit Space and no internal gains or equipment. Reciprocal interzone Wall–Wall
+and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
+the getter's Ceiling alias. Exact reverse Material
 identity retains the Native fast path; differing counts or layer identities use
 an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
 retain Native's warning sequence. Infrared-transparent constructions retain
-their sole-layer exact-reverse branch. Pairs require equal Zone factors and
-opposite coincident vertices. Eight 24-hour two-Zone
-cases cover 82,176 derived values with zero tolerance or RMSE failures;
+their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
+factors and opposite coincident vertices. Nine 24-hour two-Zone
+cases cover 92,256 derived values with zero tolerance or RMSE failures;
 the maximum absolute difference is 1.37e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Explicit

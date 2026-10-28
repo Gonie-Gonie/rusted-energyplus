@@ -557,7 +557,7 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         ("outside_boundary_condition_object", json!("Missing")),
         ("zone_name", json!("Zulu")),
         ("construction_name", json!("Other")),
-        ("surface_type", json!("Roof")),
+        ("surface_type", json!("Window")),
         ("sun_exposure", json!(null)),
         ("wind_exposure", json!(false)),
         ("sun_exposure", json!(" ")),
@@ -569,6 +569,124 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         assert!(
             crate::ordinary_equipment_input::resolve_source_a(&raw).is_err(),
             "paired {field} escaped"
+        );
+    }
+    // Unit87 adds normal horizontal opaque pairs without a class-equality
+    // rule. The typed model keeps authored Ceiling; only the genuine Source
+    // getter may alias that alpha to ROOF. These are admission operands, not
+    // reconstructed runtime Surface owners or physical result expectations.
+    let mut horizontal = paired.clone();
+    let zone = horizontal["Zone"]["Zulu"].clone();
+    horizontal["Zone"] = json!({"Zulu":zone.clone(),"Alpha":zone});
+    horizontal["Zone"]["Alpha"]["volume"] = json!(2.0);
+    let mut horizontal_surfaces = serde_json::Map::new();
+    for (zone, offset, height) in [("Zulu", 0.0, 1.0), ("Alpha", 1.0, 2.0)] {
+        for (name, original) in &faces {
+            let mut face = original.clone();
+            face["zone_name"] = json!(zone);
+            for point in face["vertices"].as_array_mut().unwrap() {
+                point["vertex_z_coordinate"] =
+                    json!(offset + height * point["vertex_z_coordinate"].as_f64().unwrap());
+            }
+            horizontal_surfaces.insert(format!("{zone}:{name}"), face);
+        }
+    }
+    horizontal["BuildingSurface:Detailed"] = Value::Object(horizontal_surfaces);
+    for (name, target) in [("Zulu:Roof", "Alpha:Floor"), ("Alpha:Floor", "Zulu:Roof")] {
+        horizontal["BuildingSurface:Detailed"][name]["outside_boundary_condition"] =
+            json!("Surface");
+        horizontal["BuildingSurface:Detailed"][name]["outside_boundary_condition_object"] =
+            json!(target);
+    }
+    for (lower, upper) in [
+        ("Roof", "Floor"),
+        ("Floor", "Roof"),
+        ("Ceiling", "Floor"),
+        ("Floor", "Ceiling"),
+    ] {
+        let mut classes = horizontal.clone();
+        classes["BuildingSurface:Detailed"]["Zulu:Roof"]["surface_type"] = json!(lower);
+        classes["BuildingSurface:Detailed"]["Alpha:Floor"]["surface_type"] = json!(upper);
+        let raw = parse_epjson_str(&classes.to_string()).expect("normal horizontal pair classes");
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)
+            .expect("normal opaque class pair Source input");
+        let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+            .expect("authored horizontal class operands");
+        let compiled = compile_raw_model(&raw);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("actual typed horizontal pair");
+        for (name, kind) in [("Zulu:Roof", lower), ("Alpha:Floor", upper)] {
+            let row = projected
+                .surface
+                .building_surfaces
+                .iter()
+                .find(|row| row.object.object_name == name)
+                .expect("raw horizontal class row");
+            assert_eq!(
+                row.object.fields["surface_type"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    kind.into()
+                )
+            );
+            let typed = model
+                .surfaces
+                .iter()
+                .find(|row| row.name == ep_model::NormalizedName::new(name))
+                .expect("typed authored class");
+            let expected = match kind {
+                "Floor" => ep_model::SurfaceType::Floor,
+                "Roof" => ep_model::SurfaceType::Roof,
+                _ => {
+                    assert_eq!(kind, "Ceiling");
+                    ep_model::SurfaceType::Ceiling
+                }
+            };
+            assert_eq!(typed.surface_type, expected);
+            assert_eq!(
+                typed.outside_boundary_condition,
+                ep_model::OutsideBoundaryCondition::Surface
+            );
+        }
+        let mut typed_violations = Vec::new();
+        super::surface_pairs::validate(model, PortingScope::A, &mut typed_violations);
+        assert!(
+            typed_violations.is_empty(),
+            "{lower}/{upper}: {typed_violations:?}"
+        );
+        let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(
+            selected.admissible,
+            "{lower}/{upper}: {:?}",
+            selected.violations
+        );
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+    }
+    // Other Native-valid class combinations have their own literal warning
+    // branches. They remain separate from this warning-free Roof/Floor lane.
+    for (lower, upper) in [
+        ("Roof", "Roof"),
+        ("Floor", "Floor"),
+        ("Wall", "Roof"),
+        ("Floor", "Wall"),
+    ] {
+        let mut invalid = horizontal.clone();
+        invalid["BuildingSurface:Detailed"]["Zulu:Roof"]["surface_type"] = json!(lower);
+        invalid["BuildingSurface:Detailed"]["Alpha:Floor"]["surface_type"] = json!(upper);
+        let raw = parse_epjson_str(&invalid.to_string()).expect("held class-warning input");
+        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+        let compiled = compile_raw_model(&raw);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("typed class-warning operands");
+        let mut typed_violations = Vec::new();
+        super::surface_pairs::validate(model, PortingScope::A, &mut typed_violations);
+        assert!(
+            !typed_violations.is_empty(),
+            "{lower}/{upper} class-warning lane escaped"
         );
     }
     // The paired and ordinary Outdoors faces retain authored absence/empty
@@ -994,6 +1112,31 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .count(),
         2
     );
+    // Horizontal normal classes must not leak through the established IRT
+    // Surface-use guard. Independently exercise both raw and typed pair fences.
+    for (left, right) in [("Roof", "Floor"), ("Ceiling", "Floor"), ("Wall", "Roof")] {
+        let mut invalid = irt_pair.clone();
+        invalid["BuildingSurface:Detailed"]["Zulu:East"]["surface_type"] = json!(left);
+        invalid["BuildingSurface:Detailed"]["Alpha:West"]["surface_type"] = json!(right);
+        let raw = parse_epjson_str(&invalid.to_string()).expect("IRT non-Wall pair operands");
+        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+        let compiled = compile_raw_model(&raw);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("typed IRT class fence operands");
+        let mut typed_violations = Vec::new();
+        super::surface_pairs::validate(model, PortingScope::A, &mut typed_violations);
+        assert!(
+            !typed_violations.is_empty(),
+            "{left}/{right} IRT escaped typed Wall fence"
+        );
+        assert!(
+            !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A).admissible
+        );
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+    }
     // The normal differing-ID lane must not admit distinct IRT identities,
     // even though the existing name-only definitions have the same fixed fields.
     let mut irt_alias = irt_pair.clone();
