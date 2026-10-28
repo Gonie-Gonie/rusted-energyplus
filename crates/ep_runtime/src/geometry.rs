@@ -35,7 +35,7 @@ pub use zone_volume::{
 #[allow(unused_imports)]
 pub(crate) use zone_volume::{
     bounded_topology_rejection, calculated_zone_height, initial_enclosure, polyhedron_volume,
-    surface_orientation, wall_heights_same,
+    source_enclosure, surface_orientation, wall_heights_same,
 };
 /// Actual original product precision observed for the bounded centroid owner.
 pub const SOURCE_CENTROID_PRODUCT_PRECISION_BITS: u32 =

@@ -1,4 +1,4 @@
-//! Source A's producer-free opaque multi-Zone and explicit paired-surface stage.
+//! Source A's bounded opaque multi-Zone, electric-gain and paired-surface stage.
 //! This is input admission only; it supplies no scientific owner values.
 use super::{number, text};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
@@ -15,8 +15,8 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
             continue;
         }
         // An explicit positive-family boundary prevents previously admitted
-        // one-Zone gains, comfort and equipment paths from leaking into this
-        // new topology. Existing per-field/reference checks still run next.
+        // other one-Zone gain, comfort and HVAC paths from leaking into this
+        // topology. Existing per-field/reference checks still run next.
         if !matches!(
             family.0.as_str(),
             "Version"
@@ -61,6 +61,7 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 | "Output:Surfaces:Drawing"
                 | "Output:Surfaces:List"
                 | "Output:Constructions"
+                | "OtherEquipment"
                 | "Output:Meter"
                 | "Output:Meter:MeterFileOnly"
                 | "OutputControl:Table:Style"
@@ -70,6 +71,14 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 "Source A bounded multi-Zone excludes positive family {}",
                 family.0
             ));
+        }
+        if family.0 == "OtherEquipment"
+            && rows.values().any(|row| {
+                !text(row, "fuel_type")
+                    .is_some_and(|value| value.eq_ignore_ascii_case("Electricity"))
+            })
+        {
+            return Err("Source A multi-Zone OtherEquipment currently requires Electricity".into());
         }
     }
     validate_surface_pairs(raw)

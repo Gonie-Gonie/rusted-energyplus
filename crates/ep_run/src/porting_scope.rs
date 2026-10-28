@@ -26,7 +26,7 @@ pub(crate) use environment::{
 /// Frozen input family selected for card-based porting work.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
 pub enum PortingScope {
-    /// Unconditioned opaque Zones; multiple Zones require the bounded producer-free Source stage.
+    /// Unconditioned opaque Zones; multiple Zones require bounded Source topology and gain admission.
     A,
     /// One fully mixed zone with direct no-OA sensible IdealLoads and hard limits.
     B,

@@ -1,4 +1,4 @@
-//! Initial source closure and source-ordered signed volume; no polygon repair.
+//! Initial observations, Source temporary collinear closure and original signed volume.
 
 use super::{ZoneVolumeDiagnostics, ZoneVolumeEdge, ZoneVolumeFace};
 use ep_model::{Point3, SurfaceId, SurfaceType};
@@ -16,9 +16,9 @@ struct Edge {
     direction_balance: i32,
 }
 
-pub(crate) fn initial_enclosure(faces: &[ZoneVolumeFace]) -> ZoneVolumeDiagnostics {
+fn unique_vertices(faces: &[ZoneVolumeFace]) -> Vec<Point3> {
     // makeListOfUniqueVertices preserves first occurrence under the original
-    // strict per-coordinate OneCentimeter test, before any repair.
+    // strict per-coordinate OneCentimeter test, before any completion.
     let mut unique = Vec::new();
     for face in faces {
         for point in &face.vertices {
@@ -27,11 +27,11 @@ pub(crate) fn initial_enclosure(faces: &[ZoneVolumeFace]) -> ZoneVolumeDiagnosti
             }
         }
     }
+    unique
+}
+
+fn ordered_edges(faces: &[ZoneVolumeFace], unique: &[Point3]) -> Vec<Edge> {
     let mut edges: Vec<Edge> = Vec::new();
-    let mut data = ZoneVolumeDiagnostics {
-        initial_unique_vertex_count: unique.len(),
-        ..ZoneVolumeDiagnostics::default()
-    };
     for face in faces {
         // edgesNotTwo visits last->first, then each retained successive point.
         for (index, current) in face.vertices.iter().enumerate() {
@@ -63,7 +63,11 @@ pub(crate) fn initial_enclosure(faces: &[ZoneVolumeFace]) -> ZoneVolumeDiagnosti
             }
         }
     }
-    data.initial_edges_not_used_twice = edges
+    edges
+}
+
+fn initial_diagnostics(unique: &[Point3], edges: &[Edge]) -> ZoneVolumeDiagnostics {
+    let initial_edges_not_used_twice: Vec<_> = edges
         .iter()
         .filter(|edge| edge.count != 2)
         .map(|edge| ZoneVolumeEdge {
@@ -74,12 +78,98 @@ pub(crate) fn initial_enclosure(faces: &[ZoneVolumeFace]) -> ZoneVolumeDiagnosti
             other_surface_ids: edge.others.clone(),
         })
         .collect();
-    data.initially_closed = !edges.is_empty() && data.initial_edges_not_used_twice.is_empty();
-    data.edges_winding_consistent = !edges.is_empty()
-        && edges
-            .iter()
-            .all(|edge| edge.count == 2 && edge.direction_balance == 0);
-    data
+    ZoneVolumeDiagnostics {
+        initial_unique_vertex_count: unique.len(),
+        initially_closed: !edges.is_empty() && initial_edges_not_used_twice.is_empty(),
+        edges_winding_consistent: !edges.is_empty()
+            && edges
+                .iter()
+                .all(|edge| edge.count == 2 && edge.direction_balance == 0),
+        initial_edges_not_used_twice,
+        ..ZoneVolumeDiagnostics::default()
+    }
+}
+
+pub(crate) fn initial_enclosure(faces: &[ZoneVolumeFace]) -> ZoneVolumeDiagnostics {
+    let unique = unique_vertices(faces);
+    initial_diagnostics(&unique, &ordered_edges(faces, &unique))
+}
+
+fn point_distance(a: Point3, b: Point3) -> f64 {
+    ((a.x_m - b.x_m).powi(2) + (a.y_m - b.y_m).powi(2) + (a.z_m - b.z_m).powi(2)).sqrt()
+}
+
+fn point_on_segment(start: Point3, end: Point3, test: Point3) -> bool {
+    // Original12802-08 and Vector3::normalize: multiply each coordinate by
+    // 1/length before the ordered cross product; no projection/interpolation.
+    let mut x = end.x_m - start.x_m;
+    let mut y = end.y_m - start.y_m;
+    let mut z = end.z_m - start.z_m;
+    let inverse_length = 1.0 / (x * x + y * y + z * z).sqrt();
+    x *= inverse_length;
+    y *= inverse_length;
+    z *= inverse_length;
+    let other_x = test.x_m - start.x_m;
+    let other_y = test.y_m - start.y_m;
+    let other_z = test.z_m - start.z_m;
+    let cross_x = y * other_z - z * other_y;
+    let cross_y = z * other_x - x * other_z;
+    let cross_z = x * other_y - y * other_x;
+    let line_distance = (cross_x * cross_x + cross_y * cross_y + cross_z * cross_z).sqrt();
+    if line_distance < 0.01 {
+        (point_distance(start, end) - (point_distance(start, test) + point_distance(test, end)))
+            .abs()
+            < 0.01
+    } else {
+        false
+    }
+}
+
+/// Tests Source closure using a temporary polygon copy, retaining initial observations.
+pub(crate) fn source_enclosure(faces: &[ZoneVolumeFace]) -> (ZoneVolumeDiagnostics, bool) {
+    let unique = unique_vertices(faces);
+    let edges = ordered_edges(faces, &unique);
+    let initial = initial_diagnostics(&unique, &edges);
+    if initial.initially_closed {
+        return (initial, true);
+    }
+    // Original12487-12522: ORIGINAL unique order, current->next (wrapping to
+    // index0), first eligible candidate, then restart the SAME face at index0.
+    // Only the temporary points change. Source Vertices, Newell and volume
+    // continue to consume the original faces.
+    let mut completed = faces.to_vec();
+    for face in &mut completed {
+        loop {
+            let mut inserted = false;
+            for index in 0..face.vertices.len() {
+                let next = (index + 1) % face.vertices.len();
+                let current = face.vertices[index];
+                let following = face.vertices[next];
+                for &candidate in &unique {
+                    if !almost_equal(current, candidate)
+                        && !almost_equal(following, candidate)
+                        && point_on_segment(current, following, candidate)
+                    {
+                        face.vertices.insert(next, candidate);
+                        inserted = true;
+                        break;
+                    }
+                }
+                if inserted {
+                    break;
+                }
+            }
+            if !inserted {
+                break;
+            }
+        }
+    }
+    // Original12341 reuses the ORIGINAL unique list. Enclosure is solely
+    // undirected edge count2, with no additional winding acceptance predicate.
+    let completed_edges = ordered_edges(&completed, &unique);
+    let enclosed =
+        !completed_edges.is_empty() && completed_edges.iter().all(|edge| edge.count == 2);
+    (initial, enclosed)
 }
 
 pub(crate) fn surface_orientation(faces: &[ZoneVolumeFace]) -> (bool, bool, bool) {

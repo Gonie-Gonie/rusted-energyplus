@@ -3169,6 +3169,162 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             parent.reports.output_registration, retained_registration,
             "InitOnly repeats skip getter"
         );
+        // Unit88 authored input checkpoint: the real Zone getter creates two
+        // implicit Spaces, then the real IHG getter resolves opposite object/
+        // Zone order. This is not a completed geometry/timestep certificate.
+        {
+            use crate::heat_balance::selected_heat_balance_input::zone::ZoneGetterOwners;
+            use crate::heat_balance::selected_input_processor::{SourceInputFamily,SourceObjectDefinition,SourceObjectShape};
+            use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainDictionaryFile;
+            use crate::heat_balance::source_output_registration::{SourceInternalGainOutputField as GainField,SourceRealOutputTarget};
+            let mut multi_model=model.typed.clone();
+            multi_model.timestep.number_of_timesteps_per_hour=4;
+            let template=multi_model.zones[0].clone();
+            let space_template=multi_model.spaces[0].clone();
+            multi_model.zones.clear();multi_model.spaces.clear();multi_model.zone_names=Default::default();
+            multi_model.authored_space_names=Default::default();
+            for (index,name) in ["ZULU","ALPHA"].into_iter().enumerate() {
+                let mut zone=template.clone();zone.id=ZoneId(u32::try_from(index)?);
+                zone.name=NormalizedName::new(name);zone.spaces=vec![ep_model::SpaceId(u32::try_from(index)?)];
+                zone.inside_convection_algorithm=ep_model::ZoneConvectionAlgorithm::Override(template.inside_convection_algorithm.effective());
+                zone.outside_convection_algorithm=ep_model::ZoneConvectionAlgorithm::Override(template.outside_convection_algorithm.effective());
+                assert!(multi_model.zone_names.insert(name,zone.id).is_none());
+                let mut space=space_template.clone();space.id=ep_model::SpaceId(u32::try_from(index)?);
+                space.name=zone.name.clone();space.zone=zone.id;space.origin=ep_model::SpaceOrigin::AutoZoneDefault;
+                multi_model.zones.push(zone);multi_model.spaces.push(space);
+            }
+            let requests=[
+                ("ALPHA LOAD","Other Equipment Electricity Energy"),("ZULU LOAD","Other Equipment Electricity Energy"),
+                ("ALPHA","Zone Other Equipment Total Heating Rate"),("ZULU","Zone Other Equipment Total Heating Rate"),
+                ("ALPHA","Space Other Equipment Total Heating Rate"),("ZULU","Space Other Equipment Total Heating Rate"),
+            ];
+            multi_model.report_inputs.output_variables=requests.iter().enumerate().map(|(index,(key,name))|
+                ep_model::SourceOutputVariableInput { object_name:format!("GAIN REQUEST {index}"),key:(*key).into(),
+                    variable_name:(*name).into(),reporting_frequency:"TIMESTEP".into(),schedule_name:String::new(),
+                    alpha_blank:[false,false,false,true],default_applied:[false;4],num_alphas:3,is_epjson:true }).collect();
+            let zone_objects=["ZULU","ALPHA"].into_iter().map(|name|ProjectInputObject {
+                object_name:name.into(),idf_max_fields:None,
+                fields:std::collections::BTreeMap::from([
+                    ("volume".into(),ProjectInputValue::Number(1.0)),
+                    ("zone_inside_convection_algorithm".into(),ProjectInputValue::String("TARP".into())),
+                    ("zone_outside_convection_algorithm".into(),ProjectInputValue::String("DOE-2".into())),
+                    ("part_of_total_floor_area".into(),ProjectInputValue::String("Yes".into())),
+                ]),
+            }).collect::<Vec<_>>();
+            let gain_objects=[("ALPHA LOAD","ALPHA",300.0),("ZULU LOAD","ZULU",100.0)].into_iter()
+                .map(|(name,zone,power)|ProjectInputObject { object_name:name.into(),idf_max_fields:None,
+                    fields:std::collections::BTreeMap::from([
+                        ("zone_or_zonelist_or_space_or_spacelist_name".into(),ProjectInputValue::String(zone.into())),
+                        ("schedule_name".into(),ProjectInputValue::String("Constant-1.0".into())),
+                        ("fuel_type".into(),ProjectInputValue::String("Electricity".into())),
+                        ("design_level_calculation_method".into(),ProjectInputValue::String("EquipmentLevel".into())),
+                        ("design_level".into(),ProjectInputValue::Number(power)),
+                        ("fraction_radiant".into(),ProjectInputValue::Number(0.25)),
+                    ]) }).collect::<Vec<_>>();
+            let raw=crate::heat_balance::selected_heat_balance_input::SelectedHeatBalanceInput {
+                source_is_epjson:true,objects:std::collections::BTreeMap::from([
+                    ("Zone".into(),zone_objects.clone()),("OtherEquipment".into(),gain_objects.clone()),
+                ]),..Default::default()
+            };
+            let mut definitions=Vec::new();
+            let mut definition_input=failed_gains.selected_input_processor.clone().ok_or("actual IHG definitions")?;
+            for family in ["People","Lights","ElectricEquipment","GasEquipment","HotWaterEquipment","SteamEquipment",
+                "OtherEquipment","ElectricEquipment:ITE:AirCooled","ZoneBaseboard:OutdoorTemperatureControlled",
+                "ZoneContaminantSourceAndSink:CarbonDioxide"] {
+                let actual=definition_input.get_object_def_max_args(family)?;
+                definitions.push(SourceObjectDefinition { object_type:family.into(),alpha_fields:actual.alphas,numeric_fields:actual.numerics,
+                    alpha_extensions:0,numeric_extensions:0,extension:None });
+            }
+            definitions.push(SourceObjectDefinition { object_type:"Zone".into(),alpha_fields:4,numeric_fields:9,
+                alpha_extensions:0,numeric_extensions:0,extension:None });
+            definitions.push(SourceObjectDefinition { object_type:"Output:Variable".into(),alpha_fields:4,numeric_fields:0,
+                alpha_extensions:0,numeric_extensions:0,extension:None });
+            let shape=|rows:&[ProjectInputObject]|SourceInputFamily::Objects(rows.iter().map(|row|SourceObjectShape {
+                object_name:row.object_name.clone(),field_sizes:Default::default() }).collect());
+            let mut input=SelectedInputProcessor::from_admitted_input(definitions,std::collections::BTreeMap::from([
+                ("Zone".into(),shape(&zone_objects)),("OtherEquipment".into(),shape(&gain_objects)),
+                ("Output:Variable".into(),SourceInputFamily::Objects(multi_model.report_inputs.output_variables.iter().map(|row|
+                    SourceObjectShape { object_name:row.object_name.clone(),field_sizes:Default::default() }).collect())),
+            ]))?;
+            let mut shortcut=SourceInputProcessorShortCut::default();shortcut.allocate_from_input(&input)?;
+            let mut zones=SelectedZoneInputOwners::default();
+            let mut globals=crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default();
+            let mut output=crate::heat_balance::source_output_registration::SourceOutputRegistration::default();
+            let mut prescan=crate::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            let (mut state,mut error,mut console,mut eio,mut eso)=(ctf_ordinary_output_test_state(),Vec::new(),Vec::new(),Vec::new(),Vec::new());
+            state.output_error_header=false;
+            let clock=crate::weather::day::WeatherGlobalState::default();
+            let system=&failed_gains.selected_project_data.as_ref().ok_or("actual gain project")?.system;
+            let developer=system.developer_flag;let minimum=system.minimum_report_frequency.clone();
+            let mut backend=SourceErrorBackend { state:&mut state,error_stream:Some(&mut error),console:&mut console,
+                out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None };
+            for (key,name) in requests { prescan.add_record(key,name,&mut backend)?; }
+            zones.get_zone_data(&raw,&failed_gains.heat_balance_input_state,&multi_model,&mut ZoneGetterOwners {
+                input:&mut input,shortcut:&mut shortcut,globals:&mut globals,output:&mut output,prescan:&prescan,
+                report_input:&multi_model.report_inputs,minimum_report_frequency:&minimum,developer:&developer,clock:Some(&clock),
+                backend:&mut backend,minutes_in_time_step:15,host:&mut gain_host,eio:&mut eio,
+            })?;
+            assert_eq!((globals.num_of_zones,globals.num_spaces),(2,2));
+            let retained=zones.zones.as_ref().ok_or("actual multi gain Zones")?;
+            assert_eq!(retained.iter().map(|row|row.name.as_str()).collect::<Vec<_>>(),["ZULU","ALPHA"]);
+            assert_eq!(zones.spaces.as_ref().ok_or("actual multi gain Spaces")?.iter().map(|row|row.zone_num).collect::<Vec<_>>(),[1,2]);
+            let mut multi=failed_gains.clone();
+            multi.selected_zone_input=Some(zones);multi.selected_heat_balance_globals=Some(globals);
+            multi.selected_input_processor=Some(input);multi.input_processor_shortcut=shortcut;
+            multi.heat_balance_input=Some(raw);multi.output_registration=output;multi.output_prescan=prescan;
+            let mut context=CtfInitializationContext { reports:&mut multi,eio:&mut eio,backend };
+            context.manage_selected_internal_heat_gains_input_with_dictionary(&multi_model,15,&mut gain_host,Some(&clock),
+                Some(SourceGainDictionaryFile { eso:Some(&mut eso) }))?;
+            let gains=&context.reports.selected_internal_heat_gains;
+            assert!(!gains.get_input_flag && !gains.errors_found);assert_eq!(gains.totals[6],2);
+            assert_eq!(gains.allocations.zone_report.as_ref().ok_or("actual two gain reports")?.len(),2);
+            assert_eq!(gains.allocations.space_report.as_ref().ok_or("actual two Space reports")?.len(),2);
+            let equipment=gains.allocations.other_equipment.as_ref().ok_or("actual two OtherEquipment rows")?;
+            assert_eq!(equipment.iter().map(|row|(row.name.as_str(),row.zone_ptr,row.space_index,row.design_level))
+                .collect::<Vec<_>>(),[("ALPHA LOAD",2,2,300.0),("ZULU LOAD",1,1,100.0)]);
+            assert!(equipment.iter().all(|row|row.fuel as i32==0 && row.fraction_radiant.to_bits()==0.25_f64.to_bits()));
+            let devices=gains.allocations.space_devices.as_ref().ok_or("actual separate Space devices")?;
+            assert_eq!(devices.len(),2);
+            for (space,name) in [(0,"ZULU LOAD"),(1,"ALPHA LOAD")] {
+                let row=&devices[space];assert_eq!(row.number_of_devices,1);
+                let device=&row.devices.as_ref().ok_or("actual per-Space gain target")?[0];
+                assert_eq!(device.component_name,name);assert!(device.targets.iter().all(Option::is_some));
+            }
+            assert_ne!(devices[0].devices.as_ref().ok_or("actual first target")?[0].targets[0],
+                devices[1].devices.as_ref().ok_or("actual second target")?[0].targets[0]);
+            let zones=context.reports.selected_zone_input.as_ref().ok_or("retained gain associations")?;
+            assert_eq!(zones.zones.as_ref().ok_or("retained gain Zones")?.iter().map(|row|row.internal_heat_gains).collect::<Vec<_>>(),[100.0,300.0]);
+            assert!(zones.zones.as_ref().ok_or("actual fuel Zones")?.iter().all(|row|row.other_equipment_fuels==[0]));
+            assert!(zones.spaces.as_ref().ok_or("actual fuel Spaces")?.iter().all(|row|row.other_equipment_fuels==[0]));
+            let registration=&context.reports.output_registration;
+            for (key,name,index,field) in [
+                ("ALPHA LOAD","Other Equipment Electricity Energy",1,GainField::OtherConsumption),
+                ("ZULU LOAD","Other Equipment Electricity Energy",2,GainField::OtherConsumption),
+                ("ALPHA","Zone Other Equipment Total Heating Rate",2,GainField::ZoneOtherThermal { field:9 }),
+                ("ZULU","Zone Other Equipment Total Heating Rate",1,GainField::ZoneOtherThermal { field:9 }),
+                ("ALPHA","Space Other Equipment Total Heating Rate",2,GainField::SpaceOtherThermal { field:9 }),
+                ("ZULU","Space Other Equipment Total Heating Rate",1,GainField::SpaceOtherThermal { field:9 }),
+            ] {
+                let matches=registration.out_vars.iter().filter(|row|row.key==key && row.name==name).collect::<Vec<_>>();
+                assert_eq!(matches.len(),1,"{key}:{name}");assert!(matches[0].report);
+                assert_eq!(matches[0].which,Some(SourceRealOutputTarget::InternalGain { index,field }));
+            }
+            for (name,expected) in [("ELECTRICITY:FACILITY",vec!["ALPHA LOAD","ZULU LOAD"]),
+                ("ELECTRICITY:ZONE:ALPHA",vec!["ALPHA LOAD"]),("ELECTRICITY:ZONE:ZULU",vec!["ZULU LOAD"])] {
+                let number=*registration.meters.meter_map.get(name).ok_or("genuine electrical meter")?;
+                let meter=&registration.meters.meters[number];
+                let keys=meter.source_variable_numbers.iter().map(|&number|registration.out_vars[number].key.as_str()).collect::<Vec<_>>();
+                assert_eq!(keys,expected,"actual {name} membership");
+            }
+            assert_eq!(context.backend.state.tracking.total_warning_errors,0);assert_eq!(context.backend.state.tracking.total_severe_errors,0);
+            let retained_gains=context.reports.selected_internal_heat_gains.clone();
+            let retained_registration=context.reports.output_registration.clone();
+            context.manage_selected_internal_heat_gains_input_with_dictionary(&multi_model,15,&mut gain_host,Some(&clock),
+                Some(SourceGainDictionaryFile { eso:Some(&mut eso) }))?;
+            assert_eq!(context.reports.selected_internal_heat_gains,retained_gains);
+            assert_eq!(context.reports.output_registration,retained_registration);
+            assert!(error.is_empty());
+        }
         // Genuine dictionary capability over the same gain getter: the stream
         // can fail, or actually be closed, without moving SQL/RF owners out.
         for dictionary_case in 0..4 {

@@ -140,6 +140,118 @@
             .expect_err("automatic inward volume must not use a bounding box or absolute value");
         assert!(matches!(error, ZoneVolumeError::UnsupportedTopology(reason)
             if reason.contains("signed polyhedron volume is nonpositive")));
+
+        // Authored geometry checkpoint: split one real outward cube wall into
+        // two quads. Its neighbours retain whole vertical edges, so only the
+        // Source temporary-collinear completion can establish edge-count2.
+        use crate::geometry::{
+            ZoneVolumeFace, initial_enclosure, polyhedron_volume, source_enclosure,
+        };
+        let mut outward = cube_model();
+        for face in &mut outward.surfaces {
+            face.vertices.reverse();
+        }
+        let whole_faces = outward
+            .surfaces
+            .iter()
+            .map(ZoneVolumeFace::from_surface)
+            .collect::<Result<Vec<_>, _>>()?;
+        let whole_volume = polyhedron_volume(&whole_faces, point(0.0, 0.0, 0.0))
+            .ok_or("outward cube has finite signed volume")?;
+        assert_eq!(whole_volume.to_bits(), 1.0_f64.to_bits());
+        let (whole_initial, whole_closed) = source_enclosure(&whole_faces);
+        assert_eq!(whole_initial, initial_enclosure(&whole_faces));
+        assert!(whole_initial.initially_closed && whole_closed);
+
+        let mut lower = outward.surfaces[2].clone();
+        lower.name = NormalizedName::new("Wall X0 Lower");
+        lower.vertices = vec![
+            point(0.0, 0.0, 0.5),
+            point(0.0, 1.0, 0.5),
+            point(0.0, 1.0, 0.0),
+            point(0.0, 0.0, 0.0),
+        ];
+        lower.computed_geometry = None;
+        let mut upper = lower.clone();
+        upper.id = SurfaceId(6);
+        upper.name = NormalizedName::new("Wall X0 Upper");
+        upper.vertices = vec![
+            point(0.0, 0.0, 1.0),
+            point(0.0, 1.0, 1.0),
+            point(0.0, 1.0, 0.5),
+            point(0.0, 0.0, 0.5),
+        ];
+        outward.surfaces[2] = lower;
+        outward.surfaces.push(upper);
+        let split_faces = outward
+            .surfaces
+            .iter()
+            .map(ZoneVolumeFace::from_surface)
+            .collect::<Result<Vec<_>, _>>()?;
+        let retained_original_faces = split_faces.clone();
+        let initial = initial_enclosure(&split_faces);
+        assert_eq!(initial.initial_unique_vertex_count, 10);
+        assert_eq!(initial.initial_edges_not_used_twice.len(), 6);
+        assert!(!initial.initially_closed);
+        let (observed_initial, completed_closed) = source_enclosure(&split_faces);
+        assert_eq!(observed_initial, initial);
+        assert!(completed_closed);
+        assert_eq!(split_faces, retained_original_faces);
+        assert_eq!(
+            polyhedron_volume(&split_faces, point(0.0, 0.0, 0.0))
+                .ok_or("original split faces have finite signed volume")?
+                .to_bits(),
+            whole_volume.to_bits(),
+        );
+        assert_eq!(
+            split_faces.iter().map(|face| face.area_m2).sum::<f64>().to_bits(),
+            6.0_f64.to_bits(),
+        );
+
+        // Point-only closure checkpoints: the copied area/Newell bundles are
+        // intentionally not recomputed or asserted as physical geometry.
+        for (height, offset, expected_closed) in [
+            (1.0, 0.009, true),
+            (1.0, 0.01, false),
+            (1.0, 0.011, false),
+            (30.0, 0.3, false),
+        ] {
+            let mut point_checkpoint = split_faces.clone();
+            for face in &mut point_checkpoint {
+                for vertex in &mut face.vertices {
+                    if vertex.z_m.to_bits() == 0.5_f64.to_bits() {
+                        vertex.x_m = offset;
+                    }
+                    vertex.z_m *= height;
+                }
+            }
+            let retained_points = point_checkpoint.clone();
+            let initial_points = initial_enclosure(&point_checkpoint);
+            let (observed_points, completed_points) = source_enclosure(&point_checkpoint);
+            assert!(!initial_points.initially_closed);
+            assert_eq!(observed_points, initial_points);
+            assert_eq!(completed_points, expected_closed, "height={height}, offset={offset}");
+            assert_eq!(point_checkpoint, retained_points);
+        }
+        // The 30m/.3m case passes the distance-sum tolerance alone; the
+        // perpendicular-distance guard must prevent the false completion.
+        assert!((30.0 - 2.0 * (15.0_f64 * 15.0 + 0.3 * 0.3).sqrt()).abs() < 0.01);
+
+        // Positive entered volume does not authorize the Source open-zone
+        // fallback: removing a real face still leaves failed completion.
+        let mut open_faces = split_faces.clone();
+        open_faces.remove(1);
+        let (open_initial, open_completed) = source_enclosure(&open_faces);
+        assert!(!open_initial.initially_closed && !open_completed);
+        assert!(!open_initial.initial_edges_not_used_twice.is_empty());
+
+        // The separate legacy automatic-volume contract remains six quads.
+        outward.zones[0].volume = AutoOrNumber::AutoCalculate;
+        let legacy_error = zone_geometry_properties(&outward, &outward.zones[0])
+            .expect_err("temporary Source completion must not broaden legacy automatic volume");
+        assert!(matches!(legacy_error, ZoneVolumeError::UnsupportedTopology(reason)
+            if reason.contains("six base quadrilaterals")));
+
         // The original open/reversed fallback and warning IO stay source-only.
         Ok(())
     }

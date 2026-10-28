@@ -1,14 +1,15 @@
 //! Source-ordered zone height and closed opaque-zone volume ownership.
 //!
-//! The admitted automatic route has six initially closed, consistently wound
-//! quads. Original repair/open-zone fallbacks, Space state and warning IO remain
-//! unpaired. A positive current Volume retains its source priority even when
-//! automatic topology is unsupported. Vertices are already world coordinates.
+//! The legacy automatic route has six initially closed, consistently wound
+//! quads. The separate Source caller can complete collinear vertices in a
+//! temporary closure copy; original faces still own Newell and volume. Open-zone
+//! fallbacks remain held. A positive current Volume retains its existing legacy
+//! priority. Vertices are already world coordinates.
 
 mod topology;
 pub(crate) use topology::{
-    bounded_topology_rejection, initial_enclosure, polyhedron_volume, surface_orientation,
-    wall_heights_same,
+    bounded_topology_rejection, initial_enclosure, polyhedron_volume, source_enclosure,
+    surface_orientation, wall_heights_same,
 };
 
 use super::surface_geometry_properties;
@@ -84,7 +85,7 @@ pub struct ZoneVolumeDiagnostics {
     pub sum_face_areas_m2: f64,
     /// Source-order first-pass unique point count.
     pub initial_unique_vertex_count: usize,
-    /// First-pass edges, before any excluded source polygon repair.
+    /// First-pass edges, before temporary Source collinear completion.
     pub initial_edges_not_used_twice: Vec<ZoneVolumeEdge>,
     /// Actual initial undirected-edge closure result.
     pub initially_closed: bool,

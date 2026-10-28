@@ -643,11 +643,8 @@ fn resolve_raw(
                 if family == "OtherEquipment"
                     && !text(object, "zone_or_zonelist_or_space_or_spacelist_name").is_some_and(
                         |name| {
-                            zones.len() == 1
-                                && zones
-                                    .keys()
-                                    .next()
-                                    .is_some_and(|zone| name.eq_ignore_ascii_case(&zone.0))
+                            (source_multizone_ingress || zones.len() == 1)
+                                && zones.keys().any(|zone| name.eq_ignore_ascii_case(&zone.0))
                         },
                     )
                 {
@@ -820,7 +817,6 @@ mod tests {
         assert!(resolve(&raw).is_err());
         for family in [
             "People",
-            "OtherEquipment",
             "Exterior:Lights",
             "ComfortViewFactorAngles",
             "Lights",
@@ -851,6 +847,58 @@ mod tests {
                 error.starts_with("Source A bounded multi-Zone excludes positive family"),
                 "{family}: {error}"
             );
+        }
+        // Only direct real Zone references and explicit Electricity expand.
+        // The object order is opposite the direct-JSON Zone order, without
+        // renumbering IDs or changing either actual namespace.
+        let mut gains: serde_json::Value = serde_json::from_str(multi)?;
+        gains["Schedule:Constant"] = serde_json::json!({"On":{"hourly_value":1}});
+        gains["OtherEquipment"] = serde_json::json!({
+            "A gain":{"zone_or_zonelist_or_space_or_spacelist_name":"Zulu","schedule_name":"On",
+                "fuel_type":"Electricity","design_level_calculation_method":"EquipmentLevel",
+                "design_level":100,"fraction_radiant":0.25},
+            "Z gain":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","schedule_name":"On",
+                "fuel_type":"Electricity","design_level_calculation_method":"EquipmentLevel",
+                "design_level":300,"fraction_radiant":0.25}
+        });
+        let raw = parse_epjson_str(&gains.to_string())?;
+        assert!(resolve_source_a(&raw).is_ok());
+        assert!(resolve_source_b(&raw).is_err());
+        assert!(resolve(&raw).is_err());
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+        assert_eq!(projected.objects["OtherEquipment"].len(), 2);
+        for (index, target) in ["Zulu", "Alpha"].into_iter().enumerate() {
+            assert_eq!(
+                projected.objects["OtherEquipment"][index].fields["zone_or_zonelist_or_space_or_spacelist_name"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    target.into()
+                )
+            );
+        }
+        for fuel in [
+            None,
+            Some(""),
+            Some("None"),
+            Some("NaturalGas"),
+            Some("DistrictHeatingWater"),
+        ] {
+            let mut invalid = gains.clone();
+            let row = invalid["OtherEquipment"]["A gain"]
+                .as_object_mut()
+                .ok_or("actual gain test row")?;
+            if let Some(fuel) = fuel {
+                row.insert("fuel_type".into(), serde_json::json!(fuel));
+            } else {
+                row.remove("fuel_type");
+            }
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        for target in ["Missing", "ZoneList", "Alpha Space"] {
+            let mut invalid = gains.clone();
+            invalid["OtherEquipment"]["A gain"]["zone_or_zonelist_or_space_or_spacelist_name"] =
+                serde_json::json!(target);
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
         }
         let base = r#""Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}}"#;
         for (name, addition, accepted) in [

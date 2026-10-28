@@ -1,7 +1,7 @@
 //! Actual548 selected closed-zone call; return precedes550 centroid/bounds.
 use super::{Error, SelectedInputProcessor, SourceErrorBackend, SurfaceGeometryInputState};
 use crate::geometry::{
-    InitializedZoneGeometry, ZoneGeometryProperties, initial_enclosure, polyhedron_volume,
+    InitializedZoneGeometry, ZoneGeometryProperties, polyhedron_volume, source_enclosure,
     surface_orientation, wall_heights_same,
 };
 use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners;
@@ -48,7 +48,7 @@ impl SurfaceGeometryInputState {
             // Genuine selected pure calls, in their Original12087/91/94 order.
             let orientation = surface_orientation(&faces);
             let same_height = wall_heights_same(&faces);
-            let mut diagnostics = initial_enclosure(&faces);
+            let (mut diagnostics, enclosed) = source_enclosure(&faces);
             (
                 diagnostics.floor_horizontal,
                 diagnostics.roof_horizontal,
@@ -66,9 +66,9 @@ impl SurfaceGeometryInputState {
             } else {
                 zone.geometric_ceiling_area
             };
-            if !diagnostics.initially_closed {
+            if !enclosed {
                 return Err(Error::Unavailable(
-                    "Source volume polygon-repair/open-zone branch",
+                    "Source volume open-zone fallback after collinear completion",
                 ));
             }
             let mut numeric = ZoneGeometryProperties {
@@ -87,7 +87,7 @@ impl SurfaceGeometryInputState {
             };
             diagnostics.signed_polyhedron_volume_m3 =
                 polyhedron_volume(&numeric.faces, numeric.p0_m);
-            // Native's initially enclosed branch consumes the signed result
+            // Native's enclosed branch consumes the original signed result
             // directly, then retains a positive user-entered Zone.Volume.
             // Face count and winding are not additional Native enclosure tests.
             let calculated = diagnostics
@@ -179,7 +179,7 @@ impl SurfaceGeometryInputState {
                 returned: numeric,
             });
         }
-        // Every admitted zone was initially enclosed; the12311 summary branch
+        // Every admitted zone was enclosed after the selected test; the12311 summary branch
         // is genuinely false. Faces remain in the existing Rust numeric return;
         // this projection does not claim Native local-array deallocation parity.
         Ok(returned)

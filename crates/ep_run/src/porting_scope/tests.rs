@@ -444,6 +444,113 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .any(|diagnostic| diagnostic.code == "UnsupportedTopology")
     );
 
+    // Unit88 admits only direct-Zone Electricity OtherEquipment on this
+    // Source topology. Actual compiler/IP names link opposite object/Zone order;
+    // no typed IDs, rates or thermal outcomes are synthesized for this test.
+    let mut gain_case = value.clone();
+    gain_case["OtherEquipment"] = json!({
+        "A gain":{"zone_or_zonelist_or_space_or_spacelist_name":"Zulu","schedule_name":"On",
+            "fuel_type":"Electricity","design_level_calculation_method":"EquipmentLevel",
+            "design_level":100,"fraction_radiant":0.25},
+        "Z gain":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","schedule_name":"On",
+            "fuel_type":"Electricity","design_level_calculation_method":"EquipmentLevel",
+            "design_level":300,"fraction_radiant":0.25}
+    });
+    let gain_raw =
+        parse_epjson_str(&gain_case.to_string()).expect("multi-Zone electric gain raw input");
+    let gain_ip = crate::ordinary_input_processor::resolve_source_a(&gain_raw)
+        .expect("actual multi-Zone electric gain input processor");
+    let gain_input = crate::ordinary_heat_balance_input::resolve_source(&gain_raw, &gain_ip)
+        .expect("actual gain getter operands");
+    assert_eq!(gain_input.objects["OtherEquipment"].len(), 2);
+    let gain_compiled = compile_raw_model(&gain_raw);
+    let gain_model = gain_compiled
+        .model
+        .as_ref()
+        .expect("actual typed multi-Zone electric gains");
+    assert_eq!(gain_model.other_equipment.len(), 2);
+    for (name, target, power) in [
+        ("A gain", "Zulu", 100.0_f64),
+        ("Z gain", "Alpha", 300.0_f64),
+    ] {
+        let raw = gain_input.objects["OtherEquipment"]
+            .iter()
+            .find(|row| row.object_name == name)
+            .expect("actual raw gain row");
+        assert_eq!(
+            raw.fields["zone_or_zonelist_or_space_or_spacelist_name"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                target.into()
+            )
+        );
+        let typed = gain_model
+            .other_equipment
+            .iter()
+            .find(|row| row.name == ep_model::NormalizedName::new(name))
+            .expect("actual typed gain row");
+        let zone = gain_model
+            .zones
+            .iter()
+            .find(|row| row.name == ep_model::NormalizedName::new(target))
+            .expect("actual target Zone");
+        assert_eq!(typed.zone, zone.id);
+        assert_eq!(
+            typed.fuel_type,
+            ep_model::NormalizedName::new("Electricity")
+        );
+        assert_eq!(typed.design_level_w.to_bits(), power.to_bits());
+        assert_eq!(typed.fraction_radiant.to_bits(), 0.25_f64.to_bits());
+    }
+    let mut gain_scope = inspect_porting_scope(
+        &gain_raw,
+        &gain_compiled.report,
+        Some(gain_model),
+        PortingScope::A,
+    );
+    assert!(gain_scope.admissible, "{:?}", gain_scope.violations);
+    gain_scope.environment = Some(
+        super::environment::environment_from_weather(
+            gain_model,
+            &weather,
+            "authored multi-Zone electric gains",
+        )
+        .expect("genuine gain environment"),
+    );
+    let gain_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&gain_raw, &gain_scope)
+            .expect("validated Source gain admission");
+    let gain_support = crate::support::assess_support_with_source_admission(
+        &gain_raw,
+        &gain_compiled.report,
+        Some(gain_model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&gain_admission),
+    );
+    assert!(
+        gain_support.allows_rust_runtime(),
+        "{:?}",
+        gain_support.diagnostics
+    );
+    assert_eq!(
+        gain_support.runtime_class,
+        crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+    );
+    assert!(gain_support.matched_capability_ids.is_empty());
+    assert!(!gain_support.runtime_class.conformance_promotion_allowed());
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&gain_raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&gain_raw).is_err());
+    assert!(
+        !inspect_porting_scope(
+            &gain_raw,
+            &gain_compiled.report,
+            Some(gain_model),
+            PortingScope::B
+        )
+        .admissible
+    );
     // Actual compiler and raw-to-IP projection already share each format's Source
     // order. Legal reverse-lexical IDF declarations prove that fact, without
     // renumbering IDs or reordering the compiled vectors for this test.
