@@ -5,8 +5,8 @@ use crate::geometry::zone_floor_area_m2;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
 use crate::time_axis::{DayType, EnvironmentTimeAxis, EnvironmentTimePoint, TimeAxis, TimePoint};
 use ep_model::{
-    OtherEquipment, OtherEquipmentDesignLevelCalculationMethod, People,
-    PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
+    InternalGainScheduleReference, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
+    People, PeopleNumberCalculationMethod, ScheduleCompact, ScheduleCompactDayProfile,
     ScheduleCompactPeriod, ScheduleCompactSegment, ScheduleDayType, ScheduleFile, ScheduleId,
     ScheduleInterpolation, TypedModel, ZoneId,
 };
@@ -191,23 +191,33 @@ fn radiant_internal_gain_for_equipment_with_multiplier_w(
 
 fn hour_only_schedule_multiplier(
     model: &TypedModel,
-    schedule_id: Option<ScheduleId>,
+    schedule_id: Option<InternalGainScheduleReference>,
     hour_ending: u32,
 ) -> f64 {
-    let Some(schedule_id) = schedule_id else {
-        return 1.0;
+    let schedule_id = match schedule_id {
+        None => return 1.0,
+        Some(InternalGainScheduleReference::User(id)) => id,
+        Some(
+            InternalGainScheduleReference::ConstantZero
+            | InternalGainScheduleReference::ConstantOne,
+        ) => return f64::NAN,
     };
     schedule_value(model, schedule_id, hour_ending).unwrap_or(f64::NAN)
 }
 
 fn hour_only_schedule_multiplier_live_profiled(
     model: &TypedModel,
-    schedule_id: Option<ScheduleId>,
+    schedule_id: Option<InternalGainScheduleReference>,
     hour_ending: u32,
     operations: &mut InternalGainSchedulePhaseOperations,
 ) -> f64 {
-    let Some(schedule_id) = schedule_id else {
-        return 1.0;
+    let schedule_id = match schedule_id {
+        None => return 1.0,
+        Some(InternalGainScheduleReference::User(id)) => id,
+        Some(
+            InternalGainScheduleReference::ConstantZero
+            | InternalGainScheduleReference::ConstantOne,
+        ) => return f64::NAN,
     };
     schedule_value_with_operations(model, schedule_id, hour_ending, Some(operations))
         .unwrap_or(f64::NAN)
@@ -217,8 +227,17 @@ pub(crate) fn validate_hour_only_internal_gain_schedules(
     model: &TypedModel,
 ) -> Result<(), RuntimeError> {
     for equipment in &model.other_equipment {
-        let Some(schedule_id) = equipment.schedule else {
-            continue;
+        let schedule_id = match equipment.schedule {
+            None => continue,
+            Some(InternalGainScheduleReference::User(id)) => id,
+            Some(
+                InternalGainScheduleReference::ConstantZero
+                | InternalGainScheduleReference::ConstantOne,
+            ) => {
+                return Err(RuntimeError::HeatBalanceInput(Box::new(
+                    crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                        "actual Source schedule manager for built-in OtherEquipment schedule"))));
+            }
         };
         if model
             .schedules

@@ -668,7 +668,8 @@ fn resolve_raw(
                 };
                 // ScheduleManager's two real built-in Constant owners exist
                 // without authored definitions (ScheduleManager.cc:316-320).
-                if family == "Output:Variable"
+                if (family == "Output:Variable"
+                    || (source_calendar_ingress && family == "OtherEquipment"))
                     && ["Constant-0.0", "Constant-1.0"]
                         .iter()
                         .any(|name| schedule.eq_ignore_ascii_case(name))
@@ -953,6 +954,61 @@ mod tests {
             let mut invalid = gains.clone();
             invalid["OtherEquipment"]["A gain"]["zone_or_zonelist_or_space_or_spacelist_name"] =
                 serde_json::json!(target);
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        // Unit92: the genuine Source manager owns these two schedules even
+        // without an authored Constant. Keep names/raw presence and typed user
+        // IDs separate; neither the legacy lane nor unknown constants expand.
+        for (reference, expected) in [
+            (
+                "cOnStAnT-0.0",
+                ep_model::InternalGainScheduleReference::ConstantZero,
+            ),
+            (
+                "CONSTANT-1.0",
+                ep_model::InternalGainScheduleReference::ConstantOne,
+            ),
+        ] {
+            let mut actual = gains.clone();
+            actual["OtherEquipment"]["A gain"]["schedule_name"] = serde_json::json!(reference);
+            let raw = parse_epjson_str(&actual.to_string())?;
+            resolve_source_a(&raw)?;
+            assert!(resolve_source_b(&raw).is_err() && resolve(&raw).is_err());
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+            let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+            assert_eq!(
+                projected.objects["OtherEquipment"][0].fields["schedule_name"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    reference.into()
+                )
+            );
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            let model = compiled
+                .model
+                .ok_or_else(|| format!("{:?}", compiled.report.diagnostics))?;
+            let gain = model
+                .other_equipment
+                .iter()
+                .find(|row| row.name == ep_model::NormalizedName::new("A gain"))
+                .ok_or("actual built-in gain identity")?;
+            assert_eq!(gain.schedule, Some(expected));
+            assert_eq!(model.schedules.len(), 1);
+            assert_eq!(model.schedule_names.resolve(reference), None);
+            let single = serde_json::json!({"Zone":{"Z":{}},"OtherEquipment":{"P":{
+                "zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":reference,"design_level":10}}});
+            let raw = parse_epjson_str(&single.to_string())?;
+            resolve_source_a(&raw)?;
+            resolve_source_b(&raw)?;
+            assert!(resolve(&raw).is_err());
+            let model = ep_compiler::compile_raw_model_for_source(&raw)
+                .model
+                .ok_or("Source built-in without user schedules")?;
+            assert!(model.schedules.is_empty());
+            assert_eq!(model.other_equipment[0].schedule, Some(expected));
+        }
+        for reference in ["Constant-2.0", " Constant-1.0", "Constant-0.0 "] {
+            let mut invalid = gains.clone();
+            invalid["OtherEquipment"]["A gain"]["schedule_name"] = serde_json::json!(reference);
             assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
         }
         // Unit91 composes the existing People sizing/field/reference rules

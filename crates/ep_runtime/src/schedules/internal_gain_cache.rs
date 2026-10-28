@@ -13,7 +13,7 @@ use super::{
 };
 use crate::error::RuntimeError;
 use crate::heat_balance::state::SurfaceHeatBalanceState;
-use ep_model::{ScheduleId, TypedModel, ZoneId};
+use ep_model::{InternalGainScheduleReference, ScheduleId, TypedModel, ZoneId};
 use std::collections::BTreeSet;
 
 const HOUR_ONLY_SAMPLE_COUNT: usize = 24;
@@ -35,7 +35,7 @@ fn precompute_hour_only_internal_gain_schedule_cache_with_build_operations(
     let mut entries = Vec::new();
     let mut compact_value_evaluation_count = 0_usize;
     for equipment in &model.other_equipment {
-        let Some(schedule_id) = equipment.schedule else {
+        let Some(InternalGainScheduleReference::User(schedule_id)) = equipment.schedule else {
             continue;
         };
         if referenced_schedule_ids.insert(schedule_id) {
@@ -140,12 +140,17 @@ fn invalid_internal_gain_schedule(
 
 fn hour_only_schedule_multiplier_from_cache_with_operations(
     schedule_cache: &ScheduleSeriesCache,
-    schedule_id: Option<ScheduleId>,
+    schedule_id: Option<InternalGainScheduleReference>,
     hour_ending: u32,
     operations: Option<&mut InternalGainSchedulePhaseOperations>,
 ) -> f64 {
-    let Some(schedule_id) = schedule_id else {
-        return 1.0;
+    let schedule_id = match schedule_id {
+        None => return 1.0,
+        Some(InternalGainScheduleReference::User(id)) => id,
+        Some(
+            InternalGainScheduleReference::ConstantZero
+            | InternalGainScheduleReference::ConstantOne,
+        ) => return f64::NAN,
     };
     if let Some(operations) = operations {
         operations.record_cached_value_lookup();
@@ -305,7 +310,7 @@ mod tests {
             name: NormalizedName::new(&format!("Equipment {id}")),
             fuel_type: NormalizedName::new("Electricity"),
             zone: ZoneId(3),
-            schedule,
+            schedule: schedule.map(InternalGainScheduleReference::User),
             design_level_calculation_method:
                 OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
             design_level_w: 100.0,
@@ -613,10 +618,30 @@ mod tests {
             .push(equipment(0, Some(ScheduleId(31))));
         let cache = precompute_hour_only_internal_gain_schedule_cache(&model)
             .expect("referenced constant schedule should cache");
-        model.other_equipment[0].schedule = Some(ScheduleId(32));
+        model.other_equipment[0].schedule =
+            Some(InternalGainScheduleReference::User(ScheduleId(32)));
 
         assert!(convective_internal_gain_w_from_cache(&model, &cache, ZoneId(3), 1).is_nan());
         assert!(radiant_internal_gain_w_from_cache(&model, &cache, ZoneId(3), 1).is_nan());
+        // Explicit Source built-ins cannot be evaluated by a legacy cache.
+        // The existing genuine Source manager must own them; do not seed a
+        // synthetic user ID, cache sample, or fallback1 for Constant-0.0.
+        for schedule in [
+            InternalGainScheduleReference::ConstantZero,
+            InternalGainScheduleReference::ConstantOne,
+        ] {
+            model.other_equipment[0].schedule = Some(schedule);
+            assert!(
+                matches!(precompute_hour_only_internal_gain_schedule_cache(&model),
+                Err(RuntimeError::HeatBalanceInput(ref error)) if matches!(**error,
+                    crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                        "actual Source schedule manager for built-in OtherEquipment schedule")))
+            );
+            assert!(convective_internal_gain_w_from_cache(&model, &cache, ZoneId(3), 1).is_nan());
+            assert!(radiant_internal_gain_w_from_cache(&model, &cache, ZoneId(3), 1).is_nan());
+            assert!(super::super::convective_internal_gain_w(&model, ZoneId(3), 1).is_nan());
+            assert!(super::super::internal_gain_w(&model, ZoneId(3), 1).is_nan());
+        }
     }
 
     #[test]

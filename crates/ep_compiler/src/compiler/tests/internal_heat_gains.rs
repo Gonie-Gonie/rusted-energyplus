@@ -138,6 +138,108 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
             result.report.diagnostics
         );
     }
+    // Unit92: only explicit Source compilation resolves genuine built-ins.
+    // No authored object or user ScheduleId is inserted for either constant.
+    for (reference, expected) in [
+        (
+            "cOnStAnT-0.0",
+            ep_model::InternalGainScheduleReference::ConstantZero,
+        ),
+        (
+            "CONSTANT-1.0",
+            ep_model::InternalGainScheduleReference::ConstantOne,
+        ),
+        (
+            "User",
+            ep_model::InternalGainScheduleReference::User(ep_model::ScheduleId(0)),
+        ),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"User":{{"hourly_value":0.25}}}},"OtherEquipment":{{"Plug":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"{reference}","design_level":10}}}}}}"#
+        );
+        let raw = parse_epjson_str(&text)?;
+        let result = super::super::compile_raw_model_for_source(&raw);
+        assert!(
+            !result.has_errors(),
+            "{reference}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result
+            .model
+            .ok_or("Source OtherEquipment schedule identity")?;
+        assert_eq!(typed.other_equipment[0].schedule, Some(expected));
+        assert_eq!(typed.schedules.len(), 1);
+        assert_eq!(typed.schedules[0].id, ep_model::ScheduleId(0));
+        assert_eq!(
+            typed.schedule_names.resolve("User"),
+            Some(ep_model::ScheduleId(0))
+        );
+        assert_eq!(typed.schedule_names.resolve("Constant-0.0"), None);
+        assert_eq!(typed.schedule_names.resolve("Constant-1.0"), None);
+        assert_eq!(
+            compile_raw_model(&raw).has_errors(),
+            reference != "User",
+            "legacy compilation retains authored-user-only OtherEquipment schedules"
+        );
+    }
+    for (authored, reference, expected) in [
+        (
+            " Constant-1.0",
+            "Constant-1.0",
+            ep_model::InternalGainScheduleReference::ConstantOne,
+        ),
+        (
+            "Constant-0.0 ",
+            "Constant-0.0",
+            ep_model::InternalGainScheduleReference::ConstantZero,
+        ),
+        (
+            " Constant-1.0",
+            " Constant-1.0",
+            ep_model::InternalGainScheduleReference::User(ep_model::ScheduleId(0)),
+        ),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"{authored}":{{"hourly_value":0.25}}}},"OtherEquipment":{{"Plug":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"{reference}","design_level":10}}}}}}"#
+        );
+        let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?);
+        assert!(
+            !result.has_errors(),
+            "{authored:?}/{reference:?}: {:?}",
+            result.report.diagnostics
+        );
+        let typed = result.model.ok_or("Source raw schedule name boundary")?;
+        assert_eq!(typed.other_equipment[0].schedule, Some(expected));
+        assert_eq!(typed.schedules[0].hourly_value, 0.25);
+    }
+    for (reference, schedules, code) in [
+        ("Missing", "", "MissingReference"),
+        (" Constant-1.0", "", "MissingReference"),
+        ("Constant-2.0", "", "MissingReference"),
+        (
+            "Constant-1.0",
+            r#", "Schedule:Constant":{"CONSTANT-1.0":{"hourly_value":0.25}}"#,
+            "AmbiguousOtherEquipmentSchedule",
+        ),
+        (
+            "CONSTANT-0.0",
+            r#", "Schedule:Constant":{"constant-0.0":{"hourly_value":0.25}}"#,
+            "AmbiguousOtherEquipmentSchedule",
+        ),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Direct Zone":{{}}}}{schedules},"OtherEquipment":{{"Plug":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"{reference}","design_level":10}}}}}}"#
+        );
+        let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?);
+        assert!(result.has_errors(), "{reference}");
+        assert!(
+            result.report.diagnostics.iter().any(|d| d.code == code
+                && d.object_type == "OtherEquipment"
+                && d.field.as_deref() == Some("schedule_name")),
+            "{reference}: {:?}",
+            result.report.diagnostics
+        );
+    }
     for method in ["Watts/Person", "Power/Person"] {
         let text = format!(
             r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2}}}},"OtherEquipment":{{"Per person":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"on","design_level_calculation_method":"{method}","design_level":-7,"power_per_floor_area":-9,"power_per_person":3.5}}}}}}"#

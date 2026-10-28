@@ -104,7 +104,7 @@
             name: NormalizedName::new("Plug Load"),
             fuel_type: NormalizedName::new("None"),
             zone: ZoneId(0),
-            schedule: Some(ScheduleId(0)),
+            schedule: Some(ep_model::InternalGainScheduleReference::User(ScheduleId(0))),
             design_level_calculation_method:
                 OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
             design_level_w: 12.0,

@@ -1,25 +1,27 @@
 //! Bounded internal-heat-gain input sequencing.
 
 use super::{Compiler, DiagnosticSeverity};
-use ep_model::{PeopleScheduleReference, TypedModel};
+use ep_model::{InternalGainScheduleReference, PeopleScheduleReference, TypedModel};
 use ep_raw_model::RawObject;
 
 impl Compiler<'_> {
     /// Preserve the actual built-in identity without manufacturing a user schedule.
     /// Native creates these names before reading user schedules, so a user name
     /// collision is a duplicate error rather than an alternate built-in value.
-    pub(super) fn people_schedule_reference(
+    fn internal_gain_schedule_reference(
         &mut self,
         model: &TypedModel,
+        object_type: &str,
         name: &str,
         object: &RawObject,
-    ) -> Option<PeopleScheduleReference> {
-        const FIELD: &str = "number_of_people_schedule_name";
-        let reference = self.optional_schedule_name("People", name, object, FIELD)?;
+        field: &str,
+        ambiguous_code: &str,
+    ) -> Option<InternalGainScheduleReference> {
+        let reference = self.optional_schedule_name(object_type, name, object, field)?;
         let built_in = if reference.eq_ignore_ascii_case("Constant-0.0") {
-            Some(PeopleScheduleReference::ConstantZero)
+            Some(InternalGainScheduleReference::ConstantZero)
         } else if reference.eq_ignore_ascii_case("Constant-1.0") {
-            Some(PeopleScheduleReference::ConstantOne)
+            Some(InternalGainScheduleReference::ConstantOne)
         } else {
             None
         };
@@ -52,11 +54,11 @@ impl Compiler<'_> {
             });
             if exact_collision {
                 self.error(
-                    "AmbiguousPeopleSchedule",
-                    "People",
+                    ambiguous_code,
+                    object_type,
                     Some(name),
-                    Some(FIELD),
-                    format!("People/{name} schedule reference '{reference}' collides with an EnergyPlus built-in schedule"),
+                    Some(field),
+                    format!("{object_type}/{name} schedule reference '{reference}' collides with an EnergyPlus built-in schedule"),
                 );
                 None
             } else {
@@ -65,14 +67,60 @@ impl Compiler<'_> {
         } else {
             self.resolve_name(
                 &model.schedule_names,
-                "People",
+                object_type,
                 name,
-                FIELD,
+                field,
                 &reference,
                 "Schedule",
             )
-            .map(PeopleScheduleReference::User)
+            .map(InternalGainScheduleReference::User)
         }
+    }
+
+    pub(super) fn people_schedule_reference(
+        &mut self,
+        model: &TypedModel,
+        name: &str,
+        object: &RawObject,
+    ) -> Option<PeopleScheduleReference> {
+        self.internal_gain_schedule_reference(
+            model,
+            "People",
+            name,
+            object,
+            "number_of_people_schedule_name",
+            "AmbiguousPeopleSchedule",
+        )
+    }
+
+    pub(super) fn other_equipment_schedule_reference(
+        &mut self,
+        model: &TypedModel,
+        name: &str,
+        object: &RawObject,
+    ) -> Option<InternalGainScheduleReference> {
+        if self.source_file_declarations {
+            return self.internal_gain_schedule_reference(
+                model,
+                "OtherEquipment",
+                name,
+                object,
+                "schedule_name",
+                "AmbiguousOtherEquipmentSchedule",
+            );
+        }
+        // Unscoped compilation keeps the old authored-schedule-only boundary.
+        let reference =
+            self.optional_schedule_name("OtherEquipment", name, object, "schedule_name")?;
+        self.resolve_name(
+            &model.schedule_names,
+            "OtherEquipment",
+            name,
+            "schedule_name",
+            &reference,
+            "Schedule",
+        )
+        .map(InternalGainScheduleReference::User)
     }
 
     /// Parses the currently typed internal-gain families in source order.

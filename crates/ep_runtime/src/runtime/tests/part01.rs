@@ -1787,7 +1787,7 @@
         assert!(multi_period_error.contains("hour-only consumers require one"));
 
         let mut gain_model = cube_model();
-        gain_model.other_equipment[0].schedule = Some(schedule_id);
+        gain_model.other_equipment[0].schedule = Some(ep_model::InternalGainScheduleReference::User(schedule_id));
         gain_model.compact_schedules.push(schedule);
         let gain_error = simulate_zone_internal_convective_gains(&gain_model, 2)
             .expect_err("calendar-varying internal-gain schedule must be rejected");
@@ -1820,7 +1820,7 @@
         ));
 
         let mut missing_schedule_model = cube_model();
-        missing_schedule_model.other_equipment[0].schedule = Some(ScheduleId(999));
+        missing_schedule_model.other_equipment[0].schedule = Some(ep_model::InternalGainScheduleReference::User(ScheduleId(999)));
         let missing_convective = simulate_zone_internal_convective_gains(&missing_schedule_model, 2)
             .expect_err("missing convective schedule must be rejected");
         let missing_radiant = simulate_zone_internal_radiant_gains(&missing_schedule_model, 2)

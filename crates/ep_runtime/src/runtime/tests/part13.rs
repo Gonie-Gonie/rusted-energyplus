@@ -180,7 +180,7 @@
         let mut constant_equipment = typed.other_equipment[0].clone();
         constant_equipment.id = InternalGainId(1);
         constant_equipment.name = NormalizedName::new("Constant Profile Equipment");
-        constant_equipment.schedule = Some(ScheduleId(1));
+        constant_equipment.schedule = Some(ep_model::InternalGainScheduleReference::User(ScheduleId(1)));
         constant_equipment.design_level_w = 4.0;
         typed.other_equipment.push(constant_equipment);
         let model = SimulationModel::from_typed(typed);

@@ -5500,9 +5500,22 @@ fn ideal_loads_other_equipment_latent_gain_values(
         .iter()
         .filter(|equipment| equipment.zone == zone.id)
     {
+        let schedule_id = match equipment.schedule {
+            None => None,
+            Some(ep_model::InternalGainScheduleReference::User(id)) => Some(id),
+            Some(
+                ep_model::InternalGainScheduleReference::ConstantZero
+                | ep_model::InternalGainScheduleReference::ConstantOne,
+            ) => {
+                return Err(format!(
+                    "OtherEquipment/{} built-in schedule requires the actual Source schedule manager",
+                    equipment.name.0
+                ));
+            }
+        };
         let schedule_values = ideal_loads_optional_schedule_values(
             model,
-            equipment.schedule,
+            schedule_id,
             &format!("OtherEquipment/{} latent gain", equipment.name.0),
             sample_count,
             timestamps,

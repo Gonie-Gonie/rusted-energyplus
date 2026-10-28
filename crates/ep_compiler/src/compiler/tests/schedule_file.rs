@@ -475,9 +475,15 @@ fn rejects_short_and_non_numeric_selected_columns() -> Result<(), Box<dyn std::e
     );
     assert_eq!(
         names.other_equipment[0].schedule,
-        names.schedule_names.resolve("File")
+        names
+            .schedule_names
+            .resolve("File")
+            .map(ep_model::InternalGainScheduleReference::User)
     );
-    assert_ne!(names.other_equipment[0].schedule, Some(file.id));
+    assert_ne!(
+        names.other_equipment[0].schedule,
+        Some(ep_model::InternalGainScheduleReference::User(file.id))
+    );
     assert_eq!(
         names.thermostat_dual_setpoints[0].heating_setpoint_schedule,
         names
@@ -573,7 +579,10 @@ fn rejects_short_and_non_numeric_selected_columns() -> Result<(), Box<dyn std::e
             model.people[0].number_of_people_schedule,
             Some(ep_model::PeopleScheduleReference::User(file.id))
         );
-        assert_eq!(model.other_equipment[0].schedule, Some(file.id));
+        assert_eq!(
+            model.other_equipment[0].schedule,
+            Some(ep_model::InternalGainScheduleReference::User(file.id))
+        );
         assert_eq!(
             model.thermostat_dual_setpoints[0].heating_setpoint_schedule,
             file.id

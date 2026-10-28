@@ -22,8 +22,8 @@ pub struct OtherEquipment {
     pub fuel_type: NormalizedName,
     /// Target zone.
     pub zone: ZoneId,
-    /// Availability or level schedule.
-    pub schedule: Option<ScheduleId>,
+    /// Actual availability/level identity, separate from user-authored IDs.
+    pub schedule: Option<InternalGainScheduleReference>,
     /// Method used to calculate the design-level heat gain.
     pub design_level_calculation_method: OtherEquipmentDesignLevelCalculationMethod,
     /// Design-level heat gain in watts.
@@ -53,10 +53,10 @@ pub enum PeopleNumberCalculationMethod {
     AreaPerPerson,
 }
 
-/// Resolved occupancy-schedule identity for a People object.
+/// Resolved internal-gain schedule identity for a Source input object.
 /// Built-ins remain separate from the user-authored schedule namespace and IDs.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum PeopleScheduleReference {
+pub enum InternalGainScheduleReference {
     /// User-authored schedule in the shared typed schedule namespace.
     User(ScheduleId),
     /// EnergyPlus's genuine built-in `Constant-0.0` schedule.
@@ -64,6 +64,9 @@ pub enum PeopleScheduleReference {
     /// EnergyPlus's genuine built-in `Constant-1.0` schedule.
     ConstantOne,
 }
+
+/// Existing People occupancy schedule API, sharing the genuine identity type.
+pub type PeopleScheduleReference = InternalGainScheduleReference;
 
 /// Occupant internal gain represented as a design people count.
 #[derive(Clone, Debug, PartialEq)]

@@ -13760,22 +13760,7 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let schedule = match self.optional_schedule_name(
-                "OtherEquipment",
-                &name,
-                &object,
-                "schedule_name",
-            ) {
-                Some(schedule_name) => self.resolve_name(
-                    &model.schedule_names,
-                    "OtherEquipment",
-                    &name,
-                    "schedule_name",
-                    &schedule_name,
-                    "Schedule",
-                ),
-                None => None,
-            };
+            let schedule = self.other_equipment_schedule_reference(model, &name, &object);
             let Some(id_value) =
                 self.checked_id("OtherEquipment", &name, model.other_equipment.len())
             else {
@@ -18281,7 +18266,12 @@ mod tests {
         assert_eq!(model.other_equipment.len(), 1);
         assert_eq!(model.other_equipment[0].fuel_type.0, "ELECTRICITY");
         assert_eq!(model.other_equipment[0].zone.0, 0);
-        assert_eq!(model.other_equipment[0].schedule.map(|id| id.0), Some(0));
+        assert_eq!(
+            model.other_equipment[0].schedule,
+            Some(ep_model::InternalGainScheduleReference::User(
+                ep_model::ScheduleId(0)
+            ))
+        );
         assert_eq!(
             model.other_equipment[0].design_level_calculation_method,
             OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea

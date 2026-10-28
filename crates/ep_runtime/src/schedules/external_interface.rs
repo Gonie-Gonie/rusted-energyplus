@@ -300,7 +300,9 @@ mod tests {
                 name: NormalizedName::new("Equipment"),
                 fuel_type: NormalizedName::new("None"),
                 zone: ZoneId(0),
-                schedule: Some(ScheduleId(28)),
+                schedule: Some(ep_model::InternalGainScheduleReference::User(ScheduleId(
+                    28,
+                ))),
                 design_level_calculation_method:
                     OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
                 design_level_w: 100.0,
@@ -330,7 +332,9 @@ mod tests {
                 name: NormalizedName::new("Equipment"),
                 fuel_type: NormalizedName::new("None"),
                 zone: ZoneId(0),
-                schedule: Some(ScheduleId(27)),
+                schedule: Some(ep_model::InternalGainScheduleReference::User(ScheduleId(
+                    27,
+                ))),
                 design_level_calculation_method:
                     OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
                 design_level_w: 100.0,

@@ -48,10 +48,10 @@ use ep_conformance::{
 use ep_model::{
     AutoOrNumber, Construction, ConstructionKind, GeometryCoordinateSystem, GlobalGeometryRules,
     Material, MaterialDefinition, ModelGraph, OtherEquipment, OutsideBoundaryCondition, Point3,
-    ScheduleId, SimulationModel, StartingVertexPosition, SurfaceType, TypedModel,
-    VertexEntryDirection, WindowGapEquivalentLayerMaterial, WindowGasMaterial,
-    WindowGasMixtureMaterial, WindowGasType, WindowGlazingEquivalentLayerMaterial,
-    WindowGlazingRefractionExtinctionMaterial, WindowGlazingSpectralAverageMaterial,
+    SimulationModel, StartingVertexPosition, SurfaceType, TypedModel, VertexEntryDirection,
+    WindowGapEquivalentLayerMaterial, WindowGasMaterial, WindowGasMixtureMaterial, WindowGasType,
+    WindowGlazingEquivalentLayerMaterial, WindowGlazingRefractionExtinctionMaterial,
+    WindowGlazingSpectralAverageMaterial,
 };
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{RawModel, RawModelSummary, RawValue, load_epjson_file};
@@ -11963,7 +11963,7 @@ fn other_equipment_nominal_rows(model: &TypedModel) -> Vec<OtherEquipmentNominal
 
             OtherEquipmentNominalRow {
                 equipment_name: equipment.name.0.clone(),
-                schedule_name: schedule_name_for_id(model, equipment.schedule),
+                schedule_name: schedule_name_for_internal_gain_reference(model, equipment.schedule),
                 zone_name,
                 zone_floor_area_m2,
                 equipment_level_w: equipment.design_level_w,
@@ -11977,9 +11977,19 @@ fn other_equipment_nominal_rows(model: &TypedModel) -> Vec<OtherEquipmentNominal
         .collect()
 }
 
-fn schedule_name_for_id(model: &TypedModel, schedule_id: Option<ScheduleId>) -> String {
-    let Some(schedule_id) = schedule_id else {
-        return "NONE".to_string();
+fn schedule_name_for_internal_gain_reference(
+    model: &TypedModel,
+    schedule_id: Option<ep_model::InternalGainScheduleReference>,
+) -> String {
+    let schedule_id = match schedule_id {
+        None => return "NONE".to_string(),
+        Some(ep_model::InternalGainScheduleReference::User(id)) => id,
+        // Genuine schedule identities only; this metadata projection supplies
+        // no cached/current values or Source scientific owner.
+        Some(ep_model::InternalGainScheduleReference::ConstantZero) => {
+            return "Constant-0.0".into();
+        }
+        Some(ep_model::InternalGainScheduleReference::ConstantOne) => return "Constant-1.0".into(),
     };
 
     model
