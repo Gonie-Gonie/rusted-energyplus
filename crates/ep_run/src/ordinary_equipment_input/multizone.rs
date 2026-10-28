@@ -1,4 +1,4 @@
-//! Source A's bounded opaque multi-Zone, electric-gain and paired-surface stage.
+//! Source A's bounded opaque multi-Zone, OtherEquipment and paired-surface stage.
 //! This is input admission only; it supplies no scientific owner values.
 use super::{number, text};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawObject, RawValue};
@@ -71,14 +71,6 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 "Source A bounded multi-Zone excludes positive family {}",
                 family.0
             ));
-        }
-        if family.0 == "OtherEquipment"
-            && rows.values().any(|row| {
-                !text(row, "fuel_type")
-                    .is_some_and(|value| value.eq_ignore_ascii_case("Electricity"))
-            })
-        {
-            return Err("Source A multi-Zone OtherEquipment currently requires Electricity".into());
         }
     }
     validate_surface_pairs(raw)

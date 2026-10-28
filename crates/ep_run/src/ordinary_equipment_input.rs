@@ -848,7 +848,7 @@ mod tests {
                 "{family}: {error}"
             );
         }
-        // Only direct real Zone references and explicit Electricity expand.
+        // Direct real Zone references reuse the existing None/non-Water fuels.
         // The object order is opposite the direct-JSON Zone order, without
         // renumbering IDs or changing either actual namespace.
         let mut gains: serde_json::Value = serde_json::from_str(multi)?;
@@ -876,23 +876,79 @@ mod tests {
                 )
             );
         }
+        // Unit90 removes only the witness-only Electricity restriction. These
+        // canonical fuel strings and defaults already reach the one-Zone
+        // Source getter; keep raw presence and actual direct-Zone bindings.
         for fuel in [
-            None,
-            Some(""),
-            Some("None"),
-            Some("NaturalGas"),
-            Some("DistrictHeatingWater"),
+            "None",
+            "Electricity",
+            "NaturalGas",
+            "Gasoline",
+            "Diesel",
+            "Coal",
+            "Propane",
+            "FuelOilNo1",
+            "FuelOilNo2",
+            "OtherFuel1",
+            "OtherFuel2",
+            "DistrictCooling",
+            "DistrictHeatingWater",
+            "DistrictHeatingSteam",
         ] {
-            let mut invalid = gains.clone();
-            let row = invalid["OtherEquipment"]["A gain"]
+            let mut actual = gains.clone();
+            actual["OtherEquipment"]["A gain"]["fuel_type"] = serde_json::json!(fuel);
+            let raw = parse_epjson_str(&actual.to_string())?;
+            assert!(resolve_source_a(&raw).is_ok(), "{fuel}");
+            assert!(resolve_source_b(&raw).is_err());
+            assert!(resolve(&raw).is_err());
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+            let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+            assert_eq!(
+                projected.objects["OtherEquipment"][0].fields["fuel_type"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    fuel.into()
+                )
+            );
+            assert_eq!(
+                projected.objects["OtherEquipment"][0].fields["zone_or_zonelist_or_space_or_spacelist_name"],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    "Zulu".into()
+                )
+            );
+        }
+        for fuel in [None, Some("")] {
+            let mut actual = gains.clone();
+            let row = actual["OtherEquipment"]["A gain"]
                 .as_object_mut()
-                .ok_or("actual gain test row")?;
+                .ok_or("default fuel row")?;
             if let Some(fuel) = fuel {
                 row.insert("fuel_type".into(), serde_json::json!(fuel));
             } else {
                 row.remove("fuel_type");
             }
-            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            let raw = parse_epjson_str(&actual.to_string())?;
+            assert!(resolve_source_a(&raw).is_ok());
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+            let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+            assert_eq!(
+                projected.objects["OtherEquipment"][0]
+                    .fields
+                    .get("fuel_type"),
+                fuel.map(|value| {
+                    ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                        value.into(),
+                    )
+                })
+                .as_ref()
+            );
+        }
+        for fuel in ["Water", "UnknownFuel90"] {
+            let mut invalid = gains.clone();
+            invalid["OtherEquipment"]["A gain"]["fuel_type"] = serde_json::json!(fuel);
+            assert!(
+                resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err(),
+                "{fuel}"
+            );
         }
         for target in ["Missing", "ZoneList", "Alpha Space"] {
             let mut invalid = gains.clone();
