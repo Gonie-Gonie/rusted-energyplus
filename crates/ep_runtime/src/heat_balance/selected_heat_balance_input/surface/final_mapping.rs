@@ -8,14 +8,27 @@ use super::{
 };
 use crate::geometry::SurfaceGeometryProperties;
 use crate::heat_balance::error_backend::SourceDiagnosticFlags;
+use crate::heat_balance::selected_material_data::SelectedMaterialData;
 use ep_model::{
     OutsideBoundaryCondition, Point3, SunExposure, SurfaceId, SurfaceType, WindExposure,
 };
+
+/// Rust-only validation provenance for the actual branch reached. This
+/// supplies no Native/scientific input and never mutates exposure flags.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub(crate) enum InterzoneExposurePath {
+    #[default]
+    Unreached,
+    Completed,
+    SkippedNumLayersWarning,
+    SkippedLayerOrderWarning,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct FinalSurface {
     pub(crate) row: SurfaceTmpInput,
     pub(crate) original_class: SurfaceClass,
+    pub(crate) interzone_exposure_path: InterzoneExposurePath,
     /// Actual SurfaceData ctor Invalid/zero plane/default Surface2D, written at ManageHB183.
     pub(crate) shape_cat: super::computed_geometry::SourceComputedShapeCategory,
     pub(crate) plane: [f64; 4],
@@ -42,6 +55,7 @@ impl Default for FinalSurface {
         Self {
             row: SurfaceTmpInput::default(),
             original_class: SurfaceClass::default(),
+            interzone_exposure_path: InterzoneExposurePath::Unreached,
             shape_cat: super::computed_geometry::SourceComputedShapeCategory::Invalid,
             plane: [0.0; 4],
             surface_2d: super::computed_geometry::SourceComputedSurface2D::default(),
@@ -57,6 +71,28 @@ impl Default for FinalSurface {
             oscm_ptr: 0,
             is_ground_surface_property_defined: false,
             use_ground_surface_temperature: false,
+        }
+    }
+}
+
+impl FinalSurface {
+    /// Extra Rust association check against actual reached Native control flow.
+    /// The scientific value remains row.exterior_wind, never this expectation.
+    pub(crate) fn expected_wind_exposure(
+        &self,
+        input_wind: bool,
+        is_surface: bool,
+    ) -> Result<bool, Error> {
+        if !is_surface {
+            return Ok(input_wind);
+        }
+        match self.interzone_exposure_path {
+            InterzoneExposurePath::Completed => Ok(false),
+            InterzoneExposurePath::SkippedNumLayersWarning
+            | InterzoneExposurePath::SkippedLayerOrderWarning => Ok(input_wind),
+            InterzoneExposurePath::Unreached => Err(Error::Unavailable(
+                "actual interzone exposure control-flow return",
+            )),
         }
     }
 }
@@ -91,6 +127,7 @@ impl SurfaceGeometryInputState {
         errors: &mut bool,
         max_solid_window_layers: i32,
         flags: Option<&SourceDiagnosticFlags<'_>>,
+        materials: Option<&SelectedMaterialData>,
     ) -> Result<(), Error> {
         if *errors {
             // Original1215, before actual Surface allocation.
@@ -264,7 +301,7 @@ impl SurfaceGeometryInputState {
                 ))?;
             }
         }
-        self.reconcile_opaque_surface_boundaries(owners, backend, flags)?;
+        self.reconcile_opaque_surface_boundaries(owners, backend, flags, materials)?;
         // Release the preceding createSpaceSurfaceLists borrow before the
         // Source reconciliation reads real Zone factors, then retain the ranges.
         let spaces = owners.zones.spaces.as_mut().ok_or(Error::Unavailable(
@@ -504,8 +541,10 @@ impl SurfaceGeometryInputState {
                     != (typed.sun_exposure == SunExposure::SunExposed
                         && typed.outside_boundary_condition == OutsideBoundaryCondition::Outdoors)
                 || row.exterior_wind
-                    != (typed.wind_exposure == WindExposure::WindExposed
-                        && boundary != OutsideBoundaryCondition::Surface)
+                    != surface.expected_wind_exposure(
+                        typed.wind_exposure == WindExposure::WindExposed,
+                        boundary == OutsideBoundaryCondition::Surface,
+                    )?
             {
                 return Err(Error::Unavailable(
                     "actual Surface name/class/Zone/Space/Construction/boundary identity",

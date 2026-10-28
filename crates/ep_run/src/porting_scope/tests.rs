@@ -632,7 +632,8 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
         }
     }
-    // Input-owned exact reverse stacks, not thermal-property equivalence.
+    // Exact reverse identities keep their existing fast path. Normal mismatches
+    // below are structural candidates only; real Source owners decide the U gate.
     // The compiler creates all natural Material/Construction IDs; no vectors or
     // IDs are rearranged to manufacture a Source-order mismatch.
     let material_names = [
@@ -660,8 +661,8 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
     let mut stacks = paired.clone();
     let material = stacks["Material:NoMass"]["Opaque"].clone();
     for name in material_names {
-        // Identical physical properties deliberately do not make distinct
-        // Native material identities interchangeable in the reverse check.
+        // Identical properties do not merge actual typed Material identities;
+        // a differing normal identity reaches only the later Source U/warning lane.
         stacks["Material:NoMass"][name] = material.clone();
     }
     for (count, same_construction) in [(1, false), (2, false), (3, false), (10, false), (3, true)] {
@@ -745,48 +746,119 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         json!("STACK FORWARD");
     invalid_stacks["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
         json!("STACK REVERSE");
-    for layers in [
-        construction_value(&material_names[..2]), // same order, equal nominal U
-        construction_value(&material_names[..3]), // unequal count
-        construction_value(&[material_names[1], material_names[2]]), // equal properties, different opaque ID
-        json!({"outside_layer":material_names[0],"layer_3":material_names[1]}), // actual gap
+    for (layers, structural_candidate) in [
+        (construction_value(&material_names[..2]), true), // same order, equal nominal U
+        (construction_value(&material_names[..3]), true), // unequal count
+        (
+            construction_value(&[material_names[1], material_names[2]]),
+            true,
+        ), // equal properties, different opaque ID
+        (
+            json!({"outside_layer":material_names[0],"layer_3":material_names[1]}),
+            false,
+        ), // actual gap
     ] {
         let mut value = invalid_stacks.clone();
         value["Construction"]["STACK REVERSE"] = layers;
         let raw =
-            parse_epjson_str(&value.to_string()).expect("unported opaque reverse mismatch inputs");
-        // Unequal normal counts now enter a STRUCTURAL candidate lane; actual
-        // NominalU is deliberately unavailable in this raw/typed scope. This
-        // old differing-count row still fails at runtime with its real U gap.
+            parse_epjson_str(&value.to_string()).expect("preserved opaque mismatch and gap inputs");
         let compiled = compile_raw_model(&raw);
-        if let Some(model) = compiled.model.as_ref() {
-            let counts = ["STACK FORWARD", "STACK REVERSE"].map(|name| {
-                model
+        if structural_candidate {
+            // These normal stacks are raw/IP/typed candidates, not a claim
+            // about missing runtime NominalU or future Warning/Continue effects.
+            let model = compiled
+                .model
+                .as_ref()
+                .expect("valid normal stack candidate");
+            for name in ["STACK FORWARD", "STACK REVERSE"] {
+                let construction = model
                     .constructions
                     .iter()
                     .find(|row| row.name.0.eq_ignore_ascii_case(name))
-                    .map(|row| row.effective_layers().len())
-            });
-            if counts[0]
-                .zip(counts[1])
-                .is_some_and(|(left, right)| left != right)
-            {
-                assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
-                let selected =
-                    inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
-                assert!(selected.admissible, "{:?}", selected.violations);
-                continue;
+                    .expect("actual normal Construction identity");
+                assert!(!construction.effective_layers().is_empty());
             }
+            assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
+            let selected =
+                inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+            assert!(selected.admissible, "{:?}", selected.violations);
+            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        } else {
+            assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+            assert!(!trace(&value, PortingScope::A).admissible);
         }
-        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
-        assert!(!trace(&value, PortingScope::A).admissible);
     }
     let mut nonpalindrome = invalid_stacks;
     nonpalindrome["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
         json!("STACK FORWARD");
     let raw = parse_epjson_str(&nonpalindrome.to_string())
-        .expect("same constructor is not automatically reversed");
-    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+        .expect("same nonpalindromic constructor remains an authored mismatch");
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
+    assert!(trace(&nonpalindrome, PortingScope::A).admissible);
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+    // A separately named, sole-layer normal alias proves actual raw/IP/typed
+    // identity custody. Its equal properties are authored input only: no Source
+    // MaterialGroup, NominalU, diagnostic or physical result is fabricated here.
+    let mut similar = paired.clone();
+    similar["Material:NoMass"]["OPAQUE ALIAS86"] = similar["Material:NoMass"]["Opaque"].clone();
+    similar["Construction"]["ALIAS LINK86"] = json!({"outside_layer":"OPAQUE ALIAS86"});
+    similar["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] = json!("ALIAS LINK86");
+    let raw = parse_epjson_str(&similar.to_string()).expect("authored distinct normal alias input");
+    let ip = crate::ordinary_input_processor::resolve_source_a(&raw)
+        .expect("normal differing-identity structural Source IP candidate");
+    let materials = crate::ordinary_material_input::resolve_source(&raw, &ip)
+        .expect("genuine raw/IP normal Material custody");
+    let inputs = ["Opaque", "OPAQUE ALIAS86"].map(|name| {
+        materials
+            .no_mass
+            .iter()
+            .find(|row| row.object_name == name)
+            .expect("actual distinct named raw Material object")
+    });
+    assert_ne!(inputs[0].object_name, inputs[1].object_name);
+    assert_eq!(inputs[0].fields, inputs[1].fields);
+    let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+        .expect("actual alias Construction projection");
+    assert_eq!(
+        projected.objects["Construction"]
+            .iter()
+            .find(|row| row.object_name == "ALIAS LINK86")
+            .unwrap()
+            .fields["outside_layer"],
+        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+            "OPAQUE ALIAS86".into()
+        )
+    );
+    let compiled = compile_raw_model(&raw);
+    let model = compiled
+        .model
+        .as_ref()
+        .expect("actual normal alias typed identities");
+    let aliases = ["Opaque", "OPAQUE ALIAS86"].map(|name| {
+        model
+            .materials
+            .iter()
+            .find(|row| row.name == ep_model::NormalizedName::new(name))
+            .expect("actual distinct typed Material")
+    });
+    assert_ne!(aliases[0].id, aliases[1].id);
+    assert_eq!(aliases[0].definition, aliases[1].definition);
+    let constructors = ["Opaque", "ALIAS LINK86"].map(|name| {
+        model
+            .constructions
+            .iter()
+            .find(|row| row.name == ep_model::NormalizedName::new(name))
+            .expect("actual distinct typed Construction")
+    });
+    assert_ne!(constructors[0].id, constructors[1].id);
+    assert_eq!(constructors[0].effective_layers(), &[aliases[0].id]);
+    assert_eq!(constructors[1].effective_layers(), &[aliases[1].id]);
+    let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
     // Input-definition algebra only: splitting the stated NoMass resistance
     // gives a1vs2 normal stack candidate without computing U in admission.
     let mut unequal = paired.clone();
@@ -922,6 +994,41 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .count(),
         2
     );
+    // The normal differing-ID lane must not admit distinct IRT identities,
+    // even though the existing name-only definitions have the same fixed fields.
+    let mut irt_alias = irt_pair.clone();
+    irt_alias["Material:InfraredTransparent"]["WALL IRT ALIAS86"] = json!({});
+    irt_alias["Construction"]["IRT ALIAS LINK86"] = json!({"outside_layer":"WALL IRT ALIAS86"});
+    irt_alias["BuildingSurface:Detailed"]["Alpha:West"]["construction_name"] =
+        json!("IRT ALIAS LINK86");
+    let raw = parse_epjson_str(&irt_alias.to_string()).expect("distinct sole-layer IRT identities");
+    let compiled = compile_raw_model(&raw);
+    let model = compiled
+        .model
+        .as_ref()
+        .expect("actual typed IRT alias records");
+    let materials = ["WALL IRT", "WALL IRT ALIAS86"].map(|name| {
+        model
+            .materials
+            .iter()
+            .find(|row| row.name == ep_model::NormalizedName::new(name))
+            .expect("actual distinct IRT Material")
+    });
+    assert_ne!(materials[0].id, materials[1].id);
+    assert_eq!(materials[0].definition, materials[1].definition);
+    assert!(
+        materials
+            .iter()
+            .all(|row| row.kind() == ep_model::MaterialKind::InfraredTransparent)
+    );
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+    assert!(
+        !selected.admissible,
+        "different IRT IDs cannot use the normal U lane"
+    );
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
     let mut unequal_irt = irt_pair.clone();
     unequal_irt["Construction"]["NORMAL TWO85"] =
         json!({"outside_layer":"Opaque","layer_2":"Opaque"});

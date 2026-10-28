@@ -53,22 +53,19 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                             .is_some_and(|(a, b)| {
                                 let left = a.effective_layers();
                                 let right = b.effective_layers();
-                                let relation = if left.len() == right.len() {
-                                    left.iter().eq(right.iter().rev())
-                                } else {
-                                    // Input classification only: never calculate or
-                                    // cache a thermal U value in this typed scope.
-                                    left.iter().chain(right).all(|id| {
-                                        model
-                                            .materials
-                                            .iter()
-                                            .find(|material| material.id == *id)
-                                            .is_some_and(|material| {
-                                                material.kind()
-                                                    != ep_model::MaterialKind::InfraredTransparent
-                                            })
-                                    })
-                                };
+                                let exact_reverse =
+                                    left.len() == right.len() && left.iter().eq(right.iter().rev());
+                                let normal = left.iter().chain(right).all(|id| {
+                                    model
+                                        .materials
+                                        .iter()
+                                        .find(|material| material.id == *id)
+                                        .is_some_and(|material| {
+                                            material.kind()
+                                                != ep_model::MaterialKind::InfraredTransparent
+                                        })
+                                });
+                                let relation = exact_reverse || normal;
                                 a.is_ordinary_opaque()
                                     && b.is_ordinary_opaque()
                                     && !a.has_internal_heat_source()
@@ -83,7 +80,7 @@ pub(super) fn validate(model: &TypedModel, scope: PortingScope, violations: &mut
                         && reversed_coincident(&surface.vertices, &other.vertices)
                 });
         if !valid {
-            violations.push(format!("{} requires the bounded reciprocal Source A Wall pair with exactly reversed equal-count opaque layers or unequal normal-opaque counts checked against actual Source NominalU, equal Zone factors and reversed coincident World vertices", surface.name.0));
+            violations.push(format!("{} requires the bounded reciprocal Source A Wall pair with exactly reversed IRT layers or normal opaque layers checked against actual Source groups and NominalU, equal Zone factors and reversed coincident World vertices", surface.name.0));
         }
     }
 }

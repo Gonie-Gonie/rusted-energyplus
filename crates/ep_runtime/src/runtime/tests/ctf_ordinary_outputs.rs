@@ -608,7 +608,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         }
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
         raw.initialize_coordinate_owners(&owners)?;
-        raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None)?;
+        raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None, None)?;
         raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
         // Authored child diagnostic inputs, not a completed Native material or
         // geometry certificate. Real IRT property/getter owners are tested in
@@ -851,7 +851,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 warmup: &pair_clock.warmup_flag, doing_sizing: &pair_globals.doing_sizing,
             };
             let mut pair_ip = owners.input.clone(); let mut pair_shortcut = owners.shortcut.clone();
-            let pair_owners = SurfaceGetterOwners {
+            let mut pair_owners = SurfaceGetterOwners {
                 model: owners.model, environment: owners.environment, input: &mut pair_ip, shortcut: &mut pair_shortcut,
                 zones: &mut pair_zones, control: &mut pair_control, globals: &pair_globals,
             };
@@ -862,7 +862,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 state:&mut backend_state,error_stream:Some(&mut writer),console:&mut console,
                 out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
             };
-            let result = pair.reconcile_opaque_surface_boundaries(&pair_owners,&mut backend,have_flags.then_some(&flags));
+            let result = pair.reconcile_opaque_surface_boundaries(&mut pair_owners,&mut backend,have_flags.then_some(&flags),None);
             let needed = usize::from(sun)*3 + usize::from(wind_mask!=0)*3;
             let success = needed==0 || (have_flags && allowed_lines>=needed);
             let warnings = if !have_flags { 0 } else { usize::from(sun) + usize::from(wind_mask!=0 && (!sun || allowed_lines>=3)) };
@@ -1036,11 +1036,11 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 row.zone_num=i32::try_from(index+1)?;row.typed_space_id=None;
             }
             let mut globals=owners.globals.clone();globals.num_of_zones=2;globals.num_spaces=2;
-            let pair_owners=SurfaceGetterOwners { model:&stack_model,environment:owners.environment,
+            let mut pair_owners=SurfaceGetterOwners { model:&stack_model,environment:owners.environment,
                 input:&mut stack_input,shortcut:&mut stack_shortcut,zones:&mut zones,control:&mut stack_control,globals:&globals };
             let mut pair=raw.clone();pair.moved_surfaces=2;pair.total_surfaces=2;pair.final_surfaces=Some(rows);
             let nominal_checkpoint=pair.clone();
-            let result=pair.reconcile_opaque_surface_boundaries(&pair_owners,&mut backend,None);
+            let result=pair.reconcile_opaque_surface_boundaries(&mut pair_owners,&mut backend,None,None);
             if succeeds { result?; } else { assert!(result.is_err()); }
             let rows=pair.final_surfaces.as_ref().ok_or("retained actual stack reconciliation rows")?;
             assert_eq!(rows[0].row.exterior_boundary,2);
@@ -1064,17 +1064,248 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 let mut control=pair_owners.control.clone();control.nominal_u=nominal_u;
                 let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
                 let mut zones=pair_owners.zones.clone();
-                let probe_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                let mut probe_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
                     input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:pair_owners.globals };
                 let mut probe=nominal_checkpoint.clone();
                 let before=backend.state.tracking.clone();
-                let result=probe.reconcile_opaque_surface_boundaries(&probe_owners,&mut backend,None);
+                let result=probe.reconcile_opaque_surface_boundaries(&mut probe_owners,&mut backend,None,None);
                 if expected { result?; } else { assert!(result.is_err()); }
                 let rows=probe.final_surfaces.as_ref().ok_or("actual U-gate child prefix")?;
                 assert_eq!(rows[0].row.exterior_boundary,2);
                 assert_eq!(rows[1].row.exterior_boundary,if expected { 1 } else { -999 });
                 assert!(!probe.surface_error,"unsupported invalid-U branches are not fabricated Native Severe returns");
                 assert_eq!(backend.state.tracking,before,"accepted unequal counts emit no diagnostic");
+            }
+
+            if left==[1,2] && right==[1,2] && !same_constructor {
+                // Unit86 authored child checkpoints: the real getter above supplies
+                // Construction names, Source IDs and LayerPoint arrays. Warning
+                // effects below are not represented as completed Native endpoints.
+                let getter_u=pair_owners.control.nominal_u.as_ref().ok_or("actual getter NominalU")?;
+                assert_eq!(getter_u.len(),2);
+                assert_eq!(getter_u[0].to_bits(),getter_u[1].to_bits());
+                assert!(pair_owners.control.construction_usage.iter().all(|row|
+                    !row.reverse_construction_num_layers_warning && !row.reverse_construction_layers_order_warning));
+                let expected_records=[
+                    "   ** Warning ** GetSurfaceData: Construction STACK LEFT of interzone surface STACK LEFT WALL does not have the same materials in the reverse order as the construction STACK RIGHT of adjacent surface STACK RIGHT WALL\n",
+                    "   **   ~~~   ** or the properties of the reversed layers are not correct due to differing layer front and back side values\n",
+                    "   **   ~~~   ** ...but Nominal U values are similar, diff=[0.0000] ... simulation proceeds.\n",
+                    "   **   ~~~   ** ...if the two zones are expected to have significantly different temperatures, the proper \"reverse\" construction should be created.\n",
+                    "   **   ~~~   ** ...this problem for this pair will not be reported again.\n",
+                ];
+                for (allowed_lines,have_flags,sizing) in [
+                    (usize::MAX,true,false),(usize::MAX,true,true),
+                    (0,true,false),(1,true,false),(2,true,false),(3,true,false),(4,true,false),
+                    (usize::MAX,false,false),
+                ] {
+                    let mut control=pair_owners.control.clone();
+                    let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
+                    let mut zones=pair_owners.zones.clone();
+                    let mut phase_globals=pair_owners.globals.clone();
+                    phase_globals.kickoff_simulation=false;phase_globals.doing_sizing=sizing;
+                    let clock=crate::weather::day::WeatherGlobalState { warmup_flag:true,..Default::default() };
+                    let developer=true;
+                    let flags=crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff:&phase_globals.kickoff_simulation,developer:&developer,
+                        warmup:&clock.warmup_flag,doing_sizing:&phase_globals.doing_sizing,
+                    };
+                    let mut warning_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                        input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:&phase_globals };
+                    let mut warning_pair=nominal_checkpoint.clone();
+                    let mut state=ctf_ordinary_output_test_state();state.output_error_header=false;
+                    assert!(!state.warmup_flag && !state.doing_sizing && !state.developer_flag && !state.kickoff_simulation);
+                    let (mut writer,mut console)=(ExposureRecordWriter { bytes:Vec::new(),completed_lines:0,allowed_lines },Vec::new());
+                    let mut backend=SourceErrorBackend {
+                        state:&mut state,error_stream:Some(&mut writer),console:&mut console,
+                        out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+                    };
+                    let result=warning_pair.reconcile_opaque_surface_boundaries(
+                        &mut warning_owners,&mut backend,have_flags.then_some(&flags),Some(&material_checkpoint));
+                    let success=have_flags && allowed_lines>=5;
+                    if success { result?; } else { assert!(result.is_err()); }
+                    let completed=if have_flags { allowed_lines.min(5) } else { 0 };
+                    assert_eq!(warning_pair.iz_const_diff_message,Some(completed>=4),
+                        "the invocation hint changes only after its Continue returns");
+                    let rows=warning_pair.final_surfaces.as_ref().ok_or("warning child Found prefix")?;
+                    assert_eq!((rows[0].row.exterior_boundary,rows[1].row.exterior_boundary),(2,if success { 1 } else { -999 }));
+                    assert!(!warning_pair.surface_error,"accepted warnings and effect failures do not invent Native Severe");
+                    for row in &warning_owners.control.construction_usage {
+                        assert_eq!(row.reverse_construction_layers_order_warning,success,
+                            "both persistent latches change only after the fifth record returns");
+                        assert!(!row.reverse_construction_num_layers_warning);
+                    }
+                    assert_eq!(backend.state.tracking.total_warning_errors,i32::from(have_flags));
+                    assert_eq!(backend.state.tracking.total_warning_errors_during_warmup,i32::from(have_flags && !sizing));
+                    assert_eq!(backend.state.tracking.total_warning_errors_during_sizing,i32::from(have_flags && sizing));
+                    assert_eq!(backend.state.tracking.total_severe_errors,0);
+                    assert_eq!(writer.completed_lines,completed);
+                    assert_eq!(writer.bytes,expected_records[..completed].concat().as_bytes(),
+                        "all completed warning records precede the failed writer operation");
+                    if success {
+                        for row in rows { assert!(!row.expected_wind_exposure(true,true)?); }
+                    } else {
+                        assert!(rows[0].expected_wind_exposure(true,true).is_err(),
+                            "an incomplete body supplies no completed-exposure validation expectation");
+                    }
+                }
+                // Deliberately varied ACTUAL NominalU/group owner checkpoints.
+                // Missing, nonfinite and over-threshold values stop before warning;
+                // unrelated material groups remain genuinely lazy.
+                for (nominal_u,group_mode,expected) in [
+                    (None,"regular",false),(Some(vec![]),"regular",false),
+                    (Some(vec![0.5]),"regular",false),
+                    (Some(vec![f64::NAN,0.5]),"regular",false),
+                    (Some(vec![0.5,f64::INFINITY]),"regular",false),
+                    (Some(vec![0.0,f64::from_bits(0.001_f64.to_bits()+1)]),"regular",false),
+                    (Some(vec![0.0,0.001]),"regular",true),
+                    (Some(vec![0.5,0.5]),"none",false),
+                    (Some(vec![0.5,0.5]),"missing",false),
+                    (Some(vec![0.5,0.5]),"glass",false),
+                    (Some(vec![0.5,0.5]),"unused-missing",true),
+                ] {
+                    let mut control=pair_owners.control.clone();control.nominal_u=nominal_u;
+                    let mut materials=material_checkpoint.clone();
+                    match group_mode {
+                        "missing"=>{ materials.material_groups.remove(&MaterialId(0)); }
+                        "glass"=>{ materials.material_groups.insert(MaterialId(0),SourceMaterialGroup::Glass); }
+                        "unused-missing"=>{ materials.material_groups.remove(&MaterialId(2)); }
+                        _=>{}
+                    }
+                    let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
+                    let mut zones=pair_owners.zones.clone();
+                    let mut probe_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                        input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:pair_owners.globals };
+                    let mut probe=nominal_checkpoint.clone();
+                    let clock=crate::weather::day::WeatherGlobalState { warmup_flag:true,..Default::default() };
+                    let developer=true;
+                    let flags=crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff:&pair_owners.globals.kickoff_simulation,developer:&developer,
+                        warmup:&clock.warmup_flag,doing_sizing:&pair_owners.globals.doing_sizing,
+                    };
+                    let (mut writer,mut console)=(Vec::new(),Vec::new());
+                    let mut state=ctf_ordinary_output_test_state();state.output_error_header=false;
+                    let mut backend=SourceErrorBackend {
+                        state:&mut state,error_stream:Some(&mut writer),console:&mut console,
+                        out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+                    };
+                    let result=probe.reconcile_opaque_surface_boundaries(
+                        &mut probe_owners,&mut backend,Some(&flags),(group_mode!="none").then_some(&materials));
+                    if expected { result?; } else { assert!(result.is_err()); }
+                    let rows=probe.final_surfaces.as_ref().ok_or("U/group availability prefix")?;
+                    assert_eq!((rows[0].row.exterior_boundary,rows[1].row.exterior_boundary),(2,if expected { 1 } else { -999 }));
+                    assert!(!probe.surface_error);
+                    assert_eq!(probe.iz_const_diff_message,Some(expected));
+                    assert_eq!(backend.state.tracking.total_warning_errors,i32::from(expected));
+                    assert_eq!(backend.state.tracking.total_severe_errors,0);
+                    assert!(probe_owners.control.construction_usage.iter().all(|row|
+                        row.reverse_construction_layers_order_warning==expected && !row.reverse_construction_num_layers_warning));
+                    let text=std::str::from_utf8(&writer)?;
+                    assert_eq!(text.lines().count(),if expected { 5 } else { 0 });
+                    if expected && group_mode=="regular" {
+                        assert!(text.contains("diff=[1.0000E-003]"),
+                            "the exact .001 threshold reaches the existing Source .4R formatter");
+                    }
+                }
+                // Native1842/1846 read BOTH construction latches before U/groups,
+                // area/exposure and reciprocal writes. These are authored entry
+                // checkpoints, not fabricated prior Native warning endpoints.
+                for number_latch in [true,false] {
+                    let mut control=pair_owners.control.clone();control.nominal_u=None;
+                    for row in &mut control.construction_usage {
+                        row.reverse_construction_num_layers_warning=number_latch;
+                        row.reverse_construction_layers_order_warning = !number_latch;
+                    }
+                    let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
+                    let mut zones=pair_owners.zones.clone();
+                    let mut latched_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                        input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:pair_owners.globals };
+                    let mut latched=nominal_checkpoint.clone();latched.iz_const_diff_message=Some(true);
+                    for row in latched.final_surfaces.as_mut().ok_or("latched pair")? { row.row.exterior_wind=true; }
+                    let (mut writer,mut console)=(Vec::new(),Vec::new());
+                    let mut state=ctf_ordinary_output_test_state();state.output_error_header=false;
+                    let before=state.tracking.clone();
+                    let mut backend=SourceErrorBackend {
+                        state:&mut state,error_stream:Some(&mut writer),console:&mut console,
+                        out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+                    };
+                    latched.reconcile_opaque_surface_boundaries(&mut latched_owners,&mut backend,None,None)?;
+                    assert_eq!(latched.iz_const_diff_message,Some(false),"the local resets on each invocation");
+                    assert!(!latched.surface_error);
+                    let rows=latched.final_surfaces.as_ref().ok_or("latched return")?;
+                    assert_eq!((rows[0].row.exterior_boundary,rows[1].row.exterior_boundary),(2,1));
+                    for row in rows {
+                        assert!(row.row.exterior_wind);
+                        assert!(row.expected_wind_exposure(true,true)?);
+                    }
+                    assert_eq!(backend.state.tracking,before);
+                    assert!(latched_owners.control.construction_usage.iter().all(|row|
+                        row.reverse_construction_num_layers_warning==number_latch
+                        && row.reverse_construction_layers_order_warning!=number_latch));
+                    assert!(writer.is_empty());
+                }
+                // Actual Source traversal groups the two left rows before the two
+                // right rows. Reusing real getter constructions exposes the
+                // asymmetric skipped/Completed validation path; no IDs are changed.
+                for (same_first,wind) in [(false,false),(false,true),(true,false)] {
+                    let checkpoint_rows=nominal_checkpoint.final_surfaces.as_ref().ok_or("two-pair checkpoint")?;
+                    let left_number=checkpoint_rows[0].row.construction;
+                    let right_number=checkpoint_rows[1].row.construction;
+                    let mut rows=vec![checkpoint_rows[0].clone(),checkpoint_rows[0].clone(),
+                        checkpoint_rows[1].clone(),checkpoint_rows[1].clone()];
+                    let names=["STACK LEFT A","STACK LEFT B","STACK RIGHT A","STACK RIGHT B"];
+                    for (index,row) in rows.iter_mut().enumerate() {
+                        row.row.name=names[index].into();
+                        row.row.base_surface=i32::try_from(index+1)?;
+                        row.row.exterior_boundary = -999;
+                        row.row.exterior_boundary_name=names[[2,3,0,1][index]].into();
+                        row.row.construction=if index<2 || (same_first && index==2) { left_number } else { right_number };
+                        row.row.exterior_wind=wind;
+                    }
+                    let mut control=pair_owners.control.clone();
+                    let mut input=pair_owners.input.clone();let mut shortcut=pair_owners.shortcut.clone();
+                    let mut zones=pair_owners.zones.clone();
+                    let mut repeated_owners=SurfaceGetterOwners { model:pair_owners.model,environment:pair_owners.environment,
+                        input:&mut input,shortcut:&mut shortcut,zones:&mut zones,control:&mut control,globals:pair_owners.globals };
+                    let mut repeated=nominal_checkpoint.clone();repeated.moved_surfaces=4;repeated.total_surfaces=4;
+                    repeated.final_surfaces=Some(rows);
+                    let clock=crate::weather::day::WeatherGlobalState { warmup_flag:true,..Default::default() };
+                    let developer=true;
+                    let flags=crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff:&pair_owners.globals.kickoff_simulation,developer:&developer,
+                        warmup:&clock.warmup_flag,doing_sizing:&pair_owners.globals.doing_sizing,
+                    };
+                    let (mut writer,mut console)=(Vec::new(),Vec::new());
+                    let mut state=ctf_ordinary_output_test_state();state.output_error_header=false;
+                    let mut backend=SourceErrorBackend {
+                        state:&mut state,error_stream:Some(&mut writer),console:&mut console,
+                        out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None,
+                    };
+                    repeated.reconcile_opaque_surface_boundaries(
+                        &mut repeated_owners,&mut backend,Some(&flags),Some(&material_checkpoint))?;
+                    let warnings=if same_first || wind { 2 } else { 1 };
+                    assert_eq!(backend.state.tracking.total_warning_errors,warnings);
+                    assert_eq!(backend.state.tracking.total_warning_errors_during_warmup,warnings);
+                    assert_eq!(backend.state.tracking.total_severe_errors,0);
+                    assert_eq!(repeated.iz_const_diff_message,Some(true));
+                    assert!(!repeated.surface_error);
+                    assert!(repeated_owners.control.construction_usage.iter().all(|row|
+                        row.reverse_construction_layers_order_warning && !row.reverse_construction_num_layers_warning));
+                    let rows=repeated.final_surfaces.as_ref().ok_or("reused-construction return")?;
+                    assert_eq!(rows.iter().map(|row|row.row.exterior_boundary).collect::<Vec<_>>(),[3,4,1,2]);
+                    for (index,row) in rows.iter().enumerate() {
+                        let expected=wind && (index==1 || index==3);
+                        assert_eq!(row.row.exterior_wind,expected);
+                        assert_eq!(row.expected_wind_exposure(wind,true)?,expected,
+                            "later reused constructions retain Wind only on their actual skipped rows");
+                    }
+                    let text=std::str::from_utf8(&writer)?;
+                    assert_eq!(text.matches(" ** Warning **").count(),usize::try_from(warnings)?);
+                    assert_eq!(text.matches("proper \"reverse\" construction should be created.").count(),1,
+                        "the invocation-local hint is emitted once across two distinct warnings");
+                    assert_eq!(text.matches("this problem for this pair will not be reported again.").count(),if same_first { 2 } else { 1 });
+                    assert_eq!(text.matches("Interzone surfaces cannot be \"WindExposed\"").count(),usize::from(wind));
+                    assert_eq!(text.lines().count(),if same_first { 9 } else if wind { 8 } else { 5 });
+                }
             }
         }
         assert!(raw.final_surfaces.as_ref().ok_or("actual pre-override Surface algorithm rows")?.iter()

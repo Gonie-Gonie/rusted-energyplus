@@ -368,6 +368,9 @@ pub(crate) struct SelectedConstructionUsage {
     pub(crate) window_type_eql: bool,
     pub(crate) type_is_eco_roof: bool,
     pub(crate) type_is_irt: bool,
+    /// Actual Construction.hh287-288 constructorfalse suppression latches.
+    pub(crate) reverse_construction_num_layers_warning: bool,
+    pub(crate) reverse_construction_layers_order_warning: bool,
     pub(crate) is_used: bool,
     pub(crate) is_used_ctf: bool,
     /// Construction.hh270, distinct from the isTCMaster constructor member.

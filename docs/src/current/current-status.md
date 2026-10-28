@@ -39,7 +39,7 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 111
 object types; legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 135 paired physical cases and 3,581,214 reported values with zero
+contains 136 paired physical cases and 3,592,830 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -67,12 +67,13 @@ agree within the explicitly recorded version-header and line-ending boundaries.
 
 Explicit Source A also accepts multiple closed opaque Zones, each with its
 implicit Space and no internal gains or equipment. Reciprocal interzone Wall
-pairs accept exactly reversed opaque stacks of one to ten layers. Normal opaque
-stacks with different layer counts also connect when their actual Source
-nominal-U values differ by at most 0.001; infrared-transparent constructions
-retain their sole-layer exact-reverse branch. Pairs require equal Zone factors
-and opposite coincident vertices. Seven 24-hour two-Zone
-cases cover 70,560 derived values with zero tolerance or RMSE failures;
+pairs accept normal opaque stacks of one to ten layers. Exact reverse Material
+identity retains the Native fast path; differing counts or layer identities use
+an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
+retain Native's warning sequence. Infrared-transparent constructions retain
+their sole-layer exact-reverse branch. Pairs require equal Zone factors and
+opposite coincident vertices. Eight 24-hour two-Zone
+cases cover 82,176 derived values with zero tolerance or RMSE failures;
 the maximum absolute difference is 1.37e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Explicit
@@ -88,9 +89,15 @@ unaccepted.
 Paired Walls accept the legal Sun/Wind exposure enums, omission and empty defaults.
 IDF and direct epJSON comparisons preserve their distinct warning labels and
 surface order; non-external Sun warnings and paired Wind clearing agree with
-Native. Both actual final exposure flags are false, while raw authored fields
+Native. Those two exposure cases finish with both flags false; raw authored fields
 retain their presence and values. The existing input table covers all sixteen
 presence/value combinations without adding test functions.
+
+The two-pair construction-warning case also checks repeated warning suppression.
+Both real Construction order-warning flags and the invocation-local hint follow
+Native's record order. Reusing the warned constructions skips the later pair's
+exposure clearing, so its actual WindExposed flags remain set. Internal Rust
+path bookkeeping is separate from the observed scientific owner fields.
 
 `Material:InfraredTransparent` now reaches the ordered Source A/B getter and
 single-layer CTF on Ground or Adiabatic boundaries, preserving the Native

@@ -194,6 +194,8 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             "DayltPropPtr":row.daylt_prop_ptr,
             "TypeIsWindow":row.type_is_window, "WindowTypeEQL":row.window_type_eql,
             "TypeIsEcoRoof":row.type_is_eco_roof, "TypeIsIRT":row.type_is_irt,
+            "ReverseConstructionNumLayersWarning":row.reverse_construction_num_layers_warning,
+            "ReverseConstructionLayersOrderWarning":row.reverse_construction_layers_order_warning,
             "IsUsed":row.is_used, "IsUsedCTF":row.is_used_ctf,
             "InsideAbsorpVis":scalar(row.inside_absorp_vis),
             "OutsideAbsorpVis":scalar(row.outside_absorp_vis),
@@ -234,7 +236,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
             "NominalUBeforeAdjusted":array(owners.nominal_u_before_adjusted),
             "CoeffAdjRatio":array(owners.coefficient_adjustment_ratio),
         },
-        "geometry_context":{"err_count5":owners.err_count5},
+        "geometry_context":{"err_count5":owners.err_count5,"izConstDiffMsg":owners.iz_const_diff_message},
         "global_Process_return":{
             "process_one_time_flag":process.process_one_time_flag,
             "max_vertices_per_surface":process.max_vertices_per_surface,

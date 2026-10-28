@@ -214,6 +214,7 @@ impl CtfInitializationContext<'_> {
                 &mut reports.heat_balance_input_errors_found,
                 max_solid_window_layers,
                 surface_diagnostic_flags.as_ref(),
+                Some(&reports.selected_material_data),
             )
             .map_err(hb_input_error)?;
         state

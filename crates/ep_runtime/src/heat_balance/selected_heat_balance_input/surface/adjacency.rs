@@ -1,16 +1,33 @@
 //! Reached explicit opaque Surface-name checks and bounded final reconciliation.
 //! Native SurfaceGeometry4396-4425,1785-2109; no inferred typed ordinals.
+use super::final_mapping::InterzoneExposurePath;
 use super::{
     Error, SourceErrorBackend, SurfaceClass, SurfaceGeometryInputState, SurfaceGetterOwners,
     SurfaceTmpInput,
 };
 use crate::heat_balance::error_backend::SourceDiagnosticFlags;
+use crate::heat_balance::selected_material_data::{SelectedMaterialData, SourceMaterialGroup};
 
 fn index(number: i32) -> Result<usize, Error> {
     number
         .checked_sub(1)
         .and_then(|value| usize::try_from(value).ok())
         .ok_or(Error::Unavailable("actual positive paired Surface ordinal"))
+}
+
+// Read the existing Source array only when the Native branch reaches it.
+fn nominal_u_difference(values: Option<&[f64]>, current: i32, found: i32) -> Result<f64, Error> {
+    let values = values.ok_or(Error::Unavailable("actual paired NominalU allocation"))?;
+    let current_u = *values
+        .get(index(current)?)
+        .ok_or(Error::Unavailable("actual paired NominalU slot"))?;
+    let found_u = *values
+        .get(index(found)?)
+        .ok_or(Error::Unavailable("actual adjacent NominalU slot"))?;
+    if !current_u.is_finite() || !found_u.is_finite() {
+        return Err(Error::Unavailable("bounded finite paired NominalU values"));
+    }
+    Ok((current_u - found_u).abs())
 }
 
 fn world_vertices(row: &SurfaceTmpInput) -> Result<Vec<[f64; 3]>, Error> {
@@ -96,9 +113,10 @@ impl SurfaceGeometryInputState {
     /// branches stop at their first unavailable operation; no diagnostics vanish.
     pub(crate) fn reconcile_opaque_surface_boundaries(
         &mut self,
-        owners: &SurfaceGetterOwners<'_>,
+        owners: &mut SurfaceGetterOwners<'_>,
         backend: &mut SourceErrorBackend<'_>,
         flags: Option<&SourceDiagnosticFlags<'_>>,
+        materials: Option<&SelectedMaterialData>,
     ) -> Result<(), Error> {
         let rows = self
             .final_surfaces
@@ -107,6 +125,7 @@ impl SurfaceGeometryInputState {
         if self.moved_surfaces != rows.len() {
             return Err(Error::Unavailable("actual MovedSurfs pair-search bounds"));
         }
+        self.iz_const_diff_message = Some(false); // Actual1776 invocation local.
         for current in 0..self.moved_surfaces {
             if !rows[current].row.heat_transfer_surface
                 || rows[current].row.exterior_boundary != -999
@@ -168,6 +187,22 @@ impl SurfaceGeometryInputState {
                 .construction_usage
                 .get(index(adjacent.construction)?)
                 .ok_or(Error::Unavailable("actual adjacent Source Construction"))?;
+            // Native1842/1846 continue AFTER current Found but BEFORE all
+            // layer/area/exposure checks and the opposing reciprocal write.
+            if construction.reverse_construction_num_layers_warning
+                && adjacent_construction.reverse_construction_num_layers_warning
+            {
+                rows[current].interzone_exposure_path =
+                    InterzoneExposurePath::SkippedNumLayersWarning;
+                continue;
+            }
+            if construction.reverse_construction_layers_order_warning
+                && adjacent_construction.reverse_construction_layers_order_warning
+            {
+                rows[current].interzone_exposure_path =
+                    InterzoneExposurePath::SkippedLayerOrderWarning;
+                continue;
+            }
             if !(1..=10).contains(&construction.total_layers)
                 || !(1..=10).contains(&adjacent_construction.total_layers)
                 || (construction.type_is_irt && construction.total_layers != 1)
@@ -193,38 +228,95 @@ impl SurfaceGeometryInputState {
                         "unequal-count normal opaque pair domain",
                     ));
                 }
-                let values = owners
-                    .control
-                    .nominal_u
-                    .as_ref()
-                    .ok_or(Error::Unavailable("actual paired NominalU allocation"))?;
-                let current_u = *values
-                    .get(index(surface.construction)?)
-                    .ok_or(Error::Unavailable("actual paired NominalU slot"))?;
-                let found_u = *values
-                    .get(index(adjacent.construction)?)
-                    .ok_or(Error::Unavailable("actual adjacent NominalU slot"))?;
-                if !current_u.is_finite()
-                    || !found_u.is_finite()
-                    || (current_u - found_u).abs() > 0.001
+                if nominal_u_difference(
+                    owners.control.nominal_u.as_deref(),
+                    surface.construction,
+                    adjacent.construction,
+                )? > 0.001
                 {
                     return Err(Error::Unavailable(
                         "unequal-count actual NominalU difference",
                     ));
                 }
             } else {
-                // CheckForReversedLayers15495-15500: same actual LayerPoint takes
-                // the continue fast path at EACH reversed position, including distinct
-                // Construction owners. Different opaque IDs and glass branches stay held.
                 let layers = usize::try_from(construction.total_layers)
                     .map_err(|_| Error::Unavailable("actual paired TotLayers"))?;
+                let mut different = false;
                 for layer in 0..layers {
                     let original = construction.layer_points[layer];
                     let reversed = adjacent_construction.layer_points[layers - layer - 1];
-                    if original <= 0 || original != reversed {
+                    if original <= 0 || reversed <= 0 {
                         return Err(Error::Unavailable(
-                            "positive reversed Source LayerPoint comparison",
+                            "actual positive reversed Source LayerPoint",
                         ));
+                    }
+                    if original == reversed {
+                        continue;
+                    }
+                    // Native15495-15599: fetch BOTH actual material groups only
+                    // for distinct IDs. No typed property-equivalence surrogate.
+                    let data = materials
+                        .ok_or(Error::Unavailable("actual paired Material group owner"))?;
+                    let group = data.source_group_at(original)?;
+                    let reverse_group = data.source_group_at(reversed)?;
+                    if !matches!(
+                        group,
+                        SourceMaterialGroup::Regular | SourceMaterialGroup::AirGap
+                    ) || !matches!(
+                        reverse_group,
+                        SourceMaterialGroup::Regular | SourceMaterialGroup::AirGap
+                    ) || construction.type_is_irt
+                        || adjacent_construction.type_is_irt
+                    {
+                        return Err(Error::Unavailable(
+                            "normal opaque reversed Material group domain",
+                        ));
+                    }
+                    different = true;
+                    break; // Native opaque mismatch immediately exits.
+                }
+                if different {
+                    let difference = nominal_u_difference(
+                        owners.control.nominal_u.as_deref(),
+                        surface.construction,
+                        adjacent.construction,
+                    )?;
+                    if difference > 0.001 {
+                        return Err(Error::Unavailable(
+                            "mismatched-layer actual NominalU Severe branch",
+                        ));
+                    }
+                    let flags = flags.ok_or(Error::Unavailable(
+                        "actual interzone Construction warning phase owners",
+                    ))?;
+                    backend.show_source_warning_error(&format!(
+                        "GetSurfaceData: Construction {} of interzone surface {} does not have the same materials in the reverse order as the construction {} of adjacent surface {}",
+                        construction.name,surface.name,adjacent_construction.name,adjacent.name),flags)?;
+                    backend.show_continue_error("or the properties of the reversed layers are not correct due to differing layer front and back side values")?;
+                    // Formatting occurs at the reached THIRD record, after the
+                    // warning and preceding Continue have both returned.
+                    backend.show_continue_error(&format!(
+                        "...but Nominal U values are similar, diff=[{}] ... simulation proceeds.",
+                        super::super::rounded(difference, 4)?
+                    ))?;
+                    if self.iz_const_diff_message == Some(false) {
+                        backend.show_continue_error("...if the two zones are expected to have significantly different temperatures, the proper \"reverse\" construction should be created.")?;
+                        self.iz_const_diff_message = Some(true);
+                    }
+                    let current_construction = index(surface.construction)?;
+                    let found_construction = index(adjacent.construction)?;
+                    if !owners.control.construction_usage[current_construction]
+                        .reverse_construction_layers_order_warning
+                        || !owners.control.construction_usage[found_construction]
+                            .reverse_construction_layers_order_warning
+                    {
+                        backend.show_continue_error(
+                            "...this problem for this pair will not be reported again.",
+                        )?;
+                        owners.control.construction_usage[current_construction]
+                            .reverse_construction_layers_order_warning = true;
+                        owners.control.construction_usage[found_construction]
+                            .reverse_construction_layers_order_warning = true;
                     }
                 }
             }
@@ -347,6 +439,10 @@ impl SurfaceGeometryInputState {
             }
             // Actual2109 after every reached check: mutate the genuine opposing row.
             rows[found].row.exterior_boundary = number;
+            // Rust-only validation bookkeeping observes the completed body;
+            // it never supplies or changes either scientific exposure value.
+            rows[current].interzone_exposure_path = InterzoneExposurePath::Completed;
+            rows[found].interzone_exposure_path = InterzoneExposurePath::Completed;
         }
         Ok(())
     }

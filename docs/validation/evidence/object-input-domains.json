@@ -74,7 +74,7 @@
       "same-input Ground floor uses all original58 streams and additional exact96 outside-face temperature checks at18C, with all twelve monthly EIO values and zero diagnostics",
       "Source-specific raw ingress accepts all four schema class choices Wall/Floor/Roof/Ceiling; raw and typed Ceiling provenance survives until the genuine getter aliases it to retained Roof class3. The unscoped legacy three-class guard and every other geometry/physics boundary remain.",
       "Two full-profile same-input Ceiling models retain all original A55-variable/3-meter and B102-variable/no-meter policies. The connected current-primary observer reads actual retained Zone/Space/Surface owners after normal completion and own-file read, observing typedID5 to final class3 without synthesizing legacy state/timestep fields. Whole EIO bodies agree after only the first identity record; A ordered DXF records agree except one Program Version payload and EOL encoding, with Default Roof color15 distinct from class3. Native private class is not instrumented.",
-      "The SourceA producer-free multizone route admits reciprocal normal opaque Wall pairs with equal factors and reversed coincident Worldvertices. Equal-count normal opaque stacks1..10 retain exact reversed material identity. Unequal normal opaque counts1..10 use only finite actual Source NominalU owner slots by Construction number and abs difference<=0.001, without layer-identity substitution,1/R reconstruction, typed-cache or EIO-rounded U. Missing/nonfinite/out-of-range owners or larger differences fail closed; IRT remains sole-layer and windows/internal sources are excluded. Existing sole-layer IRT and real Sun/Wind diagnostics/clearing remain. Positive Source IDs/distinct constructors, complete LayerPoint/materialMap/actual nominal slots, two enclosures and declared/typed/retained Worldbits are observed. Finite2/2 and2/3 witnesses retain unchanged105policies/fullEIO/publicCTF/ERR/DXF/emptyMTR; private Native/Source histories, other geometry/material/fenestration/auto-generated branches and arbitrary combinations are unpromoted."
+      "Producer-free SourceA reciprocal normal Walls retain equal factors/reversed Worldvertices. Bounded SourceA reciprocal normal Wall stacks1..10 retain exact reversed identity fast paths. Differing reversed Material IDs read BOTH real normal groups and actual finite NominalU slots with abs difference<=0.001 before literal similar-U Warning/Continue effects; actual Construction orderlatches suppress later pair checks and the hint is a separate invocation-local snapshot. Unequal85 and sole-layer exact-IRT remain; unavailable/nonfinite/out-of-range owners or larger deltas fail closed. Current-primary direct IDs/LayerPoint/materialMap/nominal/latches/local/finalWind accompany the closed7face/two-triangle-pair121policy witness, unchanged105prefix+16keycopies/137EIO5CTF/ERR1Warning4Continue/579DXF/emptyMTR. Internal reached labels are unexported; private Native state/other geometry/material/fenestration/auto-generated branches/arbitrary combinations are unpromoted."
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -132,7 +132,7 @@
       "Existing one-Zone implicit-Space A/B Source admits actual integer multipliers1..i32MAX with list_multiplier1, the existing compiler/getter defined signed-int range. The schema has no maximum; this is not a new schema limit. ZoneList/ZoneGroup, authored Space partitions, local-environment and other guarded physics remain unpromoted.",
       "Source-linked consumer proof retains original multiplier products/divisions in predicted/sequenced demand, inlet sums/flow/moisture corrections, internal-gain meter factors, geometry/predefined/tabular area and ceiling ACH terms. Per-physical-Zone state is not blanket-scaled; PurchasedAir meter defaults stay1 because upstream equipment demand is already aggregate.",
       "Two actual Source75 multiplier2 A/B pairs complete all58/5352 and102/9792 original profiles with unchanged policy rows, exact complete Zone EIO header/record2/list1 and ERR/END0/0. B retains genuine MTR absence with actual Source deleted-empty0owner. A retains fuelNone/+352/-352W; nonzero internal-fuel scaling is not established by this physical case. Separate authored live EnergyTransfer/shared normal-meter tests check factors1/2/i32MAX; they do not exercise OtherEquipment fuel registration.",
-      "SourceA admits ungrouped producer-free opaque Zones with one implicit Space and a non-floor face each. Reciprocal Wall pairs retain distinct Zones/Spaces, equal factors and reversed coincident Worldvertices. Equal-count normal opaque stacks1..10 retain exact reversed material identity. Unequal normal opaque counts1..10 use only finite actual Source NominalU owner slots by Construction number and abs difference<=0.001, without layer-identity substitution,1/R reconstruction, typed-cache or EIO-rounded U. Missing/nonfinite/out-of-range owners or larger differences fail closed; IRT remains sole-layer and windows/internal sources are excluded. Actual Source IDs/LayerPoint/nominal/enclosure owners and Sun/Wind getter semantics stay authoritative; no capability promotion. Finite disconnected, paired-IRT/exposure and normal2/2 plus2/3 witnesses retain all105 policies/fullstreams. Groups/gain/equipment/windows/explicitSpaces/other families and SourceB/legacy remain bounded."
+      "Producer-free SourceA opaque Zones retain one implicit Space/non-floor face each, distinct reciprocal-Wall Zones/Spaces, equal factors/reversed Worldvertices. Bounded SourceA reciprocal normal Wall stacks1..10 retain exact reversed identity fast paths. Differing reversed Material IDs read BOTH real normal groups and actual finite NominalU slots with abs difference<=0.001 before literal similar-U Warning/Continue effects; actual Construction orderlatches suppress later pair checks and the hint is a separate invocation-local snapshot. Unequal85 and sole-layer exact-IRT remain; unavailable/nonfinite/out-of-range owners or larger deltas fail closed. Actual IDs/LayerPoint/groups/nominal/enclosures/Sun-Wind remain authoritative. Finite disconnected/IRT/exposure/normal-count/two-triangle-pair witnesses retain original-limit profiles; groups/gain/equipment/windows/explicitSpaces/other families/SourceBlegacy remain bounded with no capability promotion."
     ],
     "Site:Location": [
       "Five finite numeric fields retain official latitude[-90,90], longitude[-180,180], timezone[-12,14], elevation[-300,8900) and omitted-zero defaults; nonblank named identity and raw keep-weather-file flag are retained.",
@@ -2887,6 +2887,125 @@
         "total_code_paths": 5,
         "production_code_paths": 3,
         "scope": "Four affected checks fmt/strictClippy/scope19/existing actual-owner1 pass; no new function/full-suite/cohort rerun. Three production paths add unequal normal counts with actual finite NominalU difference<=0.001; equal-count exact reversal/IRT/SourceB/legacy remain. Actual Build85 source/archive/current custody binds the final five tested source hashes."
+      },
+      "similar_U_opaque_warning_86": {
+        "actual_quality": {
+          "path": ".runtime/object-expansion/unit86-prep/similar-u-warning-quality02/receipt.json",
+          "sha256": "8a4aa82703bc70a0417f74ed5193b51361ff81330d9de39c5a579d1142c97aaa",
+          "bytes": 5369
+        },
+        "code_adoption": {
+          "path": ".runtime/object-expansion/unit86-prep/adoption02.json",
+          "sha256": "3114be2ee0ee19b848f93c8500c44b29b8f0c8dfd8339aec6f41f845a9115130",
+          "bytes": 4297
+        },
+        "commands": [
+          {
+            "name": "fmt",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "fmt",
+              "-p",
+              "ep_run",
+              "-p",
+              "ep_runtime",
+              "--check"
+            ],
+            "start": 1793146238.3860693,
+            "finish": 1793146247.1784387,
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit86-prep/similar-u-warning-quality02/fmt.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "clippy",
+              "-p",
+              "ep_run",
+              "-p",
+              "ep_runtime",
+              "-p",
+              "ep_cli",
+              "--all-targets",
+              "--locked",
+              "--offline",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "start": 1793146247.1839628,
+            "finish": 1793146348.2537525,
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit86-prep/similar-u-warning-quality02/clippy.log",
+              "sha256": "9aaa6581cb11a06edf9e8f8c6b6a24876d5021881a69c9b8c9a6297412859f70",
+              "bytes": 490
+            }
+          },
+          {
+            "name": "scope-tests",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "-p",
+              "ep_run",
+              "--lib",
+              "porting_scope::tests::",
+              "--locked",
+              "--offline"
+            ],
+            "start": 1793146348.266079,
+            "finish": 1793146420.9486167,
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit86-prep/similar-u-warning-quality02/scope-tests.log",
+              "sha256": "843516359c63f63b2a7313bd1855cf5797397b902b586ef26722ea67ce6cbe1e",
+              "bytes": 2746
+            }
+          },
+          {
+            "name": "surface-layer-test",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "-p",
+              "ep_runtime",
+              "--lib",
+              "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+              "--locked",
+              "--offline"
+            ],
+            "start": 1793146420.9623902,
+            "finish": 1793146506.3499377,
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit86-prep/similar-u-warning-quality02/surface-layer-test.log",
+              "sha256": "d5004fcbcc8cf07da37bedc8be6bec5511aad72c1ace0101dffe2ab6ac22647c",
+              "bytes": 792
+            }
+          }
+        ],
+        "focused_tests": {
+          "scope": 19,
+          "actual_owner": 1,
+          "total_passed": 20,
+          "failed": 0
+        },
+        "new_test_functions": 0,
+        "total_code_paths": 11,
+        "production_code_paths": 9,
+        "retained_initial_quality_failure": {
+          "path": ".runtime/object-expansion/unit86-prep/similar-u-warning-quality01/receipt.json",
+          "sha256": "3339dd188d2ef6e66000c013a5ac3815ae9b897ee2bdabfdfa352d63b5c93f96",
+          "bytes": 4125
+        },
+        "initial_quality_failure_is_Source_or_build_failure": false,
+        "scope": "q02fmt/strictClippy/scope19/existingowner1 allpass;0newfunctions/fullsuite/cohort. q01lint101 was only skipped-test spacing around = !, fixed without semantics and retained as quality-only history. Nine production paths add real groups/U/warning/latch/local/earlycontinue plumbing/observation, without thermal-equation/SourceB/legacy/IRT expansion; Build86 binds11tested source hashes."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -2896,7 +3015,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration. The two Source77 Ceiling-alias models retain every original A55-variable/3-meter and B102-variable/no-meter policy without selector or numerical changes. Actual raw/typed Ceiling links by exact typedID to retained Source Roof class3. Complete EIO body bytes exclude only the first Program Version record; all334 A DXF logical records exclude only one Program Version999 payload and line-ending encoding. Native private class is not observed. Earlier Source76A engine0 was unaccepted solely for a missing current-primary observer artifact; B76 was never launched and no76 samples enter accepted totals. The two Source79 IRT B models each retain all original102Timestepvariable policies/9792values with no selector or numerical changes, genuine absent MTR/DXF, all EIO records (91 total) except the first ProgramVersion record, and exact ERR body after only its first identity and final elapsed-time payload. Actual Warning/Continue, finalIRTcategory and Warmup/Sizing state remain included. Native78 is reused without replay. Source78 Ground engine6 stopped for missing IDF metadata before physical output, with no Adiabatic launch or accepted numerical evidence; actual changed code/build79 is separate. The disconnected two-Zone A pilot uses105 explicit derived selectors (50 perZone plus5shared), preserving all55 originalA policy origins and every units/stage/frequency/atol/rtol/RMSE field; only keys are duplicated/renamed. Its10080finite operands are raw/binary64 equal, with exact whole-stream structure and genuine removed-producer emptyMTR lifecycle. Complete117-record EIO excludes only first identity, wholeERR includes unused-schedule information, and533DXF logical pairs exclude only one ProgramVersion999/EOL. This is not originalA55/3meter or frozen-case conformance; its new Source class has no matched one-Zone capability IDs or promotion. The normal reciprocal-Wall A witness reuses exactly the same105 derived rows/keys and55 originalA policy origins, with original numeric limits and all8 reports on each shared face. Its10080finite values include7321raw/binary64 differences, all passing original point/RMSE policies. Actual returned positive Source IDs reciprocate across distinct Zones/Spaces; complete117-record EIO/wholeERR/533-pair DXF and genuine emptyMTR retain the existing identity/duration/EOL exclusions. This finite single-layer R13 Wall case does not establish all interzone or IRT combinations. The proper paired-IRT witness retains all105 derived A selectors and original numeric limits,97 actual EIO records except the first identity, complete ERR except identity/elapsed-time payload,533 DXF pairs except the sole ProgramVersion payload/EOL and genuine emptyMTR. Its sole engine0 output is accepted by a separate strict read-only one-Name IDF-metadata correction; the original false verifier result is retained without an engine replay or extra build. Paired-Wall exposure/default variants preserve per-format raw absence/empty/value and one-Name IDF versus unannotated epJSON provenance; exact labels/order and final retained ext_solar/ext_wind accompany all105 unchanged physical policies and complete streams/ancillary records. Typed exposure enums and Native private owners are not invented. Equal-count reverse normal opaque stacks are checked by full material identity/order and actual Source LayerPoint, never inferred thermal equivalence. Actual nominal arrays are copied unchanged and all reached public Construction/CTF report records match at emitted precision; private coefficient/history arrays are unrepresented. A rejected warmup reference and the separate pre-Source maximum-days revision preserve all model/comparison tolerances. Unequal normal opaque counts use actual finite Source NominalU owner slots and the source-defined absolute0.001 criterion; complete2/3LayerPoint and four-material links plus all138EIO/publicCTF/ERR/DXF/emptyMTR and105 unchanged policies are retained. The finite same-input2vs3 witness does not establish arbitrary layer/family combinations.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration. The two Source77 Ceiling-alias models retain every original A55-variable/3-meter and B102-variable/no-meter policy without selector or numerical changes. Actual raw/typed Ceiling links by exact typedID to retained Source Roof class3. Complete EIO body bytes exclude only the first Program Version record; all334 A DXF logical records exclude only one Program Version999 payload and line-ending encoding. Native private class is not observed. Earlier Source76A engine0 was unaccepted solely for a missing current-primary observer artifact; B76 was never launched and no76 samples enter accepted totals. The two Source79 IRT B models each retain all original102Timestepvariable policies/9792values with no selector or numerical changes, genuine absent MTR/DXF, all EIO records (91 total) except the first ProgramVersion record, and exact ERR body after only its first identity and final elapsed-time payload. Actual Warning/Continue, finalIRTcategory and Warmup/Sizing state remain included. Native78 is reused without replay. Source78 Ground engine6 stopped for missing IDF metadata before physical output, with no Adiabatic launch or accepted numerical evidence; actual changed code/build79 is separate. The disconnected two-Zone A pilot uses105 explicit derived selectors (50 perZone plus5shared), preserving all55 originalA policy origins and every units/stage/frequency/atol/rtol/RMSE field; only keys are duplicated/renamed. Its10080finite operands are raw/binary64 equal, with exact whole-stream structure and genuine removed-producer emptyMTR lifecycle. Complete117-record EIO excludes only first identity, wholeERR includes unused-schedule information, and533DXF logical pairs exclude only one ProgramVersion999/EOL. This is not originalA55/3meter or frozen-case conformance; its new Source class has no matched one-Zone capability IDs or promotion. The normal reciprocal-Wall A witness reuses exactly the same105 derived rows/keys and55 originalA policy origins, with original numeric limits and all8 reports on each shared face. Its10080finite values include7321raw/binary64 differences, all passing original point/RMSE policies. Actual returned positive Source IDs reciprocate across distinct Zones/Spaces; complete117-record EIO/wholeERR/533-pair DXF and genuine emptyMTR retain the existing identity/duration/EOL exclusions. This finite single-layer R13 Wall case does not establish all interzone or IRT combinations. The proper paired-IRT witness retains all105 derived A selectors and original numeric limits,97 actual EIO records except the first identity, complete ERR except identity/elapsed-time payload,533 DXF pairs except the sole ProgramVersion payload/EOL and genuine emptyMTR. Its sole engine0 output is accepted by a separate strict read-only one-Name IDF-metadata correction; the original false verifier result is retained without an engine replay or extra build. Paired-Wall exposure/default variants preserve per-format raw absence/empty/value and one-Name IDF versus unannotated epJSON provenance; exact labels/order and final retained ext_solar/ext_wind accompany all105 unchanged physical policies and complete streams/ancillary records. Typed exposure enums and Native private owners are not invented. Equal-count reverse normal opaque stacks are checked by full material identity/order and actual Source LayerPoint, never inferred thermal equivalence. Actual nominal arrays are copied unchanged and all reached public Construction/CTF report records match at emitted precision; private coefficient/history arrays are unrepresented. A rejected warmup reference and the separate pre-Source maximum-days revision preserve all model/comparison tolerances. Unequal normal opaque counts use actual finite Source NominalU owner slots and the source-defined absolute0.001 criterion; complete2/3LayerPoint and four-material links plus all138EIO/publicCTF/ERR/DXF/emptyMTR and105 unchanged policies are retained. The finite same-input2vs3 witness does not establish arbitrary layer/family combinations. Equal-count normal Material-ID mismatches reach actual BOTH-group and nominal-owner checks plus exact Warning/Continue/suppression effects. The two-triangle-pair witness retains105unchanged rows+16predeclaredkeycopies under original limits:121series/11616values/all5WarningContinue records/137EIO/publicCTF/579DXF/emptyMTR. Source Wind/latches/local are direct; internal path labels are inference, Native private state unobserved.",
     "cases": [
       {
         "id": "timestep-8",
@@ -35110,12 +35229,793 @@
           },
           "qualification": "Actual Construction4/5 LayerPoint[1,2]/[4,4,1] uses genuine four-entry MaterialMap and repeated HALF ID4. All four nominal owner arrays are bit-valid; actual constructor-number NominalU slots both0.4255954926829538 bits3fdb3cf4e0997da6, delta0<=0.001. No recomputed1/R, typed-cache or EIO-rounded U substitutes. Full5 public CTF groups match at emitted precision. Compiled raw Construction and private Native/Source coefficient histories remain unexposed; no full-object claim."
         }
+      },
+      {
+        "id": "A-INTERZONE-SIMILAR-U-TWO-PAIR-24H",
+        "group": "equal_count_similar_U_opaque_warning",
+        "source_build": "similar-u-warning-86",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit86-prep/similar-u-two-pair-pilot-proposal/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/input.idf",
+          "sha256": "32240b2f9041f0ba88be15a36ab4e30872aea6736f2167aeca8bad8b7ccc8535",
+          "bytes": 16489
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/similar-u-two-pair-86/native-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/command/receipt.json",
+          "sha256": "1b4c7b012b0dabd9df4e7b7f27c47970a243cc3c4328bee46f2cca15ef80e0bf",
+          "bytes": 10938
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/command/receipt.json",
+          "sha256": "fa536c717367881e43a961307804c812dab0ef3b43f23eac51f91704aead1da5",
+          "bytes": 9604
+        },
+        "source_summary": {
+          "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/run-summary.json",
+          "sha256": "499e289db532b7414edba3d9804524bb07e03eb143ccb5d66eda15ca41cb4f8e",
+          "bytes": 51859
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-86/eplus-rs.exe",
+          "sha256": "4a70a610fdfd091799880df6dfb07557129af2aaec9ece5242de4906fe371aea",
+          "bytes": 78369874
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/33/3373cd251372fa093d20b295ed8c2dd24961094798bf8427194a8eb6527ad54d",
+          "sha256": "3373cd251372fa093d20b295ed8c2dd24961094798bf8427194a8eb6527ad54d"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-86/receipt.json",
+          "sha256": "43ec25dc61f15c8906aef07e0dd47a873255d40e96e49aa06210b2d4608928af",
+          "bytes": 5830
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/comparison.json",
+          "sha256": "b315b9fb8da230c15db54471faa30067b527bb9c64f63430b0a1bb1793b01ed3",
+          "bytes": 415383
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit86-prep/similar-u-source-callable-proposal/plan.json",
+          "sha256": "bb2a48baa7ee30d70f1d7b686ac43cecf4db230c21820d6b459c440164816157",
+          "bytes": 84827
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit86-prep/similar-u-two-pair-pilot-proposal/proposal.json",
+          "sha256": "ecc925c6db7e13fdfb6f9a80f65109d6a9de4cb80830ca04381924534fbddf01",
+          "bytes": 19483
+        },
+        "totals": {
+          "series": 121,
+          "samples": 11616,
+          "raw_operand_unequal": 8906,
+          "parsed_binary64_unequal": 8906,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All121 predeclared Timestep selectors/11616finite values: unchanged105prefix+16key-onlyBcopies. Exact127dictionary/reportIDs,1environment/96orderedclocks/footerEOF and all8reports on each shared triangle. All137EIOrecords except first identity and5complete publicCTF groups match.",
+          "MTR": "OriginalA three meter requests removed with excluded producers before results; genuine Native absence and actual Source deleted_empty=true/0records/0series/[] plus file absence.",
+          "original_full_reported_profile_rows": false,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit86-prep/similar-u-two-pair-pilot-proposal/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/derived-policy.json",
+            "sha256": "80c2f16834c7c3c281f34fbc34d048c6ffb98c0c1805544d3114cfbe5aecd1be",
+            "bytes": 49438
+          },
+          "profile": "DerivedA two-Zone/two-pair121-variable profile",
+          "all_original_variable_and_meter_policy_rows": false,
+          "derived_policy_rows": 121,
+          "numerical_limits_changed": false,
+          "original_A_policy_indices_covered": 55,
+          "qualification": "105rows remain exact prefix;16Bface rows copy existing shared8+8 with only keys changed. All55 originalA origins and every unit/stage/frequency/atol/rtol/RMSE remain exact. Not originalA55+3meters/frozen conformance.",
+          "selectors_changed_from_disconnected_baseline80": true,
+          "original_105_selector_rows_unchanged": true,
+          "additional_key_only_rows": 16,
+          "sealed_105_prefix_policy": {
+            "path": ".runtime/object-expansion/unit80-prep/multizone-pilot-proposal/A-MULTIZONE-24H/derived-policy.json",
+            "sha256": "146b0914eb09427efb97b5ebf3fff54d12e1d408dc199f5df5d63adbeb93e890",
+            "bytes": 42682
+          }
+        },
+        "physical_metrics": {
+          "max_abs_delta": 4.433786671143025e-12,
+          "max_rmse_delta": 1.5457856808196934e-12,
+          "streams": [
+            {
+              "stream": "eso",
+              "numeric_records": 11616,
+              "exact_dictionary_entries": 127,
+              "exact_timestamp_rows": 96,
+              "exact_ordered_environment_and_timestamp_rows_sha256": "cbfbdafda816b3753043653c7788d6fd0bfb376e49bafc04ad7c58b1925cec2a"
+            },
+            {
+              "stream": "mtr",
+              "numeric_records": 0,
+              "deleted_empty": true
+            }
+          ]
+        },
+        "effective_state": "Actual SourceA24hour producer-free two-Zone/7closedfaces each,4shared3.75m2triangles,30/15m3 volumes/floors12/6. First reversed mismatch Material IDs2/4 have real groups0/0; actual Constructor4/5 NominalU delta0<=0.001. Exact1Warning+4Continue records include0.0000/hint/repeat notice. Real orderlatches=true/numlatches=false/localhint=true accompany firstWindfalse/BWindtrue. All121 policies pass; no private Native flag/full-object/promotion claim.",
+        "input_format": "IDF",
+        "similar_U_opaque_Wall_observation": {
+          "runtime_class": "source-multizone-heat-balance-compatibility",
+          "matched_capability_ids": [],
+          "conformance_promotion_allowed": false,
+          "surfaces": 14,
+          "solar_enclosures": 2,
+          "radiant_enclosures": 2,
+          "SurfacePtr_entries_each": 7,
+          "F_finite_cells_each": 49,
+          "declared_compiled_retained_World_vertex_bits_exact": true,
+          "current_primary_only": true,
+          "unavailable_legacy_fields_absent": true,
+          "Native_private_Zone_Space_or_enclosure_owners_observed": false,
+          "Zone_names": [
+            "ZULU CELL",
+            "ALPHA CELL"
+          ],
+          "Source_Zone_IDs": [
+            1,
+            2
+          ],
+          "typed_Zone_IDs": [
+            0,
+            1
+          ],
+          "Source_Space_IDs": [
+            1,
+            2
+          ],
+          "typed_Space_IDs": [
+            0,
+            1
+          ],
+          "compiled_geometry": {
+            "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/compiled-geometry.json",
+            "sha256": "f2374b6dbca73dfd449d6046247cf678d216e795b90fda3166fbabbcb12c5f87",
+            "bytes": 42677
+          },
+          "geometry_consumers": {
+            "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/geometry-consumers.json",
+            "sha256": "5e40441a90e9ca51dd888d668700cc027fa9cbf3c29c92050bafa0d4097b4a47",
+            "bytes": 66101
+          },
+          "Source_converted": {
+            "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/input/converted.epJSON",
+            "sha256": "67d68018936e53b23433d85df993364fd98bbafd94438a38e4acc3fba77cd019",
+            "bytes": 49379
+          },
+          "full_EIO": {
+            "artifact": {
+              "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/eplusrs.eio",
+              "sha256": "0c4ffb68b2f7a4c34bf44f8f037339149cafd0e73fd5de72a047692cf2d6b74e",
+              "bytes": 16701
+            },
+            "records": 137,
+            "body_records": 136,
+            "body_sha256": "13a7b49cf0f50c69405a0c6db6e482e67cab19c1d480b3bdeb43320f9e61001a",
+            "comparison": "Every rawCRLF body record exact after only first ProgramVersion identity."
+          },
+          "full_ERR": {
+            "artifact": {
+              "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/eplusrs.err",
+              "sha256": "f1940c076d0834088913d9d21786f4174434eb66b63d161ea9def5d8d0134d23",
+              "bytes": 1706
+            },
+            "end": {
+              "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/eplusrs.end",
+              "sha256": "ae275188a2cd8ac2fab7d7d82fc5c83ce908dbd60af039e00663b1eb0f15066e",
+              "bytes": 98
+            },
+            "final_warnings": 1,
+            "Warning_records": 1,
+            "Continue_records": 4,
+            "total_Warning_Continue_records": 5,
+            "warning_and_continue_records_hex": [
+              "2020202a2a205761726e696e67202a2a2047657453757266616365446174613a20436f6e737472756374696f6e205a554c55204335205231332057414c4c203834206f6620696e7465727a6f6e652073757266616365205a554c553a57414c4c30303220646f6573206e6f742068617665207468652073616d65206d6174657269616c7320696e207468652072657665727365206f726465722061732074686520636f6e737472756374696f6e20414c504841205231335f414c542043352057414c4c203836206f662061646a6163656e74207375726661636520414c5048413a57414c4c3030340d0a",
+              "2020202a2a2020207e7e7e2020202a2a206f72207468652070726f70657274696573206f6620746865207265766572736564206c617965727320617265206e6f7420636f72726563742064756520746f20646966666572696e67206c617965722066726f6e7420616e64206261636b20736964652076616c7565730d0a",
+              "2020202a2a2020207e7e7e2020202a2a202e2e2e627574204e6f6d696e616c20552076616c756573206172652073696d696c61722c20646966663d5b302e303030305d202e2e2e2073696d756c6174696f6e2070726f63656564732e0d0a",
+              "2020202a2a2020207e7e7e2020202a2a202e2e2e6966207468652074776f207a6f6e65732061726520657870656374656420746f2068617665207369676e69666963616e746c7920646966666572656e742074656d7065726174757265732c207468652070726f7065722022726576657273652220636f6e737472756374696f6e2073686f756c6420626520637265617465642e0d0a",
+              "2020202a2a2020207e7e7e2020202a2a202e2e2e746869732070726f626c656d20666f72207468697320706169722077696c6c206e6f74206265207265706f7274656420616761696e2e0d0a"
+            ],
+            "warmup_sizing_summary_records_hex": [
+              "2020202a2a2a2a2a2a2a2a2a2a2a2a2a20456e65726779506c7573205761726d7570204572726f722053756d6d6172792e20447572696e67205761726d75703a2030205761726e696e673b203020536576657265204572726f72732e0d0a",
+              "2020202a2a2a2a2a2a2a2a2a2a2a2a2a20456e65726779506c75732053697a696e67204572726f722053756d6d6172792e20447572696e672053697a696e673a2030205761726e696e673b203020536576657265204572726f72732e0d0a"
+            ],
+            "severe_or_fatal": false,
+            "unused_schedule_info_records": 2,
+            "comparison": "All actual records exact except first identity/finalelapsed, including all5Warning/Continue records, unused-info and phase/final counters."
+          },
+          "DXF": {
+            "artifact": {
+              "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/eplusrs.dxf",
+              "sha256": "66c269d648d233a550793adf042200812207dd11456e42959ea0166811194919",
+              "bytes": 9275
+            },
+            "logical_pairs": 579,
+            "all_other_pairs_sha256": "6e5ec774e3249682d05c81c9d34cda0b2dbdc43058cf3f38e4ce737c0afff0a7",
+            "named_POLYLINE": 14,
+            "VERTEX": 52,
+            "SEQEND": 14,
+            "comparison": "Every ordered pair/entity/color/coordinate exact except soleProgramVersion999/EOL; every other999 retained."
+          },
+          "actual_Source_MTR_owner": {
+            "deleted_empty": true,
+            "owned_path": "C:\\Users\\GonieGonie\\Documents\\GitHub\\rusted-energyplus\\.runtime\\porting\\similar-u-two-pair-86\\source-01\\A-INTERZONE-SIMILAR-U-TWO-PAIR-24H\\output\\eplusrs.mtr",
+            "reported_numeric_records": 0,
+            "series": 0,
+            "series_samples": [],
+            "stream": "mtr"
+          },
+          "genuine_Native_MTR_present": false,
+          "Source_MTR_present": false,
+          "shared_all8reports_each_complete": true,
+          "actual_normal_constructions": [
+            {
+              "AbsDiffShade": {
+                "value": 0.0,
+                "value_bits": "0000000000000000"
+              },
+              "DayltPropPtr": 0,
+              "InsideAbsorpSolar": {
+                "value": 0.75,
+                "value_bits": "3fe8000000000000"
+              },
+              "InsideAbsorpThermal": {
+                "value": 0.9,
+                "value_bits": "3feccccccccccccd"
+              },
+              "InsideAbsorpVis": {
+                "value": 0.75,
+                "value_bits": "3fe8000000000000"
+              },
+              "IsUsed": true,
+              "IsUsedCTF": true,
+              "LayerPoint": {
+                "lower": 1,
+                "size": 11,
+                "upper": 11,
+                "values": [
+                  1,
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "OutsideAbsorpSolar": {
+                "value": 0.65,
+                "value_bits": "3fe4cccccccccccd"
+              },
+              "OutsideAbsorpThermal": {
+                "value": 0.9,
+                "value_bits": "3feccccccccccccd"
+              },
+              "OutsideAbsorpVis": {
+                "value": 0.65,
+                "value_bits": "3fe4cccccccccccd"
+              },
+              "OutsideRoughness": 2,
+              "ReflectVisDiffBack": {
+                "value": 0.25,
+                "value_bits": "3fd0000000000000"
+              },
+              "ReverseConstructionLayersOrderWarning": true,
+              "ReverseConstructionNumLayersWarning": false,
+              "TotGlassLayers": 0,
+              "TotLayers": 2,
+              "TotSolidLayers": 0,
+              "TypeIsEcoRoof": false,
+              "TypeIsIRT": false,
+              "TypeIsWindow": false,
+              "WindowTypeEQL": false,
+              "id": 4,
+              "name": "ZULU C5 R13 WALL 84",
+              "typed_id": 3
+            },
+            {
+              "AbsDiffShade": {
+                "value": 0.0,
+                "value_bits": "0000000000000000"
+              },
+              "DayltPropPtr": 0,
+              "InsideAbsorpSolar": {
+                "value": 0.65,
+                "value_bits": "3fe4cccccccccccd"
+              },
+              "InsideAbsorpThermal": {
+                "value": 0.9,
+                "value_bits": "3feccccccccccccd"
+              },
+              "InsideAbsorpVis": {
+                "value": 0.65,
+                "value_bits": "3fe4cccccccccccd"
+              },
+              "IsUsed": true,
+              "IsUsedCTF": true,
+              "LayerPoint": {
+                "lower": 1,
+                "size": 11,
+                "upper": 11,
+                "values": [
+                  4,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "OutsideAbsorpSolar": {
+                "value": 0.75,
+                "value_bits": "3fe8000000000000"
+              },
+              "OutsideAbsorpThermal": {
+                "value": 0.9,
+                "value_bits": "3feccccccccccccd"
+              },
+              "OutsideAbsorpVis": {
+                "value": 0.75,
+                "value_bits": "3fe8000000000000"
+              },
+              "OutsideRoughness": 1,
+              "ReflectVisDiffBack": {
+                "value": 0.35,
+                "value_bits": "3fd6666666666666"
+              },
+              "ReverseConstructionLayersOrderWarning": true,
+              "ReverseConstructionNumLayersWarning": false,
+              "TotGlassLayers": 0,
+              "TotLayers": 2,
+              "TotSolidLayers": 0,
+              "TypeIsEcoRoof": false,
+              "TypeIsIRT": false,
+              "TypeIsWindow": false,
+              "WindowTypeEQL": false,
+              "id": 5,
+              "name": "ALPHA R13_ALT C5 WALL 86",
+              "typed_id": 4
+            }
+          ],
+          "actual_layer_materials": {
+            "C5 - 4 IN HW CONCRETE": {
+              "NominalR": {
+                "value": 0.05868394410887749,
+                "value_bits": "3fae0bd2697eef76"
+              },
+              "group": 0,
+              "id": 1,
+              "map_key": "C5 - 4 IN HW CONCRETE",
+              "typed_id": 0,
+              "validated_typed_properties": {
+                "AbsorpSolar": {
+                  "value": 0.65,
+                  "value_bits": "3fe4cccccccccccd"
+                },
+                "AbsorpThermal": {
+                  "value": 0.9,
+                  "value_bits": "3feccccccccccccd"
+                },
+                "AbsorpVisible": {
+                  "value": 0.65,
+                  "value_bits": "3fe4cccccccccccd"
+                },
+                "Roughness": 2
+              }
+            },
+            "R13LAYER": {
+              "NominalR": {
+                "value": 2.290965,
+                "value_bits": "400253e5753a3ec0"
+              },
+              "group": 0,
+              "id": 2,
+              "map_key": "R13LAYER",
+              "typed_id": 1,
+              "validated_typed_properties": {
+                "AbsorpSolar": {
+                  "value": 0.75,
+                  "value_bits": "3fe8000000000000"
+                },
+                "AbsorpThermal": {
+                  "value": 0.9,
+                  "value_bits": "3feccccccccccccd"
+                },
+                "AbsorpVisible": {
+                  "value": 0.75,
+                  "value_bits": "3fe8000000000000"
+                },
+                "Roughness": 1
+              }
+            },
+            "R13_ALT": {
+              "NominalR": {
+                "value": 2.290965,
+                "value_bits": "400253e5753a3ec0"
+              },
+              "group": 0,
+              "id": 4,
+              "map_key": "R13_ALT",
+              "typed_id": 3,
+              "validated_typed_properties": {
+                "AbsorpSolar": {
+                  "value": 0.75,
+                  "value_bits": "3fe8000000000000"
+                },
+                "AbsorpThermal": {
+                  "value": 0.9,
+                  "value_bits": "3feccccccccccccd"
+                },
+                "AbsorpVisible": {
+                  "value": 0.75,
+                  "value_bits": "3fe8000000000000"
+                },
+                "Roughness": 1
+              }
+            }
+          },
+          "actual_LayerPoint_sequences": [
+            [
+              1,
+              2
+            ],
+            [
+              4,
+              1
+            ]
+          ],
+          "actual_nominal_owner_arrays": {
+            "CoeffAdjRatio": {
+              "allocated": true,
+              "lower": 1,
+              "size": 5,
+              "upper": 5,
+              "values": [
+                {
+                  "value": 1.0,
+                  "value_bits": "3ff0000000000000"
+                },
+                {
+                  "value": 1.0,
+                  "value_bits": "3ff0000000000000"
+                },
+                {
+                  "value": 1.0,
+                  "value_bits": "3ff0000000000000"
+                },
+                {
+                  "value": 1.0,
+                  "value_bits": "3ff0000000000000"
+                },
+                {
+                  "value": 1.0,
+                  "value_bits": "3ff0000000000000"
+                }
+              ]
+            },
+            "NominalRforNominalUCalculation": {
+              "allocated": true,
+              "lower": 1,
+              "size": 5,
+              "upper": 5,
+              "values": [
+                {
+                  "value": 2.290965,
+                  "value_bits": "400253e5753a3ec0"
+                },
+                {
+                  "value": 0.05868394410887749,
+                  "value_bits": "3fae0bd2697eef76"
+                },
+                {
+                  "value": 5.456,
+                  "value_bits": "4015d2f1a9fbe76d"
+                },
+                {
+                  "value": 2.3496489441088775,
+                  "value_bits": "4002cc14bee03a7e"
+                },
+                {
+                  "value": 2.3496489441088775,
+                  "value_bits": "4002cc14bee03a7e"
+                }
+              ]
+            },
+            "NominalU": {
+              "allocated": true,
+              "lower": 1,
+              "size": 5,
+              "upper": 5,
+              "values": [
+                {
+                  "value": 0.43649728389565096,
+                  "value_bits": "3fdbef924dc7fa3d"
+                },
+                {
+                  "value": 17.040436105396733,
+                  "value_bits": "40310a5a054641af"
+                },
+                {
+                  "value": 0.18328445747800584,
+                  "value_bits": "3fc775dd775dd775"
+                },
+                {
+                  "value": 0.4255954926829538,
+                  "value_bits": "3fdb3cf4e0997da6"
+                },
+                {
+                  "value": 0.4255954926829538,
+                  "value_bits": "3fdb3cf4e0997da6"
+                }
+              ]
+            },
+            "NominalUBeforeAdjusted": {
+              "allocated": true,
+              "lower": 1,
+              "size": 5,
+              "upper": 5,
+              "values": [
+                {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                }
+              ]
+            }
+          },
+          "per_construction_nominal_u_injected": false,
+          "private_CTF_arrays_observed": false,
+          "maximum_warmup_allowance": 100,
+          "minimum_warmup_days": 6,
+          "model_temperature_convergence_tolerance": 0.004,
+          "model_loads_convergence_tolerance": 0.04,
+          "actual_warmup_days": 32,
+          "actual_warmup_records_hex": [
+            "456e7669726f6e6d656e743a5761726d7570446179732c2033320d0a"
+          ],
+          "CTF_report": {
+            "artifact": {
+              "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/output/eplusrs.eio",
+              "sha256": "0c4ffb68b2f7a4c34bf44f8f037339149cafd0e73fd5de72a047692cf2d6b74e",
+              "bytes": 16701
+            },
+            "groups": [
+              {
+                "name": "R13WALL",
+                "public_report_index": 1,
+                "layers": 1,
+                "terms": 1,
+                "thermal_conductance_decimal": "0.4365",
+                "material_names": [
+                  "R13LAYER"
+                ]
+              },
+              {
+                "name": "FLOOR",
+                "public_report_index": 2,
+                "layers": 1,
+                "terms": 5,
+                "thermal_conductance_decimal": "17.04",
+                "material_names": [
+                  "C5 - 4 IN HW CONCRETE"
+                ]
+              },
+              {
+                "name": "ROOF31",
+                "public_report_index": 3,
+                "layers": 1,
+                "terms": 1,
+                "thermal_conductance_decimal": "0.1833",
+                "material_names": [
+                  "R31LAYER"
+                ]
+              },
+              {
+                "name": "ZULU C5 R13 WALL 84",
+                "public_report_index": 4,
+                "layers": 2,
+                "terms": 6,
+                "thermal_conductance_decimal": "0.4256",
+                "material_names": [
+                  "C5 - 4 IN HW CONCRETE",
+                  "R13LAYER"
+                ]
+              },
+              {
+                "name": "ALPHA R13_ALT C5 WALL 86",
+                "public_report_index": 5,
+                "layers": 2,
+                "terms": 6,
+                "thermal_conductance_decimal": "0.4256",
+                "material_names": [
+                  "R13_ALT",
+                  "C5 - 4 IN HW CONCRETE"
+                ]
+              }
+            ],
+            "complete_emitted_bytes_verified_by": {
+              "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/comparison.json",
+              "sha256": "b315b9fb8da230c15db54471faa30067b527bb9c64f63430b0a1bb1793b01ed3",
+              "bytes": 415383
+            },
+            "private_coefficient_history_arrays_observed": false
+          },
+          "qualification": "Direct Source observations are real Construction latches, separate invocation-local izConstDiffMsg snapshot, per-surface Wind, groups/material IDs and nominal slots. Internal Completed/SkippedLayerOrderWarning labels are qualified code/state inference, not serialized markers/private Native fields. No typed/EIO-rounded/recomputed1R substitute; complete publicCTF bytes match at emitted precision. Other families/arbitrary combinations unpromoted.",
+          "triangles": 4,
+          "quads": 10,
+          "actual_reciprocal_pairs": [
+            [
+              {
+                "id": 2,
+                "typed_id": 1,
+                "name": "ZULU:WALL002",
+                "class": 1,
+                "zone_id": 1,
+                "space_id": 1,
+                "construction_id": 4,
+                "outside_boundary": 11,
+                "sides": 3,
+                "ext_solar": false,
+                "ext_wind": false,
+                "area_m2": {
+                  "value": 3.75,
+                  "value_bits": "400e000000000000"
+                }
+              },
+              {
+                "id": 11,
+                "typed_id": 10,
+                "name": "ALPHA:WALL004",
+                "class": 1,
+                "zone_id": 2,
+                "space_id": 2,
+                "construction_id": 5,
+                "outside_boundary": 2,
+                "sides": 3,
+                "ext_solar": false,
+                "ext_wind": false,
+                "area_m2": {
+                  "value": 3.75,
+                  "value_bits": "400e000000000000"
+                }
+              }
+            ],
+            [
+              {
+                "id": 5,
+                "typed_id": 4,
+                "name": "ZULU:WALL002B",
+                "class": 1,
+                "zone_id": 1,
+                "space_id": 1,
+                "construction_id": 4,
+                "outside_boundary": 12,
+                "sides": 3,
+                "ext_solar": false,
+                "ext_wind": true,
+                "area_m2": {
+                  "value": 3.75,
+                  "value_bits": "400e000000000000"
+                }
+              },
+              {
+                "id": 12,
+                "typed_id": 11,
+                "name": "ALPHA:WALL004B",
+                "class": 1,
+                "zone_id": 2,
+                "space_id": 2,
+                "construction_id": 5,
+                "outside_boundary": 5,
+                "sides": 3,
+                "ext_solar": false,
+                "ext_wind": true,
+                "area_m2": {
+                  "value": 3.75,
+                  "value_bits": "400e000000000000"
+                }
+              }
+            ]
+          ],
+          "actual_mismatched_Source_material_groups": [
+            {
+              "material_id": 2,
+              "actual_Source_group": 0
+            },
+            {
+              "material_id": 4,
+              "actual_Source_group": 0
+            }
+          ],
+          "actual_similar_U_NominalU": {
+            "actual_owner_slots": [
+              {
+                "construction_id": 4,
+                "construction_name": "ZULU C5 R13 WALL 84",
+                "owner_array": "heat_balance_nominal.NominalU",
+                "owner_index": 4,
+                "storage_offset": 3,
+                "scalar": {
+                  "value": 0.4255954926829538,
+                  "value_bits": "3fdb3cf4e0997da6"
+                }
+              },
+              {
+                "construction_id": 5,
+                "construction_name": "ALPHA R13_ALT C5 WALL 86",
+                "owner_array": "heat_balance_nominal.NominalU",
+                "owner_index": 5,
+                "storage_offset": 4,
+                "scalar": {
+                  "value": 0.4255954926829538,
+                  "value_bits": "3fdb3cf4e0997da6"
+                }
+              }
+            ],
+            "absolute_difference": 0.0,
+            "maximum_absolute_difference": 0.001,
+            "criterion_met": true,
+            "EIO_or_typed_cache_or_recomputed_1R_used": false
+          },
+          "actual_invocation_local_hint_snapshot": true,
+          "internal_InterzoneExposurePath_serialized": false,
+          "reached_path_inference": {
+            "first_pair": "Completed",
+            "B_pair": "SkippedLayerOrderWarning",
+            "qualification": "Source-derived inference from actual flags/latches/local snapshot plus pinned control flow; internal Rust marker is unexported, Native private flags are unobserved."
+          },
+          "first_pair_final_Wind_false_B_pair_true": true,
+          "Native_private_flags_latches_local_observed": false
+        }
       }
     ],
     "totals": {
-      "paired_cases": 135,
-      "reported_samples": 3581214,
-      "raw_operand_unequal": 765976,
+      "paired_cases": 136,
+      "reported_samples": 3592830,
+      "raw_operand_unequal": 774882,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -36514,6 +37414,23 @@
           "sha256": "b86628a7cbe0b5f30e5940892cefd6c8005ece5f30c4710002a3e6489e03bc9c",
           "bytes": 78367450
         }
+      },
+      {
+        "id": "similar-u-warning-86",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-86/receipt.json",
+          "sha256": "43ec25dc61f15c8906aef07e0dd47a873255d40e96e49aa06210b2d4608928af",
+          "bytes": 5830
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/33/3373cd251372fa093d20b295ed8c2dd24961094798bf8427194a8eb6527ad54d",
+          "sha256": "3373cd251372fa093d20b295ed8c2dd24961094798bf8427194a8eb6527ad54d"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-86/eplus-rs.exe",
+          "sha256": "4a70a610fdfd091799880df6dfb07557129af2aaec9ece5242de4906fe371aea",
+          "bytes": 78369874
+        }
       }
     ],
     "focused_since_workspace": {
@@ -36680,14 +37597,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 82,
-      "builds_with_accepted_paired_cases": 79,
+      "actual_recorded_builds": 83,
+      "builds_with_accepted_paired_cases": 80,
       "builds_with_only_retained_failed_Source_attempts": 2,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 3,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "82 actual recorded builds partition into79 with accepted pairs,2 engine-failed-only builds68/78(exit6), and1 observer-unaccepted-only build76(engine0). Unaccepted attempts add no accepted cases/samples; quality/reference negatives remain in their original separate histories."
+      "qualification": "83 recorded builds partition into80accepted,2engine-failed-only68/78(exit6),1observer-unaccepted-only76(engine0). Unaccepted attempts add no accepted cases/samples; quality/reference negatives stay in their own histories."
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",
@@ -37485,6 +38402,62 @@
       "Native_replays": 0,
       "Source_replays": 0,
       "scope": "Equal-count normal opaque stacks1..10 retain exact reversed material identity. Unequal normal opaque counts1..10 use only finite actual Source NominalU owner slots by Construction number and abs difference<=0.001, without layer-identity substitution,1/R reconstruction, typed-cache or EIO-rounded U. Missing/nonfinite/out-of-range owners or larger differences fail closed; IRT remains sole-layer and windows/internal sources are excluded. One finite2vs3 witness retains all105policies/fullstreams/138EIO5publicCTF/ERR/DXF/emptyMTR. SourceA producer-free geometry/class fences and SourceB/legacy are unchanged; no promotion/full-object claim."
+    },
+    "current_similar_U_opaque_warning_live_pair": {
+      "source_build": "similar-u-warning-86",
+      "case_rows": [
+        "A-INTERZONE-SIMILAR-U-TWO-PAIR-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/similar-u-two-pair-86/source-01/summary.json",
+        "sha256": "935c5d82f1bc125d1c7b3b15b44d98bfb9eb17390a265b2d6e23a309914df5b8",
+        "bytes": 1641
+      },
+      "comparisons": [
+        {
+          "path": ".runtime/porting/similar-u-two-pair-86/source-01/A-INTERZONE-SIMILAR-U-TWO-PAIR-24H/comparison.json",
+          "sha256": "b315b9fb8da230c15db54471faa30067b527bb9c64f63430b0a1bb1793b01ed3",
+          "bytes": 415383
+        }
+      ],
+      "Native_index": {
+        "path": ".runtime/porting/similar-u-two-pair-86/native-01/launches.json",
+        "sha256": "78a6b15f77a8243c528dd97e8e1504a3179481a5a9f103cb41c79273c030bffd",
+        "bytes": 1477
+      },
+      "Native_raw_readback": {
+        "path": ".runtime/object-expansion/unit86-prep/native-01-raw-readback.json",
+        "sha256": "5a45d2c4416951335a9900bb969e64d06b5ef29e3ecdb4a57bc661582c95c17a",
+        "bytes": 54282
+      },
+      "Root_independent_full_raw_reread": {
+        "path": ".runtime/object-expansion/unit86-prep/root-raw-readback01.json",
+        "sha256": "d6745f02da051578e7fbe35aad72c0b4eabf9345d6a2069441a4522ca2f9af25",
+        "bytes": 26287
+      },
+      "code_adoption": {
+        "path": ".runtime/object-expansion/unit86-prep/adoption02.json",
+        "sha256": "3114be2ee0ee19b848f93c8500c44b29b8f0c8dfd8339aec6f41f845a9115130",
+        "bytes": 4297
+      },
+      "quality": {
+        "path": ".runtime/object-expansion/unit86-prep/similar-u-warning-quality02/receipt.json",
+        "sha256": "8a4aa82703bc70a0417f74ed5193b51361ff81330d9de39c5a579d1142c97aaa",
+        "bytes": 5369
+      },
+      "input_proposal": {
+        "path": ".runtime/object-expansion/unit86-prep/similar-u-two-pair-pilot-proposal/proposal.json",
+        "sha256": "ecc925c6db7e13fdfb6f9a80f65109d6a9de4cb80830ca04381924534fbddf01",
+        "bytes": 19483
+      },
+      "validation_proposal": {
+        "path": ".runtime/object-expansion/unit86-prep/similar-u-source-callable-proposal/proposal.json",
+        "sha256": "c2a838aba7f594a781d9682d2c64fbf371544d03750fad323f1f1fcbe03dc01a",
+        "bytes": 1924
+      },
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "scope": "Bounded SourceA reciprocal normal Wall stacks1..10 retain exact reversed identity fast paths. Differing reversed Material IDs read BOTH real normal groups and actual finite NominalU slots with abs difference<=0.001 before literal similar-U Warning/Continue effects; actual Construction orderlatches suppress later pair checks and the hint is a separate invocation-local snapshot. Unequal85 and sole-layer exact-IRT remain; unavailable/nonfinite/out-of-range owners or larger deltas fail closed. One2triangle-pair witness observes orderlatches/local and firstWindfalse/BWindtrue,121original-limit policies/fullstreams/137EIO5CTF/ERR1Warning4Continue/579DXF/emptyMTR. Internal labels are inference; Native private flags unobserved. Emptycaps/no promotion/SourceBlegacy fences remain."
     }
   },
   "additional_native_type_calibrations": [

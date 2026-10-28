@@ -213,15 +213,26 @@ fn validate_surface_pairs(raw: &RawModel) -> Result<(), String> {
         {
             return Err("unequal-count paired Walls require normal opaque materials".into());
         }
-        // Count differences defer the numerical U check to the actual Source
-        // getter-owned array. Equal counts retain the established exact reverse.
-        if layers[0].len() == layers[1].len()
-            && !layers[0]
+        // Only the established IRT path still requires exact identity here.
+        // Normal opaque mismatches defer BOTH real groups and U to Source.
+        let exact_reverse = layers[0].len() == layers[1].len()
+            && layers[0]
                 .iter()
                 .zip(layers[1].iter().rev())
-                .all(|(left, right)| left.eq_ignore_ascii_case(right))
+                .all(|(left, right)| left.eq_ignore_ascii_case(right));
+        if !exact_reverse
+            && layers.iter().any(|stack| {
+                infrared.is_some_and(|rows| {
+                    stack.iter().any(|material| {
+                        rows.keys()
+                            .any(|name| name.0.eq_ignore_ascii_case(material))
+                    })
+                })
+            })
         {
-            return Err("paired Walls require exactly reversed opaque Material references".into());
+            return Err(
+                "IRT paired Walls require the existing exact reverse Material identity".into(),
+            );
         }
     }
     Ok(())

@@ -34,6 +34,8 @@ pub struct OrdinarySurfaceGeometry<'a> {
     pub nominal_u_before_adjusted: Option<&'a [f64]>,
     /// Actual retained CoeffAdjRatio array.
     pub coefficient_adjustment_ratio: Option<&'a [f64]>,
+    /// Snapshot of the actual invocation-local izConstDiffMsg, not a latch.
+    pub iz_const_diff_message: Option<bool>,
     /// Existing caller/scratch/list members, with no inferred readiness.
     pub process: OrdinaryGeometryProcess<'a>,
     /// Actual retained SurfaceGeometry.ErrCount5 owner.
@@ -136,6 +138,10 @@ pub struct OrdinaryGeometryConstruction<'a> {
     pub type_is_eco_roof: bool,
     /// Actual TypeIsIRT.
     pub type_is_irt: bool,
+    /// Actual persistent Construction diagnostic suppression latches.
+    pub reverse_construction_num_layers_warning: bool,
+    /// Actual ReverseConstructionLayersOrderWarning.
+    pub reverse_construction_layers_order_warning: bool,
     /// Actual IsUsed.
     pub is_used: bool,
     /// Actual IsUsedCTF.
@@ -476,6 +482,10 @@ impl CtfInitializationReports {
                     window_type_eql: row.window_type_eql,
                     type_is_eco_roof: row.type_is_eco_roof,
                     type_is_irt: row.type_is_irt,
+                    reverse_construction_num_layers_warning: row
+                        .reverse_construction_num_layers_warning,
+                    reverse_construction_layers_order_warning: row
+                        .reverse_construction_layers_order_warning,
                     is_used: row.is_used,
                     is_used_ctf: row.is_used_ctf,
                     inside_absorp_vis: row.inside_absorp_vis,
@@ -674,6 +684,7 @@ impl CtfInitializationReports {
             nominal_u: control.nominal_u.as_deref(),
             nominal_u_before_adjusted: control.nominal_u_before_adjusted.as_deref(),
             coefficient_adjustment_ratio: control.coefficient_adjustment_ratio.as_deref(),
+            iz_const_diff_message: source.iz_const_diff_message,
             err_count5: source.err_count5,
             process: OrdinaryGeometryProcess {
                 process_one_time_flag: scratch.one_time,

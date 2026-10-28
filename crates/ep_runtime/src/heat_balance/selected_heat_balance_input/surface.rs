@@ -278,6 +278,10 @@ pub(crate) struct SurfaceGeometryInputState {
     pub(crate) any_movable_slat: bool,
     /// Actual DataSurface.hh1505 constructorfalse; no positive selected shading writer.
     pub(crate) shading_transmittance_varies: bool,
+    /// Snapshot of actual invocation-local izConstDiffMsg, initialized at1776.
+    /// None means the matching loop has not been entered; this is not a
+    /// persistent Native Construction flag or a substitute physics input.
+    pub(crate) iz_const_diff_message: Option<bool>,
     pub(crate) surface_error: bool,
     pub(crate) surfaces_read: usize,
     pub(crate) next_object: usize,
