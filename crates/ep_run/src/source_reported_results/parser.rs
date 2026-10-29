@@ -174,7 +174,6 @@ pub(super) fn read_stream(
     })
     .map_err(|_| invalid(stream, 0, "negative actual Source record counter"))?;
     let mut declared = BTreeMap::new();
-    let mut identities = BTreeSet::new();
     for d in c.declarations.iter().filter(|d| d.stream == stream) {
         if d.report_id <= 0 || declared.insert(d.report_id, d).is_some() {
             return Err(invalid(
@@ -192,21 +191,10 @@ pub(super) fn read_stream(
                 "variable/meter key presence differs from actual declaration kind",
             ));
         }
-        if !identities.insert((
-            d.key.clone(),
-            d.name.clone(),
-            d.units.clone(),
-            d.frequency,
-            d.store_type.id(),
-            d.kind.id(),
-            d.reporting_schedule.clone(),
-        )) {
-            return Err(invalid(
-                stream,
-                0,
-                "duplicate full key/name/units/frequency/store/kind identity is not silently collapsed",
-            ));
-        }
+        // Native SetupOutputVariable creates a separate ReportID/Which for
+        // every actual owner, even when all public labels coincide. Keep each
+        // declaration by its real report ID; later dictionary/sample checks
+        // authenticate that complete metadata and preserve every series.
     }
     let bytes = match std::fs::read(path) {
         Ok(b) => b,
@@ -484,6 +472,21 @@ pub(super) fn read_stream(
                 stream,
                 n,
                 "hourly output paired with a subhour stamp",
+            ));
+        }
+        // Each ReportID is one actual Native owner/request. Zone/System
+        // calls may share a physical stamp, but different owners keep different
+        // IDs. A later physical stamp is a new group even if its text repeats;
+        // never deduplicate guessed logical dates or Detailed/System substeps.
+        if series[position]
+            .samples
+            .last()
+            .is_some_and(|sample| sample.stamp_index == stamp_index)
+        {
+            return Err(invalid(
+                stream,
+                n,
+                "the same actual report ID occurs twice under one physical timestamp record",
             ));
         }
         let value = real(&fields[0], stream, n)?;

@@ -121,6 +121,161 @@ fn scheduled_filter_completed_parser_retains_dictionary_and_zero_sample_series()
     // A missing unscheduled report remains invalid even beside an emitted report.
     assert!(read_completed_source_reports(&eso, &mtr, &c).is_err());
 
+    // Unit96: public labels are not unique owner IDs. These authored closed
+    // stream records stand for two distinct registered owners; no simulation
+    // or Native run is implied by this parser checkpoint.
+    let aliases = catalog(vec![declaration(7, None), declaration(8, None)], 2);
+    let alias_bytes = physical(&aliases)?
+        .replace("7,-4.5\n", "7,-4.5\n8,12.25\n")
+        .replace(
+            "Number of Records Written=           1",
+            "Number of Records Written=           2",
+        );
+    std::fs::write(&eso, &alias_bytes)?;
+    let aliased = read_completed_source_reports(&eso, &mtr, &aliases)?;
+    assert_eq!(aliased.eso.series.len(), 2);
+    assert_eq!(aliased.eso.record_count, 2);
+    assert_eq!(aliased.eso.series[0].declaration.report_id, 7);
+    assert_eq!(aliased.eso.series[1].declaration.report_id, 8);
+    assert_eq!(
+        aliased.eso.series[0].declaration.key,
+        aliased.eso.series[1].declaration.key
+    );
+    assert_eq!(
+        aliased.eso.series[0].declaration.name,
+        aliased.eso.series[1].declaration.name
+    );
+    assert_eq!(aliased.eso.series[0].samples[0].reported_fields, ["-4.5"]);
+    assert_eq!(aliased.eso.series[1].samples[0].reported_fields, ["12.25"]);
+    assert_eq!(
+        aliased.eso.series[0].samples[0].value.to_bits(),
+        (-4.5_f64).to_bits()
+    );
+    assert_eq!(
+        aliased.eso.series[1].samples[0].value.to_bits(),
+        12.25_f64.to_bits()
+    );
+    assert_ne!(
+        aliased.eso.series[0].samples[0].stream_data_ordinal,
+        aliased.eso.series[1].samples[0].stream_data_ordinal
+    );
+    let alias_export = directory.0.join("alias-export");
+    write_source_reported_artifacts(&alias_export, &aliased)?;
+    let json: serde_json::Value = serde_json::from_slice(&std::fs::read(
+        alias_export.join("source-reported-results.json"),
+    )?)?;
+    assert_eq!(
+        json["eso"]["series"]
+            .as_array()
+            .ok_or("alias series array")?
+            .len(),
+        2
+    );
+    assert_eq!(json["eso"]["series"][0]["report_id"], 7);
+    assert_eq!(json["eso"]["series"][1]["report_id"], 8);
+    let csv = std::fs::read_to_string(alias_export.join("source-eso.csv"))?;
+    let rows = csv.lines().skip(1).collect::<Vec<_>>();
+    assert_eq!(rows.len(), 2);
+    assert!(rows[0].starts_with("eso,7,Environment,"));
+    assert!(rows[1].starts_with("eso,8,Environment,"));
+    // Detailed Zone/System owners can share a timestamp without sharing a
+    // ReportID. Genuine repeated reporting of one ID needs a later physical
+    // stamp; preserve that boundary even when raw timestamp fields coincide.
+    let mut each_seven = declaration(7, None);
+    each_seven.frequency = Frequency::EachCall;
+    let mut each_eight = declaration(8, None);
+    each_eight.frequency = Frequency::EachCall;
+    let each_aliases = catalog(vec![each_seven.clone(), each_eight], 2);
+    let each_alias_bytes = physical(&each_aliases)?
+        .replace("7,-4.5\n", "7,-4.5\n8,12.25\n")
+        .replace(
+            "Number of Records Written=           1",
+            "Number of Records Written=           2",
+        );
+    std::fs::write(&eso, &each_alias_bytes)?;
+    let parsed = read_completed_source_reports(&eso, &mtr, &each_aliases)?;
+    assert_eq!(parsed.eso.series.len(), 2);
+    assert_eq!(
+        parsed.eso.series[0].samples[0].stamp_index,
+        parsed.eso.series[1].samples[0].stamp_index
+    );
+    assert_ne!(
+        parsed.eso.series[0].declaration.report_id,
+        parsed.eso.series[1].declaration.report_id
+    );
+    let successive = catalog(vec![each_seven], 2);
+    let next_stamp = "2,1,1,1,0,1,0.00,60.00,Tuesday\n";
+    let successive_bytes = physical(&successive)?
+        .replace("7,-4.5\n", &format!("7,-4.5\n{next_stamp}7,12.25\n"))
+        .replace(
+            "Number of Records Written=           1",
+            "Number of Records Written=           2",
+        );
+    std::fs::write(&eso, &successive_bytes)?;
+    let parsed = read_completed_source_reports(&eso, &mtr, &successive)?;
+    assert_eq!(parsed.eso.series.len(), 1);
+    assert_eq!(parsed.eso.series[0].samples.len(), 2);
+    let first = &parsed.eso.series[0].samples[0];
+    let second = &parsed.eso.series[0].samples[1];
+    assert_ne!(first.stamp_index, second.stamp_index);
+    assert_eq!(
+        parsed.eso.stamps[first.stamp_index].fields,
+        parsed.eso.stamps[second.stamp_index].fields
+    );
+    assert_eq!(first.reported_fields, ["-4.5"]);
+    assert_eq!(second.reported_fields, ["12.25"]);
+    // A same-ID duplicate in one Detailed physical group still fails.
+    let each_duplicate_bytes = physical(&successive)?
+        .replace("7,-4.5\n", "7,-4.5\n7,12.25\n")
+        .replace(
+            "Number of Records Written=           1",
+            "Number of Records Written=           2",
+        );
+    std::fs::write(&eso, each_duplicate_bytes)?;
+    assert!(read_completed_source_reports(&eso, &mtr, &successive).is_err());
+    std::fs::write(&eso, &alias_bytes)?;
+    // Equal report IDs still fail against the genuine catalog before parsing.
+    let duplicate_id = catalog(vec![declaration(7, None), declaration(7, None)], 2);
+    assert!(read_completed_source_reports(&eso, &mtr, &duplicate_id).is_err());
+    // Equal dictionary IDs remain invalid even when catalog IDs are distinct.
+    std::fs::write(
+        &eso,
+        alias_bytes.replace("\n8,1,Environment,", "\n7,1,Environment,"),
+    )?;
+    assert!(read_completed_source_reports(&eso, &mtr, &aliases).is_err());
+    // Both the physical count and footer agree here; the second unscheduled
+    // owner's missing sample alone must still reject the completed stream.
+    let missing = catalog(vec![declaration(7, None), declaration(8, None)], 1);
+    std::fs::write(
+        &eso,
+        alias_bytes.replace("8,12.25\n", "").replace(
+            "Number of Records Written=           2",
+            "Number of Records Written=           1",
+        ),
+    )?;
+    assert!(read_completed_source_reports(&eso, &mtr, &missing).is_err());
+    // Matching footer/counter cannot license a second sample for the same
+    // actual owner and interval, or incorrect dictionary units.
+    let repeated = catalog(vec![declaration(7, None), declaration(8, None)], 3);
+    std::fs::write(
+        &eso,
+        alias_bytes
+            .replace("8,12.25\n", "8,12.25\n8,13.5\n")
+            .replace(
+                "Number of Records Written=           2",
+                "Number of Records Written=           3",
+            ),
+    )?;
+    assert!(read_completed_source_reports(&eso, &mtr, &repeated).is_err());
+    std::fs::write(
+        &eso,
+        alias_bytes.replace(
+            "8,1,Environment,Site Outdoor Air Drybulb Temperature [C] !Hourly",
+            "8,1,Environment,Site Outdoor Air Drybulb Temperature [K] !Hourly",
+        ),
+    )?;
+    assert!(read_completed_source_reports(&eso, &mtr, &aliases).is_err());
+
     // This authored closed-stream child checks parser custody, not successful
     // ManageSimulation execution. Every warmup/regular row remains in order.
     let mut warmup = catalog(vec![declaration(7, None), declaration(8, Some("OFF"))], 4);

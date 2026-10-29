@@ -13779,7 +13779,13 @@ impl<'a> Compiler<'a> {
                     continue 'inputs;
                 };
                 let id = InternalGainId(id_value);
-                if model
+                if self.source_file_declarations {
+                    // Native keeps every generated owner. Equal public names
+                    // in different Spaces still have distinct real IDs/ranges.
+                    model
+                        .other_equipment_names
+                        .insert_instance(&instance_name, id);
+                } else if model
                     .other_equipment_names
                     .insert(&instance_name, id)
                     .is_some()

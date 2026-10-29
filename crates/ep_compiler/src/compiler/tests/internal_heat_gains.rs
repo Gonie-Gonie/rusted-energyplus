@@ -589,6 +589,82 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
     assert_eq!(typed.people_names.names().len(), typed.people.len());
     assert_eq!(typed.source_people_inputs[0].instances, 0..1);
     assert_eq!(typed.source_people_inputs[1].instances, 1..2);
+    // Unit96: one generated list member and one direct raw object can have
+    // the same public name in different Spaces. Keep the real dense owners
+    // and raw ranges; the NameMap lookup is only the first-match convenience.
+    let equipment_alias = parse_epjson_str(
+        r#"{
+        "Zone":{"Zulu":{},"Alpha":{}},
+        "ZoneList":{"Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]}},
+        "OtherEquipment":{
+            "Load":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","fuel_type":"Electricity","design_level":23},
+            "ZULU LOAD":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","fuel_type":"Electricity","design_level":17}}}"#,
+    )?;
+    let result = super::super::compile_raw_model_for_source(&equipment_alias);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let typed = result
+        .model
+        .ok_or("distinct-Space generated OtherEquipment alias")?;
+    assert_eq!(typed.other_equipment.len(), 3);
+    assert_eq!(
+        typed
+            .other_equipment
+            .iter()
+            .map(|gain| gain.name.0.as_str())
+            .collect::<Vec<_>>(),
+        ["ZULU LOAD", "ALPHA LOAD", "ZULU LOAD"]
+    );
+    assert_ne!(typed.other_equipment[0].zone, typed.other_equipment[2].zone);
+    assert_eq!(typed.other_equipment[1].zone, typed.other_equipment[2].zone);
+    assert_eq!(
+        typed
+            .other_equipment
+            .iter()
+            .map(|gain| gain.design_level_w)
+            .collect::<Vec<_>>(),
+        [23.0, 23.0, 17.0]
+    );
+    assert_eq!(
+        typed
+            .source_other_equipment_inputs
+            .iter()
+            .map(|binding| binding.instances.clone())
+            .collect::<Vec<_>>(),
+        [0..2, 2..3]
+    );
+    assert!(matches!(
+        typed.source_other_equipment_inputs[0].target,
+        ep_model::SourceOtherEquipmentInputTarget::ZoneList(_)
+    ));
+    assert!(matches!(typed.source_other_equipment_inputs[1].target,
+        ep_model::SourceOtherEquipmentInputTarget::Zone(zone) if zone == typed.other_equipment[2].zone));
+    for (index, gain) in typed.other_equipment.iter().enumerate() {
+        assert_eq!(usize::try_from(gain.id.0)?, index);
+        assert_eq!(typed.other_equipment_names.names()[index], gain.name);
+    }
+    assert_eq!(
+        typed.other_equipment_names.resolve("ZULU LOAD"),
+        Some(typed.other_equipment[0].id)
+    );
+    assert_eq!(
+        typed.other_equipment_names.names().len(),
+        typed.other_equipment.len()
+    );
+    // The existing legacy unique namespace must retain its duplicate error.
+    let legacy_duplicate = compile_raw_model(&parse_epjson_str(
+        r#"{
+        "Zone":{"Z":{}},"OtherEquipment":{
+            "Duplicate":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","design_level":1},
+            "duplicate":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","design_level":2}}}"#,
+    )?);
+    assert!(
+        legacy_duplicate
+            .report
+            .diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "DuplicateName"
+                && diagnostic.object_type == "OtherEquipment")
+    );
     let spaced = parse_epjson_str(
         r#"{"Zone":{" Z ":{}},"ZoneList":{" L ":{"zones":[{"zone_name":" Z "}]}},"People":{" p ":{"zone_or_zonelist_or_space_or_spacelist_name":" L ","number_of_people":1}}}"#,
     )?;
