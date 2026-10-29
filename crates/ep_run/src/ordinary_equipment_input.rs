@@ -29,6 +29,7 @@ fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
     field(object, name).is_none_or(|value| blank(value) || text_is(value, choices))
 }
 
+mod electric;
 mod fields;
 mod infrared;
 mod multizone;
@@ -98,6 +99,8 @@ fn resolve_raw(
         let source_irt_family =
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
         let source_people_family = source_calendar_ingress && family.0 == "People";
+        let source_electric_family =
+            source_calendar_ingress && !source_b_ingress && family.0 == "ElectricEquipment";
         let source_angle_family = source_calendar_ingress && family.0 == "ComfortViewFactorAngles";
         let source_compact_family = source_calendar_ingress
             && matches!(
@@ -162,6 +165,7 @@ fn resolve_raw(
             && !source_calendar_family
             && !source_compact_family
             && !source_people_family
+            && !source_electric_family
             && !source_angle_family
             && !source_space_family
             && !source_space_list_family
@@ -198,7 +202,10 @@ fn resolve_raw(
         }
         for (name, object) in objects {
             let source_empty_gain = source_space_list_ingress
-                && matches!(family.0.as_str(), "People" | "OtherEquipment")
+                && matches!(
+                    family.0.as_str(),
+                    "People" | "OtherEquipment" | "ElectricEquipment"
+                )
                 && space_lists::empty_gain_target(raw, object);
             if source_empty_gain {
                 space_lists::validate_empty_gain_schema(&family.0, object)?;
@@ -212,6 +219,7 @@ fn resolve_raw(
                 && matches!(
                     family.0.as_str(),
                     "OtherEquipment"
+                        | "ElectricEquipment"
                         | "People"
                         | "ZoneList"
                         | "ZoneGroup"
@@ -415,10 +423,15 @@ fn resolve_raw(
                 } else if source_calendar_ingress
                     && (matches!(
                         (family.0.as_str(), required),
-                        ("Exterior:Lights" | "OtherEquipment", "schedule_name")
-                    ) || (source_gain_collections
-                        && family.0 == "OtherEquipment"
-                        && required == "zone_or_zonelist_or_space_or_spacelist_name"))
+                        (
+                            "Exterior:Lights" | "OtherEquipment" | "ElectricEquipment",
+                            "schedule_name"
+                        )
+                    ) || (family.0 == "ElectricEquipment"
+                        && required == "zone_or_zonelist_or_space_or_spacelist_name")
+                        || (source_gain_collections
+                            && family.0 == "OtherEquipment"
+                            && required == "zone_or_zonelist_or_space_or_spacelist_name"))
                 {
                     !matches!(field(object, required), Some(RawValue::String(value)) if !value.is_empty())
                 } else {
@@ -563,6 +576,8 @@ fn resolve_raw(
                     source_people_family
                         && people::admitted_object(raw, object, source_gain_collections)
                 }
+                "ElectricEquipment" if source_empty_gain => source_electric_family,
+                "ElectricEquipment" => source_electric_family && electric::admitted_object(object),
                 "OtherEquipment" if source_empty_gain => true,
                 "OtherEquipment" => {
                     (selected(object, "fuel_type", &["None"])
@@ -702,20 +717,27 @@ fn resolve_raw(
         .ok_or("ordinary equipment requires actual admitted Zone rows")?;
     // Consumer-specific actual Constant schedule references; no schedule-name or
     // case-name list. The compiler still validates type limits and associations.
-    for family in ["OtherEquipment", "Exterior:Lights", "Output:Variable"] {
+    for family in [
+        "OtherEquipment",
+        "ElectricEquipment",
+        "Exterior:Lights",
+        "Output:Variable",
+    ] {
         if let Some(objects) = raw.objects.get(&ObjectType(family.into())) {
             for object in objects.values() {
                 if source_space_list_ingress
-                    && family == "OtherEquipment"
+                    && matches!(family, "OtherEquipment" | "ElectricEquipment")
                     && !space_lists::family_has_instances(raw, family)
                 {
-                    // Native TotOthEquip==0 skips every statement getter. The
+                    // Native zero TotOthEquip/TotElecEquip skips statement getters. The
                     // unconditional schema/actual target checks already ran.
                     continue;
                 }
-                if family == "OtherEquipment"
+                if matches!(family, "OtherEquipment" | "ElectricEquipment")
                     && !match field(object, "zone_or_zonelist_or_space_or_spacelist_name") {
-                        Some(RawValue::String(name)) if source_gain_collections => {
+                        Some(RawValue::String(name))
+                            if source_gain_collections || family == "ElectricEquipment" =>
+                        {
                             zone_lists::gain_target(raw, name)
                         }
                         _ => text(object, "zone_or_zonelist_or_space_or_spacelist_name")
@@ -725,7 +747,9 @@ fn resolve_raw(
                             }),
                     }
                 {
-                    return Err("ordinary OtherEquipment requires an actual admitted Zone, Source Space, ZoneList or SpaceList".into());
+                    return Err(format!(
+                        "ordinary {family} requires an actual admitted Zone, Source Space, ZoneList or SpaceList"
+                    ));
                 }
                 let schedule = if source_calendar_ingress {
                     match field(object, "schedule_name") {
@@ -746,7 +770,8 @@ fn resolve_raw(
                 // ScheduleManager's two real built-in Constant owners exist
                 // without authored definitions (ScheduleManager.cc:316-320).
                 if (family == "Output:Variable"
-                    || (source_calendar_ingress && family == "OtherEquipment"))
+                    || (source_calendar_ingress
+                        && matches!(family, "OtherEquipment" | "ElectricEquipment")))
                     && ["Constant-0.0", "Constant-1.0"]
                         .iter()
                         .any(|name| schedule.eq_ignore_ascii_case(name))
@@ -919,6 +944,8 @@ mod tests {
                 .ok_or("multi-Zone positive family escaped")?;
             let expected = if family == "ZoneGroup" {
                 "Source ZoneGroup requires actual positive ZoneLists"
+            } else if family == "ElectricEquipment" {
+                "missing ElectricEquipment."
             } else {
                 "Source A bounded multi-Zone excludes positive family"
             };
@@ -2283,6 +2310,176 @@ mod tests {
             resolve(&parse_epjson_str("{}")?).is_err(),
             "no inferred timing or geometry defaults"
         );
+
+        // Unit102: the existing selected IP schema already has five alphas and
+        // six numerics; Source A now supplies only real ElectricEquipment fields.
+        let electric_value = serde_json::json!({
+            "Zone":{"Zulu":{},"Alpha":{}},
+            "Space":{"A room":{"zone_name":"Zulu"},"Z room":{"zone_name":"Alpha"}},
+            "ZoneList":{"Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]}},
+            "SpaceList":{"Both":{"spaces":[{"space_name":"Z room"}]},
+                "Only":{"spaces":[{"space_name":"A room"}]},"Empty":{}},
+            "Schedule:Constant":{"On":{"hourly_value":1}},
+            "ElectricEquipment":{"E":{"zone_or_zonelist_or_space_or_spacelist_name":"Both",
+                "schedule_name":"On","design_level_calculation_method":"Watts/Area",
+                "design_level":7,"watts_per_floor_area":2,"watts_per_person":3,
+                "fraction_latent":0.1,"fraction_radiant":0.2,"fraction_lost":0.3,
+                "end_use_subcategory":" Case  kept "}}
+        });
+        let electric_raw = parse_epjson_str(&electric_value.to_string())?;
+        assert!(resolve_source_a(&electric_raw).is_ok());
+        assert!(resolve_source_b(&electric_raw).is_err());
+        assert!(resolve(&electric_raw).is_err());
+        let mut electric_ip = crate::ordinary_input_processor::resolve_source_a(&electric_raw)?;
+        let definition = electric_ip.get_object_def_max_args("ElectricEquipment")?;
+        assert_eq!((definition.alphas, definition.numerics), (5, 6));
+        assert_eq!(electric_ip.get_num_objects_found("ElectricEquipment"), 1);
+        let electric_hb =
+            crate::ordinary_heat_balance_input::resolve_source(&electric_raw, &electric_ip)?;
+        let electric_rows = &electric_hb.objects["ElectricEquipment"];
+        assert_eq!(electric_rows.len(), 1);
+        use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as ElectricValue;
+        assert_eq!(
+            electric_rows[0].fields["end_use_subcategory"],
+            ElectricValue::String(" Case  kept ".into())
+        );
+        assert_eq!(
+            electric_rows[0].fields["watts_per_floor_area"],
+            ElectricValue::Number(2.0)
+        );
+        assert!(!electric_rows[0].fields.contains_key("power_per_floor_area"));
+        assert!(!electric_rows[0].fields.contains_key("fuel_type"));
+        assert!(
+            !electric_rows[0]
+                .fields
+                .contains_key("carbon_dioxide_generation_rate")
+        );
+        for (field, value) in [
+            ("design_level", serde_json::json!(-1)),
+            ("watts_per_floor_area", serde_json::json!(-1)),
+            ("watts_per_person", serde_json::json!(-1)),
+            (
+                "design_level_calculation_method",
+                serde_json::json!("Power/Area"),
+            ),
+            ("fraction_lost", serde_json::json!(0.8)),
+            ("schedule_name", serde_json::json!(" On")),
+            (
+                "zone_or_zonelist_or_space_or_spacelist_name",
+                serde_json::json!(" Both"),
+            ),
+        ] {
+            let mut invalid = electric_value.clone();
+            invalid["ElectricEquipment"]["E"][field] = value;
+            assert!(
+                resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err(),
+                "{field}"
+            );
+        }
+        for (method, field) in [
+            ("EquipmentLevel", "design_level"),
+            ("Watts/Area", "watts_per_floor_area"),
+            ("Watts/Person", "watts_per_person"),
+        ] {
+            let mut selected = electric_value.clone();
+            selected["ElectricEquipment"]["E"]["design_level_calculation_method"] =
+                serde_json::json!(method);
+            selected["ElectricEquipment"]["E"][field] = serde_json::json!(0);
+            assert!(
+                resolve_source_a(&parse_epjson_str(&selected.to_string())?).is_ok(),
+                "{method}"
+            );
+        }
+        let zero_electric = parse_epjson_str(
+            r#"{"Zone":{"Z":{}},"SpaceList":{"Empty":{}},"ElectricEquipment":{"E":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Missing","fraction_latent":0.8,"fraction_radiant":0.8}}}"#,
+        )?;
+        assert!(resolve_source_a(&zero_electric).is_ok());
+        assert!(resolve_source_b(&zero_electric).is_err());
+        assert!(resolve(&zero_electric).is_err());
+        let mut mixed_electric: serde_json::Value = serde_json::from_str(
+            r#"{"Zone":{"Z":{}},"SpaceList":{"Empty":{}},"ElectricEquipment":{"E":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Missing"},"F":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":1}}}"#,
+        )?;
+        assert!(resolve_source_a(&parse_epjson_str(&mixed_electric.to_string())?).is_err());
+        mixed_electric["ElectricEquipment"]["E"]["schedule_name"] =
+            serde_json::json!("Constant-1.0");
+        assert!(resolve_source_a(&parse_epjson_str(&mixed_electric.to_string())?).is_ok());
+        mixed_electric["ElectricEquipment"]["E"]["watts_per_person"] = serde_json::json!(-1);
+        assert!(resolve_source_a(&parse_epjson_str(&mixed_electric.to_string())?).is_err());
+
+        // Preserve direct epJSON integer-kind conversion before the genuine
+        // getter. Its authored unsigned schema minimum still passes.
+        for (token, bits) in [
+            ("18446744073709551615", (-1.0_f64).to_bits()),
+            (
+                "18446744073709551615.0",
+                (18446744073709551615.0_f64).to_bits(),
+            ),
+        ] {
+            let text = format!(
+                r#"{{"Zone":{{"Z":{{}}}},"ElectricEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":{token}}}}}}}"#
+            );
+            let raw = parse_epjson_str(&text)?;
+            assert!(resolve_source_a(&raw).is_ok());
+            let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+            let hb = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+            let ElectricValue::Number(value) =
+                &hb.objects["ElectricEquipment"][0].fields["design_level"]
+            else {
+                return Err("actual Electric numeric HB operand".into());
+            };
+            assert_eq!(value.to_bits(), bits);
+        }
+
+        // Unknown Electric instance metadata is legal JSON of every kind and
+        // stays in the full original IP. The HB owner filters it by real schema.
+        let opaque_electric: serde_json::Value = serde_json::from_str(
+            r#"{
+          "Zone":{"Z":{}},"ElectricEquipment":{"E":{
+            "zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0",
+            "design_level_calculation_method":"Watts/Area",
+            "power_per_floor_area":99,"fuel_type":{"ignored":true},"carbon_dioxide_generation_rate":-1,
+            "opaque_null":null,"opaque_bool":true,"opaque_number":7,"opaque_string":" text ",
+            "opaque_array":[null,true,7,"text",{},[]],"opaque_object":{"nested":[null,false,8," x ",{},[]]}}}}"#,
+        )?;
+        let raw = parse_epjson_str(&opaque_electric.to_string())?;
+        assert!(resolve_source_a(&raw).is_ok());
+        assert!(resolve_source_b(&raw).is_err());
+        assert!(resolve(&raw).is_err());
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        let retained = ip.source_raw_object_fields("ElectricEquipment", "E")?;
+        use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as ElectricRaw;
+        assert_eq!(retained["opaque_null"], ElectricRaw::Null);
+        assert_eq!(retained["opaque_bool"], ElectricRaw::Bool(true));
+        assert_eq!(retained["opaque_number"], ElectricRaw::Number("7".into()));
+        assert_eq!(
+            retained["opaque_string"],
+            ElectricRaw::String(" text ".into())
+        );
+        assert!(
+            matches!(&retained["opaque_array"],ElectricRaw::Array(items) if items.len()==6 && items[0]==ElectricRaw::Null && items[1]==ElectricRaw::Bool(true) && items[2]==ElectricRaw::Number("7".into()))
+        );
+        assert!(
+            matches!(&retained["opaque_object"],ElectricRaw::Object(items) if items.contains_key("nested"))
+        );
+        assert_eq!(
+            retained["power_per_floor_area"],
+            ElectricRaw::Number("99".into())
+        );
+        let hb = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+        let row = &hb.objects["ElectricEquipment"][0];
+        assert!(!row.fields.contains_key("watts_per_floor_area"));
+        assert!(!row.fields.contains_key("power_per_floor_area"));
+        assert!(!row.fields.contains_key("fuel_type"));
+        assert!(!row.fields.contains_key("carbon_dioxide_generation_rate"));
+        assert!(!row.fields.keys().any(|key| key.starts_with("opaque_")));
+        for reserved in ["idf_order", "idf_max_fields", "idf_max_extensible_fields"] {
+            let mut invalid = opaque_electric.clone();
+            invalid["ElectricEquipment"]["E"][reserved] = serde_json::json!(0.0);
+            assert!(
+                resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err(),
+                "reserved {reserved}"
+            );
+        }
         super::design_day_projection::verify_admitted_design_day_projection()?;
         crate::ordinary_input_processor::tests::verify_shared_input_boundary()?;
         Ok(())

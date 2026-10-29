@@ -1975,6 +1975,116 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         json!("Missing");
     let raw = parse_epjson_str(&invalid_pair.to_string()).expect("IRT invalid actual pair target");
     assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+
+    // Unit102: ElectricEquipment uses a separate arena and remains a Source A
+    // compatibility admission, including the ordinary one-Zone default Space.
+    for authored_lists in [false, true] {
+        let mut value = self::input(PortingScope::A);
+        value["OtherEquipment"] = json!({"Same":{"zone_or_zonelist_or_space_or_spacelist_name":"Zone","schedule_name":"On","design_level":2}});
+        value["ElectricEquipment"] = json!({"Same":{"zone_or_zonelist_or_space_or_spacelist_name":"Zone","schedule_name":"Constant-1.0","design_level":3,"end_use_subcategory":" Case  kept "}});
+        if authored_lists {
+            value["Space"] = json!({"Room":{"zone_name":"Zone"}});
+            value["ZoneList"] = json!({"Both":{"zones":[{"zone_name":"Zone"}]}});
+            value["SpaceList"] =
+                json!({"Both":{},"Only":{"spaces":[{"space_name":"Room"}]},"Empty":{}});
+            value["ElectricEquipment"]["A empty"] =
+                json!({"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"On"});
+            value["ElectricEquipment"]["B list"] = json!({"zone_or_zonelist_or_space_or_spacelist_name":"Both","schedule_name":"On","design_level_calculation_method":"Watts/Area","watts_per_floor_area":4});
+            value["ElectricEquipment"]["C space list"] = json!({"zone_or_zonelist_or_space_or_spacelist_name":"Only","schedule_name":"On","design_level_calculation_method":"Watts/Person","watts_per_person":5});
+            value["ElectricEquipment"]["D space"] = json!({"zone_or_zonelist_or_space_or_spacelist_name":"Room","schedule_name":"On","design_level":6});
+        }
+        let raw = parse_epjson_str(&value.to_string()).expect("actual electric Source input");
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("distinct electric typed inputs");
+        assert_eq!(model.other_equipment.len(), 1);
+        assert_eq!(model.source_other_equipment_inputs.len(), 1);
+        assert_eq!(
+            model.electric_equipment.len(),
+            if authored_lists { 4 } else { 1 }
+        );
+        assert_eq!(
+            model.source_electric_equipment_inputs.len(),
+            if authored_lists { 5 } else { 1 }
+        );
+        let selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(selected.admissible, "{:?}", selected.violations);
+        assert!(
+            !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B).admissible
+        );
+        let mut selected = selected;
+        selected.environment = Some(
+            super::environment::environment_from_weather(model, &weather, "electric Source A")
+                .expect("actual selected environment"),
+        );
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                .expect("electric Source admission");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+        assert_eq!(
+            support.runtime_class,
+            crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+        );
+        assert!(support.matched_capability_ids.is_empty());
+        assert!(!support.runtime_class.conformance_promotion_allowed());
+        assert!(
+            !assess_support(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal
+            )
+            .allows_rust_runtime()
+        );
+        let legacy = compile_raw_model(&raw);
+        let legacy_model = legacy
+            .model
+            .as_ref()
+            .expect("legacy preserves raw electric family");
+        assert!(legacy_model.electric_equipment.is_empty());
+        assert!(
+            !inspect_porting_scope(&raw, &legacy.report, Some(legacy_model), PortingScope::A)
+                .admissible
+        );
+        for changed in 0..5 {
+            let mut corrupt = model.clone();
+            match changed {
+                0 => corrupt.electric_equipment[0].id = ep_model::ElectricEquipmentId(99),
+                1 => corrupt.electric_equipment[0].name.0.push('X'),
+                2 => corrupt.electric_equipment[0].design_level_w += 1.0,
+                3 => corrupt.electric_equipment[0].schedule = None,
+                _ => {
+                    corrupt
+                        .source_electric_equipment_inputs
+                        .last_mut()
+                        .expect("raw Electric range")
+                        .instances
+                        .end = 0
+                }
+            }
+            assert!(
+                !inspect_porting_scope(&raw, &compiled.report, Some(&corrupt), PortingScope::A)
+                    .admissible,
+                "Electric binding corruption {changed}"
+            );
+        }
+    }
 }
 
 #[test]

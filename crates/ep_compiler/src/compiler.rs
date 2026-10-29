@@ -5,6 +5,7 @@ mod construction_internal_heat_source;
 mod construction_use;
 mod construction_window_data_file;
 mod construction_window_equivalent_layer;
+mod electric_equipment;
 mod fenestration_solar_absorbed;
 mod internal_heat_gains;
 mod report_inputs;
@@ -684,6 +685,14 @@ impl<'a> Compiler<'a> {
             model.day_schedule_names = NameMap::source_schedule_namespace();
             model.week_schedule_names = NameMap::source_schedule_namespace();
             model.schedule_type_limit_names = NameMap::source_schedule_namespace();
+            if self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType("ElectricEquipment".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            {
+                model.electric_equipment_names = NameMap::source_exact_namespace();
+            }
             model.other_equipment_names = NameMap::source_exact_namespace();
             model.people_names = NameMap::source_exact_namespace();
             model.zone_list_names = NameMap::source_exact_namespace();
@@ -805,6 +814,9 @@ impl<'a> Compiler<'a> {
             for entry in &mut coverage {
                 if entry.object_type == "Schedule:File" {
                     entry.status = ObjectCoverageStatus::RawOnly;
+                } else if entry.object_type == "ElectricEquipment" {
+                    // Only explicit Source compilation has this distinct arena.
+                    entry.status = ObjectCoverageStatus::Typed;
                 }
             }
         }
@@ -16381,7 +16393,8 @@ impl<'a> Compiler<'a> {
                 // stored JSON number kind, not an unconditional double parse.
                 // Other families retain their existing numeric projection.
                 let parsed = if matches!(object_type, "OtherEquipment" | "People")
-                    || (self.source_file_declarations && object_type == "Space")
+                    || (self.source_file_declarations
+                        && matches!(object_type, "Space" | "ElectricEquipment"))
                 {
                     ep_model::classify_source_json_number(text)
                         .ok()

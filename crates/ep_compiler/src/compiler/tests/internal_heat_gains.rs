@@ -1439,6 +1439,267 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
         let model = projected.model.ok_or("Source Space actual type alpha")?;
         assert_eq!(model.spaces[0].space_type.0, expected);
     }
+
+    // Unit102: explicit Source owns a distinct ElectricEquipment arena. The
+    // shared target lookup keeps Zone/Space/List precedence and singleton prefixes.
+    let electric_raw = parse_epjson_str(
+        r#"{
+      "Zone":{"Zulu":{},"Alpha":{}},
+      "Space":{"A room":{"zone_name":"Zulu","floor_area":6},"Z room":{"zone_name":"Alpha"}},
+      "ZoneList":{"Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]}},
+      "SpaceList":{"Both":{"spaces":[{"space_name":"Z room"}]},
+        "All":{"spaces":[{"space_name":"Z room"},{"space_name":"A room"}]},
+        "Only":{"spaces":[{"space_name":"A room"}]},"Empty":{}},
+      "Schedule:Constant":{"On":{"hourly_value":1}},
+      "ElectricEquipment":{
+        "A empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"On"},
+        "B direct ":{"zone_or_zonelist_or_space_or_spacelist_name":"Zulu","schedule_name":"constant-1.0","design_level":10,"end_use_subcategory":" Case  kept "},
+        "C space":{"zone_or_zonelist_or_space_or_spacelist_name":"Z room","schedule_name":"On","design_level_calculation_method":"Watts/Area","watts_per_floor_area":2,"design_level":99},
+        "D zone list":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","schedule_name":"On","design_level_calculation_method":"Watts/Person","watts_per_person":3},
+        "E space list":{"zone_or_zonelist_or_space_or_spacelist_name":"All","schedule_name":"On","design_level":4},
+        "F singleton":{"zone_or_zonelist_or_space_or_spacelist_name":"Only","schedule_name":"On","design_level":5}}}"#,
+    )?;
+    let projected = super::super::compile_raw_model_for_source(&electric_raw);
+    assert!(
+        !projected.has_errors(),
+        "{:?}",
+        projected.report.diagnostics
+    );
+    let electric = projected.model.ok_or("distinct Source Electric arena")?;
+    assert_eq!(electric.electric_equipment.len(), 7);
+    assert_eq!(electric.source_electric_equipment_inputs.len(), 6);
+    assert!(electric.other_equipment.is_empty());
+    assert!(electric.source_other_equipment_inputs.is_empty());
+    assert_eq!(projected.report.typed_object_count, electric.object_count());
+    let zulu = electric
+        .zone_names
+        .resolve("Zulu")
+        .ok_or("Zulu typed identity")?;
+    let alpha = electric
+        .zone_names
+        .resolve("Alpha")
+        .ok_or("Alpha typed identity")?;
+    for (name, zones, names) in [
+        ("A empty", vec![], vec![]),
+        ("B direct ", vec![zulu], vec!["B DIRECT "]),
+        ("C space", vec![alpha], vec!["C SPACE"]),
+        (
+            "D zone list",
+            vec![zulu, alpha],
+            vec!["A ROOM D ZONE LIST", "Z ROOM D ZONE LIST"],
+        ),
+        (
+            "E space list",
+            vec![alpha, zulu],
+            vec!["Z ROOM E SPACE LIST", "A ROOM E SPACE LIST"],
+        ),
+        ("F singleton", vec![zulu], vec!["A ROOM F SINGLETON"]),
+    ] {
+        let binding = electric
+            .source_electric_equipment_inputs
+            .iter()
+            .find(|row| row.object_name == name)
+            .ok_or("actual Electric raw binding")?;
+        let rows = &electric.electric_equipment[binding.instances.clone()];
+        assert_eq!(rows.iter().map(|row| row.zone).collect::<Vec<_>>(), zones);
+        assert_eq!(
+            rows.iter()
+                .map(|row| row.name.0.as_str())
+                .collect::<Vec<_>>(),
+            names
+        );
+    }
+    for (index, row) in electric.electric_equipment.iter().enumerate() {
+        assert_eq!(usize::try_from(row.id.0)?, index);
+        assert_eq!(electric.electric_equipment_names.names()[index], row.name);
+    }
+    let direct = &electric.electric_equipment[electric
+        .source_electric_equipment_inputs
+        .iter()
+        .find(|row| row.object_name == "B direct ")
+        .ok_or("direct electric range")?
+        .instances
+        .start];
+    assert_eq!(direct.end_use_subcategory, " Case  kept ");
+    assert_eq!(
+        direct.schedule,
+        Some(ep_model::InternalGainScheduleReference::ConstantOne)
+    );
+    assert!(
+        electric
+            .electric_equipment_names
+            .resolve("B direct")
+            .is_none()
+    );
+    let area = &electric.electric_equipment[electric
+        .source_electric_equipment_inputs
+        .iter()
+        .find(|row| row.object_name == "C space")
+        .ok_or("area electric range")?
+        .instances
+        .start];
+    assert_eq!(
+        area.design_level_calculation_method,
+        ep_model::ElectricEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+    );
+    assert_eq!(area.watts_per_floor_area_w_per_m2, 2.0);
+    assert_eq!(area.design_level_w, 99.0); // Retained operand, no frontend sizing.
+    assert_eq!(area.end_use_subcategory, "General");
+
+    // No selected Source path means the legacy RawOnly family stays unprojected.
+    let legacy_raw = parse_epjson_str(
+        r#"{"Zone":{"Z":{}},"ElectricEquipment":{"E":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":1}}}"#,
+    )?;
+    let legacy = compile_raw_model(&legacy_raw).model.ok_or("legacy model")?;
+    assert!(legacy.electric_equipment.is_empty());
+    assert!(legacy.source_electric_equipment_inputs.is_empty());
+    assert_eq!(
+        super::super::typed_coverage_status("ElectricEquipment"),
+        super::super::ObjectCoverageStatus::RawOnly
+    );
+    for fields in [
+        r#""design_level":-1"#,
+        r#""watts_per_floor_area":-1"#,
+        r#""watts_per_person":-1"#,
+        r#""design_level_calculation_method":"Power/Area""#,
+        r#""fraction_latent":0.6,"fraction_radiant":0.5"#,
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"ElectricEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0",{fields}}}}}}}"#
+        );
+        assert!(
+            super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?).has_errors(),
+            "{fields}"
+        );
+    }
+    for (target, schedule) in [(" Z", "Constant-1.0"), ("Z", " Constant-1.0")] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"ElectricEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"{target}","schedule_name":"{schedule}"}}}}}}"#
+        );
+        assert!(super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?).has_errors());
+    }
+    let all_zero = parse_epjson_str(
+        r#"{"Zone":{"Z":{}},"SpaceList":{"Empty":{}},"ElectricEquipment":{"E":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Missing","fraction_latent":0.8,"fraction_radiant":0.8}}}"#,
+    )?;
+    let zero = super::super::compile_raw_model_for_source(&all_zero);
+    assert!(!zero.has_errors(), "{:?}", zero.report.diagnostics);
+    let zero = zero.model.ok_or("zero Electric family")?;
+    assert!(zero.electric_equipment.is_empty());
+    assert_eq!(zero.source_electric_equipment_inputs[0].instances, 0..0);
+    for fields in [
+        r#""schedule_name":"Missing","watts_per_person":-1"#,
+        r#""schedule_name":"Missing","design_level_calculation_method":"Power/Person""#,
+        r#""design_level":0"#,
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"SpaceList":{{"Empty":{{}}}},"ElectricEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"Empty",{fields}}}}}}}"#
+        );
+        assert!(super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?).has_errors());
+    }
+    let mixed = parse_epjson_str(
+        r#"{"Zone":{"Z":{}},"SpaceList":{"Empty":{}},"ElectricEquipment":{"A empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Missing"},"B actual":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":1}}}"#,
+    )?;
+    assert!(super::super::compile_raw_model_for_source(&mixed).has_errors());
+
+    // Integer and floating origins retain their real IP stored-kind conversion.
+    for (token, bits) in [
+        ("18446744073709551615", (-1.0_f64).to_bits()),
+        (
+            "18446744073709551615.0",
+            (18446744073709551615.0_f64).to_bits(),
+        ),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"ElectricEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":{token}}}}}}}"#
+        );
+        let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        assert_eq!(
+            result
+                .model
+                .ok_or("stored electric number")?
+                .electric_equipment[0]
+                .design_level_w
+                .to_bits(),
+            bits
+        );
+    }
+
+    let staged_electric = ep_raw_model::parse_epjson_str_with_idf_order(
+        r#"{"Zone":{"Z":{}},"ElectricEquipment":{"E":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":7.0,"end_use_subcategory":" Keep "}}}"#,
+        "Zone,Z;ElectricEquipment,E,Z,Constant-1.0,EquipmentLevel,7,,,,,, Keep ;",
+    )?;
+    assert!(!staged_electric.is_epjson());
+    let staged = super::super::compile_raw_model_for_source(&staged_electric);
+    assert!(!staged.has_errors(), "{:?}", staged.report.diagnostics);
+    let staged = staged.model.ok_or("staged electric Source declaration")?;
+    assert_eq!(staged.electric_equipment[0].design_level_w, 7.0);
+    assert_eq!(staged.electric_equipment[0].end_use_subcategory, " Keep ");
+
+    let alias_raw = parse_epjson_str(
+        r#"{"Zone":{"Zulu":{},"Alpha":{}},"ZoneList":{"Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]}},"ElectricEquipment":{"A":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","schedule_name":"Constant-1.0","design_level":1},"ZULU A":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","schedule_name":"Constant-1.0","design_level":2}}}"#,
+    )?;
+    let aliases = super::super::compile_raw_model_for_source(&alias_raw);
+    assert!(!aliases.has_errors(), "{:?}", aliases.report.diagnostics);
+    let aliases = aliases
+        .model
+        .ok_or("distinct electric generated alias owners")?;
+    assert_eq!(aliases.electric_equipment.len(), 3);
+    assert_eq!(
+        aliases
+            .electric_equipment_names
+            .names()
+            .iter()
+            .filter(|name| name.0 == "ZULU A")
+            .count(),
+        2
+    );
+    assert_ne!(
+        aliases.electric_equipment[0].id,
+        aliases.electric_equipment[2].id
+    );
+
+    // Unit102 correction: official ElectricEquipment instance properties are
+    // open. Unknown keys retain all JSON kinds and never become electric fields.
+    for metadata in [
+        "null",
+        "true",
+        "7",
+        r#"" text ""#,
+        r#"[null,true,7,"text",{},[]]"#,
+        r#"{"nested":[null,true,7," text ",{},[]]}"#,
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"ElectricEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level_calculation_method":"Watts/Area","power_per_floor_area":99,"fuel_type":{{"ignored":true}},"carbon_dioxide_generation_rate":-1,"opaque":{metadata}}}}}}}"#
+        );
+        let raw = parse_epjson_str(&text)?;
+        let projected = super::super::compile_raw_model_for_source(&raw);
+        assert!(
+            !projected.has_errors(),
+            "{metadata}: {:?}",
+            projected.report.diagnostics
+        );
+        let model = projected.model.ok_or("open Electric instance metadata")?;
+        assert_eq!(model.electric_equipment.len(), 1);
+        assert!(model.other_equipment.is_empty());
+        let row = &model.electric_equipment[0];
+        assert_eq!(
+            row.design_level_calculation_method,
+            ep_model::ElectricEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+        );
+        assert_eq!(row.watts_per_floor_area_w_per_m2, 0.0);
+        assert_eq!(row.design_level_w, 0.0);
+        assert_eq!(row.watts_per_person_w, 0.0);
+    }
+    for reserved in ["idf_order", "idf_max_fields", "idf_max_extensible_fields"] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"ElectricEquipment":{{"E":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","{reserved}":0.0}}}}}}"#
+        );
+        assert!(
+            super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?).has_errors(),
+            "reserved {reserved}"
+        );
+    }
     Ok(())
 }
 

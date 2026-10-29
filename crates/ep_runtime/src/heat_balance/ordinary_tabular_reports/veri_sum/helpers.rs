@@ -130,6 +130,16 @@ pub(super) fn gain_zone(
             .get(at)
             .ok_or(Error::Unavailable("actual VeriSum People.ZonePtr row"))?
             .zone_ptr),
+        2 => Ok(o
+            .gains
+            .allocations
+            .electric_equipment
+            .as_ref()
+            .and_then(|r| r.get(at))
+            .ok_or(Error::Unavailable(
+                "actual VeriSum ZoneElectric.ZonePtr row",
+            ))?
+            .zone_ptr),
         6 => Ok(o
             .gains
             .allocations
@@ -157,6 +167,16 @@ pub(super) fn gain_space(
             .rows
             .get(at)
             .ok_or(Error::Unavailable("actual VeriSum People.spaceIndex row"))?
+            .space_index),
+        2 => Ok(o
+            .gains
+            .allocations
+            .electric_equipment
+            .as_ref()
+            .and_then(|r| r.get(at))
+            .ok_or(Error::Unavailable(
+                "actual VeriSum ZoneElectric.spaceIndex row",
+            ))?
             .space_index),
         6 => Ok(o
             .gains
@@ -190,6 +210,16 @@ pub(super) fn gain_value(
                 "actual VeriSum People.NumberOfPeople row",
             ))?
             .number_of_people),
+        2 => Ok(o
+            .gains
+            .allocations
+            .electric_equipment
+            .as_ref()
+            .and_then(|r| r.get(at))
+            .ok_or(Error::Unavailable(
+                "actual VeriSum ZoneElectric.DesignLevel row",
+            ))?
+            .design_level),
         6 => Ok(o
             .gains
             .allocations

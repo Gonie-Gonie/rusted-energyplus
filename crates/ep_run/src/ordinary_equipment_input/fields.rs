@@ -12,6 +12,9 @@ pub(super) fn admitted_field(
     value: &RawValue,
     source_ingress: bool,
 ) -> bool {
+    if family == "ElectricEquipment" {
+        return source_ingress && super::electric::admitted_field(name, value);
+    }
     if let Some(admitted) = ground::admitted_field(family, name, value) {
         return admitted;
     }
@@ -906,7 +909,7 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         "ZoneList" => &["zones"],
         "ZoneGroup" => &["zone_list_name"],
         "Space" => &["zone_name"],
-        "OtherEquipment" => &[
+        "OtherEquipment" | "ElectricEquipment" => &[
             "zone_or_zonelist_or_space_or_spacelist_name",
             "schedule_name",
         ],

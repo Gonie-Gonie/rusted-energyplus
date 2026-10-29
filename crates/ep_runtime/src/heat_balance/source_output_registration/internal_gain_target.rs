@@ -6,6 +6,9 @@ use super::{
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceInternalGainOutputField {
+    ElectricObject { field: u8 },
+    ElectricZone { field: u8 },
+    ElectricSpace { field: u8 },
     OtherPower,
     OtherConsumption,
     // Field is the actual interleaved Energy/Rate report ordinal, never a value.
@@ -36,6 +39,13 @@ impl SourceRealOutputOwners for SelectedInternalHeatGains {
                 .and_then(|rows| rows.get(i))
                 .ok_or(OrdinaryRadiationUnavailable::StorageDomain)
         };
+        let electric = || {
+            self.allocations
+                .electric_equipment
+                .as_ref()
+                .and_then(|rows| rows.get(i))
+                .ok_or(OrdinaryRadiationUnavailable::StorageDomain)
+        };
         let zone = || {
             self.allocations
                 .zone_report
@@ -53,6 +63,17 @@ impl SourceRealOutputOwners for SelectedInternalHeatGains {
         use SourceInternalGainOutputField::*;
         use SourcePeopleOutputField as P;
         let value = match field {
+            ElectricObject { field } if field < 12 => {
+                let row = electric()?;
+                let at = usize::from(field / 2);
+                if field.is_multiple_of(2) {
+                    row.energies.get(at)
+                } else {
+                    row.rates.get(at)
+                }
+            }
+            ElectricZone { field } => electric_report(zone()?, field),
+            ElectricSpace { field } => electric_report(space()?, field),
             OtherPower => Some(&other()?.rates[0]),
             OtherConsumption => Some(&other()?.energies[0]),
             OtherThermal { field } if field < 10 => {
@@ -162,4 +183,25 @@ pub(crate) enum SourcePeopleOutputField {
     TotalRate,
     AirTemperature,
     AirRelativeHumidity,
+}
+
+fn electric_report(
+    row: &crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainReport,
+    field: u8,
+) -> Option<&f64> {
+    Some(match field {
+        0 => &row.elec_consump,
+        1 => &row.elec_power,
+        2 => &row.elec_rad_gain,
+        3 => &row.elec_rad_gain_rate,
+        4 => &row.elec_con_gain,
+        5 => &row.elec_con_gain_rate,
+        6 => &row.elec_lat_gain,
+        7 => &row.elec_lat_gain_rate,
+        8 => &row.elec_lost,
+        9 => &row.elec_lost_rate,
+        10 => &row.elec_tot_gain,
+        11 => &row.elec_tot_gain_rate,
+        _ => return None,
+    })
 }

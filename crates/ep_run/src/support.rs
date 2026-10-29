@@ -126,7 +126,7 @@ pub enum RuntimeClass {
     None,
     /// One-zone opaque heat-balance compatibility runtime.
     OneZoneHeatBalanceCompatibility,
-    /// Validated Source A bounded Zones, ZoneList and whole-Zone authored Space input lane.
+    /// Validated Source A electric gains and bounded Zone/list/whole-Space input lane.
     /// No one-Zone capability/evidence or conformance promotion is inherited.
     #[serde(rename = "source-multizone-heat-balance-compatibility")]
     SourceMultiZoneHeatBalanceCompatibility,
@@ -338,7 +338,7 @@ fn runtime_selection_note(
     match run_result_state {
         RunResultState::SupportedCompatibilityRun
             if runtime_class == RuntimeClass::SourceMultiZoneHeatBalanceCompatibility =>
-            "selected explicit Source A bounded Zones/ZoneList/whole-Zone authored Space input lane; no one-Zone capability/evidence is inherited and conformance promotion remains disabled".into(),
+            "selected explicit Source A electric gains or bounded Zones/ZoneList/whole-Zone authored Space input lane; no one-Zone capability/evidence is inherited and conformance promotion remains disabled".into(),
         RunResultState::SupportedCompatibilityRun => format!(
             "selected runtime '{}' executes the matched capability boundary; conformance_claim remains false for arbitrary runs",
             runtime_class.id()

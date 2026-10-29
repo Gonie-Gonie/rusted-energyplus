@@ -5,11 +5,11 @@ use crate::{
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
     ConstructionId, ConstructionThermochromicChild, ConstructionThermochromicSeries,
     ConstructionWindowDataFileRequest, DayScheduleId, DesignSpecificationOutdoorAir,
-    DesignSpecificationOutdoorAirId, ExternalInterfaceFmuExportSchedule,
-    ExternalInterfaceFmuImportSchedule, ExternalInterfaceSchedule, FanComponent,
-    FenestrationSolarAbsorbedRequest, GlazingSpectralData, GlazingSpectralDataId,
-    GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId, InternalGainId, LoopId,
-    Material, MaterialHeatAndMoistureTransferDiffusion,
+    DesignSpecificationOutdoorAirId, ElectricEquipment, ElectricEquipmentId,
+    ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
+    ExternalInterfaceSchedule, FanComponent, FenestrationSolarAbsorbedRequest, GlazingSpectralData,
+    GlazingSpectralDataId, GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId,
+    InternalGainId, LoopId, Material, MaterialHeatAndMoistureTransferDiffusion,
     MaterialHeatAndMoistureTransferRedistribution, MaterialHeatAndMoistureTransferSettings,
     MaterialHeatAndMoistureTransferSorptionIsotherm, MaterialHeatAndMoistureTransferSuction,
     MaterialHeatAndMoistureTransferThermalConductivity, MaterialId,
@@ -162,6 +162,12 @@ pub struct TypedModel {
     pub external_interface_fmu_export_schedules: Vec<ExternalInterfaceFmuExportSchedule>,
     /// Schedule names.
     pub schedule_names: NameMap<ScheduleId>,
+    /// Distinct ElectricEquipment arena, enabled by explicit Source input.
+    pub electric_equipment: Vec<ElectricEquipment>,
+    /// ElectricEquipment names in their separate typed namespace.
+    pub electric_equipment_names: NameMap<ElectricEquipmentId>,
+    /// Every raw electric statement and its real dense instance range.
+    pub source_electric_equipment_inputs: Vec<crate::SourceElectricEquipmentInput>,
     /// Zone internal gains from OtherEquipment objects.
     pub other_equipment: Vec<OtherEquipment>,
     /// OtherEquipment names.
@@ -367,6 +373,9 @@ impl Default for TypedModel {
             external_interface_fmu_import_schedules: Vec::new(),
             external_interface_fmu_export_schedules: Vec::new(),
             schedule_names: NameMap::default(),
+            electric_equipment: Vec::new(),
+            electric_equipment_names: NameMap::default(),
+            source_electric_equipment_inputs: Vec::new(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
             source_other_equipment_inputs: Vec::new(),
@@ -525,6 +534,7 @@ impl TypedModel {
             + self.external_interface_schedules.len()
             + self.external_interface_fmu_import_schedules.len()
             + self.external_interface_fmu_export_schedules.len()
+            + self.electric_equipment.len()
             + self.other_equipment.len()
             + self.people.len()
             + self.thermostat_dual_setpoints.len()

@@ -52,7 +52,7 @@
         "Actual request/Which/ReportID owners retain full dictionaries, genuine clocks, metadata, footer/EOF and all raw samples. Tested distinct-owner equal public labels remain separately bound by actual ReportID/nominal owner order; no value sorting is used. The separate whole-Zone authored-Space witness has351uniqueTimestepESO and13realHourlyMTR series/34008values/262object-Space-Zone-Facility relations. All289prior variable and13meter policies remain exact and62new Space/gain selectors copy originalCount1e-9/W.001/J1 limits. Count units are empty, rates Average and energies Sum. Original humidity1/51 canonicalZone policies stay unchanged despite actualHVAC/Average/emptyunit producer metadata; allnew62 producers are genuineZone. ASCII report-key folding never trims literal whitespace. Other producers/backends/model combinations, expected timestep arrays and full-object/frozen conformance are not established.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -83,7 +83,7 @@
         "Current SourceA composes the existing bounded opaque multizone geometry with exactly one authored whole-Zone Space per Zone. Six unchanged blank-Space surfaces per Zone bind to the real sole Space; separate typed-ID/Source-number/World/construction/material/enclosure associations and independent Space/Zone order remain observable. Effective floor6 can coexist with geometric12 and unchanged DXF coordinates/extents. Existing normal Wall/Wall or Roof/Floor reciprocal stack1..10/reversed-identity/finiteNominalU and sole-layer exact-IRT Wall fences remain; Group compositions with authored Spaces or nonempty SpaceLists, multiple/remainder Spaces, SpaceHB, SourceB authored Spaces, windows and HVAC and broader combinations remain unestablished. Full EIO/ERR/DXF/publicCTF/warmup comparisons retain existing identity/elapsed exceptions and no conformance promotion.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -132,7 +132,7 @@
         "exact unnamed singleton identity and strict five alpha scalar fields; required enums do not accept blanks",
         "Closed triangular/quadrilateral volumes retain genuine geometry/physics boundaries; SourceA bounded implicit-Space multizone additionally admits bounded reciprocal normal or proper single-layer IRT Wall pairs only when canonical Worldvertices coincide in reverse cyclic order. Finite World-coordinate witnesses do not establish every transform/pair combination; SourceB/legacy remain one-Zone.",
         "The bounded temporary collinear-edge completion retains original authored3/4point World vertices, real Zone volumes and enclosure owners. A separate World-coordinate13quad/113variable case passes; initial/Newell/temp-copy behavior remains reviewed-code/input inference, not a new JSON observer or general geometry repair.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "Zone": [
         "authored Simple/TARP/CeilingDiffuser inside and SimpleCombined/TARP/MoWiTT/DOE-2 outside retain strict optional alpha/default inheritance and immutable typed Override provenance",
@@ -147,7 +147,7 @@
         "Current SourceA admits the existing bounded closed opaque multizone route with implicit Spaces or exactly one authored whole-Zone Space per Zone. Authored Space/Zone order is independent. Effective Space floor overrides precede omitted Zone-floor sums and selected People/OtherEquipment design sizing; explicit Zone floor remains its original value. The finite witness retains geometric12 with effectiveZulu6 and Alpha defaultSpace12/originalZone12, unchanged geometry/volumes, direct6People20gains and262actual public joins. SourceA authored-Space routing uses source-multizone-heat-balance-compatibility with empty one-Zone capabilities and no promotion, including singleton routing. Existing one-Zone A/B and bounded reciprocal normal/IRT rules remain; Group compositions with authored Spaces or nonempty SpaceLists, multiple/remainder Spaces, SpaceHB, SourceB authored Spaces and arbitrary combinations remain unestablished.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "Site:Location": [
       "Five finite numeric fields retain official latitude[-90,90], longitude[-180,180], timezone[-12,14], elevation[-300,8900) and omitted-zero defaults; nonblank named identity and raw keep-weather-file flag are retained.",
@@ -267,7 +267,7 @@
         "Current SourceA composes direct-Zone or positive ZoneList gains on implicit Spaces, and direct Space targets when each Zone has exactly one authored whole-Zone Space. None/default and allthirteen non-Water fuels use genuine builtin/authored schedules and real per-instance identities. EquipmentLevel, Watts/Area and Watts/Person use selected operands, effective Space floor and genuine design People before current schedule evaluation; unused negative operands retain existing getter/error rules. Real object/Space/Zone/Facility W/J joins include thermal-only None without None consumption reports/meters. Literal whitespace names and tested distinct-implicit-Space aliases retain actual owners/ReportIDs without general collision claims. The authored-Space witness has20thermal/16metered devices,4None including one builtin0,13positiveFacility meters and262publicjoins. SourceB lists/authored Spaces, Other ZoneList/Space combinations, multiple/remainder Spaces, SpaceHB, Group compositions with authored Spaces or nonempty SpaceLists, EMS/HVAC and arbitrary combinations remain outside this evidence.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "People": [
         "Direct-Zone People uses the real single implicit Space, raw/IP defaults and counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select the actual numeric operand and Space floor area, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts explicit numeric values or omitted, empty and Autocalculate defaults; automatic sensible uses the same live Space MAT, retained Mixing RoomAir, Native polynomial and ordered clamps. Getter occupant totals, devices, rates/energy, Which bindings, nominal reporting and mandatory SimpleASH55 remain connected. Auxiliary comfort operands stay unconsumed when no optional model is selected, with the original count-sensitive warnings.",
@@ -277,7 +277,7 @@
         "Current SourceA composes direct-Zone and positive ZoneList People on implicit Spaces, and direct Space targets when each Zone has exactly one authored whole-Zone Space. Zone-first precedence over a same-name list, real per-instance identities/ranges and selected People/People-Area/Area-Person operands remain. Genuine effective Space floor and Count/current occupancy Schedule prove unrounded design occupants before OtherEquipment per-person sizing; rounded nominal display cells do not relaxCount1e-9. Separate finite alias evidence preserves equal public names across distinct implicit Spaces by actual ReportID and nominal(Name,Zone), without value sorting. The authored-Space witness retains six People/allthree methods, positive Count/thermal/latent/humidity families and originalCount/W/J limits. Optional comfort evidence and all prior mandatory bounds remain separate. Other ZoneList/Space combinations, multiple/remainder Spaces, SpaceHB, SourceB authored Space/list targets and arbitrary combinations remain unvalidated.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "ComfortViewFactorAngles": [
       "ComfortViewFactorAngles remains RawOnly and uses the genuine Source A/B raw/IP getter without a TypedModel arena. Original blank, whitespace and case-variant names, JSON or declaration order, optional partial rows and harmless instance/row metadata retain raw custody; reserved IDF metadata stays separate. Six shared arrays reset within actual schema-derived capacity, preserving numeric origins, field names, blank flags, counts and exact usage identities. IDF delimiter and parsed-value events retain independent fixed/extensible counts and the true-EOF unattached-array behavior. Every list, including unused lists, reaches ordered Surface/enclosure and sum checks before the first Fatal; first retained uppercase-name People association precedes the second Fatal. Actual construction absorptance, angle factors and term1 surface histories feed AngleFactor MRT and the shared radiant-HVAC correction. Same-input A/B evidence bounds these paths; arbitrary list/model combinations and full family completion remain outside this claim."
@@ -292,19 +292,23 @@
         "Explicit SourceA accepts positive ZoneLists on closed opaque implicit-Space geometry for People and OtherEquipment. GetZoneData preserves member order, diagnostics, typed-Zone bijections and Zone-first same-name precedence. Both families expand into real Source-prefixed per-Space instances; selected People methods and genuine design totals reach Zone/Space owners before OtherEquipment per-person sizing. Four genuine Zone List Sensible Heating/Cooling W/J outputs retain System Sum/Average owners and ordered HVAC reductions using Zone.Multiplier only. Finite uncontrolled physical list outputs are complete zeros; nonzero/reset/order/factor behavior remains separate existing-owner-unit evidence. The finite Source A positive-ZoneList/authored-whole-Zone-Space composition now has complete public closure; other ZoneList/Space combinations remain unvalidated. SourceB lists, Group compositions with authored Spaces or nonempty SpaceLists, general collisions, HVAC/arbitrary legal combinations and full-object/conformance completion remain unestablished.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "Space": [
         "Ordinary explicit SourceA admits exactly one authored whole-Zone Space per admitted opaque Zone, with no partition/remainder or Space heat balance. SourceB authored Spaces, multiple/partial/remainder Spaces and arbitrary model/name combinations remain blocked or unvalidated. The real GetSpaceData retains actual Native JSON-map authored Space order, Zone association, AutoOrNumber operands, raw type/tags and capacity before later CreateMissingSpaces right-sizing and whole-Zone surface assignment. Effective Space floor overrides are applied before omitted Zone floor summation, allthree People methods and OtherEquipment WattsPerson design sizing; entered zero volume uses the real whole-Zone volume fallback. The directepJSON witness has independent Space/Zone order, unchanged12quads, effectiveZulu6/geometric12 and Alpha defaultSpace12/originalZone12, direct6People20gains and262public joins across351ESO+13MTR/34008values. Current typed validation still omits source partial-invalid identities/type/link effects; complete shared Zone/ZoneList/Space/SpaceList namespace collisions, other surface families/auto-adjacency, general diagnostics/value combinations and full-object/frozen conformance remain unclaimed. Source IDs remain separate from typed IDs and Native private IDs are unobserved.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "SpaceList": [
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
-        "Source A composes positive ZoneLists with one authored whole-Zone Space per Zone and nonempty SpaceLists. Target precedence and selected sizing use real owners; positive explicit Zone floor sets its sole Space floor first. See the same-input composition evidence. Groups with authored Spaces or nonempty SpaceLists, Source B, multiple/remainder Spaces, SpaceHB, HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "ZoneGroup": [
       "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated."
+    ]
+  ,
+    "ElectricEquipment": [
+      "Source A ElectricEquipment uses real retained ZoneElectric rows on the bounded closed opaque Zone/Space/ZoneList/SpaceList route. EquipmentLevel, Watts/Area and Watts/Person read the selected operand, final Space floor and prior all-family People totals. Ordered list members retain singleton prefixes; empty SpaceLists retain zero ranges. Defaults and retaincase subcategory, strict known schema fields and ignored retained unknown instance JSON reach the genuine getter, nominal/minmax, Which bindings, component heat and Electricity Facility consumers. Source B/legacy Electric, EMS/demand, Group compositions, multiple/remainder Spaces, Space heat balance/HVAC and arbitrary/full-object combinations remain unvalidated; no frozen capability promotion."
     ]
   },
   "verification": {
@@ -44806,14 +44810,151 @@
                                               "actual_Source_engines":  1
                                           }
       }
+    ,
+      {
+        "id": "A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H",
+        "group": "ElectricEquipment",
+        "source_build": "electric-equipment-102-output-order",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit102-prep/electric-pilot-proposal03/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/input.epJSON",
+          "sha256": "83b1bcfe787d092edee1db22be49ffc7de6dcf7904bc146fc9c7ca1464a0c7b6",
+          "bytes": 261064
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/electric-equipment-102/native-low-load-01/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/command/receipt.json",
+          "sha256": "b7c64b010db1895aa703fad78c7b449c6315422f1e73240ddfe1c0ad5c399805",
+          "bytes": 15004
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/electric-equipment-102/source-output-order-03/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/command/receipt.json",
+          "sha256": "48390e899d038e648ca5693a18220d4501b807b86e2102574776103b3b3e62d4",
+          "bytes": 13882
+        },
+        "source_summary": {
+          "path": ".runtime/porting/electric-equipment-102/source-output-order-03/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/output/run-summary.json",
+          "sha256": "87b75547bf85e1ce1f25a83ab2962cd4cc56271e0ccf4fcc27b79769e7d7b051",
+          "bytes": 320339
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-104/eplus-rs.exe",
+          "sha256": "f9356b76a14b30eb9c602e0081dbcef6fb852b7def83a1b4770d1b98c49d78b9",
+          "bytes": 80019708
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b6/b6ad504d4284fe877da3db728e0646bde07d3a43e9e02a2ebe5e47fa92f94cd3",
+          "sha256": "b6ad504d4284fe877da3db728e0646bde07d3a43e9e02a2ebe5e47fa92f94cd3"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-104/receipt.json",
+          "sha256": "cc19cdd94bc5be23288f02c158a32f9338d0d5fe92bec5fa14cf71ebce2e37ba",
+          "bytes": 9956
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/electric-equipment-102/source-output-order-03/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/comparison.json",
+          "sha256": "0bcfd9a16fbdcf29a4e215555acb60b8c507c260cb23aa6b2ea5dd8f36eb28ca",
+          "bytes": 4660323
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit102-prep/electric-source-output-order-ready03/plan.json",
+          "sha256": "44dcb2a6c87353f22cd9ac89c33980221fdee2b0c8567a659936a10bad7d4785",
+          "bytes": 124245
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit102-prep/electric-pilot-proposal03/proposal.json",
+          "sha256": "05c3666bdbffb99e5016a02afde599c8fed0a58509d78ad1e72e14d49de31a40",
+          "bytes": 283095
+        },
+        "totals": {
+          "series": 968,
+          "samples": 91992,
+          "raw_operand_unequal": 7011,
+          "parsed_binary64_unequal": 7011,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "input_format": "epJSON",
+        "full_reported_stream_scope": {
+          "ESO": "Complete955 Timestep series/91680 values, actual ordered dictionaries/IDs and96 clocks, including8 genuine System List streams.",
+          "MTR": "Complete13 Facility Hourly series/312 values and24 clocks; genuine MTR owner/footer/EOF.",
+          "original_full_reported_profile_rows": false,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit102-prep/electric-pilot-proposal01/A-MULTIZONE-ELECTRIC-EQUIPMENT-24H/derived-policy.json",
+            "sha256": "73375893055f195c00abfe06d1bccccafb015ac8a7f01d358b1fb82b3ee8f0b5",
+            "bytes": 1226615
+          },
+          "prior599_variable_and13_meter_policy_prefix_exact": true,
+          "numerical_limits_changed": false,
+          "Count_limit": 1e-09,
+          "W_limit": 0.001,
+          "J_limit": 1,
+          "qualification": "Original scalar limits, point OR gate, ordered binary64 serial SSE/RMSE and uncapped failures unchanged. No expected histories, Source seed or dictionary-order waiver."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 3.2741809263825417e-11,
+          "max_rmse_delta": 1.1695939201319275e-11
+        },
+        "effective_state": "Distinct Electric owners use all3 methods on Zone/Space/ordered ZoneList/SpaceList targets, retained empty bindings and shared Facility Electricity. Legal convective snap separates object Q-Lost from aggregate component sums. Corrected Build104 completes actual VeriSum reads and Native producer order.",
+        "current_primary_observation": {
+          "public_membership_checks": 773,
+          "public_nominal_owners": 79,
+          "ElectricEquipment": 21,
+          "People": 22,
+          "OtherEquipment": 36,
+          "Source_converted": {
+            "path": ".runtime/porting/electric-equipment-102/source-output-order-03/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/output/input/converted.epJSON",
+            "sha256": "83b1bcfe787d092edee1db22be49ffc7de6dcf7904bc146fc9c7ca1464a0c7b6",
+            "bytes": 261064
+          },
+          "compiled_geometry": {
+            "path": ".runtime/porting/electric-equipment-102/source-output-order-03/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/output/compiled-geometry.json",
+            "sha256": "ed3a68f6f4c59e1b68562ce54cd27164d24faa84c60f18c2c530115e9c2dd563",
+            "bytes": 35905
+          },
+          "geometry_consumers": {
+            "path": ".runtime/porting/electric-equipment-102/source-output-order-03/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/output/geometry-consumers.json",
+            "sha256": "4c9a9a1047372c664fb537a8b2df2726996f92f216ab3aaec59862ddadab5ebe",
+            "bytes": 58253
+          },
+          "private_internal_gain_arrays_exported": false,
+          "Root_full_actual_Source_readback": {
+            "path": ".runtime/object-expansion/unit102-prep/reader102-readbacks/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/source-output-order-03.json",
+            "sha256": "fafc34f19d5f0759e3fca1d9193b7eab9b29a62b5df7a3a3b8bfcee5daa58f07",
+            "bytes": 2056833
+          },
+          "independent_full_actual_Source_peer": {
+            "path": ".runtime/object-expansion/unit102-prep/source102-order-complete-independent-peer01.json",
+            "sha256": "74462f30f7b38bc625165c89081d9a9950afd51b7285da5d1a469562964a0062",
+            "bytes": 1748633
+          }
+        }
+      }
     ],
     "totals": {
-        "paired_cases":  152,
-        "reported_samples":  4068246,
-        "raw_operand_unequal":  892536,
-        "tolerance_failures":  0,
-        "rmse_failures":  0,
-        "passed":  true
+      "paired_cases": 153,
+      "reported_samples": 4160238,
+      "raw_operand_unequal": 899547,
+      "tolerance_failures": 0,
+      "rmse_failures": 0,
+      "passed": true
     },
     "source_builds": [
       {
@@ -46465,6 +46606,58 @@
           "bytes": 79688985
         }
       }
+    ,
+      {
+        "id": "electric-equipment-102",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-102/receipt.json",
+          "sha256": "4b98e0fac5748d006008a0d6b1a080ffebfd4363604859d96b2eb334dbaa0a8a",
+          "bytes": 9780
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/2a/2adecd938db1021850e8513f9998e2a5929fe73807e7043bd419f3b74341eea3",
+          "sha256": "2adecd938db1021850e8513f9998e2a5929fe73807e7043bd419f3b74341eea3"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-102/eplus-rs.exe",
+          "sha256": "18d07ba836952bd4d814550201bae8a8ea343272bab96f275f529db158e37494",
+          "bytes": 80007372
+        }
+      },
+      {
+        "id": "electric-equipment-102-verisum",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-103/receipt.json",
+          "sha256": "a22ce0e522d8d1d5bbd1773672ac5ccd41d3dedf8cea96c0aaf3cc5715d4cfa9",
+          "bytes": 9955
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/14/14dd92512d3b2685add13130b78e6e951f3f33084eccc1e0292af884c0c53d13",
+          "sha256": "14dd92512d3b2685add13130b78e6e951f3f33084eccc1e0292af884c0c53d13"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-103/eplus-rs.exe",
+          "sha256": "bbb8b1937971d1d7287f61b54b0d2067f28b688dc76b350ea7bef564075f8b6d",
+          "bytes": 80013820
+        }
+      },
+      {
+        "id": "electric-equipment-102-output-order",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-104/receipt.json",
+          "sha256": "cc19cdd94bc5be23288f02c158a32f9338d0d5fe92bec5fa14cf71ebce2e37ba",
+          "bytes": 9956
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b6/b6ad504d4284fe877da3db728e0646bde07d3a43e9e02a2ebe5e47fa92f94cd3",
+          "sha256": "b6ad504d4284fe877da3db728e0646bde07d3a43e9e02a2ebe5e47fa92f94cd3"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-104/eplus-rs.exe",
+          "sha256": "f9356b76a14b30eb9c602e0081dbcef6fb852b7def83a1b4770d1b98c49d78b9",
+          "bytes": 80019708
+        }
+      }
     ],
     "focused_since_workspace": {
       "passed": 0,
@@ -46628,17 +46821,59 @@
         "admitted_samples": 0,
         "classification": "Input-order/provenance failure before physical execution, RuntimeConvergenceFailure: actual Material IDF order unavailable: Material:InfraredTransparent. This is not a numerical tolerance failure. Adiabatic78 never launched; no Source78 retry/Native replay or fabricated stream rows."
       }
+    ,
+      {
+        "unit": 102,
+        "scope": "A",
+        "source_build": "electric-equipment-102",
+        "build_row": {
+          "path": ".runtime/object-expansion/build102-row.json",
+          "sha256": "bf4c607f976a41ca15d8cc2a26b153d47fd2e0624b54176a0a049abba2d96c77",
+          "bytes": 673
+        },
+        "failed_summary": {
+          "path": ".runtime/porting/electric-equipment-102/source-01/summary.json",
+          "sha256": "eefdca2cebe8e047238366b8ef606e6a434bcbe73c43c8b96a5ce4248fe2d3ae",
+          "bytes": 2117
+        },
+        "failed_comparison": {
+          "path": ".runtime/porting/electric-equipment-102/source-01/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/comparison.json",
+          "sha256": "3a55864215465dfd97adf9377b2524d8d2c25272835814b69627bee5e28f9291",
+          "bytes": 2211
+        },
+        "actual_Source_receipt": {
+          "path": ".runtime/porting/electric-equipment-102/source-01/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/command/receipt.json",
+          "sha256": "8cb165e41220c3fa4809e0066e7c85d12db8a2e034bf32c2606c134812c0bb5f",
+          "bytes": 13614
+        },
+        "Source_launch": {
+          "path": ".runtime/porting/electric-equipment-102/source-01/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/source-launch.json",
+          "sha256": "2ccff8fedb4c5a0df2b9a24b2b68ce32eb8b0a14c410a14de3cc878d4c634bd6",
+          "bytes": 40983
+        },
+        "retained_failure": {
+          "path": ".runtime/object-expansion/unit102-prep/retained-source-negative02.json",
+          "sha256": "f72a9e937860b599b402886928740f5195890f9fba6e8e822885db156719993e",
+          "bytes": 13090
+        },
+        "actual_Source_executions": 1,
+        "exit_code": 6,
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "classification": "Actual first Source execution reached endrun after96 clocks but failed on real positive Electric VeriSum ZonePtr. Partial outputs remain unchanged/unaccepted; no completed-footer claim."
+      }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 97,
-      "builds_with_accepted_paired_cases": 93,
-      "builds_with_only_retained_failed_Source_attempts": 2,
+      "actual_recorded_builds": 100,
+      "builds_with_accepted_paired_cases": 94,
+      "builds_with_only_retained_failed_Source_attempts": 3,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
-      "builds_with_only_unaccepted_Source_attempts": 4,
+      "builds_with_only_unaccepted_Source_attempts": 6,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "97 Source builds:93 with accepted pairs and the same4 unaccepted-only builds (engine-failed68/78,observer76,original93comparison). Build100 adds one bounded implicit-Space ZoneGroup pair. Prior150case/96build rows and every failed/observer/comparison ledger remain exact.",
-      "builds_with_only_retained_unaccepted_Source_comparison_attempts": 1,
+      "qualification": "100 actual Source builds:94 have accepted pairs and6 are unaccepted-only. Prior4 remain unchanged; Build102 retains Source exit6 and Build103 retains a normal strict-dictionary rejection. Only corrected Build104 adds the Electric pair. All prior152case/97build rows and historical failure records remain literal prefixes; rejected attempts add no paired cases or samples.",
+      "builds_with_only_retained_unaccepted_Source_comparison_attempts": 2,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
@@ -47893,6 +48128,51 @@
         ],
         "classification": "Genuine Source Constant diagnostic field-title mismatch on directepJSON after normal engine0. Strict wholeERR comparison correctly rejected it. The runtime fix/distinct diagnostic build/Source02 are separate; original artifacts stay unchanged and add zero cases/samples. No diagnostic waiver, reader/observer relabel or Native replay."
       }
+    ,
+      {
+        "id": "Source102-source-verisum02-electricity-dictionary-order",
+        "unit": 102,
+        "scope": "A",
+        "source_build": "electric-equipment-102-verisum",
+        "build_row": {
+          "path": ".runtime/object-expansion/build103-row.json",
+          "sha256": "986351f1b779c588d9dca5f965bba9f50be1056f97b90f584774f08dd3ad7b48",
+          "bytes": 681
+        },
+        "summary": {
+          "path": ".runtime/porting/electric-equipment-102/source-verisum-02/summary.json",
+          "sha256": "f87b81e7d2d39acf2c6ac16110b1101ef5e1d5021ba7590458138262796d0006",
+          "bytes": 3637
+        },
+        "comparison": {
+          "path": ".runtime/porting/electric-equipment-102/source-verisum-02/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/comparison.json",
+          "sha256": "bade2ab6894071ef03fd998996f8ee857d010a15d8ae6a8b738d111f6ea27bc5",
+          "bytes": 2636
+        },
+        "actual_Source_receipt": {
+          "path": ".runtime/porting/electric-equipment-102/source-verisum-02/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/command/receipt.json",
+          "sha256": "d272c30b9ca34be5d71e517b6c16c01556d9739176f5a3f8148312ee5a57e539",
+          "bytes": 13847
+        },
+        "Source_launch": {
+          "path": ".runtime/porting/electric-equipment-102/source-verisum-02/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/source-launch.json",
+          "sha256": "2023dfa325a95ae1cb5228c85fdd45f63859f7e9c7931e6035ac9cecfb35d341",
+          "bytes": 67657
+        },
+        "retained_negative": {
+          "path": ".runtime/object-expansion/unit102-prep/electric-output-order-correction01/retained-normal-Source-comparison-negative.json",
+          "sha256": "1a1d7cf30c2f4b874800dd676760e6f25472d4e9213b3b5198fa629d4d181a60",
+          "bytes": 1460
+        },
+        "engine_exit_code": 0,
+        "normal_engine_completion": true,
+        "actual_Source_executions": 1,
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "failure_category": "Strict ordered ESO dictionary mismatch: four Zone/Space Electricity Rate/Energy pairs.",
+        "classification": "Genuine normal Source process remains scientifically unaccepted. Two real producer-loop order corrections preserve input/physical math/limits; fresh Build104 and Source execution are separate."
+      }
     ],
     "current_exact_OtherEquipment_name_live_pair": {
       "source_build": "other-equipment-exact-names-diagnostics-93",
@@ -48634,6 +48914,142 @@
         "scope":  "Source A additionally validates finite positive-ZoneList composition with exactly one authored whole-Zone Space per Zone and nonempty SpaceLists. Zone/Space/ZoneList/SpaceList precedence, ordered members and singleton prefixes preserve all three People and OtherEquipment methods. All22 live Count/schedule designs reach every WattsPerson consumer before simulation. Initial raw Zulu Space6 is retained, then positive explicit Zone12 sets its sole final Space floor12 before IHG; both final Space and nominal Zone floors are12, with no final6/12 discriminator. One fresh Native and one physical Source child compare612 series/57816 values and419 public joins under unchanged original limits, including58 nominal owners and13 positive Facility meters. Source geometry independently links actual singleton enclosure FloorArea12 by Space name/number; no private gain allocation is exported. All8 System streams/768 samples are genuine zeros. The Source child reuses the verified Build100 image with no new Rust/tests/build or QA credit. Reader01 wrong-phase and Source preflight count-key failures remain retained; the preflight launched no Source engine. Group compositions with authored Spaces or nonempty SpaceLists, other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, HVAC and arbitrary/full-object/frozen conformance remain unvalidated."
     }
 
+  ,
+    "current_ElectricEquipment_live_pair": {
+      "source_build": "electric-equipment-102-output-order",
+      "case_rows": [
+        "A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/electric-equipment-102/source-output-order-03/summary.json",
+        "sha256": "bbd591f6f3facb10c632e41d6d6c94a13fcea64ea7d809784c4e0d4bcc87c48b",
+        "bytes": 4465
+      },
+      "Root_independent_full_raw_reread": {
+        "path": ".runtime/object-expansion/unit102-prep/reader102-readbacks/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/source-output-order-03.json",
+        "sha256": "fafc34f19d5f0759e3fca1d9193b7eab9b29a62b5df7a3a3b8bfcee5daa58f07",
+        "bytes": 2056833
+      },
+      "independent_full_actual_Source_peer": {
+        "path": ".runtime/object-expansion/unit102-prep/source102-order-complete-independent-peer01.json",
+        "sha256": "74462f30f7b38bc625165c89081d9a9950afd51b7285da5d1a469562964a0062",
+        "bytes": 1748633
+      },
+      "Root_independent_Native_full_raw_reread": {
+        "path": ".runtime/object-expansion/unit102-prep/reader102-readbacks/A-MULTIZONE-ELECTRIC-EQUIPMENT-LOW-LOAD-24H/native-01.json",
+        "sha256": "40de696f4fdcddf2aaa9e4271594ad4c64fa1ed07517b1f6cce737c477b5f1f6",
+        "bytes": 1768925
+      },
+      "Native_index": {
+        "path": ".runtime/porting/electric-equipment-102/native-low-load-01/launches.json",
+        "sha256": "ba8a28c8631401d8003cf11cb13647f15145e8e6a929956eedfdadb71ac18e9b",
+        "bytes": 1805
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit102-prep/electric-pilot-proposal03/proposal.json",
+        "sha256": "05c3666bdbffb99e5016a02afde599c8fed0a58509d78ad1e72e14d49de31a40",
+        "bytes": 283095
+      },
+      "scientific_plan": {
+        "path": ".runtime/object-expansion/unit102-prep/electric-pilot-proposal03/scientific-plan.json",
+        "sha256": "5401b8f6806a511b90c6dcf87b634004a7fe76f891fbac7d68469fb44d5727c2",
+        "bytes": 289911
+      },
+      "current_quality": {
+        "path": ".runtime/object-expansion/unit102-prep/accepted-quality-output-order03.json",
+        "sha256": "ea5c2020d89eb2732d87c185d0ae9d71c5beab668e5076b504bdf7c10cc95146",
+        "bytes": 21679
+      },
+      "current_code_authority": {
+        "path": ".runtime/object-expansion/unit102-prep/final-formatted-code-authority-output-order03.json",
+        "sha256": "1ac293fb9623733df106939f242880f790a00c3c77d50cf92dc7f6ab6e39b78f",
+        "bytes": 10874
+      },
+      "quality_qualification": "Four existing passed tests remain retained, unchanged and not rerun. Two non-cfg Zone/Space output declaration loops now follow Native Rate/Energy order, preserving field Which and all math/meter storage. Current runtime fmt/check and strict library clippy pass. Prior all-target lint and unchanged test bodies remain retained. Final same-input completed stream comparison on new Build104 is the meaningful registration-order regression; no scientific acceptance claimed here.",
+      "existing_actual_test_functions": 4,
+      "new_test_functions": 0,
+      "correction_test_replays": 0,
+      "build_rows": [
+        {
+          "path": ".runtime/object-expansion/build102-row.json",
+          "sha256": "bf4c607f976a41ca15d8cc2a26b153d47fd2e0624b54176a0a049abba2d96c77",
+          "bytes": 673
+        },
+        {
+          "path": ".runtime/object-expansion/build103-row.json",
+          "sha256": "986351f1b779c588d9dca5f965bba9f50be1056f97b90f584774f08dd3ad7b48",
+          "bytes": 681
+        },
+        {
+          "path": ".runtime/object-expansion/build104-row.json",
+          "sha256": "1df41d672309eb551622fd6717bef5f45feb53059cbe7efa607dc57e01c209ef",
+          "bytes": 686
+        }
+      ],
+      "split_build_custody": {
+        "historical_Native_build102": {
+          "path": ".runtime/object-expansion/build102-row.json",
+          "sha256": "bf4c607f976a41ca15d8cc2a26b153d47fd2e0624b54176a0a049abba2d96c77",
+          "bytes": 673
+        },
+        "new_Source_build104": {
+          "path": ".runtime/object-expansion/build104-row.json",
+          "sha256": "1df41d672309eb551622fd6717bef5f45feb53059cbe7efa607dc57e01c209ef",
+          "bytes": 686
+        },
+        "changed_source_paths": [
+          "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/output/electric.rs",
+          "crates/ep_runtime/src/heat_balance/ordinary_tabular_reports/veri_sum/helpers.rs"
+        ],
+        "unchanged_compiler_entries": 4654,
+        "all_other_source_bytes_exact": true,
+        "repair_authority": {
+          "path": ".runtime/object-expansion/unit102-prep/electric-verisum-correction-proposal01/proposal.json",
+          "sha256": "d154507aa852b4e14f9ac6cca82b5f705ecf52dadb4ca579ce94f3a8ac8d3bb3",
+          "bytes": 2843
+        },
+        "output_order_repair": {
+          "path": ".runtime/object-expansion/unit102-prep/electric-output-order-correction01/proposal.json",
+          "sha256": "3376bbaab129ccae2d37c39b1ca38a6ba0067fc3329b6eb6f8caa03896c37638",
+          "bytes": 2461
+        },
+        "qualification": "Historical Native Build102 source archives are authenticated separately from current fixed Source Build104. Prior rejected Source Build103 remains separately retained. No current==old snapshot or rewritten Native receipt claim."
+      },
+      "retained_original_Native_negative": {
+        "path": ".runtime/object-expansion/unit102-prep/electric-pilot-proposal03/retained-native-negative01.json",
+        "sha256": "e61025019645314f71a7a7baab8d2110900dbdd2aad24b8f81d981754ab2b4a3",
+        "bytes": 6477
+      },
+      "retained_first_Source_failure": {
+        "path": ".runtime/object-expansion/unit102-prep/retained-source-negative02.json",
+        "sha256": "f72a9e937860b599b402886928740f5195890f9fba6e8e822885db156719993e",
+        "bytes": 13090
+      },
+      "retained_normal_Source_comparison_negative": {
+        "path": ".runtime/object-expansion/unit102-prep/electric-output-order-correction01/retained-normal-Source-comparison-negative.json",
+        "sha256": "1a1d7cf30c2f4b874800dd676760e6f25472d4e9213b3b5198fa629d4d181a60",
+        "bytes": 1460
+      },
+      "actual_engine_inventory": {
+        "Native_models": 2,
+        "Native_unaccepted_models": 1,
+        "Native_accepted_reference_models": 1,
+        "Source_executions": 3,
+        "Source_unaccepted_executions": 2,
+        "Source_accepted_executions": 1,
+        "Native_replays": 0
+      },
+      "actual_EIO_records": 219,
+      "actual_warmup_days": 30,
+      "actual_warmup_related_EIO_records": 7,
+      "actual_warnings": 3,
+      "actual_continues": 5,
+      "actual_DXF_pairs": 533,
+      "actual_System_streams": 8,
+      "actual_System_samples": 768,
+      "Source_private_gain_owners_exported": false,
+      "scope": "Source A connects distinct ElectricEquipment owners to the bounded closed opaque Zone/Space/ordered ZoneList/SpaceList route, with one whole-Zone Space per Zone. All3 sizing methods, defaults, retaincase subcategory, ignored retained unknown JSON and zero-member statements reach real getters and consumers. Actual Count/schedules establish per-person designs; explicit Zone12 adjusts sole initial Space6 to final12. Public object Q-Lost remains separate from Space/Zone/generic component sums at the legal convective snap. The sole accepted low-load case retains all prior policies and complete reports. SourceB/legacy Electric, EMS/demand/HVAC/SpaceHB, Groups with authored Spaces/SpaceLists, multiple/remainder Spaces and arbitrary/full-object combinations remain unvalidated; no private gain allocation or frozen capability promotion."
+    }
   },
   "additional_native_type_calibrations": [
     {
@@ -48658,19 +49074,16 @@
     "archived_corpus_canonical_types": 110,
     "additional_accepted_types": [
       "ComfortViewFactorAngles",
+      "ElectricEquipment",
       "Space",
       "SpaceList",
+      "ZoneGroup",
       "ZoneList"
     ],
-    "additional_accepted_type_count": 4,
-    "combined_canonical_types": 114,
+    "additional_accepted_type_count": 6,
+    "combined_canonical_types": 116,
     "original_corpus_unchanged": true,
-    "ZoneGroup_already_in_original_corpus": true,
-    "provenance": {
-      "path": ".runtime/object-expansion/unit100-prep/zonegroup-evidence-proposal01/current-union-provenance.json",
-      "sha256": "587b32d1c987d9258ccbf905380eaca068bf2243e695bb74b3ef9469cb43dcf2",
-      "bytes": 2006
-    },
-    "qualification": "Current114 inventory corrects the stale112 current-status declaration; the original110-type corpus and all historical verification ledgers remain exact. A registry admission change does not add a union type."
+    "ZoneGroup_already_in_original_corpus": false,
+    "qualification": "Original188files/176IDF/12epJSON/110types/9118instances are unchanged. The generated pre-Electric union already has115 types including ZoneGroup; accepted Electric adds one. Manual114 omitted ZoneGroup. Added types are distinct accepted domain inputs, not original corpus occurrences or full-object conformance."
   }
 }

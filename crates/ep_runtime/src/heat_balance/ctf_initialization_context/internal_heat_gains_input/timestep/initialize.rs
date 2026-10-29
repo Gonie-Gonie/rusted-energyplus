@@ -155,10 +155,49 @@ impl SelectedInternalHeatGains {
             report.people_lat_gain_rate += row.lat_gain_rate;
             report.people_tot_gain_rate += row.tot_gain_rate;
         }
-        // Lights, ElectricEquipment and GasEquipment precede OtherEq.
-        for family in [1, 2, 3] {
-            self.require_empty_family(family)?;
+        self.require_empty_family(1)?;
+        for equipment in 0..self.positive_count(2)? {
+            let row = self
+                .allocations
+                .electric_equipment
+                .as_mut()
+                .and_then(|rows| rows.get_mut(equipment))
+                .ok_or_else(|| unavailable("actual ZoneElectric timestep row"))?;
+            let schedule = row
+                .schedule
+                .and_then(|i| owners.schedules.schedules.get(i.0))
+                .ok_or_else(|| unavailable("same actual ElectricEquipment Schedule pointer"))?;
+            let current_value = if schedule.ems_actuated_on {
+                schedule.ems_value
+            } else {
+                schedule.current_value
+            };
+            let mut q = row.design_level * current_value;
+            if row.manage_demand && q > row.demand_limit {
+                q = row.demand_limit;
+            }
+            if row.ems_zone_equipment_override_on {
+                q = row.ems_equipment_power;
+            }
+            row.rates[0] = q;
+            row.rates[1] = q * row.fraction_radiant;
+            row.rates[2] = q * row.fraction_convected;
+            row.rates[3] = q * row.fraction_latent;
+            row.rates[4] = q * row.fraction_lost;
+            row.rates[5] = q - row.rates[4];
+            let report = self
+                .allocations
+                .space_report
+                .as_mut()
+                .and_then(|rows| rows.get_mut(index(row.space_index).ok()?))
+                .ok_or_else(|| unavailable("same actual ElectricEquipment SpaceRpt"))?;
+            report.elec_power += row.rates[0];
+            report.elec_rad_gain_rate += row.rates[1];
+            report.elec_con_gain_rate += row.rates[2];
+            report.elec_lat_gain_rate += row.rates[3];
+            report.elec_lost_rate += row.rates[4];
         }
+        self.require_empty_family(3)?;
         for equipment in 0..self.positive_count(6)? {
             let row = self
                 .allocations

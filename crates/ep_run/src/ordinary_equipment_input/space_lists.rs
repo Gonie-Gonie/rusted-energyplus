@@ -125,6 +125,8 @@ pub(super) fn validate_empty_gain_schema(family: &str, row: &RawObject) -> Resul
     for (name, value) in &row.fields {
         let valid = if family == "People" {
             !super::people::known_field(&name.0) || super::people::admitted_field(&name.0, value)
+        } else if family == "ElectricEquipment" {
+            super::electric::admitted_field(&name.0, value)
         } else {
             match name.0.as_str() {
                 "design_level" | "power_per_floor_area" | "power_per_person" => {

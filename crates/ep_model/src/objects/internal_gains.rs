@@ -1,4 +1,7 @@
-use crate::{InternalGainId, NormalizedName, ScheduleId, SpaceId, SpaceListId, ZoneId, ZoneListId};
+use crate::{
+    ElectricEquipmentId, InternalGainId, NormalizedName, ScheduleId, SpaceId, SpaceListId, ZoneId,
+    ZoneListId,
+};
 
 /// OtherEquipment design-level calculation method.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -42,6 +45,39 @@ pub struct OtherEquipment {
     pub carbon_dioxide_generation_rate_m3_per_s_w: f64,
 }
 
+/// ElectricEquipment uses the same three genuine sizing methods.
+/// Its parser admits only the ElectricEquipment schema spellings.
+pub type ElectricEquipmentDesignLevelCalculationMethod = OtherEquipmentDesignLevelCalculationMethod;
+
+/// Genuine ElectricEquipment input, separate from every OtherEquipment row.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ElectricEquipment {
+    /// Dense typed identity in the separate electric arena, not a Native number.
+    pub id: ElectricEquipmentId,
+    /// Exact Source name under ASCII case folding without trimming.
+    pub name: NormalizedName,
+    /// Owning Zone; the raw target retains its distinct Space/list association.
+    pub zone: ZoneId,
+    /// Actual user or built-in schedule identity.
+    pub schedule: Option<InternalGainScheduleReference>,
+    /// Selected sizing method; runtime uses the final retained Space owners.
+    pub design_level_calculation_method: ElectricEquipmentDesignLevelCalculationMethod,
+    /// Authored Numeric1 after real stored-kind projection; not a sized result.
+    pub design_level_w: f64,
+    /// Authored Numeric2 in W/m2; no typed-floor sizing is performed here.
+    pub watts_per_floor_area_w_per_m2: f64,
+    /// Authored Numeric3 in W/person; runtime consumes actual design occupants.
+    pub watts_per_person_w: f64,
+    /// Latent fraction.
+    pub fraction_latent: f64,
+    /// Radiant fraction.
+    pub fraction_radiant: f64,
+    /// Lost fraction.
+    pub fraction_lost: f64,
+    /// Native A5 retaincase string, including authored whitespace.
+    pub end_use_subcategory: String,
+}
+
 /// Resolved raw internal-gain target for explicit Source input only.
 /// These are typed input identities, not Native Source array numbers.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -58,6 +94,20 @@ pub enum SourceGainInputTarget {
 
 /// Existing OtherEquipment input-target API over the shared actual identity.
 pub type SourceOtherEquipmentInputTarget = SourceGainInputTarget;
+
+/// ElectricEquipment shares the actual Zone/Space/list target identities.
+pub type SourceElectricEquipmentInputTarget = SourceGainInputTarget;
+
+/// Raw ElectricEquipment statement and its genuine dense electric instance range.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SourceElectricEquipmentInput {
+    /// Exact original raw key, separate from generated names.
+    pub object_name: String,
+    /// Actual resolved target; an empty range requires a real empty SpaceList.
+    pub target: SourceElectricEquipmentInputTarget,
+    /// Contiguous IDs in TypedModel.electric_equipment, never OtherEquipment.
+    pub instances: std::ops::Range<usize>,
+}
 
 /// People input targets share the same genuine Zone, Space and list identities.
 pub type SourcePeopleInputTarget = SourceGainInputTarget;

@@ -152,9 +152,22 @@ impl SelectedInternalHeatGains {
             row.lat_gain_energy = row.lat_gain_rate * seconds;
             row.tot_gain_energy = row.tot_gain_rate * seconds;
         }
-        for family in [1, 2, 3] {
-            self.require_empty_family(family)?;
+        self.require_empty_family(1)?;
+        for equipment in 0..self.positive_count(2)? {
+            let row = self
+                .allocations
+                .electric_equipment
+                .as_mut()
+                .and_then(|rows| rows.get_mut(equipment))
+                .ok_or_else(|| unavailable("actual ZoneElectric report row"))?;
+            row.energies[0] = row.rates[0] * seconds;
+            row.energies[1] = row.rates[1] * seconds;
+            row.energies[2] = row.rates[2] * seconds;
+            row.energies[3] = row.rates[3] * seconds;
+            row.energies[4] = row.rates[4] * seconds;
+            row.energies[5] = row.rates[5] * seconds;
         }
+        self.require_empty_family(3)?;
         for equipment in 0..self.positive_count(6)? {
             let row = self
                 .allocations

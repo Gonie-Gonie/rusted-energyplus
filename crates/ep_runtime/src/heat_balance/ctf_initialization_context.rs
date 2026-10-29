@@ -24,10 +24,11 @@ mod setup_zone_geometry;
 mod source_heat_balance_input;
 mod world_surface_geometry;
 pub use internal_heat_gains_input::observation::{
-    OrdinaryGainDevice, OrdinaryGainDeviceStorage, OrdinaryGainDictionaryEntry,
-    OrdinaryGainMiscObject, OrdinaryGainOutputRegistration, OrdinaryGainRateTarget,
-    OrdinaryGainReport, OrdinaryGainSchedule, OrdinaryGainSchedules, OrdinaryGainSpace,
-    OrdinaryGainSpaceList, OrdinaryGainZone, OrdinaryInternalGains, OrdinaryOtherEquipment,
+    OrdinaryElectricEquipment, OrdinaryGainDevice, OrdinaryGainDeviceStorage,
+    OrdinaryGainDictionaryEntry, OrdinaryGainMiscObject, OrdinaryGainOutputRegistration,
+    OrdinaryGainRateTarget, OrdinaryGainReport, OrdinaryGainSchedule, OrdinaryGainSchedules,
+    OrdinaryGainSpace, OrdinaryGainSpaceList, OrdinaryGainZone, OrdinaryInternalGains,
+    OrdinaryOtherEquipment,
 };
 pub use ordinary_surface_geometry::{
     OrdinaryGeometryConstruction, OrdinaryGeometryMaterial, OrdinaryGeometryProcess,

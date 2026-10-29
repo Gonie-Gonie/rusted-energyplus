@@ -7,6 +7,8 @@ use crate::heat_balance::source_output_registration::{
     SourceRealOutputDeclaration, SourceReportVariableInput,
 };
 
+mod electric;
+
 struct GainOutputHost<'a>(&'a mut dyn SourceOutputFileHost);
 impl SourceOutputFileHost for GainOutputHost<'_> {
     fn ensure_mtd_open(&mut self) -> std::io::Result<()> {
@@ -255,7 +257,8 @@ impl SelectedInternalHeatGains {
             }
             add_space_outputs[number] = false;
         }
-        // Lights/electric/gas/hot-water/steam loops remain genuinely empty here.
+        // Lights remain empty; Electric precedes the still-empty Gas/HW/Steam families.
+        self.setup_electric_outputs(owners, &zone_names, &space_names)?;
         if let Some(equipment) = &self.allocations.other_equipment {
             for (row_index, row) in equipment.iter().enumerate() {
                 add_zone_outputs[index(row.zone_ptr)?] = true;

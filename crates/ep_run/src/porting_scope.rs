@@ -3,6 +3,7 @@
 //! Admission records input/settings scope, not numerical conformance. Ordinary
 //! arbitrary runs keep their existing support assessment and runtime behavior.
 
+mod electric_equipment;
 mod environment;
 mod settings;
 mod surface_pairs;
@@ -120,6 +121,10 @@ pub fn inspect_porting_scope(
             || raw
                 .objects
                 .get(&ep_raw_model::ObjectType("SpaceList".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            || raw
+                .objects
+                .get(&ep_raw_model::ObjectType("ElectricEquipment".into()))
                 .is_some_and(|rows| !rows.is_empty()))
         && let Err(error) = crate::ordinary_equipment_input::resolve_source_a(raw)
     {
@@ -154,6 +159,14 @@ pub fn inspect_porting_scope(
             validate_empty_source_gain_bindings(raw, model, &mut violations);
         }
         validate_typed_scope(model, scope, &mut violations);
+        if scope == PortingScope::A {
+            electric_equipment::validate(raw, model, &mut violations);
+        } else if !model.electric_equipment.is_empty()
+            || !model.source_electric_equipment_inputs.is_empty()
+            || !model.electric_equipment_names.is_empty()
+        {
+            violations.push("ElectricEquipment typed inputs are admitted only by Source A".into());
+        }
         if object_counts.contains_key("RoomAirModelType") {
             if settings["room_air_controls"]["air_temperature_coupling_strategy"] != "Direct" {
                 violations
@@ -245,7 +258,10 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "RunPeriodControl:DaylightSavingTime"
             | "RunPeriodControl:SpecialDays"
     ) || (scope == PortingScope::A
-        && matches!(kind, "ZoneList" | "ZoneGroup" | "Space" | "SpaceList"))
+        && matches!(
+            kind,
+            "ZoneList" | "ZoneGroup" | "Space" | "SpaceList" | "ElectricEquipment"
+        ))
         || (scope == PortingScope::B
             && matches!(
                 kind,

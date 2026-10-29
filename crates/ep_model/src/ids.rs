@@ -37,6 +37,7 @@ typed_id!(MaterialHeatAndMoistureTransferRedistributionId);
 typed_id!(MaterialHeatAndMoistureTransferDiffusionId);
 typed_id!(MaterialHeatAndMoistureTransferThermalConductivityId);
 typed_id!(InternalGainId);
+typed_id!(ElectricEquipmentId);
 typed_id!(ScheduleTypeLimitId);
 typed_id!(DayScheduleId);
 typed_id!(WeekScheduleId);

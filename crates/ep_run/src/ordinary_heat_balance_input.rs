@@ -41,6 +41,7 @@ fn resolve_ordered(
         "Construction",
         "Zone",
         "OtherEquipment",
+        "ElectricEquipment",
         "People",
         "Exterior:Lights",
         "Site:Location",
@@ -57,6 +58,13 @@ fn resolve_ordered(
         "Site:GroundTemperature:Shallow",
         "Site:GroundTemperature:Deep",
     ] {
+        // No new HB map key/state on legacy or Source B's unselected family.
+        // Positive raw statements include genuine zero-member Source A inputs.
+        if family == "ElectricEquipment"
+            && (!source_order || input.get_num_objects_found(family) == 0)
+        {
+            continue;
+        }
         let ordered = if source_order {
             raw.source_ordered_instances(family)?
         } else {
@@ -132,6 +140,23 @@ fn resolve_ordered(
                 {
                     continue;
                 }
+                if family == "ElectricEquipment"
+                    && !matches!(
+                        field.0.as_str(),
+                        "zone_or_zonelist_or_space_or_spacelist_name"
+                            | "schedule_name"
+                            | "design_level_calculation_method"
+                            | "design_level"
+                            | "watts_per_floor_area"
+                            | "watts_per_person"
+                            | "fraction_latent"
+                            | "fraction_radiant"
+                            | "fraction_lost"
+                            | "end_use_subcategory"
+                    )
+                {
+                    continue;
+                }
                 if family == "OtherEquipment"
                     && !matches!(
                         field.0.as_str(),
@@ -154,7 +179,9 @@ fn resolve_ordered(
                 let scalar = match value {
                     RawValue::String(value) => ProjectInputValue::String(value.clone()),
                     RawValue::Number(value) => {
-                        let value = if matches!(family, "OtherEquipment" | "People") {
+                        let value = if matches!(family, "OtherEquipment" | "People")
+                            || (source_order && family == "ElectricEquipment")
+                        {
                             ep_model::classify_source_json_number(value)
                                 .map(ep_model::SourceJsonNumber::as_f64)
                                 .map_err(|_| format!("HB numeric parse: {family}.{}", field.0))?

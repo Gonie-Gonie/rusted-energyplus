@@ -1,5 +1,5 @@
 //! Safe resolution of the same seven Source internal-gain pointer targets.
-use super::super::SourceOtherEquipment;
+use super::super::SourceZoneEquipData;
 use super::super::devices::{
     SourceGainDevice, SourceRateField, SourceRateTarget, SourceSpaceGainDevices,
 };
@@ -86,7 +86,8 @@ pub(super) fn sum_by_types(
 
 fn dereference_rate(
     target: Option<SourceRateTarget>,
-    equipment: Option<&[SourceOtherEquipment]>,
+    equipment: Option<&[SourceZoneEquipData]>,
+    electric: Option<&[SourceZoneEquipData]>,
     people: &[super::super::comfort_people::SourcePeopleComfortData],
     zero_pointer_value: f64,
 ) -> Result<f64, E> {
@@ -96,6 +97,17 @@ fn dereference_rate(
             let row = equipment
                 .and_then(|rows| rows.get(row))
                 .ok_or_else(|| unavailable("same live OtherEquipment pointer owner"))?;
+            Ok(row.rates[match field {
+                SourceRateField::Convective => 2,
+                SourceRateField::Radiant => 1,
+                SourceRateField::Latent => 3,
+                SourceRateField::CarbonDioxide => 6,
+            }])
+        }
+        Some(SourceRateTarget::ElectricEquipment { row, field }) => {
+            let row = electric
+                .and_then(|rows| rows.get(row))
+                .ok_or_else(|| unavailable("same live ZoneElectric pointer owner"))?;
             Ok(row.rates[match field {
                 SourceRateField::Convective => 2,
                 SourceRateField::Radiant => 1,
@@ -171,6 +183,7 @@ impl SelectedInternalHeatGains {
     ) -> Result<(), E> {
         let do_radiation_update = !suppress_radiation_update;
         let equipment = self.allocations.other_equipment.as_deref();
+        let electric = self.allocations.electric_equipment.as_deref();
         let people = &self.allocations.people.rows;
         let spaces = self
             .allocations
@@ -196,6 +209,7 @@ impl SelectedInternalHeatGains {
                     device.cached_rates[field] = dereference_rate(
                         device.targets[field],
                         equipment,
+                        electric,
                         people,
                         self.zero_pointer_value,
                     )? * device.space_gain_fraction;

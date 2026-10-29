@@ -3229,6 +3229,9 @@ fn typed_counts(model: &TypedModel) -> BTreeMap<&'static str, usize> {
         ("boilers_hot_water", model.boilers_hot_water.len()),
         ("chillers_electric_eir", model.chillers_electric_eir.len()),
     ]);
+    if !model.source_electric_equipment_inputs.is_empty() {
+        counts.insert("electric_equipment", model.electric_equipment.len());
+    }
     if !model.source_file_schedule_declarations.is_empty() {
         counts.insert(
             "source_file_schedule_declarations",

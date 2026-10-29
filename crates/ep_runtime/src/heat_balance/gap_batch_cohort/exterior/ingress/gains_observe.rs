@@ -999,6 +999,12 @@ impl GainFactory {
                                 return Err(invalid("Native actual equipment pointer unexpectedly aliases zero cell").into());
                             }
                         }
+                        Some(OrdinaryGainRateTarget::ElectricEquipment { .. }) => {
+                            return Err(invalid(
+                                "ElectricEquipment pointer outside this OtherEquipment-only cohort",
+                            )
+                            .into());
+                        }
                         Some(OrdinaryGainRateTarget::People { .. }) => {
                             return Err(invalid(
                                 "People pointer outside this OtherEquipment-only cohort",

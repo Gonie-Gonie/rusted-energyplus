@@ -1,7 +1,7 @@
 //! Ephemeral read-only views of actual retained InternalHeatGains owners.
 //! This does not invoke getters, schedule accessors, rate targets or calculations.
 use super::devices::{SourceRateField, SourceRateTarget};
-use super::{SourceMiscGainObject, SourceOtherEquipment};
+use super::{SourceMiscGainObject, SourceZoneEquipData};
 use crate::heat_balance::HeatBalanceState;
 use crate::heat_balance::ctf_initialization_context::CtfInitializationReports;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError;
@@ -17,6 +17,13 @@ pub enum OrdinaryGainRateTarget {
         /// Actual zero-based People owner position.
         row_index: usize,
         /// Literal Source rate member name.
+        field: &'static str,
+    },
+    /// A genuine retained ZoneElectric row and rate-field target.
+    ElectricEquipment {
+        /// Actual zero-based ZoneElectric owner position.
+        row_index: usize,
+        /// Literal Source name of the stored target field.
         field: &'static str,
     },
     /// A genuine retained OtherEquipment row and rate-field target.
@@ -84,6 +91,46 @@ pub struct OrdinaryOtherEquipment<'a> {
     pub fraction_convected: f64,
     /// Actual retained co2 rate factor.
     pub co2_rate_factor: f64,
+    /// Actual retained end use subcategory.
+    pub end_use_subcategory: &'a str,
+    /// Actual retained rates.
+    pub rates: &'a [f64; 7],
+    /// Actual retained energies.
+    pub energies: &'a [f64; 6],
+}
+
+/// Borrowed descriptor of the same real ZoneElectric storage.
+pub struct OrdinaryElectricEquipment<'a> {
+    /// Actual retained name.
+    pub name: &'a str,
+    /// Actual retained space index.
+    pub space_index: i32,
+    /// Actual retained zone ptr.
+    pub zone_ptr: i32,
+    /// Actual retained schedule index.
+    pub schedule_index: Option<usize>,
+    /// Actual retained design level.
+    pub design_level: f64,
+    /// Actual retained nominal min design level.
+    pub nominal_min_design_level: f64,
+    /// Actual retained nominal max design level.
+    pub nominal_max_design_level: f64,
+    /// Actual retained fraction latent.
+    pub fraction_latent: f64,
+    /// Actual retained fraction radiant.
+    pub fraction_radiant: f64,
+    /// Actual retained fraction lost.
+    pub fraction_lost: f64,
+    /// Actual retained fraction convected.
+    pub fraction_convected: f64,
+    /// Actual demand-manager flag, constructorfalse.
+    pub manage_demand: bool,
+    /// Actual demand limit, constructorzero.
+    pub demand_limit: f64,
+    /// Actual EMS override flag.
+    pub ems_override_on: bool,
+    /// Actual EMS override power.
+    pub ems_power: f64,
     /// Actual retained end use subcategory.
     pub end_use_subcategory: &'a str,
     /// Actual retained rates.
@@ -254,6 +301,8 @@ pub struct OrdinaryInternalGains<'a> {
     pub people_allocated: bool,
     /// Actual retained People storage length, without manufacturing empty-target rows.
     pub people_storage_size: usize,
+    /// Actual retained ElectricEquipment allocation, separate from OtherEquipment.
+    pub electric_equipment: Option<Vec<OrdinaryElectricEquipment<'a>>>,
     /// Actual retained other equipment.
     pub other_equipment: Option<Vec<OrdinaryOtherEquipment<'a>>>,
     /// Actual retained co2 generation size.
@@ -274,7 +323,7 @@ pub struct OrdinaryInternalGains<'a> {
     pub output_registration: OrdinaryGainOutputRegistration<'a>,
 }
 
-fn equipment(row: &SourceOtherEquipment) -> OrdinaryOtherEquipment<'_> {
+fn equipment(row: &SourceZoneEquipData) -> OrdinaryOtherEquipment<'_> {
     OrdinaryOtherEquipment {
         name: &row.name,
         space_index: row.space_index,
@@ -289,6 +338,29 @@ fn equipment(row: &SourceOtherEquipment) -> OrdinaryOtherEquipment<'_> {
         fraction_lost: row.fraction_lost,
         fraction_convected: row.fraction_convected,
         co2_rate_factor: row.co2_rate_factor,
+        end_use_subcategory: &row.end_use_subcategory,
+        rates: &row.rates,
+        energies: &row.energies,
+    }
+}
+
+fn electric(row: &SourceZoneEquipData) -> OrdinaryElectricEquipment<'_> {
+    OrdinaryElectricEquipment {
+        name: &row.name,
+        space_index: row.space_index,
+        zone_ptr: row.zone_ptr,
+        schedule_index: row.schedule.map(|index| index.0),
+        design_level: row.design_level,
+        nominal_min_design_level: row.nominal_min_design_level,
+        nominal_max_design_level: row.nominal_max_design_level,
+        fraction_latent: row.fraction_latent,
+        fraction_radiant: row.fraction_radiant,
+        fraction_lost: row.fraction_lost,
+        fraction_convected: row.fraction_convected,
+        manage_demand: row.manage_demand,
+        demand_limit: row.demand_limit,
+        ems_override_on: row.ems_zone_equipment_override_on,
+        ems_power: row.ems_equipment_power,
         end_use_subcategory: &row.end_use_subcategory,
         rates: &row.rates,
         energies: &row.energies,
@@ -329,6 +401,17 @@ fn target(value: SourceRateTarget) -> OrdinaryGainRateTarget {
                 SourceRateField::CarbonDioxide => "CO2GainRate",
             },
         },
+        SourceRateTarget::ElectricEquipment { row, field } => {
+            OrdinaryGainRateTarget::ElectricEquipment {
+                row_index: row,
+                field: match field {
+                    SourceRateField::Convective => "ConGainRate",
+                    SourceRateField::Radiant => "RadGainRate",
+                    SourceRateField::Latent => "LatGainRate",
+                    SourceRateField::CarbonDioxide => "CO2GainRate",
+                },
+            }
+        }
     }
 }
 
@@ -413,6 +496,10 @@ impl CtfInitializationReports {
             }),
             zone_electric_end_use: allocations.zone_electric_end_use.as_deref(),
             refrigeration_credit: allocations.refrigeration_credit.as_deref(),
+            electric_equipment: allocations
+                .electric_equipment
+                .as_ref()
+                .map(|rows| rows.iter().map(electric).collect()),
             other_equipment: allocations
                 .other_equipment
                 .as_ref()

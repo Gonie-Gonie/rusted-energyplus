@@ -267,6 +267,24 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
 
+    let electric_input_count = typed_model
+        .electric_equipment
+        .len()
+        .max(typed_model.source_electric_equipment_inputs.len());
+    if electric_input_count > 0
+        && !source_admission.is_some_and(|admission| admission.consumes("ElectricEquipment"))
+    {
+        // This Source-only family has no arbitrary-runtime registry rule.
+        // Enforce its real admission boundary independently of that registry.
+        push_typed_boundary(
+            unsupported_objects,
+            diagnostics,
+            "ElectricEquipment",
+            electric_input_count,
+            "UnsupportedElectricEquipmentSourceAdmission",
+            "ElectricEquipment requires a validated Source A input route",
+        );
+    }
     if !source_admission.is_some_and(|admission| admission.consumes("ZoneList")) {
         push_typed_unsupported_object(
             registry,

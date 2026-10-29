@@ -36,12 +36,12 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 
 ## Running And Comparing
 
-The [example-object union](../generated/example-object-union.md) contains 114
+The [example-object union](../generated/example-object-union.md) contains 116
 object types: the original 110-type corpus plus accepted ComfortViewFactorAngles,
-Space, SpaceList and ZoneList additions. Legal-value completion remains tracked
-per object. The retained
+ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
+Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 152 paired physical cases and 4,068,246 reported values with zero
+contains 153 paired physical cases and 4,160,238 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -106,43 +106,29 @@ ReportIDs. One alias case keeps 391 requests but emits 406 variable series and
 limits. Completed-file parsing preserves each actual ID; occurrence bindings
 use public nominal Name/Zone order without sorting values. Whole EIO, ERR and
 DXF comparisons remain strict. Other collision and input-value domains remain open.
-Source A accepts direct Space targets and positive SpaceLists of authored
-whole-Zone Spaces, exactly one Space per Zone. Lists retain member order,
-Space-prefixed names even for a singleton, and the full selected count/load per
-member. Effective Space floor overrides reach People and equipment sizing.
-Omitted or explicit-empty member arrays also work without an authored Space
-family. Empty targets retain raw zero-length bindings and create no gain
-instances, object outputs or meters. Structural schema checks always run.
-An all-zero family skips its entire getter reference body; mixed families still
-check occupancy/equipment schedules before the member loop while activity,
-comfort, member sizing and fraction-sum checks skip empty members.
-The two empty-list cases compare 469 and 145 series, 58,008 values and 325 and
-20 public joins under unchanged limits. The zero case has 40 actual zero
-total-gain selectors, no object nominal rows and a genuinely absent MTR file.
-Whole EIO, ERR, DXF, CTF and warmup checks pass. Private gain allocations remain
-separate owner-test evidence. Native default-Space effective floor in the zero
-case is inferred from public Zone floor and its sole default Space; actual
-Source geometry reports its floor directly. Other ZoneList/Space combinations, multiple/remainder Spaces, Space heat
-balance, Source B and arbitrary combinations remain unvalidated. The class
-inherits no frozen capability.
-Source A now also composes positive ZoneLists with authored whole-Zone Spaces
-and nonempty SpaceLists. One case compares all 612 series, 57,816 values and
-419 public joins, including 58 nominal owners and all three People/equipment
-sizing methods. The same-name singleton ZoneList wins over a SpaceList that
-points at the other Space. Initial raw Zulu Space floor 6 remains in the input;
-the later positive explicit Zone floor 12 sets its sole final Space floor to 12
-before sizing. Actual Count/schedule contributions establish every per-person
-equipment design; Source also exports the real linked enclosure floor 12.
-This does not test a final Space-6/Zone-12 ratio. All eight System streams and
-768 samples are genuine zeros. Whole EIO, ERR, DXF, CTF and 30-day warmup checks
-pass under the existing limits. The original wrong-phase reader and the Source
-count-key preflight failure remain retained; that preflight launched no engine.
-The single Native launch is retained; the single Source child reuses Build100,
-with no new Rust changes, tests, build or QA credit. There are still 97 recorded
-builds, 93 with accepted pairs and the same four unaccepted builds. Group
-compositions with authored Spaces/nonempty SpaceLists, other ZoneList/Space
-combinations, Source B, multiple/remainder Spaces and Space heat balance remain
-unvalidated.
+Source A connects People, OtherEquipment and ElectricEquipment on bounded closed
+opaque Zones with one whole-Zone Space each. Zone, Space, ordered ZoneList and
+SpaceList targets retain distinct real owners, member order and singleton
+prefixes. Empty SpaceLists keep zero-length bindings without gain objects,
+object outputs or meters; structural schema checks always run. Positive explicit
+Zone floor adjusts its sole Space before sizing: initial raw Zulu Space6 becomes
+final12, with actual Count/schedule contributions feeding per-person designs.
+
+The Electric case compares 968 series, 91,992 values and 773 public joins,
+including 79 nominal owners and all three sizing methods, under unchanged
+limits. Defaults, retaincase subcategories and ignored retained JSON metadata
+reach genuine getters and consumers. The legal convective-fraction snap keeps
+object Q-Lost separate from Space/Zone component totals and real generic heat
+reports. Whole EIO, ERR, DXF, CTF and 30-day warmup checks pass. Source exports
+actual enclosure floors; private gain allocations remain separate owner evidence.
+The original high-load Native model and two earlier Source attempts remain
+unaccepted; the accepted pair uses corrected Build104 and the sole retained
+low-load Native reference. Four existing test executions are retained without
+rerun or new test functions; actual formatting/lint and physical regression
+validate the consumer corrections. There are 100 recorded Source builds,
+94 with accepted pairs and six unaccepted-only builds. B/legacy Electric,
+Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
+and arbitrary/full-object combinations remain unvalidated.
 
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
@@ -151,8 +137,8 @@ identity retains the Native fast path; differing counts or layer identities use
 an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
 retain Native's warning sequence. Infrared-transparent constructions retain
 their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
-and list factors and opposite coincident vertices. Twenty-four 24-hour two-Zone
-cases cover 557,592 derived values with zero tolerance or RMSE failures;
+and list factors and opposite coincident vertices. Twenty-five 24-hour two-Zone
+cases cover 649,584 derived values with zero tolerance or RMSE failures;
 the maximum absolute difference is 3.8198777474462986e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Multiple/remainder Spaces, Space heat balance, Source B authored Spaces,

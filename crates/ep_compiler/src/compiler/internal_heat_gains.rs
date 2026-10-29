@@ -313,7 +313,10 @@ impl Compiler<'_> {
                     | "air_velocity_schedule_name"
                     | "ankle_level_air_velocity_schedule_name",
                 )
-                | ("OtherEquipment", "schedule_name" | "end_use_subcategory") => {
+                | (
+                    "OtherEquipment" | "ElectricEquipment",
+                    "schedule_name" | "end_use_subcategory",
+                ) => {
                     matches!(value, RawValue::String(_))
                 }
                 ("People", "number_of_people_calculation_method") => {
@@ -324,9 +327,10 @@ impl Compiler<'_> {
                     "number_of_people" | "people_per_floor_area" | "floor_area_per_person",
                 ) => number.is_some_and(|n| n >= 0.0),
                 ("People", "fraction_radiant")
-                | ("OtherEquipment", "fraction_latent" | "fraction_radiant" | "fraction_lost") => {
-                    number.is_some_and(|n| (0.0..=1.0).contains(&n))
-                }
+                | (
+                    "OtherEquipment" | "ElectricEquipment",
+                    "fraction_latent" | "fraction_radiant" | "fraction_lost",
+                ) => number.is_some_and(|n| (0.0..=1.0).contains(&n)),
                 ("People", "sensible_heat_fraction") => {
                     number.is_some_and(|n| (0.0..=1.0).contains(&n))
                         || choice(&["", "Autocalculate"])
@@ -373,6 +377,19 @@ impl Compiler<'_> {
                     "OtherEquipment",
                     "design_level" | "power_per_floor_area" | "power_per_person",
                 ) => number.is_some(),
+                (
+                    "ElectricEquipment",
+                    "design_level" | "watts_per_floor_area" | "watts_per_person",
+                ) => number.is_some_and(|n| n >= 0.0),
+                ("ElectricEquipment", "design_level_calculation_method") => {
+                    choice(&["", "EquipmentLevel", "Watts/Area", "Watts/Person"])
+                }
+                (
+                    "ElectricEquipment",
+                    "idf_order" | "idf_max_fields" | "idf_max_extensible_fields",
+                ) => {
+                    matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok())
+                }
                 ("OtherEquipment", "design_level_calculation_method") => choice(&[
                     "",
                     "EquipmentLevel",
@@ -398,7 +415,10 @@ impl Compiler<'_> {
                     "OtherFuel2",
                     "Propane",
                 ]),
-                // Both official instance schemas allow additional properties.
+                // Official instance schemas permit unknown metadata. Only
+                // real fields above become ElectricEquipment operands; unknown
+                // aliases/fuel/CO2 retain opaque original-IP custody.
+                // Existing People/Other metadata behavior is unchanged.
                 _ => true,
             };
             if !valid {
@@ -504,6 +524,22 @@ impl Compiler<'_> {
         )
     }
 
+    pub(super) fn electric_equipment_schedule_reference(
+        &mut self,
+        model: &TypedModel,
+        name: &str,
+        object: &RawObject,
+    ) -> Option<InternalGainScheduleReference> {
+        self.internal_gain_schedule_reference(
+            model,
+            "ElectricEquipment",
+            name,
+            object,
+            "schedule_name",
+            "AmbiguousElectricEquipmentSchedule",
+        )
+    }
+
     pub(super) fn other_equipment_schedule_reference(
         &mut self,
         model: &TypedModel,
@@ -550,7 +586,9 @@ impl Compiler<'_> {
         }
 
         self.parse_people(model);
-        // Deferred here: Lights, Electric/Gas/HotWater/Steam equipment.
+        // Lights remains deferred; real Electric precedes Other as in IHG.
+        self.parse_electric_equipment(model);
+        // Gas/HotWater/Steam equipment remain deferred.
         self.parse_other_equipment(model);
         // Deferred here: ITE, outdoor-temperature baseboard, and CO2 gains.
     }

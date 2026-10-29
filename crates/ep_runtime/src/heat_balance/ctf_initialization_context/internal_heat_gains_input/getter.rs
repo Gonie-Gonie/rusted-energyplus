@@ -1,7 +1,7 @@
 //! Ordered allocations/local arguments and admitted OtherEquipment getter.
 use super::{
-    E, SelectedInternalHeatGains, SourceGainReport, SourceMiscGainObject, SourceOtherEquipment,
-    SourceOtherFuel, index, unavailable,
+    E, SelectedInternalHeatGains, SourceGainReport, SourceMiscGainObject, SourceOtherFuel,
+    SourceZoneEquipData, index, unavailable,
 };
 use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
@@ -135,10 +135,18 @@ impl SelectedInternalHeatGains {
                         &mut local,
                         owners,
                     )?;
+                } else if kind == 2 {
+                    self.allocations.electric_equipment =
+                        Some(vec![
+                            SourceZoneEquipData::default();
+                            usize::try_from(self.totals[2])
+                                .map_err(|_| unavailable("TotElecEquip capacity"))?
+                        ]);
+                    self.read_electric(&mut local, owners)?;
                 } else if kind == 6 {
                     self.allocations.other_equipment =
                         Some(vec![
-                            SourceOtherEquipment::default();
+                            SourceZoneEquipData::default();
                             usize::try_from(self.totals[kind])
                                 .map_err(|_| unavailable("TotOthEquip capacity"))?
                         ]);
@@ -200,7 +208,7 @@ impl SelectedInternalHeatGains {
         self.totals[9] = i32::try_from(owners.input.get_num_objects_found(FAMILIES[9]))
             .map_err(|_| unavailable("actual TotCO2Gen capacity"))?;
         self.allocations.co2_generation = Some(vec![
-            SourceOtherEquipment::default();
+            SourceZoneEquipData::default();
             usize::try_from(self.totals[9]).map_err(
                 |_| unavailable("TotCO2Gen capacity")
             )?
@@ -262,7 +270,7 @@ impl SelectedInternalHeatGains {
             }
             return Ok(Some(misc));
         }
-        if !matches!(family, "OtherEquipment" | "People") {
+        if !matches!(family, "OtherEquipment" | "People" | "ElectricEquipment") {
             if kind == 1 {
                 self.lights_objects = Some(misc);
             } else if kind == 2 {
@@ -454,6 +462,18 @@ impl SelectedInternalHeatGains {
         }
         if family == "People" && !local_errors {
             check_people_input_association(&misc, owners)?;
+        }
+        if family == "ElectricEquipment" {
+            self.electric_objects = Some(misc);
+            if !local_errors {
+                super::electric::check_electric_input_association(
+                    self.electric_objects
+                        .as_deref()
+                        .ok_or_else(|| unavailable("actual retained electric misc association"))?,
+                    owners,
+                )?;
+            }
+            return Ok(None);
         }
         Ok(Some(misc))
     }
@@ -1002,7 +1022,10 @@ fn check_people_input_association(
 
 // New per-area diagnostics require actual Source phase owners. Legacy entry
 // points have no clock and stop here instead of inventing its warmup flag.
-fn sizing_warning(owners: &mut SourceGainInputOwners<'_, '_>, message: &str) -> Result<(), E> {
+pub(super) fn sizing_warning(
+    owners: &mut SourceGainInputOwners<'_, '_>,
+    message: &str,
+) -> Result<(), E> {
     let clock = owners
         .clock
         .ok_or_else(|| unavailable("actual OtherEquipment sizing diagnostic clock"))?;
@@ -1014,7 +1037,10 @@ fn sizing_warning(owners: &mut SourceGainInputOwners<'_, '_>, message: &str) -> 
     };
     owners.backend.show_source_warning_error(message, &flags)
 }
-fn sizing_severe(owners: &mut SourceGainInputOwners<'_, '_>, message: &str) -> Result<(), E> {
+pub(super) fn sizing_severe(
+    owners: &mut SourceGainInputOwners<'_, '_>,
+    message: &str,
+) -> Result<(), E> {
     let clock = owners
         .clock
         .ok_or_else(|| unavailable("actual OtherEquipment sizing diagnostic clock"))?;

@@ -3845,6 +3845,197 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 );
             }
         }
+        // Unit102: genuine ElectricEquipment getter/Which owners and reached
+        // timestep children. These are authored owner checkpoints, not a
+        // successful parent timestep or a Native/Source physical certificate.
+        {
+            use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::{SourceGainDictionaryFile, SourceGainStepOwners, SourceZoneGenericGainAllocation};
+            use crate::heat_balance::selected_input_processor::{SourceInputFamily, SourceObjectDefinition, SourceObjectShape};
+            use crate::heat_balance::source_output_registration::{SourceInternalGainOutputField as ElectricField, SourceRealOutputTarget, SourceRealOutputOwners};
+            let suffixes = ["Electricity Energy", "Electricity Rate", "Radiant Heating Energy", "Radiant Heating Rate", "Convective Heating Energy", "Convective Heating Rate", "Latent Gain Energy", "Latent Gain Rate", "Lost Heat Energy", "Lost Heat Rate", "Total Heating Energy", "Total Heating Rate"];
+            for target_mode in 0..5 {
+                let mut candidate = failed_gains.clone();
+                candidate.output_registration = Default::default();
+                let mut typed = model.typed.clone();
+                typed.other_equipment.clear(); typed.source_other_equipment_inputs.clear();
+                typed.people.clear(); typed.source_people_inputs.clear();
+                typed.electric_equipment.clear(); typed.source_electric_equipment_inputs.clear();
+                typed.zone_lists.clear(); typed.space_lists.clear();
+                let zone_name = typed.zones[0].name.0.clone();
+                if matches!(target_mode, 1 | 3 | 4) {
+                    typed.spaces[0].name = ep_model::NormalizedName("ELECTRIC SPACE102".into());
+                    typed.spaces[0].origin = ep_model::SpaceOrigin::Authored;
+                }
+                let space_name = typed.spaces[0].name.0.clone();
+                let source = candidate.selected_zone_input.as_mut().ok_or("Electric owner checkpoint")?;
+                let zone = &mut source.zones.as_mut().ok_or("Electric actual Zone")?[0];
+                zone.name = zone_name.clone(); zone.total_occupants = 2.0;
+                let space = &mut source.spaces.as_mut().ok_or("Electric actual Space")?[0];
+                space.name = space_name.clone(); space.total_occupants = 2.0;
+                let floor_area = space.floor_area;
+                assert!(floor_area > 0.0);
+                let empty = target_mode == 4;
+                let target = match target_mode {
+                    0 => ep_model::SourceElectricEquipmentInputTarget::Zone(typed.zones[0].id),
+                    1 => ep_model::SourceElectricEquipmentInputTarget::Space(typed.spaces[0].id),
+                    2 => {
+                        typed.zone_lists.push(ep_model::ZoneList { id: ep_model::ZoneListId(0), name: ep_model::NormalizedName("ELECTRIC LIST102".into()), zones: vec![typed.zones[0].id], max_zone_name_length: zone_name.len() });
+                        source.num_zone_lists = 1;
+                        source.zone_lists = Some(vec![Default::default()]);
+                        let list = &mut source.zone_lists.as_mut().ok_or("Electric ZoneList allocation")?[0];
+                        list.name = "ELECTRIC LIST102".into();
+                        list.num_of_zones = 1;
+                        list.max_zone_name_length = zone_name.len();
+                        list.zone = Some(vec![1]);
+                        list.typed_zone_list_id = Some(ep_model::ZoneListId(0));
+                        ep_model::SourceElectricEquipmentInputTarget::ZoneList(ep_model::ZoneListId(0))
+                    }
+                    _ => {
+                        let max = if empty { 0 } else { space_name.len() };
+                        typed.space_lists.push(ep_model::SpaceList { id: ep_model::SpaceListId(0), name: ep_model::NormalizedName("ELECTRIC LIST102".into()), spaces: if empty { vec![] } else { vec![typed.spaces[0].id] }, max_space_name_length: max });
+                        source.space_lists = Some(vec![Default::default()]);
+                        let list = &mut source.space_lists.as_mut().ok_or("Electric SpaceList allocation")?[0];
+                        list.name = "ELECTRIC LIST102".into();
+                        list.num_list_spaces = i32::from(!empty);
+                        list.max_space_name_length = max;
+                        list.spaces = if empty { vec![] } else { vec![1] };
+                        list.typed_space_list_id = Some(ep_model::SpaceListId(0));
+                        ep_model::SourceElectricEquipmentInputTarget::SpaceList(ep_model::SpaceListId(0))
+                    }
+                };
+                let target_name = match target_mode { 0 => zone_name.as_str(), 1 => space_name.as_str(), _ => "ELECTRIC LIST102" };
+                let mut raw_rows = Vec::new();
+                for (at, (method, field, value, typed_method)) in [
+                    ("EquipmentLevel", "design_level", 10.0, ep_model::ElectricEquipmentDesignLevelCalculationMethod::EquipmentLevel),
+                    ("Watts/Area", "watts_per_floor_area", 2.0, ep_model::ElectricEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea),
+                    ("Watts/Person", "watts_per_person", 5.0, ep_model::ElectricEquipmentDesignLevelCalculationMethod::WattsPerPerson),
+                ].into_iter().enumerate() {
+                    let raw_name = format!("Electric {at}");
+                    let end_use = if at == 0 { "Process eLeC " } else { "General" };
+                    let mut fields = std::collections::BTreeMap::from([
+                        ("zone_or_zonelist_or_space_or_spacelist_name".into(), ProjectInputValue::String(target_name.into())),
+                        ("schedule_name".into(), ProjectInputValue::String(if empty { "UNRESOLVED EMPTY102" } else { "Constant-1.0" }.into())),
+                        ("design_level_calculation_method".into(), ProjectInputValue::String(method.into())),
+                        (field.into(), ProjectInputValue::Number(value)),
+                        ("fraction_latent".into(), ProjectInputValue::Number(0.1)),
+                        ("fraction_radiant".into(), ProjectInputValue::Number(0.2)),
+                        ("fraction_lost".into(), ProjectInputValue::Number(0.3)),
+                    ]);
+                    if at < 2 { fields.insert("end_use_subcategory".into(), ProjectInputValue::String(if at == 1 { "" } else { end_use }.into())); }
+                    raw_rows.push(ProjectInputObject { object_name: raw_name.clone(), idf_max_fields: None, fields });
+                    if !empty {
+                        typed.electric_equipment.push(ep_model::ElectricEquipment {
+                            id: ep_model::ElectricEquipmentId(at as u32), name: ep_model::NormalizedName(if target_mode >= 2 { format!("{space_name} {}", raw_name.to_ascii_uppercase()) } else { raw_name.to_ascii_uppercase() }),
+                            zone: typed.zones[0].id, schedule: Some(ep_model::InternalGainScheduleReference::ConstantOne), design_level_calculation_method: typed_method,
+                            design_level_w: if at == 0 { value } else { 0.0 }, watts_per_floor_area_w_per_m2: if at == 1 { value } else { 0.0 }, watts_per_person_w: if at == 2 { value } else { 0.0 },
+                            fraction_latent: 0.1, fraction_radiant: 0.2, fraction_lost: 0.3, end_use_subcategory: end_use.into(),
+                        });
+                    }
+                    typed.source_electric_equipment_inputs.push(ep_model::SourceElectricEquipmentInput { object_name: raw_name, target, instances: if empty { 0..0 } else { at..at + 1 } });
+                }
+                typed.report_inputs.output_variables = ["Electric Equipment", "Zone Electric Equipment", "Space Electric Equipment"].into_iter().flat_map(|prefix| suffixes.map(|suffix| format!("{prefix} {suffix}"))).enumerate().map(|(at, name)| ep_model::SourceOutputVariableInput {
+                    object_name: format!("Electric request {at}"), key: "*".into(), variable_name: name, reporting_frequency: "TIMESTEP".into(), schedule_name: String::new(), alpha_blank: [false, false, false, true], default_applied: [false; 4], num_alphas: 3, is_epjson: true,
+                }).collect();
+                let mut old_ip = candidate.selected_input_processor.take().ok_or("Electric original IP")?;
+                let mut definitions = Vec::new();
+                for family in ["People", "Lights", "ElectricEquipment", "GasEquipment", "HotWaterEquipment", "SteamEquipment", "OtherEquipment", "ElectricEquipment:ITE:AirCooled", "ZoneBaseboard:OutdoorTemperatureControlled", "ZoneContaminantSourceAndSink:CarbonDioxide"] {
+                    let actual = old_ip.get_object_def_max_args(family)?;
+                    definitions.push(SourceObjectDefinition { object_type: family.into(), alpha_fields: actual.alphas, numeric_fields: actual.numerics, alpha_extensions: 0, numeric_extensions: 0, extension: None });
+                }
+                definitions.push(SourceObjectDefinition { object_type: "Output:Variable".into(), alpha_fields: 4, numeric_fields: 0, alpha_extensions: 0, numeric_extensions: 0, extension: None });
+                candidate.selected_input_processor = Some(SelectedInputProcessor::from_admitted_input(definitions, std::collections::BTreeMap::from([
+                    ("ElectricEquipment".into(), SourceInputFamily::Objects(raw_rows.iter().map(|row| SourceObjectShape { object_name: row.object_name.clone(), field_sizes: row.fields.keys().map(|key| (key.clone(), 1)).collect() }).collect())),
+                    ("Output:Variable".into(), SourceInputFamily::Objects(typed.report_inputs.output_variables.iter().map(|row| SourceObjectShape { object_name: row.object_name.clone(), field_sizes: Default::default() }).collect())),
+                ]))?);
+                let raw = candidate.heat_balance_input.as_mut().ok_or("Electric raw owner")?;
+                raw.objects.remove("OtherEquipment"); raw.objects.remove("People"); raw.objects.insert("ElectricEquipment".into(), raw_rows);
+                let clock = crate::weather::day::WeatherGlobalState { time_step_zone_sec: 900.0, ..Default::default() };
+                let (mut state, mut errors, mut console, mut eio, mut eso) = (ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
+                let mut context = CtfInitializationContext { reports: &mut candidate, eio: &mut eio, backend: SourceErrorBackend { state: &mut state, error_stream: Some(&mut errors), console: &mut console, out_unit1: None, out_unit2: None, f_message: None, message_callback: None, error_callback: None, sqlite: None } };
+                for request in &typed.report_inputs.output_variables { context.reports.output_prescan.add_record("*", &request.variable_name, &mut context.backend)?; }
+                context.manage_selected_internal_heat_gains_input_with_dictionary(&typed, 15, &mut gain_host, Some(&clock), Some(SourceGainDictionaryFile { eso: Some(&mut eso) }))?;
+                assert!(errors.is_empty(), "Electric getter {target_mode}: {}", String::from_utf8_lossy(&errors));
+                let gains = &candidate.selected_internal_heat_gains;
+                assert_eq!(gains.totals[2], if empty { 0 } else { 3 });
+                assert!(gains.allocations.other_equipment.is_none());
+                let misc = gains.electric_objects.as_ref().ok_or("retained actual electric objects")?;
+                assert_eq!(misc.len(), 3);
+                assert!(misc.iter().all(|row| row.space_list_active == (target_mode >= 3) && row.zone_list_active == (target_mode == 2)));
+                if empty {
+                    assert!(gains.allocations.electric_equipment.is_none());
+                    assert!(misc.iter().all(|row| row.num_spaces == 0 && row.space_start_ptr == 1 && row.space_nums.is_empty() && row.names.is_empty() && row.space_or_space_list_ptr == 1));
+                    assert!(!candidate.output_registration.dictionary_variables.iter().any(|row| row.name.starts_with("Electric Equipment ")));
+                    assert!(candidate.output_registration.meters.meters.is_empty());
+                    continue;
+                }
+                let rows = gains.allocations.electric_equipment.as_ref().ok_or("real ZoneElectric allocation")?;
+                assert_eq!(rows.iter().map(|row| row.design_level).collect::<Vec<_>>(), [10.0, 2.0 * floor_area, 10.0]);
+                assert_eq!(rows.iter().map(|row| row.end_use_subcategory.as_str()).collect::<Vec<_>>(), ["Process eLeC ", "General", "General"]);
+                assert!(rows.iter().all(|row| !row.manage_demand && row.demand_limit == 0.0 && !row.ems_zone_equipment_override_on && row.ems_equipment_power == 0.0 && row.rates == [0.0; 7] && row.energies == [0.0; 6]));
+                assert_eq!(candidate.output_registration.out_vars.len(), 60);
+                for (number, object) in rows.iter().enumerate() {
+                    let declared = &candidate.output_registration.out_vars[number * 12..(number + 1) * 12];
+                    assert_eq!(declared.iter().map(|row| row.name.as_str()).collect::<Vec<_>>(), [1, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(|field| format!("Electric Equipment {}", suffixes[field])).iter().map(String::as_str).collect::<Vec<_>>());
+                    assert!(declared.iter().all(|row| row.key == object.name));
+                }
+                assert!(std::str::from_utf8(&eio)?.contains("ElectricEquipment Internal Gains Nominal"));
+                assert!(std::str::from_utf8(&eio)?.contains("End-Use SubCategory"));
+                let devices = &gains.allocations.space_devices.as_ref().ok_or("Electric devices")?[0];
+                assert_eq!(devices.number_of_devices, 3);
+                assert!(devices.devices.as_ref().ok_or("Electric device slots")?[..3].iter().all(|row| row.component_type == 2));
+                let meter = candidate.output_registration.meters.meters.iter().find(|row| row.name == "Electricity:Facility").ok_or("actual Electric Facility meter")?;
+                assert_eq!(meter.source_variable_numbers.len(), 3);
+                for &number in &meter.source_variable_numbers {
+                    let target = candidate.output_registration.out_vars[number].which.ok_or("actual Electric metered Which")?;
+                    assert!(matches!(target, SourceRealOutputTarget::InternalGain { field: ElectricField::ElectricObject { field: 0 }, .. }));
+                }
+                if target_mode != 0 { continue; }
+                // Native demand fields are exercised on their real allocated
+                // owner; this does not admit a DemandManager or EMS input object.
+                for (demand, ems, expected_first) in [(false, false, 10.0), (true, false, 4.0), (true, true, 6.0)] {
+                    let row = &mut candidate.selected_internal_heat_gains.allocations.electric_equipment.as_mut().ok_or("actual demand owner")?[0];
+                    row.manage_demand = demand; row.demand_limit = 4.0;
+                    row.ems_zone_equipment_override_on = ems; row.ems_equipment_power = 6.0;
+                    let globals = candidate.selected_heat_balance_globals.as_ref().ok_or("Electric actual globals")?;
+                    candidate.selected_zone_input.as_mut().ok_or("Electric predefined")?.zone_predefined = Some(vec![crate::heat_balance::selected_heat_balance_input::zone::ZonePredefined::default(); globals.num_of_zones as usize]);
+                    let mut air = crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance::default();
+                    air.allocate_source_arrays(globals)?;
+                    let mut modules = crate::heat_balance::selected_gain_modules::SourceGainModules::default();
+                    let mut facility = crate::heat_balance::facility_electric_service::FacilityElectricService::new();
+                    let mut provider = crate::heat_balance::selected_gain_modules::SourceModuleGainProvider { modules: &mut modules, input: candidate.selected_input_processor.as_mut().ok_or("Electric module IP")?, facility: Some(&mut facility) };
+                    let mut backend = SourceErrorBackend { state: &mut state, error_stream: Some(&mut errors), console: &mut console, out_unit1: None, out_unit2: None, f_message: None, message_callback: None, error_callback: None, sqlite: None };
+                    let mut step = SourceGainStepOwners { clock: &clock, globals, control: &candidate.heat_balance_input_state, zones: candidate.selected_zone_input.as_mut().ok_or("Electric timestep Zones")?, schedules: candidate.selected_schedule_manager.as_ref().ok_or("Electric timestep schedules")?, backend: &mut backend, modules: &mut provider, latent: Some(&mut air), room_air: None, radiation: None, zone_generic_gain: SourceZoneGenericGainAllocation::Unavailable };
+                    let reached = candidate.selected_internal_heat_gains.manage_timestep(&mut step);
+                    assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same refrigeration selected official schema definition"))), "Electric parent prefix: {reached:?}");
+                    // Explicit real child calls after that genuine parent stop;
+                    // no successful full parent or radiation pass is claimed.
+                    candidate.selected_internal_heat_gains.update_source_internal_gain_values(&mut step, false, true)?;
+                    candidate.selected_internal_heat_gains.report_timestep(&step)?;
+                    let gains = &candidate.selected_internal_heat_gains;
+                    let rows = gains.allocations.electric_equipment.as_ref().ok_or("Electric updated rows")?;
+                    let expected = [expected_first, 2.0 * floor_area, 10.0];
+                    let power = expected.iter().sum::<f64>();
+                    assert_eq!(rows.iter().map(|row| row.rates[0]).collect::<Vec<_>>(), expected);
+                    for (row, q) in rows.iter().zip(expected) {
+                        assert_eq!(row.rates[1], q * 0.2); assert_eq!(row.rates[2], q * (1.0 - (0.1 + 0.2 + 0.3)));
+                        assert_eq!(row.rates[3], q * 0.1); assert_eq!(row.rates[4], q * 0.3); assert_eq!(row.rates[5], q - q * 0.3);
+                        assert_eq!(row.energies, std::array::from_fn(|i| row.rates[i] * 900.0));
+                    }
+                    let space = &gains.allocations.space_report.as_ref().ok_or("Electric Space report")?[0];
+                    let zone = &gains.allocations.zone_report.as_ref().ok_or("Electric Zone report")?[0];
+                    assert_eq!(space.elec_power, power); assert_eq!(zone.elec_power, power); assert_eq!(zone.elec_consump, power * 900.0);
+                    assert_eq!(*gains.real_output(SourceRealOutputTarget::InternalGain { field: ElectricField::ElectricObject { field: 1 }, index: 1 })?, expected_first);
+                    assert_eq!(*gains.real_output(SourceRealOutputTarget::InternalGain { field: ElectricField::ElectricObject { field: 0 }, index: 1 })?, expected_first * 900.0);
+                    assert_eq!(*gains.real_output(SourceRealOutputTarget::InternalGain { field: ElectricField::ElectricZone { field: 1 }, index: 1 })?, power);
+                    let devices = &gains.allocations.space_devices.as_ref().ok_or("Electric live rate targets")?[0];
+                    let device = &devices.devices.as_ref().ok_or("Electric cached actual pointer values")?[0];
+                    assert_eq!(device.cached_rates[0], rows[0].rates[2]);
+                    assert_eq!(device.cached_rates[2], rows[0].rates[1]);
+                    assert_eq!(device.cached_rates[3], rows[0].rates[3]);
+                    assert!((air.spaces.as_ref().ok_or("Electric latent owner")?[0].air.latent_gain - rows.iter().map(|row| row.rates[3]).sum::<f64>()).abs() < 1e-12);
+                }
+            }
+        }
         // Positive direct People uses the real schedule producer and IHG getter.
         // Later explicit child checks do not turn the genuine Refrig stop into
         // a successful parent. All operands here are authored unit inputs.

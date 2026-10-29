@@ -66,6 +66,7 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 | "Output:Surfaces:List"
                 | "Output:Constructions"
                 | "OtherEquipment"
+                | "ElectricEquipment"
                 | "People"
                 | "Output:Meter"
                 | "Output:Meter:MeterFileOnly"

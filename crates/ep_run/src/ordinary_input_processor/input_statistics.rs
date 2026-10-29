@@ -120,6 +120,7 @@ pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsIn
         );
     }
     for family in [
+        "ElectricEquipment",
         "People",
         "ZoneList",
         "ZoneGroup",

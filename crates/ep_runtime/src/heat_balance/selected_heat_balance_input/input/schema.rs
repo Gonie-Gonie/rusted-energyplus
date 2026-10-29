@@ -177,6 +177,76 @@ const F5: &[Field] = &[
     },
 ];
 // OtherEquipment IDD22738-22829: same local getter, not a new count owner.
+// Genuine ElectricEquipment IDD22455-22520: five alphas/six numerics,
+// Name plus ten regular fields, min-fields10; A5 retains case/default General.
+const ELECTRIC: &[Field] = &[
+    Field {
+        json: "name",
+        legacy: "Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "zone_or_zonelist_or_space_or_spacelist_name",
+        legacy: "Zone or ZoneList or Space or SpaceList Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "schedule_name",
+        legacy: "Schedule Name",
+        default: DefaultValue::Alpha(""),
+        retain_case: false,
+    },
+    Field {
+        json: "design_level_calculation_method",
+        legacy: "Design Level Calculation Method",
+        default: DefaultValue::Alpha("EquipmentLevel"),
+        retain_case: false,
+    },
+    Field {
+        json: "design_level",
+        legacy: "Design Level",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "watts_per_floor_area",
+        legacy: "Watts per Floor Area",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "watts_per_person",
+        legacy: "Watts per Person",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "fraction_latent",
+        legacy: "Fraction Latent",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "fraction_radiant",
+        legacy: "Fraction Radiant",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "fraction_lost",
+        legacy: "Fraction Lost",
+        default: DefaultValue::Numeric(0.0),
+        retain_case: false,
+    },
+    Field {
+        json: "end_use_subcategory",
+        legacy: "End-Use Subcategory",
+        default: DefaultValue::Alpha("General"),
+        retain_case: true,
+    },
+];
 const OTHER: &[Field] = &[
     Field {
         json: "name",
@@ -724,6 +794,7 @@ pub(super) fn fields(family: &str) -> Option<(&'static [Field], usize, bool)> {
         "HeatBalanceAlgorithm" => Some((F3, 0, false)),
         "ZoneAirHeatBalanceAlgorithm" => Some((F4, 2, false)),
         "Construction" => Some((F5, 0, true)),
+        "ElectricEquipment" => Some((ELECTRIC, 10, true)),
         "OtherEquipment" => Some((OTHER, 11, true)),
         "People" => Some((PEOPLE, 10, true)),
         "Exterior:Lights" => Some((EXTERIOR_LIGHTS, 0, true)),

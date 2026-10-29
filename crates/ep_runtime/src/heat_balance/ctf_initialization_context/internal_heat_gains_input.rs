@@ -10,6 +10,7 @@ mod allocations;
 mod comfort_people;
 pub(crate) use comfort_people::SourcePeopleArray;
 mod devices;
+mod electric;
 mod getter;
 mod nominal;
 pub(super) mod observation;
@@ -125,7 +126,7 @@ impl SourceOtherFuel {
 
 /// One genuine ZoneEquipData row; rates/energies retain their constructor zero.
 #[derive(Clone, Debug, Default, PartialEq)]
-pub(crate) struct SourceOtherEquipment {
+pub(crate) struct SourceZoneEquipData {
     pub(crate) name: String,
     pub(crate) space_index: i32,
     pub(crate) zone_ptr: i32,
@@ -135,6 +136,9 @@ pub(crate) struct SourceOtherEquipment {
     /// Actual ZoneEquipData constructorfalse/zero; written only by genuine EMS.
     pub(crate) ems_zone_equipment_override_on: bool,
     pub(crate) ems_equipment_power: f64,
+    // Same real ZoneEquipData demand-manager fields; no admission of managers.
+    pub(crate) manage_demand: bool,
+    pub(crate) demand_limit: f64,
     pub(crate) nominal_min_design_level: f64,
     pub(crate) nominal_max_design_level: f64,
     pub(crate) fraction_latent: f64,
@@ -274,8 +278,9 @@ pub(crate) struct SourceGainAllocations {
     pub(crate) zone_electric_end_use: Option<Vec<[[f64; 26]; 4]>>,
     // RefrigCaseCreditData four genuine ctor-zero credit fields.
     pub(crate) refrigeration_credit: Option<Vec<[f64; 4]>>,
-    pub(crate) other_equipment: Option<Vec<SourceOtherEquipment>>,
-    pub(crate) co2_generation: Option<Vec<SourceOtherEquipment>>,
+    pub(crate) electric_equipment: Option<Vec<SourceZoneEquipData>>,
+    pub(crate) other_equipment: Option<Vec<SourceZoneEquipData>>,
+    pub(crate) co2_generation: Option<Vec<SourceZoneEquipData>>,
 }
 
 /// Sole retained InternalHeatGains module state and reached DataHeatBalance owners.

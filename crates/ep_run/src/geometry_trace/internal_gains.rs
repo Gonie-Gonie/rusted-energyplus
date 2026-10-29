@@ -113,6 +113,9 @@ fn target(value: Option<OrdinaryGainRateTarget>) -> Value {
         Some(OrdinaryGainRateTarget::People { row_index, field }) => {
             json!({"kind":"People","index":row_index+1,"field":field})
         }
+        Some(OrdinaryGainRateTarget::ElectricEquipment { row_index, field }) => {
+            json!({"kind":"ZoneElectric","index":row_index+1,"field":field})
+        }
     }
 }
 
