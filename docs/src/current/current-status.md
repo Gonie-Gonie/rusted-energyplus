@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 Space, SpaceList and ZoneList additions. Legal-value completion remains tracked
 per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 151 paired physical cases and 4,010,430 reported values with zero
+contains 152 paired physical cases and 4,068,246 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -122,10 +122,28 @@ total-gain selectors, no object nominal rows and a genuinely absent MTR file.
 Whole EIO, ERR, DXF, CTF and warmup checks pass. Private gain allocations remain
 separate owner-test evidence. Native default-Space effective floor in the zero
 case is inferred from public Zone floor and its sole default Space; actual
-Source geometry reports its floor directly. Positive ZoneList compositions with
-authored Spaces or nonempty SpaceLists, multiple/remainder Spaces, Space heat
+Source geometry reports its floor directly. Other ZoneList/Space combinations, multiple/remainder Spaces, Space heat
 balance, Source B and arbitrary combinations remain unvalidated. The class
 inherits no frozen capability.
+Source A now also composes positive ZoneLists with authored whole-Zone Spaces
+and nonempty SpaceLists. One case compares all 612 series, 57,816 values and
+419 public joins, including 58 nominal owners and all three People/equipment
+sizing methods. The same-name singleton ZoneList wins over a SpaceList that
+points at the other Space. Initial raw Zulu Space floor 6 remains in the input;
+the later positive explicit Zone floor 12 sets its sole final Space floor to 12
+before sizing. Actual Count/schedule contributions establish every per-person
+equipment design; Source also exports the real linked enclosure floor 12.
+This does not test a final Space-6/Zone-12 ratio. All eight System streams and
+768 samples are genuine zeros. Whole EIO, ERR, DXF, CTF and 30-day warmup checks
+pass under the existing limits. The original wrong-phase reader and the Source
+count-key preflight failure remain retained; that preflight launched no engine.
+The single Native launch is retained; the single Source child reuses Build100,
+with no new Rust changes, tests, build or QA credit. There are still 97 recorded
+builds, 93 with accepted pairs and the same four unaccepted builds. Group
+compositions with authored Spaces/nonempty SpaceLists, other ZoneList/Space
+combinations, Source B, multiple/remainder Spaces and Space heat balance remain
+unvalidated.
+
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
 the getter's Ceiling alias. Exact reverse Material
@@ -133,16 +151,16 @@ identity retains the Native fast path; differing counts or layer identities use
 an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
 retain Native's warning sequence. Infrared-transparent constructions retain
 their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
-and list factors and opposite coincident vertices. Twenty-three 24-hour two-Zone
-cases cover 499,776 derived values with zero tolerance or RMSE failures;
-the maximum absolute difference is 3.54702933691442e-11. Actual Zone/Space and enclosure links,
+and list factors and opposite coincident vertices. Twenty-four 24-hour two-Zone
+cases cover 557,592 derived values with zero tolerance or RMSE failures;
+the maximum absolute difference is 3.8198777474462986e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Multiple/remainder Spaces, Space heat balance, Source B authored Spaces,
 Group compositions with authored Spaces or nonempty SpaceLists, Source B groups
 and multi-Zone HVAC remain open, as do broader interzone combinations.
 Source closure can complete collinear edge points in a temporary copy while
 retaining authored Surface vertices and volume inputs. Open-zone fallbacks remain held.
-Actual device and Zone W/J sums agree with all thirteen Facility Hourly meters;
+Actual device and Zone W/J joins and Facility sums use their recorded public factors;
 None contributes heat without a resource report or meter.
 
 The reversed two-layer and unequal two/three-layer cases also match all emitted
