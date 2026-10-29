@@ -57,7 +57,7 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
     Ok(())
 }
 
-pub(super) fn other_equipment_target(raw: &RawModel, reference: &str) -> bool {
+pub(super) fn gain_target(raw: &RawModel, reference: &str) -> bool {
     // Native Zone lookup precedes Space and ZoneList. Authored Space families
     // remain rejected by the enclosing stage; no trimmed alias is invented.
     raw.objects

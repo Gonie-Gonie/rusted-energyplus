@@ -685,6 +685,7 @@ impl<'a> Compiler<'a> {
             model.week_schedule_names = NameMap::source_schedule_namespace();
             model.schedule_type_limit_names = NameMap::source_schedule_namespace();
             model.other_equipment_names = NameMap::source_exact_namespace();
+            model.people_names = NameMap::source_exact_namespace();
             model.zone_list_names = NameMap::source_exact_namespace();
         }
 
@@ -13764,7 +13765,7 @@ impl<'a> Compiler<'a> {
                 continue;
             }
             let Some((target, target_instances)) =
-                self.other_equipment_input_targets(model, &name, &object)
+                self.internal_gain_input_targets(model, "OtherEquipment", &name, &object)
             else {
                 continue;
             };
@@ -13942,73 +13943,83 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_people(&mut self, model: &mut TypedModel) {
-        for (name, object) in self.objects("People") {
-            let Some(zone_name) = self.source_reference_name(
-                "People",
-                &name,
-                &object,
-                "zone_or_zonelist_or_space_or_spacelist_name",
-            ) else {
-                continue;
-            };
+        'inputs: for (name, object) in self.objects("People") {
+            // Official RE2 ^.*\S.*$: ASCII whitespace excludes vertical tab.
+            // Preserve every authored Source name byte, including boundaries.
             if self.source_file_declarations
-                && self.source_raw_object_name("Zone", &zone_name).is_none()
+                && (name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' ')))
             {
                 self.error(
-                    "MissingReference",
+                    "InvalidName",
                     "People",
                     Some(&name),
-                    Some("zone_or_zonelist_or_space_or_spacelist_name"),
-                    "Source People remains limited to its exact actual direct Zone reference"
-                        .into(),
+                    None,
+                    "People name must match the actual epJSON name pattern".into(),
                 );
                 continue;
             }
-            let Some(zone) = self.resolve_name(
-                &model.zone_names,
-                "People",
-                &name,
-                "zone_or_zonelist_or_space_or_spacelist_name",
-                &zone_name,
-                "Zone",
-            ) else {
+            let Some((target, target_instances)) =
+                self.internal_gain_input_targets(model, "People", &name, &object)
+            else {
                 continue;
             };
             let number_of_people_schedule = self.people_schedule_reference(model, &name, &object);
-            let Some(id_value) = self.checked_id("People", &name, model.people.len()) else {
-                continue;
-            };
-            let id = InternalGainId(id_value);
-            if model.people_names.insert(&name, id).is_some() {
-                self.duplicate_name("People", &name);
-                continue;
+            let first_instance = model.people.len();
+            let mut instances = Vec::with_capacity(target_instances.len());
+            for (zone, instance_name) in target_instances {
+                let Some(id_value) =
+                    self.checked_id("People", &name, first_instance + instances.len())
+                else {
+                    continue 'inputs;
+                };
+                let id = InternalGainId(id_value);
+                if self.source_file_declarations {
+                    // Native setupIHGZonesAndSpaces and SetupOutputVariable keep
+                    // every generated owner even when their report keys coincide.
+                    model.people_names.insert_instance(&instance_name, id);
+                } else if model.people_names.insert(&instance_name, id).is_some() {
+                    self.duplicate_name("People", &instance_name);
+                    continue 'inputs;
+                }
+                instances.push((id, zone, instance_name));
             }
-
-            model.people.push(People {
-                id,
-                name: NormalizedName::new(&name),
-                zone,
-                number_of_people_schedule,
-                number_of_people_calculation_method: self.enum_default(
-                    "People",
-                    &name,
-                    (&object, "number_of_people_calculation_method"),
-                    PeopleNumberCalculationMethod::People,
-                    "People",
-                    parse_people_number_calculation_method,
-                ),
-                number_of_people: self.people_number_default(&name, &object, "number_of_people"),
-                people_per_floor_area: self.people_number_default(
-                    &name,
-                    &object,
-                    "people_per_floor_area",
-                ),
-                floor_area_per_person: self.people_number_default(
-                    &name,
-                    &object,
-                    "floor_area_per_person",
-                ),
-            });
+            let number_of_people_calculation_method = self.enum_default(
+                "People",
+                &name,
+                (&object, "number_of_people_calculation_method"),
+                PeopleNumberCalculationMethod::People,
+                "People",
+                parse_people_number_calculation_method,
+            );
+            let number_of_people = self.people_number_default(&name, &object, "number_of_people");
+            let people_per_floor_area =
+                self.people_number_default(&name, &object, "people_per_floor_area");
+            let floor_area_per_person =
+                self.people_number_default(&name, &object, "floor_area_per_person");
+            for (id, zone, instance_name) in instances {
+                model.people.push(People {
+                    id,
+                    name: model.people_names.normalized_name(&instance_name),
+                    zone,
+                    number_of_people_schedule,
+                    number_of_people_calculation_method,
+                    number_of_people,
+                    people_per_floor_area,
+                    floor_area_per_person,
+                });
+            }
+            if self.source_file_declarations {
+                model
+                    .source_people_inputs
+                    .push(ep_model::SourcePeopleInput {
+                        object_name: name,
+                        target,
+                        instances: first_instance..model.people.len(),
+                    });
+            }
         }
     }
 

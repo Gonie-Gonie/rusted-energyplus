@@ -179,6 +179,7 @@ fn resolve_raw(
                 && matches!(
                     family.0.as_str(),
                     "OtherEquipment"
+                        | "People"
                         | "ZoneList"
                         | "ScheduleTypeLimits"
                         | "Schedule:Constant"
@@ -510,7 +511,10 @@ fn resolve_raw(
                         .is_some_and(|value| value >= 0.0)
                 }
                 "Material:InfraredTransparent" => source_irt_family,
-                "People" => source_people_family && people::admitted_object(raw, object),
+                "People" => {
+                    source_people_family
+                        && people::admitted_object(raw, object, source_zone_list_ingress)
+                }
                 "OtherEquipment" => {
                     (selected(object, "fuel_type", &["None"])
                         || source_calendar_ingress
@@ -655,7 +659,7 @@ fn resolve_raw(
                 if family == "OtherEquipment"
                     && !match field(object, "zone_or_zonelist_or_space_or_spacelist_name") {
                         Some(RawValue::String(name)) if source_zone_list_ingress => {
-                            zone_lists::other_equipment_target(raw, name)
+                            zone_lists::gain_target(raw, name)
                         }
                         _ => text(object, "zone_or_zonelist_or_space_or_spacelist_name")
                             .is_some_and(|name| {
@@ -1203,10 +1207,78 @@ mod tests {
                 invalid[family] = serde_json::json!({"held":{}});
                 assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
             }
-            let mut invalid = list_case.clone();
-            invalid["People"] = serde_json::json!({"held":{"zone_or_zonelist_or_space_or_spacelist_name":"Both",
-                "number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}});
-            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            // Unit95: People uses the same retained ordered list input. All
+            // three sizing operands stay authored for the genuine People getter.
+            for method in ["People", "People/Area", "Area/Person"] {
+                let mut occupants = list_case.clone();
+                occupants["People"] = serde_json::json!({
+                    "List P":{"zone_or_zonelist_or_space_or_spacelist_name":"Both",
+                        "number_of_people_schedule_name":"On","activity_level_schedule_name":"On",
+                        "number_of_people_calculation_method":method,"number_of_people":2,
+                        "people_per_floor_area":0.25,"floor_area_per_person":8},
+                    "Shadow P":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha",
+                        "number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}});
+                let text = occupants.to_string();
+                for staged in [false, true] {
+                    let raw = if staged {
+                        ep_raw_model::parse_epjson_str_with_idf_order(
+                            &text,
+                            &format!(
+                                "Zone,Zulu;Zone,Alpha;Schedule:Constant,On,,1;ZoneList,Both,Zulu,Alpha;ZoneList,Alpha,Zulu;People,List P,Both,On,{method},2,0.25,8,0.3,0.6,On;People,Shadow P,Alpha,On,People,1,,,0.3,0.6,On;OtherEquipment,Load,,Both,On,EquipmentLevel,23;OtherEquipment,Shadow,,Alpha,On,EquipmentLevel,7;"
+                            ),
+                        )?
+                    } else {
+                        parse_epjson_str(&text)?
+                    };
+                    resolve_source_a(&raw)?;
+                    assert!(resolve_source_b(&raw).is_err() && resolve(&raw).is_err());
+                    let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+                    let fields = ip.source_raw_object_fields("People", "List P")?;
+                    assert_eq!(fields["number_of_people"], V::Number("2".into()));
+                    assert_eq!(fields["people_per_floor_area"], V::Number("0.25".into()));
+                    assert_eq!(fields["floor_area_per_person"], V::Number("8".into()));
+                    let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+                    assert_eq!(projected.objects["People"].len(), 2);
+                    let result = ep_compiler::compile_raw_model_for_source(&raw);
+                    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+                    let typed = result.model.ok_or("real Source People list instances")?;
+                    assert_eq!(typed.people.len(), 3);
+                    assert_eq!(typed.source_people_inputs[0].instances, 0..2);
+                    assert_eq!(typed.source_people_inputs[1].instances, 2..3);
+                    assert_eq!(
+                        typed
+                            .people
+                            .iter()
+                            .map(|p| p.name.0.as_str())
+                            .collect::<Vec<_>>(),
+                        ["ZULU LIST P", "ALPHA LIST P", "SHADOW P"]
+                    );
+                    for (id, row) in typed.people.iter().enumerate() {
+                        assert_eq!(usize::try_from(row.id.0)?, id);
+                        assert_eq!(typed.people_names.names()[id], row.name);
+                    }
+                }
+                occupants["People"]["List P"]["zone_or_zonelist_or_space_or_spacelist_name"] =
+                    serde_json::json!(" Both ");
+                assert!(resolve_source_a(&parse_epjson_str(&occupants.to_string())?).is_err());
+            }
+            for name in ["\u{000b}", "\u{00a0}", " P ", "P "] {
+                let mut occupants = list_case.clone();
+                occupants["People"] = serde_json::json!({(name):{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha",
+                    "number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}});
+                let raw = parse_epjson_str(&occupants.to_string())?;
+                resolve_source_a(&raw)?;
+                let typed = ep_compiler::compile_raw_model_for_source(&raw)
+                    .model
+                    .ok_or("exact People name")?;
+                assert_eq!(typed.people[0].name.0, name.to_ascii_uppercase());
+            }
+            for name in ["", " \t\r\u{000c}", "P\nQ"] {
+                let mut occupants = list_case.clone();
+                occupants["People"] = serde_json::json!({(name):{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha",
+                    "number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}});
+                assert!(resolve_source_a(&parse_epjson_str(&occupants.to_string())?).is_err());
+            }
         }
         // Unit91 composes the existing People sizing/field/reference rules
         // with real direct Zone names; no comfort or CO2 default is replaced.

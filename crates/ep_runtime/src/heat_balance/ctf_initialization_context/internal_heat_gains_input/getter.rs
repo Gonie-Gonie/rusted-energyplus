@@ -18,7 +18,7 @@ use crate::heat_balance::source_output_registration::{
     SourceOutputFileHost, SourceOutputRegistration,
 };
 use crate::weather::day::WeatherGlobalState;
-use ep_model::ReportInputs;
+use ep_model::{ReportInputs, TypedModel};
 use std::io::Write;
 
 pub(super) const FAMILIES: [&str; 10] = [
@@ -35,6 +35,7 @@ pub(super) const FAMILIES: [&str; 10] = [
 ];
 
 pub(super) struct SourceGainInputOwners<'a, 'b> {
+    pub(super) model: &'a TypedModel,
     pub(super) raw: &'a SelectedHeatBalanceInput,
     pub(super) input: &'a mut SelectedInputProcessor,
     pub(super) globals: &'a SelectedHeatBalanceGlobals,
@@ -324,9 +325,6 @@ impl SelectedInternalHeatGains {
                 .as_ref()
                 .and_then(|lists| lists.iter().find(|list| list.name == target))
             {
-                if family != "OtherEquipment" {
-                    return Err(unavailable("positive People ZoneList expansion"));
-                }
                 if list.typed_zone_list_id.is_none() {
                     return Err(unavailable("unbound actual Source ZoneList"));
                 }
@@ -387,6 +385,9 @@ impl SelectedInternalHeatGains {
                 .backend
                 .show_continue_error("...These will not be read in.  Other errors may occur.")?;
             self.totals[kind] = 0;
+        }
+        if family == "People" && !local_errors {
+            check_people_input_association(&misc, owners)?;
         }
         Ok(Some(misc))
     }
@@ -659,6 +660,152 @@ impl SelectedInternalHeatGains {
         }
         Ok(())
     }
+}
+
+// Bind only genuine input identities. This does not replace Native raw-order
+// rows with typed arena order, nor derive a Native spaceStartPtr from typed IDs.
+fn check_people_input_association(
+    misc: &[SourceMiscGainObject],
+    owners: &SourceGainInputOwners<'_, '_>,
+) -> Result<(), E> {
+    let bindings = &owners.model.source_people_inputs;
+    if bindings.is_empty() && !misc.iter().any(|row| row.zone_list_active) {
+        // Older direct getter boundary fixtures predate explicit Source input
+        // associations. Positive list expansion always requires the real map.
+        return Ok(());
+    }
+    if bindings.len() != misc.len() {
+        return Err(unavailable("People raw/typed object association count"));
+    }
+    let zones = owners
+        .zones
+        .zones
+        .as_deref()
+        .ok_or_else(|| unavailable("People association actual Zones"))?;
+    let spaces = owners
+        .zones
+        .spaces
+        .as_deref()
+        .ok_or_else(|| unavailable("People association actual Spaces"))?;
+    let mut seen = vec![false; owners.model.people.len()];
+    let raw_rows = owners
+        .raw
+        .objects
+        .get("People")
+        .ok_or_else(|| unavailable("People retained raw family identity"))?;
+    if raw_rows.len() != misc.len() {
+        return Err(unavailable("People retained raw ordinal count"));
+    }
+    for (ordinal, object) in misc.iter().enumerate() {
+        let raw = &raw_rows[ordinal];
+        let matching = bindings
+            .iter()
+            .filter(|binding| binding.object_name == raw.object_name)
+            .collect::<Vec<_>>();
+        if matching.len() != 1 {
+            return Err(unavailable("People exact raw object association"));
+        }
+        let binding = matching[0];
+        if raw.object_name.to_ascii_uppercase() != object.name {
+            return Err(unavailable("People retained raw/Native name association"));
+        }
+        let target = match raw
+            .fields
+            .get("zone_or_zonelist_or_space_or_spacelist_name")
+        {
+            Some(ProjectInputValue::String(value)) => value.to_ascii_uppercase(),
+            _ => return Err(unavailable("People retained raw target identity")),
+        };
+        let rows = owners
+            .model
+            .people
+            .get(binding.instances.clone())
+            .ok_or_else(|| unavailable("People actual dense typed instance range"))?;
+        if rows.len() != object.space_nums.len()
+            || rows.len() != object.names.len()
+            || usize::try_from(object.num_spaces).ok() != Some(rows.len())
+            || rows.is_empty()
+        {
+            return Err(unavailable("People raw/typed expanded instance count"));
+        }
+        match binding.target {
+            ep_model::SourcePeopleInputTarget::Zone(id) => {
+                if object.zone_list_active
+                    || rows.len() != 1
+                    || rows[0].zone != id
+                    || !zones
+                        .iter()
+                        .any(|zone| zone.typed_zone_id == Some(id) && zone.name == target)
+                {
+                    return Err(unavailable("People direct Zone precedence association"));
+                }
+            }
+            ep_model::SourcePeopleInputTarget::ZoneList(id) => {
+                let lists = owners
+                    .zones
+                    .zone_lists
+                    .as_deref()
+                    .ok_or_else(|| unavailable("People actual ZoneList allocation"))?;
+                let lists = lists
+                    .iter()
+                    .filter(|list| list.typed_zone_list_id == Some(id))
+                    .collect::<Vec<_>>();
+                let actual_zones = object
+                    .space_nums
+                    .iter()
+                    .map(|&number| {
+                        spaces
+                            .get(index(number)?)
+                            .map(|space| space.zone_num)
+                            .ok_or_else(|| unavailable("People list member Space/Zone owner"))
+                    })
+                    .collect::<Result<Vec<_>, E>>()?;
+                if !object.zone_list_active
+                    || lists.len() != 1
+                    || lists[0].name != target
+                    || lists[0].zone.as_deref() != Some(actual_zones.as_slice())
+                {
+                    return Err(unavailable("People actual ordered ZoneList association"));
+                }
+            }
+        }
+        for (position, row) in rows.iter().enumerate() {
+            let at = binding.instances.start + position;
+            let slot = seen
+                .get_mut(at)
+                .ok_or_else(|| unavailable("People typed range coverage"))?;
+            let space = spaces
+                .get(index(object.space_nums[position])?)
+                .ok_or_else(|| unavailable("People actual expanded Space"))?;
+            let zone = zones
+                .get(index(space.zone_num)?)
+                .ok_or_else(|| unavailable("People actual expanded Zone"))?;
+            let typed_space = owners
+                .model
+                .spaces
+                .iter()
+                .find(|typed| Some(typed.id) == space.typed_space_id)
+                .ok_or_else(|| unavailable("People genuine typed implicit Space"))?;
+            if *slot
+                || usize::try_from(row.id.0).ok() != Some(at)
+                || row.name.0 != object.names[position]
+                || zone.typed_zone_id != Some(row.zone)
+                || typed_space.zone != row.zone
+                || typed_space.origin != ep_model::SpaceOrigin::AutoZoneDefault
+                || zone.num_spaces != 1
+                || zone.space_indexes.as_slice() != [object.space_nums[position]]
+            {
+                return Err(unavailable(
+                    "People typed instance/name/Zone/implicit-Space bijection",
+                ));
+            }
+            *slot = true;
+        }
+    }
+    if seen.iter().any(|seen| !seen) {
+        return Err(unavailable("People complete typed instance coverage"));
+    }
+    Ok(())
 }
 
 // New per-area diagnostics require actual Source phase owners. Legacy entry

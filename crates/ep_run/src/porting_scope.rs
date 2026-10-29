@@ -413,6 +413,51 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         if cursor != model.other_equipment.len() {
             violations.push("Source OtherEquipment ranges must cover all actual instances".into());
         }
+        let mut cursor = 0;
+        for binding in &model.source_people_inputs {
+            let range = binding.instances.clone();
+            if range.start != cursor || range.is_empty() || range.end > model.people.len() {
+                violations.push("Source People raw-instance range is unavailable".into());
+                break;
+            }
+            let instances = &model.people[range.clone()];
+            if instances
+                .iter()
+                .enumerate()
+                .any(|(offset, row)| usize::try_from(row.id.0).ok() != Some(range.start + offset))
+            {
+                violations.push("Source People instance IDs must remain real and dense".into());
+            }
+            match binding.target {
+                ep_model::SourcePeopleInputTarget::Zone(zone) => {
+                    if instances.len() != 1 || instances[0].zone != zone {
+                        violations.push("Source People direct Zone association differs".into());
+                    }
+                }
+                ep_model::SourcePeopleInputTarget::ZoneList(id) => {
+                    if !model
+                        .zone_lists
+                        .iter()
+                        .find(|list| list.id == id)
+                        .is_some_and(|list| {
+                            list.zones.len() == instances.len()
+                                && list
+                                    .zones
+                                    .iter()
+                                    .zip(instances)
+                                    .all(|(zone, row)| *zone == row.zone)
+                        })
+                    {
+                        violations
+                            .push("Source People ordered ZoneList association differs".into());
+                    }
+                }
+            }
+            cursor = range.end;
+        }
+        if cursor != model.people.len() {
+            violations.push("Source People ranges must cover all actual instances".into());
+        }
     }
     if model.building.is_none()
         || model.global_geometry_rules.is_none()

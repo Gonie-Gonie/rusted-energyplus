@@ -42,14 +42,32 @@ pub struct OtherEquipment {
     pub carbon_dioxide_generation_rate_m3_per_s_w: f64,
 }
 
-/// Resolved raw OtherEquipment target for explicit Source input only.
+/// Resolved raw internal-gain target for explicit Source input only.
 /// These are typed input identities, not Native Source array numbers.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum SourceOtherEquipmentInputTarget {
+pub enum SourceGainInputTarget {
     /// Native lookup found a genuine Zone before considering lists.
     Zone(ZoneId),
     /// Native lookup found a genuine ZoneList after Zone/Space lookup.
     ZoneList(ZoneListId),
+}
+
+/// Existing OtherEquipment input-target API over the shared actual identity.
+pub type SourceOtherEquipmentInputTarget = SourceGainInputTarget;
+
+/// People input targets share the same genuine Zone and ZoneList identities.
+pub type SourcePeopleInputTarget = SourceGainInputTarget;
+
+/// Explicit raw People object and its actual dense typed instance range.
+/// Generated names may coincide; the ordered range preserves every owner.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SourcePeopleInput {
+    /// Exact original raw People key, separate from generated instance names.
+    pub object_name: String,
+    /// Actual resolved Zone or ZoneList identity.
+    pub target: SourcePeopleInputTarget,
+    /// Contiguous real IDs in TypedModel.people, not Native array numbers.
+    pub instances: std::ops::Range<usize>,
 }
 
 /// Explicit raw-object association with actual dense typed gain instances.

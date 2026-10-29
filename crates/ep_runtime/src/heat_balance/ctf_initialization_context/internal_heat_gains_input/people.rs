@@ -1,4 +1,4 @@
-//! Genuine direct People getter over retained IP, schedule and Zone/Space owners.
+//! Genuine People getter over retained IP, schedule and Zone/Space owners.
 use super::getter::SourceGainInputOwners;
 use super::{E, SelectedInternalHeatGains, SourceMiscGainObject, index, unavailable};
 use crate::heat_balance::error_backend::SourceDiagnosticFlags;
@@ -70,7 +70,9 @@ fn design_level(
         return Ok(0.0);
     }
     if method == 0 {
-        // The admitted direct Zone has exactly one real implicit Space.
+        // Every admitted member Zone has exactly one real implicit Space.
+        // Native3495-3516 therefore keeps spaceFrac=1.0 even when a
+        // ZoneList makes inputObject.numOfSpaces greater than one.
         return Ok(value * 1.0);
     }
     let space = owners

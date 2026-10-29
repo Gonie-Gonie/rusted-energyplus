@@ -4291,7 +4291,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     // Fresh reads from the genuine pre-getter checkpoint. These
                     // authored Space operands are independent of the Zone area;
                     // no geometry completion or remainder-space writer is claimed.
-                    let mut read_sizing = |mut candidate: CtfInitializationReports|
+                    let mut read_sizing = |mut candidate: CtfInitializationReports, typed_model: &TypedModel|
                      -> Result<_, Box<dyn std::error::Error>> {
                         let (mut state, mut errors, mut console, mut eio, mut eso) = (
                             ctf_ordinary_output_test_state(),
@@ -4318,7 +4318,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             },
                         }
                         .manage_selected_internal_heat_gains_input_with_dictionary(
-                            &people_model,
+                            typed_model,
                             15,
                             &mut gain_host,
                             Some(&clock),
@@ -4383,7 +4383,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         rows[1]
                             .fields
                             .insert("number_of_people".into(), ProjectInputValue::Number(0.0));
-                        let (candidate, state, errors, _, reached) = read_sizing(candidate)?;
+                        let (candidate, state, errors, _, reached) = read_sizing(candidate, &people_model)?;
                         assert!(reached.is_ok(), "{method}/{selected:?}: {reached:?}");
                         let gains = &candidate.selected_internal_heat_gains;
                         assert_eq!(
@@ -4457,7 +4457,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 ProjectInputValue::Number(0.02),
                             );
                         }
-                        let (candidate, state, errors, eio, reached) = read_sizing(candidate)?;
+                        let (candidate, state, errors, eio, reached) = read_sizing(candidate, &people_model)?;
                         assert!(reached.is_err(), "invalid selected sizing completed");
                         assert!(candidate.selected_internal_heat_gains.get_input_flag);
                         assert!(candidate.selected_internal_heat_gains.errors_found);
@@ -4599,7 +4599,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             local.numeric_field_blanks[4],
                             sensible_token != Some("Autocalculate")
                         );
-                        let (mut candidate, state, _, _, reached) = read_sizing(candidate)?;
+                        let (mut candidate, state, _, _, reached) = read_sizing(candidate, &people_model)?;
                         assert!(reached.is_ok(), "automatic getter: {reached:?}");
                         assert_eq!(state.tracking.total_warning_errors, 0);
                         assert_eq!(
@@ -4666,7 +4666,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             );
                             row.fields.remove("sensible_heat_fraction");
                         }
-                        let (mut candidate, _, _, _, reached) = read_sizing(candidate)?;
+                        let (mut candidate, _, _, _, reached) = read_sizing(candidate, &people_model)?;
                         assert!(reached.is_ok(), "nonpositive automatic getter: {reached:?}");
                         let (reached, air) = run_auto(&mut candidate, None)?;
                         assert!(matches!(&reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable("same refrigeration selected official schema definition"))), "nonpositive automatic prefix: {reached:?}");
@@ -4816,6 +4816,147 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         );
                         Ok(candidate)
                     };
+                    // Unit95 authored owner checkpoint after the genuine Zone
+                    // getter above. Two explicit Zone/implicit-Space states and
+                    // a reverse list exercise the same live People getter. This
+                    // is not a completed two-Zone geometry certificate.
+                    for (method, operand, expected_by_zone) in [
+                        ("People", 2.0_f64, [2.0_f64, 2.0]),
+                        ("People/Area", 0.02, [2.0, 1.0]),
+                        ("Area/Person", 25.0, [4.0, 2.0]),
+                    ] {
+                        let mut candidate = person_case(
+                            "Watts/Person", Some(3.5), Some([1.5, 0.5]),
+                            "Constant-0.0", "None", false,
+                        )?;
+                        let mut list_model = people_model.clone();
+                        assert_eq!(list_model.zones.len(), 1);
+                        assert_eq!(list_model.spaces.len(), 1);
+                        let first_zone = list_model.zones[0].id;
+                        let second_zone = ep_model::ZoneId(1);
+                        let mut zone = list_model.zones[0].clone();
+                        zone.id = second_zone;
+                        zone.name = ep_model::NormalizedName::new("SECOND ZONE95");
+                        zone.spaces = vec![ep_model::SpaceId(1)];
+                        list_model.zones.push(zone);
+                        let mut space = list_model.spaces[0].clone();
+                        space.id = ep_model::SpaceId(1);
+                        space.zone = second_zone;
+                        space.name = ep_model::NormalizedName::new("SECOND ZONE95");
+                        list_model.spaces.push(space);
+                        let list_id = ep_model::ZoneListId(0);
+                        list_model.zone_lists = vec![ep_model::ZoneList {
+                            id: list_id,
+                            name: ep_model::NormalizedName::new("LIST95 REVERSE"),
+                            zones: vec![second_zone, first_zone],
+                            max_zone_name_length: zone_name.len().max("SECOND ZONE95".len()),
+                        }];
+                        let source = candidate.selected_zone_input.as_mut().ok_or("list People Zones")?;
+                        let zones = source.zones.as_mut().ok_or("list People Zone rows")?;
+                        let mut zone = zones[0].clone();
+                        zone.name = "SECOND ZONE95".into();
+                        zone.typed_zone_id = Some(second_zone);
+                        zone.space_indexes = vec![2];
+                        zones.push(zone);
+                        let spaces = source.spaces.as_mut().ok_or("list People Space rows")?;
+                        spaces[0].floor_area = 100.0;
+                        let mut space = spaces[0].clone();
+                        space.name = "SECOND ZONE95".into();
+                        space.typed_space_id = Some(ep_model::SpaceId(1));
+                        space.zone_num = 2;
+                        space.floor_area = 50.0;
+                        spaces.push(space);
+                        source.num_zone_lists = 1;
+                        source.zone_lists = Some(vec![Default::default()]);
+                        let list = &mut source.zone_lists.as_mut().ok_or("authored list owner")?[0];
+                        list.name = "LIST95 REVERSE".into();
+                        list.num_of_zones = 2;
+                        list.max_zone_name_length = zone_name.len().max("SECOND ZONE95".len());
+                        list.zone = Some(vec![2, 1]);
+                        list.typed_zone_list_id = Some(list_id);
+                        let globals = candidate.selected_heat_balance_globals.as_mut().ok_or("list People globals")?;
+                        globals.num_of_zones = 2;
+                        globals.num_spaces = 2;
+                        let raw = candidate.heat_balance_input.as_mut().ok_or("list People raw")?;
+                        let people = raw.objects.get_mut("People").ok_or("list People objects")?;
+                        let first_name = people[0].object_name.clone();
+                        let second_name = people[1].object_name.clone();
+                        people[0].fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(),
+                            ProjectInputValue::String("LIST95 REVERSE".into()));
+                        people[0].fields.insert("number_of_people_calculation_method".into(),
+                            ProjectInputValue::String(method.into()));
+                        let selected = match method {
+                            "People" => "number_of_people",
+                            "People/Area" => "people_per_floor_area",
+                            "Area/Person" => "floor_area_per_person",
+                            _ => return Err("authored list People method".into()),
+                        };
+                        for field in ["number_of_people", "people_per_floor_area", "floor_area_per_person"] {
+                            people[0].fields.insert(field.into(), ProjectInputValue::Number(if field == selected { operand } else { -7.0 }));
+                        }
+                        raw.objects.get_mut("OtherEquipment").ok_or("list per-person equipment")?[0].fields.insert(
+                            "zone_or_zonelist_or_space_or_spacelist_name".into(),
+                            ProjectInputValue::String("LIST95 REVERSE".into()));
+                        list_model.people = [
+                            (format!("SECOND ZONE95 {}", first_name.to_ascii_uppercase()), second_zone),
+                            (format!("{} {}", zone_name.to_ascii_uppercase(), first_name.to_ascii_uppercase()), first_zone),
+                            (second_name.to_ascii_uppercase(), first_zone),
+                        ].into_iter().enumerate().map(|(index, (name, zone))| ep_model::People {
+                            id: ep_model::InternalGainId(u32::try_from(index).expect("three authored People rows")),
+                            name: ep_model::NormalizedName(name), zone,
+                            number_of_people_schedule: Some(ep_model::PeopleScheduleReference::ConstantZero),
+                            number_of_people_calculation_method: match if index == 2 { "People" } else { method } {
+                                "People" => ep_model::PeopleNumberCalculationMethod::People,
+                                "People/Area" => ep_model::PeopleNumberCalculationMethod::PeoplePerArea,
+                                _ => ep_model::PeopleNumberCalculationMethod::AreaPerPerson,
+                            },
+                            number_of_people: if index == 2 { 0.5 } else if selected == "number_of_people" { operand } else { -7.0 },
+                            people_per_floor_area: if index == 2 { 0.0 } else if selected == "people_per_floor_area" { operand } else { -7.0 },
+                            floor_area_per_person: if index == 2 { 0.0 } else if selected == "floor_area_per_person" { operand } else { -7.0 },
+                        }).collect();
+                        list_model.source_people_inputs = vec![
+                            ep_model::SourcePeopleInput { object_name: first_name,
+                                target: ep_model::SourcePeopleInputTarget::ZoneList(list_id), instances: 0..2 },
+                            ep_model::SourcePeopleInput { object_name: second_name,
+                                target: ep_model::SourcePeopleInputTarget::Zone(first_zone), instances: 2..3 },
+                        ];
+                        let checkpoint = candidate.clone();
+                        let (candidate, state, errors, _, reached) = read_sizing(candidate, &list_model)?;
+                        assert!(reached.is_ok(), "genuine list People/{method}: {reached:?}");
+                        assert!(errors.is_empty());
+                        assert_eq!(state.tracking.total_warning_errors, 0);
+                        let gains = &candidate.selected_internal_heat_gains;
+                        assert_eq!(gains.totals[0], 3);
+                        assert_eq!(gains.totals[6], 2);
+                        assert_eq!(gains.allocations.people.rows.iter().map(|person|
+                            (person.name.as_str(), person.zone_ptr, person.space_index, person.number_of_people))
+                            .collect::<Vec<_>>(), [
+                                (list_model.people[0].name.0.as_str(), 2, 2, expected_by_zone[1]),
+                                (list_model.people[1].name.0.as_str(), 1, 1, expected_by_zone[0]),
+                                (list_model.people[2].name.0.as_str(), 1, 1, 0.5),
+                            ]);
+                        let source = candidate.selected_zone_input.as_ref().ok_or("list live totals")?;
+                        let totals = [expected_by_zone[0] + 0.5, expected_by_zone[1]];
+                        assert_eq!(source.zones.as_ref().ok_or("list Zone totals")?.iter()
+                            .map(|zone| zone.total_occupants).collect::<Vec<_>>(), totals);
+                        assert_eq!(source.spaces.as_ref().ok_or("list Space totals")?.iter()
+                            .map(|space| space.total_occupants).collect::<Vec<_>>(), totals);
+                        let equipment = gains.allocations.other_equipment.as_ref().ok_or("list Watts/Person rows")?;
+                        assert_eq!(equipment.iter().map(|row| (row.zone_ptr, row.design_level)).collect::<Vec<_>>(),
+                            [(2, totals[1] * 3.5), (1, totals[0] * 3.5)]);
+                        assert!(gains.allocations.people.rows.iter().all(|person|
+                            person.nom_min_number_people == 0.0 && person.nom_max_number_people == 0.0));
+                        // A broken typed range must stop before allocated People
+                        // mutation; no Native Fatal or successful result is invented.
+                        let mut invalid_model = list_model.clone();
+                        invalid_model.source_people_inputs[1].instances = 1..2;
+                        let (candidate, _, _, eio, reached) = read_sizing(checkpoint, &invalid_model)?;
+                        assert!(reached.is_err());
+                        assert!(candidate.selected_internal_heat_gains.get_input_flag);
+                        assert!(!candidate.selected_internal_heat_gains.allocations.people.allocated);
+                        assert!(candidate.selected_internal_heat_gains.allocations.people.rows.is_empty());
+                        assert!(eio.is_empty());
+                    }
                     let projected_negative =
                         ep_model::classify_source_json_number("18446744073709551615")
                             .map_err(|_| "per-person signed design total")?
@@ -4955,7 +5096,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     ] {
                         let candidate =
                             person_case(method, selected, counts, occupancy, fuel, prior_error)?;
-                        let (mut candidate, state, errors, eio, reached) = read_sizing(candidate)?;
+                        let (mut candidate, state, errors, eio, reached) = read_sizing(candidate, &people_model)?;
                         assert_eq!(
                             reached.is_ok(),
                             severe == 0,

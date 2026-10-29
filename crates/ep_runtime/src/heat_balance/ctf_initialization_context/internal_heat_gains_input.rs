@@ -387,6 +387,7 @@ impl CtfInitializationContext<'_> {
                 }
             });
             let mut owners = getter::SourceGainInputOwners {
+                model,
                 raw,
                 input,
                 globals,

@@ -248,12 +248,12 @@
     "OtherEquipment": [
       "The ordinary one-Zone opaque Source A/B route selects EquipmentLevel directly, multiplies Power/Area or Watts/Area by the genuine post-geometry Space floor area, or multiplies Power/Person or Watts/Person by the actual Space total_occupants written by the People getter. Design occupant totals remain distinct from current scheduled occupancy. Missing selected operands warn and return zero before the prior-error gate; nonblank per-person operands at or below zero produce their Severe before that gate. The per-person product is computed before the nonpositive-occupant warning and retains a negative result for fuel None; existing metered-fuel negative-design Severe/Continue follows. Finite unused numeric operands retain either sign. Convective fraction uses 1-(latent+radiant+lost), clamps an absolute residual at most 0.001 to zero, then checks negativity. Direct epJSON signed/unsigned/float projection, including UInt64MAX to signed-1, and ignored instance metadata of all six JSON kinds remain connected after known-field validation; idf_order, idf_max_fields and idf_max_extensible_fields stay separately recognized.",
       "None and thirteen non-Water fuels are connected: Electricity, NaturalGas, Gasoline, Diesel, Coal, Propane, FuelOilNo1, FuelOilNo2, OtherFuel1, OtherFuel2, DistrictCooling, DistrictHeatingWater and DistrictHeatingSteam. Object/Zone/Space rates and consumption use real resource meters, including NaturalGas Gas-IP predefined columns. Owner checks cover all thirteen and sizing/error/write-order branches. Same-input A/B evidence adds per-person sizing with genuine People design totals and different current occupancy while retaining every output policy; earlier evidence covers Electricity, its separate Hourly meter, bound object/Zone/implicit-Space thermal/fuel Timestep dictionaries and nonzero latent/radiant/lost fields. Real device caches, radiant enclosures, surface absorption, moisture balance and psychrometric consumers remain live. Source B retains existing NoLimit IdealLoads with no outdoor air and None humidity controls. Explicit/multiple Spaces, groups and EMS remain unsupported; other model/fraction restrictions remain as stated. This is bounded support, not full OtherEquipment input-domain completion.",
-      "SourceA multizone composes direct-Zone or positive ZoneList OtherEquipment with None/default or all thirteen non-Water fuels, genuine builtin/authored schedules, and direct-Zone People on existing implicit-Space geometry. Source names retain whitespace with ASCII-only folding and real arena identities; default legacy trimming and user Schedule IDs are unchanged. The direct-epJSON list witness expands three raw gains by authored member order into six real implicit-Space instances, exercising EquipmentLevel, Watts/Area and Watts/Person with unused negative operands preserved. Its 325 variable and13 real Hourly meter series cover31,512values,85fuel and64People joins under unchanged limits, plus generated-sizing and twelve genuine System-list output checks. Uncontrolled System-list loads may be zero; nonzero/reset/ordered/multiplier behavior is separate existing-owner-unit evidence. Existing literal keys A, space-A-space and A-space remain distinct; zero builtin0 None stays in Zone totals without a consumption report/meter. Source B lists, People list targets, ZoneGroup, SpaceList, authored Spaces, cross-Space case-only/CSV-sensitive names, HVAC and arbitrary combinations remain unestablished. No private gain/list/NameMap observer or full-object/frozen capability promotion is claimed."
+      "SourceA multizone composes direct-Zone or positive ZoneList OtherEquipment with None/default or all thirteen non-Water fuels, genuine builtin/authored schedules, and direct-Zone or ZoneList People on existing implicit-Space geometry. Source names retain whitespace with ASCII-only folding and real arena identities; default legacy trimming and user Schedule IDs are unchanged. The direct-epJSON list witness expands three raw gains by authored member order into six real implicit-Space instances, exercising EquipmentLevel, Watts/Area and Watts/Person with unused negative operands preserved. Its 325 variable and13 real Hourly meter series cover31,512values,85fuel and64People joins under unchanged limits, plus generated-sizing and twelve genuine System-list output checks. Uncontrolled System-list loads may be zero; nonzero/reset/ordered/multiplier behavior is separate existing-owner-unit evidence. Existing literal keys A, space-A-space and A-space remain distinct; zero builtin0 None stays in Zone totals without a consumption report/meter. Source B lists, ZoneGroup, SpaceList, authored Spaces, cross-Space case-only/CSV-sensitive names, HVAC and arbitrary combinations remain unestablished. No private gain/list/NameMap observer or full-object/frozen capability promotion is claimed. The additional People-list witness uses twelve actual People design-count contributions before the existing WattsPerson getter. Its selected5W/person input is unchanged while new actual nominal powers8.594W/4.844W reflect the live increased design totals; these rounded public observations are not injected expected outputs. All391+13series/37,848values and191joins retain original limits, including six generated gain sizing checks and the three literal names. Positive unused People2/3/5 are schema-valid; owner-only negative-operand checkpoints are distinct from this clean physical input."
     ],
     "People": [
       "Direct-Zone People uses the real single implicit Space, raw/IP defaults and counts, and genuine built-in or user occupancy schedules. People, People/Area and Area/Person select the actual numeric operand and Space floor area, preserving blank-first, selected-sign and prior-error diagnostics. Raw schema checks precede stored JSON-number conversion. Sensible fraction accepts explicit numeric values or omitted, empty and Autocalculate defaults; automatic sensible uses the same live Space MAT, retained Mixing RoomAir, Native polynomial and ordered clamps. Getter occupant totals, devices, rates/energy, Which bindings, nominal reporting and mandatory SimpleASH55 remain connected. Auxiliary comfort operands stay unconsumed when no optional model is selected, with the original count-sensitive warnings.",
-      "Fanger reporting connects EnclosureAveraged, SurfaceWeighted or AngleFactor MRT with ClothingInsulationSchedule, DynamicClothingModelASHRAE55 or CalculationMethodSchedule. Dynamic clothing uses the retained six-AM temperature owner and ordered Native formula without auxiliary method/clothing lookups. Calculation schedules use current value 1 for scheduled clothing and 2 for Dynamic; genuine hasVal(1) controls the getter clothing lookup, with no invented method-range or clothing bounds. Other method values retain Native warning/fallback and reached missing-pointer boundaries. SurfaceWeighted resolves the real selected Surface and radiant enclosure, retains separate Surface AE/enclAESum and comfort first-use/error flags, and uses ordered other-surface area-times-inside-absorptance weights with actual history temperatures. Selected-surface averaging, radReCalc and the first-warning-only Space MAT fallback preserve Native behavior; AngleFactor processes all lists in retained raw order with original blank/case identities and independent IDF delimiter/value counts, preserving the two Fatal stages around People association. Its ordered construction-absorptance-times-factor Kelvin fourth-power ratio uses genuine term1 histories. The common radiant-HVAC correction follows all three MRT methods. Actual work/air-velocity schedules, averaged Zone air/humidity and stateful RH/Psat feed real People temperature/RH and six People-keyed Zone/Average comfort outputs even at zero occupancy. AnkleDraftASH55 independently loops People without an occupancy filter and rereads genuine ASHRAE inputs using body area 1.8258, strict applicability, relative air velocity and Native PMV/logistic arithmetic. Its separate empty-unit Zone/Average PPD output retains -1 outside applicability. Same-input A/B evidence covers both-model and Ankle-only cases. With Fanger unselected, its six Fanger/common registrations are genuinely absent from ESO and RDD; every original pre-Fanger policy and the existing ankle criterion stays unchanged. The ASH route keeps its own clothing/operative writes without inventing Fanger report rows or People temperature/RH updates. Existing owner checks preserve the genuine fresh-Space CTF stop separately from physical closure. DisplayExtraWarnings reaches the same live project/global flag. Same-input A/B evidence compares complete ERR/END, including actual ankle recurring warnings, per-call totals, phase counts and extrema. Independent air/met/clothing checks retain Native comparisons, call order and literal units; other global extra-warning producers remain visible. NoSizing/NoLimit and empty monthly bounds remain. The other five comfort models, comfort-thermostat PNum/Tset, EMS, explicit/multiple Spaces, groups, positive non-Mixing RoomAir and positive Kiva/windows/shading remain unsupported. This is bounded support, not full People input-domain completion.",
-      "SourceA multizone additionally admits direct actual-Zone People with one implicit Space per Zone and the existing sizing/schedule/fraction/error/comfort rules. Six People exercise all3 sizing methods in a coupled mixed-fuel witness, retaining all195+13 prior policies and88 new Count/W/J selectors. Actual empty-unit Count uses original1e-9 scalar limits; one-decimal nominal EIO remains a rounded display. All64 People and73 fuel memberships pass original limits, including small nonzero radiant-energy sum deltas below1J. Actual latent rates and humidity vary, while the Activity schedule Warning/2Continues are retained. NoComfort is this witness choice rather than a new gate; default CO2 production is separate from unclaimed contaminant transport. No private People/moisture owner, grouped/explicit-Space/HVAC/arbitrary-combination or frozen/fullobject promotion."
+      "Fanger reporting connects EnclosureAveraged, SurfaceWeighted or AngleFactor MRT with ClothingInsulationSchedule, DynamicClothingModelASHRAE55 or CalculationMethodSchedule. Dynamic clothing uses the retained six-AM temperature owner and ordered Native formula without auxiliary method/clothing lookups. Calculation schedules use current value 1 for scheduled clothing and 2 for Dynamic; genuine hasVal(1) controls the getter clothing lookup, with no invented method-range or clothing bounds. Other method values retain Native warning/fallback and reached missing-pointer boundaries. SurfaceWeighted resolves the real selected Surface and radiant enclosure, retains separate Surface AE/enclAESum and comfort first-use/error flags, and uses ordered other-surface area-times-inside-absorptance weights with actual history temperatures. Selected-surface averaging, radReCalc and the first-warning-only Space MAT fallback preserve Native behavior; AngleFactor processes all lists in retained raw order with original blank/case identities and independent IDF delimiter/value counts, preserving the two Fatal stages around People association. Its ordered construction-absorptance-times-factor Kelvin fourth-power ratio uses genuine term1 histories. The common radiant-HVAC correction follows all three MRT methods. Actual work/air-velocity schedules, averaged Zone air/humidity and stateful RH/Psat feed real People temperature/RH and six People-keyed Zone/Average comfort outputs even at zero occupancy. AnkleDraftASH55 independently loops People without an occupancy filter and rereads genuine ASHRAE inputs using body area 1.8258, strict applicability, relative air velocity and Native PMV/logistic arithmetic. Its separate empty-unit Zone/Average PPD output retains -1 outside applicability. Same-input A/B evidence covers both-model and Ankle-only cases. With Fanger unselected, its six Fanger/common registrations are genuinely absent from ESO and RDD; every original pre-Fanger policy and the existing ankle criterion stays unchanged. The ASH route keeps its own clothing/operative writes without inventing Fanger report rows or People temperature/RH updates. Existing owner checks preserve the genuine fresh-Space CTF stop separately from physical closure. DisplayExtraWarnings reaches the same live project/global flag. Same-input A/B evidence compares complete ERR/END, including actual ankle recurring warnings, per-call totals, phase counts and extrema. Independent air/met/clothing checks retain Native comparisons, call order and literal units; other global extra-warning producers remain visible. NoSizing/NoLimit and empty monthly bounds remain. The other five comfort models, comfort-thermostat PNum/Tset, EMS, explicit/multiple Spaces, ZoneGroups, SpaceLists, Source B list targets, positive non-Mixing RoomAir and positive Kiva/windows/shading remain unsupported. This is bounded support, not full People input-domain completion.",
+      "SourceA also expands positive ZoneList People targets in authored member order into real instances on each implicit Space. Direct Zone targets retain Zone-first precedence over a same-name list. All three People sizing methods keep the selected operand and raw-to-instance range; unused numeric fields remain present and must satisfy the unconditional official schema minimum0. The directepJSON witness adds three raw People with selected .125,1/192 and384 and distinct unused positive2/3/5, yielding nine raw and twelve actual People. Actual Count/Schedule and floor/nominal associations retain1e-9; fixed/scientific nominal display cells use mantissa precision plus exponent without relaxing unrounded Count or whole EIO bytes. All106 People and85 fuel joins pass original limits across391variable/13realmeter series and37,848values. Genuine Zone/Space design occupant totals accumulate before retained OtherEquipment WattsPerson, independently of current scheduled occupancy. All12Count/thermal/moisture and mandatory existing owner rules stay live; NoComfort is the witness choice. SourceB list targets, ZoneGroup, SpaceList, authoredSpaces, general generated-name collisions, HVAC/arbitrary combinations and private People/list/NameMap or full-object/frozen-capability claims remain open."
     ],
     "ComfortViewFactorAngles": [
       "ComfortViewFactorAngles remains RawOnly and uses the genuine Source A/B raw/IP getter without a TypedModel arena. Original blank, whitespace and case-variant names, JSON or declaration order, optional partial rows and harmless instance/row metadata retain raw custody; reserved IDF metadata stays separate. Six shared arrays reset within actual schema-derived capacity, preserving numeric origins, field names, blank flags, counts and exact usage identities. IDF delimiter and parsed-value events retain independent fixed/extensible counts and the true-EOF unattached-array behavior. Every list, including unused lists, reaches ordered Surface/enclosure and sum checks before the first Fatal; first retained uppercase-name People association precedes the second Fatal. Actual construction absorptance, angle factors and term1 surface histories feed AngleFactor MRT and the shared radiant-HVAC correction. Same-input A/B evidence bounds these paths; arbitrary list/model combinations and full family completion remain outside this claim."
@@ -264,7 +264,7 @@
       "Five finite cases retain unchanged policies: two B102 Ground/Adiabatic and three derived A105 reciprocal IRT profiles,49824samples. Exposed IDF and directepJSON omitted/empty defaults retain raw metadata/exposure state, real format-specific owner IDs, 3/2 warning counts with all Warning/Continue records retained and final cleared paired flags. Complete physical streams and actual EIO/ERR/requested DXF/emptyMTR retain precise identity/EOL qualifications. Earlier read-only metadata recovery stays separate immutable provenance. Native private MaterialBase/ROnly/CTF owners and typed exposure enum fields remain unobserved; Source ROnly is unexposed. Exterior/report/CondFD/window/Space/grouping and arbitrary combinations stay bounded."
     ],
     "ZoneList": [
-      "Explicit Source A accepts positive ZoneLists on closed opaque implicit-Space geometry. The actual GetZoneData getter retains authored member order, source-name diagnostics and typed-Zone bijections; a same-name Zone wins before a ZoneList for OtherEquipment targets. OtherEquipment expands into real per-Space arena instances with Source-prefixed names and the selected EquipmentLevel, Watts/Area or Watts/Person operand. The four genuine Zone List Sensible Heating/Cooling Energy/Rate outputs use System Sum/Average owners and ordered HVAC reductions with Zone.Multiplier only. The direct-epJSON physical witness covers three lists, six generated instances and twelve complete System streams under original limits; uncontrolled loads are legitimately zero. Existing real-owner tests separately check nonzero/reset/order/multiplier behavior. IDF metadata/order branches have existing-table coverage, not a new IDF physical pair. Source B, People list targets, ZoneGroup, SpaceList, authored Spaces, HVAC and arbitrary legal combinations remain outside this bounded increment."
+      "Explicit Source A accepts positive ZoneLists on closed opaque implicit-Space geometry for OtherEquipment and People. The real GetZoneData getter retains authored member order, source diagnostics and typed-Zone bijections; a same-name Zone wins before a list for direct targets. Both families expand to genuine per-Space instances with Source-prefixed names and retained selected sizing operands. People design/min/max totals reach actual Zone/Space owners before OtherEquipment per-person sizing. The four genuine Zone List Sensible Heating/Cooling Energy/Rate outputs retain System Sum/Average owners and ordered HVAC reductions using Zone.Multiplier only. Fresh directepJSON evidence covers three lists,raw9People?12instances andraw21OtherEquipment?24instances,all191publicjoins and391+13series under unchanged limits. Twelve uncontrolled System streams are complete zeros; nonzero/reset/order/multiplier behavior remains separate existing real-owner unit evidence. IDF metadata/order has existing-table coverage, not a new physical pair. SourceB lists,ZoneGroup,SpaceList,authoredSpaces,general name collisions,HVAC/arbitrary legal combinations and full-object/conformance completion remain unestablished."
     ]
   },
   "verification": {
@@ -4371,6 +4371,293 @@
           "bytes": 10080
         },
         "qualification": "Q03 four intended tests ran1/pass; two wrong exact filters ran0 and are retained without execution credit. Only those two corrected filters are run in Q04, each requires actual1test/1passed. Source41 bytes unchanged; reused fmt/clippy/featurecompile/four successful tests apply exactly."
+      },
+      "People_ZoneList_95": {
+        "actual_quality": {
+          "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/receipt.json",
+          "sha256": "b5e224936a0b02c4de224af6567692e9b95ed1f0ac84d9ab6a21daf8f97e13d6",
+          "bytes": 8989
+        },
+        "code_authority": {
+          "path": ".runtime/object-expansion/unit95-prep/final-formatted-code-authority.json",
+          "sha256": "2effb390ad9f24b12e4dee53c8922b1fb8d664e73fde4080475bffc0c8388f0d",
+          "bytes": 14498
+        },
+        "commands": [
+          {
+            "name": "format",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "fmt",
+              "-p",
+              "ep_model",
+              "-p",
+              "ep_compiler",
+              "-p",
+              "ep_run",
+              "-p",
+              "ep_runtime"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/format.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "fmt-check",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "fmt",
+              "-p",
+              "ep_model",
+              "-p",
+              "ep_compiler",
+              "-p",
+              "ep_run",
+              "-p",
+              "ep_runtime",
+              "--",
+              "--check"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/fmt-check.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          },
+          {
+            "name": "clippy",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "clippy",
+              "--locked",
+              "--offline",
+              "-p",
+              "ep_model",
+              "-p",
+              "ep_compiler",
+              "-p",
+              "ep_run",
+              "-p",
+              "ep_runtime",
+              "-p",
+              "ep_cli",
+              "--all-targets",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/clippy.log",
+              "sha256": "f0919f506a34ae02ea572fb2e0b76643e5fe127409bb491d9aa8853979270582",
+              "bytes": 580
+            }
+          },
+          {
+            "name": "cohort-api-check",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "check",
+              "--locked",
+              "--offline",
+              "-p",
+              "ep_runtime",
+              "--features",
+              "native-controlled-air-cohort",
+              "--test",
+              "native_controlled_air_cohort"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/cohort-api-check.log",
+              "sha256": "388355354d7bb25332b5d491b79ccf0809976e8761cfa39acf2e5ca5290c03e5",
+              "bytes": 1469097
+            }
+          },
+          {
+            "name": "compiler-gains-test",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "--locked",
+              "--offline",
+              "-p",
+              "ep_compiler",
+              "--lib",
+              "compiler::tests::internal_heat_gains::direct_zone_people_and_other_equipment_use_existing_typed_arenas",
+              "--",
+              "--exact"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/compiler-gains-test.log",
+              "sha256": "f6164ea9456e972d404ff64d8ba6f1ff2b5b520bc7ccd759f57a1985925b5ff1",
+              "bytes": 911
+            }
+          },
+          {
+            "name": "raw-admission-test",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "--locked",
+              "--offline",
+              "-p",
+              "ep_run",
+              "--lib",
+              "ordinary_equipment_input::tests::raw_equipment_admission_preserves_empty_presence_and_rejects_positive_or_field_branches",
+              "--",
+              "--exact"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/raw-admission-test.log",
+              "sha256": "e7834e841a1142dec135c6bfe834d6f56a116cf63e48112233c32a4e6482c154",
+              "bytes": 1402
+            }
+          },
+          {
+            "name": "scope-test",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "--locked",
+              "--offline",
+              "-p",
+              "ep_run",
+              "--lib",
+              "porting_scope::tests::closed_opaque_faces_reach_source_layout_and_view_factor_kernel",
+              "--",
+              "--exact"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/scope-test.log",
+              "sha256": "151d646a9e3cada1738b216d2fbda4e833f6c455c1925eb0c30aecaa907322a8",
+              "bytes": 677
+            }
+          },
+          {
+            "name": "runtime-people-test",
+            "argv": [
+              "C:/Users/GonieGonie/.cargo/bin/cargo.exe",
+              "test",
+              "--locked",
+              "--offline",
+              "-p",
+              "ep_runtime",
+              "--lib",
+              "runtime::tests::ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle",
+              "--",
+              "--exact"
+            ],
+            "exit_code": 0,
+            "log": {
+              "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/runtime-people-test.log",
+              "sha256": "c2e9336ec046c667c835da15d0ffff7ca01937ea63f9b5caed7611aa656dfd6f",
+              "bytes": 792
+            }
+          }
+        ],
+        "tested_source_hashes": [
+          {
+            "path": "crates/ep_model/src/objects/internal_gains.rs",
+            "sha256": "51a9f9984d175b14e43d2a17561dfc68fd54e2d22a3aebc37769ff00cf2e3091",
+            "bytes": 5413
+          },
+          {
+            "path": "crates/ep_model/src/model.rs",
+            "sha256": "4652e90973d5e831524f1a353d00e6eb75a1023c94467ce48eca363309d32170",
+            "bytes": 95421
+          },
+          {
+            "path": "crates/ep_model/src/names.rs",
+            "sha256": "98716226b8d07b2d677960d8a74059452b4157789e82ebf5dd7740c88b2cfbd4",
+            "bytes": 3820
+          },
+          {
+            "path": "crates/ep_compiler/src/compiler/internal_heat_gains.rs",
+            "sha256": "ed0fa90ffbf5078500fde307392f177530b48feb9fb6f2077b0756a5c4bda362",
+            "bytes": 12479
+          },
+          {
+            "path": "crates/ep_compiler/src/compiler.rs",
+            "sha256": "d694c252b36bd49130040e28ab13a432c8b769ff4d77d4f586cc064eafb158c8",
+            "bytes": 811876
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_equipment_input/zone_lists.rs",
+            "sha256": "c018d230040ed402237c9e139cc661a87eeac5d4c99a3d33ee39a2b272c0f5a1",
+            "bytes": 2860
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_equipment_input/people.rs",
+            "sha256": "d008a10aecde8cdc30bd9463c3533f919bec59568f3f76e113745bcf135a2308",
+            "bytes": 13015
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+            "sha256": "02a66864049615ac2c077e21aaf88c5142a5b1a3596cda4c743b21e0750ac88d",
+            "bytes": 214991
+          },
+          {
+            "path": "crates/ep_run/src/porting_scope.rs",
+            "sha256": "fbb6a3a7904ab6fd9bee61a6a6dcfffd3d9c702f88a789626e9245fe1585e69a",
+            "bytes": 25603
+          },
+          {
+            "path": "crates/ep_run/src/porting_scope/tests.rs",
+            "sha256": "461020e25492b9f050fbaf5ff86727849edea457ab52c1bcbfd31098cc11adce",
+            "bytes": 154776
+          },
+          {
+            "path": "crates/ep_compiler/src/compiler/tests/internal_heat_gains.rs",
+            "sha256": "feaab477514edd927c57fc5d61bf3368e07b2c6f9284fc4252269367d60824f8",
+            "bytes": 42960
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/getter.rs",
+            "sha256": "cfc8660b4db42f8bdc99dcdc35aba4c30a7c1abf5736b1ad2c9a25efd290bb82",
+            "bytes": 38721
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input/people.rs",
+            "sha256": "db387cd28f5f086b6da5fe25a285ef6be1eb998215c1ef9570e80565fa1fd6cc",
+            "bytes": 35722
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/ctf_initialization_context/internal_heat_gains_input.rs",
+            "sha256": "342db7c575d7a770d65f777063ad278d664381513db3d714ad7e3e6f8c82b99b",
+            "bytes": 19255
+          },
+          {
+            "path": "crates/ep_runtime/src/runtime/tests/ctf_ordinary_outputs.rs",
+            "sha256": "2225970481cde7a0f674f58e7d188b19b1dc804e8425d01652d994b0601778eb",
+            "bytes": 465507
+          }
+        ],
+        "successful_existing_test_executions": 4,
+        "new_test_functions": 0,
+        "optional_cohort_execution": false,
+        "optional_cohort_compile_only": true,
+        "retained_precheck_failure_receipts": [
+          {
+            "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality01/receipt.json",
+            "sha256": "ac88ddeac90530e4669d4fb27d7520f13364a3398b7679cc088722448334513e",
+            "bytes": 5326
+          },
+          {
+            "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality02/receipt.json",
+            "sha256": "b83479d2595bf2dccc5e6a6e5d73e51a55673cc1b97720db90ddc6e434fcc1fc",
+            "bytes": 5326
+          }
+        ],
+        "retained_prechecks_test_executions": 0,
+        "qualification": "Only four actual selected existing tests each running1/1passed receive credit. Earlier Q01/Q02 stop at Clippy101 before tests/build/engine; their format/compile checks remain quality provenance. No duplicate full suite or extra Source build/actor is counted."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -4380,7 +4667,7 @@
       "bytes": 45145
     },
     "policy_changes": 0,
-    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration. The two Source77 Ceiling-alias models retain every original A55-variable/3-meter and B102-variable/no-meter policy without selector or numerical changes. Actual raw/typed Ceiling links by exact typedID to retained Source Roof class3. Complete EIO body bytes exclude only the first Program Version record; all334 A DXF logical records exclude only one Program Version999 payload and line-ending encoding. Native private class is not observed. Earlier Source76A engine0 was unaccepted solely for a missing current-primary observer artifact; B76 was never launched and no76 samples enter accepted totals. The two Source79 IRT B models each retain all original102Timestepvariable policies/9792values with no selector or numerical changes, genuine absent MTR/DXF, all EIO records (91 total) except the first ProgramVersion record, and exact ERR body after only its first identity and final elapsed-time payload. Actual Warning/Continue, finalIRTcategory and Warmup/Sizing state remain included. Native78 is reused without replay. Source78 Ground engine6 stopped for missing IDF metadata before physical output, with no Adiabatic launch or accepted numerical evidence; actual changed code/build79 is separate. The disconnected two-Zone A pilot uses105 explicit derived selectors (50 perZone plus5shared), preserving all55 originalA policy origins and every units/stage/frequency/atol/rtol/RMSE field; only keys are duplicated/renamed. Its10080finite operands are raw/binary64 equal, with exact whole-stream structure and genuine removed-producer emptyMTR lifecycle. Complete117-record EIO excludes only first identity, wholeERR includes unused-schedule information, and533DXF logical pairs exclude only one ProgramVersion999/EOL. This is not originalA55/3meter or frozen-case conformance; its new Source class has no matched one-Zone capability IDs or promotion. The normal reciprocal-Wall A witness reuses exactly the same105 derived rows/keys and55 originalA policy origins, with original numeric limits and all8 reports on each shared face. Its10080finite values include7321raw/binary64 differences, all passing original point/RMSE policies. Actual returned positive Source IDs reciprocate across distinct Zones/Spaces; complete117-record EIO/wholeERR/533-pair DXF and genuine emptyMTR retain the existing identity/duration/EOL exclusions. This finite single-layer R13 Wall case does not establish all interzone or IRT combinations. The proper paired-IRT witness retains all105 derived A selectors and original numeric limits,97 actual EIO records except the first identity, complete ERR except identity/elapsed-time payload,533 DXF pairs except the sole ProgramVersion payload/EOL and genuine emptyMTR. Its sole engine0 output is accepted by a separate strict read-only one-Name IDF-metadata correction; the original false verifier result is retained without an engine replay or extra build. Paired-Wall exposure/default variants preserve per-format raw absence/empty/value and one-Name IDF versus unannotated epJSON provenance; exact labels/order and final retained ext_solar/ext_wind accompany all105 unchanged physical policies and complete streams/ancillary records. Typed exposure enums and Native private owners are not invented. Equal-count reverse normal opaque stacks are checked by full material identity/order and actual Source LayerPoint, never inferred thermal equivalence. Actual nominal arrays are copied unchanged and all reached public Construction/CTF report records match at emitted precision; private coefficient/history arrays are unrepresented. A rejected warmup reference and the separate pre-Source maximum-days revision preserve all model/comparison tolerances. Unequal normal opaque counts use actual finite Source NominalU owner slots and the source-defined absolute0.001 criterion; complete2/3LayerPoint and four-material links plus all138EIO/publicCTF/ERR/DXF/emptyMTR and105 unchanged policies are retained. The finite same-input2vs3 witness does not establish arbitrary layer/family combinations. Equal-count normal Material-ID mismatches reach actual BOTH-group and nominal-owner checks plus exact Warning/Continue/suppression effects. The two-triangle-pair witness retains105unchanged rows+16predeclaredkeycopies under original limits:121series/11616values/all5WarningContinue records/137EIO/publicCTF/579DXF/emptyMTR. Source Wind/latches/local are direct; internal path labels are inference, Native private state unobserved. Normal opaque horizontal class relations retain all105 unchanged rows/all55 origins, full137EIO/5publicCTF/wholeERR/533DXF/emptyMTR and actual Source class3/2/reciprocal12m2 ownership. Authored DisplayExtraWarnings accompanies the source-defined horizontal azimuth/SinTilt skip; this is qualified source inference, not a serialized execution marker or Native private flag. Separate electric-gain and collinear witnesses share one actual Build88. The first retains105 baseline+16 predeclared WJ rows and real Hourly FacilityMTR24 under original scalar limits; the second retains105+8 key copies/original13quad World rows and genuine emptyMTR. Complete public streams/whole EIO/ERR/DXF pass, without private gain/member/initial/Newell/temp projections or joint-cross-product completion. The mixed-fuel two-Zone witness retains all121 previous variable policies and the old Electricity meter row, with74 predeclared additional W/J selectors and12 additional Hourly resource meters. Complete195-variable/18720-value ESO and13-meter/312-value MTR preserve original .001W/1J scalar limits, exact dictionaries/clock joins/footerEOF and serial binary64 SSE/RMSE. All73 public device/Zone/resource/Facility memberships pass; None contributes thermal output while resource catalogs/meters remain absent. No input-derived expected output or private member projection is used. The direct-Zone People witness retains every195 variable and13 meter policy from the mixed-fuel case and adds88 Count/W/J rows. Genuine empty Count units and separate quantity metadata use originalA2 scalar1e-9 limits without a ScheduleValue alias; W/J keep original.001W/1J. All64 People+73 fuel exact-clock memberships pass, with actual small nonzero radiant-energy sums retained. Public Count/Schedule sizing reads real floor/nominal records without replacing output arrays; nominal decimal rounding does not relax unrounded Count. Whole160EIO/ERR1Warning2Continue/533DXF and positive13MTR remain strict; latent/humidity evidence does not establish contaminant transport or private People state. The builtin-schedule witness preserves all283 variable and13 meter policies, including genuine empty Count units. Actual public nominal Constant-1.0/Constant-0.0 names and exact two-field semantic input changes accompany positive Alpha and zero None complete series; zero None remains in all73 fuel sums. People64 retains small nonzero radiant-energy sums under1J. Whole160EIO/ERR1Warning2Continue/533DXF/real13MTR stay strict; no private builtin schedule/ID projection or authored expected output is used. The directepJSON literal-name witness keeps all283 prior variable and13 meter policies and adds six predeclared W.001/J1 selectors. Keys A, space-A-space and A-space use ASCII folding without trim in literal dictionary/owner/policy/member binding; fresh IDs/order/clocks/fullEOF stay strict. All18 thermals include oldzeroNone and three positive None streams;73fuel+64People joins retain original limits and tiny nonzero J sums. Whole163EIO/ERR1Warning2Continue with genuine JSON field title/533DXF/real13MTR pass. Original normal0 Source93 runtime diagnostic mismatch stays outside paired totals in its own ledger. No private NameMap fields, expected arrays, label waiver or general stale-source fallback. The ZoneList OtherEquipment witness preserves every289 prior variable and13 meter row and appends24 generated-device and12 genuine System-list W/J selectors under unchanged limits. Actual24nominal/21raw associations, all149public joins, live selected sizing and whole169EIO/2Warnings3Continues/533DXF/real13MTR remain strict. Twelve uncontrolled System streams are complete zeros; nonzero/reset/ordered/Zone.Multiplier behavior is separate existing real-owner unit evidence, not a private Native member observation. Same-name Zone precedence, three literal names and authored member order are retained. IDF metadata/order has selected existing-test coverage; this new physical pair is directepJSON only.",
+    "comparison_contract": "Complete physical ESO/MTR dictionaries, IDs, environments, timestamps, intervals, counts, footers, EOF and all reported operands. Original named absolute/RMSE tolerances remain unchanged; Program Version payload may differ. Added direct-month Ground temperature uses exact zero limits. Added Electricity:Facility ESO/MTR rows have a separate explicitly derived raw/binary64-exact0/0/0 contract, never an original named policy identity. All-frequency added ExteriorLights:Electricity energy Value/Min/Max roles separately derive the original named Hourly1J/0rtol/1J-RMSE policy; integer extrema dates are exact, Annual0 has structural-only checks and no fabricated numeric metrics. The A59 JSON-number case retains original58 policies plus a separate96-sample Constant Schedule Value raw/binary64-exact0/0/0 rule and physical MTR3/72. Its Source37 regression reuses the same sole Native36 calibration/input/weather; no new Native37 run. Physical reports do not establish lexical negative-zero sign custody, which is checked separately by parser/compiler/input-consumer bodies. No added rule is an original named policy identity or frozen-case promotion. The two Source73 reporting-DFA A models each request only one complete96-sample Zone Mean Timestep series, with genuine absent MTR on both sides. Their derived100k Zone key rebinds only the original A named selector; original1e-6/0/1e-6 numerical limits and complete physical dictionary/clock/count/footer/EOF checks remain unchanged. They do not claim the frozen original58-series A profile or whole process stderr equality. The two Source74 minimum-frequency A models retain the complete sole Zone Mean24-sample Hourly ESO and original3-meter72-sample MTR. Only the named Zone Mean frequency selector changes toHourly; its original numerical limits and all meter policy rows remain unchanged. Both retain96physical zone steps at4/hour, exact dictionaries/clocks/counts/footer/EOF, exact EIO override records and actual ERR warning/Continue counters. They do not claim the frozen58-series A profile. The two Source75 Zone-multiplier2 models retain all original A55variable/3meter and B102variable/no-meter profiles without selector or numerical policy derivation. Complete dictionaries/clocks/counts/footer/EOF and exact Zone EIO2/list1 agree. These are derived inputs; the A fuelNone/+352/-352W physical case does not prove nonzero internal fuel-meter scaling, while separately authored live EnergyTransfer/shared normal-meter factor1/2/i32MAX tests do not exercise OtherEquipment fuel registration. The two Source77 Ceiling-alias models retain every original A55-variable/3-meter and B102-variable/no-meter policy without selector or numerical changes. Actual raw/typed Ceiling links by exact typedID to retained Source Roof class3. Complete EIO body bytes exclude only the first Program Version record; all334 A DXF logical records exclude only one Program Version999 payload and line-ending encoding. Native private class is not observed. Earlier Source76A engine0 was unaccepted solely for a missing current-primary observer artifact; B76 was never launched and no76 samples enter accepted totals. The two Source79 IRT B models each retain all original102Timestepvariable policies/9792values with no selector or numerical changes, genuine absent MTR/DXF, all EIO records (91 total) except the first ProgramVersion record, and exact ERR body after only its first identity and final elapsed-time payload. Actual Warning/Continue, finalIRTcategory and Warmup/Sizing state remain included. Native78 is reused without replay. Source78 Ground engine6 stopped for missing IDF metadata before physical output, with no Adiabatic launch or accepted numerical evidence; actual changed code/build79 is separate. The disconnected two-Zone A pilot uses105 explicit derived selectors (50 perZone plus5shared), preserving all55 originalA policy origins and every units/stage/frequency/atol/rtol/RMSE field; only keys are duplicated/renamed. Its10080finite operands are raw/binary64 equal, with exact whole-stream structure and genuine removed-producer emptyMTR lifecycle. Complete117-record EIO excludes only first identity, wholeERR includes unused-schedule information, and533DXF logical pairs exclude only one ProgramVersion999/EOL. This is not originalA55/3meter or frozen-case conformance; its new Source class has no matched one-Zone capability IDs or promotion. The normal reciprocal-Wall A witness reuses exactly the same105 derived rows/keys and55 originalA policy origins, with original numeric limits and all8 reports on each shared face. Its10080finite values include7321raw/binary64 differences, all passing original point/RMSE policies. Actual returned positive Source IDs reciprocate across distinct Zones/Spaces; complete117-record EIO/wholeERR/533-pair DXF and genuine emptyMTR retain the existing identity/duration/EOL exclusions. This finite single-layer R13 Wall case does not establish all interzone or IRT combinations. The proper paired-IRT witness retains all105 derived A selectors and original numeric limits,97 actual EIO records except the first identity, complete ERR except identity/elapsed-time payload,533 DXF pairs except the sole ProgramVersion payload/EOL and genuine emptyMTR. Its sole engine0 output is accepted by a separate strict read-only one-Name IDF-metadata correction; the original false verifier result is retained without an engine replay or extra build. Paired-Wall exposure/default variants preserve per-format raw absence/empty/value and one-Name IDF versus unannotated epJSON provenance; exact labels/order and final retained ext_solar/ext_wind accompany all105 unchanged physical policies and complete streams/ancillary records. Typed exposure enums and Native private owners are not invented. Equal-count reverse normal opaque stacks are checked by full material identity/order and actual Source LayerPoint, never inferred thermal equivalence. Actual nominal arrays are copied unchanged and all reached public Construction/CTF report records match at emitted precision; private coefficient/history arrays are unrepresented. A rejected warmup reference and the separate pre-Source maximum-days revision preserve all model/comparison tolerances. Unequal normal opaque counts use actual finite Source NominalU owner slots and the source-defined absolute0.001 criterion; complete2/3LayerPoint and four-material links plus all138EIO/publicCTF/ERR/DXF/emptyMTR and105 unchanged policies are retained. The finite same-input2vs3 witness does not establish arbitrary layer/family combinations. Equal-count normal Material-ID mismatches reach actual BOTH-group and nominal-owner checks plus exact Warning/Continue/suppression effects. The two-triangle-pair witness retains105unchanged rows+16predeclaredkeycopies under original limits:121series/11616values/all5WarningContinue records/137EIO/publicCTF/579DXF/emptyMTR. Source Wind/latches/local are direct; internal path labels are inference, Native private state unobserved. Normal opaque horizontal class relations retain all105 unchanged rows/all55 origins, full137EIO/5publicCTF/wholeERR/533DXF/emptyMTR and actual Source class3/2/reciprocal12m2 ownership. Authored DisplayExtraWarnings accompanies the source-defined horizontal azimuth/SinTilt skip; this is qualified source inference, not a serialized execution marker or Native private flag. Separate electric-gain and collinear witnesses share one actual Build88. The first retains105 baseline+16 predeclared WJ rows and real Hourly FacilityMTR24 under original scalar limits; the second retains105+8 key copies/original13quad World rows and genuine emptyMTR. Complete public streams/whole EIO/ERR/DXF pass, without private gain/member/initial/Newell/temp projections or joint-cross-product completion. The mixed-fuel two-Zone witness retains all121 previous variable policies and the old Electricity meter row, with74 predeclared additional W/J selectors and12 additional Hourly resource meters. Complete195-variable/18720-value ESO and13-meter/312-value MTR preserve original .001W/1J scalar limits, exact dictionaries/clock joins/footerEOF and serial binary64 SSE/RMSE. All73 public device/Zone/resource/Facility memberships pass; None contributes thermal output while resource catalogs/meters remain absent. No input-derived expected output or private member projection is used. The direct-Zone People witness retains every195 variable and13 meter policy from the mixed-fuel case and adds88 Count/W/J rows. Genuine empty Count units and separate quantity metadata use originalA2 scalar1e-9 limits without a ScheduleValue alias; W/J keep original.001W/1J. All64 People+73 fuel exact-clock memberships pass, with actual small nonzero radiant-energy sums retained. Public Count/Schedule sizing reads real floor/nominal records without replacing output arrays; nominal decimal rounding does not relax unrounded Count. Whole160EIO/ERR1Warning2Continue/533DXF and positive13MTR remain strict; latent/humidity evidence does not establish contaminant transport or private People state. The builtin-schedule witness preserves all283 variable and13 meter policies, including genuine empty Count units. Actual public nominal Constant-1.0/Constant-0.0 names and exact two-field semantic input changes accompany positive Alpha and zero None complete series; zero None remains in all73 fuel sums. People64 retains small nonzero radiant-energy sums under1J. Whole160EIO/ERR1Warning2Continue/533DXF/real13MTR stay strict; no private builtin schedule/ID projection or authored expected output is used. The directepJSON literal-name witness keeps all283 prior variable and13 meter policies and adds six predeclared W.001/J1 selectors. Keys A, space-A-space and A-space use ASCII folding without trim in literal dictionary/owner/policy/member binding; fresh IDs/order/clocks/fullEOF stay strict. All18 thermals include oldzeroNone and three positive None streams;73fuel+64People joins retain original limits and tiny nonzero J sums. Whole163EIO/ERR1Warning2Continue with genuine JSON field title/533DXF/real13MTR pass. Original normal0 Source93 runtime diagnostic mismatch stays outside paired totals in its own ledger. No private NameMap fields, expected arrays, label waiver or general stale-source fallback. The ZoneList OtherEquipment witness preserves every289 prior variable and13 meter row and appends24 generated-device and12 genuine System-list W/J selectors under unchanged limits. Actual24nominal/21raw associations, all149public joins, live selected sizing and whole169EIO/2Warnings3Continues/533DXF/real13MTR remain strict. Twelve uncontrolled System streams are complete zeros; nonzero/reset/ordered/Zone.Multiplier behavior is separate existing real-owner unit evidence, not a private Native member observation. Same-name Zone precedence, three literal names and authored member order are retained. IDF metadata/order has selected existing-test coverage; this new physical pair is directepJSON only. The People ZoneList witness preserves all325prior variable and13meter policies and adds66Zone-stage Count/W/J selectors under original limits. Raw9People expand into12realinstances,all106People+85fueljoins remain strict,and actual design totals feed retainedOtherEquipment WattsPerson before equipment scheduling. Actual175EIO/2Warnings3Continues/533DXF/13realMTR and complete391+13series/37,848values are fresh. Nominal6.3E-002/3.1E-002 displays use mantissa precision plus exponent; unroundedCount1e-9 and wholeEIO byte equality stay unchanged. Twelve System rows are exactly313..324,while newPeople325..390 stayZone. Positiveunused2/3/5 satisfy unconditionalPeople schema minimum0; the negative-unused draft remains unlaunched and is distinct from owner-only unit checkpoints. No private People/list/NameMap array or arbitrary combination promotion.",
     "cases": [
       {
         "id": "timestep-8",
@@ -40971,12 +41258,1222 @@
           "private_People_gain_list_member_moisture_owners_observed": false,
           "qualification": "All169 raw EIO records except first identity, full ERR except first identity/final elapsed,533 DXF logical pairs except sole ProgramVersion999/EOL and complete338physical series pass. Actual2Warnings3Continues include the same-name ZoneList warning. No private gain/list owner or expected output arrays."
         }
+      },
+      {
+        "id": "A-MULTIZONE-LIST-PEOPLE-24H",
+        "group": "People_ZoneList",
+        "source_build": "people-zonelist-95",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit95-prep/people-zonelist-pilot-proposal/A-MULTIZONE-LIST-PEOPLE-24H/input.epJSON",
+          "sha256": "beafe760f921eeb55a853337c8c1dc0ba7cdea522674ee0071eab40c052b51d2",
+          "bytes": 118934
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/people-zonelist-95/native-01/A-MULTIZONE-LIST-PEOPLE-24H/command/receipt.json",
+          "sha256": "92f971d1930f51b813873bdb6a9f66146b4d81dcfc71e21354172bdbef282b77",
+          "bytes": 11039
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/command/receipt.json",
+          "sha256": "3a97de86ad90331bddb2c7a3ea25bf1e9ae2965c62bc74405829eebea0a8ec63",
+          "bytes": 9707
+        },
+        "source_summary": {
+          "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/run-summary.json",
+          "sha256": "4a679f60849d59da30029c167f1f99588794bce8e38b20c140f11e475be4a4eb",
+          "bytes": 138440
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-95/eplus-rs.exe",
+          "sha256": "22465a0bb2f4fcaf92ebe9fcbe7f1e9d6a76219b739305d85ec9d3663b9523ce",
+          "bytes": 78811232
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/7a/7a63a788ec366fb99dea8062b3f5f4a2a7ca1c408095f45b1c070e3f7e57b4e2",
+          "sha256": "7a63a788ec366fb99dea8062b3f5f4a2a7ca1c408095f45b1c070e3f7e57b4e2"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-95/receipt.json",
+          "sha256": "66d4379848178004f78a147b48a221b35cfd1ea62bcc4736ad01cbe48baff560",
+          "bytes": 6064
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/comparison.json",
+          "sha256": "f2632107373fbaab8926b448212dc4869ebc4741f67a6590db2e320070da58e3",
+          "bytes": 1041672
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit95-prep/people-zonelist-source-ready-proposal/plan.json",
+          "sha256": "a6452af4ad59fd9dde1e89affbf6f82ec4727c3cf4309b29915dd63aad2bb8cc",
+          "bytes": 442890
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit95-prep/people-zonelist-pilot-proposal/proposal.json",
+          "sha256": "47bc88c2630936c4ea948df7b7912e12efff0f3441a142b7b74a2fc9aca0d8e3",
+          "bytes": 82643
+        },
+        "totals": {
+          "series": 404,
+          "samples": 37848,
+          "raw_operand_unequal": 7259,
+          "parsed_binary64_unequal": 7259,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "input_format": "epJSON",
+        "full_reported_stream_scope": {
+          "ESO": "Complete391variables/37,536values/397dictionaryentries/96Zoneclocks.",
+          "MTR": "Genuine13FacilityHourlyseries/312values/19dictionaryentries/24clocks/footerEOF.",
+          "original_full_reported_profile_rows": false,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit95-prep/people-zonelist-pilot-proposal/A-MULTIZONE-LIST-PEOPLE-24H/derived-policy.json",
+            "sha256": "9d1fe04f71f852f62cdaf24c5946304b4f61fe68e457dd9d3bfe7eff95c63223",
+            "bytes": 367223
+          },
+          "original_325_variable_rows_exact_prefix": true,
+          "all13_meter_policies_exact": true,
+          "original_A_policy_indices_covered": 55,
+          "additional_generated_People_variables": 66,
+          "all_original_variable_and_meter_policy_rows": false,
+          "numerical_limits_changed": false,
+          "literal_key_binding": "ASCII a-z folding only; no trim or public key rewriting.",
+          "Count_units": "",
+          "System_policy_indices": [
+            313,
+            314,
+            315,
+            316,
+            317,
+            318,
+            319,
+            320,
+            321,
+            322,
+            323,
+            324
+          ],
+          "new_People_Zone_policy_indices": [
+            325,
+            326,
+            327,
+            328,
+            329,
+            330,
+            331,
+            332,
+            333,
+            334,
+            335,
+            336,
+            337,
+            338,
+            339,
+            340,
+            341,
+            342,
+            343,
+            344,
+            345,
+            346,
+            347,
+            348,
+            349,
+            350,
+            351,
+            352,
+            353,
+            354,
+            355,
+            356,
+            357,
+            358,
+            359,
+            360,
+            361,
+            362,
+            363,
+            364,
+            365,
+            366,
+            367,
+            368,
+            369,
+            370,
+            371,
+            372,
+            373,
+            374,
+            375,
+            376,
+            377,
+            378,
+            379,
+            380,
+            381,
+            382,
+            383,
+            384,
+            385,
+            386,
+            387,
+            388,
+            389,
+            390
+          ],
+          "qualification": "All325 prior variable and13 meter rows remain exact. New66People rows retain A2 Count1e-9/A5 .001W/meterA0 1J limits and Zone stage. Only inherited indices313..324 are System. Nominal fixed/scientific display handling changes no physical scalar OR/serialSSE/RMSE or wholeEIO policy."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 3.54702933691442e-11,
+          "max_rmse_delta": 8.762003230002707e-12,
+          "streams": [
+            {
+              "stream": "eso",
+              "records": 37536,
+              "timestamp_rows": 96,
+              "deleted_empty": false,
+              "series": 391
+            },
+            {
+              "stream": "mtr",
+              "records": 312,
+              "timestamp_rows": 24,
+              "deleted_empty": false,
+              "series": 13
+            }
+          ]
+        },
+        "effective_state": "Explicit SourceA ZoneList People expands real instances and accumulates genuine Zone/Space design occupant totals before OtherEquipment WattsPerson. Selected sizing and distinct positive unused operands remain raw; directZone precedence and literal names survive. Nominal Count display cells support fixed/scientific text without relaxingCount1e-9 or wholeEIO. SourceB lists,SpaceList,ZoneGroup,authoredSpace,HVAC and arbitrary/full-domain combinations remain open.",
+        "current_primary_observation": {
+          "original_quad_surfaces": 12,
+          "compiled_geometry": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/compiled-geometry.json",
+            "sha256": "4a23681480f09e39b292f5b6ff9ab451ccbc9ac352161030ef3faad73273fc16",
+            "bytes": 35708
+          },
+          "geometry_consumers": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/geometry-consumers.json",
+            "sha256": "45d456ac9ace70e0790f607b2c7e2438a4ace79d8f770f4ea8962fbb13f80e98",
+            "bytes": 58256
+          },
+          "Source_converted": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/input/converted.epJSON",
+            "sha256": "beafe760f921eeb55a853337c8c1dc0ba7cdea522674ee0071eab40c052b51d2",
+            "bytes": 118934
+          },
+          "declared_compiled_retained_Worldbits_exact": true,
+          "actual_shared_pair": [
+            {
+              "name": "ZULU:ROOF001",
+              "id": 12,
+              "class": 3,
+              "zone_id": 2,
+              "space_id": 2,
+              "construction_id": 5,
+              "outside_boundary": 5
+            },
+            {
+              "name": "ALPHA:FLR001",
+              "id": 5,
+              "class": 2,
+              "zone_id": 1,
+              "space_id": 1,
+              "construction_id": 1,
+              "outside_boundary": 12
+            }
+          ],
+          "actual_reversed_LayerPoint_sequences": [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "actual_NominalU_slots": [
+            {
+              "construction_id": 5,
+              "name": "ZULU C5 R13 WALL 84",
+              "actual_NominalU": {
+                "value": 0.4255954926829538,
+                "value_bits": "3fdb3cf4e0997da6"
+              }
+            },
+            {
+              "construction_id": 1,
+              "name": "ALPHA R13 C5 WALL 84",
+              "actual_NominalU": {
+                "value": 0.4255954926829538,
+                "value_bits": "3fdb3cf4e0997da6"
+              }
+            }
+          ],
+          "actual_geometry_context": {
+            "err_count5": 0,
+            "izConstDiffMsg": false
+          },
+          "public_CTF_groups": [
+            {
+              "name": "ALPHA R13 C5 WALL 84",
+              "public_report_index": 1,
+              "layers": 2,
+              "terms": 6,
+              "thermal_conductance_decimal": "0.4256",
+              "material_names": [
+                "R13LAYER",
+                "C5 - 4 IN HW CONCRETE"
+              ]
+            },
+            {
+              "name": "FLOOR",
+              "public_report_index": 2,
+              "layers": 1,
+              "terms": 5,
+              "thermal_conductance_decimal": "17.04",
+              "material_names": [
+                "C5 - 4 IN HW CONCRETE"
+              ]
+            },
+            {
+              "name": "R13WALL",
+              "public_report_index": 3,
+              "layers": 1,
+              "terms": 1,
+              "thermal_conductance_decimal": "0.4365",
+              "material_names": [
+                "R13LAYER"
+              ]
+            },
+            {
+              "name": "ROOF31",
+              "public_report_index": 4,
+              "layers": 1,
+              "terms": 1,
+              "thermal_conductance_decimal": "0.1833",
+              "material_names": [
+                "R31LAYER"
+              ]
+            },
+            {
+              "name": "ZULU C5 R13 WALL 84",
+              "public_report_index": 5,
+              "layers": 2,
+              "terms": 6,
+              "thermal_conductance_decimal": "0.4256",
+              "material_names": [
+                "C5 - 4 IN HW CONCRETE",
+                "R13LAYER"
+              ]
+            }
+          ],
+          "EIO": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/eplusrs.eio",
+            "sha256": "43b7e841c2c7f22657e0842101b70e92029fa7c11fa3ce464de34e29bf322421",
+            "bytes": 25702
+          },
+          "EIO_records": 175,
+          "actual_warmup_days": 28,
+          "ERR": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/eplusrs.err",
+            "sha256": "8507bc6291c0ea92e05f043ddaa3ae583452384f8b5bea7e3986ed65da3e5d4c",
+            "bytes": 1266
+          },
+          "ERR_final_warnings": 2,
+          "ERR_Continue_records": 3,
+          "DXF": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/eplusrs.dxf",
+            "sha256": "dde2954363ed414e48637d48e2b9c941ec1242fa1883bd046cd9d9498f0eb957",
+            "bytes": 8587
+          },
+          "DXF_logical_pairs": 533,
+          "MTR_artifact": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/output/eplusrs.mtr",
+            "sha256": "0023d0c3aa9a3b7ec9e4095ba60fe1666494152ea95f9379fcf31e36688a797a",
+            "bytes": 6361
+          },
+          "actual_Source_MTR_owner": {
+            "stream": "mtr",
+            "deleted_empty": false,
+            "series": 13,
+            "reported_numeric_records": 312
+          },
+          "genuine_Native_MTR_present": true,
+          "public_fuel_membership": {
+            "membership_checks": 85,
+            "thermal_devices": 24,
+            "metered_devices": 20,
+            "Facility_meters": 13,
+            "max_abs_delta": 0.0,
+            "max_RMSE": 0.0,
+            "old_zero_None_complete_and_included": true,
+            "three_literal_None_complete_positive_distinct": true,
+            "None_resource_and_meter_absent_from_actual_catalogs": true,
+            "passed": true
+          },
+          "public_People": {
+            "raw_objects": 9,
+            "actual_instances": 12,
+            "generated_instances": 6,
+            "membership_checks": 106,
+            "Count_units": "",
+            "Count_scalar_limit": 1e-09,
+            "rate_limit_W": 0.001,
+            "energy_limit_J": 1.0,
+            "actual_sizing": [
+              {
+                "name": "ALPHA PEOPLE 91 DIRECT",
+                "actual_Zone": "ALPHA CELL",
+                "method": "People",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.25,
+                "Count_over_schedule_max": 0.25,
+                "nominal_count_decimal": "0.3",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ALPHA PEOPLE 91 PER AREA",
+                "actual_Zone": "ALPHA CELL",
+                "method": "People/Area",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.25,
+                "Count_over_schedule_max": 0.25,
+                "nominal_count_decimal": "0.3",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ALPHA PEOPLE 91 AREA PER PERSON",
+                "actual_Zone": "ALPHA CELL",
+                "method": "Area/Person",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.25,
+                "Count_over_schedule_max": 0.25,
+                "nominal_count_decimal": "0.3",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ZULU PEOPLE 91 DIRECT",
+                "actual_Zone": "ZULU CELL",
+                "method": "People",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.5,
+                "Count_over_schedule_max": 0.5,
+                "nominal_count_decimal": "0.5",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ZULU PEOPLE 91 PER AREA",
+                "actual_Zone": "ZULU CELL",
+                "method": "People/Area",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.5,
+                "Count_over_schedule_max": 0.5,
+                "nominal_count_decimal": "0.5",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ZULU PEOPLE 91 AREA PER PERSON",
+                "actual_Zone": "ZULU CELL",
+                "method": "Area/Person",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.5,
+                "Count_over_schedule_max": 0.5,
+                "nominal_count_decimal": "0.5",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ZULU CELL LIST95 DIRECT",
+                "actual_Zone": "ZULU CELL",
+                "method": "People",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.125,
+                "Count_over_schedule_max": 0.125,
+                "nominal_count_decimal": "0.1",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ALPHA CELL LIST95 DIRECT",
+                "actual_Zone": "ALPHA CELL",
+                "method": "People",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.125,
+                "Count_over_schedule_max": 0.125,
+                "nominal_count_decimal": "0.1",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": 0,
+                "nominal_display_quantum": 0.1,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ALPHA CELL LIST95 AREA",
+                "actual_Zone": "ALPHA CELL",
+                "method": "People/Area",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.0625,
+                "Count_over_schedule_max": 0.0625,
+                "nominal_count_decimal": "6.3E-002",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": -2,
+                "nominal_display_quantum": 0.001,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ZULU CELL LIST95 AREA",
+                "actual_Zone": "ZULU CELL",
+                "method": "People/Area",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.0625,
+                "Count_over_schedule_max": 0.0625,
+                "nominal_count_decimal": "6.3E-002",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": -2,
+                "nominal_display_quantum": 0.001,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ZULU CELL LIST95 PER PERSON",
+                "actual_Zone": "ZULU CELL",
+                "method": "Area/Person",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.03125,
+                "Count_over_schedule_max": 0.03125,
+                "nominal_count_decimal": "3.1E-002",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": -2,
+                "nominal_display_quantum": 0.001,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              },
+              {
+                "name": "ALPHA CELL LIST95 PER PERSON",
+                "actual_Zone": "ALPHA CELL",
+                "method": "Area/Person",
+                "actual_floor_area_m2": 12.0,
+                "Count_over_schedule_min": 0.03125,
+                "Count_over_schedule_max": 0.03125,
+                "nominal_count_decimal": "3.1E-002",
+                "nominal_display_places": 1,
+                "nominal_display_exponent": -2,
+                "nominal_display_quantum": 0.001,
+                "qualification": "Actual fixed/scientific display cell uses mantissa precision plus exponent only; unrounded Count and scalar sizing keep original1e-9. No expected timestep output array."
+              }
+            ],
+            "generated_instance_input_associations": [
+              {
+                "raw_name": "LIST95 DIRECT",
+                "target_ZoneList": "LIST94 BOTH",
+                "zone": "ZULU CELL",
+                "implicit_Space": "ZULU CELL",
+                "generated_name": "ZULU CELL LIST95 DIRECT",
+                "method": "People",
+                "selected_field": "number_of_people",
+                "selected_operand": 0.125
+              },
+              {
+                "raw_name": "LIST95 DIRECT",
+                "target_ZoneList": "LIST94 BOTH",
+                "zone": "ALPHA CELL",
+                "implicit_Space": "ALPHA CELL",
+                "generated_name": "ALPHA CELL LIST95 DIRECT",
+                "method": "People",
+                "selected_field": "number_of_people",
+                "selected_operand": 0.125
+              },
+              {
+                "raw_name": "LIST95 AREA",
+                "target_ZoneList": "LIST94 REVERSE",
+                "zone": "ALPHA CELL",
+                "implicit_Space": "ALPHA CELL",
+                "generated_name": "ALPHA CELL LIST95 AREA",
+                "method": "People/Area",
+                "selected_field": "people_per_floor_area",
+                "selected_operand": 0.005208333333333333
+              },
+              {
+                "raw_name": "LIST95 AREA",
+                "target_ZoneList": "LIST94 REVERSE",
+                "zone": "ZULU CELL",
+                "implicit_Space": "ZULU CELL",
+                "generated_name": "ZULU CELL LIST95 AREA",
+                "method": "People/Area",
+                "selected_field": "people_per_floor_area",
+                "selected_operand": 0.005208333333333333
+              },
+              {
+                "raw_name": "LIST95 PER PERSON",
+                "target_ZoneList": "LIST94 BOTH",
+                "zone": "ZULU CELL",
+                "implicit_Space": "ZULU CELL",
+                "generated_name": "ZULU CELL LIST95 PER PERSON",
+                "method": "Area/Person",
+                "selected_field": "floor_area_per_person",
+                "selected_operand": 384
+              },
+              {
+                "raw_name": "LIST95 PER PERSON",
+                "target_ZoneList": "LIST94 BOTH",
+                "zone": "ALPHA CELL",
+                "implicit_Space": "ALPHA CELL",
+                "generated_name": "ALPHA CELL LIST95 PER PERSON",
+                "method": "Area/Person",
+                "selected_field": "floor_area_per_person",
+                "selected_operand": 384
+              }
+            ],
+            "positive_unused_operand_input_associations": [
+              {
+                "name": "ZULU CELL LIST95 DIRECT",
+                "raw_name": "LIST95 DIRECT",
+                "method": "People",
+                "selected_field": "number_of_people",
+                "selected_operand": 0.125,
+                "unused_numeric_operands": {
+                  "people_per_floor_area": 3,
+                  "floor_area_per_person": 5
+                }
+              },
+              {
+                "name": "ALPHA CELL LIST95 DIRECT",
+                "raw_name": "LIST95 DIRECT",
+                "method": "People",
+                "selected_field": "number_of_people",
+                "selected_operand": 0.125,
+                "unused_numeric_operands": {
+                  "people_per_floor_area": 3,
+                  "floor_area_per_person": 5
+                }
+              },
+              {
+                "name": "ALPHA CELL LIST95 AREA",
+                "raw_name": "LIST95 AREA",
+                "method": "People/Area",
+                "selected_field": "people_per_floor_area",
+                "selected_operand": 0.005208333333333333,
+                "unused_numeric_operands": {
+                  "number_of_people": 2,
+                  "floor_area_per_person": 5
+                }
+              },
+              {
+                "name": "ZULU CELL LIST95 AREA",
+                "raw_name": "LIST95 AREA",
+                "method": "People/Area",
+                "selected_field": "people_per_floor_area",
+                "selected_operand": 0.005208333333333333,
+                "unused_numeric_operands": {
+                  "number_of_people": 2,
+                  "floor_area_per_person": 5
+                }
+              },
+              {
+                "name": "ZULU CELL LIST95 PER PERSON",
+                "raw_name": "LIST95 PER PERSON",
+                "method": "Area/Person",
+                "selected_field": "floor_area_per_person",
+                "selected_operand": 384,
+                "unused_numeric_operands": {
+                  "number_of_people": 2,
+                  "people_per_floor_area": 3
+                }
+              },
+              {
+                "name": "ALPHA CELL LIST95 PER PERSON",
+                "raw_name": "LIST95 PER PERSON",
+                "method": "Area/Person",
+                "selected_field": "floor_area_per_person",
+                "selected_operand": 384,
+                "unused_numeric_operands": {
+                  "number_of_people": 2,
+                  "people_per_floor_area": 3
+                }
+              }
+            ],
+            "nominal_display_qualification": "Actual .125 design displays0.1; .0625 displays6.3E-002; .03125 displays3.1E-002. Mantissa precision plus exponent defines only a nominal rounding cell; complete rawEIO remains byte-exact and actual unroundedCount uses1e-9.",
+            "nonzero_membership_deltas": [
+              {
+                "label": "ALPHA CELL actual People sum Radiant Heating Rate",
+                "samples": 96,
+                "max_abs_delta": 3.552713678800501e-15,
+                "rmse": 3.552713678800501e-15,
+                "limit": 0.001
+              },
+              {
+                "label": "ALPHA CELL actual People sum Radiant Heating Energy",
+                "samples": 96,
+                "max_abs_delta": 3.637978807091713e-12,
+                "rmse": 3.637978807091713e-12,
+                "limit": 1.0
+              },
+              {
+                "label": "ALPHA CELL actual People sum Convective Heating Energy",
+                "samples": 96,
+                "max_abs_delta": 7.275957614183426e-12,
+                "rmse": 7.275957614183426e-12,
+                "limit": 1.0
+              }
+            ],
+            "actual_humidity": [
+              {
+                "zone": "ALPHA CELL",
+                "minimum": 0.2681391163330772,
+                "maximum": 0.27687387607183817,
+                "range": 0.008734759738760978
+              },
+              {
+                "zone": "ZULU CELL",
+                "minimum": 0.04275521513853103,
+                "maximum": 0.04662427880445448,
+                "range": 0.0038690636659234473
+              }
+            ],
+            "passed": true,
+            "private_People_or_moisture_history_observed": false
+          },
+          "public_ZoneList": {
+            "raw_lists": [
+              {
+                "name": "LIST94 BOTH",
+                "ordered_Zone_members": [
+                  "ZULU CELL",
+                  "ALPHA CELL"
+                ]
+              },
+              {
+                "name": "LIST94 REVERSE",
+                "ordered_Zone_members": [
+                  "ALPHA CELL",
+                  "ZULU CELL"
+                ]
+              },
+              {
+                "name": "ALPHA CELL",
+                "ordered_Zone_members": [
+                  "ZULU CELL"
+                ]
+              }
+            ],
+            "raw_People_objects": 9,
+            "expanded_People_instances": 12,
+            "raw_OtherEquipment_objects": 21,
+            "expanded_OtherEquipment_instances": 24,
+            "live_generated_OtherEquipment_sizing_and_duration_checks": [
+              {
+                "label": "ZULU CELL LIST94 LEVEL live selected sizing",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "ZULU CELL LIST94 LEVEL actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "ALPHA CELL LIST94 LEVEL live selected sizing",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "ALPHA CELL LIST94 LEVEL actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "ALPHA CELL LIST94 AREA live selected sizing",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "ALPHA CELL LIST94 AREA actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "ZULU CELL LIST94 AREA live selected sizing",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "ZULU CELL LIST94 AREA actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "ZULU CELL LIST94 PERSON live selected sizing",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "ZULU CELL LIST94 PERSON actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "ALPHA CELL LIST94 PERSON live selected sizing",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "ALPHA CELL LIST94 PERSON actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              }
+            ],
+            "fresh_generated_OtherEquipment_nominal_rows": [
+              {
+                "name": "ZULU CELL LIST94 LEVEL",
+                "actual_nominal_schedule_name": "ALWAYSON",
+                "actual_Zone": "ZULU CELL",
+                "actual_nominal_design_W": 23.0
+              },
+              {
+                "name": "ALPHA CELL LIST94 LEVEL",
+                "actual_nominal_schedule_name": "ALWAYSON",
+                "actual_Zone": "ALPHA CELL",
+                "actual_nominal_design_W": 23.0
+              },
+              {
+                "name": "ALPHA CELL LIST94 AREA",
+                "actual_nominal_schedule_name": "ALWAYSON",
+                "actual_Zone": "ALPHA CELL",
+                "actual_nominal_design_W": 21.0
+              },
+              {
+                "name": "ZULU CELL LIST94 AREA",
+                "actual_nominal_schedule_name": "ALWAYSON",
+                "actual_Zone": "ZULU CELL",
+                "actual_nominal_design_W": 21.0
+              },
+              {
+                "name": "ZULU CELL LIST94 PERSON",
+                "actual_nominal_schedule_name": "ALWAYSON",
+                "actual_Zone": "ZULU CELL",
+                "actual_nominal_design_W": 8.594
+              },
+              {
+                "name": "ALPHA CELL LIST94 PERSON",
+                "actual_nominal_schedule_name": "ALWAYSON",
+                "actual_Zone": "ALPHA CELL",
+                "actual_nominal_design_W": 4.844
+              }
+            ],
+            "System_streams": [
+              {
+                "key": "LIST94 BOTH",
+                "variable": "Zone List Sensible Heating Rate",
+                "report_id": 2183,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "LIST94 BOTH",
+                "variable": "Zone List Sensible Heating Energy",
+                "report_id": 2181,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "LIST94 BOTH",
+                "variable": "Zone List Sensible Cooling Rate",
+                "report_id": 2184,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "LIST94 BOTH",
+                "variable": "Zone List Sensible Cooling Energy",
+                "report_id": 2182,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "LIST94 REVERSE",
+                "variable": "Zone List Sensible Heating Rate",
+                "report_id": 2187,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "LIST94 REVERSE",
+                "variable": "Zone List Sensible Heating Energy",
+                "report_id": 2185,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "LIST94 REVERSE",
+                "variable": "Zone List Sensible Cooling Rate",
+                "report_id": 2188,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "LIST94 REVERSE",
+                "variable": "Zone List Sensible Cooling Energy",
+                "report_id": 2186,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "ALPHA CELL",
+                "variable": "Zone List Sensible Heating Rate",
+                "report_id": 2179,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "ALPHA CELL",
+                "variable": "Zone List Sensible Heating Energy",
+                "report_id": 2177,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "ALPHA CELL",
+                "variable": "Zone List Sensible Cooling Rate",
+                "report_id": 2180,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              },
+              {
+                "key": "ALPHA CELL",
+                "variable": "Zone List Sensible Cooling Energy",
+                "report_id": 2178,
+                "samples": 96,
+                "actual_min": 0.0,
+                "actual_max": 0.0,
+                "actual_all_zero": true
+              }
+            ],
+            "System_policy_indices": [
+              313,
+              314,
+              315,
+              316,
+              317,
+              318,
+              319,
+              320,
+              321,
+              322,
+              323,
+              324
+            ],
+            "new_People_Zone_policy_indices": [
+              325,
+              326,
+              327,
+              328,
+              329,
+              330,
+              331,
+              332,
+              333,
+              334,
+              335,
+              336,
+              337,
+              338,
+              339,
+              340,
+              341,
+              342,
+              343,
+              344,
+              345,
+              346,
+              347,
+              348,
+              349,
+              350,
+              351,
+              352,
+              353,
+              354,
+              355,
+              356,
+              357,
+              358,
+              359,
+              360,
+              361,
+              362,
+              363,
+              364,
+              365,
+              366,
+              367,
+              368,
+              369,
+              370,
+              371,
+              372,
+              373,
+              374,
+              375,
+              376,
+              377,
+              378,
+              379,
+              380,
+              381,
+              382,
+              383,
+              384,
+              385,
+              386,
+              387,
+              388,
+              389,
+              390
+            ],
+            "System_aggregate_and_interval_checks": [
+              {
+                "label": "LIST94 BOTH System Heating actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "LIST94 BOTH System Cooling actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "LIST94 REVERSE System Heating actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "LIST94 REVERSE System Cooling actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "ALPHA CELL System Heating actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "ALPHA CELL System Cooling actual duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "BOTH/REVERSE public aggregate Zone List Sensible Heating Rate",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "BOTH/REVERSE public aggregate Zone List Sensible Heating Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "BOTH/REVERSE public aggregate Zone List Sensible Cooling Rate",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 0.001
+              },
+              {
+                "label": "BOTH/REVERSE public aggregate Zone List Sensible Cooling Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              }
+            ],
+            "uncontrolled_System_zeros_allowed": true,
+            "private_Native_list_member_owners_observed": false,
+            "design_occupants_before_OtherEquipment_qualification": "Actual Count/occupancySchedule design sums include all six People perZone and feed selected5W/person with the actual equipment schedule. Earlier94 nominal powers are not expected arrays. System nonzero/reset/order/multiplier owner proof remains the separate retained unit evidence."
+          },
+          "public_literal_names": {
+            "ASCII_fold_only_no_trim": true,
+            "actual_complete_streams": [
+              {
+                "name": "A",
+                "name_utf8_hex": "41",
+                "Rate_report_id": 168,
+                "Energy_report_id": 167,
+                "samples": 96,
+                "actual_Rate_min": 3.0,
+                "actual_Rate_max": 3.0
+              },
+              {
+                "name": " A ",
+                "name_utf8_hex": "204120",
+                "Rate_report_id": 166,
+                "Energy_report_id": 165,
+                "samples": 96,
+                "actual_Rate_min": 7.0,
+                "actual_Rate_max": 7.0
+              },
+              {
+                "name": "A ",
+                "name_utf8_hex": "4120",
+                "Rate_report_id": 170,
+                "Energy_report_id": 169,
+                "samples": 96,
+                "actual_Rate_min": 11.0,
+                "actual_Rate_max": 11.0
+              }
+            ],
+            "actual_duration_checks": [
+              {
+                "label": "A actual literal duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": " A  actual literal duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              },
+              {
+                "label": "A  actual literal duration Rate-to-Energy",
+                "samples": 96,
+                "max_abs_delta": 0.0,
+                "rmse": 0.0,
+                "limit": 1.0
+              }
+            ]
+          },
+          "public_builtin_schedule_identity": {
+            "actual_nominal_rows": [
+              {
+                "name": "ALPHA LOAD 88",
+                "actual_nominal_schedule_name": "Constant-1.0",
+                "actual_Zone": "ALPHA CELL",
+                "actual_nominal_design_W": 300.0
+              },
+              {
+                "name": "MIXED90 NONE",
+                "actual_nominal_schedule_name": "Constant-0.0",
+                "actual_Zone": "ZULU CELL",
+                "actual_nominal_design_W": 10.0
+              }
+            ],
+            "authored_builtin_objects_added": false,
+            "private_builtin_schedule_or_typed_IDs_observed": false
+          },
+          "complete_observation": {
+            "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/comparison.json",
+            "sha256": "f2632107373fbaab8926b448212dc4869ebc4741f67a6590db2e320070da58e3",
+            "bytes": 1041672
+          },
+          "private_People_gain_list_member_moisture_owners_observed": false,
+          "qualification": "Whole175rawEIO except first identity,allERR except first identity/finalelapsed,533DXFpairs except soleProgramVersion999/EOL and complete404physicalseries pass. Actual2Warnings3Continues and28warmupdays are fresh observations. No private gain/list/People/NameMap arrays or expected output injection."
+        }
       }
     ],
     "totals": {
-      "paired_cases": 144,
-      "reported_samples": 3758958,
-      "raw_operand_unequal": 833996,
+      "paired_cases": 145,
+      "reported_samples": 3796806,
+      "raw_operand_unequal": 841255,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -42528,6 +44025,23 @@
           "sha256": "17a4d109bdec337dd7749318af00ae9775199229fc87d5e3f327c136cd3058b1",
           "bytes": 78751758
         }
+      },
+      {
+        "id": "people-zonelist-95",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-95/receipt.json",
+          "sha256": "66d4379848178004f78a147b48a221b35cfd1ea62bcc4736ad01cbe48baff560",
+          "bytes": 6064
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/7a/7a63a788ec366fb99dea8062b3f5f4a2a7ca1c408095f45b1c070e3f7e57b4e2",
+          "sha256": "7a63a788ec366fb99dea8062b3f5f4a2a7ca1c408095f45b1c070e3f7e57b4e2"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-95/eplus-rs.exe",
+          "sha256": "22465a0bb2f4fcaf92ebe9fcbe7f1e9d6a76219b739305d85ec9d3663b9523ce",
+          "bytes": 78811232
+        }
       }
     ],
     "focused_since_workspace": {
@@ -42694,14 +44208,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 91,
-      "builds_with_accepted_paired_cases": 87,
+      "actual_recorded_builds": 92,
+      "builds_with_accepted_paired_cases": 88,
       "builds_with_only_retained_failed_Source_attempts": 2,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 4,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "91 recorded Source builds:87 with accepted pairs,2 engine-failed-only68/78(exit6),1 observer-unaccepted-only76(engine0),1 runtime-diagnostic-comparison-unaccepted-only original93(engine0). New Build94 adds one accepted directepJSON pair. Every prior failed/observer/comparison ledger and all original143case/90build rows remain unchanged.",
+      "qualification": "92 recorded Source builds:88withacceptedpairs,2engine-failed-only68/78(exit6),1observer-unaccepted-only76(engine0),1runtime-diagnostic-comparison-unaccepted-onlyoriginal93(engine0). NewBuild95 adds one accepted directepJSON pair. All prior144case/91build rows and every failed/observer/comparison ledger remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 1,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0
     },
@@ -44105,6 +45619,75 @@
       "Native_replays": 0,
       "Source_replays": 0,
       "scope": "One directepJSON SourceA implicit-Space ZoneList OtherEquipment pair; six generated instances,three lists,twelve genuine complete System streams,325+13/31512values and149joins. No full legal-domain/People-list/SourceB-list/SpaceList/ZoneGroup/authoredSpace/HVAC or frozen capability promotion."
+    },
+    "current_People_ZoneList_live_pair": {
+      "source_build": "people-zonelist-95",
+      "case_rows": [
+        "A-MULTIZONE-LIST-PEOPLE-24H"
+      ],
+      "summary": {
+        "path": ".runtime/porting/people-zonelist-95/source-01/summary.json",
+        "sha256": "66542d1fba395105d1985f263c2f60451b3c9c08ad69ed1ff0ef2472a0dba8ce",
+        "bytes": 1672
+      },
+      "comparison": {
+        "path": ".runtime/porting/people-zonelist-95/source-01/A-MULTIZONE-LIST-PEOPLE-24H/comparison.json",
+        "sha256": "f2632107373fbaab8926b448212dc4869ebc4741f67a6590db2e320070da58e3",
+        "bytes": 1041672
+      },
+      "Native_index": {
+        "path": ".runtime/porting/people-zonelist-95/native-01/launches.json",
+        "sha256": "69b1e03e9ae7de317488d774f1c7e698b74a740c48188db99429d40c844d9551",
+        "bytes": 1438
+      },
+      "Native_raw_readback": {
+        "path": ".runtime/object-expansion/unit95-prep/native-01-raw-readback02.json",
+        "sha256": "0a60a77c281383502105c050c023c7ebef9853e6aedf934c0396ffce184eafc5",
+        "bytes": 137983
+      },
+      "Native_facts": {
+        "path": ".runtime/object-expansion/unit95-prep/people-zonelist-source-callable-proposal/native-01-facts.json",
+        "sha256": "05310de3ea82412fa0e853c3d41346978be001a5706eac1252f1ddb8c4596440",
+        "bytes": 254074
+      },
+      "Root_independent_full_raw_reread": {
+        "path": ".runtime/object-expansion/unit95-prep/root-raw-readback01.json",
+        "sha256": "75c23a063719c9fa00d320cec1ce68dbacec8ea992e3e527d54ea800bef10c0f",
+        "bytes": 206128
+      },
+      "Root_custody_review": {
+        "path": ".runtime/object-expansion/unit95-prep/root-source-callable-review01.json",
+        "sha256": "4b5929904b95f745e1e470487058c07d34c62260740dcca49fd3fbe580fc023f",
+        "bytes": 1279
+      },
+      "build_row": {
+        "path": ".runtime/object-expansion/build95-row.json",
+        "sha256": "46feb7c2d3d541b97f185dca51d7dad73b9fe1cd322600fd23f4ca51f3dbdcb4",
+        "bytes": 667
+      },
+      "code_authority": {
+        "path": ".runtime/object-expansion/unit95-prep/final-formatted-code-authority.json",
+        "sha256": "2effb390ad9f24b12e4dee53c8922b1fb8d664e73fde4080475bffc0c8388f0d",
+        "bytes": 14498
+      },
+      "quality": {
+        "path": ".runtime/object-expansion/unit95-prep/people-zonelist-quality03/receipt.json",
+        "sha256": "b5e224936a0b02c4de224af6567692e9b95ed1f0ac84d9ab6a21daf8f97e13d6",
+        "bytes": 8989
+      },
+      "input_proposal": {
+        "path": ".runtime/object-expansion/unit95-prep/people-zonelist-pilot-proposal/proposal.json",
+        "sha256": "47bc88c2630936c4ea948df7b7912e12efff0f3441a142b7b74a2fc9aca0d8e3",
+        "bytes": 82643
+      },
+      "validation_proposal": {
+        "path": ".runtime/object-expansion/unit95-prep/people-zonelist-source-ready-proposal/proposal.json",
+        "sha256": "171a18f384a2a4760c17a814ec23f7070a9c00f5b78b314693a3a2accfd3fb98",
+        "bytes": 1016
+      },
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "scope": "One directepJSON SourceA implicit-Space People list witness:9raw?12actualPeople,24actualOtherEquipment,391+13/37848values/191joins; selectedmethods andschema-validpositiveunused2/3/5,live designoccupants beforeWattsPerson,fixed/scientific nominal displays and12genuineSystemstreams remain strict. No full-domain/generated-name-collision/SourceBlist/ZoneGroup/SpaceList/authoredSpace/HVAC/private-owner/frozen-capability promotion."
     }
   },
   "additional_native_type_calibrations": [

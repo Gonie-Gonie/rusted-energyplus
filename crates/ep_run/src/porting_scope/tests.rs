@@ -460,6 +460,10 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         lists["ZoneList"] = json!({"Members":{"zones":member_names.iter().map(|name|json!({"zone_name":name})).collect::<Vec<_>>()}});
         lists["OtherEquipment"] = json!({"List gain":{"zone_or_zonelist_or_space_or_spacelist_name":"Members",
             "schedule_name":"On","fuel_type":"Electricity","design_level":23}});
+        lists["People"] = json!({"List occupants":{"zone_or_zonelist_or_space_or_spacelist_name":"Members",
+            "number_of_people_schedule_name":"On","activity_level_schedule_name":"On",
+            "number_of_people_calculation_method":"Area/Person","number_of_people":7,
+            "people_per_floor_area":0.75,"floor_area_per_person":8}});
         let raw = parse_epjson_str(&lists.to_string()).expect("actual ordered list input");
         assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
         assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
@@ -481,6 +485,28 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
                 format!("{} LIST GAIN", zone_name.to_ascii_uppercase())
             );
         }
+        assert_eq!(model.people.len(), member_names.len());
+        assert_eq!(model.source_people_inputs.len(), 1);
+        assert_eq!(
+            model.source_people_inputs[0].instances,
+            0..member_names.len()
+        );
+        for (row, zone_name) in model.people.iter().zip(&member_names) {
+            assert_eq!(Some(row.zone), model.zone_names.resolve(zone_name));
+            assert_eq!(
+                row.name.0,
+                format!("{} LIST OCCUPANTS", zone_name.to_ascii_uppercase())
+            );
+            assert_eq!(row.number_of_people, 7.0);
+            assert_eq!(row.people_per_floor_area, 0.75);
+            assert_eq!(row.floor_area_per_person, 8.0);
+        }
+        let mut reordered = model.clone();
+        reordered.source_people_inputs[0].instances = 0..0;
+        assert!(
+            !inspect_porting_scope(&raw, &compiled.report, Some(&reordered), PortingScope::A)
+                .admissible
+        );
         let mut selected =
             inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
         assert!(selected.admissible, "{:?}", selected.violations);

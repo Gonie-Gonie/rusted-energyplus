@@ -169,7 +169,7 @@ pub(super) fn admitted_field(name: &str, value: &RawValue) -> bool {
         _ => false,
     }
 }
-pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
+pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_lists: bool) -> bool {
     if !selected(
         object,
         "number_of_people_calculation_method",
@@ -251,9 +251,10 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject) -> bool {
     let Some(zones) = raw.objects.get(&ObjectType("Zone".into())) else {
         return false;
     };
-    if !text(object, "zone_or_zonelist_or_space_or_spacelist_name")
-        .is_some_and(|target| zones.keys().any(|n| n.0.eq_ignore_ascii_case(target)))
-    {
+    if !text(object, "zone_or_zonelist_or_space_or_spacelist_name").is_some_and(|target| {
+        zones.keys().any(|n| n.0.eq_ignore_ascii_case(target))
+            || source_zone_lists && super::zone_lists::gain_target(raw, target)
+    }) {
         return false;
     }
     let source_schedule = |schedule: &str| {

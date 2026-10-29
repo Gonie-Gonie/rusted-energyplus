@@ -81,6 +81,16 @@ impl<T: Copy> NameMap<T> {
         None
     }
 
+    /// Registers every ordered arena instance, including duplicate generated names.
+    /// Name lookup retains the first real ID; by-ID names preserve every owner.
+    /// Explicit Source callers use this after resolving the raw input separately.
+    /// The ordinary unique-name insert API and its normalization are unchanged.
+    pub fn insert_instance(&mut self, name: &str, id: T) {
+        let normalized = self.normalized_name(name);
+        self.by_name.entry(normalized.clone()).or_insert(id);
+        self.by_id.push(normalized);
+    }
+
     /// Resolves a raw EnergyPlus name to a typed ID.
     #[must_use]
     pub fn resolve(&self, name: &str) -> Option<T> {

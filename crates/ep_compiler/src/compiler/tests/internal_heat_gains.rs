@@ -465,11 +465,169 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
     for text in [
         r#"{"Zone":{"Z":{}},"ZoneList":{" L ":{"zones":[{"zone_name":"Z"}]}},"OtherEquipment":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","design_level":3}}}"#,
         r#"{"Zone":{" Z ":{}},"ZoneList":{"L":{"zones":[{"zone_name":"Z"}]}}}"#,
-        r#"{"Zone":{"Z":{}},"ZoneList":{"L":{"zones":[{"zone_name":"Z"}]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","number_of_people":1}}}"#,
+        r#"{"Zone":{"Z":{}},"ZoneList":{"L":{"zones":[{"zone_name":"Z"}]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"Missing","number_of_people":1}}}"#,
     ] {
         assert!(
             super::super::compile_raw_model_for_source(&parse_epjson_str(text)?).has_errors(),
             "Source exact references and direct People boundary must remain: {text}"
+        );
+    }
+    // Unit95: each raw People statement keeps its true ordered instance
+    // range. Three selected methods preserve every authored numeric operand.
+    let raw = parse_epjson_str(
+        r#"{
+        "Zone":{"Zulu":{"floor_area":12},"Alpha":{"floor_area":6}},
+        "ZoneList":{"Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]},
+            "Reverse":{"zones":[{"zone_name":"Alpha"},{"zone_name":"Zulu"}]},
+            "Only":{"zones":[{"zone_name":"Alpha"}]},"Alpha":{"zones":[{"zone_name":"Zulu"}]}},
+        "People":{
+            "A direct":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","number_of_people":2,"people_per_floor_area":0.75,"floor_area_per_person":3},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Reverse","number_of_people_calculation_method":"People/Area","number_of_people":7,"people_per_floor_area":0.25,"floor_area_per_person":5},
+            "C divide":{"zone_or_zonelist_or_space_or_spacelist_name":"Only","number_of_people_calculation_method":"Area/Person","number_of_people":11,"people_per_floor_area":0.5,"floor_area_per_person":8},
+            "D shadow":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","number_of_people":1}}}"#,
+    )?;
+    let result = super::super::compile_raw_model_for_source(&raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let typed = result.model.ok_or("actual Source People list arenas")?;
+    assert_eq!(
+        typed
+            .people
+            .iter()
+            .map(|p| p.name.0.as_str())
+            .collect::<Vec<_>>(),
+        [
+            "ZULU A DIRECT",
+            "ALPHA A DIRECT",
+            "ALPHA B AREA",
+            "ZULU B AREA",
+            "ALPHA C DIVIDE",
+            "D SHADOW"
+        ]
+    );
+    assert_eq!(
+        typed
+            .source_people_inputs
+            .iter()
+            .map(|p| p.instances.clone())
+            .collect::<Vec<_>>(),
+        [0..2, 2..4, 4..5, 5..6]
+    );
+    for binding in &typed.source_people_inputs {
+        let rows = &typed.people[binding.instances.clone()];
+        let object = raw
+            .objects
+            .get(&ep_raw_model::ObjectType("People".into()))
+            .and_then(|rows| rows.get(&ep_raw_model::ObjectName(binding.object_name.clone())))
+            .ok_or("authored People object")?;
+        let authored_number = |field: &str| -> Result<f64, Box<dyn std::error::Error>> {
+            let Some(ep_raw_model::RawValue::Number(number)) =
+                object.fields.get(&ep_raw_model::FieldName(field.into()))
+            else {
+                return Err("authored People number".into());
+            };
+            Ok(number.parse()?)
+        };
+        for row in rows {
+            assert_eq!(row.number_of_people, authored_number("number_of_people")?);
+            if binding.object_name != "D shadow" {
+                assert_eq!(
+                    row.people_per_floor_area,
+                    authored_number("people_per_floor_area")?
+                );
+                assert_eq!(
+                    row.floor_area_per_person,
+                    authored_number("floor_area_per_person")?
+                );
+            }
+        }
+        match binding.target {
+            ep_model::SourcePeopleInputTarget::Zone(zone) => {
+                assert_eq!(binding.object_name, "D shadow");
+                assert_eq!(rows.len(), 1);
+                assert_eq!(rows[0].zone, zone);
+                assert_eq!(Some(zone), typed.zone_names.resolve("Alpha"));
+            }
+            ep_model::SourcePeopleInputTarget::ZoneList(id) => {
+                let list = typed
+                    .zone_lists
+                    .iter()
+                    .find(|list| list.id == id)
+                    .ok_or("actual People list")?;
+                assert_eq!(rows.iter().map(|p| p.zone).collect::<Vec<_>>(), list.zones);
+            }
+        }
+    }
+    for (index, row) in typed.people.iter().enumerate() {
+        assert_eq!(usize::try_from(row.id.0)?, index);
+        assert_eq!(typed.people_names.names()[index], row.name);
+    }
+    assert!(typed.people_names.resolve("A direct").is_none());
+    assert!(compile_raw_model(&raw).has_errors());
+    // Distinct Spaces can generate identical full names without triggering
+    // Native's per-Space/type duplicate-device error. Preserve both real owners.
+    let alias_raw = parse_epjson_str(
+        r#"{
+        "Zone":{"Z":{},"Z P":{}},
+        "ZoneList":{"First":{"zones":[{"zone_name":"Z"}]},"Second":{"zones":[{"zone_name":"Z P"}]}},
+        "People":{"P Q":{"zone_or_zonelist_or_space_or_spacelist_name":"First","number_of_people":2},
+            "Q":{"zone_or_zonelist_or_space_or_spacelist_name":"Second","number_of_people":3}}}"#,
+    )?;
+    let result = super::super::compile_raw_model_for_source(&alias_raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let typed = result
+        .model
+        .ok_or("distinct-Space generated People alias")?;
+    assert_eq!(typed.people.len(), 2);
+    assert_eq!(typed.people[0].name.0, "Z P Q");
+    assert_eq!(typed.people[1].name.0, "Z P Q");
+    assert_ne!(typed.people[0].zone, typed.people[1].zone);
+    assert_ne!(typed.people[0].id, typed.people[1].id);
+    assert_eq!(
+        typed.people_names.resolve("Z P Q"),
+        Some(typed.people[0].id)
+    );
+    assert_eq!(typed.people_names.names().len(), typed.people.len());
+    assert_eq!(typed.source_people_inputs[0].instances, 0..1);
+    assert_eq!(typed.source_people_inputs[1].instances, 1..2);
+    let spaced = parse_epjson_str(
+        r#"{"Zone":{" Z ":{}},"ZoneList":{" L ":{"zones":[{"zone_name":" Z "}]}},"People":{" p ":{"zone_or_zonelist_or_space_or_spacelist_name":" L ","number_of_people":1}}}"#,
+    )?;
+    let result = super::super::compile_raw_model_for_source(&spaced);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let typed = result.model.ok_or("exact single-member People list name")?;
+    assert_eq!(typed.people[0].name.0, format!("{} {}", " Z ", " P "));
+    for name in ["A", " A ", "A ", "\u{000b}", "\u{00a0}"] {
+        let mut raw = parse_epjson_str(
+            r#"{"Zone":{"Z":{}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","number_of_people":1}}}"#,
+        )?;
+        let rows = raw
+            .objects
+            .get_mut(&ep_raw_model::ObjectType("People".into()))
+            .ok_or("People name fixture")?;
+        let (_, object) = rows.pop_first().ok_or("People name object")?;
+        rows.insert(ep_raw_model::ObjectName(name.into()), object);
+        let result = super::super::compile_raw_model_for_source(&raw);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let typed = result.model.ok_or("exact Source People name")?;
+        assert_eq!(typed.people[0].name.0, name.to_ascii_uppercase());
+    }
+    for name in ["", " \t\r\u{000c}", "A\nB"] {
+        let mut raw = parse_epjson_str(
+            r#"{"Zone":{"Z":{}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","number_of_people":1}}}"#,
+        )?;
+        let rows = raw
+            .objects
+            .get_mut(&ep_raw_model::ObjectType("People".into()))
+            .ok_or("People name fixture")?;
+        let (_, object) = rows.pop_first().ok_or("People name object")?;
+        rows.insert(ep_raw_model::ObjectName(name.into()), object);
+        let result = super::super::compile_raw_model_for_source(&raw);
+        assert!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "InvalidName" && d.object_type == "People")
         );
     }
     for method in ["Watts/Person", "Power/Person"] {

@@ -172,6 +172,8 @@ pub struct TypedModel {
     pub people: Vec<People>,
     /// People object names.
     pub people_names: NameMap<InternalGainId>,
+    /// Source raw People objects and their genuine dense instance ranges.
+    pub source_people_inputs: Vec<crate::SourcePeopleInput>,
     /// Dual setpoint thermostat objects.
     pub thermostat_dual_setpoints: Vec<ThermostatDualSetpoint>,
     /// Dual setpoint names.
@@ -370,6 +372,7 @@ impl Default for TypedModel {
             source_other_equipment_inputs: Vec::new(),
             people: Vec::new(),
             people_names: NameMap::default(),
+            source_people_inputs: Vec::new(),
             thermostat_dual_setpoints: Vec::new(),
             thermostat_dual_setpoint_names: NameMap::default(),
             zone_thermostats: Vec::new(),
