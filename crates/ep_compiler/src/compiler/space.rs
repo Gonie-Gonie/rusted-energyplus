@@ -170,9 +170,38 @@ impl Compiler<'_> {
     }
 
     fn parse_space_lists(&mut self, model: &mut TypedModel) {
-        for (name, object) in self.objects(SPACE_LIST_OBJECT_TYPE) {
+        // GetSpaceData reads the JSON map directly, including converted IDF.
+        let objects = if self.source_file_declarations {
+            match self.raw_model.source_json_instances(SPACE_LIST_OBJECT_TYPE) {
+                Ok(rows) => rows
+                    .into_iter()
+                    .map(|(name, object)| (name.0.clone(), object.clone()))
+                    .collect(),
+                Err(error) => {
+                    self.error(
+                        "SourceObjectOrderUnavailable",
+                        SPACE_LIST_OBJECT_TYPE,
+                        None,
+                        None,
+                        error,
+                    );
+                    return;
+                }
+            }
+        } else {
+            self.objects(SPACE_LIST_OBJECT_TYPE)
+        };
+        for (name, object) in objects {
             let diagnostics_before_fields = self.diagnostics.len();
-            if name.trim().is_empty() {
+            let invalid_name = if self.source_file_declarations {
+                name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|b| matches!(b, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            } else {
+                name.trim().is_empty()
+            };
+            if invalid_name {
                 self.error(
                     "MissingRequiredField",
                     SPACE_LIST_OBJECT_TYPE,
@@ -182,7 +211,12 @@ impl Compiler<'_> {
                 );
             }
 
-            if model.zone_names.resolve(&name).is_some() {
+            let matches_zone = if self.source_file_declarations {
+                self.source_raw_object_name("Zone", &name).is_some()
+            } else {
+                model.zone_names.resolve(&name).is_some()
+            };
+            if matches_zone {
                 self.error(
                     "SpaceListNameMatchesZone",
                     SPACE_LIST_OBJECT_TYPE,
@@ -222,7 +256,7 @@ impl Compiler<'_> {
             debug_assert!(existing.is_none());
             model.space_lists.push(SpaceList {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.space_list_names.normalized_name(&name),
                 spaces,
                 max_space_name_length,
             });
@@ -369,12 +403,22 @@ impl Compiler<'_> {
                 source_span: None,
             };
             let entry_name = format!("{object_name}[{index}]");
-            let Some(space_name) = self.required_string(
-                SPACE_LIST_OBJECT_TYPE,
-                &entry_name,
-                &entry_object,
-                "space_name",
-            ) else {
+            let space_name = if self.source_file_declarations {
+                self.source_reference_name(
+                    SPACE_LIST_OBJECT_TYPE,
+                    &entry_name,
+                    &entry_object,
+                    "space_name",
+                )
+            } else {
+                self.required_string(
+                    SPACE_LIST_OBJECT_TYPE,
+                    &entry_name,
+                    &entry_object,
+                    "space_name",
+                )
+            };
+            let Some(space_name) = space_name else {
                 continue;
             };
             max_space_name_length = max_space_name_length.max(space_name.len());
@@ -396,7 +440,7 @@ impl Compiler<'_> {
                     Some("space_name"),
                     format!(
                         "SpaceList/{object_name} includes Space '{}' more than once",
-                        NormalizedName::new(&space_name).0
+                        model.authored_space_names.normalized_name(&space_name).0
                     ),
                 );
                 continue;

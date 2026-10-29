@@ -308,6 +308,17 @@ pub(crate) struct SelectedZoneListData {
     pub(crate) typed_zone_list_id: Option<ep_model::ZoneListId>,
 }
 
+/// Native DataHeatBalance.hh500-507; typed identity is only a Rust boundary proof.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SelectedSpaceListData {
+    pub(crate) name: String,
+    pub(crate) num_list_spaces: i32,
+    pub(crate) max_space_name_length: usize,
+    /// Actual Source Space array numbers in authored member order.
+    pub(crate) spaces: Vec<i32>,
+    pub(crate) typed_space_list_id: Option<ep_model::SpaceListId>,
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedZoneInputOwners {
     pub(crate) zones: Option<Vec<SelectedZoneData>>,
@@ -318,7 +329,7 @@ pub(crate) struct SelectedZoneInputOwners {
     pub(crate) building_predefined: ZonePredefined,
     pub(crate) spaces: Option<Vec<SelectedSpaceData>>,
     pub(crate) space_types: Option<Vec<String>>,
-    pub(crate) space_lists: Option<Vec<std::convert::Infallible>>,
+    pub(crate) space_lists: Option<Vec<SelectedSpaceListData>>,
     pub(crate) zone_lists: Option<Vec<SelectedZoneListData>>,
     pub(crate) num_zone_lists: i32,
     pub(crate) num_zone_groups: i32,

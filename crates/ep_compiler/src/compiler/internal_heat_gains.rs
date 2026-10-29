@@ -194,18 +194,66 @@ impl Compiler<'_> {
             }
             return Some((ep_model::SourceGainInputTarget::ZoneList(id), targets));
         }
-        if self
-            .source_raw_object_name("SpaceList", &reference)
-            .is_some()
-        {
-            self.error(
-                &format!("Source{family}SpaceListUnavailable"),
+        if let Some(raw_list) = self.source_raw_object_name("SpaceList", &reference) {
+            let id = self.resolve_name(
+                &model.space_list_names,
                 family,
-                Some(name),
-                Some(FIELD),
-                format!("SpaceList {family} remains outside the Source list stage"),
-            );
-            return None;
+                name,
+                FIELD,
+                &raw_list,
+                "SpaceList",
+            )?;
+            let Some(list) = model
+                .space_lists
+                .iter()
+                .find(|list| list.id == id)
+                .filter(|list| !list.spaces.is_empty())
+            else {
+                self.error(
+                    &format!("Source{family}SpaceListUnavailable"),
+                    family,
+                    Some(name),
+                    Some(FIELD),
+                    format!("Source {family} requires a positive actual SpaceList member sequence"),
+                );
+                return None;
+            };
+            let mut targets = Vec::with_capacity(list.spaces.len());
+            for &space_id in &list.spaces {
+                let Some(space) = model.spaces.iter().find(|space| {
+                    space.id == space_id && space.origin == ep_model::SpaceOrigin::Authored
+                }) else {
+                    self.error(
+                        "InternalReferenceError",
+                        family,
+                        Some(name),
+                        Some(FIELD),
+                        format!(
+                            "Source {family} SpaceList member must be an actual authored Space"
+                        ),
+                    );
+                    return None;
+                };
+                let space_name =
+                    self.source_whole_zone_gain_space_name(model, family, name, space.zone)?;
+                if space_name != space.name.0 {
+                    self.error(
+                        "InternalReferenceError",
+                        family,
+                        Some(name),
+                        Some(FIELD),
+                        format!("Source {family} SpaceList member identity differs"),
+                    );
+                    return None;
+                }
+                // Native3411-3413 prefixes every member, including singleton lists.
+                // Authored count/level operands stay whole for each genuine row.
+                targets.push((
+                    space.zone,
+                    format!("{space_name} {}", name.to_ascii_uppercase()),
+                ));
+            }
+            return Some((ep_model::SourceGainInputTarget::SpaceList(id), targets));
         }
         self.error(
             "MissingReference",
@@ -213,7 +261,7 @@ impl Compiler<'_> {
             Some(name),
             Some(FIELD),
             format!(
-                "{family}/{name} references missing exact Source Zone, Space or ZoneList '{reference}'"
+                "{family}/{name} references missing exact Source Zone, Space, ZoneList or SpaceList '{reference}'"
             ),
         );
         None

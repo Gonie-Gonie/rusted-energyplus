@@ -1,4 +1,4 @@
-//! Genuine GetSpaceData2422-2567: lexical authored rows, then Zone defaults.
+//! Genuine GetSpaceData2422-2567: epJSON-map authored rows, then Zone defaults.
 //! Allocation capacity is not active numSpaces and must remain retained.
 use super::{
     HeatBalanceInputError as Error, SelectedZoneInputOwners, ZoneGetterOwners, signed, storage,
@@ -62,16 +62,16 @@ impl SelectedZoneInputOwners {
         errors_found: &mut bool,
     ) -> Result<(), Error> {
         // Literal find, no count query, null insertion, shortcut reset or IDF
-        // ordinal conversion. Original traverses the epJSON ordered map here.
+        // ordinal conversion. These family rows retain the epJSON map's pinned
+        // doj::alphanum_less order, independently of the IDF declaration overlay.
         let family = owners.input.find_exact_family("Space").cloned();
-        let mut names = match &family {
+        let names = match &family {
             Some(SourceInputFamily::Objects(rows)) => rows
                 .iter()
                 .map(|row| row.object_name.clone())
                 .collect::<Vec<_>>(),
             Some(SourceInputFamily::Null) | None => Vec::new(),
         };
-        names.sort();
         let zone_count = usize::try_from(owners.globals.num_of_zones)
             .map_err(|_| Error::Unavailable("negative actual NumOfZones"))?;
         let capacity = if family.is_some() {
@@ -196,13 +196,105 @@ impl SelectedZoneInputOwners {
         if family.is_some() {
             owners.globals.num_spaces = space_num;
         }
-        // Positive SpaceList retains its separate unavailable branch, after
-        // the real preceding Space allocation and field/usage writes.
-        if let Some(family) = owners.input.find_exact_family("SpaceList") {
-            if matches!(family,SourceInputFamily::Objects(rows) if !rows.is_empty()) {
-                return Err(Error::Unavailable("positive SpaceList"));
+        // Literal GetSpaceData2489-2550. Resolve members before the following
+        // implicit defaults exist, and retain allocation/append/diagnostic order.
+        if let Some(family) = owners.input.find_exact_family("SpaceList").cloned() {
+            let names = match family {
+                SourceInputFamily::Objects(rows) => rows
+                    .into_iter()
+                    .map(|row| row.object_name)
+                    .collect::<Vec<_>>(),
+                SourceInputFamily::Null => Vec::new(),
+            };
+            self.space_lists = Some(vec![storage::SelectedSpaceListData::default(); names.len()]);
+            for (at, name) in names.into_iter().enumerate() {
+                let fields = owners
+                    .input
+                    .source_raw_object_fields("SpaceList", &name)
+                    .map_err(|_| Error::Unavailable("actual retained SpaceList JSON fields"))?
+                    .clone();
+                let list = &mut self
+                    .space_lists
+                    .as_mut()
+                    .ok_or(Error::Unavailable("actual SpaceList allocation"))?[at];
+                list.name = name.to_ascii_uppercase();
+                owners.input.mark_object_as_used("SpaceList", &name);
+                for (collision, label) in [
+                    (
+                        zones
+                            .iter()
+                            .any(|zone| zone.name.eq_ignore_ascii_case(&list.name)),
+                        "zone",
+                    ),
+                    (
+                        spaces
+                            .iter()
+                            .any(|space| space.name.eq_ignore_ascii_case(&list.name)),
+                        "space",
+                    ),
+                ] {
+                    if collision {
+                        owners.backend.show_source_severe_error(
+                            &format!("GetSpaceData: SpaceList=\"{}\":  is a duplicate of a {label} name.", list.name),
+                            &super::zone_lists::diagnostic_flags(owners.globals, owners.developer, owners.clock)?,
+                        )?;
+                        *errors_found = true;
+                    }
+                }
+                list.num_list_spaces = 0;
+                if let Some(members) = fields.get("spaces") {
+                    let Value::Array(members) = members else {
+                        return Err(Error::Unavailable("actual SpaceList spaces array"));
+                    };
+                    for member in members {
+                        let Value::Object(member) = member else {
+                            return Err(Error::Unavailable("actual SpaceList member object"));
+                        };
+                        let member_name = alpha(member, "space_name", "")?;
+                        let number = spaces
+                            .iter()
+                            .position(|space| space.name.eq_ignore_ascii_case(&member_name))
+                            .map(|index| signed(index + 1))
+                            .transpose()?
+                            .unwrap_or(0);
+                        if number > 0 {
+                            list.spaces.push(number);
+                            list.num_list_spaces =
+                                list.num_list_spaces
+                                    .checked_add(1)
+                                    .ok_or(Error::Unavailable(
+                                        "native signed SpaceList member count",
+                                    ))?;
+                        } else {
+                            owners.backend.show_source_severe_error(
+                                &format!("GetSpaceData: SpaceList={}", list.name),
+                                &super::zone_lists::diagnostic_flags(
+                                    owners.globals,
+                                    owners.developer,
+                                    owners.clock,
+                                )?,
+                            )?;
+                            owners.backend.show_continue_error(&format!(
+                                "Space Name={member_name} not found."
+                            ))?;
+                            *errors_found = true;
+                        }
+                        list.max_space_name_length =
+                            list.max_space_name_length.max(member_name.len());
+                        // Native compares every preceding retained successful member,
+                        // after append/count and max-length writes, with no early break.
+                        for &prior in list.spaces.iter().take(list.spaces.len().saturating_sub(1)) {
+                            if number == prior {
+                                owners.backend.show_source_severe_error(
+                                    &format!("GetSpaceData: SpaceList=\"{}\":  Space Name {member_name} appears more than once in list.", list.name),
+                                    &super::zone_lists::diagnostic_flags(owners.globals, owners.developer, owners.clock)?,
+                                )?;
+                                *errors_found = true;
+                            }
+                        }
+                    }
+                }
             }
-            self.space_lists = Some(Vec::new());
         }
         for (zone_index, zone) in zones.iter_mut().enumerate() {
             if !zone.space_indexes.is_empty() {
@@ -239,6 +331,16 @@ impl SelectedZoneInputOwners {
                 ));
             }
             space.typed_space_id = Some(matching[0].id);
+        }
+        // Rust identity proof follows all genuine getter writes; it never
+        // substitutes typed members for the actual pre-default resolution.
+        if !*errors_found {
+            let ids = self.source_space_list_ids(model)?;
+            if let Some(lists) = self.space_lists.as_mut() {
+                for (list, id) in lists.iter_mut().zip(ids) {
+                    list.typed_space_list_id = Some(id);
+                }
+            }
         }
         Ok(())
     }

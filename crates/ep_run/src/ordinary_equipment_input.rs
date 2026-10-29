@@ -34,6 +34,7 @@ mod infrared;
 mod multizone;
 mod people;
 mod source_b;
+mod space_lists;
 mod spaces;
 mod zone_lists;
 use fields::{admitted_field, required_fields};
@@ -63,7 +64,10 @@ fn resolve_raw(
         source_calendar_ingress && !source_b_ingress && zone_lists::positive(raw);
     let source_space_ingress =
         source_calendar_ingress && !source_b_ingress && spaces::positive(raw);
-    let source_gain_collections = source_zone_list_ingress || source_space_ingress;
+    let source_space_list_ingress =
+        source_calendar_ingress && !source_b_ingress && space_lists::positive(raw);
+    let source_gain_collections =
+        source_zone_list_ingress || source_space_ingress || source_space_list_ingress;
     if source_multizone_ingress || source_gain_collections {
         multizone::validate(raw)?;
     }
@@ -73,11 +77,15 @@ fn resolve_raw(
     if source_zone_list_ingress {
         zone_lists::validate(raw)?;
     }
+    if source_space_list_ingress {
+        space_lists::validate(raw)?;
+    }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
             continue;
         }
         let source_space_family = source_space_ingress && family.0 == "Space";
+        let source_space_list_family = source_space_list_ingress && family.0 == "SpaceList";
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
         let source_irt_family =
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
@@ -147,6 +155,7 @@ fn resolve_raw(
             && !source_people_family
             && !source_angle_family
             && !source_space_family
+            && !source_space_list_family
         {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
@@ -191,6 +200,7 @@ fn resolve_raw(
                         | "People"
                         | "ZoneList"
                         | "Space"
+                        | "SpaceList"
                         | "ScheduleTypeLimits"
                         | "Schedule:Constant"
                         | "Schedule:Compact"
@@ -320,6 +330,7 @@ fn resolve_raw(
                             "Schedule:Week:Compact" => field.0 != "data",
                             "ZoneList" if source_zone_list_ingress => field.0 != "zones",
                             "Space" if source_space_family => !spaces::known_field(&field.0),
+                            "SpaceList" if source_space_list_family => field.0 != "spaces",
                             "OtherEquipment" => !matches!(
                                 field.0.as_str(),
                                 "fuel_type"
@@ -684,7 +695,7 @@ fn resolve_raw(
                             }),
                     }
                 {
-                    return Err("ordinary OtherEquipment requires an actual admitted Zone, Source Space or Source ZoneList".into());
+                    return Err("ordinary OtherEquipment requires an actual admitted Zone, Source Space, ZoneList or SpaceList".into());
                 }
                 let schedule = if source_calendar_ingress {
                     match field(object, "schedule_name") {
@@ -861,7 +872,6 @@ mod tests {
             "HotWaterEquipment",
             "SteamEquipment",
             "ZoneGroup",
-            "SpaceList",
             "ZoneProperty:LocalEnvironment",
             "ZoneHVAC:EquipmentConnections",
             "ZoneHVAC:EquipmentList",
@@ -910,7 +920,6 @@ mod tests {
             r#"{"Space":{"A":{"zone_name":"Missing"}}}"#,
             r#"{"Space":{"A":{"zone_name":"Zulu","floor_area":" "}}}"#,
             r#"{"Space":{"A":{"zone_name":"Zulu","tags":[{"tag":7}]}}}"#,
-            r#"{"Space":{"A":{"zone_name":"Zulu"}},"SpaceList":{"L":{"spaces":[{"space_name":"A"}]}}}"#,
         ] {
             let mut value: serde_json::Value =
                 serde_json::from_str(r#"{"Zone":{"Zulu":{},"Alpha":{}}}"#)?;
@@ -923,6 +932,62 @@ mod tests {
                 "{extra}"
             );
         }
+        // SpaceList members remain raw, authored and ordered; the real getter
+        // owns Source numbers and sizing. Positive empty lists stay outside this increment.
+        let space_lists: serde_json::Value = serde_json::from_str(
+            r#"{
+            "Zone":{"Zulu":{},"Alpha":{}},
+            "Space":{"A room":{"zone_name":"Zulu"},"Z room":{"zone_name":"Alpha"}},
+            "SpaceList":{"Both":{"spaces":[{"space_name":"Z room"},{"space_name":"A room"}],"metadata":[null,true]}," L ":{"spaces":[{"space_name":"A room"}]}},
+            "Schedule:Constant":{"On":{"hourly_value":1}},
+            "People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}},
+            "OtherEquipment":{"G":{"zone_or_zonelist_or_space_or_spacelist_name":" L ","schedule_name":"On","design_level":7}}}"#,
+        )?;
+        let raw_lists = parse_epjson_str(&space_lists.to_string())?;
+        assert!(resolve_source_a(&raw_lists).is_ok());
+        assert!(resolve_source_b(&raw_lists).is_err());
+        assert!(resolve(&raw_lists).is_err());
+        let mut projected = crate::ordinary_input_processor::resolve_source_a(&raw_lists)?;
+        assert_eq!(projected.get_num_objects_found("SpaceList"), 2);
+        let definition = projected.get_object_def_max_args("SpaceList")?;
+        assert_eq!((definition.alphas, definition.numerics), (3, 0));
+        let list_fields = projected.source_raw_object_fields("SpaceList", "Both")?;
+        use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as ListValue;
+        let ListValue::Array(members) = &list_fields["spaces"] else {
+            return Err("actual SpaceList array".into());
+        };
+        let member_names = members
+            .iter()
+            .map(|member| match member {
+                ListValue::Object(fields) => match &fields["space_name"] {
+                    ListValue::String(name) => Ok(name.as_str()),
+                    _ => Err("actual SpaceList member string"),
+                },
+                _ => Err("actual SpaceList member object"),
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        assert_eq!(member_names, ["Z room", "A room"]);
+        for members in [
+            serde_json::json!([]),
+            serde_json::json!([{}]),
+            serde_json::json!([{"space_name":1}]),
+            serde_json::json!([{"space_name":" Z room"}]),
+            serde_json::json!([{"space_name":"Zulu"}]),
+            serde_json::json!([{"space_name":"A room"},{"space_name":"a room"}]),
+        ] {
+            let mut invalid = space_lists.clone();
+            invalid["SpaceList"]["Both"]["spaces"] = members;
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        for name in ["Zulu", "a ROOM", " ", "bad\nname"] {
+            let mut invalid = space_lists.clone();
+            invalid["SpaceList"] = serde_json::json!({name:{"spaces":[{"space_name":"A room"}]}});
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        let mut wrong_target = space_lists.clone();
+        wrong_target["OtherEquipment"]["G"]["zone_or_zonelist_or_space_or_spacelist_name"] =
+            serde_json::json!("L");
+        assert!(resolve_source_a(&parse_epjson_str(&wrong_target.to_string())?).is_err());
         // Direct real Zone references reuse the existing None/non-Water fuels.
         // The object order is opposite the direct-JSON Zone order, without
         // renumbering IDs or changing either actual namespace.

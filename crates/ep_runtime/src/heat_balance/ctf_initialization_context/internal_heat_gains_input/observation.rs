@@ -106,6 +106,12 @@ pub struct OrdinaryGainMiscObject<'a> {
     pub name: &'a str,
     /// Actual retained space start ptr.
     pub space_start_ptr: i32,
+    /// Actual retained ZoneListActive.
+    pub zone_list_active: bool,
+    /// Actual retained spaceListActive.
+    pub space_list_active: bool,
+    /// Actual retained Space or SpaceList array number, with constructor zero.
+    pub space_or_space_list_ptr: i32,
     /// Actual retained num spaces.
     pub num_spaces: i32,
     /// Actual retained space nums.
@@ -130,6 +136,18 @@ pub struct OrdinaryGainSpace<'a> {
     pub name: &'a str,
     /// Actual retained zone number.
     pub zone_number: i32,
+}
+
+/// Passive view of the same retained GetSpaceData SpaceList owner.
+pub struct OrdinaryGainSpaceList<'a> {
+    /// Actual ASCII-folded name, without trimming.
+    pub name: &'a str,
+    /// Actual count of successfully appended members.
+    pub num_list_spaces: i32,
+    /// Actual maximum input member-name byte length.
+    pub max_space_name_length: usize,
+    /// Actual Source Space array numbers in input member order.
+    pub spaces: &'a [i32],
 }
 
 /// Borrowed descriptor of the corresponding retained Source owner.
@@ -244,6 +262,8 @@ pub struct OrdinaryInternalGains<'a> {
     pub zones: Option<Vec<OrdinaryGainZone<'a>>>,
     /// Actual retained spaces.
     pub spaces: Option<Vec<OrdinaryGainSpace<'a>>>,
+    /// None is absent; Some(empty) is the actual allocated-empty list owner.
+    pub space_lists: Option<Vec<OrdinaryGainSpaceList<'a>>>,
     /// Actual retained schedules.
     pub schedules: Option<OrdinaryGainSchedules<'a>>,
     /// Actual retained output registration.
@@ -275,6 +295,9 @@ fn misc(row: &SourceMiscGainObject) -> OrdinaryGainMiscObject<'_> {
     OrdinaryGainMiscObject {
         name: &row.name,
         space_start_ptr: row.space_start_ptr,
+        zone_list_active: row.zone_list_active,
+        space_list_active: row.space_list_active,
+        space_or_space_list_ptr: row.space_or_space_list_ptr,
         num_spaces: row.num_spaces,
         space_nums: &row.space_nums,
         names: &row.names,
@@ -411,6 +434,17 @@ impl CtfInitializationReports {
                     .map(|r| OrdinaryGainSpace {
                         name: &r.name,
                         zone_number: r.zone_num,
+                    })
+                    .collect()
+            }),
+            space_lists: zones.space_lists.as_ref().map(|lists| {
+                lists
+                    .iter()
+                    .map(|list| OrdinaryGainSpaceList {
+                        name: &list.name,
+                        num_list_spaces: list.num_list_spaces,
+                        max_space_name_length: list.max_space_name_length,
+                        spaces: &list.spaces,
                     })
                     .collect()
             }),

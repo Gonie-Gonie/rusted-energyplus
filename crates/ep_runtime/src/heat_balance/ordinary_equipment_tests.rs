@@ -1042,9 +1042,22 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             );
             assert_eq!(&after[1..], &before[1..]);
         }
-        // Unit97: real raw GetSpaceData, independent lexical Space order,
+        // Unit97/98: real raw GetSpaceData, independent doj JSON-map Space order,
         // mixed authored/default ownership and retained constructor tail.
-        for authored_count in [total, total.saturating_sub(1)] {
+        for (authored_count, list_mode, source_is_epjson) in [
+            (total, 0, true),
+            (total.saturating_sub(1), 0, true),
+            (total, 1, true),
+            (total, 1, false),
+            (total, 2, true),
+            (total, 3, true),
+            (total, 4, true),
+            (total, 5, true),
+            (total, 6, true),
+            (total, 7, true),
+            (total, 8, true),
+            (total.saturating_sub(1), 9, true),
+        ] {
             if authored_count == 0 {
                 continue;
             }
@@ -1054,10 +1067,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             let mut authored_model = model.clone();
             authored_model.zone_lists.clear();
             authored_model.zone_list_names = Default::default();
+            authored_model.space_lists.clear();
             let mut space_fields = BTreeMap::new();
             for index in 0..authored_count {
                 let space = &mut authored_model.spaces[index];
-                space.name = ep_model::NormalizedName(format!("SPACE {}", total - index));
+                space.name =
+                    ep_model::NormalizedName(["S2", "S10", "S20"][total - index - 1].into());
+                if list_mode == 6 && index == 0 {
+                    space.name = authored_model.zones[0].name.clone();
+                }
                 space.origin = ep_model::SpaceOrigin::Authored;
                 let mut fields: BTreeMap<String, V> = BTreeMap::from([(
                     "zone_name".into(),
@@ -1084,8 +1102,132 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 }
                 space_fields.insert(space.name.0.clone(), fields);
             }
-            let expected = space_fields
-                .keys()
+            // initializeMaps retains doj map order: S2 precedes S10 despite
+            // Rust lexical order. Typed/declaration order is the reverse here.
+            let space_json_order = authored_model
+                .spaces
+                .iter()
+                .take(authored_count)
+                .rev()
+                .map(|space| space.name.0.clone())
+                .collect::<Vec<_>>();
+            if authored_count == total && total > 1 && list_mode != 6 {
+                assert_eq!(&space_json_order[..2], &["S2", "S10"]);
+                assert_ne!(
+                    space_json_order,
+                    space_fields.keys().cloned().collect::<Vec<_>>()
+                );
+            }
+            // Unit98 actual list getter: L2 precedes L10 in the genuine JSON
+            // map, independently of reverse IDF order, singleton prefixes and
+            // exact whitespace. The retained fields map alone is lexical.
+            let mut space_list_fields: BTreeMap<String, BTreeMap<String, V>> = BTreeMap::new();
+            let first_space = authored_model.spaces[0].name.0.clone();
+            let last_space = authored_model.spaces[authored_count - 1].name.0.clone();
+            let members = match list_mode {
+                1 if authored_count > 1 => vec![last_space.clone(), first_space.clone()],
+                2 => vec![first_space.clone(); 3],
+                3 => vec![
+                    first_space.clone(),
+                    "MISSING SPACE LONG98".into(),
+                    first_space.clone(),
+                ],
+                9 => vec![authored_model.zones[total - 1].name.0.clone()],
+                _ => vec![first_space.clone()],
+            };
+            let list_name = match list_mode {
+                4 => authored_model.zones[0].name.0.clone(),
+                5 | 6 => first_space.clone(),
+                _ => " L2 ".into(),
+            };
+            if list_mode != 0 && list_mode != 8 {
+                if list_mode == 7 {
+                    space_list_fields.insert(" L2 EMPTY98 ".into(), BTreeMap::new());
+                    space_list_fields.insert(
+                        " L10 EMPTY98 ".into(),
+                        BTreeMap::from([("spaces".into(), V::Array(Vec::new()))]),
+                    );
+                } else {
+                    space_list_fields.insert(
+                        list_name,
+                        BTreeMap::from([(
+                            "spaces".into(),
+                            V::Array(
+                                members
+                                    .iter()
+                                    .map(|name| {
+                                        V::Object(BTreeMap::from([(
+                                            "space_name".into(),
+                                            V::String(name.to_ascii_lowercase()),
+                                        )]))
+                                    })
+                                    .collect(),
+                            ),
+                        )]),
+                    );
+                    if list_mode == 1 {
+                        space_list_fields.insert(
+                            " L10 ".into(),
+                            BTreeMap::from([(
+                                "spaces".into(),
+                                V::Array(vec![V::Object(BTreeMap::from([(
+                                    "space_name".into(),
+                                    V::String(first_space),
+                                )]))]),
+                            )]),
+                        );
+                    }
+                }
+            }
+            let space_list_json_order = match list_mode {
+                1 => vec![" L2 ".into(), " L10 ".into()],
+                7 => vec![" L2 EMPTY98 ".into(), " L10 EMPTY98 ".into()],
+                _ => space_list_fields.keys().cloned().collect::<Vec<String>>(),
+            };
+            if matches!(list_mode, 1 | 7) {
+                assert_ne!(
+                    space_list_json_order,
+                    space_list_fields.keys().cloned().collect::<Vec<_>>()
+                );
+                for (index, (name, fields)) in space_list_fields.iter().enumerate() {
+                    let member_names = match fields.get("spaces") {
+                        Some(V::Array(rows)) => rows
+                            .iter()
+                            .map(|row| {
+                                let V::Object(row) = row else { unreachable!() };
+                                let V::String(name) = &row["space_name"] else {
+                                    unreachable!()
+                                };
+                                name.to_ascii_uppercase()
+                            })
+                            .collect::<Vec<_>>(),
+                        None => Vec::new(),
+                        _ => unreachable!(),
+                    };
+                    authored_model.space_lists.push(ep_model::SpaceList {
+                        id: ep_model::SpaceListId(u32::try_from(index)?),
+                        name: ep_model::NormalizedName(name.clone()),
+                        spaces: member_names
+                            .iter()
+                            .map(|name| {
+                                authored_model
+                                    .spaces
+                                    .iter()
+                                    .find(|space| space.name.0 == *name)
+                                    .expect("real authored SpaceList member")
+                                    .id
+                            })
+                            .collect(),
+                        max_space_name_length: member_names
+                            .iter()
+                            .map(String::len)
+                            .max()
+                            .unwrap_or(0),
+                    });
+                }
+            }
+            let expected = space_json_order
+                .iter()
                 .map(|name| {
                     authored_model
                         .spaces
@@ -1106,7 +1248,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 .iter()
                 .map(|row| (row.object_name.clone(), BTreeMap::new()))
                 .collect::<BTreeMap<_, _>>();
-            let families = BTreeMap::from([
+            let mut families: BTreeMap<String, SourceInputFamily> = BTreeMap::from([
                 (
                     "Zone".into(),
                     SourceInputFamily::Objects(
@@ -1122,12 +1264,11 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 (
                     "Space".into(),
                     SourceInputFamily::Objects(
-                        space_fields
+                        space_json_order
                             .iter()
-                            .rev()
-                            .map(|(name, fields)| SourceObjectShape {
+                            .map(|name| SourceObjectShape {
                                 object_name: name.clone(),
-                                field_sizes: fields
+                                field_sizes: space_fields[name]
                                     .iter()
                                     .map(|(key, value)| {
                                         (
@@ -1144,9 +1285,35 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     ),
                 ),
             ]);
+            if list_mode != 0 {
+                families.insert(
+                    "SpaceList".into(),
+                    SourceInputFamily::Objects(
+                        space_list_json_order
+                            .iter()
+                            .map(|name| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: space_list_fields[name]
+                                    .iter()
+                                    .map(|(key, value)| {
+                                        (
+                                            key.clone(),
+                                            match value {
+                                                V::Array(rows) => rows.len(),
+                                                _ => 1,
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                );
+            }
             let definitions = [
                 ("Zone", 4, 9, 0, None),
                 ("Space", 3, 3, 1, Some("tags")),
+                ("SpaceList", 1, 0, 1, Some("spaces")),
                 ("Output:Variable", 4, 0, 0, None),
                 ("NodeList", 1, 0, 1, Some("nodes")),
                 ("ZoneHVAC:EquipmentList", 2, 0, 4, Some("equipment")),
@@ -1170,13 +1337,69 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             })
             .collect();
             let mut ip = SelectedInputProcessor::from_admitted_input(definitions, families)?;
+            let mut statistic_objects: BTreeMap<String, _> = BTreeMap::from([
+                ("Zone".into(), zone_fields),
+                ("Space".into(), space_fields.clone()),
+            ]);
+            if list_mode != 0 {
+                statistic_objects.insert("SpaceList".into(), space_list_fields.clone());
+            }
+            // Converted IDF uses a separate declaration overlay for
+            // getObjectItem. GetSpaceData reads the JSON map directly in both
+            // formats and must not consume that overlay or re-sort its rows.
+            let mut object_order: BTreeMap<String, Vec<String>> = statistic_objects
+                .iter()
+                .map(|(family, objects)| {
+                    (family.clone(), objects.keys().cloned().collect::<Vec<_>>())
+                })
+                .collect();
+            object_order.insert(
+                "Space".into(),
+                if source_is_epjson {
+                    space_json_order.clone()
+                } else {
+                    authored_model
+                        .spaces
+                        .iter()
+                        .take(authored_count)
+                        .map(|space| space.name.0.clone())
+                        .collect()
+                },
+            );
+            if list_mode != 0 {
+                object_order.insert(
+                    "SpaceList".into(),
+                    if source_is_epjson {
+                        space_list_json_order.clone()
+                    } else {
+                        space_list_json_order.iter().rev().cloned().collect()
+                    },
+                );
+            }
             ip.retain_source_input_statistics(SourceInputStatisticsInput {
-                objects: BTreeMap::from([
-                    ("Zone".into(), zone_fields),
-                    ("Space".into(), space_fields.clone()),
-                ]),
-                object_order: BTreeMap::new(),
+                objects: statistic_objects,
+                object_order,
             })?;
+            if !source_is_epjson {
+                assert_eq!(ip.source_raw_object_names("SpaceList")?, [" L10 ", " L2 "]);
+                if authored_count > 1 {
+                    assert_ne!(
+                        ip.source_raw_object_names("Space")?,
+                        space_json_order.as_slice()
+                    );
+                }
+            }
+            let mut authored_raw = raw.clone();
+            authored_raw.source_is_epjson = source_is_epjson;
+            if !source_is_epjson {
+                for zone in authored_raw
+                    .objects
+                    .get_mut("Zone")
+                    .ok_or("physical IDF Zone rows")?
+                {
+                    zone.idf_max_fields = Some(1); // Zone, name;
+                }
+            }
             let mut shared = SourceInputProcessorShortCut::default();
             shared.allocate_from_input(&ip)?;
             let mut actual = SelectedZoneInputOwners::default();
@@ -1184,6 +1407,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             let mut registration = SourceOutputRegistration::default();
             let (mut errors, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
             error_state.output_error_header = false;
+            let severe_before = error_state.tracking.total_severe_errors;
             let mut backend = SourceErrorBackend {
                 state: &mut error_state,
                 error_stream: Some(&mut errors),
@@ -1197,7 +1421,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             };
             let mut found = false;
             actual.get_zone_data(
-                &raw,
+                &authored_raw,
                 &control,
                 &authored_model,
                 &mut ZoneGetterOwners {
@@ -1217,8 +1441,132 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 },
                 &mut found,
             )?;
-            assert!(!found);
             assert_eq!(actual_globals.num_spaces, i32::try_from(total)?);
+            if list_mode == 0 {
+                assert!(actual.space_lists.is_none());
+            } else {
+                let lists = actual
+                    .space_lists
+                    .as_ref()
+                    .ok_or("real SpaceList allocation")?;
+                assert_eq!(lists.len(), space_list_fields.len());
+                assert_eq!(
+                    lists
+                        .iter()
+                        .map(|list| list.name.as_str())
+                        .collect::<Vec<_>>(),
+                    space_list_json_order
+                        .iter()
+                        .map(String::as_str)
+                        .collect::<Vec<_>>()
+                );
+                assert!(
+                    space_list_fields
+                        .keys()
+                        .all(|name| !ip.is_object_unused("SpaceList", name))
+                );
+                if list_mode == 1 {
+                    assert_eq!(
+                        lists[0].spaces,
+                        if authored_count > 1 {
+                            vec![1, i32::try_from(authored_count)?]
+                        } else {
+                            vec![1]
+                        }
+                    );
+                    assert_eq!(lists[1].spaces, [i32::try_from(authored_count)?]);
+                }
+                if list_mode == 2 {
+                    assert_eq!(lists[0].num_list_spaces, 3);
+                    assert_eq!(lists[0].spaces.len(), 3);
+                    assert!(
+                        lists[0]
+                            .spaces
+                            .iter()
+                            .all(|number| *number == lists[0].spaces[0])
+                    );
+                }
+                if list_mode == 3 {
+                    assert_eq!(lists[0].num_list_spaces, 2);
+                    assert_eq!(lists[0].spaces[0], lists[0].spaces[1]);
+                    assert_eq!(lists[0].max_space_name_length, "MISSING SPACE LONG98".len());
+                }
+                if list_mode == 7 {
+                    assert!(lists.iter().all(|list| list.num_list_spaces == 0
+                        && list.spaces.is_empty()
+                        && list.max_space_name_length == 0));
+                }
+                if list_mode == 9 {
+                    assert_eq!(lists[0].num_list_spaces, 0);
+                    assert!(lists[0].spaces.is_empty());
+                    assert_eq!(
+                        lists[0].max_space_name_length,
+                        authored_model.zones[total - 1].name.0.len()
+                    );
+                    assert_eq!(
+                        actual.spaces.as_ref().ok_or("default after list lookup")?[total - 1].name,
+                        authored_model.zones[total - 1].name.0
+                    );
+                }
+            }
+            if matches!(list_mode, 2 | 3 | 4 | 5 | 6 | 9) {
+                assert!(found);
+                let expected_severe = match list_mode {
+                    2 => 3,
+                    3 | 6 => 2,
+                    _ => 1,
+                };
+                assert_eq!(
+                    backend.state.tracking.total_severe_errors - severe_before,
+                    expected_severe
+                );
+                assert!(
+                    actual
+                        .space_lists
+                        .as_ref()
+                        .ok_or("diagnostic SpaceLists")?
+                        .iter()
+                        .all(|list| list.typed_space_list_id.is_none())
+                );
+                assert_eq!(
+                    actual
+                        .spaces
+                        .as_ref()
+                        .ok_or("retained Space diagnostic capacity")?
+                        .len(),
+                    total + authored_count
+                );
+                let text = String::from_utf8_lossy(&errors);
+                if list_mode == 6 {
+                    assert!(
+                        text.find("duplicate of a zone name")
+                            .ok_or("real Zone collision")?
+                            < text
+                                .find("duplicate of a space name")
+                                .ok_or("real Space collision")?
+                    );
+                }
+                continue;
+            }
+            assert!(!found);
+            let list_ids = actual.source_space_list_ids(&authored_model)?;
+            if matches!(list_mode, 1 | 7) {
+                assert_eq!(
+                    list_ids,
+                    [ep_model::SpaceListId(1), ep_model::SpaceListId(0)]
+                );
+                for (list, id) in actual
+                    .space_lists
+                    .as_ref()
+                    .ok_or("bound real lists")?
+                    .iter()
+                    .zip(list_ids)
+                {
+                    assert_eq!(list.typed_space_list_id, Some(id));
+                }
+            } else {
+                assert!(list_ids.is_empty());
+            }
             let (zone_ids, space_ids) =
                 actual.source_implicit_space_ids(&authored_model, &actual_globals)?;
             assert_eq!(space_ids, expected);
@@ -1280,7 +1628,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             ip.report_source_idf_records_stats(&mut stats)?;
             assert_eq!(
                 stats.number_input_records,
-                i32::try_from(total + authored_count)?
+                i32::try_from(total + authored_count + space_list_fields.len())?
             );
             assert_eq!(
                 stats.total_autocalculatable_fields,
@@ -1311,7 +1659,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     schedules: &mut schedules,
                     sizing: &mut sizing,
                     branch: None,
-                    source_is_epjson: true,
+                    source_is_epjson,
                 },
             )?;
             assert_eq!(equipment.space_ids, expected);

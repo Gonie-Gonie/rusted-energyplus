@@ -399,8 +399,9 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
     for binding in &list_model.source_other_equipment_inputs {
         let rows = &list_model.other_equipment[binding.instances.clone()];
         match binding.target {
-            ep_model::SourceOtherEquipmentInputTarget::Space(_) => {
-                return Err("unexpected direct Space in prior ZoneList fixture".into());
+            ep_model::SourceOtherEquipmentInputTarget::Space(_)
+            | ep_model::SourceOtherEquipmentInputTarget::SpaceList(_) => {
+                return Err("unexpected Space target in prior ZoneList fixture".into());
             }
             ep_model::SourceOtherEquipmentInputTarget::ZoneList(id) => {
                 let list = list_model
@@ -550,8 +551,9 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
                 assert_eq!(rows[0].zone, zone);
                 assert_eq!(Some(zone), typed.zone_names.resolve("Alpha"));
             }
-            ep_model::SourcePeopleInputTarget::Space(_) => {
-                return Err("unexpected direct Space in prior ZoneList fixture".into());
+            ep_model::SourcePeopleInputTarget::Space(_)
+            | ep_model::SourcePeopleInputTarget::SpaceList(_) => {
+                return Err("unexpected Space target in prior ZoneList fixture".into());
             }
             ep_model::SourcePeopleInputTarget::ZoneList(id) => {
                 let list = typed
@@ -1047,6 +1049,243 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
         matches!(model.source_people_inputs[0].target,ep_model::SourcePeopleInputTarget::Zone(id) if Some(id)==model.zone_names.resolve("Alpha"))
     );
     assert_eq!(model.people[0].name.0, "P");
+    // Unit98: SpaceList members keep their authored order and genuine Space
+    // identities. All methods retain whole authored operands per instance;
+    // the genuine getter, rather than this frontend, sizes their loads/counts.
+    let space_list_json = r#"{
+        "Zone":{"Zulu":{"floor_area":12},"Alpha":{"floor_area":6}},
+        "Space":{"A room":{"zone_name":"Zulu"},"Z room":{"zone_name":"Alpha"}},
+        "ZoneList":{"Shared":{"zones":[{"zone_name":"Zulu"}]}},
+        "SpaceList":{
+            "Joined":{"spaces":[{"space_name":"Z room"},{"space_name":"A room"}]},
+            "Solo":{"spaces":[{"space_name":"A room"}]},
+            "Shared":{"spaces":[{"space_name":"Z room"}]}},
+        "People":{
+            "A count":{"zone_or_zonelist_or_space_or_spacelist_name":"Joined","number_of_people":2,"people_per_floor_area":0.25,"floor_area_per_person":8},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Joined","number_of_people_calculation_method":"People/Area","number_of_people":2,"people_per_floor_area":0.25,"floor_area_per_person":8},
+            "C inverse":{"zone_or_zonelist_or_space_or_spacelist_name":"Solo","number_of_people_calculation_method":"Area/Person","number_of_people":2,"people_per_floor_area":0.25,"floor_area_per_person":8},
+            "D precedence":{"zone_or_zonelist_or_space_or_spacelist_name":"Shared","number_of_people":2,"people_per_floor_area":0.25,"floor_area_per_person":8}},
+        "OtherEquipment":{
+            "A level":{"zone_or_zonelist_or_space_or_spacelist_name":"Joined","design_level":23,"power_per_floor_area":1.75,"power_per_person":5},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Joined","design_level_calculation_method":"Watts/Area","design_level":23,"power_per_floor_area":1.75,"power_per_person":5},
+            "C person":{"zone_or_zonelist_or_space_or_spacelist_name":"Solo","design_level_calculation_method":"Watts/Person","design_level":23,"power_per_floor_area":1.75,"power_per_person":5},
+            "D precedence":{"zone_or_zonelist_or_space_or_spacelist_name":"Shared","design_level":23,"power_per_floor_area":1.75,"power_per_person":5}}}"#;
+    let space_list_idf = "Zone,Zulu;Zone,Alpha;Space,Z room,Alpha;Space,A room,Zulu;SpaceList,Solo,A room;SpaceList,Shared,Z room;SpaceList,Joined,Z room,A room;ZoneList,Shared,Zulu;People,D precedence,Shared,,People,2,0.25,8;People,C inverse,Solo,,Area/Person,2,0.25,8;People,B area,Joined,,People/Area,2,0.25,8;People,A count,Joined,,People,2,0.25,8;OtherEquipment,D precedence,,Shared,,EquipmentLevel,23,1.75,5;OtherEquipment,C person,,Solo,,Watts/Person,23,1.75,5;OtherEquipment,B area,,Joined,,Watts/Area,23,1.75,5;OtherEquipment,A level,,Joined,,EquipmentLevel,23,1.75,5;";
+    for staged in [false, true] {
+        let raw = if staged {
+            ep_raw_model::parse_epjson_str_with_idf_order(space_list_json, space_list_idf)?
+        } else {
+            parse_epjson_str(space_list_json)?
+        };
+        assert!(!raw.has_idf_declaration_order("SpaceList"));
+        let result = super::super::compile_raw_model_for_source(&raw);
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let typed = result.model.ok_or("actual Source SpaceList instances")?;
+        assert_eq!(typed.people.len(), 6);
+        assert_eq!(typed.other_equipment.len(), 6);
+        assert_eq!(typed.space_lists.len(), 3);
+        for (index, (name, _)) in raw
+            .source_json_instances("SpaceList")?
+            .into_iter()
+            .enumerate()
+        {
+            assert_eq!(usize::try_from(typed.space_lists[index].id.0)?, index);
+            assert_eq!(typed.space_lists[index].name.0, name.0.to_ascii_uppercase());
+        }
+        assert_eq!(
+            typed.source_people_inputs[0].object_name,
+            if staged { "D precedence" } else { "A count" }
+        );
+        assert_eq!(
+            typed.source_other_equipment_inputs[0].object_name,
+            if staged { "D precedence" } else { "A level" }
+        );
+        let mut people_cursor = 0;
+        for binding in &typed.source_people_inputs {
+            assert_eq!(binding.instances.start, people_cursor);
+            let rows = &typed.people[binding.instances.clone()];
+            if let ep_model::SourcePeopleInputTarget::SpaceList(id) = binding.target {
+                let list = typed
+                    .space_lists
+                    .iter()
+                    .find(|list| list.id == id)
+                    .ok_or("actual typed People SpaceList")?;
+                assert_eq!(rows.len(), list.spaces.len());
+                for (row, member) in rows.iter().zip(&list.spaces) {
+                    let space = typed
+                        .spaces
+                        .iter()
+                        .find(|space| space.id == *member)
+                        .ok_or("actual People list member Space")?;
+                    assert_eq!(space.origin, ep_model::SpaceOrigin::Authored);
+                    assert_eq!(row.zone, space.zone);
+                    assert_eq!(
+                        row.name.0,
+                        format!(
+                            "{} {}",
+                            space.name.0,
+                            binding.object_name.to_ascii_uppercase()
+                        )
+                    );
+                }
+            } else {
+                assert_eq!(binding.object_name, "D precedence");
+                assert!(matches!(
+                    binding.target,
+                    ep_model::SourcePeopleInputTarget::ZoneList(_)
+                ));
+                assert_eq!(rows.len(), 1);
+                assert_eq!(Some(rows[0].zone), typed.zone_names.resolve("Zulu"));
+            }
+            for row in rows {
+                assert_eq!(
+                    (
+                        row.number_of_people,
+                        row.people_per_floor_area,
+                        row.floor_area_per_person
+                    ),
+                    (2.0, 0.25, 8.0)
+                );
+                assert_eq!(
+                    row.number_of_people_calculation_method,
+                    match binding.object_name.as_str() {
+                        "B area" => ep_model::PeopleNumberCalculationMethod::PeoplePerArea,
+                        "C inverse" => ep_model::PeopleNumberCalculationMethod::AreaPerPerson,
+                        _ => ep_model::PeopleNumberCalculationMethod::People,
+                    }
+                );
+            }
+            people_cursor = binding.instances.end;
+        }
+        assert_eq!(people_cursor, typed.people.len());
+        let mut equipment_cursor = 0;
+        for binding in &typed.source_other_equipment_inputs {
+            assert_eq!(binding.instances.start, equipment_cursor);
+            let rows = &typed.other_equipment[binding.instances.clone()];
+            if let ep_model::SourceOtherEquipmentInputTarget::SpaceList(id) = binding.target {
+                let list = typed
+                    .space_lists
+                    .iter()
+                    .find(|list| list.id == id)
+                    .ok_or("actual typed OtherEquipment SpaceList")?;
+                assert_eq!(rows.len(), list.spaces.len());
+                for (row, member) in rows.iter().zip(&list.spaces) {
+                    let space = typed
+                        .spaces
+                        .iter()
+                        .find(|space| space.id == *member)
+                        .ok_or("actual equipment list member Space")?;
+                    assert_eq!(space.origin, ep_model::SpaceOrigin::Authored);
+                    assert_eq!(row.zone, space.zone);
+                    assert_eq!(
+                        row.name.0,
+                        format!(
+                            "{} {}",
+                            space.name.0,
+                            binding.object_name.to_ascii_uppercase()
+                        )
+                    );
+                }
+            } else {
+                assert_eq!(binding.object_name, "D precedence");
+                assert!(matches!(
+                    binding.target,
+                    ep_model::SourceOtherEquipmentInputTarget::ZoneList(_)
+                ));
+                assert_eq!(rows.len(), 1);
+                assert_eq!(Some(rows[0].zone), typed.zone_names.resolve("Zulu"));
+            }
+            for row in rows {
+                assert_eq!(
+                    (
+                        row.design_level_w,
+                        row.power_per_floor_area_w_per_m2,
+                        row.power_per_person_w
+                    ),
+                    (23.0, 1.75, 5.0)
+                );
+                assert_eq!(row.design_level_calculation_method, match binding.object_name.as_str() {
+                    "B area" => ep_model::OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea,
+                    "C person" => ep_model::OtherEquipmentDesignLevelCalculationMethod::WattsPerPerson,
+                    _ => ep_model::OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
+                });
+            }
+            equipment_cursor = binding.instances.end;
+        }
+        assert_eq!(equipment_cursor, typed.other_equipment.len());
+        assert_eq!(typed.people_names.names().len(), typed.people.len());
+        for (index, row) in typed.people.iter().enumerate() {
+            assert_eq!(usize::try_from(row.id.0)?, index);
+            assert_eq!(typed.people_names.names()[index], row.name);
+        }
+        assert_eq!(
+            typed.other_equipment_names.names().len(),
+            typed.other_equipment.len()
+        );
+        for (index, row) in typed.other_equipment.iter().enumerate() {
+            assert_eq!(usize::try_from(row.id.0)?, index);
+            assert_eq!(typed.other_equipment_names.names()[index], row.name);
+        }
+        assert!(
+            compile_raw_model(&raw).has_errors(),
+            "legacy gain target lookup stays direct-Zone-only"
+        );
+    }
+    let exact_list_raw = parse_epjson_str(
+        r#"{"Zone":{"Z":{}},"Space":{" S ":{"zone_name":"Z"}},"SpaceList":{" L ":{"spaces":[{"space_name":" s "}]}},"People":{" p ":{"zone_or_zonelist_or_space_or_spacelist_name":" l ","number_of_people":2}},"OtherEquipment":{" e ":{"zone_or_zonelist_or_space_or_spacelist_name":" l ","design_level":23}}}"#,
+    )?;
+    let exact_list_result = super::super::compile_raw_model_for_source(&exact_list_raw);
+    assert!(
+        !exact_list_result.has_errors(),
+        "{:?}",
+        exact_list_result.report.diagnostics
+    );
+    let exact_list_model = exact_list_result
+        .model
+        .ok_or("exact Source list gain target")?;
+    assert_eq!(
+        exact_list_model.people[0].name.0,
+        format!("{} {}", " S ", " P ")
+    );
+    assert_eq!(
+        exact_list_model.other_equipment[0].name.0,
+        format!("{} {}", " S ", " E ")
+    );
+    assert!(matches!(exact_list_model.source_people_inputs[0].target,
+        ep_model::SourcePeopleInputTarget::SpaceList(id) if Some(id)==exact_list_model.space_list_names.resolve(" L ")));
+    assert!(
+        matches!(exact_list_model.source_other_equipment_inputs[0].target,
+        ep_model::SourceOtherEquipmentInputTarget::SpaceList(id) if Some(id)==exact_list_model.space_list_names.resolve(" L "))
+    );
+    for (family, text) in [
+        (
+            "People",
+            r#"{"Zone":{"Z":{}},"Space":{" S ":{"zone_name":"Z"}},"SpaceList":{" L ":{"spaces":[{"space_name":" S "}]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","number_of_people":2}}}"#,
+        ),
+        (
+            "OtherEquipment",
+            r#"{"Zone":{"Z":{}},"Space":{" S ":{"zone_name":"Z"}},"SpaceList":{" L ":{"spaces":[{"space_name":" S "}]}},"OtherEquipment":{"E":{"zone_or_zonelist_or_space_or_spacelist_name":"L","design_level":23}}}"#,
+        ),
+    ] {
+        let wrong_raw = parse_epjson_str(text)?;
+        let rejected = super::super::compile_raw_model_for_source(&wrong_raw);
+        assert!(
+            rejected
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.object_type == family && d.code == "MissingReference")
+        );
+    }
+    for text in [
+        r#"{"Zone":{"Z":{}},"Space":{"S1":{"zone_name":"Z"},"S2":{"zone_name":"Z"}},"SpaceList":{"L":{"spaces":[{"space_name":"S1"}]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","number_of_people":1}}}"#,
+        r#"{"Zone":{"Z":{}},"SpaceList":{"L":{"spaces":[]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","number_of_people":1}}}"#,
+    ] {
+        assert!(
+            super::super::compile_raw_model_for_source(&parse_epjson_str(text)?).has_errors(),
+            "positive SpaceList expansion keeps singleton whole-Zone and nonempty boundaries"
+        );
+    }
     for (field, expected) in [("", ""), ("General", "GENERAL")] {
         let text = format!(
             r#"{{"Zone":{{"Z":{{}}}},"Space":{{"S":{{"zone_name":"Z","space_type":"{field}"}}}}}}"#

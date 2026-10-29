@@ -218,7 +218,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Schedule:Year"
             | "RunPeriodControl:DaylightSavingTime"
             | "RunPeriodControl:SpecialDays"
-    ) || (scope == PortingScope::A && matches!(kind, "ZoneList" | "Space"))
+    ) || (scope == PortingScope::A && matches!(kind, "ZoneList" | "Space" | "SpaceList"))
         || (scope == PortingScope::B
             && matches!(
                 kind,
@@ -379,9 +379,11 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         // producer that remains outside this stage.
         violations.push("multi-Zone requires a non-floor opaque enclosure for every Zone".into());
     }
-    if !model.zone_lists.is_empty() || authored_spaces {
+    if !model.zone_lists.is_empty() || !model.space_lists.is_empty() || authored_spaces {
         if scope != PortingScope::A {
-            violations.push("ZoneList and authored Space are admitted only by Source A".into());
+            violations.push(
+                "ZoneList, SpaceList and authored Space are admitted only by Source A".into(),
+            );
         }
         let mut cursor = 0;
         for binding in &model.source_other_equipment_inputs {
@@ -439,6 +441,37 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                     {
                         violations.push(
                             "Source OtherEquipment ordered ZoneList association differs".into(),
+                        );
+                    }
+                }
+                ep_model::SourceOtherEquipmentInputTarget::SpaceList(id) => {
+                    if !model
+                        .space_lists
+                        .iter()
+                        .find(|list| list.id == id)
+                        .is_some_and(|list| {
+                            !list.spaces.is_empty()
+                                && list.spaces.len() == instances.len()
+                                && list.spaces.iter().zip(instances).all(|(id, row)| {
+                                    model
+                                        .spaces
+                                        .iter()
+                                        .find(|space| space.id == *id)
+                                        .is_some_and(|space| {
+                                            space.origin == ep_model::SpaceOrigin::Authored
+                                                && row.zone == space.zone
+                                                && row.name.0
+                                                    == format!(
+                                                        "{} {}",
+                                                        space.name.0,
+                                                        binding.object_name.to_ascii_uppercase()
+                                                    )
+                                        })
+                                })
+                        })
+                    {
+                        violations.push(
+                            "Source OtherEquipment ordered SpaceList association differs".into(),
                         );
                     }
                 }
@@ -500,6 +533,36 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                     {
                         violations
                             .push("Source People ordered ZoneList association differs".into());
+                    }
+                }
+                ep_model::SourcePeopleInputTarget::SpaceList(id) => {
+                    if !model
+                        .space_lists
+                        .iter()
+                        .find(|list| list.id == id)
+                        .is_some_and(|list| {
+                            !list.spaces.is_empty()
+                                && list.spaces.len() == instances.len()
+                                && list.spaces.iter().zip(instances).all(|(id, row)| {
+                                    model
+                                        .spaces
+                                        .iter()
+                                        .find(|space| space.id == *id)
+                                        .is_some_and(|space| {
+                                            space.origin == ep_model::SpaceOrigin::Authored
+                                                && row.zone == space.zone
+                                                && row.name.0
+                                                    == format!(
+                                                        "{} {}",
+                                                        space.name.0,
+                                                        binding.object_name.to_ascii_uppercase()
+                                                    )
+                                        })
+                                })
+                        })
+                    {
+                        violations
+                            .push("Source People ordered SpaceList association differs".into());
                     }
                 }
             }

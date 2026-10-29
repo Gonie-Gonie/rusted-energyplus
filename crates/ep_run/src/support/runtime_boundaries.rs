@@ -305,13 +305,15 @@ pub(super) fn assess_typed_runtime_boundaries(
             })
             .count(),
     );
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "SpaceList",
-        typed_model.space_lists.len(),
-    );
+    if !source_admission.is_some_and(|admission| admission.consumes("SpaceList")) {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "SpaceList",
+            typed_model.space_lists.len(),
+        );
+    }
 
     push_typed_unsupported_object(
         registry,

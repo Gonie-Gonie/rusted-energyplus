@@ -546,7 +546,13 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
     // Unit97 singleton authored Spaces use the same Source-only class as
     // bounded Zones/ZoneLists. No ZoneList can hide the singleton predicate.
     // The no-Space control retains its existing one-Zone capability.
-    for (authored, explicit_surfaces) in [(false, false), (true, false), (true, true)] {
+    for (authored, explicit_surfaces, list_target) in [
+        (false, false, false),
+        (true, false, false),
+        (true, true, false),
+        (true, false, true),
+        (true, true, true),
+    ] {
         let mut single = self::input(PortingScope::A);
         if authored {
             single["Space"] = json!({"Room97":{"zone_name":"Zone","ceiling_height":0,"volume":0}});
@@ -559,6 +565,11 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
                     surface["space_name"] = json!("Room97");
                 }
             }
+        }
+        if list_target {
+            single["SpaceList"] = json!({"Only98":{"spaces":[{"space_name":"Room97"}]}});
+            single["People"] = json!({"P98":{"zone_or_zonelist_or_space_or_spacelist_name":"Only98","number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}});
+            single["OtherEquipment"] = json!({"G98":{"zone_or_zonelist_or_space_or_spacelist_name":"Only98","schedule_name":"On","design_level":7}});
         }
         let raw = parse_epjson_str(&single.to_string()).expect("actual singleton Space input");
         assert!(
@@ -581,6 +592,17 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
                 ep_model::SpaceOrigin::AutoZoneDefault
             }
         );
+        if list_target {
+            assert_eq!(model.space_lists.len(), 1);
+            assert_eq!(model.people[0].name.0, "ROOM97 P98");
+            assert_eq!(model.other_equipment[0].name.0, "ROOM97 G98");
+            assert!(
+                matches!(model.source_people_inputs[0].target,ep_model::SourcePeopleInputTarget::SpaceList(id) if id==model.space_lists[0].id)
+            );
+            assert!(
+                matches!(model.source_other_equipment_inputs[0].target,ep_model::SourceOtherEquipmentInputTarget::SpaceList(id) if id==model.space_lists[0].id)
+            );
+        }
         let mut selected =
             inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
         assert!(selected.admissible, "{:?}", selected.violations);

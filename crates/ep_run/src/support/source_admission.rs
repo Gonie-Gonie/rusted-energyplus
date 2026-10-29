@@ -91,6 +91,7 @@ impl SourceSupportAdmission {
             // Real GetZoneData/GetSpaceData and ZoneList demand owners, not a fixed one-Zone capability.
             "ZoneList",
             "Space",
+            "SpaceList",
             // Ordered IRT getter/ROnly CTF properties; the same raw resolver
             // checks safe Source uses before this consumed-family marker.
             "Material:InfraredTransparent",

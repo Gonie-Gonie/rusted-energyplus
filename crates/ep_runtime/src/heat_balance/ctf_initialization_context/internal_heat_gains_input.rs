@@ -251,6 +251,8 @@ pub(crate) struct SourceMiscGainObject {
     pub(crate) name: String,
     pub(crate) space_start_ptr: i32,
     pub(crate) zone_list_active: bool,
+    pub(crate) space_or_space_list_ptr: i32,
+    pub(crate) space_list_active: bool,
     pub(crate) num_spaces: i32,
     pub(crate) space_nums: Vec<i32>,
     pub(crate) names: Vec<String>,

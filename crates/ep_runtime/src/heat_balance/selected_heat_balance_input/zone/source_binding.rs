@@ -3,7 +3,7 @@
 use super::SelectedZoneInputOwners;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
-use ep_model::{NormalizedName, SpaceId, SpaceOrigin, TypedModel, ZoneId};
+use ep_model::{NormalizedName, SpaceId, SpaceListId, SpaceOrigin, TypedModel, ZoneId};
 use std::collections::{BTreeMap, BTreeSet};
 
 impl SelectedZoneInputOwners {
@@ -145,6 +145,109 @@ impl SelectedZoneInputOwners {
                 "unbound actual Source ZoneList identity",
             ));
         }
+        let space_list_ids = self.source_space_list_ids(model)?;
+        if self
+            .space_lists
+            .as_deref()
+            .unwrap_or(&[])
+            .iter()
+            .zip(space_list_ids)
+            .any(|(list, id)| list.typed_space_list_id != Some(id))
+        {
+            return Err(Error::Unavailable(
+                "unbound actual Source SpaceList identity",
+            ));
+        }
         Ok((zone_ids, space_ids))
+    }
+
+    pub(crate) fn source_space_list_ids(
+        &self,
+        model: &TypedModel,
+    ) -> Result<Vec<SpaceListId>, Error> {
+        let lists = self.space_lists.as_deref().unwrap_or(&[]);
+        let spaces = self
+            .spaces
+            .as_deref()
+            .ok_or(Error::Unavailable("actual SpaceList Space owner"))?;
+        let zones = self
+            .zones
+            .as_deref()
+            .ok_or(Error::Unavailable("actual SpaceList Zone owner"))?;
+        let mut typed = model
+            .space_lists
+            .iter()
+            .map(|list| (list.name.0.as_str(), list))
+            .collect::<BTreeMap<_, _>>();
+        if lists.len() != model.space_lists.len()
+            || typed.len() != lists.len()
+            || model
+                .space_lists
+                .iter()
+                .map(|list| list.id)
+                .collect::<BTreeSet<_>>()
+                .len()
+                != lists.len()
+        {
+            return Err(Error::Unavailable(
+                "Source/typed SpaceList identity bijection",
+            ));
+        }
+        let mut ids = Vec::with_capacity(lists.len());
+        for list in lists {
+            let row = typed
+                .remove(list.name.as_str())
+                .ok_or(Error::Unavailable("Source/typed exact SpaceList name"))?;
+            if i32::try_from(list.spaces.len()).ok() != Some(list.num_list_spaces)
+                || list.spaces.len() != row.spaces.len()
+                || list.max_space_name_length != row.max_space_name_length
+                || list.spaces.iter().collect::<BTreeSet<_>>().len() != list.spaces.len()
+                || list.typed_space_list_id.is_some_and(|id| id != row.id)
+            {
+                return Err(Error::Unavailable("Source/typed SpaceList member shape"));
+            }
+            for (&number, &id) in list.spaces.iter().zip(&row.spaces) {
+                let at = number
+                    .checked_sub(1)
+                    .and_then(|n| usize::try_from(n).ok())
+                    .ok_or(Error::Unavailable(
+                        "positive actual SpaceList member pointer",
+                    ))?;
+                let space = spaces
+                    .get(at)
+                    .ok_or(Error::Unavailable("actual SpaceList member bounds"))?;
+                let mut matching = model.spaces.iter().filter(|space| space.id == id);
+                let member = matching
+                    .next()
+                    .ok_or(Error::Unavailable("typed SpaceList member identity"))?;
+                let zone_at = space
+                    .zone_num
+                    .checked_sub(1)
+                    .and_then(|n| usize::try_from(n).ok())
+                    .ok_or(Error::Unavailable("actual SpaceList member Zone pointer"))?;
+                let zone = zones
+                    .get(zone_at)
+                    .ok_or(Error::Unavailable("actual SpaceList member Zone bounds"))?;
+                if matching.next().is_some()
+                    || space.typed_space_id != Some(id)
+                    || member.origin != SpaceOrigin::Authored
+                    || member.name.0 != space.name
+                    || Some(member.zone) != zone.typed_zone_id
+                    || zone.num_spaces != 1
+                    || zone.space_indexes.as_slice() != [number]
+                {
+                    return Err(Error::Unavailable(
+                        "Source/typed ordered whole-Zone SpaceList member",
+                    ));
+                }
+            }
+            ids.push(row.id);
+        }
+        if !typed.is_empty() {
+            return Err(Error::Unavailable(
+                "incomplete Source/typed SpaceList bijection",
+            ));
+        }
+        Ok(ids)
     }
 }

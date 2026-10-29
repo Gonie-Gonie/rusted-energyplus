@@ -23,6 +23,7 @@ pub(super) fn admitted_field(
             | "Zone"
             | "ZoneList"
             | "Space"
+            | "SpaceList"
             | "Material"
             | "Material:NoMass"
             | "Material:AirGap"
@@ -743,7 +744,9 @@ pub(super) fn admitted_field(
         ("Exterior:Lights", "end_use_subcategory") => {
             blank(value) || matches!(value, RawValue::String(_))
         }
-        ("ZoneList", "zones") if source_ingress => matches!(value, RawValue::Array(_)),
+        ("ZoneList", "zones") | ("SpaceList", "spaces") if source_ingress => {
+            matches!(value, RawValue::Array(_))
+        }
         ("Space", name) if source_ingress => super::spaces::admitted_field(name, value),
         ("OtherEquipment", "fuel_type") => {
             blank(value)

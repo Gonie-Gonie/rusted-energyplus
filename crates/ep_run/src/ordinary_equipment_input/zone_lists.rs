@@ -80,4 +80,11 @@ pub(super) fn gain_target(raw: &RawModel, reference: &str) -> bool {
                 rows.keys()
                     .any(|name| name.0.eq_ignore_ascii_case(reference))
             })
+        || raw
+            .objects
+            .get(&ObjectType("SpaceList".into()))
+            .is_some_and(|rows| {
+                rows.keys()
+                    .any(|name| name.0.eq_ignore_ascii_case(reference))
+            })
 }

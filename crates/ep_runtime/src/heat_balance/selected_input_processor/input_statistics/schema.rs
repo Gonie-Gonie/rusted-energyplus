@@ -3,6 +3,21 @@
 use super::{SchemaAutomatic, SchemaDefault, SchemaDefinition, SchemaField};
 pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
     Some(match name {
+        "SpaceList" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[SchemaField {
+                name: "name",
+                default: SchemaDefault::Absent,
+                automatic: &[],
+            }],
+            extension: Some("spaces"),
+            extensible: &[SchemaField {
+                name: "space_name",
+                default: SchemaDefault::Absent,
+                automatic: &[],
+            }],
+        },
         "Space" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

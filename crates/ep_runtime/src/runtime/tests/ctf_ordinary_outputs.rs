@@ -3258,7 +3258,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 ("Z SPACE".into(),std::collections::BTreeMap::from([("zone_name".into(),V::String("ZULU".into()))])),
                 ("A SPACE".into(),std::collections::BTreeMap::from([("zone_name".into(),V::String("ALPHA".into()))])),
             ]);
-            if authored {families.insert("Space".into(),SourceInputFamily::Objects(space_fields.keys().rev().map(|name|SourceObjectShape {
+            // Family rows retain native JSON-map order: A SPACE before Z SPACE.
+            if authored {families.insert("Space".into(),SourceInputFamily::Objects(space_fields.keys().map(|name|SourceObjectShape {
                 object_name:name.clone(),field_sizes:std::collections::BTreeMap::from([("zone_name".into(),1)]),
             }).collect()));}
             let mut statistics=SourceInputStatisticsInput {objects:families.iter().map(|(family,rows)| {
@@ -5008,6 +5009,95 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             let mut bad=direct_model.clone();bad.source_people_inputs[0].target=ep_model::SourcePeopleInputTarget::Space(ep_model::SpaceId(0));
                             let (bad,_,_,_,reached)=read_sizing(direct_checkpoint,&bad)?;
                             assert!(reached.is_err());assert!(!bad.selected_internal_heat_gains.allocations.people.allocated);
+                        }
+                        // Unit98 SpaceList input-owner checkpoints retain independent
+                        // actual list/Space arrays and typed IDs. Every singleton or
+                        // multiple member gets the full selected authored operand.
+                        for one_member in [false, true] {
+                            for (equipment_method, equipment_field, equipment_value) in [
+                                ("EquipmentLevel", "design_level", 23.0),
+                                ("Watts/Area", "power_per_floor_area", 1.75),
+                                ("Watts/Person", "power_per_person", 3.5),
+                            ] {
+                                let mut listed = checkpoint.clone();
+                                let mut listed_model = list_model.clone();
+                                listed_model.spaces[0].name = ep_model::NormalizedName("S10".into());
+                                listed_model.spaces[1].name = ep_model::NormalizedName("S2".into());
+                                for space in &mut listed_model.spaces { space.origin = ep_model::SpaceOrigin::Authored; }
+                                let member_ids = if one_member { vec![ep_model::SpaceId(1)] } else { vec![ep_model::SpaceId(1), ep_model::SpaceId(0)] };
+                                listed_model.space_lists = vec![
+                                    ep_model::SpaceList { id: ep_model::SpaceListId(0), name: ep_model::NormalizedName(" L10 ".into()),
+                                        spaces: member_ids, max_space_name_length: if one_member { "S2".len() } else { "S10".len() } },
+                                    ep_model::SpaceList { id: ep_model::SpaceListId(1), name: ep_model::NormalizedName(" L2 ".into()),
+                                        spaces: vec![ep_model::SpaceId(0)], max_space_name_length: "S10".len() },
+                                ];
+                                let raw = listed.heat_balance_input.as_mut().ok_or("SpaceList raw getter owners")?;
+                                let people = raw.objects.get_mut("People").ok_or("SpaceList People raw rows")?;
+                                let first_name = people[0].object_name.to_ascii_uppercase();
+                                people[0].fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(), ProjectInputValue::String(" l10 ".into()));
+                                let list_count: usize = if one_member { 1 } else { 2 };
+                                listed_model.people = if one_member { vec![list_model.people[0].clone(), list_model.people[2].clone()] } else { list_model.people.clone() };
+                                for (index, person) in listed_model.people.iter_mut().enumerate() {
+                                    person.id = ep_model::InternalGainId(u32::try_from(index)?);
+                                    if index < list_count {
+                                        person.name = ep_model::NormalizedName(format!("{} {first_name}", if index == 0 { "S2" } else { "S10" }));
+                                    }
+                                }
+                                listed_model.source_people_inputs[0].target = ep_model::SourcePeopleInputTarget::SpaceList(ep_model::SpaceListId(0));
+                                listed_model.source_people_inputs[0].instances = 0..list_count;
+                                listed_model.source_people_inputs[1].instances = list_count..list_count + 1;
+                                let equipment = &mut raw.objects.get_mut("OtherEquipment").ok_or("SpaceList equipment raw row")?[0];
+                                let equipment_name = equipment.object_name.to_ascii_uppercase();
+                                equipment.fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(), ProjectInputValue::String(" L10 ".into()));
+                                equipment.fields.insert("design_level_calculation_method".into(), ProjectInputValue::String(equipment_method.into()));
+                                for field in ["design_level", "power_per_floor_area", "power_per_person"] {
+                                    equipment.fields.insert(field.into(), ProjectInputValue::Number(if field == equipment_field { equipment_value } else { -7.0 }));
+                                }
+                                let source = listed.selected_zone_input.as_mut().ok_or("SpaceList actual Source owners")?;
+                                let old = source.spaces.as_ref().ok_or("SpaceList actual original Space rows")?.clone();
+                                let mut first = old[1].clone(); first.name = "S2".into();
+                                let mut second = old[0].clone(); second.name = "S10".into();
+                                source.spaces = Some(vec![first, second, Default::default(), Default::default()]);
+                                let zones = source.zones.as_mut().ok_or("SpaceList actual Zone membership")?;
+                                zones[0].space_indexes = vec![2]; zones[1].space_indexes = vec![1];
+                                source.space_lists = Some(vec![Default::default(), Default::default()]);
+                                let lists = source.space_lists.as_mut().ok_or("SpaceList actual list allocation")?;
+                                lists[0].name = " L2 ".into(); lists[0].num_list_spaces = 1;
+                                lists[0].max_space_name_length = "S10".len(); lists[0].spaces = vec![2]; lists[0].typed_space_list_id = Some(ep_model::SpaceListId(1));
+                                lists[1].name = " L10 ".into(); lists[1].num_list_spaces = i32::try_from(list_count)?;
+                                lists[1].max_space_name_length = if one_member { "S2".len() } else { "S10".len() }; lists[1].spaces = if one_member { vec![1] } else { vec![1, 2] };
+                                lists[1].typed_space_list_id = Some(ep_model::SpaceListId(0));
+                                assert_eq!(source.source_space_list_ids(&listed_model)?, [ep_model::SpaceListId(1), ep_model::SpaceListId(0)]);
+                                let listed_checkpoint = listed.clone();
+                                let (listed, state, errors, _, reached) = read_sizing(listed, &listed_model)?;
+                                assert!(reached.is_ok(), "SpaceList/{method}/{equipment_method}/{one_member}: {reached:?}");
+                                assert!(errors.is_empty()); assert_eq!(state.tracking.total_warning_errors, 0);
+                                let gain = &listed.selected_internal_heat_gains;
+                                assert_eq!(gain.totals[0], i32::try_from(list_count + 1)?);
+                                assert_eq!(gain.totals[6], i32::try_from(list_count)?);
+                                assert_eq!(gain.allocations.people.rows.iter().take(list_count).map(|row| (row.name.clone(), row.zone_ptr, row.space_index, row.number_of_people)).collect::<Vec<_>>(),
+                                    (0..list_count).map(|index| (format!("{} {first_name}", if index == 0 { "S2" } else { "S10" }),
+                                        if index == 0 { 2 } else { 1 }, if index == 0 { 1 } else { 2 }, expected_by_zone[if index == 0 { 1 } else { 0 }])).collect::<Vec<_>>());
+                                let zone_totals = [if one_member { 0.5 } else { expected_by_zone[0] + 0.5 }, expected_by_zone[1]];
+                                let source = listed.selected_zone_input.as_ref().ok_or("SpaceList final design totals")?;
+                                assert_eq!(source.zones.as_ref().ok_or("SpaceList real Zone totals")?.iter().map(|zone| zone.total_occupants).collect::<Vec<_>>(), zone_totals);
+                                assert_eq!(source.spaces.as_ref().ok_or("SpaceList real Space totals")?.iter().map(|space| space.total_occupants).collect::<Vec<_>>(), [zone_totals[1], zone_totals[0], 0.0, 0.0]);
+                                assert_eq!(gain.allocations.other_equipment.as_ref().ok_or("SpaceList real equipment rows")?.iter().map(|row|
+                                    (row.name.clone(), row.zone_ptr, row.space_index, row.design_level)).collect::<Vec<_>>(), (0..list_count).map(|index| {
+                                    let zi = if index == 0 { 1 } else { 0 };
+                                    let expected = match equipment_method { "EquipmentLevel" => 23.0, "Watts/Area" => if index == 0 { 50.0 * 1.75 } else { 100.0 * 1.75 }, _ => zone_totals[zi] * 3.5 };
+                                    (format!("{} {equipment_name}", if index == 0 { "S2" } else { "S10" }), if index == 0 { 2 } else { 1 }, if index == 0 { 1 } else { 2 }, expected)
+                                }).collect::<Vec<_>>());
+                                let mut malformed = listed_model.clone();
+                                malformed.source_people_inputs[0].target = ep_model::SourcePeopleInputTarget::SpaceList(ep_model::SpaceListId(1));
+                                let (malformed, _, _, _, reached) = read_sizing(listed_checkpoint.clone(), &malformed)?;
+                                assert!(reached.is_err()); assert!(!malformed.selected_internal_heat_gains.allocations.people.allocated);
+                                if !one_member {
+                                    let mut malformed = listed_model.clone(); malformed.space_lists[0].spaces.reverse();
+                                    let (malformed, _, _, _, reached) = read_sizing(listed_checkpoint, &malformed)?;
+                                    assert!(reached.is_err()); assert!(!malformed.selected_internal_heat_gains.allocations.people.allocated);
+                                }
+                            }
                         }
                         // A broken typed range must stop before allocated People
                         // mutation; no Native Fatal or successful result is invented.

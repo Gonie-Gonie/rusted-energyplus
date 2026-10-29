@@ -27,7 +27,7 @@ pub use internal_heat_gains_input::observation::{
     OrdinaryGainDevice, OrdinaryGainDeviceStorage, OrdinaryGainDictionaryEntry,
     OrdinaryGainMiscObject, OrdinaryGainOutputRegistration, OrdinaryGainRateTarget,
     OrdinaryGainReport, OrdinaryGainSchedule, OrdinaryGainSchedules, OrdinaryGainSpace,
-    OrdinaryGainZone, OrdinaryInternalGains, OrdinaryOtherEquipment,
+    OrdinaryGainSpaceList, OrdinaryGainZone, OrdinaryInternalGains, OrdinaryOtherEquipment,
 };
 pub use ordinary_surface_geometry::{
     OrdinaryGeometryConstruction, OrdinaryGeometryMaterial, OrdinaryGeometryProcess,

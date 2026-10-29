@@ -1,4 +1,4 @@
-use crate::{InternalGainId, NormalizedName, ScheduleId, SpaceId, ZoneId, ZoneListId};
+use crate::{InternalGainId, NormalizedName, ScheduleId, SpaceId, SpaceListId, ZoneId, ZoneListId};
 
 /// OtherEquipment design-level calculation method.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -52,12 +52,14 @@ pub enum SourceGainInputTarget {
     Space(SpaceId),
     /// Native lookup found a genuine ZoneList after Zone/Space lookup.
     ZoneList(ZoneListId),
+    /// Native lookup found a genuine SpaceList after Zone/Space/ZoneList lookup.
+    SpaceList(SpaceListId),
 }
 
 /// Existing OtherEquipment input-target API over the shared actual identity.
 pub type SourceOtherEquipmentInputTarget = SourceGainInputTarget;
 
-/// People input targets share the same genuine Zone, Space and ZoneList identities.
+/// People input targets share the same genuine Zone, Space and list identities.
 pub type SourcePeopleInputTarget = SourceGainInputTarget;
 
 /// Explicit raw People object and its actual dense typed instance range.
@@ -66,7 +68,7 @@ pub type SourcePeopleInputTarget = SourceGainInputTarget;
 pub struct SourcePeopleInput {
     /// Exact original raw People key, separate from generated instance names.
     pub object_name: String,
-    /// Actual resolved Zone, sole authored Space or ZoneList identity.
+    /// Actual resolved Zone, sole authored Space, ZoneList or SpaceList identity.
     pub target: SourcePeopleInputTarget,
     /// Contiguous real IDs in TypedModel.people, not Native array numbers.
     pub instances: std::ops::Range<usize>,
@@ -79,7 +81,7 @@ pub struct SourcePeopleInput {
 pub struct SourceOtherEquipmentInput {
     /// Exact original raw object key, independent of generated instance names.
     pub object_name: String,
-    /// Actual resolved Zone, sole authored Space or ZoneList identity.
+    /// Actual resolved Zone, sole authored Space, ZoneList or SpaceList identity.
     pub target: SourceOtherEquipmentInputTarget,
     /// Contiguous range in TypedModel.other_equipment with real dense typed IDs.
     pub instances: std::ops::Range<usize>,

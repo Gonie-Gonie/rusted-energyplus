@@ -347,6 +347,9 @@ impl SelectedInternalHeatGains {
                     .ok_or_else(|| unavailable("actual IHG instance start overflow"))?;
                 self.totals[kind] = row.space_start_ptr;
                 row.num_spaces = 1;
+                row.space_list_active = false;
+                row.space_or_space_list_ptr = i32::try_from(position + 1)
+                    .map_err(|_| unavailable("actual direct Space signed index"))?;
                 row.space_nums.push(
                     i32::try_from(position + 1)
                         .map_err(|_| unavailable("actual direct Space signed index"))?,
@@ -399,13 +402,41 @@ impl SelectedInternalHeatGains {
                 row.zone_list_active = true;
                 continue;
             }
-            if owners
-                .zones
-                .space_lists
-                .as_ref()
-                .is_some_and(|v| !v.is_empty())
-            {
-                return Err(unavailable("positive IHG SpaceList expansion"));
+            if let Some((position, list)) = owners.zones.space_lists.as_ref().and_then(|lists| {
+                lists
+                    .iter()
+                    .enumerate()
+                    .find(|(_, list)| list.name == target)
+            }) {
+                if list.typed_space_list_id.is_none() {
+                    return Err(unavailable("unbound actual Source SpaceList"));
+                }
+                owners.zones.source_space_list_ids(owners.model)?;
+                row.space_start_ptr = self.totals[kind]
+                    .checked_add(1)
+                    .ok_or_else(|| unavailable("actual IHG instance start overflow"))?;
+                self.totals[kind] = self.totals[kind]
+                    .checked_add(list.num_list_spaces)
+                    .ok_or_else(|| unavailable("actual IHG SpaceList instance count"))?;
+                row.num_spaces = list.num_list_spaces;
+                row.space_list_active = true;
+                row.space_or_space_list_ptr = i32::try_from(position + 1)
+                    .map_err(|_| unavailable("actual SpaceList signed index"))?;
+                for &space_number in &list.spaces {
+                    let space = spaces
+                        .get(index(space_number)?)
+                        .ok_or_else(|| unavailable("actual IHG SpaceList member Space"))?;
+                    let zone = zones
+                        .get(index(space.zone_num)?)
+                        .ok_or_else(|| unavailable("actual IHG SpaceList member Zone"))?;
+                    if zone.num_spaces != 1 || zone.space_indexes.as_slice() != [space_number] {
+                        return Err(unavailable("positive multi-Space IHG SpaceList member"));
+                    }
+                    row.space_nums.push(space_number);
+                    // Native prefixes singleton SpaceLists as well as larger lists.
+                    row.names.push(format!("{} {}", space.name, row.name));
+                }
+                continue;
             }
             owners.backend.show_severe_error(&format!(
                 "{family}=\"{}\" invalid zone_or_zonelist_or_space_or_spacelist_name=\"{target}\" not found.", row.name))?;
@@ -716,7 +747,12 @@ fn check_people_input_association(
                     && typed.origin == ep_model::SpaceOrigin::Authored
             })
         });
-    if bindings.is_empty() && !authored && !misc.iter().any(|row| row.zone_list_active) {
+    if bindings.is_empty()
+        && !authored
+        && !misc
+            .iter()
+            .any(|row| row.zone_list_active || row.space_list_active)
+    {
         // Older direct getter boundary fixtures predate explicit Source input
         // associations. Positive list expansion always requires the real map.
         return Ok(());
@@ -778,6 +814,8 @@ fn check_people_input_association(
         match binding.target {
             ep_model::SourcePeopleInputTarget::Zone(id) => {
                 if object.zone_list_active
+                    || object.space_list_active
+                    || object.space_or_space_list_ptr != 0
                     || rows.len() != 1
                     || rows[0].zone != id
                     || !zones
@@ -794,6 +832,7 @@ fn check_people_input_association(
                     .filter(|(_, space)| space.typed_space_id == Some(id))
                     .collect::<Vec<_>>();
                 if object.zone_list_active
+                    || object.space_list_active
                     || rows.len() != 1
                     || matching.len() != 1
                     || matching[0].1.name != target
@@ -801,6 +840,7 @@ fn check_people_input_association(
                     || object.space_nums.as_slice()
                         != [i32::try_from(matching[0].0 + 1)
                             .map_err(|_| unavailable("People direct Space actual index"))?]
+                    || object.space_or_space_list_ptr != object.space_nums[0]
                 {
                     return Err(unavailable("People direct Space precedence association"));
                 }
@@ -826,11 +866,51 @@ fn check_people_input_association(
                     })
                     .collect::<Result<Vec<_>, E>>()?;
                 if !object.zone_list_active
+                    || object.space_list_active
+                    || object.space_or_space_list_ptr != 0
                     || lists.len() != 1
                     || lists[0].name != target
                     || lists[0].zone.as_deref() != Some(actual_zones.as_slice())
                 {
                     return Err(unavailable("People actual ordered ZoneList association"));
+                }
+            }
+            ep_model::SourcePeopleInputTarget::SpaceList(id) => {
+                // Recheck the real typed/actual list bijection, including member
+                // order, before any allocated People instance is written.
+                owners.zones.source_space_list_ids(owners.model)?;
+                let lists = owners
+                    .zones
+                    .space_lists
+                    .as_deref()
+                    .ok_or_else(|| unavailable("People actual SpaceList allocation"))?;
+                let matching = lists
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, list)| list.typed_space_list_id == Some(id))
+                    .collect::<Vec<_>>();
+                if object.zone_list_active
+                    || !object.space_list_active
+                    || matching.len() != 1
+                    || matching[0].1.name != target
+                    || matching[0].1.spaces != object.space_nums
+                    || matching[0].1.num_list_spaces != object.num_spaces
+                    || object.space_or_space_list_ptr
+                        != i32::try_from(matching[0].0 + 1)
+                            .map_err(|_| unavailable("People actual SpaceList signed index"))?
+                    || zones.iter().any(|zone| zone.name == target)
+                    || spaces.iter().any(|space| space.name == target)
+                    || owners
+                        .zones
+                        .zone_lists
+                        .as_deref()
+                        .unwrap_or(&[])
+                        .iter()
+                        .any(|list| list.name == target)
+                {
+                    return Err(unavailable(
+                        "People actual ordered SpaceList precedence association",
+                    ));
                 }
             }
         }
@@ -857,6 +937,8 @@ fn check_people_input_association(
                 || zone.typed_zone_id != Some(row.zone)
                 || typed_space.zone != row.zone
                 || typed_space.origin == ep_model::SpaceOrigin::AutoZoneRemainder
+                || (object.space_list_active
+                    && typed_space.origin != ep_model::SpaceOrigin::Authored)
                 || match typed_space.origin {
                     ep_model::SpaceOrigin::Authored => typed_space.name.0 != space.name,
                     ep_model::SpaceOrigin::AutoZoneDefault => {

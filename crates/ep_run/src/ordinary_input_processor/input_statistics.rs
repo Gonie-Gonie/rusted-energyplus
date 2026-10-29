@@ -123,6 +123,7 @@ pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsIn
         "People",
         "ZoneList",
         "Space",
+        "SpaceList",
         "ComfortViewFactorAngles",
         "Output:Schedules",
         "Schedule:Compact",

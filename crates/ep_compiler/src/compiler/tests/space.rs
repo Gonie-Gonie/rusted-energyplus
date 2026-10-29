@@ -360,6 +360,55 @@ fn space_lists_allow_empty_input_and_reject_invalid_members_and_name_collisions(
             .all(|list| list.spaces.is_empty())
     );
 
+    // Unit98: the actual epJSON schema has no required spaces array/minItems.
+    // Names and member references use ASCII case folding without Source trim.
+    let source_raw = parse_epjson_str(
+        r#"{"Zone":{"Z":{}},"Space":{" S ":{"zone_name":"Z"}},"SpaceList":{
+            " Z ":{"spaces":[{"space_name":" s "}]},
+            "Absent Members":{},"Empty Members":{"spaces":[]}}}"#,
+    )?;
+    let source = super::super::compile_raw_model_for_source(&source_raw);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    let source_model = source.model.ok_or("actual Source SpaceList identity")?;
+    let list_id = source_model
+        .space_list_names
+        .resolve(" z ")
+        .ok_or("exact Source SpaceList name")?;
+    let list = source_model
+        .space_lists
+        .iter()
+        .find(|list| list.id == list_id)
+        .ok_or("actual Source list row")?;
+    assert_eq!(list.name.0, " Z ");
+    assert!(source_model.space_list_names.resolve("Z").is_none());
+    assert_eq!(
+        list.spaces.as_slice(),
+        &[source_model
+            .authored_space_names
+            .resolve(" S ")
+            .ok_or("exact authored Space member")?]
+    );
+    assert_eq!(list.max_space_name_length, " S ".len());
+    assert_eq!(
+        source_model
+            .space_lists
+            .iter()
+            .filter(|list| list.spaces.is_empty())
+            .count(),
+        2
+    );
+    for text in [
+        r#"{"Zone":{"Z":{}},"Space":{" S ":{"zone_name":"Z"}},"SpaceList":{"L":{"spaces":[{"space_name":"S"}]}}}"#,
+        r#"{"Zone":{"Z":{}},"Space":{" S ":{"zone_name":"Z"}},"SpaceList":{"Z":{"spaces":[{"space_name":" S "}]}}}"#,
+        r#"{"Zone":{"Z":{}},"Space":{" S ":{"zone_name":"Z"}},"SpaceList":{" S ":{"spaces":[{"space_name":" S "}]}}}"#,
+        r#"{"Zone":{"Z":{}},"SpaceList":{"L":{"spaces":[{"space_name":"Z"}]}}}"#,
+    ] {
+        assert!(
+            super::super::compile_raw_model_for_source(&parse_epjson_str(text)?).has_errors(),
+            "Source SpaceList keeps exact references, name collisions and authored-only membership"
+        );
+    }
+
     for (epjson, code) in [
         (
             r#"{

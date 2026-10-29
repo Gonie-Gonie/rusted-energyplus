@@ -41,6 +41,7 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 | "Zone"
                 | "ZoneList"
                 | "Space"
+                | "SpaceList"
                 | "GlobalGeometryRules"
                 | "BuildingSurface:Detailed"
                 | "ZoneAirHeatBalanceAlgorithm"

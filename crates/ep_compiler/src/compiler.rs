@@ -689,6 +689,7 @@ impl<'a> Compiler<'a> {
             model.zone_list_names = NameMap::source_exact_namespace();
             model.authored_space_names = NameMap::source_exact_namespace();
             model.space_type_names = NameMap::source_exact_namespace();
+            model.space_list_names = NameMap::source_exact_namespace();
         }
 
         self.parse_building(&mut model);
