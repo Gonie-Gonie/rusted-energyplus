@@ -415,7 +415,10 @@ impl OrdinarySolarRadiation {
             || surfaces.len() != model.surfaces.len()
             || surfaces.is_empty()
             || model.zones[0].spaces.as_slice() != [model.spaces[0].id]
-            || model.spaces[0].origin != ep_model::SpaceOrigin::AutoZoneDefault
+            || (model.spaces[0].origin != ep_model::SpaceOrigin::AutoZoneDefault
+                && !(self.solar_initialized
+                    && self.solar.is_some()
+                    && model.spaces[0].origin == ep_model::SpaceOrigin::Authored))
         {
             return Err(OrdinaryRadiationUnavailable::EnclosureDomain.into());
         }

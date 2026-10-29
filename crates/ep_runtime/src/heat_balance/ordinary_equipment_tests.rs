@@ -1042,6 +1042,281 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             );
             assert_eq!(&after[1..], &before[1..]);
         }
+        // Unit97: real raw GetSpaceData, independent lexical Space order,
+        // mixed authored/default ownership and retained constructor tail.
+        for authored_count in [total, total.saturating_sub(1)] {
+            if authored_count == 0 {
+                continue;
+            }
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputStatisticsInput, SourceInputStatisticsValue as V,
+            };
+            let mut authored_model = model.clone();
+            authored_model.zone_lists.clear();
+            authored_model.zone_list_names = Default::default();
+            let mut space_fields = BTreeMap::new();
+            for index in 0..authored_count {
+                let space = &mut authored_model.spaces[index];
+                space.name = ep_model::NormalizedName(format!("SPACE {}", total - index));
+                space.origin = ep_model::SpaceOrigin::Authored;
+                let mut fields: BTreeMap<String, V> = BTreeMap::from([(
+                    "zone_name".into(),
+                    V::String(authored_model.zones[index].name.0.clone()),
+                )]);
+                if index == 0 {
+                    space.ceiling_height = ep_model::AutoOrNumber::Value(2.25);
+                    space.volume = ep_model::AutoOrNumber::Value(-1.0);
+                    space.space_type = ep_model::NormalizedName(String::new());
+                    space.tags = vec![
+                        ep_model::NormalizedName(" TAG ".into()),
+                        ep_model::NormalizedName(String::new()),
+                    ];
+                    fields.insert("ceiling_height".into(), V::Number("2.25".into()));
+                    fields.insert("volume".into(), V::Number("18446744073709551615".into()));
+                    fields.insert("space_type".into(), V::String(String::new()));
+                    fields.insert(
+                        "tags".into(),
+                        V::Array(vec![
+                            V::Object(BTreeMap::from([("tag".into(), V::String(" tag ".into()))])),
+                            V::Object(BTreeMap::from([("tag".into(), V::String(String::new()))])),
+                        ]),
+                    );
+                }
+                space_fields.insert(space.name.0.clone(), fields);
+            }
+            let expected = space_fields
+                .keys()
+                .map(|name| {
+                    authored_model
+                        .spaces
+                        .iter()
+                        .find(|space| space.name.0 == *name)
+                        .expect("actual authored identity")
+                        .id
+                })
+                .chain(
+                    authored_model
+                        .spaces
+                        .iter()
+                        .filter(|space| space.origin == ep_model::SpaceOrigin::AutoZoneDefault)
+                        .map(|space| space.id),
+                )
+                .collect::<Vec<_>>();
+            let zone_fields = raw.objects["Zone"]
+                .iter()
+                .map(|row| (row.object_name.clone(), BTreeMap::new()))
+                .collect::<BTreeMap<_, _>>();
+            let families = BTreeMap::from([
+                (
+                    "Zone".into(),
+                    SourceInputFamily::Objects(
+                        zone_fields
+                            .keys()
+                            .map(|name| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: BTreeMap::new(),
+                            })
+                            .collect(),
+                    ),
+                ),
+                (
+                    "Space".into(),
+                    SourceInputFamily::Objects(
+                        space_fields
+                            .iter()
+                            .rev()
+                            .map(|(name, fields)| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: fields
+                                    .iter()
+                                    .map(|(key, value)| {
+                                        (
+                                            key.clone(),
+                                            match value {
+                                                V::Array(rows) => rows.len(),
+                                                _ => 1,
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                ),
+            ]);
+            let definitions = [
+                ("Zone", 4, 9, 0, None),
+                ("Space", 3, 3, 1, Some("tags")),
+                ("Output:Variable", 4, 0, 0, None),
+                ("NodeList", 1, 0, 1, Some("nodes")),
+                ("ZoneHVAC:EquipmentList", 2, 0, 4, Some("equipment")),
+                ("ZoneHVAC:EquipmentConnections", 8, 0, 0, None),
+                ("SpaceHVAC:EquipmentConnections", 7, 0, 0, None),
+                ("AirLoopHVAC:SupplyPath", 2, 0, 2, Some("components")),
+                ("AirLoopHVAC:ReturnPath", 2, 0, 2, Some("components")),
+            ]
+            .into_iter()
+            .map(|(name, a, n, ae, extension)| SourceObjectDefinition {
+                object_type: name.into(),
+                alpha_fields: a,
+                numeric_fields: n,
+                alpha_extensions: ae,
+                numeric_extensions: if name == "ZoneHVAC:EquipmentList" {
+                    2
+                } else {
+                    0
+                },
+                extension: extension.map(str::to_owned),
+            })
+            .collect();
+            let mut ip = SelectedInputProcessor::from_admitted_input(definitions, families)?;
+            ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                objects: BTreeMap::from([
+                    ("Zone".into(), zone_fields),
+                    ("Space".into(), space_fields.clone()),
+                ]),
+                object_order: BTreeMap::new(),
+            })?;
+            let mut shared = SourceInputProcessorShortCut::default();
+            shared.allocate_from_input(&ip)?;
+            let mut actual = SelectedZoneInputOwners::default();
+            let mut actual_globals = SelectedHeatBalanceGlobals::default();
+            let mut registration = SourceOutputRegistration::default();
+            let (mut errors, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+            error_state.output_error_header = false;
+            let mut backend = SourceErrorBackend {
+                state: &mut error_state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut found = false;
+            actual.get_zone_data(
+                &raw,
+                &control,
+                &authored_model,
+                &mut ZoneGetterOwners {
+                    input: &mut ip,
+                    shortcut: &mut shared,
+                    globals: &mut actual_globals,
+                    output: &mut registration,
+                    prescan: &prescan,
+                    report_input: &report_input,
+                    minimum_report_frequency: "",
+                    developer: &developer,
+                    clock: Some(&clock),
+                    backend: &mut backend,
+                    minutes_in_time_step: clock.minutes_in_time_step,
+                    host: &mut files,
+                    eio: &mut eio,
+                },
+                &mut found,
+            )?;
+            assert!(!found);
+            assert_eq!(actual_globals.num_spaces, i32::try_from(total)?);
+            let (zone_ids, space_ids) =
+                actual.source_implicit_space_ids(&authored_model, &actual_globals)?;
+            assert_eq!(space_ids, expected);
+            let allocation = actual.spaces.as_ref().ok_or("actual authored allocation")?;
+            assert_eq!(allocation.len(), total + authored_count);
+            assert_eq!(
+                actual.space_types.as_ref().ok_or("actual types")?.len(),
+                authored_count + 1
+            );
+            assert!(
+                allocation[total..]
+                    .iter()
+                    .all(|row| row.typed_space_id.is_none()
+                        && row.zone_num == 0
+                        && row.name.is_empty()
+                        && row.space_type == "General")
+            );
+            for (position, id) in expected.iter().enumerate() {
+                let space = &allocation[position];
+                let typed = authored_model
+                    .spaces
+                    .iter()
+                    .find(|space| space.id == *id)
+                    .ok_or("typed authored member")?;
+                let zi = authored_model
+                    .zones
+                    .iter()
+                    .position(|zone| zone.id == typed.zone)
+                    .ok_or("typed authored Zone")?;
+                assert_eq!(
+                    (space.typed_space_id, space.zone_num),
+                    (Some(*id), i32::try_from(zi + 1)?)
+                );
+                assert_eq!(
+                    actual.zones.as_ref().ok_or("actual authored Zones")?[zi].space_indexes,
+                    [i32::try_from(position + 1)?]
+                );
+            }
+            let first = allocation
+                .iter()
+                .find(|row| row.typed_space_id == Some(authored_model.spaces[0].id))
+                .ok_or("actual raw scalar Space")?;
+            assert_eq!(
+                (
+                    first.ceiling_height,
+                    first.volume,
+                    first.user_entered_floor_area
+                ),
+                (2.25, -1.0, -99999.0)
+            );
+            assert_eq!(first.space_type, "");
+            assert_eq!(first.tags, [" TAG ", ""]);
+            assert!(
+                space_fields
+                    .keys()
+                    .all(|name| !ip.is_object_unused("Space", name))
+            );
+            let mut stats = SourceOutputPreScan::default();
+            ip.report_source_idf_records_stats(&mut stats)?;
+            assert_eq!(
+                stats.number_input_records,
+                i32::try_from(total + authored_count)?
+            );
+            assert_eq!(
+                stats.total_autocalculatable_fields,
+                i32::try_from(3 * (total + authored_count))?
+            );
+            let mut equipment = OrdinaryEquipment::new_for_source_ordered(
+                &authored_model,
+                source_clock,
+                &zone_ids,
+                &space_ids,
+            )?;
+            let mut gains=crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains::default();
+            let mut schedules =
+                crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+            let mut sizing = crate::heat_balance::selected_sizing::SelectedSizingManager::default();
+            equipment.get_zone_equipment_source(
+                &mut ip,
+                source_clock,
+                false,
+                false,
+                &actual_globals,
+                &mut gains,
+                SourceEquipmentInputOwners {
+                    zones: actual
+                        .zones
+                        .as_deref_mut()
+                        .ok_or("authored equipment Zones")?,
+                    schedules: &mut schedules,
+                    sizing: &mut sizing,
+                    branch: None,
+                    source_is_epjson: true,
+                },
+            )?;
+            assert_eq!(equipment.space_ids, expected);
+            assert!(errors.is_empty() && console.is_empty() && eio.is_empty());
+        }
     }
     Ok(())
 }

@@ -1,4 +1,4 @@
-//! Actual GetZoneData/ProcessZoneData and selected implicit GetSpaceData.
+//! Actual GetZoneData/ProcessZoneData and selected whole-Zone GetSpaceData.
 //! Source arrays stay on reports until the real geometry stage succeeds.
 use super::super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use super::super::selected_input_processor::{
@@ -18,6 +18,7 @@ use std::io::Write;
 
 mod input;
 mod source_binding;
+mod spaces;
 mod storage;
 mod zone_lists;
 pub(crate) use storage::{SelectedZoneData, SelectedZoneInputOwners, ZonePredefined};
@@ -230,110 +231,7 @@ impl SelectedZoneInputOwners {
             ));
         }
         self.zone_predefined = Some(vec![storage::ZonePredefined::default(); count]);
-        self.get_implicit_space_data(model, owners.input, owners.globals)
-    }
-
-    fn get_implicit_space_data(
-        &mut self,
-        model: &TypedModel,
-        input: &SelectedInputProcessor,
-        globals: &mut SelectedHeatBalanceGlobals,
-    ) -> Result<(), HeatBalanceInputError> {
-        // Space/SpaceList are local strings in Original, leaving IP String alone.
-        if input.family("Space").is_some_and(|family| matches!(family, super::super::selected_input_processor::SourceInputFamily::Objects(rows) if !rows.is_empty())) {
-            return Err(HeatBalanceInputError::Unavailable("positive explicit Space"));
-        }
-        let count = usize::try_from(globals.num_of_zones)
-            .map_err(|_| HeatBalanceInputError::Unavailable("negative actual NumOfZones"))?;
-        self.spaces = Some(vec![storage::SelectedSpaceData::default(); count]);
-        self.space_types = Some(vec![String::new(); 1]);
-        if input.family("Space").is_some() {
-            globals.num_spaces = 0;
-        }
-        if let Some(family) = input.family("SpaceList") {
-            if matches!(family, super::super::selected_input_processor::SourceInputFamily::Objects(rows) if !rows.is_empty())
-            {
-                return Err(HeatBalanceInputError::Unavailable("positive SpaceList"));
-            }
-            self.space_lists = Some(Vec::new());
-        }
-        let zones = self
-            .zones
-            .as_mut()
-            .ok_or(HeatBalanceInputError::Unavailable(
-                "Space before Zone allocation",
-            ))?;
-        let spaces = self
-            .spaces
-            .as_mut()
-            .ok_or(HeatBalanceInputError::Unavailable(
-                "actual Space allocation",
-            ))?;
-        let types = self
-            .space_types
-            .as_mut()
-            .ok_or(HeatBalanceInputError::Unavailable(
-                "actual spaceTypes allocation",
-            ))?;
-        for (zone_index, zone) in zones.iter_mut().enumerate() {
-            if zone.space_indexes.is_empty() {
-                globals.num_spaces =
-                    globals
-                        .num_spaces
-                        .checked_add(1)
-                        .ok_or(HeatBalanceInputError::Unavailable(
-                            "native signed Space overflow",
-                        ))?;
-                let index = usize::try_from(globals.num_spaces - 1)
-                    .map_err(|_| HeatBalanceInputError::Unavailable("Space index"))?;
-                let space = spaces
-                    .get_mut(index)
-                    .ok_or(HeatBalanceInputError::Unavailable(
-                        "native Space allocation bounds",
-                    ))?;
-                space.zone_num = signed(zone_index + 1)?;
-                space.name.clone_from(&zone.name);
-                space.space_type = "GENERAL".into();
-                let type_index = types
-                    .iter()
-                    .take(usize::try_from(globals.num_space_types).map_err(|_| {
-                        HeatBalanceInputError::Unavailable("negative actual numSpaceTypes")
-                    })?)
-                    .position(|name| name.eq_ignore_ascii_case("GENERAL"));
-                space.space_type_num = if let Some(index) = type_index {
-                    signed(index + 1)?
-                } else {
-                    globals.num_space_types = globals.num_space_types.checked_add(1).ok_or(
-                        HeatBalanceInputError::Unavailable("native signed Space type overflow"),
-                    )?;
-                    let index = usize::try_from(globals.num_space_types - 1)
-                        .map_err(|_| HeatBalanceInputError::Unavailable("Space type index"))?;
-                    *types
-                        .get_mut(index)
-                        .ok_or(HeatBalanceInputError::Unavailable("spaceTypes bounds"))? =
-                        "GENERAL".into();
-                    globals.num_space_types
-                };
-                zone.space_indexes.push(globals.num_spaces);
-                zone.num_spaces += 1;
-                let id = zone
-                    .typed_zone_id
-                    .ok_or(HeatBalanceInputError::Unavailable(
-                        "Space association before raw Zone",
-                    ))?;
-                let matching: Vec<_> = model.spaces.iter().filter(|s| s.zone == id).collect();
-                if matching.len() != 1
-                    || matching[0].name != NormalizedName::new(&space.name)
-                    || matching[0].origin != ep_model::SpaceOrigin::AutoZoneDefault
-                {
-                    return Err(HeatBalanceInputError::Unavailable(
-                        "actual implicit Space/typed association",
-                    ));
-                }
-                space.typed_space_id = Some(matching[0].id);
-            }
-        }
-        Ok(())
+        self.get_space_data(model, owners, errors_found)
     }
 }
 

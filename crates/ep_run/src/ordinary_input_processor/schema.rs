@@ -341,6 +341,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
             0,
             Some("chillers"),
         ),
+        ("Space", 3, 3, 1, 0, Some("tags")),
         ("ThermostatSetpoint:DualSetpoint", 3, 0, 0, 0, None),
         ("ZoneControl:Thermostat", 11, 1, 0, 0, None),
         ("ZoneHVAC:IdealLoadsAirSystem", 21, 11, 0, 0, None),

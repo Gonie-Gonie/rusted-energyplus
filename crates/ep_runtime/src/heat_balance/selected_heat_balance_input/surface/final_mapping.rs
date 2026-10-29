@@ -179,7 +179,7 @@ impl SurfaceGeometryInputState {
         let spaces = owners
             .zones
             .spaces
-            .as_ref()
+            .as_mut()
             .ok_or(Error::Unavailable("actual Space owner before final copy"))?;
         let mut without_space = vec![false; zones.len()];
         let mut with_space = vec![false; zones.len()];
@@ -204,6 +204,16 @@ impl SurfaceGeometryInputState {
                 "actual positive remainder-Space constructor",
             ));
         }
+        // Literal CreateMissingSpaces2975. GetSpaceData capacity remains
+        // untouched until this genuine later phase right-sizes the vector.
+        let active = usize::try_from(owners.globals.num_spaces)
+            .map_err(|_| Error::Unavailable("actual CreateMissingSpaces active count"))?;
+        if active > spaces.len() {
+            return Err(Error::Unavailable(
+                "actual CreateMissingSpaces allocation bounds",
+            ));
+        }
+        spaces.truncate(active);
         for row in &mut *tmp {
             // Actual2997-3002; last real Space, never Zone alias.
             if !row.heat_transfer_surface || row.space != 0 {
@@ -293,7 +303,12 @@ impl SurfaceGeometryInputState {
                     .push(super::signed(i + 1)?);
             }
         }
-        for space in spaces.iter() {
+        let active = usize::try_from(owners.globals.num_spaces)
+            .map_err(|_| Error::Unavailable("actual surface-list active Space count"))?;
+        let active_spaces = spaces.get(..active).ok_or(Error::Unavailable(
+            "actual surface-list active Space extent",
+        ))?;
+        for space in active_spaces {
             if space.surfaces.is_empty() {
                 backend.show_warning_error(&format!(
                     "createSpaceSurfaceLists: Space={} has no surfaces.",

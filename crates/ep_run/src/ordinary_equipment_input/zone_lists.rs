@@ -58,14 +58,21 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
 }
 
 pub(super) fn gain_target(raw: &RawModel, reference: &str) -> bool {
-    // Native Zone lookup precedes Space and ZoneList. Authored Space families
-    // remain rejected by the enclosing stage; no trimmed alias is invented.
+    // Actual lookup precedence is enforced by the compiler/getter. This raw
+    // admission only recognizes exact existing families; it never trims names.
     raw.objects
         .get(&ObjectType("Zone".into()))
         .is_some_and(|rows| {
             rows.keys()
                 .any(|name| name.0.eq_ignore_ascii_case(reference))
         })
+        || raw
+            .objects
+            .get(&ObjectType("Space".into()))
+            .is_some_and(|rows| {
+                rows.keys()
+                    .any(|name| name.0.eq_ignore_ascii_case(reference))
+            })
         || raw
             .objects
             .get(&ObjectType("ZoneList".into()))

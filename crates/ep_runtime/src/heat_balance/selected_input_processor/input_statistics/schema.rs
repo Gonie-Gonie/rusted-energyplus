@@ -3,6 +3,48 @@
 use super::{SchemaAutomatic, SchemaDefault, SchemaDefinition, SchemaField};
 pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
     Some(match name {
+        "Space" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "zone_name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "ceiling_height",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "volume",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "floor_area",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "space_type",
+                    default: SchemaDefault::String("General"),
+                    automatic: &[],
+                },
+            ],
+            extension: Some("tags"),
+            extensible: &[SchemaField {
+                name: "tag",
+                default: SchemaDefault::Absent,
+                automatic: &[],
+            }],
+        },
         "ZoneList" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

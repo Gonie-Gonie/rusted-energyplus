@@ -31,60 +31,74 @@ impl Compiler<'_> {
             .map(|name| name.0.clone())
     }
 
-    // Native implicit GetSpaceData copies the actual Zone.Name verbatim. The
-    // typed Space is real; its legacy normalized name is not Source spelling.
-    fn source_implicit_gain_space_name(
+    // Genuine singleton Space identity, independent of Space/Zone vector order.
+    // Source preserves authored whitespace; generated defaults retain raw Zone spelling.
+    fn source_whole_zone_gain_space_name(
         &mut self,
         model: &TypedModel,
         family: &str,
         object_name: &str,
         zone_id: ep_model::ZoneId,
     ) -> Option<String> {
-        let Some(zone) = model.zones.iter().find(|zone| zone.id == zone_id) else {
-            self.error(
-                "InternalReferenceError",
-                family,
-                Some(object_name),
-                None,
-                format!("Source {family} member Zone identity is unavailable"),
-            );
-            return None;
-        };
+        let zone = model.zones.iter().find(|row| row.id == zone_id)?;
         let spaces = model
             .spaces
             .iter()
-            .filter(|space| space.zone == zone_id)
+            .filter(|row| row.zone == zone_id)
             .collect::<Vec<_>>();
         if spaces.len() != 1
-            || spaces[0].origin != ep_model::SpaceOrigin::AutoZoneDefault
             || zone.spaces.as_slice() != [spaces[0].id]
+            || !matches!(
+                spaces[0].origin,
+                ep_model::SpaceOrigin::Authored | ep_model::SpaceOrigin::AutoZoneDefault
+            )
         {
             self.error(
                 &format!("Source{family}SpaceUnavailable"),
                 family,
                 Some(object_name),
                 Some("zone_or_zonelist_or_space_or_spacelist_name"),
-                format!(
-                    "Source {family} requires the actual sole implicit Space for each member Zone"
-                ),
+                format!("Source {family} requires exactly one whole-Zone Space and no remainder"),
             );
             return None;
         }
+        let space = spaces[0];
+        let raw_family = if space.origin == ep_model::SpaceOrigin::Authored {
+            "Space"
+        } else {
+            "Zone"
+        };
         let names = self
             .raw_model
             .objects
-            .get(&ep_raw_model::ObjectType("Zone".into()))
+            .get(&ep_raw_model::ObjectType(raw_family.into()))
             .map(|rows| {
                 rows.keys()
-                    .filter(|name| model.zone_names.resolve(&name.0) == Some(zone_id))
+                    .filter(|name| {
+                        if raw_family == "Space" {
+                            model.authored_space_names.resolve(&name.0) == Some(space.id)
+                        } else {
+                            model.zone_names.resolve(&name.0) == Some(zone_id)
+                        }
+                    })
                     .map(|name| name.0.clone())
                     .collect::<Vec<_>>()
             })
             .unwrap_or_default();
-        if names.len() != 1 || spaces[0].name != ep_model::NormalizedName::new(&names[0]) {
-            self.error(&format!("Source{family}ZoneIdentityUnavailable"), family, Some(object_name),
+        if names.len() != 1
+            || (if raw_family == "Space" {
+                space.name != model.authored_space_names.normalized_name(&names[0])
+            } else {
+                space.name != ep_model::NormalizedName::new(&names[0])
+            })
+        {
+            self.error(
+                &format!("Source{family}SpaceIdentityUnavailable"),
+                family,
+                Some(object_name),
                 Some("zone_or_zonelist_or_space_or_spacelist_name"),
-                format!("Source {family} member needs a unique real raw Zone/typed implicit-Space association"));
+                format!("Source {family} needs a unique raw/typed whole-Zone Space identity"),
+            );
             return None;
         }
         Some(names[0].to_ascii_uppercase())
@@ -112,24 +126,41 @@ impl Compiler<'_> {
         }
         let reference = self.source_reference_name(family, name, object, FIELD)?;
         // Native IHG3342-3394: Zone precedes Space, ZoneList, then SpaceList.
-        // One-member ZoneLists still prefix every actual implicit Space name.
+        // One-member ZoneLists still prefix every actual singleton Space name.
         if let Some(raw_zone) = self.source_raw_object_name("Zone", &reference) {
             let zone =
                 self.resolve_name(&model.zone_names, family, name, FIELD, &raw_zone, "Zone")?;
+            self.source_whole_zone_gain_space_name(model, family, name, zone)?;
             return Some((
                 ep_model::SourceGainInputTarget::Zone(zone),
                 vec![(zone, name.into())],
             ));
         }
-        if self.source_raw_object_name("Space", &reference).is_some() {
-            self.error(
-                &format!("Source{family}SpaceUnavailable"),
+        if let Some(raw_space) = self.source_raw_object_name("Space", &reference) {
+            let id = self.resolve_name(
+                &model.authored_space_names,
                 family,
-                Some(name),
-                Some(FIELD),
-                format!("Direct authored Space {family} remains outside the Source list stage"),
-            );
-            return None;
+                name,
+                FIELD,
+                &raw_space,
+                "Space",
+            )?;
+            let space = model.spaces.iter().find(|row| row.id == id)?;
+            let actual = self.source_whole_zone_gain_space_name(model, family, name, space.zone)?;
+            if actual != raw_space.to_ascii_uppercase() {
+                self.error(
+                    "InternalReferenceError",
+                    family,
+                    Some(name),
+                    Some(FIELD),
+                    "Direct Source Space identity differs".into(),
+                );
+                return None;
+            }
+            return Some((
+                ep_model::SourceGainInputTarget::Space(id),
+                vec![(space.zone, name.into())],
+            ));
         }
         if let Some(raw_list) = self.source_raw_object_name("ZoneList", &reference) {
             let id = self.resolve_name(
@@ -157,7 +188,8 @@ impl Compiler<'_> {
             };
             let mut targets = Vec::with_capacity(list.zones.len());
             for &zone in &list.zones {
-                let space_name = self.source_implicit_gain_space_name(model, family, name, zone)?;
+                let space_name =
+                    self.source_whole_zone_gain_space_name(model, family, name, zone)?;
                 targets.push((zone, format!("{space_name} {}", name.to_ascii_uppercase())));
             }
             return Some((ep_model::SourceGainInputTarget::ZoneList(id), targets));
@@ -181,7 +213,7 @@ impl Compiler<'_> {
             Some(name),
             Some(FIELD),
             format!(
-                "{family}/{name} references missing exact Source Zone or ZoneList '{reference}'"
+                "{family}/{name} references missing exact Source Zone, Space or ZoneList '{reference}'"
             ),
         );
         None

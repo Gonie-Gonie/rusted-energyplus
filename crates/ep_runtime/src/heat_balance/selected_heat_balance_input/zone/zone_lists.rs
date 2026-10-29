@@ -211,7 +211,7 @@ impl SelectedZoneInputOwners {
     }
 }
 
-fn diagnostic_flags<'a>(
+pub(super) fn diagnostic_flags<'a>(
     globals: &'a crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
     developer: &'a bool,
     clock: Option<&'a crate::weather::day::WeatherGlobalState>,

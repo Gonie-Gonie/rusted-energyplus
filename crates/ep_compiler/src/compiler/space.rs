@@ -20,9 +20,39 @@ impl Compiler<'_> {
     }
 
     fn parse_authored_spaces(&mut self, model: &mut TypedModel) {
-        for (name, object) in self.objects(SPACE_OBJECT_TYPE) {
+        // GetSpaceData walks the genuine JSON map even for converted IDF;
+        // it never calls the getObjectItem declaration-order overlay.
+        let objects = if self.source_file_declarations {
+            match self.raw_model.source_json_instances(SPACE_OBJECT_TYPE) {
+                Ok(rows) => rows
+                    .into_iter()
+                    .map(|(name, object)| (name.0.clone(), object.clone()))
+                    .collect(),
+                Err(error) => {
+                    self.error(
+                        "SourceObjectOrderUnavailable",
+                        SPACE_OBJECT_TYPE,
+                        None,
+                        None,
+                        error,
+                    );
+                    return;
+                }
+            }
+        } else {
+            self.objects(SPACE_OBJECT_TYPE)
+        };
+        for (name, object) in objects {
             let diagnostics_before_fields = self.diagnostics.len();
-            if name.trim().is_empty() {
+            let invalid_name = if self.source_file_declarations {
+                name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|b| matches!(b, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            } else {
+                name.trim().is_empty()
+            };
+            if invalid_name {
                 self.error(
                     "MissingRequiredField",
                     SPACE_OBJECT_TYPE,
@@ -32,7 +62,15 @@ impl Compiler<'_> {
                 );
             }
 
-            let zone_name = self.required_string(SPACE_OBJECT_TYPE, &name, &object, "zone_name");
+            let zone_name = if self.source_file_declarations {
+                self.source_reference_name(SPACE_OBJECT_TYPE, &name, &object, "zone_name").and_then(|reference| {
+                    let exact = self.source_raw_object_name("Zone", &reference);
+                    if exact.is_none() { self.error("MissingReference",SPACE_OBJECT_TYPE,Some(&name),Some("zone_name"),format!("Space/{name} references missing exact Source Zone '{reference}'")); }
+                    exact
+                })
+            } else {
+                self.required_string(SPACE_OBJECT_TYPE, &name, &object, "zone_name")
+            };
             let zone = zone_name.as_deref().and_then(|zone_name| {
                 self.resolve_name(
                     &model.zone_names,
@@ -43,6 +81,21 @@ impl Compiler<'_> {
                     "Zone",
                 )
             });
+            if self.source_file_declarations {
+                for field in ["ceiling_height", "volume", "floor_area"] {
+                    if let Some(RawValue::String(value)) = field_value(&object, field)
+                        && !value.is_empty()
+                        && !value.eq_ignore_ascii_case("Autocalculate")
+                    {
+                        self.invalid_field_type(
+                            SPACE_OBJECT_TYPE,
+                            &name,
+                            field,
+                            "number or empty/Autocalculate string",
+                        );
+                    }
+                }
+            }
             let ceiling_height = self.auto_default(
                 SPACE_OBJECT_TYPE,
                 &name,
@@ -102,12 +155,12 @@ impl Compiler<'_> {
             debug_assert!(existing.is_none());
             model.spaces.push(Space {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.authored_space_names.normalized_name(&name),
                 zone,
                 ceiling_height,
                 volume,
                 floor_area,
-                space_type: NormalizedName::new(&space_type),
+                space_type: model.space_type_names.normalized_name(&space_type),
                 space_type_id,
                 tags,
                 origin: SpaceOrigin::Authored,
@@ -211,7 +264,11 @@ impl Compiler<'_> {
 
     fn space_type_label(&mut self, object_name: &str, object: &RawObject) -> Option<String> {
         match field_value(object, "space_type") {
-            Some(RawValue::String(value)) if !value.trim().is_empty() => Some(value.clone()),
+            Some(RawValue::String(value))
+                if self.source_file_declarations || !value.trim().is_empty() =>
+            {
+                Some(value.clone())
+            }
             Some(RawValue::String(_)) => Some(GENERAL_SPACE_TYPE.to_string()),
             Some(_) => {
                 self.invalid_field_type(SPACE_OBJECT_TYPE, object_name, "space_type", "string");
@@ -256,7 +313,11 @@ impl Compiler<'_> {
                 source_span: None,
             };
             match field_value(&entry_object, "tag") {
-                Some(RawValue::String(tag)) => tags.push(NormalizedName::new(tag)),
+                Some(RawValue::String(tag)) => tags.push(if self.source_file_declarations {
+                    NormalizedName(tag.to_ascii_uppercase())
+                } else {
+                    NormalizedName::new(tag)
+                }),
                 None => tags.push(NormalizedName::new("")),
                 Some(_) => self.invalid_field_type(
                     SPACE_OBJECT_TYPE,

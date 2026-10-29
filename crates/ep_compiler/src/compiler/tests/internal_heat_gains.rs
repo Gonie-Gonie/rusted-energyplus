@@ -399,6 +399,9 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
     for binding in &list_model.source_other_equipment_inputs {
         let rows = &list_model.other_equipment[binding.instances.clone()];
         match binding.target {
+            ep_model::SourceOtherEquipmentInputTarget::Space(_) => {
+                return Err("unexpected direct Space in prior ZoneList fixture".into());
+            }
             ep_model::SourceOtherEquipmentInputTarget::ZoneList(id) => {
                 let list = list_model
                     .zone_lists
@@ -546,6 +549,9 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
                 assert_eq!(rows.len(), 1);
                 assert_eq!(rows[0].zone, zone);
                 assert_eq!(Some(zone), typed.zone_names.resolve("Alpha"));
+            }
+            ep_model::SourcePeopleInputTarget::Space(_) => {
+                return Err("unexpected direct Space in prior ZoneList fixture".into());
             }
             ep_model::SourcePeopleInputTarget::ZoneList(id) => {
                 let list = typed
@@ -898,6 +904,161 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
                 .iter()
                 .any(|d| d.code == "InvalidNumericRange")
         );
+    }
+    // Unit97: genuine authored Space IDs run opposite Zone IDs. Direct Space
+    // wins before a same-name ZoneList, and list names prefix the actual Space.
+    let authored = parse_epjson_str(
+        r#"{
+        "Zone":{"Zulu":{"floor_area":12},"Alpha":{"floor_area":6}},
+        "Space":{"A room":{"zone_name":"Zulu","ceiling_height":0,"volume":-1,"floor_area":"Autocalculate","space_type":"Lab","tags":[{"tag":" tag "},{"tag":""},{"tag":" tag "}]},"Z room":{"zone_name":"Alpha"}},
+        "ZoneList":{"Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]},"A room":{"zones":[{"zone_name":"Alpha"}]}},
+        "People":{"A direct":{"zone_or_zonelist_or_space_or_spacelist_name":"A room","number_of_people":2},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Z room","number_of_people_calculation_method":"People/Area","people_per_floor_area":0.25},
+            "C list":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","number_of_people_calculation_method":"Area/Person","floor_area_per_person":8}},
+        "OtherEquipment":{"A level":{"zone_or_zonelist_or_space_or_spacelist_name":"A room","design_level":23},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Z room","design_level_calculation_method":"Watts/Area","power_per_floor_area":1.75},
+            "C person":{"zone_or_zonelist_or_space_or_spacelist_name":"A room","design_level_calculation_method":"Watts/Person","power_per_person":5},
+            "D list":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","design_level":17}}}"#,
+    )?;
+    let projected = super::super::compile_raw_model_for_source(&authored);
+    assert!(
+        !projected.has_errors(),
+        "{:?}",
+        projected.report.diagnostics
+    );
+    let model = projected
+        .model
+        .ok_or("actual Source authored Space projection")?;
+    assert_eq!(model.spaces.len(), 2);
+    assert_eq!(
+        model
+            .spaces
+            .iter()
+            .map(|s| s.name.0.as_str())
+            .collect::<Vec<_>>(),
+        ["A ROOM", "Z ROOM"]
+    );
+    assert_eq!(
+        model.spaces[0].zone,
+        model.zone_names.resolve("Zulu").ok_or("Zulu Zone")?
+    );
+    assert_eq!(
+        model.spaces[1].zone,
+        model.zone_names.resolve("Alpha").ok_or("Alpha Zone")?
+    );
+    assert_ne!(model.spaces[0].id.0, model.spaces[0].zone.0);
+    assert_ne!(model.spaces[1].id.0, model.spaces[1].zone.0);
+    assert!(
+        model
+            .spaces
+            .iter()
+            .all(|s| s.origin == ep_model::SpaceOrigin::Authored)
+    );
+    assert_eq!(
+        model.spaces[0].ceiling_height,
+        ep_model::AutoOrNumber::Value(0.0)
+    );
+    assert_eq!(model.spaces[0].volume, ep_model::AutoOrNumber::Value(-1.0));
+    assert_eq!(
+        model.spaces[0].floor_area,
+        ep_model::AutoOrNumber::AutoCalculate
+    );
+    assert_eq!(
+        model.spaces[0]
+            .tags
+            .iter()
+            .map(|v| v.0.as_str())
+            .collect::<Vec<_>>(),
+        [" TAG ", "", " TAG "]
+    );
+    assert!(
+        matches!(model.source_people_inputs[0].target,ep_model::SourcePeopleInputTarget::Space(id) if id==model.spaces[0].id)
+    );
+    assert!(
+        matches!(model.source_people_inputs[1].target,ep_model::SourcePeopleInputTarget::Space(id) if id==model.spaces[1].id)
+    );
+    assert_eq!(
+        model
+            .people
+            .iter()
+            .map(|p| p.name.0.as_str())
+            .collect::<Vec<_>>(),
+        ["A DIRECT", "B AREA", "A ROOM C LIST", "Z ROOM C LIST"]
+    );
+    assert_eq!(
+        model
+            .other_equipment
+            .iter()
+            .map(|g| g.name.0.as_str())
+            .collect::<Vec<_>>(),
+        [
+            "A LEVEL",
+            "B AREA",
+            "C PERSON",
+            "A ROOM D LIST",
+            "Z ROOM D LIST"
+        ]
+    );
+    for binding in &model.source_other_equipment_inputs {
+        if let ep_model::SourceOtherEquipmentInputTarget::Space(id) = binding.target {
+            let space = model
+                .spaces
+                .iter()
+                .find(|s| s.id == id)
+                .ok_or("real direct Space")?;
+            let rows = &model.other_equipment[binding.instances.clone()];
+            assert_eq!(rows.len(), 1);
+            assert_eq!(rows[0].zone, space.zone);
+        }
+    }
+    let spaced = parse_epjson_str(
+        r#"{"Zone":{" Z ":{}},"Space":{" S ":{"zone_name":" Z ","space_type":" Lab ","volume":18446744073709551615,"tags":[{"tag":" x "}]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":" S ","number_of_people":1}}}"#,
+    )?;
+    let projected = super::super::compile_raw_model_for_source(&spaced);
+    assert!(
+        !projected.has_errors(),
+        "{:?}",
+        projected.report.diagnostics
+    );
+    let model = projected.model.ok_or("exact authored Space spelling")?;
+    assert_eq!(model.spaces[0].name.0, " S ");
+    assert_eq!(model.spaces[0].space_type.0, " LAB ");
+    assert_eq!(model.spaces[0].tags[0].0, " X ");
+    assert_eq!(model.spaces[0].volume, ep_model::AutoOrNumber::Value(-1.0));
+    assert!(model.authored_space_names.resolve("S").is_none());
+    assert!(
+        matches!(model.source_people_inputs[0].target,ep_model::SourcePeopleInputTarget::Space(id) if id==model.spaces[0].id)
+    );
+    assert!(
+        compile_raw_model(&spaced).has_errors(),
+        "legacy direct-Zone-only gains remain unchanged"
+    );
+    let zone_first = parse_epjson_str(
+        r#"{"Zone":{"Alpha":{},"Zulu":{}},"Space":{"Alpha":{"zone_name":"Zulu"},"Z room":{"zone_name":"Alpha"}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","number_of_people":1}}}"#,
+    )?;
+    let projected = super::super::compile_raw_model_for_source(&zone_first);
+    assert!(
+        !projected.has_errors(),
+        "{:?}",
+        projected.report.diagnostics
+    );
+    let model = projected.model.ok_or("Zone before same-name Space")?;
+    assert!(
+        matches!(model.source_people_inputs[0].target,ep_model::SourcePeopleInputTarget::Zone(id) if Some(id)==model.zone_names.resolve("Alpha"))
+    );
+    assert_eq!(model.people[0].name.0, "P");
+    for (field, expected) in [("", ""), ("General", "GENERAL")] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"Space":{{"S":{{"zone_name":"Z","space_type":"{field}"}}}}}}"#
+        );
+        let projected = super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?);
+        assert!(
+            !projected.has_errors(),
+            "{:?}",
+            projected.report.diagnostics
+        );
+        let model = projected.model.ok_or("Source Space actual type alpha")?;
+        assert_eq!(model.spaces[0].space_type.0, expected);
     }
     Ok(())
 }

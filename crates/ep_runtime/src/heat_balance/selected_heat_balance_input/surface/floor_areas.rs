@@ -42,6 +42,11 @@ impl SurfaceGeometryInputState {
             .ok_or(Error::Unavailable("same Space floor owner"))?;
         let extra = owners.globals.display_extra_warnings;
         let mut errors = 0_i32;
+        let active = usize::try_from(owners.globals.num_spaces)
+            .map_err(|_| Error::Unavailable("actual floor active Space count"))?;
+        let spaces = spaces
+            .get_mut(..active)
+            .ok_or(Error::Unavailable("actual floor active Space extent"))?;
         for space in &mut *spaces {
             let zone = zones
                 .get_mut(index(space.zone_num)?)

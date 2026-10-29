@@ -34,6 +34,7 @@ mod infrared;
 mod multizone;
 mod people;
 mod source_b;
+mod spaces;
 mod zone_lists;
 use fields::{admitted_field, required_fields};
 
@@ -60,8 +61,14 @@ fn resolve_raw(
         source_calendar_ingress && !source_b_ingress && multizone::has_multiple_zones(raw);
     let source_zone_list_ingress =
         source_calendar_ingress && !source_b_ingress && zone_lists::positive(raw);
-    if source_multizone_ingress || source_zone_list_ingress {
+    let source_space_ingress =
+        source_calendar_ingress && !source_b_ingress && spaces::positive(raw);
+    let source_gain_collections = source_zone_list_ingress || source_space_ingress;
+    if source_multizone_ingress || source_gain_collections {
         multizone::validate(raw)?;
+    }
+    if source_space_ingress {
+        spaces::validate(raw)?;
     }
     if source_zone_list_ingress {
         zone_lists::validate(raw)?;
@@ -70,6 +77,7 @@ fn resolve_raw(
         if objects.is_empty() {
             continue;
         }
+        let source_space_family = source_space_ingress && family.0 == "Space";
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
         let source_irt_family =
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
@@ -138,6 +146,7 @@ fn resolve_raw(
             && !source_compact_family
             && !source_people_family
             && !source_angle_family
+            && !source_space_family
         {
             return Err(format!(
                 "ordinary equipment excludes positive family {}",
@@ -181,6 +190,7 @@ fn resolve_raw(
                     "OtherEquipment"
                         | "People"
                         | "ZoneList"
+                        | "Space"
                         | "ScheduleTypeLimits"
                         | "Schedule:Constant"
                         | "Schedule:Compact"
@@ -309,6 +319,7 @@ fn resolve_raw(
                             ),
                             "Schedule:Week:Compact" => field.0 != "data",
                             "ZoneList" if source_zone_list_ingress => field.0 != "zones",
+                            "Space" if source_space_family => !spaces::known_field(&field.0),
                             "OtherEquipment" => !matches!(
                                 field.0.as_str(),
                                 "fuel_type"
@@ -373,7 +384,7 @@ fn resolve_raw(
                     && (matches!(
                         (family.0.as_str(), required),
                         ("Exterior:Lights" | "OtherEquipment", "schedule_name")
-                    ) || (source_zone_list_ingress
+                    ) || (source_gain_collections
                         && family.0 == "OtherEquipment"
                         && required == "zone_or_zonelist_or_space_or_spacelist_name"))
                 {
@@ -469,7 +480,12 @@ fn resolve_raw(
                         } else {
                             field(object, "outside_boundary_condition_object").is_none_or(blank)
                         })
-                        && field(object, "space_name").is_none_or(blank)
+                        && (field(object, "space_name").is_none_or(blank)
+                            || (source_space_ingress
+                                && matches!(
+                                    field(object, "space_name"),
+                                    Some(RawValue::String(_))
+                                )))
                 }
                 "SizingPeriod:DesignDay" => {
                     selected(
@@ -513,7 +529,7 @@ fn resolve_raw(
                 "Material:InfraredTransparent" => source_irt_family,
                 "People" => {
                     source_people_family
-                        && people::admitted_object(raw, object, source_zone_list_ingress)
+                        && people::admitted_object(raw, object, source_gain_collections)
                 }
                 "OtherEquipment" => {
                     (selected(object, "fuel_type", &["None"])
@@ -658,7 +674,7 @@ fn resolve_raw(
             for object in objects.values() {
                 if family == "OtherEquipment"
                     && !match field(object, "zone_or_zonelist_or_space_or_spacelist_name") {
-                        Some(RawValue::String(name)) if source_zone_list_ingress => {
+                        Some(RawValue::String(name)) if source_gain_collections => {
                             zone_lists::gain_target(raw, name)
                         }
                         _ => text(object, "zone_or_zonelist_or_space_or_spacelist_name")
@@ -668,7 +684,7 @@ fn resolve_raw(
                             }),
                     }
                 {
-                    return Err("ordinary OtherEquipment requires an actual admitted Zone or Source ZoneList".into());
+                    return Err("ordinary OtherEquipment requires an actual admitted Zone, Source Space or Source ZoneList".into());
                 }
                 let schedule = if source_calendar_ingress {
                     match field(object, "schedule_name") {
@@ -845,7 +861,6 @@ mod tests {
             "HotWaterEquipment",
             "SteamEquipment",
             "ZoneGroup",
-            "Space",
             "SpaceList",
             "ZoneProperty:LocalEnvironment",
             "ZoneHVAC:EquipmentConnections",
@@ -865,6 +880,47 @@ mod tests {
             assert!(
                 error.starts_with("Source A bounded multi-Zone excludes positive family"),
                 "{family}: {error}"
+            );
+        }
+        // Unit97 sole authored Spaces: raw/IP values are preserved, not sized here.
+        let source_space = parse_epjson_str(
+            r#"{
+            "Zone":{"Zulu":{},"Alpha":{}},
+            "Space":{"A room":{"zone_name":"Zulu","ceiling_height":0,"volume":-1,"floor_area":"Autocalculate","space_type":" Lab ","tags":[{"tag":" x ","metadata":null},{"tag":""}],"metadata":[null,true,7,"text",{},[]]},"Z room":{"zone_name":"Alpha"}},
+            "Schedule:Constant":{"On":{"hourly_value":1}},
+            "People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"A room","number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}},
+            "OtherEquipment":{"G":{"zone_or_zonelist_or_space_or_spacelist_name":"Z room","schedule_name":"On","design_level":7}}}"#,
+        )?;
+        assert!(resolve_source_a(&source_space).is_ok());
+        assert!(resolve_source_b(&source_space).is_err());
+        assert!(resolve(&source_space).is_err());
+        let mut projected = crate::ordinary_input_processor::resolve_source_a(&source_space)?;
+        let fields = projected.source_raw_object_fields("Space", "A room")?;
+        assert!(
+            matches!(&fields["volume"],ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(n) if n=="-1")
+        );
+        assert!(
+            matches!(&fields["metadata"],ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Array(v) if v.len()==6)
+        );
+        assert_eq!(projected.get_num_objects_found("Space"), 2);
+        let definition = projected.get_object_def_max_args("Space")?;
+        assert_eq!((definition.alphas, definition.numerics), (5, 3));
+        for extra in [
+            r#"{"Space":{"A":{"zone_name":"Zulu"},"B":{"zone_name":"Zulu"}}}"#,
+            r#"{"Space":{"A":{"zone_name":"Missing"}}}"#,
+            r#"{"Space":{"A":{"zone_name":"Zulu","floor_area":" "}}}"#,
+            r#"{"Space":{"A":{"zone_name":"Zulu","tags":[{"tag":7}]}}}"#,
+            r#"{"Space":{"A":{"zone_name":"Zulu"}},"SpaceList":{"L":{"spaces":[{"space_name":"A"}]}}}"#,
+        ] {
+            let mut value: serde_json::Value =
+                serde_json::from_str(r#"{"Zone":{"Zulu":{},"Alpha":{}}}"#)?;
+            let added: serde_json::Value = serde_json::from_str(extra)?;
+            for (family, objects) in added.as_object().ok_or("authored Space negative fixture")? {
+                value[family] = objects.clone();
+            }
+            assert!(
+                resolve_source_a(&parse_epjson_str(&value.to_string())?).is_err(),
+                "{extra}"
             );
         }
         // Direct real Zone references reuse the existing None/non-Water fuels.
@@ -1202,7 +1258,7 @@ mod tests {
             invalid["OtherEquipment"]["Load"]["zone_or_zonelist_or_space_or_spacelist_name"] =
                 serde_json::json!(" Both ");
             assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
-            for family in ["ZoneGroup", "Space", "SpaceList"] {
+            for family in ["ZoneGroup", "SpaceList"] {
                 let mut invalid = list_case.clone();
                 invalid[family] = serde_json::json!({"held":{}});
                 assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());

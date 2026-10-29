@@ -299,10 +299,9 @@ pub(super) fn assess_typed_runtime_boundaries(
             .spaces
             .iter()
             .filter(|space| {
-                matches!(
-                    space.origin,
-                    ep_model::SpaceOrigin::Authored | ep_model::SpaceOrigin::AutoZoneRemainder
-                )
+                space.origin == ep_model::SpaceOrigin::AutoZoneRemainder
+                    || (space.origin == ep_model::SpaceOrigin::Authored
+                        && !source_admission.is_some_and(|admission| admission.consumes("Space")))
             })
             .count(),
     );

@@ -73,7 +73,11 @@ impl SelectedInternalHeatGains {
         let ns = usize::try_from(owners.globals.num_spaces)
             .map_err(|_| unavailable("actual numSpaces capacity"))?;
         if owners.zones.zones.as_ref().map(Vec::len) != Some(nz)
-            || owners.zones.spaces.as_ref().map(Vec::len) != Some(ns)
+            || owners
+                .zones
+                .spaces
+                .as_ref()
+                .is_none_or(|rows| rows.len() < ns)
         {
             return Err(unavailable(
                 "same actual internal-gain Zone/Space count association",
@@ -316,8 +320,39 @@ impl SelectedInternalHeatGains {
                 .spaces
                 .as_ref()
                 .ok_or_else(|| unavailable("actual gain Spaces"))?;
-            if spaces.iter().any(|space| space.name == target) {
-                return Err(unavailable("positive direct-Space IHG admission"));
+            let active = usize::try_from(owners.globals.num_spaces)
+                .map_err(|_| unavailable("actual IHG active Space count"))?;
+            let spaces = spaces
+                .get(..active)
+                .ok_or_else(|| unavailable("actual IHG active Space extent"))?;
+            if let Some((position, space)) = spaces
+                .iter()
+                .enumerate()
+                .find(|(_, space)| space.name == target)
+            {
+                // Native3361: Zone lookup has already won. Direct Space
+                // retains the raw gain name and this actual Space array number.
+                let zone = zones
+                    .get(index(space.zone_num)?)
+                    .ok_or_else(|| unavailable("actual direct Space Zone"))?;
+                if zone.num_spaces != 1
+                    || zone.space_indexes.as_slice()
+                        != [i32::try_from(position + 1)
+                            .map_err(|_| unavailable("actual direct Space signed index"))?]
+                {
+                    return Err(unavailable("positive multi-Space direct IHG target"));
+                }
+                row.space_start_ptr = self.totals[kind]
+                    .checked_add(1)
+                    .ok_or_else(|| unavailable("actual IHG instance start overflow"))?;
+                self.totals[kind] = row.space_start_ptr;
+                row.num_spaces = 1;
+                row.space_nums.push(
+                    i32::try_from(position + 1)
+                        .map_err(|_| unavailable("actual direct Space signed index"))?,
+                );
+                row.names.push(row.name.clone());
+                continue;
             }
             if let Some(list) = owners
                 .zones
@@ -669,7 +704,19 @@ fn check_people_input_association(
     owners: &SourceGainInputOwners<'_, '_>,
 ) -> Result<(), E> {
     let bindings = &owners.model.source_people_inputs;
-    if bindings.is_empty() && !misc.iter().any(|row| row.zone_list_active) {
+    let authored = owners
+        .zones
+        .spaces
+        .as_deref()
+        .unwrap_or(&[])
+        .iter()
+        .any(|space| {
+            owners.model.spaces.iter().any(|typed| {
+                Some(typed.id) == space.typed_space_id
+                    && typed.origin == ep_model::SpaceOrigin::Authored
+            })
+        });
+    if bindings.is_empty() && !authored && !misc.iter().any(|row| row.zone_list_active) {
         // Older direct getter boundary fixtures predate explicit Source input
         // associations. Positive list expansion always requires the real map.
         return Ok(());
@@ -740,6 +787,24 @@ fn check_people_input_association(
                     return Err(unavailable("People direct Zone precedence association"));
                 }
             }
+            ep_model::SourcePeopleInputTarget::Space(id) => {
+                let matching = spaces
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, space)| space.typed_space_id == Some(id))
+                    .collect::<Vec<_>>();
+                if object.zone_list_active
+                    || rows.len() != 1
+                    || matching.len() != 1
+                    || matching[0].1.name != target
+                    || zones.iter().any(|zone| zone.name == target)
+                    || object.space_nums.as_slice()
+                        != [i32::try_from(matching[0].0 + 1)
+                            .map_err(|_| unavailable("People direct Space actual index"))?]
+                {
+                    return Err(unavailable("People direct Space precedence association"));
+                }
+            }
             ep_model::SourcePeopleInputTarget::ZoneList(id) => {
                 let lists = owners
                     .zones
@@ -791,7 +856,15 @@ fn check_people_input_association(
                 || row.name.0 != object.names[position]
                 || zone.typed_zone_id != Some(row.zone)
                 || typed_space.zone != row.zone
-                || typed_space.origin != ep_model::SpaceOrigin::AutoZoneDefault
+                || typed_space.origin == ep_model::SpaceOrigin::AutoZoneRemainder
+                || match typed_space.origin {
+                    ep_model::SpaceOrigin::Authored => typed_space.name.0 != space.name,
+                    ep_model::SpaceOrigin::AutoZoneDefault => {
+                        typed_space.name != ep_model::NormalizedName::new(&space.name)
+                            || space.name != zone.name
+                    }
+                    ep_model::SpaceOrigin::AutoZoneRemainder => true,
+                }
                 || zone.num_spaces != 1
                 || zone.space_indexes.as_slice() != [object.space_nums[position]]
             {

@@ -46,8 +46,8 @@ impl OrdinaryEquipment {
         Self::new_owners(None, &[model.zones[0].id], &[model.spaces[0].id])
     }
 
-    /// Actual SetupZoneGeometry supplies paired physical IDs in Source array
-    /// order. The compiler's container order does not define Source ordinals.
+    /// Actual SetupZoneGeometry supplies independent physical IDs in each
+    /// Source array order. The compiler's container order does not define Source ordinals.
     pub(crate) fn new_for_source_ordered(
         model: &ep_model::TypedModel,
         clock: OrdinaryEquipmentInput,
@@ -76,16 +76,43 @@ impl OrdinaryEquipment {
         if typed_zones.len() != model.zones.len() || typed_spaces.len() != model.spaces.len() {
             return Err(Unavailable::GeometryOrTimestep);
         }
-        for (&zone_id, &space_id) in zone_ids.iter().zip(space_ids) {
+        let ordered_zones = zone_ids
+            .iter()
+            .copied()
+            .collect::<std::collections::BTreeSet<_>>();
+        let ordered_spaces = space_ids
+            .iter()
+            .copied()
+            .collect::<std::collections::BTreeSet<_>>();
+        if ordered_zones.len() != zone_ids.len() || ordered_spaces.len() != space_ids.len() {
+            return Err(Unavailable::GeometryOrTimestep);
+        }
+        for &zone_id in zone_ids {
             let zone = typed_zones
                 .remove(&zone_id)
                 .ok_or(Unavailable::GeometryOrTimestep)?;
+            if zone.spaces.len() != 1
+                || !ordered_spaces.contains(&zone.spaces[0])
+                || model
+                    .spaces
+                    .iter()
+                    .find(|row| row.id == zone.spaces[0])
+                    .is_none_or(|row| row.zone != zone_id)
+            {
+                return Err(Unavailable::GeometryOrTimestep);
+            }
+        }
+        for &space_id in space_ids {
             let space = typed_spaces
                 .remove(&space_id)
                 .ok_or(Unavailable::GeometryOrTimestep)?;
-            if space.origin != ep_model::SpaceOrigin::AutoZoneDefault
-                || space.zone != zone_id
-                || zone.spaces.as_slice() != [space_id]
+            if space.origin == ep_model::SpaceOrigin::AutoZoneRemainder
+                || !ordered_zones.contains(&space.zone)
+                || model
+                    .zones
+                    .iter()
+                    .find(|row| row.id == space.zone)
+                    .is_none_or(|row| row.spaces.as_slice() != [space_id])
             {
                 return Err(Unavailable::GeometryOrTimestep);
             }
@@ -93,7 +120,7 @@ impl OrdinaryEquipment {
         if !typed_zones.is_empty() || !typed_spaces.is_empty() {
             return Err(Unavailable::GeometryOrTimestep);
         }
-        if zone_ids.len() == 1 {
+        if zone_ids.len() == 1 && model.spaces[0].origin == ep_model::SpaceOrigin::AutoZoneDefault {
             return Self::new_for_source(model, clock);
         }
         Self::new_owners(None, zone_ids, space_ids)

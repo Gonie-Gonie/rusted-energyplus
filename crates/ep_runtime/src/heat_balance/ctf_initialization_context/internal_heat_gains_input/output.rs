@@ -180,6 +180,11 @@ impl SelectedInternalHeatGains {
         // These names/values are local borrows of the SAME owners. Copy only
         // names to allow the independent IP/registration mutable borrows.
         let zone_names: Vec<_> = zones.iter().map(|r| r.name.clone()).collect();
+        let active = usize::try_from(owners.globals.num_spaces)
+            .map_err(|_| unavailable("actual output active Space count"))?;
+        let spaces = spaces
+            .get(..active)
+            .ok_or_else(|| unavailable("actual output active Space extent"))?;
         let space_names: Vec<_> = spaces.iter().map(|r| r.name.clone()).collect();
         for (number, name) in zone_names.iter().enumerate() {
             for (i, suffix) in TOTAL.iter().enumerate() {

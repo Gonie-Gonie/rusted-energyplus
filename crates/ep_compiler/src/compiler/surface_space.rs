@@ -18,20 +18,47 @@ impl Compiler<'_> {
         object: &RawObject,
         zone: ZoneId,
     ) -> Option<(SpaceId, bool)> {
-        let space_name = self.optional_reference_name_checked(
-            SURFACE_OBJECT_TYPE,
-            surface_name,
-            object,
-            "space_name",
-        )?;
+        let space_name = if self.source_file_declarations {
+            match super::field_value(object, "space_name") {
+                None => None,
+                Some(ep_raw_model::RawValue::String(value)) if value.is_empty() => None,
+                Some(ep_raw_model::RawValue::String(value)) => Some(value.clone()),
+                Some(_) => {
+                    self.invalid_field_type(
+                        SURFACE_OBJECT_TYPE,
+                        surface_name,
+                        "space_name",
+                        "string",
+                    );
+                    return None;
+                }
+            }
+        } else {
+            self.optional_reference_name_checked(
+                SURFACE_OBJECT_TYPE,
+                surface_name,
+                object,
+                "space_name",
+            )?
+        };
 
         if let Some(space_name) = space_name {
             let normalized_space_name = NormalizedName::new(&space_name);
-            let Some(space) = model
-                .spaces
-                .iter()
-                .find(|space| space.name == normalized_space_name)
-            else {
+            let Some(space) = model.spaces.iter().find(|space| {
+                if self.source_file_declarations {
+                    match space.origin {
+                        SpaceOrigin::Authored => space.name.0.eq_ignore_ascii_case(&space_name),
+                        SpaceOrigin::AutoZoneDefault => {
+                            self.source_raw_object_name("Zone", &space_name)
+                                .and_then(|raw| model.zone_names.resolve(&raw))
+                                == Some(space.zone)
+                        }
+                        SpaceOrigin::AutoZoneRemainder => false,
+                    }
+                } else {
+                    space.name == normalized_space_name
+                }
+            }) else {
                 self.error(
                     "MissingReference",
                     SURFACE_OBJECT_TYPE,

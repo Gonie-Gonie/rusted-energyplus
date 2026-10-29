@@ -543,6 +543,115 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         assert!(!support.runtime_class.conformance_promotion_allowed());
     }
 
+    // Unit97 singleton authored Spaces use the same Source-only class as
+    // bounded Zones/ZoneLists. No ZoneList can hide the singleton predicate.
+    // The no-Space control retains its existing one-Zone capability.
+    for (authored, explicit_surfaces) in [(false, false), (true, false), (true, true)] {
+        let mut single = self::input(PortingScope::A);
+        if authored {
+            single["Space"] = json!({"Room97":{"zone_name":"Zone","ceiling_height":0,"volume":0}});
+            if explicit_surfaces {
+                for surface in single["BuildingSurface:Detailed"]
+                    .as_object_mut()
+                    .expect("actual singleton surfaces")
+                    .values_mut()
+                {
+                    surface["space_name"] = json!("Room97");
+                }
+            }
+        }
+        let raw = parse_epjson_str(&single.to_string()).expect("actual singleton Space input");
+        assert!(
+            !raw.objects
+                .contains_key(&ep_raw_model::ObjectType("ZoneList".into()))
+        );
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled
+            .model
+            .as_ref()
+            .expect("real singleton Source model");
+        assert_eq!(model.zones.len(), 1);
+        assert_eq!(model.spaces.len(), 1);
+        assert_eq!(
+            model.spaces[0].origin,
+            if authored {
+                ep_model::SpaceOrigin::Authored
+            } else {
+                ep_model::SpaceOrigin::AutoZoneDefault
+            }
+        );
+        let mut selected =
+            inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(selected.admissible, "{:?}", selected.violations);
+        selected.environment = Some(
+            super::environment::environment_from_weather(
+                model,
+                &weather,
+                "actual singleton whole-Zone Space",
+            )
+            .expect("same genuine singleton environment preparation"),
+        );
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                .expect("validated singleton Source A scope");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+        assert_eq!(support.status, SupportStatus::SupportedCompatibility);
+        assert!(support.failed_capability_ids.is_empty());
+        if authored {
+            assert_eq!(
+                support.runtime_class,
+                crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+            );
+            assert!(support.matched_capability_ids.is_empty());
+            assert!(support.matched_capabilities.is_empty());
+            assert!(!support.runtime_class.conformance_promotion_allowed());
+            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+            assert!(
+                !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B)
+                    .admissible
+            );
+            let legacy = assess_support(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+            );
+            assert!(!legacy.allows_rust_runtime());
+            assert!(
+                legacy
+                    .diagnostics
+                    .diagnostics
+                    .iter()
+                    .any(|diagnostic| { diagnostic.code == "UnsupportedSpacePartitioning" })
+            );
+        } else {
+            assert_eq!(
+                support.runtime_class,
+                crate::RuntimeClass::OneZoneHeatBalanceCompatibility
+            );
+            assert_eq!(
+                support.matched_capability_ids,
+                ["official_1zone_uncontrolled_declared_heat_balance"]
+            );
+            assert!(support.runtime_class.conformance_promotion_allowed());
+        }
+    }
+
     // Unit88 admits only direct-Zone Electricity OtherEquipment on this
     // Source topology. Actual compiler/IP names link opposite object/Zone order;
     // no typed IDs, rates or thermal outcomes are synthesized for this test.

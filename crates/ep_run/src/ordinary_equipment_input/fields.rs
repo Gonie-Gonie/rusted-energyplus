@@ -22,6 +22,7 @@ pub(super) fn admitted_field(
             | "BuildingSurface:Detailed"
             | "Zone"
             | "ZoneList"
+            | "Space"
             | "Material"
             | "Material:NoMass"
             | "Material:AirGap"
@@ -743,6 +744,7 @@ pub(super) fn admitted_field(
             blank(value) || matches!(value, RawValue::String(_))
         }
         ("ZoneList", "zones") if source_ingress => matches!(value, RawValue::Array(_)),
+        ("Space", name) if source_ingress => super::spaces::admitted_field(name, value),
         ("OtherEquipment", "fuel_type") => {
             blank(value)
                 || text_is(
@@ -894,6 +896,7 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         "Output:Meter" | "Output:Meter:MeterFileOnly" => &["key_name"],
         "Exterior:Lights" => &["schedule_name", "design_level"],
         "ZoneList" => &["zones"],
+        "Space" => &["zone_name"],
         "OtherEquipment" => &[
             "zone_or_zonelist_or_space_or_spacelist_name",
             "schedule_name",

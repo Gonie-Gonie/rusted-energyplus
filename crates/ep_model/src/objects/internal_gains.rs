@@ -1,4 +1,4 @@
-use crate::{InternalGainId, NormalizedName, ScheduleId, ZoneId, ZoneListId};
+use crate::{InternalGainId, NormalizedName, ScheduleId, SpaceId, ZoneId, ZoneListId};
 
 /// OtherEquipment design-level calculation method.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -48,6 +48,8 @@ pub struct OtherEquipment {
 pub enum SourceGainInputTarget {
     /// Native lookup found a genuine Zone before considering lists.
     Zone(ZoneId),
+    /// Native lookup found a genuine authored Space after Zone lookup.
+    Space(SpaceId),
     /// Native lookup found a genuine ZoneList after Zone/Space lookup.
     ZoneList(ZoneListId),
 }
@@ -55,7 +57,7 @@ pub enum SourceGainInputTarget {
 /// Existing OtherEquipment input-target API over the shared actual identity.
 pub type SourceOtherEquipmentInputTarget = SourceGainInputTarget;
 
-/// People input targets share the same genuine Zone and ZoneList identities.
+/// People input targets share the same genuine Zone, Space and ZoneList identities.
 pub type SourcePeopleInputTarget = SourceGainInputTarget;
 
 /// Explicit raw People object and its actual dense typed instance range.
@@ -64,7 +66,7 @@ pub type SourcePeopleInputTarget = SourceGainInputTarget;
 pub struct SourcePeopleInput {
     /// Exact original raw People key, separate from generated instance names.
     pub object_name: String,
-    /// Actual resolved Zone or ZoneList identity.
+    /// Actual resolved Zone, sole authored Space or ZoneList identity.
     pub target: SourcePeopleInputTarget,
     /// Contiguous real IDs in TypedModel.people, not Native array numbers.
     pub instances: std::ops::Range<usize>,
@@ -77,7 +79,7 @@ pub struct SourcePeopleInput {
 pub struct SourceOtherEquipmentInput {
     /// Exact original raw object key, independent of generated instance names.
     pub object_name: String,
-    /// Actual resolved Zone or ZoneList identity.
+    /// Actual resolved Zone, sole authored Space or ZoneList identity.
     pub target: SourceOtherEquipmentInputTarget,
     /// Contiguous range in TypedModel.other_equipment with real dense typed IDs.
     pub instances: std::ops::Range<usize>,

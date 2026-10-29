@@ -3172,7 +3172,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         // Unit88 authored input checkpoint: the real Zone getter creates two
         // implicit Spaces, then the real IHG getter resolves opposite object/
         // Zone order. This is not a completed geometry/timestep certificate.
-        {
+        for authored in [false,true] {
             use crate::heat_balance::selected_heat_balance_input::zone::ZoneGetterOwners;
             use crate::heat_balance::selected_input_processor::{SourceInputFamily,SourceObjectDefinition,SourceObjectShape};
             use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SourceGainDictionaryFile;
@@ -3193,10 +3193,16 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 space.name=zone.name.clone();space.zone=zone.id;space.origin=ep_model::SpaceOrigin::AutoZoneDefault;
                 multi_model.zones.push(zone);multi_model.spaces.push(space);
             }
+            if authored {
+                for (index,name) in ["Z SPACE","A SPACE"].into_iter().enumerate() {
+                    multi_model.spaces[index].name=NormalizedName(name.into());
+                    multi_model.spaces[index].origin=ep_model::SpaceOrigin::Authored;
+                }
+            }
             let requests=[
                 ("ALPHA LOAD","Other Equipment Electricity Energy"),("ZULU LOAD","Other Equipment Electricity Energy"),
                 ("ALPHA","Zone Other Equipment Total Heating Rate"),("ZULU","Zone Other Equipment Total Heating Rate"),
-                ("ALPHA","Space Other Equipment Total Heating Rate"),("ZULU","Space Other Equipment Total Heating Rate"),
+                (if authored {"A SPACE"} else {"ALPHA"},"Space Other Equipment Total Heating Rate"),(if authored {"Z SPACE"} else {"ZULU"},"Space Other Equipment Total Heating Rate"),
             ];
             multi_model.report_inputs.output_variables=requests.iter().enumerate().map(|(index,(key,name))|
                 ep_model::SourceOutputVariableInput { object_name:format!("GAIN REQUEST {index}"),key:(*key).into(),
@@ -3214,7 +3220,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             let gain_objects=[("ALPHA LOAD","ALPHA",300.0),("ZULU LOAD","ZULU",100.0)].into_iter()
                 .map(|(name,zone,power)|ProjectInputObject { object_name:name.into(),idf_max_fields:None,
                     fields:std::collections::BTreeMap::from([
-                        ("zone_or_zonelist_or_space_or_spacelist_name".into(),ProjectInputValue::String(zone.into())),
+                        ("zone_or_zonelist_or_space_or_spacelist_name".into(),ProjectInputValue::String(if authored {if zone=="ALPHA" {"A SPACE"}else{"Z SPACE"}}else{zone}.into())),
                         ("schedule_name".into(),ProjectInputValue::String("Constant-1.0".into())),
                         ("fuel_type".into(),ProjectInputValue::String("Electricity".into())),
                         ("design_level_calculation_method".into(),ProjectInputValue::String("EquipmentLevel".into())),
@@ -3241,11 +3247,26 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 alpha_extensions:0,numeric_extensions:0,extension:None });
             let shape=|rows:&[ProjectInputObject]|SourceInputFamily::Objects(rows.iter().map(|row|SourceObjectShape {
                 object_name:row.object_name.clone(),field_sizes:Default::default() }).collect());
-            let mut input=SelectedInputProcessor::from_admitted_input(definitions,std::collections::BTreeMap::from([
+            if authored {definitions.push(SourceObjectDefinition {object_type:"Space".into(),alpha_fields:3,numeric_fields:3,alpha_extensions:1,numeric_extensions:0,extension:Some("tags".into())});}
+            let mut families:std::collections::BTreeMap<String,SourceInputFamily>=std::collections::BTreeMap::from([
                 ("Zone".into(),shape(&zone_objects)),("OtherEquipment".into(),shape(&gain_objects)),
                 ("Output:Variable".into(),SourceInputFamily::Objects(multi_model.report_inputs.output_variables.iter().map(|row|
                     SourceObjectShape { object_name:row.object_name.clone(),field_sizes:Default::default() }).collect())),
-            ]))?;
+            ]);
+            use crate::heat_balance::selected_input_processor::{SourceInputStatisticsInput,SourceInputStatisticsValue as V};
+            let space_fields:std::collections::BTreeMap<String,std::collections::BTreeMap<String,V>>=std::collections::BTreeMap::from([
+                ("Z SPACE".into(),std::collections::BTreeMap::from([("zone_name".into(),V::String("ZULU".into()))])),
+                ("A SPACE".into(),std::collections::BTreeMap::from([("zone_name".into(),V::String("ALPHA".into()))])),
+            ]);
+            if authored {families.insert("Space".into(),SourceInputFamily::Objects(space_fields.keys().rev().map(|name|SourceObjectShape {
+                object_name:name.clone(),field_sizes:std::collections::BTreeMap::from([("zone_name".into(),1)]),
+            }).collect()));}
+            let mut statistics=SourceInputStatisticsInput {objects:families.iter().map(|(family,rows)| {
+                let SourceInputFamily::Objects(rows)=rows else {unreachable!()};
+                (family.clone(),rows.iter().map(|row|(row.object_name.clone(),if family=="Space" {space_fields[&row.object_name].clone()}else{Default::default()})).collect())
+            }).collect(),object_order:Default::default()};
+            let mut input=SelectedInputProcessor::from_admitted_input(definitions,families)?;
+            if authored {input.retain_source_input_statistics(std::mem::take(&mut statistics))?;}
             let mut shortcut=SourceInputProcessorShortCut::default();shortcut.allocate_from_input(&input)?;
             let mut zones=SelectedZoneInputOwners::default();
             let mut globals=crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default();
@@ -3267,7 +3288,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             assert_eq!((globals.num_of_zones,globals.num_spaces),(2,2));
             let retained=zones.zones.as_ref().ok_or("actual multi gain Zones")?;
             assert_eq!(retained.iter().map(|row|row.name.as_str()).collect::<Vec<_>>(),["ZULU","ALPHA"]);
-            assert_eq!(zones.spaces.as_ref().ok_or("actual multi gain Spaces")?.iter().map(|row|row.zone_num).collect::<Vec<_>>(),[1,2]);
+            assert_eq!(zones.spaces.as_ref().ok_or("actual multi gain Spaces")?.iter().take(2).map(|row|row.zone_num).collect::<Vec<_>>(),if authored {[2,1]}else{[1,2]});
+            assert_eq!(zones.spaces.as_ref().ok_or("actual multi gain Space capacity")?.len(),if authored {4}else{2});
             let mut multi=failed_gains.clone();
             multi.selected_zone_input=Some(zones);multi.selected_heat_balance_globals=Some(globals);
             multi.selected_input_processor=Some(input);multi.input_processor_shortcut=shortcut;
@@ -3281,11 +3303,11 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             assert_eq!(gains.allocations.space_report.as_ref().ok_or("actual two Space reports")?.len(),2);
             let equipment=gains.allocations.other_equipment.as_ref().ok_or("actual two OtherEquipment rows")?;
             assert_eq!(equipment.iter().map(|row|(row.name.as_str(),row.zone_ptr,row.space_index,row.design_level))
-                .collect::<Vec<_>>(),[("ALPHA LOAD",2,2,300.0),("ZULU LOAD",1,1,100.0)]);
+                .collect::<Vec<_>>(),[("ALPHA LOAD",2,if authored {1}else{2},300.0),("ZULU LOAD",1,if authored {2}else{1},100.0)]);
             assert!(equipment.iter().all(|row|row.fuel as i32==0 && row.fraction_radiant.to_bits()==0.25_f64.to_bits()));
             let devices=gains.allocations.space_devices.as_ref().ok_or("actual separate Space devices")?;
             assert_eq!(devices.len(),2);
-            for (space,name) in [(0,"ZULU LOAD"),(1,"ALPHA LOAD")] {
+            for (space,name) in if authored {[(1,"ZULU LOAD"),(0,"ALPHA LOAD")]}else{[(0,"ZULU LOAD"),(1,"ALPHA LOAD")]} {
                 let row=&devices[space];assert_eq!(row.number_of_devices,1);
                 let device=&row.devices.as_ref().ok_or("actual per-Space gain target")?[0];
                 assert_eq!(device.component_name,name);assert!(device.targets.iter().all(Option::is_some));
@@ -3295,15 +3317,15 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             let zones=context.reports.selected_zone_input.as_ref().ok_or("retained gain associations")?;
             assert_eq!(zones.zones.as_ref().ok_or("retained gain Zones")?.iter().map(|row|row.internal_heat_gains).collect::<Vec<_>>(),[100.0,300.0]);
             assert!(zones.zones.as_ref().ok_or("actual fuel Zones")?.iter().all(|row|row.other_equipment_fuels==[0]));
-            assert!(zones.spaces.as_ref().ok_or("actual fuel Spaces")?.iter().all(|row|row.other_equipment_fuels==[0]));
+            assert!(zones.spaces.as_ref().ok_or("actual fuel Spaces")?.iter().take(2).all(|row|row.other_equipment_fuels==[0]));
             let registration=&context.reports.output_registration;
             for (key,name,index,field) in [
                 ("ALPHA LOAD","Other Equipment Electricity Energy",1,GainField::OtherConsumption),
                 ("ZULU LOAD","Other Equipment Electricity Energy",2,GainField::OtherConsumption),
                 ("ALPHA","Zone Other Equipment Total Heating Rate",2,GainField::ZoneOtherThermal { field:9 }),
                 ("ZULU","Zone Other Equipment Total Heating Rate",1,GainField::ZoneOtherThermal { field:9 }),
-                ("ALPHA","Space Other Equipment Total Heating Rate",2,GainField::SpaceOtherThermal { field:9 }),
-                ("ZULU","Space Other Equipment Total Heating Rate",1,GainField::SpaceOtherThermal { field:9 }),
+                (if authored {"A SPACE"}else{"ALPHA"},"Space Other Equipment Total Heating Rate",if authored {1}else{2},GainField::SpaceOtherThermal { field:9 }),
+                (if authored {"Z SPACE"}else{"ZULU"},"Space Other Equipment Total Heating Rate",if authored {2}else{1},GainField::SpaceOtherThermal { field:9 }),
             ] {
                 let matches=registration.out_vars.iter().filter(|row|row.key==key && row.name==name).collect::<Vec<_>>();
                 assert_eq!(matches.len(),1,"{key}:{name}");assert!(matches[0].report);
@@ -3323,6 +3345,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 Some(SourceGainDictionaryFile { eso:Some(&mut eso) }))?;
             assert_eq!(context.reports.selected_internal_heat_gains,retained_gains);
             assert_eq!(context.reports.output_registration,retained_registration);
+            assert!(context.reports.output_registration.out_vars.iter().all(|row|!row.key.is_empty()));
+            assert!(context.reports.selected_zone_input.as_ref().ok_or("retained Zone/Space owner")?.spaces.as_ref().ok_or("retained Space tail")?.iter().skip(2).all(|row|row.zone_num==0 && row.typed_space_id.is_none() && row.other_equipment_fuels.is_empty()));
             assert!(error.is_empty());
         }
         // Genuine dictionary capability over the same gain getter: the stream
@@ -4946,6 +4970,45 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             [(2, totals[1] * 3.5), (1, totals[0] * 3.5)]);
                         assert!(gains.allocations.people.rows.iter().all(|person|
                             person.nom_min_number_people == 0.0 && person.nom_max_number_people == 0.0));
+                        // Unit97 direct-Space People uses a real SpaceId and
+                        // reverse actual array ownership; no prefix is added.
+                        // This remains an authored input-owner checkpoint.
+                        {
+                            let mut direct=checkpoint.clone();let mut direct_model=list_model.clone();
+                            direct_model.spaces[0].name=ep_model::NormalizedName("Z ROOM97".into());
+                            direct_model.spaces[1].name=ep_model::NormalizedName("A ROOM97".into());
+                            for space in &mut direct_model.spaces {space.origin=ep_model::SpaceOrigin::Authored;}
+                            let raw=direct.heat_balance_input.as_mut().ok_or("direct Space People raw")?;
+                            let people=raw.objects.get_mut("People").ok_or("direct Space People rows")?;
+                            let raw_name=people[0].object_name.clone();
+                            people[0].fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(),ProjectInputValue::String("A ROOM97".into()));
+                            direct_model.people=vec![list_model.people[0].clone(),list_model.people[2].clone()];
+                            direct_model.people[0].name=ep_model::NormalizedName(raw_name.to_ascii_uppercase());
+                            direct_model.people[1].id=ep_model::InternalGainId(1);
+                            direct_model.source_people_inputs[0].target=ep_model::SourcePeopleInputTarget::Space(ep_model::SpaceId(1));
+                            direct_model.source_people_inputs[0].instances=0..1;direct_model.source_people_inputs[1].instances=1..2;
+                            let source=direct.selected_zone_input.as_mut().ok_or("direct Space live owners")?;
+                            let old=source.spaces.as_ref().ok_or("direct original spaces")?.clone();
+                            let mut first=old[1].clone();first.name="A ROOM97".into();
+                            let mut second=old[0].clone();second.name="Z ROOM97".into();
+                            source.spaces=Some(vec![first,second,Default::default(),Default::default()]);
+                            let zones=source.zones.as_mut().ok_or("direct actual Zone links")?;
+                            zones[0].space_indexes=vec![2];zones[1].space_indexes=vec![1];
+                            let direct_checkpoint=direct.clone();
+                            let (direct,state,errors,_,reached)=read_sizing(direct,&direct_model)?;
+                            assert!(reached.is_ok(),"direct Space People/{method}: {reached:?}");assert!(errors.is_empty());assert_eq!(state.tracking.total_warning_errors,0);
+                            let gain=&direct.selected_internal_heat_gains;
+                            assert_eq!(gain.allocations.people.rows.iter().map(|row|(row.name.as_str(),row.zone_ptr,row.space_index,row.number_of_people)).collect::<Vec<_>>(),[
+                                (direct_model.people[0].name.0.as_str(),2,1,expected_by_zone[1]),(direct_model.people[1].name.0.as_str(),1,2,0.5),
+                            ]);
+                            let source=direct.selected_zone_input.as_ref().ok_or("direct People totals")?;
+                            assert_eq!(source.zones.as_ref().ok_or("direct Zone totals")?.iter().map(|row|row.total_occupants).collect::<Vec<_>>(),[0.5,expected_by_zone[1]]);
+                            assert_eq!(source.spaces.as_ref().ok_or("direct Space totals")?.iter().map(|row|row.total_occupants).collect::<Vec<_>>(),[expected_by_zone[1],0.5,0.0,0.0]);
+                            assert_eq!(gain.allocations.other_equipment.as_ref().ok_or("direct per-person dependents")?.iter().map(|row|(row.zone_ptr,row.space_index,row.design_level)).collect::<Vec<_>>(),[(2,1,expected_by_zone[1]*3.5),(1,2,0.5*3.5)]);
+                            let mut bad=direct_model.clone();bad.source_people_inputs[0].target=ep_model::SourcePeopleInputTarget::Space(ep_model::SpaceId(0));
+                            let (bad,_,_,_,reached)=read_sizing(direct_checkpoint,&bad)?;
+                            assert!(reached.is_err());assert!(!bad.selected_internal_heat_gains.allocations.people.allocated);
+                        }
                         // A broken typed range must stop before allocated People
                         // mutation; no Native Fatal or successful result is invented.
                         let mut invalid_model = list_model.clone();

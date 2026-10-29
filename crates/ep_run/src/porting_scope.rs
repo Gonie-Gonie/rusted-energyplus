@@ -107,6 +107,10 @@ pub fn inspect_porting_scope(
             || raw
                 .objects
                 .get(&ep_raw_model::ObjectType("ZoneList".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            || raw
+                .objects
+                .get(&ep_raw_model::ObjectType("Space".into()))
                 .is_some_and(|rows| !rows.is_empty()))
         && let Err(error) = crate::ordinary_equipment_input::resolve_source_a(raw)
     {
@@ -214,7 +218,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Schedule:Year"
             | "RunPeriodControl:DaylightSavingTime"
             | "RunPeriodControl:SpecialDays"
-    ) || (scope == PortingScope::A && kind == "ZoneList")
+    ) || (scope == PortingScope::A && matches!(kind, "ZoneList" | "Space"))
         || (scope == PortingScope::B
             && matches!(
                 kind,
@@ -336,17 +340,32 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         violations
             .push("Source A requires positive opaque Zones; Source B requires exactly one".into());
     }
-    if (model.zones.len() > 1 || !model.zone_lists.is_empty())
+    let authored_spaces = model
+        .spaces
+        .iter()
+        .any(|space| space.origin == ep_model::SpaceOrigin::Authored);
+    if (model.zones.len() > 1 || !model.zone_lists.is_empty() || authored_spaces)
         && (model.spaces.len() != model.zones.len()
             || model.zones.iter().any(|zone| {
-                let mut spaces = model.spaces.iter().filter(|space| space.zone == zone.id);
-                !spaces
-                    .next()
-                    .is_some_and(|space| space.origin == ep_model::SpaceOrigin::AutoZoneDefault)
-                    || spaces.next().is_some()
+                let spaces = model
+                    .spaces
+                    .iter()
+                    .filter(|space| space.zone == zone.id)
+                    .collect::<Vec<_>>();
+                spaces.len() != 1
+                    || zone.spaces.as_slice() != [spaces[0].id]
+                    || !matches!(
+                        spaces[0].origin,
+                        ep_model::SpaceOrigin::AutoZoneDefault | ep_model::SpaceOrigin::Authored
+                    )
+                    || (scope != PortingScope::A
+                        && spaces[0].origin == ep_model::SpaceOrigin::Authored)
             }))
     {
-        violations.push("bounded multi-Zone requires one implicit Space per Zone".into());
+        violations.push(
+            "bounded Source A requires exactly one whole-Zone Space per Zone and no remainder"
+                .into(),
+        );
     }
     if (model.zones.len() > 1 || !model.zone_lists.is_empty())
         && model.zones.iter().any(|zone| {
@@ -360,9 +379,9 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         // producer that remains outside this stage.
         violations.push("multi-Zone requires a non-floor opaque enclosure for every Zone".into());
     }
-    if !model.zone_lists.is_empty() {
+    if !model.zone_lists.is_empty() || authored_spaces {
         if scope != PortingScope::A {
-            violations.push("ZoneList is admitted only by Source A".into());
+            violations.push("ZoneList and authored Space are admitted only by Source A".into());
         }
         let mut cursor = 0;
         for binding in &model.source_other_equipment_inputs {
@@ -386,6 +405,22 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                     if instances.len() != 1 || instances[0].zone != zone {
                         violations
                             .push("Source OtherEquipment direct Zone association differs".into());
+                    }
+                }
+                ep_model::SourceOtherEquipmentInputTarget::Space(id) => {
+                    if instances.len() != 1
+                        || !model
+                            .spaces
+                            .iter()
+                            .find(|space| space.id == id)
+                            .is_some_and(|space| {
+                                space.origin == ep_model::SpaceOrigin::Authored
+                                    && instances[0].zone == space.zone
+                            })
+                    {
+                        violations.push(
+                            "Source OtherEquipment direct actual Space association differs".into(),
+                        );
                     }
                 }
                 ep_model::SourceOtherEquipmentInputTarget::ZoneList(id) => {
@@ -432,6 +467,21 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                 ep_model::SourcePeopleInputTarget::Zone(zone) => {
                     if instances.len() != 1 || instances[0].zone != zone {
                         violations.push("Source People direct Zone association differs".into());
+                    }
+                }
+                ep_model::SourcePeopleInputTarget::Space(id) => {
+                    if instances.len() != 1
+                        || !model
+                            .spaces
+                            .iter()
+                            .find(|space| space.id == id)
+                            .is_some_and(|space| {
+                                space.origin == ep_model::SpaceOrigin::Authored
+                                    && instances[0].zone == space.zone
+                            })
+                    {
+                        violations
+                            .push("Source People direct actual Space association differs".into());
                     }
                 }
                 ep_model::SourcePeopleInputTarget::ZoneList(id) => {

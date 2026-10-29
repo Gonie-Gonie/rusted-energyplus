@@ -687,6 +687,8 @@ impl<'a> Compiler<'a> {
             model.other_equipment_names = NameMap::source_exact_namespace();
             model.people_names = NameMap::source_exact_namespace();
             model.zone_list_names = NameMap::source_exact_namespace();
+            model.authored_space_names = NameMap::source_exact_namespace();
+            model.space_type_names = NameMap::source_exact_namespace();
         }
 
         self.parse_building(&mut model);
@@ -16274,7 +16276,9 @@ impl<'a> Compiler<'a> {
                 // The connected IHG numeric operands use Native IP842's
                 // stored JSON number kind, not an unconditional double parse.
                 // Other families retain their existing numeric projection.
-                let parsed = if matches!(object_type, "OtherEquipment" | "People") {
+                let parsed = if matches!(object_type, "OtherEquipment" | "People")
+                    || (self.source_file_declarations && object_type == "Space")
+                {
                     ep_model::classify_source_json_number(text)
                         .ok()
                         .map(ep_model::SourceJsonNumber::as_f64)
