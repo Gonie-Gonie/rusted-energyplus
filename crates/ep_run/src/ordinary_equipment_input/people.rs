@@ -177,6 +177,30 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
     ) {
         return false;
     }
+    if source_zone_lists && super::space_lists::empty_gain_target(raw, object) {
+        // Schema kinds/required fields/enums/ranges were checked separately.
+        // Only the occupancy schedule precedes the member loop in a mixed
+        // family; activity/comfort schedules are consumed inside that loop.
+        if !super::space_lists::family_has_instances(raw, "People") {
+            return true;
+        }
+        let Some(RawValue::String(schedule)) = field(object, "number_of_people_schedule_name")
+        else {
+            return false;
+        };
+        return !schedule.is_empty()
+            && (["Constant-0.0", "Constant-1.0"]
+                .iter()
+                .any(|name| schedule.eq_ignore_ascii_case(name))
+                || raw
+                    .objects
+                    .get(&ObjectType("Schedule:Constant".into()))
+                    .is_some_and(|rows| {
+                        rows.keys()
+                            .any(|name| name.0.eq_ignore_ascii_case(schedule))
+                    })
+                || super::source_b::has_source_detailed_reference(raw, schedule));
+    }
     // Known field types/enums were validated first. No-model auxiliaries stay
     // unconsumed; either supported model consumes the real auxiliary inputs.
     let mut fanger = false;

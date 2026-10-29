@@ -188,6 +188,12 @@ fn resolve_raw(
             return Err(format!("ordinary equipment requires unique {}", family.0));
         }
         for (name, object) in objects {
+            let source_empty_gain = source_space_list_ingress
+                && matches!(family.0.as_str(), "People" | "OtherEquipment")
+                && space_lists::empty_gain_target(raw, object);
+            if source_empty_gain {
+                space_lists::validate_empty_gain_schema(&family.0, object)?;
+            }
             // These unnamed singletons have no authored Name. Their official
             // epJSON patterns accept arbitrary keys; keep exact IP identity.
             // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
@@ -385,10 +391,11 @@ fn resolve_raw(
             for &required in required_fields(&family.0) {
                 // Meter keys are required strings but the schema has no
                 // minLength: an authored empty key reaches the real not-found warning.
-                let required_is_missing = if matches!(
+                let required_is_missing = if (matches!(
                     family.0.as_str(),
                     "Output:Meter" | "Output:Meter:MeterFileOnly"
-                ) && required == "key_name"
+                ) && required == "key_name")
+                    || source_empty_gain
                 {
                     !matches!(field(object, required), Some(RawValue::String(_)))
                 } else if source_calendar_ingress
@@ -542,6 +549,7 @@ fn resolve_raw(
                     source_people_family
                         && people::admitted_object(raw, object, source_gain_collections)
                 }
+                "OtherEquipment" if source_empty_gain => true,
                 "OtherEquipment" => {
                     (selected(object, "fuel_type", &["None"])
                         || source_calendar_ingress
@@ -683,6 +691,14 @@ fn resolve_raw(
     for family in ["OtherEquipment", "Exterior:Lights", "Output:Variable"] {
         if let Some(objects) = raw.objects.get(&ObjectType(family.into())) {
             for object in objects.values() {
+                if source_space_list_ingress
+                    && family == "OtherEquipment"
+                    && !space_lists::family_has_instances(raw, family)
+                {
+                    // Native TotOthEquip==0 skips every statement getter. The
+                    // unconditional schema/actual target checks already ran.
+                    continue;
+                }
                 if family == "OtherEquipment"
                     && !match field(object, "zone_or_zonelist_or_space_or_spacelist_name") {
                         Some(RawValue::String(name)) if source_gain_collections => {
@@ -933,7 +949,7 @@ mod tests {
             );
         }
         // SpaceList members remain raw, authored and ordered; the real getter
-        // owns Source numbers and sizing. Positive empty lists stay outside this increment.
+        // owns Source numbers and sizing; empty targets retain real zero-instance statements.
         let space_lists: serde_json::Value = serde_json::from_str(
             r#"{
             "Zone":{"Zulu":{},"Alpha":{}},
@@ -968,7 +984,8 @@ mod tests {
             .collect::<Result<Vec<_>, _>>()?;
         assert_eq!(member_names, ["Z room", "A room"]);
         for members in [
-            serde_json::json!([]),
+            serde_json::json!(null),
+            serde_json::json!({}),
             serde_json::json!([{}]),
             serde_json::json!([{"space_name":1}]),
             serde_json::json!([{"space_name":" Z room"}]),
@@ -988,6 +1005,93 @@ mod tests {
         wrong_target["OtherEquipment"]["G"]["zone_or_zonelist_or_space_or_spacelist_name"] =
             serde_json::json!("L");
         assert!(resolve_source_a(&parse_epjson_str(&wrong_target.to_string())?).is_err());
+        // Unit99: an actual empty list is valid without any authored Space.
+        // Total-zero families retain schema-valid unconsumed reference strings.
+        let mut empty_lists = serde_json::json!({
+            "Zone":{"Z":{}},"SpaceList":{"Absent":{},"Empty":{"spaces":[]}},
+            "People":{
+                "A":{"zone_or_zonelist_or_space_or_spacelist_name":"Absent","number_of_people_schedule_name":"Missing","activity_level_schedule_name":"","number_of_people_calculation_method":"Area/Person","floor_area_per_person":0,"thermal_comfort_model_1_type":"KSU"},
+                "B":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","number_of_people_schedule_name":"","activity_level_schedule_name":"Missing","number_of_people":2}},
+            "OtherEquipment":{
+                "A":{"zone_or_zonelist_or_space_or_spacelist_name":"Absent","schedule_name":"Missing","design_level_calculation_method":"Watts/Area","power_per_floor_area":-2,"fraction_latent":0.75,"fraction_radiant":0.75},
+                "B":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"","design_level":-3}}
+        });
+        let raw = parse_epjson_str(&empty_lists.to_string())?;
+        assert!(resolve_source_a(&raw).is_ok());
+        assert!(resolve_source_b(&raw).is_err() && resolve(&raw).is_err());
+        let projected = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert_eq!(projected.get_num_objects_found("SpaceList"), 2);
+        assert_eq!(projected.get_num_objects_found("Space"), 0);
+        assert_eq!(projected.get_num_objects_found("People"), 2);
+        assert_eq!(projected.get_num_objects_found("OtherEquipment"), 2);
+        let mut priority = empty_lists.clone();
+        priority["ZoneList"] = serde_json::json!({"Absent":{"zones":[{"zone_name":"Z"}]}});
+        assert!(
+            resolve_source_a(&parse_epjson_str(&priority.to_string())?).is_err(),
+            "same-name positive ZoneList wins before the empty SpaceList and exposes schedule checks"
+        );
+        for (family, field_name, bad_value) in [
+            ("People", "number_of_people", serde_json::json!(-1)),
+            (
+                "People",
+                "activity_level_schedule_name",
+                serde_json::json!(null),
+            ),
+            (
+                "People",
+                "number_of_people_schedule_name",
+                serde_json::json!(7),
+            ),
+            (
+                "People",
+                "number_of_people_calculation_method",
+                serde_json::json!("bad"),
+            ),
+            ("OtherEquipment", "schedule_name", serde_json::json!(null)),
+            ("OtherEquipment", "design_level", serde_json::json!("")),
+            ("OtherEquipment", "fuel_type", serde_json::json!("Water")),
+            ("OtherEquipment", "fraction_lost", serde_json::json!(1.1)),
+        ] {
+            let mut invalid = empty_lists.clone();
+            invalid[family]["A"][field_name] = bad_value;
+            assert!(
+                resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err(),
+                "unconditional empty-target schema {family}.{field_name}"
+            );
+        }
+        for (family, field_name) in [
+            ("People", "activity_level_schedule_name"),
+            ("People", "number_of_people_schedule_name"),
+            ("OtherEquipment", "schedule_name"),
+        ] {
+            let mut invalid = empty_lists.clone();
+            invalid[family]["A"]
+                .as_object_mut()
+                .ok_or("raw object")?
+                .remove(field_name);
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+        }
+        for family in ["People", "OtherEquipment"] {
+            let mut wrong = empty_lists.clone();
+            wrong[family]["A"]["zone_or_zonelist_or_space_or_spacelist_name"] =
+                serde_json::json!(" Absent ");
+            assert!(resolve_source_a(&parse_epjson_str(&wrong.to_string())?).is_err());
+        }
+        empty_lists["Schedule:Constant"] = serde_json::json!({"On":{"hourly_value":1}});
+        empty_lists["People"]["Z actual"] = serde_json::json!({"zone_or_zonelist_or_space_or_spacelist_name":"Z","number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1});
+        empty_lists["OtherEquipment"]["Z actual"] = serde_json::json!({"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"On","design_level":5});
+        assert!(
+            resolve_source_a(&parse_epjson_str(&empty_lists.to_string())?).is_err(),
+            "a positive family total exposes each empty statement schedule lookup"
+        );
+        for name in ["A", "B"] {
+            empty_lists["People"][name]["number_of_people_schedule_name"] = serde_json::json!("On");
+            empty_lists["OtherEquipment"][name]["schedule_name"] = serde_json::json!("On");
+        }
+        assert!(
+            resolve_source_a(&parse_epjson_str(&empty_lists.to_string())?).is_ok(),
+            "mixed empty rows skip activity/comfort, selected sizing and grouped fractions"
+        );
         // Direct real Zone references reuse the existing None/non-Water fuels.
         // The object order is opposite the direct-JSON Zone order, without
         // renumbering IDs or changing either actual namespace.
@@ -1323,11 +1427,15 @@ mod tests {
             invalid["OtherEquipment"]["Load"]["zone_or_zonelist_or_space_or_spacelist_name"] =
                 serde_json::json!(" Both ");
             assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
-            for family in ["ZoneGroup", "SpaceList"] {
-                let mut invalid = list_case.clone();
-                invalid[family] = serde_json::json!({"held":{}});
-                assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
-            }
+            let mut invalid = list_case.clone();
+            invalid["ZoneGroup"] = serde_json::json!({"held":{}});
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            let mut unused_empty_list = list_case.clone();
+            unused_empty_list["SpaceList"] = serde_json::json!({"held":{}});
+            assert!(
+                resolve_source_a(&parse_epjson_str(&unused_empty_list.to_string())?).is_ok(),
+                "an unused empty SpaceList is valid beside the existing ZoneList input"
+            );
             // Unit95: People uses the same retained ordered list input. All
             // three sizing operands stay authored for the genuine People getter.
             for method in ["People", "People/Area", "Area/Person"] {

@@ -674,6 +674,144 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         }
     }
 
+    // Unit99: positive raw SpaceList objects select the finite Source class
+    // even when both lists have no members and every Space is implicit.
+    for mixed in [false, true] {
+        let mut empty_case = self::input(PortingScope::A);
+        empty_case["SpaceList"] = json!({"Absent99":{},"Empty99":{"spaces":[]}});
+        let schedule = if mixed { "On" } else { "Missing" };
+        empty_case["People"] = json!({
+            "A empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Absent99","number_of_people_schedule_name":schedule,"activity_level_schedule_name":"Missing","number_of_people":2},
+            "C empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty99","number_of_people_schedule_name":schedule,"activity_level_schedule_name":"","number_of_people_calculation_method":"Area/Person","floor_area_per_person":0}
+        });
+        empty_case["OtherEquipment"] = json!({
+            "A empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Absent99","schedule_name":schedule,"design_level_calculation_method":"Watts/Area","power_per_floor_area":-2,"fraction_latent":0.75,"fraction_radiant":0.75},
+            "C empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty99","schedule_name":schedule,"design_level":-3}
+        });
+        if mixed {
+            empty_case["People"]["B actual"] = json!({"zone_or_zonelist_or_space_or_spacelist_name":"Zone","number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1});
+            empty_case["OtherEquipment"]["B actual"] = json!({"zone_or_zonelist_or_space_or_spacelist_name":"Zone","schedule_name":"On","design_level":5});
+        }
+        let raw = parse_epjson_str(&empty_case.to_string()).expect("real empty SpaceLists");
+        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled.model.as_ref().expect("real empty input bindings");
+        assert!(model.authored_space_names.is_empty());
+        assert_eq!(model.spaces.len(), 1);
+        assert_eq!(
+            model.spaces[0].origin,
+            ep_model::SpaceOrigin::AutoZoneDefault
+        );
+        assert_eq!(model.people.len(), usize::from(mixed));
+        assert_eq!(model.other_equipment.len(), usize::from(mixed));
+        let expected = if mixed {
+            vec![0..0, 0..1, 1..1]
+        } else {
+            vec![0..0, 0..0]
+        };
+        assert_eq!(
+            model
+                .source_people_inputs
+                .iter()
+                .map(|row| row.instances.clone())
+                .collect::<Vec<_>>(),
+            expected
+        );
+        assert_eq!(
+            model
+                .source_other_equipment_inputs
+                .iter()
+                .map(|row| row.instances.clone())
+                .collect::<Vec<_>>(),
+            expected
+        );
+        for mutation in 0..6 {
+            let mut invalid = model.clone();
+            match mutation {
+                0 => {
+                    invalid.source_people_inputs.remove(0);
+                }
+                1 => {
+                    invalid.source_other_equipment_inputs[0].target =
+                        ep_model::SourceGainInputTarget::Zone(model.zones[0].id);
+                }
+                2 => {
+                    invalid.source_people_inputs[0].instances = 1..1;
+                }
+                3 => {
+                    invalid.source_people_inputs[0].target =
+                        ep_model::SourceGainInputTarget::SpaceList(
+                            model
+                                .space_list_names
+                                .resolve("Empty99")
+                                .expect("other real empty list"),
+                        );
+                }
+                4 => {
+                    invalid.space_lists[0].spaces.push(model.spaces[0].id);
+                }
+                _ => {
+                    invalid.source_people_inputs[0].instances =
+                        std::ops::Range { start: 1, end: 0 };
+                }
+            }
+            assert!(
+                !inspect_porting_scope(&raw, &compiled.report, Some(&invalid), PortingScope::A)
+                    .admissible,
+                "empty range association/coverage mutation {mutation}"
+            );
+        }
+        let mut selected =
+            inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(selected.admissible, "{:?}", selected.violations);
+        assert!(
+            !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B).admissible
+        );
+        selected.environment = Some(
+            super::environment::environment_from_weather(
+                model,
+                &weather,
+                "real empty SpaceList scope",
+            )
+            .expect("same one-Zone weather preparation"),
+        );
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                .expect("validated empty SpaceList input");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+        assert_eq!(
+            support.runtime_class,
+            crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+        );
+        assert!(support.matched_capability_ids.is_empty());
+        assert!(!support.runtime_class.conformance_promotion_allowed());
+        assert!(
+            !assess_support(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal
+            )
+            .allows_rust_runtime()
+        );
+    }
+
     // Unit88 admits only direct-Zone Electricity OtherEquipment on this
     // Source topology. Actual compiler/IP names link opposite object/Zone order;
     // no typed IDs, rates or thermal outcomes are synthesized for this test.

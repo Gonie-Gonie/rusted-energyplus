@@ -771,6 +771,7 @@ fn check_people_input_association(
         .as_deref()
         .ok_or_else(|| unavailable("People association actual Spaces"))?;
     let mut seen = vec![false; owners.model.people.len()];
+    let mut cursor = 0;
     let raw_rows = owners
         .raw
         .objects
@@ -778,6 +779,29 @@ fn check_people_input_association(
         .ok_or_else(|| unavailable("People retained raw family identity"))?;
     if raw_rows.len() != misc.len() {
         return Err(unavailable("People retained raw ordinal count"));
+    }
+    // Native starts are written in JSON-map order before getIDFObjNum places
+    // each misc row. Prove that real prefix independently of typed IDF ranges;
+    // zero-member lists keep total+1, including repeated starts and empty tails.
+    let Some(SourceInputFamily::Objects(json_rows)) = owners.input.find_exact_family("People")
+    else {
+        return Err(unavailable("People actual JSON-map prefix owner"));
+    };
+    let mut native_cursor = 0_i32;
+    for shape in json_rows {
+        let ordinal = raw_rows
+            .iter()
+            .position(|row| row.object_name == shape.object_name)
+            .ok_or_else(|| unavailable("People exact JSON/IDF ordinal"))?;
+        let object = misc
+            .get(ordinal)
+            .ok_or_else(|| unavailable("People actual misc ordinal"))?;
+        if Some(object.space_start_ptr) != native_cursor.checked_add(1) {
+            return Err(unavailable("People actual Native instance start"));
+        }
+        native_cursor = native_cursor
+            .checked_add(object.num_spaces)
+            .ok_or_else(|| unavailable("People actual Native instance prefix"))?;
     }
     for (ordinal, object) in misc.iter().enumerate() {
         let raw = &raw_rows[ordinal];
@@ -789,6 +813,9 @@ fn check_people_input_association(
             return Err(unavailable("People exact raw object association"));
         }
         let binding = matching[0];
+        if binding.instances.start != cursor {
+            return Err(unavailable("People dense raw instance cursor"));
+        }
         if raw.object_name.to_ascii_uppercase() != object.name {
             return Err(unavailable("People retained raw/Native name association"));
         }
@@ -807,7 +834,6 @@ fn check_people_input_association(
         if rows.len() != object.space_nums.len()
             || rows.len() != object.names.len()
             || usize::try_from(object.num_spaces).ok() != Some(rows.len())
-            || rows.is_empty()
         {
             return Err(unavailable("People raw/typed expanded instance count"));
         }
@@ -914,6 +940,17 @@ fn check_people_input_association(
                 }
             }
         }
+        // Only the actual empty SpaceList branch above proves a zero-member
+        // statement. It retains its real pointer/flag/start without a fake row.
+        if rows.is_empty()
+            && !matches!(
+                binding.target,
+                ep_model::SourcePeopleInputTarget::SpaceList(_)
+            )
+        {
+            return Err(unavailable("People empty non-SpaceList instance range"));
+        }
+        cursor = binding.instances.end;
         for (position, row) in rows.iter().enumerate() {
             let at = binding.instances.start + position;
             let slot = seen
@@ -957,7 +994,7 @@ fn check_people_input_association(
             *slot = true;
         }
     }
-    if seen.iter().any(|seen| !seen) {
+    if cursor != owners.model.people.len() || seen.iter().any(|seen| !seen) {
         return Err(unavailable("People complete typed instance coverage"));
     }
     Ok(())

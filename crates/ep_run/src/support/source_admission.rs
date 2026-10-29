@@ -161,6 +161,10 @@ impl SourceSupportAdmission {
                     || raw
                         .objects
                         .get(&ObjectType("Space".into()))
+                        .is_some_and(|rows| !rows.is_empty())
+                    || raw
+                        .objects
+                        .get(&ObjectType("SpaceList".into()))
                         .is_some_and(|rows| !rows.is_empty())),
         })
     }

@@ -13747,7 +13747,24 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_other_equipment(&mut self, model: &mut TypedModel) {
-        'inputs: for (name, object) in self.objects("OtherEquipment") {
+        let objects = self.objects("OtherEquipment");
+        // Native setupIHGZonesAndSpaces resolves the entire family before its
+        // total gates every getObjectItem/schedule/member-body operation.
+        let mut source_targets = if self.source_file_declarations {
+            objects
+                .iter()
+                .map(|(name, object)| {
+                    self.internal_gain_input_targets(model, "OtherEquipment", name, object)
+                })
+                .collect::<Vec<_>>()
+        } else {
+            Vec::new()
+        };
+        let source_has_instances = source_targets
+            .iter()
+            .flatten()
+            .any(|(_, instances)| !instances.is_empty());
+        'inputs: for (index, (name, object)) in objects.into_iter().enumerate() {
             // Official epJSON pattern ^.*\S.*$ under default RE2: no LF,
             // and at least one byte outside HT/LF/FF/CR/space. VT and Unicode
             // whitespace are valid name bytes; only the explicit Source lane
@@ -13767,11 +13784,46 @@ impl<'a> Compiler<'a> {
                 );
                 continue;
             }
-            let Some((target, target_instances)) =
+            let Some((target, target_instances)) = (if self.source_file_declarations {
+                source_targets[index].take()
+            } else {
                 self.internal_gain_input_targets(model, "OtherEquipment", &name, &object)
-            else {
+            }) else {
                 continue;
             };
+            if self.source_file_declarations && target_instances.is_empty() {
+                self.source_empty_gain_schema("OtherEquipment", &name, &object);
+                if source_has_instances {
+                    if matches!(field_value(&object, "schedule_name"), Some(RawValue::String(value)) if value.is_empty())
+                    {
+                        self.error(
+                            "MissingRequiredField",
+                            "OtherEquipment",
+                            Some(&name),
+                            Some("schedule_name"),
+                            "A mixed family still consumes each raw equipment schedule".into(),
+                        );
+                    }
+                    let _ = self.other_equipment_schedule_reference(model, &name, &object);
+                    self.enum_default(
+                        "OtherEquipment",
+                        &name,
+                        (&object, "design_level_calculation_method"),
+                        OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
+                        "EquipmentLevel",
+                        parse_other_equipment_design_level_calculation_method,
+                    );
+                }
+                let cursor = model.other_equipment.len();
+                model
+                    .source_other_equipment_inputs
+                    .push(ep_model::SourceOtherEquipmentInput {
+                        object_name: name,
+                        target,
+                        instances: cursor..cursor,
+                    });
+                continue;
+            }
             let schedule = self.other_equipment_schedule_reference(model, &name, &object);
             let first_instance = model.other_equipment.len();
             let mut instances = Vec::with_capacity(target_instances.len());
@@ -13952,7 +14004,22 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_people(&mut self, model: &mut TypedModel) {
-        'inputs: for (name, object) in self.objects("People") {
+        let objects = self.objects("People");
+        let mut source_targets = if self.source_file_declarations {
+            objects
+                .iter()
+                .map(|(name, object)| {
+                    self.internal_gain_input_targets(model, "People", name, object)
+                })
+                .collect::<Vec<_>>()
+        } else {
+            Vec::new()
+        };
+        let source_has_instances = source_targets
+            .iter()
+            .flatten()
+            .any(|(_, instances)| !instances.is_empty());
+        'inputs: for (index, (name, object)) in objects.into_iter().enumerate() {
             // Official RE2 ^.*\S.*$: ASCII whitespace excludes vertical tab.
             // Preserve every authored Source name byte, including boundaries.
             if self.source_file_declarations
@@ -13970,11 +14037,46 @@ impl<'a> Compiler<'a> {
                 );
                 continue;
             }
-            let Some((target, target_instances)) =
+            let Some((target, target_instances)) = (if self.source_file_declarations {
+                source_targets[index].take()
+            } else {
                 self.internal_gain_input_targets(model, "People", &name, &object)
-            else {
+            }) else {
                 continue;
             };
+            if self.source_file_declarations && target_instances.is_empty() {
+                self.source_empty_gain_schema("People", &name, &object);
+                if source_has_instances {
+                    if matches!(field_value(&object, "number_of_people_schedule_name"), Some(RawValue::String(value)) if value.is_empty())
+                    {
+                        self.error(
+                            "MissingRequiredField",
+                            "People",
+                            Some(&name),
+                            Some("number_of_people_schedule_name"),
+                            "A mixed family still consumes each raw occupancy schedule".into(),
+                        );
+                    }
+                    let _ = self.people_schedule_reference(model, &name, &object);
+                    self.enum_default(
+                        "People",
+                        &name,
+                        (&object, "number_of_people_calculation_method"),
+                        PeopleNumberCalculationMethod::People,
+                        "People",
+                        parse_people_number_calculation_method,
+                    );
+                }
+                let cursor = model.people.len();
+                model
+                    .source_people_inputs
+                    .push(ep_model::SourcePeopleInput {
+                        object_name: name,
+                        target,
+                        instances: cursor..cursor,
+                    });
+                continue;
+            }
             let number_of_people_schedule = self.people_schedule_reference(model, &name, &object);
             let first_instance = model.people.len();
             let mut instances = Vec::with_capacity(target_instances.len());

@@ -359,6 +359,27 @@ fn space_lists_allow_empty_input_and_reject_invalid_members_and_name_collisions(
             .iter()
             .all(|list| list.spaces.is_empty())
     );
+    let no_authored = super::super::compile_raw_model_for_source(&parse_epjson_str(
+        r#"{"Zone":{"Z":{}},"SpaceList":{"Absent":{},"Empty":{"spaces":[]}}}"#,
+    )?);
+    assert!(
+        !no_authored.has_errors(),
+        "{:?}",
+        no_authored.report.diagnostics
+    );
+    let no_authored = no_authored
+        .model
+        .ok_or("empty lists without authored Spaces")?;
+    assert!(no_authored.authored_space_names.is_empty());
+    assert_eq!(no_authored.spaces.len(), 1);
+    assert_eq!(no_authored.spaces[0].origin, SpaceOrigin::AutoZoneDefault);
+    assert_eq!(no_authored.space_lists.len(), 2);
+    assert!(
+        no_authored
+            .space_lists
+            .iter()
+            .all(|list| list.spaces.is_empty() && list.max_space_name_length == 0)
+    );
 
     // Unit98: the actual epJSON schema has no required spaces array/minItems.
     // Names and member references use ASCII case folding without Source trim.

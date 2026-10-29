@@ -1057,8 +1057,12 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             (total, 7, true),
             (total, 8, true),
             (total.saturating_sub(1), 9, true),
+            (0, 0, true),
+            (0, 7, true),
+            (0, 7, false),
+            (0, 8, true),
         ] {
-            if authored_count == 0 {
+            if authored_count == 0 && !matches!(list_mode, 0 | 7 | 8) {
                 continue;
             }
             use crate::heat_balance::selected_input_processor::{
@@ -1123,7 +1127,10 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             // exact whitespace. The retained fields map alone is lexical.
             let mut space_list_fields: BTreeMap<String, BTreeMap<String, V>> = BTreeMap::new();
             let first_space = authored_model.spaces[0].name.0.clone();
-            let last_space = authored_model.spaces[authored_count - 1].name.0.clone();
+            let last_space = authored_model.spaces[authored_count.saturating_sub(1)]
+                .name
+                .0
+                .clone();
             let members = match list_mode {
                 1 if authored_count > 1 => vec![last_space.clone(), first_space.clone()],
                 2 => vec![first_space.clone(); 3],
@@ -1336,6 +1343,11 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 extension: extension.map(str::to_owned),
             })
             .collect();
+            if authored_count == 0 {
+                // Unit99: no authored Space family; lists resolve before the
+                // real getter creates each Zone's default Space.
+                families.remove("Space");
+            }
             let mut ip = SelectedInputProcessor::from_admitted_input(definitions, families)?;
             let mut statistic_objects: BTreeMap<String, _> = BTreeMap::from([
                 ("Zone".into(), zone_fields),
@@ -1343,6 +1355,9 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             ]);
             if list_mode != 0 {
                 statistic_objects.insert("SpaceList".into(), space_list_fields.clone());
+            }
+            if authored_count == 0 {
+                statistic_objects.remove("Space");
             }
             // Converted IDF uses a separate declaration overlay for
             // getObjectItem. GetSpaceData reads the JSON map directly in both
@@ -1376,12 +1391,22 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     },
                 );
             }
+            if authored_count == 0 {
+                object_order.remove("Space");
+            }
             ip.retain_source_input_statistics(SourceInputStatisticsInput {
                 objects: statistic_objects,
                 object_order,
             })?;
             if !source_is_epjson {
-                assert_eq!(ip.source_raw_object_names("SpaceList")?, [" L10 ", " L2 "]);
+                assert_eq!(
+                    ip.source_raw_object_names("SpaceList")?,
+                    space_list_json_order
+                        .iter()
+                        .rev()
+                        .cloned()
+                        .collect::<Vec<_>>()
+                );
                 if authored_count > 1 {
                     assert_ne!(
                         ip.source_raw_object_names("Space")?,
@@ -1550,6 +1575,23 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             }
             assert!(!found);
             let list_ids = actual.source_space_list_ids(&authored_model)?;
+            if list_mode == 7 {
+                let mut corrupt = actual.clone();
+                let corrupt_list =
+                    &mut corrupt.space_lists.as_mut().ok_or("empty actual lists")?[0];
+                corrupt_list.max_space_name_length = 1;
+                let mut corrupt_model = authored_model.clone();
+                corrupt_model
+                    .space_lists
+                    .iter_mut()
+                    .find(|row| Some(row.id) == corrupt_list.typed_space_list_id)
+                    .ok_or("empty typed list")?
+                    .max_space_name_length = 1;
+                assert!(
+                    corrupt.source_space_list_ids(&corrupt_model).is_err(),
+                    "an actual empty list has constructor maximum-name-length zero"
+                );
+            }
             if matches!(list_mode, 1 | 7) {
                 assert_eq!(
                     list_ids,
@@ -1605,20 +1647,30 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     [i32::try_from(position + 1)?]
                 );
             }
-            let first = allocation
-                .iter()
-                .find(|row| row.typed_space_id == Some(authored_model.spaces[0].id))
-                .ok_or("actual raw scalar Space")?;
-            assert_eq!(
-                (
-                    first.ceiling_height,
-                    first.volume,
-                    first.user_entered_floor_area
-                ),
-                (2.25, -1.0, -99999.0)
-            );
-            assert_eq!(first.space_type, "");
-            assert_eq!(first.tags, [" TAG ", ""]);
+            if authored_count > 0 {
+                let first = allocation
+                    .iter()
+                    .find(|row| row.typed_space_id == Some(authored_model.spaces[0].id))
+                    .ok_or("actual raw scalar Space")?;
+                assert_eq!(
+                    (
+                        first.ceiling_height,
+                        first.volume,
+                        first.user_entered_floor_area
+                    ),
+                    (2.25, -1.0, -99999.0)
+                );
+                assert_eq!(first.space_type, "");
+                assert_eq!(first.tags, [" TAG ", ""]);
+            } else {
+                assert!(allocation.iter().all(|row| row.space_type == "GENERAL"
+                    && row.space_type_num == 1
+                    && row.tags.is_empty()));
+                assert_eq!(
+                    actual.space_types.as_deref(),
+                    Some(["GENERAL".to_owned()].as_slice())
+                );
+            }
             assert!(
                 space_fields
                     .keys()

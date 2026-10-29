@@ -111,6 +111,10 @@ pub fn inspect_porting_scope(
             || raw
                 .objects
                 .get(&ep_raw_model::ObjectType("Space".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            || raw
+                .objects
+                .get(&ep_raw_model::ObjectType("SpaceList".into()))
                 .is_some_and(|rows| !rows.is_empty()))
         && let Err(error) = crate::ordinary_equipment_input::resolve_source_a(raw)
     {
@@ -127,6 +131,14 @@ pub fn inspect_porting_scope(
             .push("Exterior:Lights (external meter only; excluded from zone heat sources)".into());
     }
     if let Some(model) = model {
+        if scope == PortingScope::A
+            && raw
+                .objects
+                .get(&ep_raw_model::ObjectType("SpaceList".into()))
+                .is_some_and(|rows| !rows.is_empty())
+        {
+            validate_empty_source_gain_bindings(raw, model, &mut violations);
+        }
         validate_typed_scope(model, scope, &mut violations);
         if object_counts.contains_key("RoomAirModelType") {
             if settings["room_air_controls"]["air_temperature_coupling_strategy"] != "Direct" {
@@ -332,6 +344,89 @@ fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut 
     }
 }
 
+fn validate_empty_source_gain_bindings(
+    raw: &RawModel,
+    model: &TypedModel,
+    violations: &mut Vec<String>,
+) {
+    let families = [
+        (
+            "People",
+            model
+                .source_people_inputs
+                .iter()
+                .map(|input| {
+                    (
+                        input.object_name.as_str(),
+                        input.target,
+                        input.instances.is_empty(),
+                    )
+                })
+                .collect::<Vec<_>>(),
+        ),
+        (
+            "OtherEquipment",
+            model
+                .source_other_equipment_inputs
+                .iter()
+                .map(|input| {
+                    (
+                        input.object_name.as_str(),
+                        input.target,
+                        input.instances.is_empty(),
+                    )
+                })
+                .collect::<Vec<_>>(),
+        ),
+    ];
+    for (family, bindings) in families {
+        let Ok(rows) = raw.source_ordered_instances(family) else {
+            violations.push(format!("Source {family} raw binding order is unavailable"));
+            continue;
+        };
+        if rows.len() != bindings.len()
+            || rows
+                .iter()
+                .zip(&bindings)
+                .any(|((name, _), (bound, _, _))| name.0 != *bound)
+        {
+            violations.push(format!(
+                "Source {family} bindings must retain every ordered raw statement"
+            ));
+            continue;
+        }
+        for ((_, row), (_, target, empty)) in rows.iter().zip(bindings) {
+            if !empty {
+                continue;
+            }
+            let valid = row.fields.get(&ep_raw_model::FieldName(
+                "zone_or_zonelist_or_space_or_spacelist_name".into()))
+                .is_some_and(|value| {
+                    let ep_raw_model::RawValue::String(reference) = value else { return false; };
+                    let higher_priority = ["Zone", "Space", "ZoneList"].iter().any(|family|
+                        raw.objects.get(&ep_raw_model::ObjectType((*family).into()))
+                            .is_some_and(|rows| rows.keys().any(|name| name.0.eq_ignore_ascii_case(reference))));
+                    let raw_empty = raw.objects.get(&ep_raw_model::ObjectType("SpaceList".into()))
+                        .and_then(|rows| rows.iter().find(|(name, _)| name.0.eq_ignore_ascii_case(reference)))
+                        .is_some_and(|(_, list)| match list.fields.get(&ep_raw_model::FieldName("spaces".into())) {
+                            None => true,
+                            Some(ep_raw_model::RawValue::Array(members)) => members.is_empty(),
+                            _ => false,
+                        });
+                    !higher_priority && raw_empty && matches!(target,
+                        ep_model::SourceGainInputTarget::SpaceList(id)
+                            if model.space_list_names.resolve(reference) == Some(id)
+                                && model.space_lists.iter().any(|list| list.id == id && list.spaces.is_empty()))
+                });
+            if !valid {
+                violations.push(format!(
+                    "Source {family} empty range requires its actual raw empty SpaceList"
+                ));
+            }
+        }
+    }
+}
+
 fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mut Vec<String>) {
     if model.version != ep_model::Version::oracle_26_1_0() {
         violations.push("effective engine must match the locked EnergyPlus 26.1.0".into());
@@ -344,7 +439,10 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         .spaces
         .iter()
         .any(|space| space.origin == ep_model::SpaceOrigin::Authored);
-    if (model.zones.len() > 1 || !model.zone_lists.is_empty() || authored_spaces)
+    if (model.zones.len() > 1
+        || !model.zone_lists.is_empty()
+        || !model.space_lists.is_empty()
+        || authored_spaces)
         && (model.spaces.len() != model.zones.len()
             || model.zones.iter().any(|zone| {
                 let spaces = model
@@ -388,7 +486,13 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         let mut cursor = 0;
         for binding in &model.source_other_equipment_inputs {
             let range = binding.instances.clone();
-            if range.start != cursor || range.is_empty() || range.end > model.other_equipment.len()
+            let empty_list = matches!(binding.target,
+                ep_model::SourceOtherEquipmentInputTarget::SpaceList(id)
+                    if model.space_lists.iter().any(|list| list.id == id && list.spaces.is_empty()));
+            if range.start != cursor
+                || range.start > range.end
+                || (range.is_empty() && !empty_list)
+                || range.end > model.other_equipment.len()
             {
                 violations.push("Source OtherEquipment raw-instance range is unavailable".into());
                 break;
@@ -450,8 +554,7 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                         .iter()
                         .find(|list| list.id == id)
                         .is_some_and(|list| {
-                            !list.spaces.is_empty()
-                                && list.spaces.len() == instances.len()
+                            list.spaces.len() == instances.len()
                                 && list.spaces.iter().zip(instances).all(|(id, row)| {
                                     model
                                         .spaces
@@ -484,7 +587,14 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         let mut cursor = 0;
         for binding in &model.source_people_inputs {
             let range = binding.instances.clone();
-            if range.start != cursor || range.is_empty() || range.end > model.people.len() {
+            let empty_list = matches!(binding.target,
+                ep_model::SourcePeopleInputTarget::SpaceList(id)
+                    if model.space_lists.iter().any(|list| list.id == id && list.spaces.is_empty()));
+            if range.start != cursor
+                || range.start > range.end
+                || (range.is_empty() && !empty_list)
+                || range.end > model.people.len()
+            {
                 violations.push("Source People raw-instance range is unavailable".into());
                 break;
             }
@@ -541,8 +651,7 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
                         .iter()
                         .find(|list| list.id == id)
                         .is_some_and(|list| {
-                            !list.spaces.is_empty()
-                                && list.spaces.len() == instances.len()
+                            list.spaces.len() == instances.len()
                                 && list.spaces.iter().zip(instances).all(|(id, row)| {
                                     model
                                         .spaces

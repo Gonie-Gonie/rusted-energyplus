@@ -1277,13 +1277,153 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
                 .any(|d| d.object_type == family && d.code == "MissingReference")
         );
     }
-    for text in [
+    let multiple_spaces = parse_epjson_str(
         r#"{"Zone":{"Z":{}},"Space":{"S1":{"zone_name":"Z"},"S2":{"zone_name":"Z"}},"SpaceList":{"L":{"spaces":[{"space_name":"S1"}]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","number_of_people":1}}}"#,
-        r#"{"Zone":{"Z":{}},"SpaceList":{"L":{"spaces":[]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","number_of_people":1}}}"#,
-    ] {
+    )?;
+    assert!(
+        super::super::compile_raw_model_for_source(&multiple_spaces).has_errors(),
+        "positive SpaceList expansion keeps the singleton whole-Zone boundary"
+    );
+    // Unit99: no authored Space is needed for real absent/empty member lists.
+    // The complete family total, rather than the current statement, gates
+    // schedule lookup. Unconsumed fields still obey the original schema.
+    let all_zero = parse_epjson_str(
+        r#"{
+        "Zone":{"Z":{}},"SpaceList":{"Absent":{},"Empty":{"spaces":[]}},
+        "People":{
+            "A count":{"zone_or_zonelist_or_space_or_spacelist_name":"Absent","number_of_people_schedule_name":"Missing","activity_level_schedule_name":"","number_of_people":7},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","number_of_people_schedule_name":"","activity_level_schedule_name":"Missing","number_of_people_calculation_method":"People/Area","people_per_floor_area":2},
+            "C inverse":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","number_of_people_schedule_name":"Missing","activity_level_schedule_name":"Missing","number_of_people_calculation_method":"Area/Person","floor_area_per_person":0}},
+        "OtherEquipment":{
+            "A level":{"zone_or_zonelist_or_space_or_spacelist_name":"Absent","schedule_name":"Missing","design_level":-7,"fraction_latent":0.75,"fraction_radiant":0.75},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"","design_level_calculation_method":"Watts/Area","power_per_floor_area":-2},
+            "C person":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Missing","design_level_calculation_method":"Watts/Person","power_per_person":-3}}}"#,
+    )?;
+    let zero_result = super::super::compile_raw_model_for_source(&all_zero);
+    assert!(
+        !zero_result.has_errors(),
+        "{:?}",
+        zero_result.report.diagnostics
+    );
+    let zero = zero_result.model.ok_or("real all-zero family bindings")?;
+    assert_eq!(zero.spaces.len(), 1);
+    assert_eq!(
+        zero.spaces[0].origin,
+        ep_model::SpaceOrigin::AutoZoneDefault
+    );
+    assert!(zero.authored_space_names.is_empty());
+    assert!(zero.people.is_empty() && zero.other_equipment.is_empty());
+    assert!(zero.people_names.is_empty() && zero.other_equipment_names.is_empty());
+    assert_eq!(zero.source_people_inputs.len(), 3);
+    assert_eq!(zero.source_other_equipment_inputs.len(), 3);
+    for input in &zero.source_people_inputs {
+        assert_eq!(input.instances, 0..0);
         assert!(
-            super::super::compile_raw_model_for_source(&parse_epjson_str(text)?).has_errors(),
-            "positive SpaceList expansion keeps singleton whole-Zone and nonempty boundaries"
+            matches!(input.target, ep_model::SourcePeopleInputTarget::SpaceList(id)
+            if zero.space_lists.iter().any(|list| list.id == id && list.spaces.is_empty()))
+        );
+    }
+    for input in &zero.source_other_equipment_inputs {
+        assert_eq!(input.instances, 0..0);
+        assert!(
+            matches!(input.target, ep_model::SourceOtherEquipmentInputTarget::SpaceList(id)
+            if zero.space_lists.iter().any(|list| list.id == id && list.spaces.is_empty()))
+        );
+    }
+    let mixed = parse_epjson_str(
+        r#"{
+        "Zone":{"Z":{}},"SpaceList":{"Empty":{}},
+        "People":{
+            "A empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","number_of_people_schedule_name":"Constant-1.0","activity_level_schedule_name":"Missing","number_of_people_calculation_method":"Area/Person","floor_area_per_person":0},
+            "B actual":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","number_of_people_schedule_name":"Constant-1.0","number_of_people":2},
+            "C empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","number_of_people_schedule_name":"Constant-1.0","activity_level_schedule_name":""},
+            "D actual":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","number_of_people_schedule_name":"Constant-1.0","number_of_people":3},
+            "E empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","number_of_people_schedule_name":"Constant-1.0","activity_level_schedule_name":"Missing"}},
+        "OtherEquipment":{
+            "A empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Constant-1.0","design_level_calculation_method":"Watts/Area","power_per_floor_area":-2,"fraction_latent":0.75,"fraction_radiant":0.75},
+            "B actual":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":7},
+            "C empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Constant-1.0"},
+            "D actual":{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"Constant-1.0","design_level":8},
+            "E empty":{"zone_or_zonelist_or_space_or_spacelist_name":"Empty","schedule_name":"Constant-1.0"}}}"#,
+    )?;
+    let mixed_result = super::super::compile_raw_model_for_source(&mixed);
+    assert!(
+        !mixed_result.has_errors(),
+        "{:?}",
+        mixed_result.report.diagnostics
+    );
+    let typed = mixed_result
+        .model
+        .ok_or("mixed dense zero/nonzero bindings")?;
+    assert_eq!(typed.people.len(), 2);
+    assert_eq!(typed.other_equipment.len(), 2);
+    let ranges = [0..0, 0..1, 1..1, 1..2, 2..2];
+    for (binding, expected) in typed.source_people_inputs.iter().zip(&ranges) {
+        assert_eq!(&binding.instances, expected);
+    }
+    for (binding, expected) in typed.source_other_equipment_inputs.iter().zip(&ranges) {
+        assert_eq!(&binding.instances, expected);
+    }
+    for (index, (people, gain)) in typed.people.iter().zip(&typed.other_equipment).enumerate() {
+        assert_eq!(usize::try_from(people.id.0)?, index);
+        assert_eq!(usize::try_from(gain.id.0)?, index);
+        assert_eq!(people.name.0, gain.name.0);
+    }
+    for (family, fields) in [
+        (
+            "People",
+            r#""number_of_people_schedule_name":"Missing","activity_level_schedule_name":"Missing""#,
+        ),
+        ("OtherEquipment", r#""schedule_name":"Missing""#),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"SpaceList":{{"Empty":{{}}}},"{family}":{{"A empty":{{"zone_or_zonelist_or_space_or_spacelist_name":"Empty",{fields}}},"B actual":{{"zone_or_zonelist_or_space_or_spacelist_name":"Z"}}}}}}"#
+        );
+        let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?);
+        assert!(
+            result
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.object_type == family && d.code == "MissingReference"),
+            "mixed-family empty statement must check its consumed schedule"
+        );
+    }
+    for (family, fields) in [
+        (
+            "People",
+            r#""number_of_people_schedule_name":"","activity_level_schedule_name":"","number_of_people":-1"#,
+        ),
+        (
+            "People",
+            r#""number_of_people_schedule_name":"","activity_level_schedule_name":null"#,
+        ),
+        ("People", r#""number_of_people_schedule_name":"""#),
+        (
+            "People",
+            r#""number_of_people_schedule_name":"","activity_level_schedule_name":"","number_of_people_calculation_method":"bad""#,
+        ),
+        (
+            "OtherEquipment",
+            r#""schedule_name":"","fraction_radiant":1.1"#,
+        ),
+        (
+            "OtherEquipment",
+            r#""schedule_name":"","power_per_person":"""#,
+        ),
+        ("OtherEquipment", r#""schedule_name":null"#),
+        (
+            "OtherEquipment",
+            r#""schedule_name":"","fuel_type":"Water""#,
+        ),
+        ("OtherEquipment", r#""design_level":0"#),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"SpaceList":{{"Empty":{{}}}},"{family}":{{"A empty":{{"zone_or_zonelist_or_space_or_spacelist_name":"Empty",{fields}}}}}}}"#
+        );
+        assert!(
+            super::super::compile_raw_model_for_source(&parse_epjson_str(&text)?).has_errors(),
+            "empty expansion must preserve unconditional schema constraints"
         );
     }
     for (field, expected) in [("", ""), ("General", "GENERAL")] {

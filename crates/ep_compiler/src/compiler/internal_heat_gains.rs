@@ -203,18 +203,13 @@ impl Compiler<'_> {
                 &raw_list,
                 "SpaceList",
             )?;
-            let Some(list) = model
-                .space_lists
-                .iter()
-                .find(|list| list.id == id)
-                .filter(|list| !list.spaces.is_empty())
-            else {
+            let Some(list) = model.space_lists.iter().find(|list| list.id == id) else {
                 self.error(
                     &format!("Source{family}SpaceListUnavailable"),
                     family,
                     Some(name),
                     Some(FIELD),
-                    format!("Source {family} requires a positive actual SpaceList member sequence"),
+                    format!("Source {family} requires its actual SpaceList member sequence"),
                 );
                 return None;
             };
@@ -265,6 +260,160 @@ impl Compiler<'_> {
             ),
         );
         None
+    }
+
+    /// Global schema validation still precedes the Native family-total gate.
+    /// Empty targets retain authored statements without consuming getter refs.
+    pub(super) fn source_empty_gain_schema(
+        &mut self,
+        family: &str,
+        name: &str,
+        object: &RawObject,
+    ) {
+        use ep_raw_model::RawValue;
+        let required: &[&str] = if family == "People" {
+            &[
+                "zone_or_zonelist_or_space_or_spacelist_name",
+                "number_of_people_schedule_name",
+                "activity_level_schedule_name",
+            ]
+        } else {
+            &[
+                "zone_or_zonelist_or_space_or_spacelist_name",
+                "schedule_name",
+            ]
+        };
+        for &field in required {
+            if super::field_value(object, field).is_none() {
+                self.error(
+                    "MissingRequiredField",
+                    family,
+                    Some(name),
+                    Some(field),
+                    format!("{family}/{name} requires the schema string {field}"),
+                );
+            }
+        }
+        for (field, value) in &object.fields {
+            let number = match value {
+                RawValue::Number(text) => text.parse::<f64>().ok().filter(|n| n.is_finite()),
+                _ => None,
+            };
+            let choice = |choices: &[&str]| matches!(value, RawValue::String(text) if choices.iter().any(|candidate| text.eq_ignore_ascii_case(candidate)));
+            let valid = match (family, field.0.as_str()) {
+                (_, "zone_or_zonelist_or_space_or_spacelist_name")
+                | (
+                    "People",
+                    "number_of_people_schedule_name"
+                    | "activity_level_schedule_name"
+                    | "surface_name_angle_factor_list_name"
+                    | "work_efficiency_schedule_name"
+                    | "clothing_insulation_calculation_method_schedule_name"
+                    | "clothing_insulation_schedule_name"
+                    | "air_velocity_schedule_name"
+                    | "ankle_level_air_velocity_schedule_name",
+                )
+                | ("OtherEquipment", "schedule_name" | "end_use_subcategory") => {
+                    matches!(value, RawValue::String(_))
+                }
+                ("People", "number_of_people_calculation_method") => {
+                    choice(&["", "People", "People/Area", "Area/Person"])
+                }
+                (
+                    "People",
+                    "number_of_people" | "people_per_floor_area" | "floor_area_per_person",
+                ) => number.is_some_and(|n| n >= 0.0),
+                ("People", "fraction_radiant")
+                | ("OtherEquipment", "fraction_latent" | "fraction_radiant" | "fraction_lost") => {
+                    number.is_some_and(|n| (0.0..=1.0).contains(&n))
+                }
+                ("People", "sensible_heat_fraction") => {
+                    number.is_some_and(|n| (0.0..=1.0).contains(&n))
+                        || choice(&["", "Autocalculate"])
+                }
+                ("People", "carbon_dioxide_generation_rate") => {
+                    number.is_some_and(|n| (0.0..=3.82e-7).contains(&n))
+                }
+                ("OtherEquipment", "carbon_dioxide_generation_rate") => {
+                    number.is_some_and(|n| (0.0..=4e-7).contains(&n))
+                }
+                ("People", "enable_ashrae_55_comfort_warnings") => choice(&["", "No", "Yes"]),
+                ("People", "mean_radiant_temperature_calculation_type") => {
+                    choice(&["", "AngleFactor", "EnclosureAveraged", "SurfaceWeighted"])
+                }
+                ("People", "clothing_insulation_calculation_method") => choice(&[
+                    "",
+                    "CalculationMethodSchedule",
+                    "ClothingInsulationSchedule",
+                    "DynamicClothingModelASHRAE55",
+                ]),
+                (
+                    "People",
+                    "thermal_comfort_model_1_type"
+                    | "thermal_comfort_model_2_type"
+                    | "thermal_comfort_model_3_type"
+                    | "thermal_comfort_model_4_type"
+                    | "thermal_comfort_model_5_type"
+                    | "thermal_comfort_model_6_type"
+                    | "thermal_comfort_model_7_type",
+                ) => choice(&[
+                    "AdaptiveASH55",
+                    "AdaptiveCEN15251",
+                    "AnkleDraftASH55",
+                    "CoolingEffectASH55",
+                    "Fanger",
+                    "KSU",
+                    "Pierce",
+                ]),
+                (
+                    "People",
+                    "cold_stress_temperature_threshold" | "heat_stress_temperature_threshold",
+                )
+                | (
+                    "OtherEquipment",
+                    "design_level" | "power_per_floor_area" | "power_per_person",
+                ) => number.is_some(),
+                ("OtherEquipment", "design_level_calculation_method") => choice(&[
+                    "",
+                    "EquipmentLevel",
+                    "Power/Area",
+                    "Power/Person",
+                    "Watts/Area",
+                    "Watts/Person",
+                ]),
+                ("OtherEquipment", "fuel_type") => choice(&[
+                    "",
+                    "Coal",
+                    "Diesel",
+                    "DistrictCooling",
+                    "DistrictHeatingSteam",
+                    "DistrictHeatingWater",
+                    "Electricity",
+                    "FuelOilNo1",
+                    "FuelOilNo2",
+                    "Gasoline",
+                    "NaturalGas",
+                    "None",
+                    "OtherFuel1",
+                    "OtherFuel2",
+                    "Propane",
+                ]),
+                // Both official instance schemas allow additional properties.
+                _ => true,
+            };
+            if !valid {
+                self.error(
+                    "InvalidFieldType",
+                    family,
+                    Some(name),
+                    Some(&field.0),
+                    format!(
+                        "{family}/{name} field {} violates the unconditional schema",
+                        field.0
+                    ),
+                );
+            }
+        }
     }
 
     /// Preserve the actual built-in identity without manufacturing a user schedule.

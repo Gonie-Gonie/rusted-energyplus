@@ -5099,6 +5099,240 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                                 }
                             }
                         }
+                        // Unit99 input-owner checkpoints: empty list statements
+                        // retain real identities/ranges and create no gain owner.
+                        // The genuine GetSpaceData cases separately cover omitted
+                        // versus [] members and creation of default Spaces.
+                        for authored in [false, true] {
+                            for mixed in [false, true] {
+                                use crate::heat_balance::source_output_registration::SourceRealOutputOwners;
+                                let mut empty = checkpoint.clone();
+                                let mut empty_model = list_model.clone();
+                                // Request the genuine unmetered declarations;
+                                // an unrequested name has DD storage but no OutVar.
+                                empty_model.report_inputs.output_variables = [
+                                    "Zone Total Internal Total Heating Rate",
+                                    "Space Total Internal Total Heating Rate",
+                                ].into_iter().enumerate().map(|(index, name)| ep_model::SourceOutputVariableInput {
+                                    object_name: format!("Empty99 total request {index}"), key: "*".into(),
+                                    variable_name: name.into(), reporting_frequency: "TIMESTEP".into(), schedule_name: String::new(),
+                                    alpha_blank: [false, false, false, true], default_applied: [false; 4], num_alphas: 3, is_epjson: true,
+                                }).collect();
+                                // This fresh authored request fixture replaces
+                                // the prior checkpoint's already-read request set.
+                                empty.output_registration.get_output_input = true;
+                                empty.output_registration.requested_variables.clear();
+                                empty.output_prescan = Default::default();
+                                {
+                                    let mut request_state = ctf_ordinary_output_test_state();
+                                    let (mut request_errors, mut request_console) = (Vec::new(), Vec::new());
+                                    let mut backend = SourceErrorBackend { state: &mut request_state,
+                                        error_stream: Some(&mut request_errors), console: &mut request_console,
+                                        out_unit1: None, out_unit2: None, f_message: None,
+                                        message_callback: None, error_callback: None, sqlite: None };
+                                    for request in &empty_model.report_inputs.output_variables {
+                                        empty.output_prescan.add_record(&request.key, &request.variable_name, &mut backend)?;
+                                    }
+                                    assert!(request_errors.is_empty() && request_console.is_empty());
+                                }
+                                empty.heat_balance_input.as_mut().ok_or("empty raw report requests")?.objects.insert(
+                                    "Output:Variable".into(), empty_model.report_inputs.output_variables.iter().map(|request| ProjectInputObject {
+                                        object_name: request.object_name.clone(), idf_max_fields: None,
+                                        fields: std::collections::BTreeMap::from([
+                                            ("key_value".into(), ProjectInputValue::String(request.key.clone())),
+                                            ("variable_name".into(), ProjectInputValue::String(request.variable_name.clone())),
+                                            ("reporting_frequency".into(), ProjectInputValue::String("Timestep".into())),
+                                        ]),
+                                    }).collect());
+                                empty_model.zone_lists.clear();
+                                empty_model.zone_list_names = Default::default();
+                                empty_model.space_lists = vec![
+                                    ep_model::SpaceList { id: ep_model::SpaceListId(0), name: ep_model::NormalizedName(" E10 ".into()),
+                                        spaces: Vec::new(), max_space_name_length: 0 },
+                                    ep_model::SpaceList { id: ep_model::SpaceListId(1), name: ep_model::NormalizedName(" E2 ".into()),
+                                        spaces: Vec::new(), max_space_name_length: 0 },
+                                ];
+                                if authored {
+                                    empty_model.spaces[0].name = ep_model::NormalizedName("S10".into());
+                                    empty_model.spaces[1].name = ep_model::NormalizedName("S2".into());
+                                    for space in &mut empty_model.spaces { space.origin = ep_model::SpaceOrigin::Authored; }
+                                }
+                                let source = empty.selected_zone_input.as_mut().ok_or("empty list actual owners")?;
+                                source.num_zone_lists = 0; source.zone_lists = None;
+                                if authored {
+                                    let old = source.spaces.as_ref().ok_or("empty list original Spaces")?.clone();
+                                    let mut first = old[1].clone(); first.name = "S2".into();
+                                    let mut second = old[0].clone(); second.name = "S10".into();
+                                    source.spaces = Some(vec![first, second, Default::default(), Default::default()]);
+                                    let zones = source.zones.as_mut().ok_or("empty list actual Zones")?;
+                                    zones[0].space_indexes = vec![2]; zones[1].space_indexes = vec![1];
+                                }
+                                source.space_lists = Some(vec![Default::default(), Default::default()]);
+                                for (list, (name, id)) in source.space_lists.as_mut().ok_or("empty actual list rows")?.iter_mut()
+                                    .zip([(" E2 ", ep_model::SpaceListId(1)), (" E10 ", ep_model::SpaceListId(0))]) {
+                                    list.name = name.into(); list.typed_space_list_id = Some(id);
+                                }
+                                assert_eq!(source.source_space_list_ids(&empty_model)?, [ep_model::SpaceListId(1), ep_model::SpaceListId(0)]);
+                                let raw = empty.heat_balance_input.as_mut().ok_or("empty list retained raw")?;
+                                let people = raw.objects.get_mut("People").ok_or("empty People statements")?;
+                                let first_name = people[0].object_name.clone();
+                                let positive_name = people[1].object_name.clone();
+                                people[0].fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(), ProjectInputValue::String(" e2 ".into()));
+                                people[1].fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(),
+                                    ProjectInputValue::String(if mixed { zone_name.clone() } else { " E10 ".into() }));
+                                let mut trailing = people[0].clone(); trailing.object_name = "ZZZ EMPTY99".into();
+                                trailing.fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(), ProjectInputValue::String(" E10 ".into()));
+                                people.push(trailing);
+                                for (index, row) in people.iter_mut().enumerate() {
+                                    if index == 1 && mixed { continue; }
+                                    for field in ["number_of_people", "people_per_floor_area", "floor_area_per_person"] {
+                                        row.fields.insert(field.into(), ProjectInputValue::Number(0.0));
+                                    }
+                                    // Native checks activity and selected area/person
+                                    // values only inside the member loop.
+                                    row.fields.insert("activity_level_schedule_name".into(), ProjectInputValue::String("ABSENT ACTIVITY99".into()));
+                                }
+                                let end = usize::from(mixed);
+                                empty_model.people = if mixed {
+                                    let mut person = list_model.people[2].clone();
+                                    person.id = ep_model::InternalGainId(0); vec![person]
+                                } else { Vec::new() };
+                                empty_model.source_people_inputs = vec![
+                                    ep_model::SourcePeopleInput { object_name: first_name.clone(), target: ep_model::SourcePeopleInputTarget::SpaceList(ep_model::SpaceListId(1)), instances: 0..0 },
+                                    ep_model::SourcePeopleInput { object_name: positive_name.clone(), target: if mixed { ep_model::SourcePeopleInputTarget::Zone(first_zone) }
+                                        else { ep_model::SourcePeopleInputTarget::SpaceList(ep_model::SpaceListId(0)) }, instances: 0..end },
+                                    ep_model::SourcePeopleInput { object_name: "ZZZ EMPTY99".into(), target: ep_model::SourcePeopleInputTarget::SpaceList(ep_model::SpaceListId(0)), instances: end..end },
+                                ];
+                                let equipment = raw.objects.get_mut("OtherEquipment").ok_or("empty equipment statements")?;
+                                let empty_equipment_name = equipment[0].object_name.clone();
+                                equipment[0].fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(), ProjectInputValue::String(" E10 ".into()));
+                                equipment[0].fields.insert("fuel_type".into(), ProjectInputValue::String("Electricity".into()));
+                                for field in ["design_level", "power_per_floor_area", "power_per_person"] {
+                                    equipment[0].fields.insert(field.into(), ProjectInputValue::Number(-7.0));
+                                }
+                                for field in ["fraction_latent", "fraction_radiant", "fraction_lost"] {
+                                    equipment[0].fields.insert(field.into(), ProjectInputValue::Number(1.0));
+                                }
+                                let mut positive = equipment[0].clone(); positive.object_name = "ZZ POSITIVE99".into();
+                                positive.fields.insert("zone_or_zonelist_or_space_or_spacelist_name".into(),
+                                    ProjectInputValue::String(if mixed { zone_name.clone() } else { " E2 ".into() }));
+                                positive.fields.insert("design_level_calculation_method".into(), ProjectInputValue::String("EquipmentLevel".into()));
+                                positive.fields.insert("design_level".into(), ProjectInputValue::Number(23.0));
+                                positive.fields.insert("fuel_type".into(), ProjectInputValue::String("Electricity".into()));
+                                for field in ["fraction_latent", "fraction_radiant", "fraction_lost"] {
+                                    positive.fields.insert(field.into(), ProjectInputValue::Number(0.0));
+                                }
+                                let mut trailing = equipment[0].clone(); trailing.object_name = "ZZZ EMPTY99".into();
+                                equipment.push(positive); equipment.push(trailing);
+                                empty_model.other_equipment.clear();
+                                if mixed {
+                                    empty_model.other_equipment.push(ep_model::OtherEquipment {
+                                        id: ep_model::InternalGainId(0), name: ep_model::NormalizedName("ZZ POSITIVE99".into()),
+                                        fuel_type: ep_model::NormalizedName("ELECTRICITY".into()), zone: first_zone,
+                                        schedule: Some(ep_model::InternalGainScheduleReference::ConstantOne),
+                                        design_level_calculation_method: ep_model::OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel,
+                                        design_level_w: 23.0, power_per_floor_area_w_per_m2: -7.0, power_per_person_w: -7.0,
+                                        fraction_latent: 0.0, fraction_radiant: 0.0, fraction_lost: 0.0, carbon_dioxide_generation_rate_m3_per_s_w: 0.0,
+                                    });
+                                }
+                                empty_model.source_other_equipment_inputs = vec![
+                                    ep_model::SourceOtherEquipmentInput { object_name: empty_equipment_name.clone(), target: ep_model::SourceOtherEquipmentInputTarget::SpaceList(ep_model::SpaceListId(0)), instances: 0..0 },
+                                    ep_model::SourceOtherEquipmentInput { object_name: "ZZ POSITIVE99".into(), target: if mixed { ep_model::SourceOtherEquipmentInputTarget::Zone(first_zone) }
+                                        else { ep_model::SourceOtherEquipmentInputTarget::SpaceList(ep_model::SpaceListId(1)) }, instances: 0..end },
+                                    ep_model::SourceOtherEquipmentInput { object_name: "ZZZ EMPTY99".into(), target: ep_model::SourceOtherEquipmentInputTarget::SpaceList(ep_model::SpaceListId(0)), instances: end..end },
+                                ];
+                                if !mixed {
+                                    // With family total0 Native skips every raw
+                                    // getObjectItem and schedule lookup, even
+                                    // though setup still marks all statements used.
+                                    for (family, field) in [("People", "number_of_people_schedule_name"), ("OtherEquipment", "schedule_name")] {
+                                        for row in raw.objects.get_mut(family).ok_or("zero family raw rows")? {
+                                            row.fields.insert(field.into(), ProjectInputValue::String("ABSENT ZERO SCHEDULE99".into()));
+                                        }
+                                    }
+                                }
+                                let mut old_ip = empty.selected_input_processor.take().ok_or("empty list actual definitions")?;
+                                let mut definitions = Vec::new();
+                                for family in ["People", "Lights", "ElectricEquipment", "GasEquipment", "HotWaterEquipment", "SteamEquipment", "OtherEquipment",
+                                    "ElectricEquipment:ITE:AirCooled", "ZoneBaseboard:OutdoorTemperatureControlled", "ZoneContaminantSourceAndSink:CarbonDioxide", "Output:Variable"] {
+                                    let counts = old_ip.get_object_def_max_args(family)?;
+                                    definitions.push(SourceObjectDefinition { object_type: family.into(), alpha_fields: counts.alphas,
+                                        numeric_fields: counts.numerics, alpha_extensions: 0, numeric_extensions: 0, extension: None });
+                                }
+                                let mut families: std::collections::BTreeMap<String, SourceInputFamily> = std::collections::BTreeMap::new();
+                                for family in ["People", "OtherEquipment"] {
+                                    families.insert(family.into(), SourceInputFamily::Objects(raw.objects.get(family).ok_or("empty family raw rows")?.iter()
+                                        .map(|row| SourceObjectShape { object_name: row.object_name.clone(), field_sizes: Default::default() }).collect()));
+                                }
+                                families.insert("Output:Variable".into(), SourceInputFamily::Objects(
+                                    empty_model.report_inputs.output_variables.iter().map(|request| SourceObjectShape {
+                                        object_name: request.object_name.clone(), field_sizes: std::collections::BTreeMap::from([
+                                            ("key_value".into(), 1), ("variable_name".into(), 1), ("reporting_frequency".into(), 1),
+                                        ]),
+                                    }).collect()));
+                                empty.selected_input_processor = Some(SelectedInputProcessor::from_admitted_input(definitions, families)?);
+                                let empty_checkpoint = empty.clone();
+                                let (empty, state, errors, eio, reached) = read_sizing(empty, &empty_model)?;
+                                assert!(reached.is_ok(), "empty SpaceList/{method}/{authored}/{mixed}: {reached:?}");
+                                assert!(errors.is_empty()); assert_eq!(state.tracking.total_warning_errors, 0);
+                                let gains = &empty.selected_internal_heat_gains;
+                                assert!(!gains.get_input_flag && !gains.errors_found);
+                                assert_eq!((gains.totals[0], gains.totals[6]), (i32::try_from(end)?, i32::try_from(end)?));
+                                assert_eq!(gains.allocations.people.allocated, mixed);
+                                assert_eq!(gains.allocations.people.rows.len(), end);
+                                assert_eq!(gains.allocations.other_equipment.as_ref().map(Vec::len), mixed.then_some(1));
+                                let ip = empty.selected_input_processor.as_ref().ok_or("empty statement used marks")?;
+                                for family in ["People", "OtherEquipment"] {
+                                    assert!(empty.heat_balance_input.as_ref().ok_or("empty retained statements")?.objects[family].iter()
+                                        .all(|row| !ip.is_object_unused(family, &row.object_name)));
+                                }
+                                let source = empty.selected_zone_input.as_ref().ok_or("empty actual totals")?;
+                                assert_eq!(source.zones.as_ref().ok_or("empty Zone totals")?.iter().map(|zone| zone.total_occupants).collect::<Vec<_>>(),
+                                    if mixed { vec![0.5, 0.0] } else { vec![0.0, 0.0] });
+                                assert_eq!(source.zones.as_ref().ok_or("empty nominal gains")?.iter().map(|zone| zone.internal_heat_gains).collect::<Vec<_>>(),
+                                    if mixed { vec![23.0, 0.0] } else { vec![0.0, 0.0] });
+                                let mut empty_keys = vec![first_name.to_ascii_uppercase(), empty_equipment_name.to_ascii_uppercase(), "ZZZ EMPTY99".into()];
+                                if !mixed { empty_keys.extend([positive_name.to_ascii_uppercase(), "ZZ POSITIVE99".into()]); }
+                                assert!(empty.output_registration.out_vars.iter().all(|row| !empty_keys.contains(&row.key)), "no zero-member object outputs");
+                                let total_outputs = empty.output_registration.out_vars.iter().filter(|row|
+                                    matches!(row.name.as_str(), "Zone Total Internal Total Heating Rate" | "Space Total Internal Total Heating Rate")).collect::<Vec<_>>();
+                                assert_eq!(total_outputs.len(), 4);
+                                for row in total_outputs {
+                                    assert!(row.report, "the real wildcard request enables this OutVar");
+                                    assert_eq!(row.frequency, crate::heat_balance::source_output_registration::SourceReportFrequency::TimeStep);
+                                    assert_eq!(*gains.real_output(row.which.ok_or("actual total Which")?)?, 0.0);
+                                }
+                                assert_eq!(empty.output_registration.meters.meters.is_empty(), !mixed);
+                                if mixed {
+                                    assert_eq!(gains.allocations.people.rows[0].name, positive_name.to_ascii_uppercase());
+                                    assert_eq!(gains.allocations.people.rows[0].number_of_people, 0.5);
+                                    assert_eq!(gains.allocations.other_equipment.as_ref().ok_or("positive mixed equipment")?[0].name, "ZZ POSITIVE99");
+                                    assert_eq!(gains.allocations.other_equipment.as_ref().ok_or("positive mixed sizing")?[0].design_level, 23.0);
+                                    for (family, field) in [("People", "number_of_people_schedule_name"), ("OtherEquipment", "schedule_name")] {
+                                        let mut bad = empty_checkpoint.clone();
+                                        bad.heat_balance_input.as_mut().ok_or("mixed bad raw")?.objects.get_mut(family).ok_or("mixed bad family")?[0]
+                                            .fields.insert(field.into(), ProjectInputValue::String("ABSENT MIXED SCHEDULE99".into()));
+                                        let (_, state, _, _, reached) = read_sizing(bad, &empty_model)?;
+                                        assert!(reached.is_err(), "positive family still reads zero-member {family} statement");
+                                        assert!(state.tracking.total_severe_errors > 0);
+                                    }
+                                } else {
+                                    assert!(!String::from_utf8(eio)?.contains(" OtherEquipment,"));
+                                    assert!(gains.allocations.space_devices.as_ref().ok_or("zero devices")?.iter()
+                                        .all(|row| row.number_of_devices == 0 && row.devices.is_none()));
+                                }
+                                for bad_kind in 0..3 {
+                                    let mut bad = empty_model.clone();
+                                    match bad_kind {
+                                        0 => bad.source_people_inputs[0].target = ep_model::SourcePeopleInputTarget::SpaceList(ep_model::SpaceListId(0)),
+                                        1 => bad.source_people_inputs[2].instances = if mixed { 0..0 } else { 1..1 },
+                                        _ => bad.source_people_inputs[0].target = ep_model::SourcePeopleInputTarget::Zone(first_zone),
+                                    }
+                                    let (bad, _, _, _, reached) = read_sizing(empty_checkpoint.clone(), &bad)?;
+                                    assert!(reached.is_err()); assert!(!bad.selected_internal_heat_gains.allocations.people.allocated);
+                                }
+                            }
+                        }
                         // A broken typed range must stop before allocated People
                         // mutation; no Native Fatal or successful result is invented.
                         let mut invalid_model = list_model.clone();

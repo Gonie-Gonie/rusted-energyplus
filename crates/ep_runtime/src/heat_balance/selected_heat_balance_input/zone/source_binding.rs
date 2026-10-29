@@ -201,6 +201,7 @@ impl SelectedZoneInputOwners {
             if i32::try_from(list.spaces.len()).ok() != Some(list.num_list_spaces)
                 || list.spaces.len() != row.spaces.len()
                 || list.max_space_name_length != row.max_space_name_length
+                || (list.spaces.is_empty() && list.max_space_name_length != 0)
                 || list.spaces.iter().collect::<BTreeSet<_>>().len() != list.spaces.len()
                 || list.typed_space_list_id.is_some_and(|id| id != row.id)
             {

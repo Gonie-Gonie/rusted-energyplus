@@ -250,6 +250,10 @@ pub struct OrdinaryInternalGains<'a> {
     pub zone_electric_end_use: Option<&'a [[[f64; 26]; 4]]>,
     /// Actual retained refrigeration credit.
     pub refrigeration_credit: Option<&'a [[f64; 4]]>,
+    /// Actual People EPVector allocation flag; zero-instance statements leave it false.
+    pub people_allocated: bool,
+    /// Actual retained People storage length, without manufacturing empty-target rows.
+    pub people_storage_size: usize,
     /// Actual retained other equipment.
     pub other_equipment: Option<Vec<OrdinaryOtherEquipment<'a>>>,
     /// Actual retained co2 generation size.
@@ -356,6 +360,8 @@ impl CtfInitializationReports {
             errors_found: gains.errors_found,
             zero_pointer_value: gains.zero_pointer_value,
             totals: &gains.totals,
+            people_allocated: allocations.people.allocated,
+            people_storage_size: allocations.people.rows.len(),
             zone_int_gain: allocations.zone_int_gain.as_deref(),
             space_int_gain: allocations.space_int_gain.as_deref(),
             space_devices: allocations.space_devices.as_ref().map(|rows| {
