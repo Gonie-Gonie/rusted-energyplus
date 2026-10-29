@@ -95,9 +95,19 @@ impl Compiler<'_> {
     }
 
     pub(super) fn parse_zone_groups(&mut self, model: &mut TypedModel) {
+        // Native GetZoneData uses getObjectItem declaration order for groups,
+        // unlike GetSpaceData's direct JSON-map Space/SpaceList traversal.
         for (name, object) in self.objects(ZONE_GROUP_OBJECT_TYPE) {
             let diagnostics_before_fields = self.diagnostics.len();
-            if name.trim().is_empty() {
+            let invalid_name = if self.source_file_declarations {
+                name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            } else {
+                name.trim().is_empty()
+            };
+            if invalid_name {
                 self.error(
                     "MissingRequiredField",
                     ZONE_GROUP_OBJECT_TYPE,
@@ -107,8 +117,12 @@ impl Compiler<'_> {
                 );
             }
 
-            let zone_list_name =
-                self.required_string(ZONE_GROUP_OBJECT_TYPE, &name, &object, "zone_list_name");
+            let zone_list_name = self.source_reference_name(
+                ZONE_GROUP_OBJECT_TYPE,
+                &name,
+                &object,
+                "zone_list_name",
+            );
             let zone_list = zone_list_name.as_deref().and_then(|zone_list_name| {
                 self.resolve_name(
                     &model.zone_list_names,
@@ -119,6 +133,22 @@ impl Compiler<'_> {
                     ZONE_LIST_OBJECT_TYPE,
                 )
             });
+            // Native global strong schema validation requires a stored JSON
+            // integer, even when a stored floating value is mathematically integral.
+            if self.source_file_declarations
+                && field_value(&object, "zone_list_multiplier").is_some_and(|value| {
+                    !matches!(value, RawValue::Number(text)
+                    if matches!(ep_model::classify_source_json_number(text),
+                        Ok(ep_model::SourceJsonNumber::Integer(_))))
+                })
+            {
+                self.invalid_field_type(
+                    ZONE_GROUP_OBJECT_TYPE,
+                    &name,
+                    "zone_list_multiplier",
+                    "actual JSON integer",
+                );
+            }
             let multiplier = self.u32_default(
                 ZONE_GROUP_OBJECT_TYPE,
                 &name,
@@ -259,7 +289,7 @@ impl Compiler<'_> {
             }
             model.zone_groups.push(ZoneGroup {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.zone_group_names.normalized_name(&name),
                 zone_list,
                 multiplier,
             });

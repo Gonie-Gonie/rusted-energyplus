@@ -97,6 +97,42 @@ fn get_zone_data_collection_phase_materializes_lists_groups_and_zone_side_effect
             && default.field == "zone_list_multiplier"
             && default.value == "1"
     }));
+    // Unit100 Source groups preserve exact names and still assign ZoneList IDs,
+    // even when an unused earlier list makes the real Group/List indices differ.
+    for (multiplier_field, expected) in [
+        ("", 1_u32),
+        (",\"zone_list_multiplier\":2", 2),
+        (",\"zone_list_multiplier\":2147483647", i32::MAX as u32),
+    ] {
+        let text = format!(
+            r#"{{"Zone":{{"A":{{}},"B":{{}}}},"ZoneList":{{
+            "A unused":{{"zones":[{{"zone_name":"A"}}]}},
+            "Both":{{"zones":[{{"zone_name":"B"}},{{"zone_name":"A"}}]}}}},
+            "ZoneGroup":{{" G ":{{"zone_list_name":"Both"{multiplier_field}}}}}}}"#
+        );
+        let raw = parse_epjson_str(&text)?;
+        let source = super::super::compile_raw_model_for_source(&raw);
+        assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+        let source = source.model.ok_or("actual exact Source Group")?;
+        assert_eq!(source.zone_groups.len(), 1);
+        let group = &source.zone_groups[0];
+        assert_eq!(group.id, ZoneGroupId(0));
+        assert_eq!(group.zone_list, ZoneListId(1));
+        assert_ne!(group.id.0, group.zone_list.0);
+        assert_eq!(group.name.0, " G ");
+        assert_eq!(group.multiplier, expected);
+        assert_eq!(source.zone_group_names.resolve(" g "), Some(group.id));
+        assert!(source.zone_group_names.resolve("G").is_none());
+        for zone in &source.zones {
+            assert_eq!(zone.list_group, Some(group.zone_list));
+            assert_eq!(zone.list_multiplier, expected);
+        }
+        let legacy = compile_raw_model(&raw)
+            .model
+            .ok_or("legacy Group normalization")?;
+        assert_eq!(legacy.zone_groups[0].name.0, "G");
+        assert_eq!(legacy.zone_group_names.resolve("G"), Some(ZoneGroupId(0)));
+    }
     Ok(())
 }
 
@@ -191,6 +227,62 @@ fn zone_collections_preserve_staged_idf_order_and_native_lexical_order()
         .ok_or_else(|| std::io::Error::other("expected native zone collections"))?;
     assert_eq!(native_model.zone_lists[0].name.0, "ALPHA LIST");
     assert_eq!(native_model.zone_groups[0].name.0, "ALPHA GROUP");
+    let numeric = r#"{"Zone":{"A":{},"B":{}},"ZoneList":{
+        "L10":{"zones":[{"zone_name":"A"}]},"L2":{"zones":[{"zone_name":"B"}]}},
+        "ZoneGroup":{"G10":{"zone_list_name":"L10","zone_list_multiplier":2},
+        "G2":{"zone_list_name":"L2"}}}"#;
+    let numeric_idf =
+        "Zone,A;Zone,B;ZoneList,L10,A;ZoneList,L2,B;ZoneGroup,G10,L10,2;ZoneGroup,G2,L2;";
+    for staged in [false, true] {
+        let raw = if staged {
+            parse_epjson_str_with_idf_order(numeric, numeric_idf)?
+        } else {
+            parse_epjson_str(numeric)?
+        };
+        assert_eq!(raw.has_idf_declaration_order("ZoneGroup"), staged);
+        let compiled = super::super::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled.model.ok_or("Source group declaration order")?;
+        let actual = model
+            .zone_groups
+            .iter()
+            .map(|group| group.name.0.as_str())
+            .collect::<Vec<_>>();
+        assert_eq!(
+            actual,
+            if staged {
+                vec!["G10", "G2"]
+            } else {
+                vec!["G2", "G10"]
+            }
+        );
+        for (index, ((name, _), group)) in raw
+            .source_ordered_instances("ZoneGroup")?
+            .iter()
+            .zip(&model.zone_groups)
+            .enumerate()
+        {
+            assert_eq!(usize::try_from(group.id.0)?, index);
+            assert_eq!(group.name.0, name.0.to_ascii_uppercase());
+        }
+    }
+    let exact = parse_epjson_str(
+        r#"{"Zone":{"A":{},"B":{}},"ZoneList":{
+        " L ":{"zones":[{"zone_name":"A"}]},"L":{"zones":[{"zone_name":"B"}]}},
+        "ZoneGroup":{" G ":{"zone_list_name":" l "},"G":{"zone_list_name":"l"}}}"#,
+    )?;
+    let exact = super::super::compile_raw_model_for_source(&exact);
+    assert!(!exact.has_errors(), "{:?}", exact.report.diagnostics);
+    let exact = exact.model.ok_or("exact Group and ZoneList namespaces")?;
+    assert_eq!(exact.zone_groups.len(), 2);
+    assert_ne!(
+        exact.zone_group_names.resolve("G"),
+        exact.zone_group_names.resolve(" G ")
+    );
+    assert_ne!(
+        exact.zone_list_names.resolve("L"),
+        exact.zone_list_names.resolve(" L ")
+    );
     Ok(())
 }
 
@@ -290,6 +382,36 @@ fn zone_group_rejects_bad_references_multipliers_and_group_overlap()
             result.report.diagnostics
         );
         assert!(result.model.is_none());
+        let source = super::super::compile_raw_model_for_source(&parse_epjson_str(epjson)?);
+        assert!(
+            has_error(&source, code, "ZoneGroup"),
+            "{:?}",
+            source.report.diagnostics
+        );
+        assert!(source.model.is_none());
+    }
+    for multiplier in ["2.0", "2e0", "\"2\"", "null", "true", "2147483648"] {
+        let text = format!(
+            r#"{{"Zone":{{"Z":{{}}}},"ZoneList":{{"L":{{"zones":[{{"zone_name":"Z"}}]}}}},
+            "ZoneGroup":{{"G":{{"zone_list_name":"L","zone_list_multiplier":{multiplier}}}}}}}"#
+        );
+        let raw = parse_epjson_str(&text)?;
+        assert!(
+            super::super::compile_raw_model_for_source(&raw).has_errors(),
+            "Source Group requires the original integer JSON kind and defined signed range: {multiplier}"
+        );
+        if matches!(multiplier, "2.0" | "2e0") {
+            assert!(
+                !compile_raw_model(&raw).has_errors(),
+                "legacy integral-double typing is unchanged"
+            );
+        }
+    }
+    for text in [
+        r#"{"Zone":{"Z":{}},"ZoneList":{" L ":{"zones":[{"zone_name":"Z"}]}},"ZoneGroup":{"G":{"zone_list_name":"L"}}}"#,
+        r#"{"Zone":{"Z":{}},"ZoneList":{"L":{"zones":[{"zone_name":"Z"}]}},"ZoneGroup":{"G\nX":{"zone_list_name":"L"}}}"#,
+    ] {
+        assert!(super::super::compile_raw_model_for_source(&parse_epjson_str(text)?).has_errors());
     }
     Ok(())
 }

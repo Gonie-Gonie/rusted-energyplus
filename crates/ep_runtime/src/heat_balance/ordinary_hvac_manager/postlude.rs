@@ -95,6 +95,41 @@ impl SourceHvacManager {
                 )?;
             }
         }
+        // Native2229-2235 follows all resets and ordered list sums. Each Group
+        // reads its real referenced List cell; ListMultiplier never enters2220.
+        for number in 1..=zones.num_zone_groups {
+            let at = number
+                .checked_sub(1)
+                .and_then(|n| usize::try_from(n).ok())
+                .ok_or(Error::Unavailable("actual Group report ordinal2229"))?;
+            let group = zones
+                .zone_groups
+                .as_deref()
+                .and_then(|rows| rows.get(at))
+                .ok_or(Error::Unavailable("actual Group record2229"))?;
+            let list_at = group
+                .zone_list
+                .checked_sub(1)
+                .and_then(|n| usize::try_from(n).ok())
+                .ok_or(Error::Unavailable("actual Group referenced List2229"))?;
+            let factor = f64::from(group.multiplier);
+            for (list, target) in [
+                (&reports.list_heat_energy, &mut reports.group_heat_energy),
+                (&reports.list_cool_energy, &mut reports.group_cool_energy),
+                (&reports.list_heat_rate, &mut reports.group_heat_rate),
+                (&reports.list_cool_rate, &mut reports.group_cool_rate),
+            ] {
+                let value = *list
+                    .as_deref()
+                    .and_then(|rows| rows.get(list_at))
+                    .ok_or(Error::Unavailable("actual Group referenced List cell2232"))?;
+                *target
+                    .as_deref_mut()
+                    .and_then(|rows| rows.get_mut(at))
+                    .ok_or(Error::Unavailable("actual Group report allocation2232"))? =
+                    value * factor;
+            }
+        }
         Ok(())
     }
     pub(crate) fn update_source_zone_list_and_group_loads(
@@ -106,11 +141,7 @@ impl SourceHvacManager {
             &o.controller.demand,
             &mut o.control.zone_air_group_loads,
         )?;
-        if o.zones.num_zone_groups > 0 {
-            return Err(Error::Unavailable(
-                "actual ZoneGroup record2229: positive GetZoneData group body unported",
-            ));
-        }
+
         Ok(())
     }
 }

@@ -307,6 +307,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("Version", 1, 0, 0, 0, None),
         ("Zone", 4, 9, 0, 0, None),
         ("ZoneList", 1, 0, 1, 0, Some("zones")),
+        ("ZoneGroup", 2, 1, 0, 0, None),
         ("ZoneAirBalance:OutdoorAir", 4, 1, 0, 0, None),
         ("ZoneInfiltration:EffectiveLeakageArea", 3, 3, 0, 0, None),
         ("ZoneInfiltration:FlowCoefficient", 3, 5, 0, 0, None),

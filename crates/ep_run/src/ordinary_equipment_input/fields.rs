@@ -22,6 +22,7 @@ pub(super) fn admitted_field(
             | "BuildingSurface:Detailed"
             | "Zone"
             | "ZoneList"
+            | "ZoneGroup"
             | "Space"
             | "SpaceList"
             | "Material"
@@ -453,6 +454,10 @@ pub(super) fn admitted_field(
         ("Construction", "layer_8") => blank(value) || matches!(value, RawValue::String(_)),
         ("Construction", "layer_9") => blank(value) || matches!(value, RawValue::String(_)),
         ("Construction", "layer_10") => blank(value) || matches!(value, RawValue::String(_)),
+        ("ZoneGroup", "zone_list_name") if source_ingress => matches!(value, RawValue::String(_)),
+        ("ZoneGroup", "zone_list_multiplier") if source_ingress => {
+            super::zone_groups::multiplier_value(value).is_some()
+        }
         ("Zone", "direction_of_relative_north") => blank(value) || number(value).is_some(),
         ("Zone", "x_origin") => blank(value) || number(value).is_some(),
         ("Zone", "y_origin") => blank(value) || number(value).is_some(),
@@ -899,6 +904,7 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         "Output:Meter" | "Output:Meter:MeterFileOnly" => &["key_name"],
         "Exterior:Lights" => &["schedule_name", "design_level"],
         "ZoneList" => &["zones"],
+        "ZoneGroup" => &["zone_list_name"],
         "Space" => &["zone_name"],
         "OtherEquipment" => &[
             "zone_or_zonelist_or_space_or_spacelist_name",

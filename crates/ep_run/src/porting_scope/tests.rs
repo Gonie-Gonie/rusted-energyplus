@@ -812,6 +812,139 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
         );
     }
 
+    // Unit100: only a genuine Source A group can supply a list factor. The
+    // unused earlier list proves Zone.ListGroup is a List ID, not a Group ID.
+    for one_zone in [false, true] {
+        for multiplier in [None, Some(2_u32), Some(i32::MAX as u32)] {
+            let mut group_case = if one_zone {
+                self::input(PortingScope::A)
+            } else {
+                value.clone()
+            };
+            let members = if one_zone {
+                vec!["Zone"]
+            } else {
+                vec!["Zulu", "Alpha"]
+            };
+            group_case["ZoneList"] = json!({
+                "A unused":{"zones":[{"zone_name":members[0]}]},
+                "Both":{"zones":members.iter().map(|name| json!({"zone_name":name})).collect::<Vec<_>>()}
+            });
+            group_case["ZoneGroup"] =
+                json!({" G ":{"zone_list_name":"Both","metadata":[null,true]}});
+            if let Some(multiplier) = multiplier {
+                group_case["ZoneGroup"][" G "]["zone_list_multiplier"] = json!(multiplier);
+            }
+            group_case["People"] = json!({"P100":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":2}});
+            group_case["OtherEquipment"] = json!({"G100":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","schedule_name":"On","fuel_type":"Electricity","design_level":23}});
+            let raw = parse_epjson_str(&group_case.to_string()).expect("actual ZoneGroup input");
+            assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
+            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+            let model = compiled
+                .model
+                .as_ref()
+                .expect("actual typed group membership");
+            assert_eq!(model.zone_groups.len(), 1);
+            let group = &model.zone_groups[0];
+            assert_eq!(group.id.0, 0);
+            assert_eq!(group.zone_list.0, 1);
+            assert_ne!(group.id.0, group.zone_list.0);
+            assert_eq!(group.name.0, " G ");
+            assert_eq!(group.multiplier, multiplier.unwrap_or(1));
+            assert!(model.zone_group_names.resolve("G").is_none());
+            assert!(model.authored_space_names.is_empty());
+            for zone in &model.zones {
+                assert_eq!(zone.list_group, Some(group.zone_list));
+                assert_eq!(zone.list_multiplier, multiplier.unwrap_or(1));
+            }
+            let mut selected =
+                inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+            assert!(selected.admissible, "{:?}", selected.violations);
+            assert!(
+                !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B)
+                    .admissible
+            );
+            for mutation in 0..4 {
+                let mut invalid = model.clone();
+                match mutation {
+                    0 => invalid.zones[0].list_group = Some(ep_model::ZoneListId(group.id.0)),
+                    1 => {
+                        invalid.zones[0].list_multiplier = if group.multiplier == 1 { 2 } else { 1 }
+                    }
+                    2 => invalid.zone_groups[0].zone_list = ep_model::ZoneListId(0),
+                    _ => {
+                        invalid.zone_groups.clear();
+                    }
+                }
+                assert!(
+                    !inspect_porting_scope(&raw, &compiled.report, Some(&invalid), PortingScope::A)
+                        .admissible,
+                    "Group/List identity and factor mutation {mutation}"
+                );
+            }
+            selected.environment = Some(
+                super::environment::environment_from_weather(
+                    model,
+                    &weather,
+                    "actual ZoneGroup Source input",
+                )
+                .expect("unchanged genuine weather preparation"),
+            );
+            let admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                    .expect("validated Source A grouped input");
+            let support = crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission),
+            );
+            assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+            assert_eq!(
+                support.runtime_class,
+                crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+            );
+            assert!(support.matched_capability_ids.is_empty());
+            assert!(!support.runtime_class.conformance_promotion_allowed());
+            assert!(
+                !assess_support(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal
+                )
+                .allows_rust_runtime()
+            );
+            let mut overflow = group_case.clone();
+            overflow["Zone"][members[0]]["multiplier"] = json!(2);
+            overflow["ZoneGroup"][" G "]["zone_list_multiplier"] = json!(i32::MAX);
+            let overflow_raw =
+                parse_epjson_str(&overflow.to_string()).expect("defined JSON integer factors");
+            assert!(crate::ordinary_equipment_input::resolve_source_a(&overflow_raw).is_err());
+            let overflow = ep_compiler::compile_raw_model_for_source(&overflow_raw);
+            assert!(
+                !inspect_porting_scope(
+                    &overflow_raw,
+                    &overflow.report,
+                    overflow.model.as_ref(),
+                    PortingScope::A
+                )
+                .admissible,
+                "a product beyond signed Native int stays outside Source scope"
+            );
+        }
+    }
+
     // Unit88 admits only direct-Zone Electricity OtherEquipment on this
     // Source topology. Actual compiler/IP names link opposite object/Zone order;
     // no typed IDs, rates or thermal outcomes are synthesized for this test.
@@ -1146,6 +1279,38 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .count(),
         2
     );
+    // The existing reciprocal-pair guard compares independent Zone and list
+    // factors. Grouping both Zones equally is legal; unequal group factors are not.
+    for same_factor in [false, true] {
+        let mut grouped_pair = paired.clone();
+        grouped_pair["ZoneList"] = json!({
+            "Alpha list":{"zones":[{"zone_name":"Alpha"}]},
+            "Zulu list":{"zones":[{"zone_name":"Zulu"}]}
+        });
+        grouped_pair["ZoneGroup"] = json!({
+            "Alpha group":{"zone_list_name":"Alpha list","zone_list_multiplier":2},
+            "Zulu group":{"zone_list_name":"Zulu list","zone_list_multiplier":if same_factor {2} else {3}}
+        });
+        let raw =
+            parse_epjson_str(&grouped_pair.to_string()).expect("genuine paired group factors");
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let grouped = inspect_porting_scope(
+            &raw,
+            &compiled.report,
+            compiled.model.as_ref(),
+            PortingScope::A,
+        );
+        assert_eq!(grouped.admissible, same_factor, "{:?}", grouped.violations);
+        if !same_factor {
+            assert!(
+                grouped
+                    .violations
+                    .iter()
+                    .any(|message| message.contains("equal Zone factors"))
+            );
+        }
+    }
     for (field, invalid) in [
         ("outside_boundary_condition_object", json!("Missing")),
         ("zone_name", json!("Zulu")),

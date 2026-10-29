@@ -188,10 +188,23 @@ impl SourceZoneAirPredictorCorrector {
                     eio,
                 )?;
             }
-            if owners.zones.num_zone_groups > 0 {
-                return Err(Error::Unavailable(
-                    "positive actual ZoneGroup2597 name/output",
-                ));
+            for number in 1..=owners.zones.num_zone_groups {
+                let group = owners
+                    .zones
+                    .zone_groups
+                    .as_deref()
+                    .and_then(|rows| index(number).ok().and_then(|at| rows.get(at)))
+                    .ok_or(Error::Unavailable("actual ZoneGroup2597 name/output"))?;
+                outputs.register_zone_group(
+                    number,
+                    &group.name,
+                    &owners.control.zone_air_group_loads,
+                    owners.clock,
+                    owners.reporting_diagnostic_flags,
+                    owners.input,
+                    owners.backend,
+                    eio,
+                )?;
             }
             self.flags.initialize_setpoints_once = false;
         }

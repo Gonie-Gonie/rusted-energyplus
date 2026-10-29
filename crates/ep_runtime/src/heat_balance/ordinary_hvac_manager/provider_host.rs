@@ -266,6 +266,30 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R> SourceZoneAirReg
             eio,
         )
     }
+    fn register_zone_group(
+        &mut self,
+        number: i32,
+        name: &str,
+        reports: &super::super::ordinary_air_heat_balance::predictor_corrector::SourceZoneListGroupLoadReports,
+        clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
+        input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        eio: &mut dyn std::io::Write,
+    ) -> Result<(), Error> {
+        self.init_air_output().register_zone_group(
+            number,
+            name,
+            reports,
+            clock,
+            reporting_diagnostic_flags,
+            input,
+            backend,
+            eio,
+        )
+    }
     fn register_air(
         &mut self,
         number: i32,

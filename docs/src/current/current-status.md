@@ -36,10 +36,12 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 
 ## Running And Comparing
 
-The [example-object union](../generated/example-object-union.md) contains 112
-object types; legal-value completion remains tracked per object. The retained
+The [example-object union](../generated/example-object-union.md) contains 114
+object types: the original 110-type corpus plus accepted ComfortViewFactorAngles,
+Space, SpaceList and ZoneList additions. Legal-value completion remains tracked
+per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 150 paired physical cases and 3,972,198 reported values with zero
+contains 151 paired physical cases and 4,010,430 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -53,7 +55,7 @@ meteorology; full schedule-domain completion remains open.
 Within the bounded one-Zone A/B route, `Zone.multiplier` accepts the Native
 signed owner's positive range, `1..=2147483647`. The actual getter, aggregate
 demand, air balance, meters and reports retain the live factor; per-Zone
-intensive state keeps its original meaning. Group/list factors remain one.
+intensive state keeps its original meaning. Those two witnesses retain Group/list factors of one.
 Two multiplier-2 models compare their complete original profiles: 15,144 values
 have zero tolerance or RMSE failures, with exact Zone Information records,
 dictionaries and clocks. This finite evidence retains the other model limits.
@@ -82,6 +84,21 @@ retains its original tolerance even when nominal EIO uses scientific notation.
 The four genuine System list load outputs are connected; their uncontrolled
 physical witness is zero, while existing owner tests cover nonzero reductions,
 reset, order and Zone factors.
+Positive ZoneGroups now reach the bounded Source A route with implicit Spaces.
+The real getter retains the referenced ZoneList identity, multiplier/default and
+ordered diagnostics; checked signed products feed the existing Zone consumers.
+Local gain rates, design occupants and sizing stay per physical Zone. Facility
+meters apply each actual nominal owner's public Zone and list factors; ordered
+System list reductions use Zone factors, then four genuine Group outputs apply
+the Group factor once. One factor-2 case compares 408 series, 38,232 values and
+195 public joins with unchanged limits. Public EIO retains Zone factors 1/1 and
+list factors 2/2, 36 nominal owners, 175 records and 28 actual warmup days; whole
+ERR, DXF and CTF checks pass. All 16 System streams and 1,536 samples are genuine
+zeros. Passed existing owner tests separately establish nonzero reductions,
+reset/order and actual ListNum versus Group ordinal. Private Native Group/gain
+allocations and physical Source private Group/gain allocations are unobserved.
+Group compositions with authored Spaces or nonempty SpaceLists, optional comfort,
+Source B, Space heat balance, HVAC and arbitrary combinations remain unvalidated.
 Distinct People and OtherEquipment instances in different implicit Spaces can
 retain equal public report names with separate arena rows, Which bindings and
 ReportIDs. One alias case keeps 391 requests but emits 406 variable series and
@@ -116,13 +133,13 @@ identity retains the Native fast path; differing counts or layer identities use
 an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
 retain Native's warning sequence. Infrared-transparent constructions retain
 their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
-factors and opposite coincident vertices. Twenty-two 24-hour two-Zone
-cases cover 461,544 derived values with zero tolerance or RMSE failures;
-the maximum absolute difference is below 3.55e-11. Actual Zone/Space and enclosure links,
+and list factors and opposite coincident vertices. Twenty-three 24-hour two-Zone
+cases cover 499,776 derived values with zero tolerance or RMSE failures;
+the maximum absolute difference is 3.54702933691442e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Multiple/remainder Spaces, Space heat balance, Source B authored Spaces,
-ZoneGroups and multi-Zone HVAC remain open, as do
-broader interzone combinations.
+Group compositions with authored Spaces or nonempty SpaceLists, Source B groups
+and multi-Zone HVAC remain open, as do broader interzone combinations.
 Source closure can complete collinear edge points in a temporary copy while
 retaining authored Surface vertices and volume inputs. Open-zone fallbacks remain held.
 Actual device and Zone W/J sums agree with all thirteen Facility Hourly meters;

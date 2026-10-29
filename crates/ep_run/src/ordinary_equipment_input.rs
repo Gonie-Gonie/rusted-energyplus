@@ -36,6 +36,7 @@ mod people;
 mod source_b;
 mod space_lists;
 mod spaces;
+mod zone_groups;
 mod zone_lists;
 use fields::{admitted_field, required_fields};
 
@@ -62,12 +63,16 @@ fn resolve_raw(
         source_calendar_ingress && !source_b_ingress && multizone::has_multiple_zones(raw);
     let source_zone_list_ingress =
         source_calendar_ingress && !source_b_ingress && zone_lists::positive(raw);
+    let source_zone_group_ingress =
+        source_calendar_ingress && !source_b_ingress && zone_groups::positive(raw);
     let source_space_ingress =
         source_calendar_ingress && !source_b_ingress && spaces::positive(raw);
     let source_space_list_ingress =
         source_calendar_ingress && !source_b_ingress && space_lists::positive(raw);
-    let source_gain_collections =
-        source_zone_list_ingress || source_space_ingress || source_space_list_ingress;
+    let source_gain_collections = source_zone_list_ingress
+        || source_zone_group_ingress
+        || source_space_ingress
+        || source_space_list_ingress;
     if source_multizone_ingress || source_gain_collections {
         multizone::validate(raw)?;
     }
@@ -76,6 +81,9 @@ fn resolve_raw(
     }
     if source_zone_list_ingress {
         zone_lists::validate(raw)?;
+    }
+    if source_zone_group_ingress {
+        zone_groups::validate(raw)?;
     }
     if source_space_list_ingress {
         space_lists::validate(raw)?;
@@ -148,6 +156,7 @@ fn resolve_raw(
                 | "ZoneAirHeatBalanceAlgorithm"
                 | "Output:Variable"
         ) && !(source_zone_list_ingress && family.0 == "ZoneList")
+            && !(source_zone_group_ingress && family.0 == "ZoneGroup")
             && !source_b_family
             && !source_irt_family
             && !source_calendar_family
@@ -205,6 +214,7 @@ fn resolve_raw(
                     "OtherEquipment"
                         | "People"
                         | "ZoneList"
+                        | "ZoneGroup"
                         | "Space"
                         | "SpaceList"
                         | "ScheduleTypeLimits"
@@ -337,6 +347,10 @@ fn resolve_raw(
                             "ZoneList" if source_zone_list_ingress => field.0 != "zones",
                             "Space" if source_space_family => !spaces::known_field(&field.0),
                             "SpaceList" if source_space_list_family => field.0 != "spaces",
+                            "ZoneGroup" if source_zone_group_ingress => !matches!(
+                                field.0.as_str(),
+                                "zone_list_name" | "zone_list_multiplier"
+                            ),
                             "OtherEquipment" => !matches!(
                                 field.0.as_str(),
                                 "fuel_type"
@@ -903,10 +917,12 @@ mod tests {
             let error = resolve_source_a(&raw)
                 .err()
                 .ok_or("multi-Zone positive family escaped")?;
-            assert!(
-                error.starts_with("Source A bounded multi-Zone excludes positive family"),
-                "{family}: {error}"
-            );
+            let expected = if family == "ZoneGroup" {
+                "Source ZoneGroup requires actual positive ZoneLists"
+            } else {
+                "Source A bounded multi-Zone excludes positive family"
+            };
+            assert!(error.starts_with(expected), "{family}: {error}");
         }
         // Unit97 sole authored Spaces: raw/IP values are preserved, not sized here.
         let source_space = parse_epjson_str(
@@ -1436,6 +1452,80 @@ mod tests {
                 resolve_source_a(&parse_epjson_str(&unused_empty_list.to_string())?).is_ok(),
                 "an unused empty SpaceList is valid beside the existing ZoneList input"
             );
+            // Unit100: groups consume genuine ordered positive ZoneLists on A.
+            let mut grouped = list_case.clone();
+            grouped["ZoneList"]["A unused"] = serde_json::json!({"zones":[{"zone_name":"Alpha"}]});
+            grouped["ZoneGroup"] = serde_json::json!({" G ":{"zone_list_name":"Both","zone_list_multiplier":2,"metadata":[null,true]}});
+            let group_raw = parse_epjson_str(&grouped.to_string())?;
+            assert!(resolve_source_a(&group_raw).is_ok());
+            assert!(resolve_source_b(&group_raw).is_err() && resolve(&group_raw).is_err());
+            for multiplier in [
+                serde_json::json!(0),
+                serde_json::json!(-1),
+                serde_json::json!(1.5),
+                serde_json::json!(2.0),
+                serde_json::json!("2"),
+                serde_json::json!(null),
+                serde_json::json!(true),
+                serde_json::json!(2147483648_u64),
+            ] {
+                let mut invalid = grouped.clone();
+                invalid["ZoneGroup"][" G "]["zone_list_multiplier"] = multiplier;
+                assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            }
+            for reference in [
+                serde_json::json!(" Both "),
+                serde_json::json!("Missing"),
+                serde_json::json!(null),
+            ] {
+                let mut invalid = grouped.clone();
+                invalid["ZoneGroup"][" G "]["zone_list_name"] = reference;
+                assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            }
+            let mut duplicate_list = grouped.clone();
+            duplicate_list["ZoneGroup"]["Second"] = serde_json::json!({"zone_list_name":"Both"});
+            assert!(resolve_source_a(&parse_epjson_str(&duplicate_list.to_string())?).is_err());
+            let mut overlap = grouped.clone();
+            overlap["ZoneGroup"]["Second"] = serde_json::json!({"zone_list_name":"A unused"});
+            assert!(resolve_source_a(&parse_epjson_str(&overlap.to_string())?).is_err());
+            let mut product = grouped.clone();
+            product["Zone"]["Alpha"]["multiplier"] = serde_json::json!(i32::MAX);
+            assert!(
+                resolve_source_a(&parse_epjson_str(&product.to_string())?).is_err(),
+                "existing Native int consumers require a defined product"
+            );
+            let ordered_groups = r#"{"Zone":{"Zulu":{},"Alpha":{}},"ZoneList":{
+                "L10":{"zones":[{"zone_name":"Alpha"}]},"L2":{"zones":[{"zone_name":"Zulu"}]}},
+                "ZoneGroup":{"G10":{"zone_list_name":"L10","zone_list_multiplier":2},
+                "G2":{"zone_list_name":"L2"}}}"#;
+            let group_idf = "Zone,Zulu;Zone,Alpha;ZoneList,L10,Alpha;ZoneList,L2,Zulu;ZoneGroup,G10,L10,2;ZoneGroup,G2,L2;";
+            for staged in [false, true] {
+                let raw = if staged {
+                    ep_raw_model::parse_epjson_str_with_idf_order(ordered_groups, group_idf)?
+                } else {
+                    parse_epjson_str(ordered_groups)?
+                };
+                resolve_source_a(&raw)?;
+                let mut ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+                let definition = ip.get_object_def_max_args("ZoneGroup")?;
+                assert_eq!((definition.alphas, definition.numerics), (2, 1));
+                assert_eq!(
+                    ip.source_raw_object_names("ZoneGroup")?,
+                    if staged {
+                        vec!["G10", "G2"]
+                    } else {
+                        vec!["G2", "G10"]
+                    }
+                );
+                assert_eq!(ip.source_raw_object_fields("ZoneGroup", "G10")?.get("zone_list_multiplier"),
+                    Some(&ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number("2".into())));
+                assert!(
+                    ip.source_raw_object_fields("ZoneGroup", "G2")?
+                        .get("zone_list_multiplier")
+                        .is_none(),
+                    "an absent numeric stays absent until the genuine Group getter applies default1"
+                );
+            }
             // Unit95: People uses the same retained ordered list input. All
             // three sizing operands stay authored for the genuine People getter.
             for method in ["People", "People/Area", "Area/Person"] {

@@ -6,6 +6,7 @@
 mod environment;
 mod settings;
 mod surface_pairs;
+mod zone_groups;
 
 use ep_compiler::CompileReport;
 use ep_model::{
@@ -110,6 +111,10 @@ pub fn inspect_porting_scope(
                 .is_some_and(|rows| !rows.is_empty())
             || raw
                 .objects
+                .get(&ep_raw_model::ObjectType("ZoneGroup".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            || raw
+                .objects
                 .get(&ep_raw_model::ObjectType("Space".into()))
                 .is_some_and(|rows| !rows.is_empty())
             || raw
@@ -131,6 +136,15 @@ pub fn inspect_porting_scope(
             .push("Exterior:Lights (external meter only; excluded from zone heat sources)".into());
     }
     if let Some(model) = model {
+        if scope == PortingScope::A
+            && (!model.zone_groups.is_empty()
+                || raw
+                    .objects
+                    .get(&ep_raw_model::ObjectType("ZoneGroup".into()))
+                    .is_some_and(|rows| !rows.is_empty()))
+        {
+            zone_groups::validate(raw, model, &mut violations);
+        }
         if scope == PortingScope::A
             && raw
                 .objects
@@ -230,7 +244,8 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Schedule:Year"
             | "RunPeriodControl:DaylightSavingTime"
             | "RunPeriodControl:SpecialDays"
-    ) || (scope == PortingScope::A && matches!(kind, "ZoneList" | "Space" | "SpaceList"))
+    ) || (scope == PortingScope::A
+        && matches!(kind, "ZoneList" | "ZoneGroup" | "Space" | "SpaceList"))
         || (scope == PortingScope::B
             && matches!(
                 kind,
@@ -719,11 +734,20 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         if zone.multiplier == 0 || zone.multiplier > i32::MAX as u32 {
             violations.push("zone multiplier must fit a positive Native signed int".into());
         }
-        if zone.list_multiplier != 1 {
+        if (scope != PortingScope::A || model.zone_groups.is_empty())
+            && (zone.list_multiplier != 1 || zone.list_group.is_some())
+        {
             violations.push(
-                "ZoneGroup/list multipliers other than one remain outside the selected inputs"
-                    .into(),
+                "ZoneGroup/list factors require a real validated Source A group assignment".into(),
             );
+        }
+        if i32::try_from(zone.multiplier)
+            .ok()
+            .zip(i32::try_from(zone.list_multiplier).ok())
+            .and_then(|(zone, list)| zone.checked_mul(list))
+            .is_none_or(|factor| factor < 1)
+        {
+            violations.push("Zone/group multiplier product must fit a positive Native int".into());
         }
         if !matches!(
             zone.inside_convection_algorithm.effective(),

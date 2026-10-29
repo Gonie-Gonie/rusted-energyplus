@@ -3,6 +3,29 @@
 use super::{SchemaAutomatic, SchemaDefault, SchemaDefinition, SchemaField};
 pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
     Some(match name {
+        "ZoneGroup" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "zone_list_name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "zone_list_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "SpaceList" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

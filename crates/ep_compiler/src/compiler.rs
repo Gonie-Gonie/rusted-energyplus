@@ -687,6 +687,7 @@ impl<'a> Compiler<'a> {
             model.other_equipment_names = NameMap::source_exact_namespace();
             model.people_names = NameMap::source_exact_namespace();
             model.zone_list_names = NameMap::source_exact_namespace();
+            model.zone_group_names = NameMap::source_exact_namespace();
             model.authored_space_names = NameMap::source_exact_namespace();
             model.space_type_names = NameMap::source_exact_namespace();
             model.space_list_names = NameMap::source_exact_namespace();

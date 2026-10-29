@@ -122,6 +122,7 @@ pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsIn
     for family in [
         "People",
         "ZoneList",
+        "ZoneGroup",
         "Space",
         "SpaceList",
         "ComfortViewFactorAngles",

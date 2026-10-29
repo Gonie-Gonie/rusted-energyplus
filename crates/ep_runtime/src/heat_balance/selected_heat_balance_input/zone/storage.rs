@@ -319,6 +319,26 @@ pub(crate) struct SelectedSpaceListData {
     pub(crate) typed_space_list_id: Option<ep_model::SpaceListId>,
 }
 
+/// Native DataHeatBalance.hh729-735; the referenced List number is independent
+/// of this owner's Group ordinal and retained typed identity.
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SelectedZoneGroupData {
+    pub(crate) name: String,
+    pub(crate) zone_list: i32,
+    pub(crate) multiplier: i32,
+    pub(crate) typed_zone_group_id: Option<ep_model::ZoneGroupId>,
+}
+impl Default for SelectedZoneGroupData {
+    fn default() -> Self {
+        Self {
+            name: String::new(),
+            zone_list: 0,
+            multiplier: 1,
+            typed_zone_group_id: None,
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedZoneInputOwners {
     pub(crate) zones: Option<Vec<SelectedZoneData>>,
@@ -333,6 +353,7 @@ pub(crate) struct SelectedZoneInputOwners {
     pub(crate) zone_lists: Option<Vec<SelectedZoneListData>>,
     pub(crate) num_zone_lists: i32,
     pub(crate) num_zone_groups: i32,
+    pub(crate) zone_groups: Option<Vec<SelectedZoneGroupData>>,
 }
 
 // The two full literal declaration/constructor translations are appended by

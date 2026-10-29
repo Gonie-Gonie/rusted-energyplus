@@ -36,7 +36,6 @@ impl SelectedZoneInputOwners {
             || spaces.len() != model.spaces.len()
             || i32::try_from(zones.len()).ok() != Some(globals.num_of_zones)
             || (allocation.len() != spaces.len() && allocation.len() != zones.len() + authored)
-            || self.num_zone_groups != 0
             || allocation[active..].iter().any(|row| {
                 row.typed_space_id.is_some() || row.zone_num != 0 || !row.name.is_empty()
             })
@@ -143,6 +142,19 @@ impl SelectedZoneInputOwners {
         {
             return Err(Error::Unavailable(
                 "unbound actual Source ZoneList identity",
+            ));
+        }
+        let group_ids = self.source_zone_group_ids(model)?;
+        if self
+            .zone_groups
+            .as_deref()
+            .unwrap_or(&[])
+            .iter()
+            .zip(group_ids)
+            .any(|(group, id)| group.typed_zone_group_id != Some(id))
+        {
+            return Err(Error::Unavailable(
+                "unbound actual Source ZoneGroup identity",
             ));
         }
         let space_list_ids = self.source_space_list_ids(model)?;

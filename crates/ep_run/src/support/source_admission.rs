@@ -9,7 +9,7 @@ pub(crate) struct SourceSupportAdmission {
     /// Exact local alpha fields consumed by genuine GetZoneData and the live
     /// owning-Zone dispatchers. This is not a general Zone-feature exemption.
     zone_convection_overrides_consumed: bool,
-    /// Source A bounded Zones, ZoneLists and whole-Zone authored Spaces use
+    /// Source A bounded Zones, lists, groups and whole-Zone authored Spaces use
     /// their own class without inheriting the frozen one-Zone capability.
     multizone_consumed: bool,
 }
@@ -88,8 +88,9 @@ impl SourceSupportAdmission {
         }
         let covered_objects = [
             "HeatBalanceAlgorithm",
-            // Real GetZoneData/GetSpaceData and ZoneList demand owners, not a fixed one-Zone capability.
+            // Real GetZoneData/GetSpaceData and list/group demand owners.
             "ZoneList",
+            "ZoneGroup",
             "Space",
             "SpaceList",
             // Ordered IRT getter/ROnly CTF properties; the same raw resolver
@@ -157,6 +158,10 @@ impl SourceSupportAdmission {
                     || raw
                         .objects
                         .get(&ObjectType("ZoneList".into()))
+                        .is_some_and(|rows| !rows.is_empty())
+                    || raw
+                        .objects
+                        .get(&ObjectType("ZoneGroup".into()))
                         .is_some_and(|rows| !rows.is_empty())
                     || raw
                         .objects

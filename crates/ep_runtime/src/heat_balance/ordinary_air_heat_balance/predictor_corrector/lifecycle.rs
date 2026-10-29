@@ -44,6 +44,19 @@ pub(crate) trait SourceZoneAirRegistrationChildren {
         backend: &mut SourceErrorBackend<'_>,
         eio: &mut dyn std::io::Write,
     ) -> Result<(), Error>;
+    fn register_zone_group(
+        &mut self,
+        number: i32,
+        name: &str,
+        reports: &SourceZoneListGroupLoadReports,
+        clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
+        input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        eio: &mut dyn std::io::Write,
+    ) -> Result<(), Error>;
     fn register_air(
         &mut self,
         number: i32,

@@ -115,7 +115,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
         let row = Row {
             number,
             space: false,
-            record: Record::ZoneList(reports),
+            record: Record::ZoneListGroup(reports),
         };
         for (field, variable, units, store) in [
             (
@@ -139,6 +139,69 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceZoneAirRegist
             (
                 Field::ZoneListSensibleCoolingRate,
                 "Zone List Sensible Cooling Rate",
+                Units::W,
+                Store::Average,
+            ),
+        ] {
+            self.declare(
+                &row,
+                Declaration {
+                    field,
+                    name: variable,
+                    key: name,
+                    units,
+                    store,
+                    options: SourceRealRegistrationOptions::unmetered(TimeStepKind::System),
+                },
+                clock,
+                reporting_diagnostic_flags,
+                input,
+                backend,
+                eio,
+            )?;
+        }
+        Ok(())
+    }
+    fn register_zone_group(
+        &mut self,
+        number: i32,
+        name: &str,
+        reports: &SourceZoneListGroupLoadReports,
+        clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
+        input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        eio: &mut dyn Write,
+    ) -> Result<(), Error> {
+        let row = Row {
+            number,
+            space: false,
+            record: Record::ZoneListGroup(reports),
+        };
+        for (field, variable, units, store) in [
+            (
+                Field::ZoneGroupSensibleHeatingEnergy,
+                "Zone Group Sensible Heating Energy",
+                Units::J,
+                Store::Sum,
+            ),
+            (
+                Field::ZoneGroupSensibleCoolingEnergy,
+                "Zone Group Sensible Cooling Energy",
+                Units::J,
+                Store::Sum,
+            ),
+            (
+                Field::ZoneGroupSensibleHeatingRate,
+                "Zone Group Sensible Heating Rate",
+                Units::W,
+                Store::Average,
+            ),
+            (
+                Field::ZoneGroupSensibleCoolingRate,
+                "Zone Group Sensible Cooling Rate",
                 Units::W,
                 Store::Average,
             ),

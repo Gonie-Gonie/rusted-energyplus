@@ -1042,6 +1042,660 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             );
             assert_eq!(&after[1..], &before[1..]);
         }
+        // Unit100: genuine shared-IP Groups, after the unchanged no-Group table.
+        // JSON-map G2/G10 order and the retained IDF declaration overlay differ;
+        // an earlier unused list keeps ListNum independent from GroupNum.
+        for source_is_epjson in [true, false] {
+            // Modes4/5 corrupt the stored postconversion JSON kind; actual IDF
+            // authored2.0/2e0 are converted to integer2 before this IP stage.
+            for mode in 0..8 {
+                if total == 1 && matches!(mode, 2 | 3) {
+                    continue;
+                }
+                use crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::{
+                    SourceZoneAirPredictorCorrector, SourceZoneAirRegistrationChildren,
+                    SourceZoneListGroupLoadReports,
+                };
+                use crate::heat_balance::selected_input_processor::{
+                    SourceInputStatisticsInput, SourceInputStatisticsValue as V,
+                };
+                use crate::heat_balance::source_output_registration::{
+                    SourceAirOutputField as F, SourceOutputStoreType, SourceRealOutputTarget,
+                    TimeStepKind,
+                };
+                let mut grouped = model.clone();
+                grouped.zone_lists.clear();
+                grouped.zone_list_names = ep_model::NameMap::source_exact_namespace();
+                grouped.zone_groups.clear();
+                grouped.zone_group_names = ep_model::NameMap::source_exact_namespace();
+                for zone in &mut grouped.zones {
+                    zone.list_group = None;
+                    zone.list_multiplier = 1;
+                }
+                let mut group_raw = raw.clone();
+                group_raw.source_is_epjson = source_is_epjson;
+                for zone in group_raw.objects.get_mut("Zone").ok_or("real Zones")? {
+                    if !source_is_epjson {
+                        zone.idf_max_fields = Some(13);
+                    }
+                }
+                if mode == 6 {
+                    grouped.zones[0].multiplier = 2;
+                    group_raw.objects.get_mut("Zone").ok_or("real Zones")?[0]
+                        .fields
+                        .insert(
+                            "multiplier".into(),
+                            crate::selected_project_data::ProjectInputValue::Number(2.0),
+                        );
+                }
+                let json_lists = ["A UNUSED2", "L2", "L10"];
+                let list_order = if source_is_epjson {
+                    vec!["A UNUSED2", "L2", "L10"]
+                } else {
+                    vec!["L10", "A UNUSED2", "L2"]
+                };
+                let mut list_fields = BTreeMap::new();
+                for (ordinal, name) in list_order.iter().enumerate() {
+                    let members = match *name {
+                        "L2" if mode == 7 => Vec::new(),
+                        "L2" => vec![0],
+                        "L10" if total > 1 => {
+                            if mode == 3 {
+                                (0..total).rev().collect::<Vec<_>>()
+                            } else {
+                                (1..total).rev().collect::<Vec<_>>()
+                            }
+                        }
+                        _ => (0..total).collect::<Vec<_>>(),
+                    };
+                    let id = ep_model::ZoneListId(u32::try_from(ordinal)?);
+                    assert!(grouped.zone_list_names.insert(name, id).is_none());
+                    grouped.zone_lists.push(ep_model::ZoneList {
+                        id,
+                        name: ep_model::NormalizedName::new(name),
+                        zones: members.iter().map(|&at| grouped.zones[at].id).collect(),
+                        max_zone_name_length: if members.is_empty() { 0 } else { 6 },
+                    });
+                    let values = members
+                        .iter()
+                        .map(|&at| {
+                            V::Object(BTreeMap::from([(
+                                "zone_name".into(),
+                                V::String(grouped.zones[at].name.0.clone()),
+                            )]))
+                        })
+                        .collect::<Vec<_>>();
+                    let mut fields = BTreeMap::from([("zones".into(), V::Array(values.clone()))]);
+                    if !source_is_epjson {
+                        fields.insert(
+                            "idf_max_fields".into(),
+                            V::Number((1 + members.len()).to_string()),
+                        );
+                        fields.insert(
+                            "idf_max_extensible_fields".into(),
+                            V::Number(members.len().to_string()),
+                        );
+                    }
+                    list_fields.insert((*name).to_owned(), fields);
+                }
+                let g2 = if source_is_epjson { " G2 " } else { "G2" };
+                let g10 = if source_is_epjson { " G10 " } else { "G10" };
+                let json_groups = if total == 1 { vec![g2] } else { vec![g2, g10] };
+                let group_order = if source_is_epjson {
+                    json_groups.clone()
+                } else {
+                    json_groups.iter().rev().copied().collect::<Vec<_>>()
+                };
+                let mut group_fields = BTreeMap::new();
+                for (ordinal, name) in group_order.iter().enumerate() {
+                    let reference = if *name == g2 {
+                        if mode == 1 { " MISSING100 " } else { "L2" }
+                    } else if mode == 2 {
+                        "L2"
+                    } else {
+                        "L10"
+                    };
+                    let multiplier = if *name == g2 {
+                        if mode == 6 { i32::MAX as u32 } else { 3 }
+                    } else {
+                        1
+                    };
+                    let typed_reference = if *name == g2 { "L2" } else { "L10" };
+                    let list_id = grouped
+                        .zone_list_names
+                        .resolve(typed_reference)
+                        .ok_or("real typed group list")?;
+                    let id = ep_model::ZoneGroupId(u32::try_from(ordinal)?);
+                    assert!(grouped.zone_group_names.insert(name, id).is_none());
+                    grouped.zone_groups.push(ep_model::ZoneGroup {
+                        id,
+                        name: ep_model::NormalizedName((*name).into()),
+                        zone_list: list_id,
+                        multiplier,
+                    });
+                    for zone_id in &grouped
+                        .zone_lists
+                        .iter()
+                        .find(|list| list.id == list_id)
+                        .ok_or("typed list")?
+                        .zones
+                    {
+                        // Invalid overlap mode deliberately reaches the Native
+                        // diagnostic body; it is never a Source-admission claim.
+                        let zone = grouped
+                            .zones
+                            .iter_mut()
+                            .find(|z| z.id == *zone_id)
+                            .ok_or("typed Zone")?;
+                        if zone.list_group.is_none() {
+                            zone.list_group = Some(list_id);
+                            zone.list_multiplier = multiplier;
+                        }
+                    }
+                    let mut fields = BTreeMap::from([
+                        ("zone_list_name".into(), V::String(reference.into())),
+                        ("unconsumed_metadata".into(), V::Bool(true)),
+                    ]);
+                    if *name == g2 {
+                        fields.insert(
+                            "zone_list_multiplier".into(),
+                            V::Number(match mode {
+                                4 => "2.0".into(),
+                                5 => "2e0".into(),
+                                _ => multiplier.to_string(),
+                            }),
+                        );
+                    }
+                    if !source_is_epjson {
+                        fields.insert(
+                            "idf_max_fields".into(),
+                            V::Number(if *name == g2 { "3" } else { "2" }.into()),
+                        );
+                    }
+                    group_fields.insert((*name).to_owned(), fields);
+                }
+                let group_variables = [
+                    (
+                        "Zone Group Sensible Heating Energy",
+                        F::ZoneGroupSensibleHeatingEnergy,
+                    ),
+                    (
+                        "Zone Group Sensible Cooling Energy",
+                        F::ZoneGroupSensibleCoolingEnergy,
+                    ),
+                    (
+                        "Zone Group Sensible Heating Rate",
+                        F::ZoneGroupSensibleHeatingRate,
+                    ),
+                    (
+                        "Zone Group Sensible Cooling Rate",
+                        F::ZoneGroupSensibleCoolingRate,
+                    ),
+                ];
+                let mut requested = ep_model::ReportInputs::default();
+                for name in &group_order {
+                    for (variable, _) in group_variables {
+                        requested
+                            .output_variables
+                            .push(ep_model::SourceOutputVariableInput {
+                                object_name: format!(
+                                    "GROUP REQUEST {:02}",
+                                    requested.output_variables.len()
+                                ),
+                                key: (*name).into(),
+                                variable_name: variable.into(),
+                                reporting_frequency: "TIMESTEP".into(),
+                                schedule_name: String::new(),
+                                alpha_blank: [false, false, false, true],
+                                default_applied: [false; 4],
+                                num_alphas: 3,
+                                is_epjson: source_is_epjson,
+                            });
+                    }
+                }
+                let definitions = [
+                    ("Zone", 4, 9, 0, None),
+                    ("ZoneList", 1, 0, 1, Some("zones")),
+                    ("ZoneGroup", 2, 1, 0, None),
+                    ("Output:Variable", 4, 0, 0, None),
+                ]
+                .into_iter()
+                .map(|(name, a, n, ext, extension)| SourceObjectDefinition {
+                    object_type: name.into(),
+                    alpha_fields: a,
+                    numeric_fields: n,
+                    alpha_extensions: ext,
+                    numeric_extensions: 0,
+                    extension: extension.map(str::to_owned),
+                })
+                .collect();
+                let zone_fields = group_raw.objects["Zone"]
+                    .iter()
+                    .map(|row| (row.object_name.clone(), BTreeMap::new()))
+                    .collect::<BTreeMap<_, _>>();
+                let request_fields = requested
+                    .output_variables
+                    .iter()
+                    .map(|row| (row.object_name.clone(), BTreeMap::new()))
+                    .collect::<BTreeMap<_, _>>();
+                // Real IP custody checks every retained field, including raw
+                // metadata. Derive shapes from those same original values.
+                let field_sizes = |fields: &BTreeMap<String, V>| {
+                    fields
+                        .iter()
+                        .map(|(name, value)| {
+                            let size = match value {
+                                V::Null => 0,
+                                V::Array(rows) => rows.len(),
+                                V::Object(fields) => fields.len(),
+                                _ => 1,
+                            };
+                            (name.clone(), size)
+                        })
+                        .collect::<BTreeMap<_, _>>()
+                };
+                let families = BTreeMap::from([
+                    (
+                        "Zone".into(),
+                        SourceInputFamily::Objects(
+                            group_raw.objects["Zone"]
+                                .iter()
+                                .map(|row| SourceObjectShape {
+                                    object_name: row.object_name.clone(),
+                                    field_sizes: BTreeMap::new(),
+                                })
+                                .collect(),
+                        ),
+                    ),
+                    (
+                        "ZoneList".into(),
+                        SourceInputFamily::Objects(
+                            json_lists
+                                .iter()
+                                .map(|name| SourceObjectShape {
+                                    object_name: (*name).into(),
+                                    field_sizes: field_sizes(&list_fields[*name]),
+                                })
+                                .collect(),
+                        ),
+                    ),
+                    (
+                        "ZoneGroup".into(),
+                        SourceInputFamily::Objects(
+                            json_groups
+                                .iter()
+                                .map(|name| SourceObjectShape {
+                                    object_name: (*name).into(),
+                                    field_sizes: field_sizes(&group_fields[*name]),
+                                })
+                                .collect(),
+                        ),
+                    ),
+                    (
+                        "Output:Variable".into(),
+                        SourceInputFamily::Objects(
+                            requested
+                                .output_variables
+                                .iter()
+                                .map(|row| SourceObjectShape {
+                                    object_name: row.object_name.clone(),
+                                    field_sizes: BTreeMap::new(),
+                                })
+                                .collect(),
+                        ),
+                    ),
+                ]);
+                let mut ip = SelectedInputProcessor::from_admitted_input(definitions, families)?;
+                ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                    objects: BTreeMap::from([
+                        ("Zone".into(), zone_fields),
+                        ("ZoneList".into(), list_fields),
+                        ("ZoneGroup".into(), group_fields),
+                        ("Output:Variable".into(), request_fields),
+                    ]),
+                    object_order: BTreeMap::from([
+                        (
+                            "Zone".into(),
+                            group_raw.objects["Zone"]
+                                .iter()
+                                .map(|z| z.object_name.clone())
+                                .collect(),
+                        ),
+                        (
+                            "ZoneList".into(),
+                            list_order.iter().map(|name| (*name).into()).collect(),
+                        ),
+                        (
+                            "ZoneGroup".into(),
+                            group_order.iter().map(|name| (*name).into()).collect(),
+                        ),
+                        (
+                            "Output:Variable".into(),
+                            requested
+                                .output_variables
+                                .iter()
+                                .map(|row| row.object_name.clone())
+                                .collect(),
+                        ),
+                    ]),
+                })?;
+                let mut shortcut = SourceInputProcessorShortCut::default();
+                shortcut.allocate_from_input(&ip)?;
+                let mut actual = SelectedZoneInputOwners::default();
+                let mut globals = SelectedHeatBalanceGlobals::default();
+                let mut registration = SourceOutputRegistration::default();
+                let mut prescan = SourceOutputPreScan::default();
+                let (mut errors, mut console, mut eio, mut eso) =
+                    (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+                error_state.output_error_header = false;
+                let mut backend = SourceErrorBackend {
+                    state: &mut error_state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                for name in &group_order {
+                    for (variable, _) in group_variables {
+                        prescan.add_record(name, variable, &mut backend)?;
+                    }
+                }
+                let severe_before = backend.state.tracking.total_severe_errors;
+                let mut found = false;
+                let result = actual.get_zone_data(
+                    &group_raw,
+                    &control,
+                    &grouped,
+                    &mut ZoneGetterOwners {
+                        input: &mut ip,
+                        shortcut: &mut shortcut,
+                        globals: &mut globals,
+                        output: &mut registration,
+                        prescan: &prescan,
+                        report_input: &requested,
+                        minimum_report_frequency: "",
+                        developer: &developer,
+                        clock: Some(&clock),
+                        backend: &mut backend,
+                        minutes_in_time_step: clock.minutes_in_time_step,
+                        host: &mut files,
+                        eio: &mut eio,
+                    },
+                    &mut found,
+                );
+                assert!(
+                    !group_raw.objects.contains_key("ZoneGroup"),
+                    "No duplicate heat-balance raw projection"
+                );
+                if matches!(mode, 4..=6) {
+                    assert!(result.is_err());
+                    continue;
+                }
+                result?;
+                assert_eq!(actual.num_zone_groups, i32::try_from(group_order.len())?);
+                let groups = actual.zone_groups.as_ref().ok_or("real Group allocation")?;
+                assert_eq!(
+                    groups.iter().map(|g| g.name.as_str()).collect::<Vec<_>>(),
+                    group_order
+                );
+                assert!(
+                    group_order
+                        .iter()
+                        .all(|name| !ip.is_object_unused("ZoneGroup", name))
+                );
+                if mode != 0 {
+                    assert!(found);
+                    assert_eq!(
+                        backend.state.tracking.total_severe_errors - severe_before,
+                        if mode == 2 { 2 } else { 1 }
+                    );
+                    assert!(groups.iter().all(|g| g.typed_zone_group_id.is_none()));
+                    if mode == 1 {
+                        let missing = groups
+                            .iter()
+                            .find(|g| g.name == g2)
+                            .ok_or("missing reference owner")?;
+                        assert_eq!(missing.zone_list, 0);
+                        assert_eq!(missing.multiplier, 3);
+                    }
+                    let text = String::from_utf8_lossy(&errors);
+                    if mode == 2 {
+                        assert!(
+                            text.find("already used by ZoneGroup")
+                                .ok_or("duplicate list diagnostic")?
+                                < text
+                                    .find("already exists in ZoneList")
+                                    .ok_or("overlap diagnostic")?
+                        );
+                        assert!(text.contains("Previous ZoneList=L2"));
+                    }
+                    if mode == 3 {
+                        assert!(
+                            text.contains("Previous ZoneList=")
+                                && !text.contains("already used by ZoneGroup")
+                        );
+                    }
+                    if mode == 7 {
+                        assert!(
+                            text.contains("No zones specified.") && !text.contains("ZoneGroup=")
+                        );
+                        let group = groups
+                            .iter()
+                            .find(|g| g.name == g2)
+                            .ok_or("retained Group targeting empty list")?;
+                        assert_eq!(group.multiplier, 3);
+                        assert!(group.zone_list > 0);
+                        let empty = &actual.zone_lists.as_ref().ok_or("actual empty list")?
+                            [usize::try_from(group.zone_list - 1)?];
+                        assert_eq!(empty.name, "L2");
+                        assert_eq!(empty.num_of_zones, 0);
+                        assert!(empty.zone.is_none());
+                        assert_eq!(
+                            actual.zones.as_ref().ok_or("actual unassigned Zone")?[0].list_group,
+                            0
+                        );
+                        assert_eq!(
+                            globals.num_spaces,
+                            i32::try_from(total)?,
+                            "Native still appends real default Spaces after diagnostics"
+                        );
+                    }
+                    continue;
+                }
+                assert!(!found);
+                assert_eq!(
+                    actual.source_zone_group_ids(&grouped)?.len(),
+                    group_order.len()
+                );
+                actual.source_implicit_space_ids(&grouped, &globals)?;
+                let lists = actual.zone_lists.as_ref().ok_or("real Lists")?;
+                for (ordinal, group) in groups.iter().enumerate() {
+                    let typed = &grouped.zone_groups[ordinal];
+                    assert_eq!(group.typed_zone_group_id, Some(typed.id));
+                    let list_at = lists
+                        .iter()
+                        .position(|list| list.typed_zone_list_id == Some(typed.zone_list))
+                        .ok_or("actual referenced list")?;
+                    assert_eq!(group.zone_list, i32::try_from(list_at + 1)?);
+                    for number in lists[list_at].zone.as_ref().ok_or("real members")? {
+                        let z = &actual.zones.as_ref().ok_or("real Zones")?
+                            [usize::try_from(number - 1)?];
+                        assert_eq!(z.list_group, group.zone_list);
+                        assert_eq!(z.list_multiplier, group.multiplier);
+                    }
+                }
+                if source_is_epjson {
+                    assert_eq!(groups[0].zone_list, 2);
+                    assert_ne!(groups[0].zone_list, 1);
+                }
+                assert_eq!(
+                    shortcut.numeric_args[0],
+                    if *group_order.last().ok_or("group order")? == g2 {
+                        3.0
+                    } else {
+                        1.0
+                    }
+                );
+                assert_eq!(
+                    shortcut.numeric_field_blanks[0],
+                    *group_order.last().ok_or("group order")? != g2
+                );
+                assert_eq!(
+                    shortcut.numeric_field_names[0],
+                    if source_is_epjson {
+                        "zone_list_multiplier"
+                    } else {
+                        "Zone List Multiplier"
+                    }
+                );
+                let mut corrupt = actual.clone();
+                corrupt.zone_groups.as_mut().ok_or("real Group")?[0].zone_list = 0;
+                assert!(corrupt.source_zone_group_ids(&grouped).is_err());
+                let mut corrupt = actual.clone();
+                corrupt.zones.as_mut().ok_or("real Zone")?[0].list_group = 1;
+                assert!(corrupt.source_zone_group_ids(&grouped).is_err());
+                let mut controller = SourceZoneAirPredictorCorrector::default();
+                controller.demand.zones = Some(vec![Default::default(); total]);
+                for (at, demand) in controller
+                    .demand
+                    .zones
+                    .as_mut()
+                    .ok_or("real demand")?
+                    .iter_mut()
+                    .enumerate()
+                {
+                    let n = f64::from(u32::try_from(at + 1)?);
+                    demand.air_sys_heat_energy = n * 10.0;
+                    demand.air_sys_cool_energy = n * 20.0;
+                    demand.air_sys_heat_rate = if total == 3 {
+                        [5.0e15, -2.5e15, 0.5][at]
+                    } else {
+                        n
+                    };
+                    demand.air_sys_cool_rate = n * 3.0;
+                }
+                for (at, z) in actual
+                    .zones
+                    .as_mut()
+                    .ok_or("real Zones")?
+                    .iter_mut()
+                    .enumerate()
+                {
+                    z.multiplier = if at == 1 { 4 } else { 2 };
+                    z.list_multiplier = 17;
+                }
+                let mut reports = SourceZoneListGroupLoadReports {
+                    list_heat_energy: Some(vec![999.0; 3]),
+                    list_cool_energy: Some(vec![999.0; 3]),
+                    list_heat_rate: Some(vec![999.0; 3]),
+                    list_cool_rate: Some(vec![999.0; 3]),
+                    group_heat_energy: Some(vec![999.0; group_order.len()]),
+                    group_cool_energy: Some(vec![999.0; group_order.len()]),
+                    group_heat_rate: Some(vec![999.0; group_order.len()]),
+                    group_cool_rate: Some(vec![999.0; group_order.len()]),
+                };
+                crate::heat_balance::ordinary_hvac_manager::SourceHvacManager::sum_source_zone_list_loads(&actual,&controller.demand,&mut reports)?;
+                let once = reports.clone();
+                crate::heat_balance::ordinary_hvac_manager::SourceHvacManager::sum_source_zone_list_loads(&actual,&controller.demand,&mut reports)?;
+                assert_eq!(
+                    reports, once,
+                    "Lists reset and Groups assign, never accumulate"
+                );
+                for (ordinal, group) in actual
+                    .zone_groups
+                    .as_ref()
+                    .ok_or("Groups")?
+                    .iter()
+                    .enumerate()
+                {
+                    let at = usize::try_from(group.zone_list - 1)?;
+                    for (list, group_values) in [
+                        (&reports.list_heat_energy, &reports.group_heat_energy),
+                        (&reports.list_cool_energy, &reports.group_cool_energy),
+                        (&reports.list_heat_rate, &reports.group_heat_rate),
+                        (&reports.list_cool_rate, &reports.group_cool_rate),
+                    ] {
+                        assert_eq!(
+                            group_values.as_ref().ok_or("real Group cell")?[ordinal],
+                            list.as_ref().ok_or("real referenced List cell")?[at]
+                                * f64::from(group.multiplier)
+                        );
+                    }
+                }
+                if total == 3 {
+                    let groups = actual.zone_groups.as_ref().ok_or("Groups")?;
+                    let rates = reports
+                        .group_heat_rate
+                        .as_ref()
+                        .ok_or("real nonzero Group rates")?;
+                    let g2_at = groups
+                        .iter()
+                        .position(|g| g.name == g2)
+                        .ok_or("actual G2")?;
+                    let g10_at = groups
+                        .iter()
+                        .position(|g| g.name == g10)
+                        .ok_or("actual G10")?;
+                    assert_eq!(rates[g2_at], 3.0e16);
+                    assert_eq!(rates[g10_at], -1.0e16);
+                    let unused = actual
+                        .zone_lists
+                        .as_ref()
+                        .ok_or("real Lists")?
+                        .iter()
+                        .position(|list| list.name == "A UNUSED2")
+                        .ok_or("unused earlier List")?;
+                    assert_eq!(
+                        reports
+                            .list_heat_rate
+                            .as_ref()
+                            .ok_or("ordered unused list")?[unused],
+                        1.0
+                    );
+                }
+                let mut vars = Vec::new();
+                let mut dictionary=crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams {eso:Some(&mut eso),sqlite_present:false,results_framework_output_variables:&mut vars};
+                {
+                    let mut host=crate::heat_balance::ordinary_air_heat_balance::output_registration::SourceInitAirOutputHost {registration:&mut registration,prescan:&prescan,reports:&requested,minimum_report_frequency:"",host:&mut files,dictionary_host:&mut dictionary};
+                    for (at, name) in group_order.iter().enumerate() {
+                        host.register_zone_group(
+                            i32::try_from(at + 1)?,
+                            name,
+                            &reports,
+                            &clock,
+                            None,
+                            &mut ip,
+                            &mut backend,
+                            &mut eio,
+                        )?;
+                    }
+                }
+                assert_eq!(registration.out_vars.len(), group_order.len() * 4);
+                let air =
+                    crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance::default();
+                let fan=crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+                let air_report=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::simple_air::SourceAirReportOutputOwners {controller:&controller};
+                let resilience=crate::heat_balance::ordinary_surface_management::SourceResilienceOutputOwners {zones:&actual};
+                let read=|reports:&SourceZoneListGroupLoadReports| -> Result<Vec<f64>,Box<dyn std::error::Error>> {
+                    let owners=crate::heat_balance::ordinary_air_heat_balance::output_registration::SourceAirOutputOwners {air:&air,demand:&controller.demand,fan:&fan,zone_lists:reports,report:&air_report,resilience:&resilience};
+                    registration.out_vars.iter().enumerate().map(|(index,row)| {assert!(row.report);assert_eq!(row.time_step_type,TimeStepKind::System);assert_eq!(row.store_type,if row.name.ends_with("Energy") {SourceOutputStoreType::Sum}else{SourceOutputStoreType::Average});let (variable,field)=group_variables[index%4];assert_eq!(row.name,variable);assert_eq!(row.key,group_order[index/4]);assert_eq!(row.which,Some(SourceRealOutputTarget::Air {field,index:i32::try_from(index/4+1)?,space:false}));Ok(*registration.read_registered_real(index,&owners)?)}).collect()
+                };
+                let before = read(&reports)?;
+                reports
+                    .group_heat_energy
+                    .as_mut()
+                    .ok_or("actual mutable Group cell")?[0] += 7.0;
+                let after = read(&reports)?;
+                assert_eq!(after[0], before[0] + 7.0);
+                assert_eq!(&after[1..], &before[1..]);
+                assert!(errors.is_empty() && console.is_empty());
+            }
+        }
+
         // Unit97/98: real raw GetSpaceData, independent doj JSON-map Space order,
         // mixed authored/default ownership and retained constructor tail.
         for (authored_count, list_mode, source_is_epjson) in [
