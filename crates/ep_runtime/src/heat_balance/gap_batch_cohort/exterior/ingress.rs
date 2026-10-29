@@ -620,6 +620,7 @@ impl GainFactory {
             }
         }
         let mut zone_backend = error_backend(&mut error_state, &mut errors, &mut console);
+        let mut zone_errors_found = false;
         zones.get_zone_data(
             &SelectedHeatBalanceInput {
                 source_is_epjson: false,
@@ -643,6 +644,7 @@ impl GainFactory {
                 host: &mut files,
                 eio: &mut eio,
             },
+            &mut zone_errors_found,
         )?;
         let inventory = object(member(factory, "raw")?)?
             .iter()

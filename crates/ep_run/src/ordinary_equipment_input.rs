@@ -34,6 +34,7 @@ mod infrared;
 mod multizone;
 mod people;
 mod source_b;
+mod zone_lists;
 use fields::{admitted_field, required_fields};
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
@@ -57,8 +58,13 @@ fn resolve_raw(
 ) -> Result<OrdinaryEquipmentInput, String> {
     let source_multizone_ingress =
         source_calendar_ingress && !source_b_ingress && multizone::has_multiple_zones(raw);
-    if source_multizone_ingress {
+    let source_zone_list_ingress =
+        source_calendar_ingress && !source_b_ingress && zone_lists::positive(raw);
+    if source_multizone_ingress || source_zone_list_ingress {
         multizone::validate(raw)?;
+    }
+    if source_zone_list_ingress {
+        zone_lists::validate(raw)?;
     }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
@@ -125,7 +131,8 @@ fn resolve_raw(
                 | "Schedule:Constant"
                 | "ZoneAirHeatBalanceAlgorithm"
                 | "Output:Variable"
-        ) && !source_b_family
+        ) && !(source_zone_list_ingress && family.0 == "ZoneList")
+            && !source_b_family
             && !source_irt_family
             && !source_calendar_family
             && !source_compact_family
@@ -172,6 +179,7 @@ fn resolve_raw(
                 && matches!(
                     family.0.as_str(),
                     "OtherEquipment"
+                        | "ZoneList"
                         | "ScheduleTypeLimits"
                         | "Schedule:Constant"
                         | "Schedule:Compact"
@@ -299,6 +307,7 @@ fn resolve_raw(
                                     | "customday2_schedule_day_name"
                             ),
                             "Schedule:Week:Compact" => field.0 != "data",
+                            "ZoneList" if source_zone_list_ingress => field.0 != "zones",
                             "OtherEquipment" => !matches!(
                                 field.0.as_str(),
                                 "fuel_type"
@@ -360,10 +369,12 @@ fn resolve_raw(
                 {
                     !matches!(field(object, required), Some(RawValue::String(_)))
                 } else if source_calendar_ingress
-                    && matches!(
+                    && (matches!(
                         (family.0.as_str(), required),
                         ("Exterior:Lights" | "OtherEquipment", "schedule_name")
-                    )
+                    ) || (source_zone_list_ingress
+                        && family.0 == "OtherEquipment"
+                        && required == "zone_or_zonelist_or_space_or_spacelist_name"))
                 {
                     !matches!(field(object, required), Some(RawValue::String(value)) if !value.is_empty())
                 } else {
@@ -642,14 +653,18 @@ fn resolve_raw(
         if let Some(objects) = raw.objects.get(&ObjectType(family.into())) {
             for object in objects.values() {
                 if family == "OtherEquipment"
-                    && !text(object, "zone_or_zonelist_or_space_or_spacelist_name").is_some_and(
-                        |name| {
-                            (source_multizone_ingress || zones.len() == 1)
-                                && zones.keys().any(|zone| name.eq_ignore_ascii_case(&zone.0))
-                        },
-                    )
+                    && !match field(object, "zone_or_zonelist_or_space_or_spacelist_name") {
+                        Some(RawValue::String(name)) if source_zone_list_ingress => {
+                            zone_lists::other_equipment_target(raw, name)
+                        }
+                        _ => text(object, "zone_or_zonelist_or_space_or_spacelist_name")
+                            .is_some_and(|name| {
+                                (source_multizone_ingress || zones.len() == 1)
+                                    && zones.keys().any(|zone| name.eq_ignore_ascii_case(&zone.0))
+                            }),
+                    }
                 {
-                    return Err("ordinary OtherEquipment requires the direct actual Zone".into());
+                    return Err("ordinary OtherEquipment requires an actual admitted Zone or Source ZoneList".into());
                 }
                 let schedule = if source_calendar_ingress {
                     match field(object, "schedule_name") {
@@ -825,7 +840,6 @@ mod tests {
             "GasEquipment",
             "HotWaterEquipment",
             "SteamEquipment",
-            "ZoneList",
             "ZoneGroup",
             "Space",
             "SpaceList",
@@ -1091,6 +1105,108 @@ mod tests {
             invalid["OtherEquipment"] = serde_json::json!({(name):{"zone_or_zonelist_or_space_or_spacelist_name":"Z","schedule_name":"On","design_level":7}});
             let raw = parse_epjson_str(&invalid.to_string())?;
             assert!(resolve_source_a(&raw).is_err() && resolve_source_b(&raw).is_err());
+        }
+        // Unit94 retains the genuine raw list array on the same IP. The
+        // compiler emits real per-member instances; it does not size gains.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
+            let list_case = serde_json::json!({
+                "Zone":{"Zulu":{},"Alpha":{}},
+                "Schedule:Constant":{"On":{"hourly_value":1}},
+                "ZoneList":{
+                    "Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]},
+                    "Alpha":{"zones":[{"zone_name":"Zulu"}]}},
+                "OtherEquipment":{
+                    "Load":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","schedule_name":"On","design_level":23},
+                    "Shadow":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","schedule_name":"On","design_level":7}}});
+            let text = list_case.to_string();
+            for staged in [false, true] {
+                let raw = if staged {
+                    ep_raw_model::parse_epjson_str_with_idf_order(
+                        &text,
+                        "Zone,Zulu;Zone,Alpha;Schedule:Constant,On,,1;ZoneList,Both,Zulu,Alpha;ZoneList,Alpha,Zulu;OtherEquipment,Load,,Both,On,EquipmentLevel,23;OtherEquipment,Shadow,,Alpha,On,EquipmentLevel,7;",
+                    )?
+                } else {
+                    parse_epjson_str(&text)?
+                };
+                resolve_source_a(&raw)?;
+                assert!(resolve_source_b(&raw).is_err() && resolve(&raw).is_err());
+                let mut ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+                let counts = ip.get_object_def_max_args("ZoneList")?;
+                assert_eq!((counts.alphas, counts.numerics), (3, 0));
+                assert_eq!(
+                    ip.source_raw_object_names("ZoneList")?,
+                    if staged {
+                        vec!["Both".to_string(), "Alpha".to_string()]
+                    } else {
+                        vec!["Alpha".to_string(), "Both".to_string()]
+                    }
+                );
+                let fields = ip.source_raw_object_fields("ZoneList", "Both")?;
+                let V::Array(members) = &fields["zones"] else {
+                    return Err("actual ZoneList array".into());
+                };
+                assert_eq!(members.len(), 2);
+                for (member, expected) in members.iter().zip(["Zulu", "Alpha"]) {
+                    let V::Object(member) = member else {
+                        return Err("actual ZoneList member object".into());
+                    };
+                    assert_eq!(member["zone_name"], V::String(expected.into()));
+                }
+                assert_eq!(fields.contains_key("idf_max_fields"), staged);
+                assert_eq!(fields.contains_key("idf_max_extensible_fields"), staged);
+                if staged {
+                    assert_eq!(fields["idf_max_fields"], V::Number("3".into()));
+                    assert_eq!(fields["idf_max_extensible_fields"], V::Number("2".into()));
+                }
+                let result = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+                let typed = result.model.ok_or("real Source list expansion")?;
+                assert_eq!(typed.other_equipment.len(), 3);
+                assert_eq!(
+                    typed
+                        .other_equipment
+                        .iter()
+                        .map(|row| row.name.0.as_str())
+                        .collect::<Vec<_>>(),
+                    vec!["ZULU LOAD", "ALPHA LOAD", "SHADOW"]
+                );
+                assert_eq!(typed.source_other_equipment_inputs[0].instances, 0..2);
+                assert_eq!(typed.source_other_equipment_inputs[1].instances, 2..3);
+                let alpha = typed
+                    .zone_names
+                    .resolve("Alpha")
+                    .ok_or("actual Alpha Zone")?;
+                assert_eq!(typed.other_equipment[2].zone, alpha);
+                assert!(matches!(typed.source_other_equipment_inputs[1].target,
+                    ep_model::SourceOtherEquipmentInputTarget::Zone(zone) if zone==alpha));
+            }
+            for members in [
+                serde_json::Value::Null,
+                serde_json::json!([]),
+                serde_json::json!(["Zulu"]),
+                serde_json::json!([{}]),
+                serde_json::json!([{"zone_name":1}]),
+                serde_json::json!([{"zone_name":" Zulu"}]),
+                serde_json::json!([{"zone_name":"Zulu"},{"zone_name":"zulu"}]),
+            ] {
+                let mut invalid = list_case.clone();
+                invalid["ZoneList"]["Both"]["zones"] = members;
+                assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            }
+            let mut invalid = list_case.clone();
+            invalid["OtherEquipment"]["Load"]["zone_or_zonelist_or_space_or_spacelist_name"] =
+                serde_json::json!(" Both ");
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            for family in ["ZoneGroup", "Space", "SpaceList"] {
+                let mut invalid = list_case.clone();
+                invalid[family] = serde_json::json!({"held":{}});
+                assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
+            }
+            let mut invalid = list_case.clone();
+            invalid["People"] = serde_json::json!({"held":{"zone_or_zonelist_or_space_or_spacelist_name":"Both",
+                "number_of_people_schedule_name":"On","activity_level_schedule_name":"On","number_of_people":1}});
+            assert!(resolve_source_a(&parse_epjson_str(&invalid.to_string())?).is_err());
         }
         // Unit91 composes the existing People sizing/field/reference rules
         // with real direct Zone names; no comfort or CO2 default is replaced.

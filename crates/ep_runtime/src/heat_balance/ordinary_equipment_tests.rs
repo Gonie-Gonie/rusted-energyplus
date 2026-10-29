@@ -481,6 +481,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 error_callback: None,
                 sqlite: None,
             };
+            let mut zone_errors_found = false;
             selected.get_zone_data(
                 &raw,
                 &control,
@@ -500,6 +501,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     host: &mut files,
                     eio: &mut eio,
                 },
+                &mut zone_errors_found,
             )?;
         }
         let (zone_ids, space_ids) = selected.source_implicit_space_ids(&model, &globals)?;
@@ -618,6 +620,428 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
         )?;
         assert_eq!(source, retained_source);
         assert_eq!(input, retained_input);
+        // Unit94 authored owner checkpoint, after the unchanged Native empty
+        // equipment fixture/table above. Real ZoneList getObjectItem consumes
+        // ordered raw members, then real list targets read original report cells.
+        {
+            use crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::{
+                SourceZoneAirPredictorCorrector, SourceZoneAirRegistrationChildren,
+                SourceZoneListGroupLoadReports,
+            };
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputStatisticsInput, SourceInputStatisticsValue as RawValue,
+            };
+            use crate::heat_balance::source_output_registration::{
+                SourceAirOutputField as AirField, SourceOutputStoreType, SourceRealOutputTarget,
+                TimeStepKind,
+            };
+            let ordered_names = ["ALL", "REVERSE", "ZONE 1"];
+            model.zone_lists.clear();
+            model.zone_list_names = Default::default();
+            let mut list_fields = BTreeMap::new();
+            let mut list_shapes = Vec::new();
+            for (ordinal, name) in ordered_names.into_iter().enumerate() {
+                let members = if ordinal == 2 {
+                    vec![0]
+                } else if ordinal == 1 {
+                    (0..total).rev().collect::<Vec<_>>()
+                } else {
+                    (0..total).collect::<Vec<_>>()
+                };
+                let typed_members = members
+                    .iter()
+                    .map(|&i| model.zones[i].id)
+                    .collect::<Vec<_>>();
+                let id = ep_model::ZoneListId(u32::try_from(ordinal)?);
+                assert!(model.zone_list_names.insert(name, id).is_none());
+                model.zone_lists.push(ep_model::ZoneList {
+                    id,
+                    name: ep_model::NormalizedName::new(name),
+                    zones: typed_members,
+                    max_zone_name_length: members
+                        .iter()
+                        .map(|&i| model.zones[i].name.0.as_str().len())
+                        .max()
+                        .ok_or("positive authored list")?,
+                });
+                let values = members
+                    .iter()
+                    .map(|&i| {
+                        RawValue::Object(BTreeMap::from([(
+                            "zone_name".into(),
+                            RawValue::String(model.zones[i].name.0.as_str().into()),
+                        )]))
+                    })
+                    .collect::<Vec<_>>();
+                list_shapes.push(SourceObjectShape {
+                    object_name: name.into(),
+                    field_sizes: BTreeMap::from([("zones".into(), values.len())]),
+                });
+                list_fields.insert(
+                    name.into(),
+                    BTreeMap::from([("zones".into(), RawValue::Array(values))]),
+                );
+            }
+            let variables = [
+                (
+                    "Zone List Sensible Heating Energy",
+                    AirField::ZoneListSensibleHeatingEnergy,
+                ),
+                (
+                    "Zone List Sensible Cooling Energy",
+                    AirField::ZoneListSensibleCoolingEnergy,
+                ),
+                (
+                    "Zone List Sensible Heating Rate",
+                    AirField::ZoneListSensibleHeatingRate,
+                ),
+                (
+                    "Zone List Sensible Cooling Rate",
+                    AirField::ZoneListSensibleCoolingRate,
+                ),
+            ];
+            let mut requested = ep_model::ReportInputs::default();
+            for name in ordered_names {
+                for (variable, _) in variables {
+                    requested
+                        .output_variables
+                        .push(ep_model::SourceOutputVariableInput {
+                            object_name: format!(
+                                "LIST REQUEST {:02}",
+                                requested.output_variables.len()
+                            ),
+                            key: name.into(),
+                            variable_name: variable.into(),
+                            reporting_frequency: "TIMESTEP".into(),
+                            schedule_name: String::new(),
+                            alpha_blank: [false, false, false, true],
+                            default_applied: [false; 4],
+                            num_alphas: 3,
+                            is_epjson: true,
+                        });
+                }
+            }
+            let definitions = [
+                SourceObjectDefinition {
+                    object_type: "Zone".into(),
+                    alpha_fields: 4,
+                    numeric_fields: 9,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                },
+                SourceObjectDefinition {
+                    object_type: "ZoneList".into(),
+                    alpha_fields: 1,
+                    numeric_fields: 0,
+                    alpha_extensions: 1,
+                    numeric_extensions: 0,
+                    extension: Some("zones".into()),
+                },
+                SourceObjectDefinition {
+                    object_type: "Output:Variable".into(),
+                    alpha_fields: 4,
+                    numeric_fields: 0,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                },
+            ]
+            .into();
+            let zone_fields = raw.objects["Zone"]
+                .iter()
+                .map(|row| (row.object_name.clone(), BTreeMap::new()))
+                .collect::<BTreeMap<_, _>>();
+            let request_fields = requested
+                .output_variables
+                .iter()
+                .map(|row| (row.object_name.clone(), BTreeMap::new()))
+                .collect::<BTreeMap<_, _>>();
+            let families = BTreeMap::from([
+                (
+                    "Zone".into(),
+                    SourceInputFamily::Objects(
+                        zone_fields
+                            .keys()
+                            .map(|name| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: BTreeMap::new(),
+                            })
+                            .collect(),
+                    ),
+                ),
+                ("ZoneList".into(), SourceInputFamily::Objects(list_shapes)),
+                (
+                    "Output:Variable".into(),
+                    SourceInputFamily::Objects(
+                        request_fields
+                            .keys()
+                            .map(|name| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: BTreeMap::new(),
+                            })
+                            .collect(),
+                    ),
+                ),
+            ]);
+            let mut ip = SelectedInputProcessor::from_admitted_input(definitions, families)?;
+            ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                objects: BTreeMap::from([
+                    ("Zone".into(), zone_fields),
+                    ("ZoneList".into(), list_fields),
+                    ("Output:Variable".into(), request_fields),
+                ]),
+                object_order: BTreeMap::from([
+                    (
+                        "Zone".into(),
+                        raw.objects["Zone"]
+                            .iter()
+                            .map(|row| row.object_name.clone())
+                            .collect(),
+                    ),
+                    (
+                        "ZoneList".into(),
+                        ordered_names.into_iter().map(str::to_owned).collect(),
+                    ),
+                    (
+                        "Output:Variable".into(),
+                        requested
+                            .output_variables
+                            .iter()
+                            .map(|row| row.object_name.clone())
+                            .collect(),
+                    ),
+                ]),
+            })?;
+            let mut local = SourceInputProcessorShortCut::default();
+            local.allocate_from_input(&ip)?;
+            let mut live = SelectedZoneInputOwners::default();
+            let mut live_globals = SelectedHeatBalanceGlobals {
+                doing_sizing: true, // actual caller cell differs from legacy backend false
+                ..Default::default()
+            };
+            let mut registration = SourceOutputRegistration::default();
+            let mut scan = SourceOutputPreScan::default();
+            let (mut list_errors, mut list_console, mut list_eio, mut list_eso) =
+                (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+            error_state.output_error_header = false;
+            let mut backend = SourceErrorBackend {
+                state: &mut error_state,
+                error_stream: Some(&mut list_errors),
+                console: &mut list_console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            for name in ordered_names {
+                for (variable, _) in variables {
+                    scan.add_record(name, variable, &mut backend)?;
+                }
+            }
+            let mut found = false;
+            live.get_zone_data(
+                &raw,
+                &control,
+                &model,
+                &mut ZoneGetterOwners {
+                    input: &mut ip,
+                    shortcut: &mut local,
+                    globals: &mut live_globals,
+                    output: &mut registration,
+                    prescan: &scan,
+                    report_input: &requested,
+                    minimum_report_frequency: "",
+                    developer: &developer,
+                    clock: Some(&clock),
+                    backend: &mut backend,
+                    minutes_in_time_step: clock.minutes_in_time_step,
+                    host: &mut files,
+                    eio: &mut list_eio,
+                },
+                &mut found,
+            )?;
+            assert!(!found);
+            assert_eq!(live.num_zone_lists, 3);
+            assert_eq!(live.num_zone_groups, 0);
+            let lists = live.zone_lists.as_ref().ok_or("actual list allocation")?;
+            assert_eq!(
+                lists
+                    .iter()
+                    .map(|row| row.name.as_str())
+                    .collect::<Vec<_>>(),
+                ordered_names
+            );
+            assert_eq!(
+                lists[0].zone.as_deref(),
+                Some((1..=i32::try_from(total)?).collect::<Vec<_>>().as_slice())
+            );
+            assert_eq!(
+                lists[1].zone.as_deref(),
+                Some(
+                    (1..=i32::try_from(total)?)
+                        .rev()
+                        .collect::<Vec<_>>()
+                        .as_slice()
+                )
+            );
+            assert_eq!(lists[2].zone.as_deref(), Some([1].as_slice()));
+            assert!(
+                lists
+                    .iter()
+                    .all(|row| row.max_zone_name_length == 6 && row.typed_zone_list_id.is_some())
+            );
+            assert_eq!(live.source_zone_list_ids(&model)?.len(), 3);
+            assert_eq!(backend.state.tracking.total_warning_errors_during_sizing, 1);
+            assert_eq!(backend.state.tracking.total_warning_errors, 1);
+            assert!(!ip.is_object_unused("ZoneList", "ALL"));
+            assert_eq!(local.current_module_object, "ZoneProperty:LocalEnvironment");
+            assert_eq!(local.alpha_args[0], "ZONE 1");
+            assert_eq!(local.alpha_args[1], "ZONE 1");
+            assert_eq!(local.alpha_field_names[1], "zone_name");
+            assert!(local.numeric_args.iter().all(|v| *v == 0.0));
+            let mut controller = SourceZoneAirPredictorCorrector::default();
+            controller.demand.zones = Some(vec![Default::default(); total]);
+            for (i, demand) in controller
+                .demand
+                .zones
+                .as_mut()
+                .ok_or("actual demand allocation")?
+                .iter_mut()
+                .enumerate()
+            {
+                let ordinal = f64::from(u32::try_from(i + 1)?);
+                demand.air_sys_heat_energy = ordinal * 10.0;
+                demand.air_sys_cool_energy = ordinal * 20.0;
+                demand.air_sys_heat_rate = if total == 3 {
+                    [5.0e15, -2.5e15, 0.5][i]
+                } else {
+                    ordinal
+                };
+                demand.air_sys_cool_rate = ordinal * 3.0;
+            }
+            for (i, zone) in live
+                .zones
+                .as_mut()
+                .ok_or("actual live Zones")?
+                .iter_mut()
+                .enumerate()
+            {
+                zone.multiplier = if i == 1 { 4 } else { 2 };
+                zone.list_multiplier = 17; // must never enter Native2220
+            }
+            let mut reports = SourceZoneListGroupLoadReports {
+                list_heat_energy: Some(vec![999.0; 3]),
+                list_cool_energy: Some(vec![999.0; 3]),
+                list_heat_rate: Some(vec![999.0; 3]),
+                list_cool_rate: Some(vec![999.0; 3]),
+                ..Default::default()
+            };
+            crate::heat_balance::ordinary_hvac_manager::SourceHvacManager::sum_source_zone_list_loads(
+                &live,&controller.demand,&mut reports)?;
+            let first = reports.clone();
+            crate::heat_balance::ordinary_hvac_manager::SourceHvacManager::sum_source_zone_list_loads(
+                &live,&controller.demand,&mut reports)?;
+            assert_eq!(
+                reports, first,
+                "real reset prevents accumulation across calls"
+            );
+            let expected_energy = [20.0, 100.0, 160.0][total - 1];
+            assert_eq!(
+                reports.list_heat_energy.as_ref().ok_or("list energy")?,
+                &vec![expected_energy, expected_energy, 20.0]
+            );
+            if total == 3 {
+                assert_eq!(
+                    reports.list_heat_rate.as_ref().ok_or("ordered heat rate")?,
+                    &vec![1.0, 0.0, 1.0e16]
+                );
+            }
+            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &live_globals.kickoff_simulation,
+                developer: &developer,
+                warmup: &clock.warmup_flag,
+                doing_sizing: &live_globals.doing_sizing,
+            };
+            let mut output_variables = Vec::new();
+            let mut dictionary =
+                crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams {
+                    eso: Some(&mut list_eso),
+                    sqlite_present: false,
+                    results_framework_output_variables: &mut output_variables,
+                };
+            {
+                let mut host=crate::heat_balance::ordinary_air_heat_balance::output_registration::SourceInitAirOutputHost {
+                    registration:&mut registration,prescan:&scan,reports:&requested,minimum_report_frequency:"",
+                    host:&mut files,dictionary_host:&mut dictionary,
+                };
+                for (i, name) in ordered_names.into_iter().enumerate() {
+                    host.register_zone_list(
+                        i32::try_from(i + 1)?,
+                        name,
+                        &reports,
+                        &clock,
+                        Some(flags),
+                        &mut ip,
+                        &mut backend,
+                        &mut list_eio,
+                    )?;
+                }
+            }
+            assert_eq!(
+                registration
+                    .out_vars
+                    .iter()
+                    .filter(|row| row.report)
+                    .count(),
+                12
+            );
+            assert_eq!(
+                std::str::from_utf8(&list_errors)?
+                    .lines()
+                    .collect::<Vec<_>>(),
+                [
+                    "   ** Warning ** GetZoneData: ZoneList=\"ZONE 1\":  is a duplicate of a zone name.",
+                    "   **   ~~~   ** This could be a problem in places where either a Zone Name or a Zone List can be used.",
+                ]
+            );
+            let air =
+                crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance::default();
+            let fan=crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+            let air_report=crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::simple_air::SourceAirReportOutputOwners { controller:&controller };
+            let resilience =
+                crate::heat_balance::ordinary_surface_management::SourceResilienceOutputOwners {
+                    zones: &live,
+                };
+            let read=|reports:&SourceZoneListGroupLoadReports| -> Result<Vec<f64>,Box<dyn std::error::Error>> {
+                let owners=crate::heat_balance::ordinary_air_heat_balance::output_registration::SourceAirOutputOwners {
+                    air:&air,demand:&controller.demand,fan:&fan,zone_lists:reports,report:&air_report,resilience:&resilience,
+                };
+                let mut values=Vec::new();
+                for (i,row) in registration.out_vars.iter().enumerate() {
+                    if !row.report { continue; }
+                    assert_eq!(row.time_step_type,TimeStepKind::System);
+                    assert_eq!(row.store_type,if row.name.ends_with("Energy") {SourceOutputStoreType::Sum}else{SourceOutputStoreType::Average});
+                    assert!(matches!(row.which,Some(SourceRealOutputTarget::Air { space:false,.. })));
+                    values.push(*registration.read_registered_real(i,&owners)?);
+                }
+                Ok(values)
+            };
+            let before = read(&reports)?;
+            reports
+                .list_heat_energy
+                .as_mut()
+                .ok_or("actual mutable report owner")?[0] += 7.0;
+            let after = read(&reports)?;
+            assert_eq!(
+                after[0],
+                before[0] + 7.0,
+                "registered Which follows original cell"
+            );
+            assert_eq!(&after[1..], &before[1..]);
+        }
     }
     Ok(())
 }

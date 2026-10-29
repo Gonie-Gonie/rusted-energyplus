@@ -82,10 +82,17 @@ class ExampleObjectUnionTests(unittest.TestCase):
             row = object_registry(root)["Zone"]
             self.assertEqual(input_typing(row), "Typed model; graph only")
             self.assertEqual(row["source_admission"], "blocked")
+            registry_path = root / "specs/object_coverage.toml"
+            registry_path.write_text(registry_path.read_text(encoding="utf8").replace(
+                'source_admission="blocked"', 'source_admission="bounded_a"'), encoding="utf8")
+            admitted = object_registry(root)["Zone"]
+            self.assertEqual(admitted["source_admission"], "bounded_a")
+            self.assertEqual(input_typing(admitted), "Typed model; graph only")
 
     def test_raw_getter_is_not_falsely_labelled_typed(self) -> None:
         self.assertEqual(input_typing({"compiler_coverage": "raw_only", "status": "raw_source_getter", "source_admission": "bounded_a_b"}), "Raw only; Source getter")
         self.assertEqual(input_typing({"compiler_coverage": "raw_only", "status": "partial_input", "source_admission": "blocked"}), "Raw only; partial projection")
+        self.assertEqual(input_typing({"compiler_coverage": "raw_only", "status": "typed", "source_admission": "bounded_a"}), "Raw only; Source getter")
 
     def test_registry_rejects_missing_or_false_classification(self) -> None:
         base = '[[object]]\nname="Zone"\nstatus="typed_graph_only"\ncompiler_coverage="typed"\nsource_admission="blocked"\nsource_boundary="No consumer"\nsource_refs=["crates/ep_compiler/src/compiler.rs"]\n'

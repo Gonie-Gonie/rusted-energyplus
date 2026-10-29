@@ -7,6 +7,7 @@ pub(super) enum Record<'a> {
     Sensible(&'a SourceSystemSensibleDemand),
     Moisture(&'a SourceSystemMoistureDemand),
     Thermostat(&'a SourceZoneFanHeatBalanceArrays),
+    ZoneList(&'a SourceZoneListGroupLoadReports),
 }
 pub(super) struct Row<'a> {
     pub(super) number: i32,
@@ -22,6 +23,19 @@ fn index(number: i32) -> Result<usize, OrdinaryRadiationError> {
 impl<'a> Record<'a> {
     fn real(self, number: i32, field: Field) -> Result<&'a f64, OrdinaryRadiationError> {
         Ok(match self {
+            Self::ZoneList(v) => {
+                let values = match field {
+                    Field::ZoneListSensibleHeatingEnergy => &v.list_heat_energy,
+                    Field::ZoneListSensibleCoolingEnergy => &v.list_cool_energy,
+                    Field::ZoneListSensibleHeatingRate => &v.list_heat_rate,
+                    Field::ZoneListSensibleCoolingRate => &v.list_cool_rate,
+                    _ => return Err(OrdinaryRadiationUnavailable::StorageDomain.into()),
+                };
+                values
+                    .as_deref()
+                    .and_then(|rows| rows.get(index(number).ok()?))
+                    .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?
+            }
             Self::Air(v) => match field {
                 Field::AirTemperature => &v.zt,
                 Field::AirHumidityRatio => &v.air_hum_rat,
@@ -134,6 +148,7 @@ pub(crate) struct SourceAirOutputOwners<'a> {
     pub(crate) air: &'a SourceAirHeatBalance,
     pub(crate) demand: &'a SourceZoneAirDemand,
     pub(crate) fan: &'a SourceZoneFanHeatBalanceArrays,
+    pub(crate) zone_lists: &'a SourceZoneListGroupLoadReports,
     pub(crate) report: &'a dyn SourceRealOutputOwners,
     pub(crate) resilience: &'a dyn SourceRealOutputOwners,
 }
@@ -148,6 +163,16 @@ impl SourceRealOutputOwners for SourceAirOutputOwners<'_> {
             return Err(OrdinaryRadiationUnavailable::StorageDomain.into());
         };
         let record = match field {
+            Field::ZoneListSensibleHeatingEnergy
+            | Field::ZoneListSensibleCoolingEnergy
+            | Field::ZoneListSensibleHeatingRate
+            | Field::ZoneListSensibleCoolingRate => {
+                if space {
+                    return Err(OrdinaryRadiationUnavailable::StorageDomain.into());
+                }
+                Record::ZoneList(self.zone_lists)
+            }
+
             Field::AirTemperature
             | Field::AirHumidityRatio
             | Field::AirRelativeHumidity

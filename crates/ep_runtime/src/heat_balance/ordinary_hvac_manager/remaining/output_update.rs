@@ -74,6 +74,7 @@ impl SourceOrdinaryHvacRemaining {
         };
         let resilience = SourceResilienceOutputOwners { zones: o.zones };
         let air = SourceAirOutputOwners {
+            zone_lists: &o.control.zone_air_group_loads,
             air: o.air,
             demand: &o.controller.demand,
             fan: o.fan,

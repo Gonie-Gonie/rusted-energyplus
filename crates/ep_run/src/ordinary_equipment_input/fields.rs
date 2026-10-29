@@ -21,6 +21,7 @@ pub(super) fn admitted_field(
             "GlobalGeometryRules"
             | "BuildingSurface:Detailed"
             | "Zone"
+            | "ZoneList"
             | "Material"
             | "Material:NoMass"
             | "Material:AirGap"
@@ -741,6 +742,7 @@ pub(super) fn admitted_field(
         ("Exterior:Lights", "end_use_subcategory") => {
             blank(value) || matches!(value, RawValue::String(_))
         }
+        ("ZoneList", "zones") if source_ingress => matches!(value, RawValue::Array(_)),
         ("OtherEquipment", "fuel_type") => {
             blank(value)
                 || text_is(
@@ -891,6 +893,7 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         "Output:Surfaces:List" | "Output:Surfaces:Drawing" => &["report_type"],
         "Output:Meter" | "Output:Meter:MeterFileOnly" => &["key_name"],
         "Exterior:Lights" => &["schedule_name", "design_level"],
+        "ZoneList" => &["zones"],
         "OtherEquipment" => &[
             "zone_or_zonelist_or_space_or_spacelist_name",
             "schedule_name",

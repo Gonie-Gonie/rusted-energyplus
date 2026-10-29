@@ -86,6 +86,8 @@ impl SourceSupportAdmission {
         }
         let covered_objects = [
             "HeatBalanceAlgorithm",
+            // Real ordered GetZoneData/ZoneList demand owners, not a fixed one-Zone capability.
+            "ZoneList",
             // Ordered IRT getter/ROnly CTF properties; the same raw resolver
             // checks safe Source uses before this consumed-family marker.
             "Material:InfraredTransparent",
@@ -144,10 +146,14 @@ impl SourceSupportAdmission {
             covered_objects,
             zone_convection_overrides_consumed,
             multizone_consumed: trace.scope == PortingScope::A
-                && raw
+                && (raw
                     .objects
                     .get(&ObjectType("Zone".into()))
-                    .is_some_and(|rows| rows.len() > 1),
+                    .is_some_and(|rows| rows.len() > 1)
+                    || raw
+                        .objects
+                        .get(&ObjectType("ZoneList".into()))
+                        .is_some_and(|rows| !rows.is_empty())),
         })
     }
 

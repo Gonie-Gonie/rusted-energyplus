@@ -19,6 +19,7 @@ use std::io::Write;
 mod input;
 mod source_binding;
 mod storage;
+mod zone_lists;
 pub(crate) use storage::{SelectedZoneData, SelectedZoneInputOwners, ZonePredefined};
 
 /// The wrapper forwards to the genuine filesystem/process host; no default sink.
@@ -52,6 +53,7 @@ impl SelectedZoneInputOwners {
         control: &SelectedHeatBalanceInputState,
         model: &TypedModel,
         owners: &mut ZoneGetterOwners<'_, '_>,
+        errors_found: &mut bool,
     ) -> Result<(), HeatBalanceInputError> {
         owners.shortcut.current_module_object = "Zone".into();
         let count = owners.input.get_num_objects_found("Zone");
@@ -212,11 +214,7 @@ impl SelectedZoneInputOwners {
                     > 0;
             }
         }
-        owners.shortcut.current_module_object = "ZoneList".into();
-        self.num_zone_lists = signed(owners.input.get_num_objects_found("ZoneList"))?;
-        if self.num_zone_lists > 0 {
-            return Err(HeatBalanceInputError::Unavailable("positive ZoneList"));
-        }
+        self.get_zone_lists(raw.source_is_epjson, model, owners, errors_found)?;
         owners.shortcut.current_module_object = "ZoneGroup".into();
         self.num_zone_groups = signed(owners.input.get_num_objects_found("ZoneGroup"))?;
         if self.num_zone_groups > 0 {

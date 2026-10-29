@@ -667,8 +667,14 @@ impl CtfInitializationContext<'_> {
             host,
             eio: self.eio,
         };
-        zone.get_zone_data(raw, &reports.heat_balance_input_state, model, &mut owners)
-            .map_err(hb_input_error)
+        zone.get_zone_data(
+            raw,
+            &reports.heat_balance_input_state,
+            model,
+            &mut owners,
+            &mut reports.heat_balance_input_errors_found,
+        )
+        .map_err(hb_input_error)
     }
     pub(crate) fn mark_selected_surface_construction_used(
         &mut self,

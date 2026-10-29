@@ -472,6 +472,7 @@ pub fn apply_idf_declaration_order(
                         | "Building"
                         | "Construction"
                         | "Zone"
+                        | "ZoneList"
                         | "BuildingSurface:Detailed"
                         | "OtherEquipment"
                         | "People"
@@ -503,6 +504,7 @@ pub fn apply_idf_declaration_order(
                         "RunPeriodControl:SpecialDays" => idf_object.max_fields.max(4),
                         // IdfParser::parse_object pads IDF counts to schema min_fields.
                         "OtherEquipment" => idf_object.max_fields.max(11),
+                        "ZoneList" => idf_object.max_fields.max(2),
                         "ComfortViewFactorAngles" if !idf_object.semicolon_terminated => {
                             idf_object.max_fields.saturating_sub(1)
                         }
@@ -538,6 +540,7 @@ pub fn apply_idf_declaration_order(
                             Some(idf_object.max_fields.saturating_sub(11))
                         }
                         "Output:Table:SummaryReports" => Some(idf_object.max_fields),
+                        "ZoneList" => Some(idf_object.max_fields.saturating_sub(1)),
                         "Schedule:Year" => Some(idf_object.max_fields.saturating_sub(2)),
                         "Schedule:Day:Interval" => Some(idf_object.max_fields.saturating_sub(3)),
                         "Schedule:Day:List" => Some(idf_object.max_fields.saturating_sub(4)),
@@ -705,6 +708,7 @@ fn scan_target_objects(
         if let Some(object_type) = fields.first()
             && (object_type.eq_ignore_ascii_case("RunPeriod")
                 || object_type.eq_ignore_ascii_case("SizingPeriod:DesignDay")
+                || object_type.eq_ignore_ascii_case("ZoneList")
                 || object_type.eq_ignore_ascii_case("ZoneControl:Thermostat")
                 || object_type.eq_ignore_ascii_case("ZoneHVAC:IdealLoadsAirSystem"))
             && targets
@@ -1828,6 +1832,11 @@ mod unnamed_report_order_tests {
                 Some([1, 1]),
             ),
             (
+                "ZoneList",
+                "ZoneList,Z,Zone;ZoneList,A,Zone,Other;",
+                Some([2, 3]),
+            ),
+            (
                 "Zone",
                 "Zone,Z;Zone,A,0,0,0,0,1,1,autocalculate,autocalculate,autocalculate,,,Yes;",
                 Some([1, 13]),
@@ -1876,11 +1885,24 @@ mod unnamed_report_order_tests {
                 let count = object.fields.get(&FieldName("idf_max_fields".into()));
                 if let Some(expected) = expected {
                     assert_eq!(count, Some(&RawValue::Number(expected[index].to_string())));
+                    if family == "ZoneList" {
+                        assert_eq!(
+                            object
+                                .fields
+                                .get(&FieldName("idf_max_extensible_fields".into())),
+                            Some(&RawValue::Number((expected[index] - 1).to_string()))
+                        );
+                    }
                 } else {
                     assert!(count.is_none());
                 }
             }
         }
+        // Native END returns before attaching the ZoneList local zones array;
+        // no admitted positive list can use an EOF metadata approximation.
+        assert!(
+            parse_epjson_str_with_idf_order(r#"{"ZoneList":{"L":{}}}"#, "ZoneList,L,Zone").is_err()
+        );
         for (family, fields, expected) in [
             ("Version", "26.1", 1),
             (

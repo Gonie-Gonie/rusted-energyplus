@@ -31,6 +31,19 @@ pub(crate) enum SourceAirUpdate {
 /// Real setUpOutputVars children; implementation must retain actual live owner targets.
 /// No default implementation or successful empty host is provided.
 pub(crate) trait SourceZoneAirRegistrationChildren {
+    fn register_zone_list(
+        &mut self,
+        number: i32,
+        name: &str,
+        reports: &SourceZoneListGroupLoadReports,
+        clock: &WeatherGlobalState,
+        reporting_diagnostic_flags: Option<
+            crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+        >,
+        input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        eio: &mut dyn std::io::Write,
+    ) -> Result<(), Error>;
     fn register_air(
         &mut self,
         number: i32,

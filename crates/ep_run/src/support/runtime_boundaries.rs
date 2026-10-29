@@ -267,13 +267,15 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
 
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "ZoneList",
-        typed_model.zone_lists.len(),
-    );
+    if !source_admission.is_some_and(|admission| admission.consumes("ZoneList")) {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "ZoneList",
+            typed_model.zone_lists.len(),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

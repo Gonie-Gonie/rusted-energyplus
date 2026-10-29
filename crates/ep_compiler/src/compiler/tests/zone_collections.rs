@@ -343,5 +343,47 @@ fn zone_list_name_matching_zone_is_a_nonblocking_source_warning()
             && diagnostic.code == "ZoneListNameMatchesZone"
             && diagnostic.object_type == "ZoneList"
     }));
+    // Unit94 Source list names share the exact namespace policy, not legacy
+    // trimming, and only an actual Zone spelling produces the Native warning.
+    let raw = parse_epjson_str(
+        r#"{"Zone":{"A":{}},"ZoneList":{"A":{"zones":[{"zone_name":"A"}]}," A ":{"zones":[{"zone_name":"A"}]}}}"#,
+    )?;
+    let exact = super::super::compile_raw_model_for_source(&raw);
+    assert!(!exact.has_errors(), "{:?}", exact.report.diagnostics);
+    assert_eq!(
+        exact
+            .report
+            .diagnostics
+            .iter()
+            .filter(|d| d.code == "ZoneListNameMatchesZone")
+            .count(),
+        1
+    );
+    let model = exact.model.ok_or("exact Source ZoneList names")?;
+    assert_eq!(model.zone_lists.len(), 2);
+    for list in &model.zone_lists {
+        assert_eq!(
+            model
+                .zone_list_names
+                .resolve(&list.name.0.to_ascii_lowercase()),
+            Some(list.id)
+        );
+        assert_eq!(list.zones, vec![model.zones[0].id]);
+    }
+    assert_ne!(
+        model.zone_list_names.resolve("A"),
+        model.zone_list_names.resolve(" A ")
+    );
+    assert_eq!(model.zone_list_names.resolve(" A"), None);
+    assert!(
+        compile_raw_model(&raw).has_errors(),
+        "legacy list namespace still trims"
+    );
+    for text in [
+        r#"{"Zone":{"A":{}},"ZoneList":{"L":{"zones":[{"zone_name":" A "}]}}}"#,
+        r#"{"Zone":{"A":{}},"ZoneList":{"A\nB":{"zones":[{"zone_name":"A"}]}}}"#,
+    ] {
+        assert!(super::super::compile_raw_model_for_source(&parse_epjson_str(text)?).has_errors());
+    }
     Ok(())
 }

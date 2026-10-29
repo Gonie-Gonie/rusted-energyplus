@@ -344,6 +344,134 @@ fn direct_zone_people_and_other_equipment_use_existing_typed_arenas()
             result.report.diagnostics
         );
     }
+    // Unit94: Source list instances use real members/implicit Spaces and dense
+    // typed rows; raw statements retain their separate explicit range owner.
+    let list_raw = parse_epjson_str(
+        r#"{
+        "Zone":{"Zulu":{"floor_area":12},"Alpha":{"floor_area":6}},
+        "Schedule:Constant":{"On":{"hourly_value":1}},
+        "ZoneList":{"Both":{"zones":[{"zone_name":"Zulu"},{"zone_name":"Alpha"}]},
+            "Reverse":{"zones":[{"zone_name":"Alpha"},{"zone_name":"Zulu"}]},
+            "Alpha":{"zones":[{"zone_name":"Zulu"}]}},
+        "OtherEquipment":{
+            "A level":{"zone_or_zonelist_or_space_or_spacelist_name":"Both","schedule_name":"On","design_level":23},
+            "B area":{"zone_or_zonelist_or_space_or_spacelist_name":"Reverse","schedule_name":"On","design_level_calculation_method":"Watts/Area","design_level":-7,"power_per_floor_area":1.75,"power_per_person":-3},
+            "C shadow":{"zone_or_zonelist_or_space_or_spacelist_name":"Alpha","schedule_name":"On","design_level":5}}}"#,
+    )?;
+    let result = super::super::compile_raw_model_for_source(&list_raw);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let list_model = result.model.ok_or("Source list expansion")?;
+    assert_eq!(list_model.other_equipment.len(), 5);
+    assert_eq!(list_model.source_other_equipment_inputs.len(), 3);
+    assert_eq!(
+        list_model
+            .other_equipment
+            .iter()
+            .map(|r| r.name.0.as_str())
+            .collect::<Vec<_>>(),
+        vec![
+            "ZULU A LEVEL",
+            "ALPHA A LEVEL",
+            "ALPHA B AREA",
+            "ZULU B AREA",
+            "C SHADOW"
+        ]
+    );
+    assert!(
+        list_model
+            .other_equipment_names
+            .resolve("A level")
+            .is_none()
+    );
+    for (index, row) in list_model.other_equipment.iter().enumerate() {
+        assert_eq!(usize::try_from(row.id.0)?, index);
+        assert_eq!(
+            list_model.other_equipment_names.resolve(&row.name.0),
+            Some(row.id)
+        );
+        assert_eq!(
+            row.schedule,
+            Some(ep_model::InternalGainScheduleReference::User(
+                ep_model::ScheduleId(0)
+            ))
+        );
+    }
+    for binding in &list_model.source_other_equipment_inputs {
+        let rows = &list_model.other_equipment[binding.instances.clone()];
+        match binding.target {
+            ep_model::SourceOtherEquipmentInputTarget::ZoneList(id) => {
+                let list = list_model
+                    .zone_lists
+                    .iter()
+                    .find(|r| r.id == id)
+                    .ok_or("real typed list")?;
+                assert_eq!(rows.iter().map(|r| r.zone).collect::<Vec<_>>(), list.zones);
+                for row in rows {
+                    let space = list_model
+                        .spaces
+                        .iter()
+                        .find(|s| s.zone == row.zone)
+                        .ok_or("actual implicit Space")?;
+                    assert_eq!(space.origin, ep_model::SpaceOrigin::AutoZoneDefault);
+                    assert_eq!(
+                        row.name.0,
+                        format!(
+                            "{} {}",
+                            space.name.0,
+                            binding.object_name.to_ascii_uppercase()
+                        )
+                    );
+                }
+            }
+            ep_model::SourceOtherEquipmentInputTarget::Zone(id) => {
+                assert_eq!(binding.object_name, "C shadow");
+                assert_eq!(rows.len(), 1);
+                assert_eq!(rows[0].zone, id);
+                assert_eq!(list_model.zone_names.resolve("Alpha"), Some(id));
+            }
+        }
+    }
+    assert!(
+        compile_raw_model(&list_raw).has_errors(),
+        "legacy gains retain direct-Zone-only lookup"
+    );
+    // A one-member list still prefixes the real implicit Space.Name; preserve
+    // actual raw spelling when legacy typed Zone/Space names themselves trim.
+    let spaced = parse_epjson_str(
+        r#"{"Zone":{" Z ":{}},"ZoneList":{" L ":{"zones":[{"zone_name":" Z "}]}},"OtherEquipment":{" p ":{"zone_or_zonelist_or_space_or_spacelist_name":" L ","schedule_name":"Constant-1.0","design_level":3}}}"#,
+    )?;
+    let result = super::super::compile_raw_model_for_source(&spaced);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let spaced_model = result.model.ok_or("actual source spelling prefix")?;
+    assert_eq!(spaced_model.zone_lists[0].name.0, " L ");
+    assert_eq!(
+        spaced_model.other_equipment[0].name.0,
+        format!("{} {}", " Z ", " P ")
+    );
+    assert_eq!(
+        spaced_model.source_other_equipment_inputs[0].instances,
+        0..1
+    );
+    // Existing direct People stays genuine when the actual Zone name has
+    // whitespace; the exact-reference guard must not inspect a trimmed alias.
+    let spaced_people = parse_epjson_str(
+        r#"{"Zone":{" Z ":{}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":" Z ","number_of_people_schedule_name":"Constant-1.0","number_of_people":1}}}"#,
+    )?;
+    let result = super::super::compile_raw_model_for_source(&spaced_people);
+    assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+    let typed = result.model.ok_or("existing exact direct People Zone")?;
+    assert_eq!(typed.people.len(), 1);
+    assert_eq!(typed.people[0].zone, typed.zones[0].id);
+    for text in [
+        r#"{"Zone":{"Z":{}},"ZoneList":{" L ":{"zones":[{"zone_name":"Z"}]}},"OtherEquipment":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","design_level":3}}}"#,
+        r#"{"Zone":{" Z ":{}},"ZoneList":{"L":{"zones":[{"zone_name":"Z"}]}}}"#,
+        r#"{"Zone":{"Z":{}},"ZoneList":{"L":{"zones":[{"zone_name":"Z"}]}},"People":{"P":{"zone_or_zonelist_or_space_or_spacelist_name":"L","number_of_people":1}}}"#,
+    ] {
+        assert!(
+            super::super::compile_raw_model_for_source(&parse_epjson_str(text)?).has_errors(),
+            "Source exact references and direct People boundary must remain: {text}"
+        );
+    }
     for method in ["Watts/Person", "Power/Person"] {
         let text = format!(
             r#"{{"Zone":{{"Direct Zone":{{}}}},"Schedule:Constant":{{"on":{{"hourly_value":1}},"activity":{{"hourly_value":120}}}},"People":{{"Occupants":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","number_of_people_schedule_name":"on","activity_level_schedule_name":"activity","number_of_people":2}}}},"OtherEquipment":{{"Per person":{{"zone_or_zonelist_or_space_or_spacelist_name":"Direct Zone","schedule_name":"on","design_level_calculation_method":"{method}","design_level":-7,"power_per_floor_area":-9,"power_per_person":3.5}}}}}}"#

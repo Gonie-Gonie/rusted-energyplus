@@ -297,6 +297,17 @@ pub(crate) struct ZoneDaylight {
     pub(crate) total_reference_points: i32,
 }
 
+/// Native DataHeatBalance.hh715-727, with retained typed identity only for binding.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SelectedZoneListData {
+    pub(crate) name: String,
+    pub(crate) num_of_zones: i32,
+    pub(crate) max_zone_name_length: usize,
+    /// None is the constructor-unallocated Native Array1D.
+    pub(crate) zone: Option<Vec<i32>>,
+    pub(crate) typed_zone_list_id: Option<ep_model::ZoneListId>,
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SelectedZoneInputOwners {
     pub(crate) zones: Option<Vec<SelectedZoneData>>,
@@ -308,6 +319,7 @@ pub(crate) struct SelectedZoneInputOwners {
     pub(crate) spaces: Option<Vec<SelectedSpaceData>>,
     pub(crate) space_types: Option<Vec<String>>,
     pub(crate) space_lists: Option<Vec<std::convert::Infallible>>,
+    pub(crate) zone_lists: Option<Vec<SelectedZoneListData>>,
     pub(crate) num_zone_lists: i32,
     pub(crate) num_zone_groups: i32,
 }

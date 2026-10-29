@@ -166,6 +166,8 @@ pub struct TypedModel {
     pub other_equipment: Vec<OtherEquipment>,
     /// OtherEquipment names.
     pub other_equipment_names: NameMap<InternalGainId>,
+    /// Source raw objects and their real dense OtherEquipment instance ranges.
+    pub source_other_equipment_inputs: Vec<crate::SourceOtherEquipmentInput>,
     /// Zone occupants from People objects.
     pub people: Vec<People>,
     /// People object names.
@@ -365,6 +367,7 @@ impl Default for TypedModel {
             schedule_names: NameMap::default(),
             other_equipment: Vec::new(),
             other_equipment_names: NameMap::default(),
+            source_other_equipment_inputs: Vec::new(),
             people: Vec::new(),
             people_names: NameMap::default(),
             thermostat_dual_setpoints: Vec::new(),

@@ -13,23 +13,99 @@ fn reset(values: &mut Option<Vec<f64>>, number: i32) -> Result<(), Error> {
         .ok_or(Error::Unavailable("actual ZoneList report allocation2210"))? = 0.0;
     Ok(())
 }
+fn add(values: &mut Option<Vec<f64>>, number: i32, value: f64) -> Result<(), Error> {
+    let at = number
+        .checked_sub(1)
+        .and_then(|n| usize::try_from(n).ok())
+        .ok_or(Error::Unavailable("actual ZoneList report ordinal"))?;
+    *values
+        .as_deref_mut()
+        .and_then(|rows| rows.get_mut(at))
+        .ok_or(Error::Unavailable("actual ZoneList report allocation2221"))? += value;
+    Ok(())
+}
 impl SourceHvacManager {
-    pub(crate) fn update_source_zone_list_and_group_loads(
-        &self,
-        o: &mut SourceHvacOwners<'_, '_>,
+    /// The same ordered HVACManager resets/sums, on the original live owners.
+    pub(crate) fn sum_source_zone_list_loads(
+        zones: &crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners,
+        demand: &crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirDemand,
+        reports: &mut crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneListGroupLoadReports,
     ) -> Result<(), Error> {
-        for number in 1..=o.zones.num_zone_lists {
-            let reports = &mut o.control.zone_air_group_loads;
+        for number in 1..=zones.num_zone_lists {
             reset(&mut reports.list_heat_energy, number)?;
             reset(&mut reports.list_cool_energy, number)?;
             reset(&mut reports.list_heat_rate, number)?;
             reset(&mut reports.list_cool_rate, number)?;
         }
-        if o.zones.num_zone_lists > 0 {
-            return Err(Error::Unavailable(
-                "actual ZoneList record2217: positive GetZoneData list body unported",
-            ));
+        for number in 1..=zones.num_zone_lists {
+            let at = number
+                .checked_sub(1)
+                .and_then(|n| usize::try_from(n).ok())
+                .ok_or(Error::Unavailable("actual ZoneList report ordinal"))?;
+            let list = zones
+                .zone_lists
+                .as_deref()
+                .and_then(|rows| rows.get(at))
+                .ok_or(Error::Unavailable("actual ZoneList record2217"))?;
+            let members = list
+                .zone
+                .as_deref()
+                .ok_or(Error::Unavailable("actual ZoneList member allocation2218"))?;
+            for member in 0..list.num_of_zones {
+                let zone_number = *usize::try_from(member)
+                    .ok()
+                    .and_then(|i| members.get(i))
+                    .ok_or(Error::Unavailable("actual ZoneList member2218"))?;
+                let zone_at = zone_number
+                    .checked_sub(1)
+                    .and_then(|n| usize::try_from(n).ok())
+                    .ok_or(Error::Unavailable("actual ZoneList member Zone ordinal"))?;
+                let demand = demand
+                    .zones
+                    .as_deref()
+                    .and_then(|rows| rows.get(zone_at))
+                    .ok_or(Error::Unavailable("actual ZoneSysEnergyDemand2219"))?;
+                let multiplier = f64::from(
+                    zones
+                        .zones
+                        .as_deref()
+                        .and_then(|rows| rows.get(zone_at))
+                        .ok_or(Error::Unavailable("actual ZoneList member Multiplier2220"))?
+                        .multiplier,
+                );
+                add(
+                    &mut reports.list_heat_energy,
+                    number,
+                    demand.air_sys_heat_energy * multiplier,
+                )?;
+                add(
+                    &mut reports.list_cool_energy,
+                    number,
+                    demand.air_sys_cool_energy * multiplier,
+                )?;
+                add(
+                    &mut reports.list_heat_rate,
+                    number,
+                    demand.air_sys_heat_rate * multiplier,
+                )?;
+                add(
+                    &mut reports.list_cool_rate,
+                    number,
+                    demand.air_sys_cool_rate * multiplier,
+                )?;
+            }
         }
+        Ok(())
+    }
+    pub(crate) fn update_source_zone_list_and_group_loads(
+        &self,
+        o: &mut SourceHvacOwners<'_, '_>,
+    ) -> Result<(), Error> {
+        Self::sum_source_zone_list_loads(
+            o.zones,
+            &o.controller.demand,
+            &mut o.control.zone_air_group_loads,
+        )?;
         if o.zones.num_zone_groups > 0 {
             return Err(Error::Unavailable(
                 "actual ZoneGroup record2229: positive GetZoneData group body unported",

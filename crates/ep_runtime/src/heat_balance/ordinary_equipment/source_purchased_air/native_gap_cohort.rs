@@ -689,6 +689,7 @@ impl Factory {
                 error_callback: None,
                 sqlite: None,
             };
+            let mut zone_errors_found = false;
             zones.get_zone_data(
                 &raw,
                 &control,
@@ -708,6 +709,7 @@ impl Factory {
                     host: &mut files,
                     eio: &mut eio,
                 },
+                &mut zone_errors_found,
             )?;
         }
         let admitted = OrdinaryEquipmentInput::from_source_family_inventory(inventory, steps)?;
@@ -2197,6 +2199,7 @@ fn registration(s: &Factory) -> Result<Value> {
     let owners = RegisteredOutputOwners {
         equipment: &s.equipment,
         air: hb::ordinary_air_heat_balance::output_registration::SourceAirOutputOwners {
+            zone_lists: &s.control.zone_air_group_loads,
             air: &s.air,
             demand: &s.controller.demand,
             fan: &s.fan,

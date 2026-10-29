@@ -39,6 +39,7 @@ pub(super) fn validate(raw: &RawModel) -> Result<(), String> {
                 | "Material:InfraredTransparent"
                 | "Construction"
                 | "Zone"
+                | "ZoneList"
                 | "GlobalGeometryRules"
                 | "BuildingSurface:Detailed"
                 | "ZoneAirHeatBalanceAlgorithm"

@@ -100,10 +100,14 @@ pub fn inspect_porting_scope(
         }
     }
     if scope == PortingScope::A
-        && raw
+        && (raw
             .objects
             .get(&ep_raw_model::ObjectType("Zone".into()))
             .is_some_and(|rows| rows.len() > 1)
+            || raw
+                .objects
+                .get(&ep_raw_model::ObjectType("ZoneList".into()))
+                .is_some_and(|rows| !rows.is_empty()))
         && let Err(error) = crate::ordinary_equipment_input::resolve_source_a(raw)
     {
         violations.push(error);
@@ -210,16 +214,17 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Schedule:Year"
             | "RunPeriodControl:DaylightSavingTime"
             | "RunPeriodControl:SpecialDays"
-    ) || (scope == PortingScope::B
-        && matches!(
-            kind,
-            "ZoneControl:Thermostat"
-                | "ThermostatSetpoint:DualSetpoint"
-                | "ZoneHVAC:EquipmentConnections"
-                | "ZoneHVAC:EquipmentList"
-                | "ZoneHVAC:IdealLoadsAirSystem"
-                | "NodeList"
-        ))
+    ) || (scope == PortingScope::A && kind == "ZoneList")
+        || (scope == PortingScope::B
+            && matches!(
+                kind,
+                "ZoneControl:Thermostat"
+                    | "ThermostatSetpoint:DualSetpoint"
+                    | "ZoneHVAC:EquipmentConnections"
+                    | "ZoneHVAC:EquipmentList"
+                    | "ZoneHVAC:IdealLoadsAirSystem"
+                    | "NodeList"
+            ))
 }
 
 fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut Vec<String>) {
@@ -331,7 +336,7 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         violations
             .push("Source A requires positive opaque Zones; Source B requires exactly one".into());
     }
-    if model.zones.len() > 1
+    if (model.zones.len() > 1 || !model.zone_lists.is_empty())
         && (model.spaces.len() != model.zones.len()
             || model.zones.iter().any(|zone| {
                 let mut spaces = model.spaces.iter().filter(|space| space.zone == zone.id);
@@ -343,7 +348,7 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
     {
         violations.push("bounded multi-Zone requires one implicit Space per Zone".into());
     }
-    if model.zones.len() > 1
+    if (model.zones.len() > 1 || !model.zone_lists.is_empty())
         && model.zones.iter().any(|zone| {
             !model.surfaces.iter().any(|surface| {
                 surface.zone == zone.id && surface.surface_type != ep_model::SurfaceType::Floor
@@ -354,6 +359,60 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
         // floor-only and other Spaces enters a separate grouped/remainder
         // producer that remains outside this stage.
         violations.push("multi-Zone requires a non-floor opaque enclosure for every Zone".into());
+    }
+    if !model.zone_lists.is_empty() {
+        if scope != PortingScope::A {
+            violations.push("ZoneList is admitted only by Source A".into());
+        }
+        let mut cursor = 0;
+        for binding in &model.source_other_equipment_inputs {
+            let range = binding.instances.clone();
+            if range.start != cursor || range.is_empty() || range.end > model.other_equipment.len()
+            {
+                violations.push("Source OtherEquipment raw-instance range is unavailable".into());
+                break;
+            }
+            let instances = &model.other_equipment[range.clone()];
+            if instances
+                .iter()
+                .enumerate()
+                .any(|(offset, row)| usize::try_from(row.id.0).ok() != Some(range.start + offset))
+            {
+                violations
+                    .push("Source OtherEquipment instance IDs must remain real and dense".into());
+            }
+            match binding.target {
+                ep_model::SourceOtherEquipmentInputTarget::Zone(zone) => {
+                    if instances.len() != 1 || instances[0].zone != zone {
+                        violations
+                            .push("Source OtherEquipment direct Zone association differs".into());
+                    }
+                }
+                ep_model::SourceOtherEquipmentInputTarget::ZoneList(id) => {
+                    if !model
+                        .zone_lists
+                        .iter()
+                        .find(|list| list.id == id)
+                        .is_some_and(|list| {
+                            list.zones.len() == instances.len()
+                                && list
+                                    .zones
+                                    .iter()
+                                    .zip(instances)
+                                    .all(|(zone, row)| *zone == row.zone)
+                        })
+                    {
+                        violations.push(
+                            "Source OtherEquipment ordered ZoneList association differs".into(),
+                        );
+                    }
+                }
+            }
+            cursor = range.end;
+        }
+        if cursor != model.other_equipment.len() {
+            violations.push("Source OtherEquipment ranges must cover all actual instances".into());
+        }
     }
     if model.building.is_none()
         || model.global_geometry_rules.is_none()

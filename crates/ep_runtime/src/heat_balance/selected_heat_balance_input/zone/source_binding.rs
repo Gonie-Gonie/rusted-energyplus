@@ -26,7 +26,6 @@ impl SelectedZoneInputOwners {
             || spaces.len() != model.spaces.len()
             || i32::try_from(zones.len()).ok() != Some(globals.num_of_zones)
             || i32::try_from(spaces.len()).ok() != Some(globals.num_spaces)
-            || self.num_zone_lists != 0
             || self.num_zone_groups != 0
         {
             return Err(Error::Unavailable(
@@ -98,6 +97,19 @@ impl SelectedZoneInputOwners {
         if !typed_zones.is_empty() || !typed_spaces.is_empty() {
             return Err(Error::Unavailable(
                 "incomplete Source typed identity bijection",
+            ));
+        }
+        let list_ids = self.source_zone_list_ids(model)?;
+        if self
+            .zone_lists
+            .as_deref()
+            .unwrap_or(&[])
+            .iter()
+            .zip(list_ids)
+            .any(|(list, id)| list.typed_zone_list_id != Some(id))
+        {
+            return Err(Error::Unavailable(
+                "unbound actual Source ZoneList identity",
             ));
         }
         Ok((zone_ids, space_ids))

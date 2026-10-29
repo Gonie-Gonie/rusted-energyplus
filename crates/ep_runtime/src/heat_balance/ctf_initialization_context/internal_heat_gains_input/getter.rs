@@ -318,15 +318,61 @@ impl SelectedInternalHeatGains {
             if spaces.iter().any(|space| space.name == target) {
                 return Err(unavailable("positive direct-Space IHG admission"));
             }
-            // Positive ZoneList/SpaceList are excluded by the actual admission.
-            if owners.zones.num_zone_lists > 0
-                || owners
-                    .zones
-                    .space_lists
-                    .as_ref()
-                    .is_some_and(|v| !v.is_empty())
+            if let Some(list) = owners
+                .zones
+                .zone_lists
+                .as_ref()
+                .and_then(|lists| lists.iter().find(|list| list.name == target))
             {
-                return Err(unavailable("positive IHG ZoneList/SpaceList expansion"));
+                if family != "OtherEquipment" {
+                    return Err(unavailable("positive People ZoneList expansion"));
+                }
+                if list.typed_zone_list_id.is_none() {
+                    return Err(unavailable("unbound actual Source ZoneList"));
+                }
+                row.space_start_ptr = self.totals[kind]
+                    .checked_add(1)
+                    .ok_or_else(|| unavailable("actual IHG instance start overflow"))?;
+                let mut num_spaces: i32 = 0;
+                for &zone_number in list
+                    .zone
+                    .as_deref()
+                    .ok_or_else(|| unavailable("actual IHG ZoneList member allocation"))?
+                {
+                    let zone = zones
+                        .get(index(zone_number)?)
+                        .ok_or_else(|| unavailable("actual IHG ZoneList member Zone"))?;
+                    num_spaces = num_spaces
+                        .checked_add(zone.num_spaces)
+                        .ok_or_else(|| unavailable("actual IHG ZoneList Space count"))?;
+                    if zone.num_spaces != 1 || zone.space_indexes.len() != 1 {
+                        return Err(unavailable("positive multi-Space IHG list expansion"));
+                    }
+                    for &space_number in &zone.space_indexes {
+                        let space = spaces
+                            .get(index(space_number)?)
+                            .ok_or_else(|| unavailable("actual IHG ZoneList member Space"))?;
+                        if space.zone_num != zone_number {
+                            return Err(unavailable("actual IHG ZoneList Zone/Space association"));
+                        }
+                        row.space_nums.push(space_number);
+                        row.names.push(format!("{} {}", space.name, row.name));
+                    }
+                }
+                self.totals[kind] = self.totals[kind]
+                    .checked_add(num_spaces)
+                    .ok_or_else(|| unavailable("actual IHG instance count"))?;
+                row.num_spaces = num_spaces;
+                row.zone_list_active = true;
+                continue;
+            }
+            if owners
+                .zones
+                .space_lists
+                .as_ref()
+                .is_some_and(|v| !v.is_empty())
+            {
+                return Err(unavailable("positive IHG SpaceList expansion"));
             }
             owners.backend.show_severe_error(&format!(
                 "{family}=\"{}\" invalid zone_or_zonelist_or_space_or_spacelist_name=\"{target}\" not found.", row.name))?;

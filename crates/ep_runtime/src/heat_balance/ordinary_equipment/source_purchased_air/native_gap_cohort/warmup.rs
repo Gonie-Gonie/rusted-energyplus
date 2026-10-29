@@ -203,6 +203,7 @@ impl WarmupFactory {
                 host: &mut files,
                 eio: &mut eio,
             },
+            &mut reports.heat_balance_input_errors_found,
         )?;
         let names = zones
             .zones

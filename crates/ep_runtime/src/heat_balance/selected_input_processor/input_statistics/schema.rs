@@ -3,6 +3,21 @@
 use super::{SchemaAutomatic, SchemaDefault, SchemaDefinition, SchemaField};
 pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
     Some(match name {
+        "ZoneList" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[SchemaField {
+                name: "name",
+                default: SchemaDefault::Absent,
+                automatic: &[],
+            }],
+            extension: Some("zones"),
+            extensible: &[SchemaField {
+                name: "zone_name",
+                default: SchemaDefault::Absent,
+                automatic: &[],
+            }],
+        },
         "ComfortViewFactorAngles" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

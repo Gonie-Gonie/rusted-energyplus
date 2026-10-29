@@ -28,7 +28,7 @@ OBJECT_STATUS_LABELS = {
     "partial_input": "Partial input projection", "unimplemented": "No connected implementation",
 }
 SOURCE_ADMISSION_LABELS = {
-    "bounded_a_b": "Bounded A/B", "bounded_b": "Bounded B only",
+    "bounded_a_b": "Bounded A/B", "bounded_a": "Bounded A only", "bounded_b": "Bounded B only",
     "inactive_only": "Inactive declaration only", "blocked": "Blocked", "unreviewed": "Not reviewed",
 }
 
@@ -102,7 +102,7 @@ def input_typing(row: dict[str, Any]) -> str:
         return "Typed model; graph only" if row["status"] == "typed_graph_only" else "Typed model"
     if row["status"] == "partial_input":
         return "Raw only; partial projection"
-    if row["status"] == "raw_source_getter" or row["source_admission"] in {"bounded_a_b", "bounded_b", "inactive_only"}:
+    if row["status"] == "raw_source_getter" or row["source_admission"] in {"bounded_a_b", "bounded_a", "bounded_b", "inactive_only"}:
         return "Raw only; Source getter"
     return "Raw only"
 
@@ -315,7 +315,7 @@ def markdown(repo_root: Path) -> str:
         "",
         "Canonical names and official groups come from the compact [EnergyPlus 26.1 catalog](../../../data/schema/energyplus-26.1-object-index.json). It records the original schema SHA256 and pinned source commit; installed EnergyPlus is not needed to regenerate this page.",
         "",
-        "Source labels are bounded A/B, bounded B only, inactive declaration only, or blocked. B is the declared direct-Zone sensible no-OA IdealLoads route. An admitted family still requires every applicable field/reference/consumer condition. Review references are code/contract facts, not additional numerical conformance cases; promoted identities and tolerances are unchanged.",
+        "Source labels are bounded A/B, bounded A only, bounded B only, inactive declaration only, blocked, or not reviewed. B is the declared direct-Zone sensible no-OA IdealLoads route. An admitted family still requires every applicable field/reference/consumer condition. Review references are code/contract facts, not additional numerical conformance cases; promoted identities and tolerances are unchanged.",
         "", "| Object type | Input files | Instances | Dependency review group | Compiler input typing | Source admission | Scope and review references |", "|---|---|---|---|---|---|---|",
     ]
     lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} | {row['group']} | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} | {source_review_cell(row['review'])} |" for row in known)

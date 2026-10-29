@@ -170,10 +170,23 @@ impl SourceZoneAirPredictorCorrector {
             if self.controls.number_comfort_zones > 0 {
                 return Err(Error::Unavailable("positive comfort-control outputs2530"));
             }
-            if owners.zones.num_zone_lists > 0 {
-                return Err(Error::Unavailable(
-                    "positive actual ZoneList2560 name/output",
-                ));
+            for number in 1..=owners.zones.num_zone_lists {
+                let list = owners
+                    .zones
+                    .zone_lists
+                    .as_deref()
+                    .and_then(|rows| index(number).ok().and_then(|i| rows.get(i)))
+                    .ok_or(Error::Unavailable("actual ZoneList2554 name/output"))?;
+                outputs.register_zone_list(
+                    number,
+                    &list.name,
+                    &owners.control.zone_air_group_loads,
+                    owners.clock,
+                    owners.reporting_diagnostic_flags,
+                    owners.input,
+                    owners.backend,
+                    eio,
+                )?;
             }
             if owners.zones.num_zone_groups > 0 {
                 return Err(Error::Unavailable(

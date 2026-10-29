@@ -685,6 +685,7 @@ impl<'a> Compiler<'a> {
             model.week_schedule_names = NameMap::source_schedule_namespace();
             model.schedule_type_limit_names = NameMap::source_schedule_namespace();
             model.other_equipment_names = NameMap::source_exact_namespace();
+            model.zone_list_names = NameMap::source_exact_namespace();
         }
 
         self.parse_building(&mut model);
@@ -13742,7 +13743,7 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_other_equipment(&mut self, model: &mut TypedModel) {
-        for (name, object) in self.objects("OtherEquipment") {
+        'inputs: for (name, object) in self.objects("OtherEquipment") {
             // Official epJSON pattern ^.*\S.*$ under default RE2: no LF,
             // and at least one byte outside HT/LF/FF/CR/space. VT and Unicode
             // whitespace are valid name bytes; only the explicit Source lane
@@ -13762,34 +13763,30 @@ impl<'a> Compiler<'a> {
                 );
                 continue;
             }
-            let Some(zone_name) = self.required_string(
-                "OtherEquipment",
-                &name,
-                &object,
-                "zone_or_zonelist_or_space_or_spacelist_name",
-            ) else {
-                continue;
-            };
-            let Some(zone) = self.resolve_name(
-                &model.zone_names,
-                "OtherEquipment",
-                &name,
-                "zone_or_zonelist_or_space_or_spacelist_name",
-                &zone_name,
-                "Zone",
-            ) else {
-                continue;
-            };
-            let schedule = self.other_equipment_schedule_reference(model, &name, &object);
-            let Some(id_value) =
-                self.checked_id("OtherEquipment", &name, model.other_equipment.len())
+            let Some((target, target_instances)) =
+                self.other_equipment_input_targets(model, &name, &object)
             else {
                 continue;
             };
-            let id = InternalGainId(id_value);
-            if model.other_equipment_names.insert(&name, id).is_some() {
-                self.duplicate_name("OtherEquipment", &name);
-                continue;
+            let schedule = self.other_equipment_schedule_reference(model, &name, &object);
+            let first_instance = model.other_equipment.len();
+            let mut instances = Vec::with_capacity(target_instances.len());
+            for (zone, instance_name) in target_instances {
+                let Some(id_value) =
+                    self.checked_id("OtherEquipment", &name, first_instance + instances.len())
+                else {
+                    continue 'inputs;
+                };
+                let id = InternalGainId(id_value);
+                if model
+                    .other_equipment_names
+                    .insert(&instance_name, id)
+                    .is_some()
+                {
+                    self.duplicate_name("OtherEquipment", &instance_name);
+                    continue 'inputs;
+                }
+                instances.push((id, zone, instance_name));
             }
 
             let fuel_type = self
@@ -13850,72 +13847,82 @@ impl<'a> Compiler<'a> {
                 );
             }
 
-            model.other_equipment.push(OtherEquipment {
-                id,
-                name: model.other_equipment_names.normalized_name(&name),
-                fuel_type,
-                zone,
-                schedule,
+            let design_level_w =
+                self.number_default("OtherEquipment", &name, &object, "design_level", 0.0);
+            let power_per_floor_area_w_per_m2 = if design_level_calculation_method
+                != OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+            {
+                // Native selects Numeric1 or Numeric3 for these methods;
+                // finite unused Numeric2 retains either sign.
+                self.number_default(
+                    "OtherEquipment",
+                    &name,
+                    &object,
+                    "power_per_floor_area",
+                    0.0,
+                )
+            } else {
+                self.number_range_default(
+                    "OtherEquipment",
+                    &name,
+                    &object,
+                    "power_per_floor_area",
+                    0.0,
+                    0.0..=f64::INFINITY,
+                )
+            };
+            let power_per_person_w = if matches!(
                 design_level_calculation_method,
-                design_level_w: self.number_default(
+                OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel
+                    | OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
+            ) {
+                // Native selects Numeric1 or Numeric2 for these methods;
+                // finite unused Numeric3 has no sign restriction. Other
+                // methods keep their existing bounded projection.
+                self.number_default("OtherEquipment", &name, &object, "power_per_person", 0.0)
+            } else {
+                self.number_range_default(
                     "OtherEquipment",
                     &name,
                     &object,
-                    "design_level",
+                    "power_per_person",
                     0.0,
-                ),
-                power_per_floor_area_w_per_m2: if design_level_calculation_method
-                    != OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
-                {
-                    // Native selects Numeric1 or Numeric3 for these methods;
-                    // finite unused Numeric2 retains either sign.
-                    self.number_default(
-                        "OtherEquipment",
-                        &name,
-                        &object,
-                        "power_per_floor_area",
-                        0.0,
-                    )
-                } else {
-                    self.number_range_default(
-                        "OtherEquipment",
-                        &name,
-                        &object,
-                        "power_per_floor_area",
-                        0.0,
-                        0.0..=f64::INFINITY,
-                    )
-                },
-                power_per_person_w: if matches!(
+                    0.0..=f64::INFINITY,
+                )
+            };
+            let carbon_dioxide_generation_rate_m3_per_s_w = self.number_default(
+                "OtherEquipment",
+                &name,
+                &object,
+                "carbon_dioxide_generation_rate",
+                0.0,
+            );
+            for (id, zone, instance_name) in instances {
+                model.other_equipment.push(OtherEquipment {
+                    id,
+                    name: model.other_equipment_names.normalized_name(&instance_name),
+                    fuel_type: fuel_type.clone(),
+                    zone,
+                    schedule,
                     design_level_calculation_method,
-                    OtherEquipmentDesignLevelCalculationMethod::EquipmentLevel
-                        | OtherEquipmentDesignLevelCalculationMethod::WattsPerZoneFloorArea
-                ) {
-                    // Native selects Numeric1 or Numeric2 for these methods;
-                    // finite unused Numeric3 has no sign restriction. Other
-                    // methods keep their existing bounded projection.
-                    self.number_default("OtherEquipment", &name, &object, "power_per_person", 0.0)
-                } else {
-                    self.number_range_default(
-                        "OtherEquipment",
-                        &name,
-                        &object,
-                        "power_per_person",
-                        0.0,
-                        0.0..=f64::INFINITY,
-                    )
-                },
-                fraction_latent,
-                fraction_radiant,
-                fraction_lost,
-                carbon_dioxide_generation_rate_m3_per_s_w: self.number_default(
-                    "OtherEquipment",
-                    &name,
-                    &object,
-                    "carbon_dioxide_generation_rate",
-                    0.0,
-                ),
-            });
+                    design_level_w,
+                    power_per_floor_area_w_per_m2,
+                    power_per_person_w,
+                    fraction_latent,
+                    fraction_radiant,
+                    fraction_lost,
+                    carbon_dioxide_generation_rate_m3_per_s_w,
+                });
+            }
+            if self.source_file_declarations {
+                model
+                    .source_other_equipment_inputs
+                    .push(ep_model::SourceOtherEquipmentInput {
+                        object_name: name,
+                        target,
+                        instances: first_instance..model.other_equipment.len(),
+                    });
+            }
         }
     }
 
@@ -13936,7 +13943,7 @@ impl<'a> Compiler<'a> {
 
     fn parse_people(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("People") {
-            let Some(zone_name) = self.required_string(
+            let Some(zone_name) = self.source_reference_name(
                 "People",
                 &name,
                 &object,
@@ -13944,6 +13951,19 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
+            if self.source_file_declarations
+                && self.source_raw_object_name("Zone", &zone_name).is_none()
+            {
+                self.error(
+                    "MissingReference",
+                    "People",
+                    Some(&name),
+                    Some("zone_or_zonelist_or_space_or_spacelist_name"),
+                    "Source People remains limited to its exact actual direct Zone reference"
+                        .into(),
+                );
+                continue;
+            }
             let Some(zone) = self.resolve_name(
                 &model.zone_names,
                 "People",

@@ -1,4 +1,4 @@
-use crate::{InternalGainId, NormalizedName, ScheduleId, ZoneId};
+use crate::{InternalGainId, NormalizedName, ScheduleId, ZoneId, ZoneListId};
 
 /// OtherEquipment design-level calculation method.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -40,6 +40,29 @@ pub struct OtherEquipment {
     pub fraction_lost: f64,
     /// CO2 generation rate per unit of power input in m3/s-W.
     pub carbon_dioxide_generation_rate_m3_per_s_w: f64,
+}
+
+/// Resolved raw OtherEquipment target for explicit Source input only.
+/// These are typed input identities, not Native Source array numbers.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SourceOtherEquipmentInputTarget {
+    /// Native lookup found a genuine Zone before considering lists.
+    Zone(ZoneId),
+    /// Native lookup found a genuine ZoneList after Zone/Space lookup.
+    ZoneList(ZoneListId),
+}
+
+/// Explicit raw-object association with actual dense typed gain instances.
+/// Instance names and member Zone IDs reside in the referenced arena rows.
+/// This range is not Native misc.spaceStartPtr, which has a different traversal.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SourceOtherEquipmentInput {
+    /// Exact original raw object key, independent of generated instance names.
+    pub object_name: String,
+    /// Actual resolved Zone or ZoneList identity.
+    pub target: SourceOtherEquipmentInputTarget,
+    /// Contiguous range in TypedModel.other_equipment with real dense typed IDs.
+    pub instances: std::ops::Range<usize>,
 }
 
 /// `People` object number-of-people calculation method.

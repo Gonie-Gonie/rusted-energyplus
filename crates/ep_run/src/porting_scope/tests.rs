@@ -444,6 +444,79 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .any(|diagnostic| diagnostic.code == "UnsupportedTopology")
     );
 
+    // Unit94 admits real ordered ZoneLists only on the explicit Source A
+    // lane. A one-Zone list also keeps empty capabilities/nonpromotion.
+    for one_zone in [false, true] {
+        let mut lists = if one_zone {
+            self::input(PortingScope::A)
+        } else {
+            value.clone()
+        };
+        let member_names = if one_zone {
+            vec!["Zone"]
+        } else {
+            vec!["Zulu", "Alpha"]
+        };
+        lists["ZoneList"] = json!({"Members":{"zones":member_names.iter().map(|name|json!({"zone_name":name})).collect::<Vec<_>>()}});
+        lists["OtherEquipment"] = json!({"List gain":{"zone_or_zonelist_or_space_or_spacelist_name":"Members",
+            "schedule_name":"On","fuel_type":"Electricity","design_level":23}});
+        let raw = parse_epjson_str(&lists.to_string()).expect("actual ordered list input");
+        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_ok());
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled.model.as_ref().expect("real list instances");
+        assert_eq!(model.zone_lists.len(), 1);
+        assert_eq!(model.other_equipment.len(), member_names.len());
+        assert_eq!(model.source_other_equipment_inputs.len(), 1);
+        assert_eq!(
+            model.source_other_equipment_inputs[0].instances,
+            0..member_names.len()
+        );
+        for (row, zone_name) in model.other_equipment.iter().zip(&member_names) {
+            assert_eq!(Some(row.zone), model.zone_names.resolve(zone_name));
+            assert_eq!(
+                row.name.0,
+                format!("{} LIST GAIN", zone_name.to_ascii_uppercase())
+            );
+        }
+        let mut selected =
+            inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(selected.admissible, "{:?}", selected.violations);
+        assert!(
+            !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B).admissible
+        );
+        selected.environment = Some(
+            super::environment::environment_from_weather(
+                model,
+                &weather,
+                "actual ordered ZoneList",
+            )
+            .expect("list environment"),
+        );
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                .expect("Source list admission");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+        assert_eq!(
+            support.runtime_class,
+            crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+        );
+        assert!(support.matched_capability_ids.is_empty());
+        assert!(!support.runtime_class.conformance_promotion_allowed());
+    }
+
     // Unit88 admits only direct-Zone Electricity OtherEquipment on this
     // Source topology. Actual compiler/IP names link opposite object/Zone order;
     // no typed IDs, rates or thermal outcomes are synthesized for this test.

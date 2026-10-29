@@ -30,7 +30,15 @@ impl Compiler<'_> {
     pub(super) fn parse_zone_lists(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects(ZONE_LIST_OBJECT_TYPE) {
             let diagnostics_before_fields = self.diagnostics.len();
-            if name.trim().is_empty() {
+            let invalid_name = if self.source_file_declarations {
+                name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            } else {
+                name.trim().is_empty()
+            };
+            if invalid_name {
                 self.error(
                     "MissingRequiredField",
                     ZONE_LIST_OBJECT_TYPE,
@@ -58,7 +66,12 @@ impl Compiler<'_> {
             };
             let id = ZoneListId(id_value);
 
-            if model.zone_names.resolve(&name).is_some() {
+            let matches_zone = if self.source_file_declarations {
+                self.source_raw_object_name("Zone", &name).is_some()
+            } else {
+                model.zone_names.resolve(&name).is_some()
+            };
+            if matches_zone {
                 self.warning(
                     "ZoneListNameMatchesZone",
                     ZONE_LIST_OBJECT_TYPE,
@@ -74,7 +87,7 @@ impl Compiler<'_> {
             debug_assert!(existing.is_none());
             model.zone_lists.push(ZoneList {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.zone_list_names.normalized_name(&name),
                 zones,
                 max_zone_name_length,
             });
@@ -304,7 +317,7 @@ impl Compiler<'_> {
                 source_span: None,
             };
             let entry_name = format!("{object_name}[{index}]");
-            let Some(zone_name) = self.required_string(
+            let Some(zone_name) = self.source_reference_name(
                 ZONE_LIST_OBJECT_TYPE,
                 &entry_name,
                 &entry_object,
@@ -313,6 +326,20 @@ impl Compiler<'_> {
                 continue;
             };
             max_zone_name_length = max_zone_name_length.max(zone_name.len());
+            if self.source_file_declarations
+                && self.source_raw_object_name("Zone", &zone_name).is_none()
+            {
+                self.error(
+                    "MissingReference",
+                    ZONE_LIST_OBJECT_TYPE,
+                    Some(object_name),
+                    Some("zone_name"),
+                    format!(
+                        "ZoneList/{object_name} references missing exact Source Zone '{zone_name}'"
+                    ),
+                );
+                continue;
+            }
             let Some(zone) = self.resolve_name(
                 &model.zone_names,
                 ZONE_LIST_OBJECT_TYPE,

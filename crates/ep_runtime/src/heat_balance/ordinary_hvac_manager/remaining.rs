@@ -158,6 +158,7 @@ impl LiveReadFields<'_> {
         };
         let resilience = SourceResilienceOutputOwners { zones: self.zones };
         let air = SourceAirOutputOwners {
+            zone_lists: &self.control.zone_air_group_loads,
             air: self.air,
             demand: &self.controller.demand,
             fan: self.fan,

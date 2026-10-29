@@ -3263,7 +3263,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 input:&mut input,shortcut:&mut shortcut,globals:&mut globals,output:&mut output,prescan:&prescan,
                 report_input:&multi_model.report_inputs,minimum_report_frequency:&minimum,developer:&developer,clock:Some(&clock),
                 backend:&mut backend,minutes_in_time_step:15,host:&mut gain_host,eio:&mut eio,
-            })?;
+            }, &mut failed_gains.heat_balance_input_errors_found)?;
             assert_eq!((globals.num_of_zones,globals.num_spaces),(2,2));
             let retained=zones.zones.as_ref().ok_or("actual multi gain Zones")?;
             assert_eq!(retained.iter().map(|row|row.name.as_str()).collect::<Vec<_>>(),["ZULU","ALPHA"]);
@@ -4213,6 +4213,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         host: &mut gain_host,
                         eio: &mut people_eio,
                     },
+                    &mut people_reports.heat_balance_input_errors_found,
                 )?;
                 assert_eq!(people_zone_globals.num_of_zones, 1);
                 assert_eq!(people_zone_globals.num_spaces, 1);
