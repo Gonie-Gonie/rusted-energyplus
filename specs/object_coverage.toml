@@ -1020,10 +1020,10 @@ family = "weather"
 status = "raw_source_getter"
 compiler_coverage = "raw_only"
 source_admission = "inactive_only"
-source_boundary = "Real design-day getter/setup reads bounded inactive declarations during weather runs. Active design-day or sizing execution remains blocked."
-source_refs = ["crates/ep_runtime/src/weather_day/source_design_day/getter.rs", "crates/ep_run/src/porting_scope.rs"]
+source_boundary = "Explicit SourceA inactive getter: DefaultMultipliers dry-bulb, five scalar/default-profile humidity modes, ASHRAEClearSky and FullResetAtBeginEnvironment. Unused names and schema-open6kind metadata retain original custody; integer JSON uses signed-int64 retrieval. SourceB/legacy keep narrower WetBulb/DewPoint admission. ActiveDD/sizing, schedule selectors, alternate solar/reset models and arbitrary scalar cross-products remain unvalidated."
+source_refs = ["crates/ep_runtime/src/weather_day/source_design_day/getter.rs", "crates/ep_runtime/src/weather_day/source_design_day/humidity.rs", "crates/ep_run/src/ordinary_equipment_input/design_days.rs", "crates/ep_run/src/ordinary_design_day_input.rs", "crates/ep_run/src/ordinary_heat_balance_input.rs", "crates/ep_run/src/porting_scope.rs"]
 first_evidence = "crates/ep_runtime/src/weather_day/source_design_day/getter.rs"
-support_boundary = "Real design-day getter/setup reads bounded inactive declarations during weather runs. Active design-day or sizing execution remains blocked. This is an implementation/admission review, not a numerical conformance promotion."
+support_boundary = "One same-input one-Zone24h weather pair with six inactive DesignDays covers five humidity modes, WB33-to32/omitted-sky warnings and integeru64MAX-to-1. All116 inherited policies/10848 values pass; complete dictionaries/clocks/footers, whole ancillary records under narrow identity exceptions, CTF,19 actual warmupdays and all36 cells in six climatic rows match. This witnesses inactive getter/default modifier construction and public inputs only; active SetUpDesignDay humidity/Tomorrow trajectories and private modifiers are unobserved. Native-undefined float-to-i32 values, broader scalar/composition cross-products, activeDD/sizing and schedule/alternate solar/reset branches remain outside this evidence. No full-object/frozen conformance promotion."
 
 [[object]]
 name = "ZoneAirHeatBalanceAlgorithm"

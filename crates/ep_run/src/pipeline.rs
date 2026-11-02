@@ -3695,7 +3695,13 @@ fn prepare_runtime_inputs(
                 crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
             if source_initialization_required {
                 let reverse = crate::ordinary_design_day_input::capture_reverse_design_days()?;
-                if scope.is_some() {
+                if scope == Some(crate::PortingScope::A) {
+                    crate::ordinary_design_day_input::prepare_source_a(
+                        raw_model,
+                        &mut configuration,
+                        reverse,
+                    )?;
+                } else if scope.is_some() {
                     crate::ordinary_design_day_input::project_source(
                         raw_model,
                         &mut configuration,

@@ -9,7 +9,7 @@ pub(crate) struct SourceSupportAdmission {
     /// Exact local alpha fields consumed by genuine GetZoneData and the live
     /// owning-Zone dispatchers. This is not a general Zone-feature exemption.
     zone_convection_overrides_consumed: bool,
-    /// Source A electric gains and bounded Zones/lists/whole-Zone Spaces use
+    /// Source A DesignDay inputs, electric gains and bounded Zones/lists/whole-Zone Spaces use
     /// their own class without inheriting the frozen one-Zone capability.
     multizone_consumed: bool,
 }
@@ -88,6 +88,8 @@ impl SourceSupportAdmission {
         }
         let covered_objects = [
             "HeatBalanceAlgorithm",
+            // Only explicit SourceA admits the scalar/default-profile DD branch.
+            "SizingPeriod:DesignDay",
             // Only the validated Source A resolver can reach this real family.
             "ElectricEquipment",
             // Real GetZoneData/GetSpaceData and list/group demand owners.
@@ -125,9 +127,11 @@ impl SourceSupportAdmission {
         ]
         .into_iter()
         .filter(|family| {
-            raw.objects
-                .get(&ObjectType((*family).into()))
-                .is_some_and(|objects| !objects.is_empty())
+            (trace.scope == PortingScope::A || *family != "SizingPeriod:DesignDay")
+                && raw
+                    .objects
+                    .get(&ObjectType((*family).into()))
+                    .is_some_and(|objects| !objects.is_empty())
         })
         .collect();
         // Scope and the same raw resolver already check every effective enum
@@ -155,8 +159,12 @@ impl SourceSupportAdmission {
             multizone_consumed: trace.scope == PortingScope::A
                 && (raw
                     .objects
-                    .get(&ObjectType("Zone".into()))
-                    .is_some_and(|rows| rows.len() > 1)
+                    .get(&ObjectType("SizingPeriod:DesignDay".into()))
+                    .is_some_and(|rows| !rows.is_empty())
+                    || raw
+                        .objects
+                        .get(&ObjectType("Zone".into()))
+                        .is_some_and(|rows| rows.len() > 1)
                     || raw
                         .objects
                         .get(&ObjectType("ZoneList".into()))

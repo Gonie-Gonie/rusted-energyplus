@@ -2553,6 +2553,94 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
             .iter()
             .any(|message| message.contains("active sizing-period"))
     );
+
+    // Explicit SourceA consumes inactive scalar/default-profile DesignDays
+    // without inheriting the frozen one-Zone capability or ignored-DD warning.
+    let weather = single_day_weather_fixture();
+    for (mode, operand, amount) in [
+        ("WetBulb", "wetbulb_or_dewpoint_at_maximum_dry_bulb", 15.0),
+        ("DewPoint", "wetbulb_or_dewpoint_at_maximum_dry_bulb", 15.0),
+        ("HumidityRatio", "humidity_ratio_at_maximum_dry_bulb", 0.009),
+        ("Enthalpy", "enthalpy_at_maximum_dry_bulb", 50000.0),
+        (
+            "WetBulbProfileDefaultMultipliers",
+            "wetbulb_or_dewpoint_at_maximum_dry_bulb",
+            15.0,
+        ),
+    ] {
+        let mut value = self::input(PortingScope::A);
+        value["SizingPeriod:DesignDay"] = json!({" DD ":{
+            "month":7,"day_of_month":21,"day_type":"SummerDesignDay",
+            "maximum_dry_bulb_temperature":32,"daily_dry_bulb_temperature_range":12,
+            "humidity_condition_type":mode,"wind_speed":2,"wind_direction":0,
+            "daily_wet_bulb_temperature_range":6,"sky_clearness":1
+        }});
+        value["SizingPeriod:DesignDay"][" DD "][operand] = amount.into();
+        let raw = parse_epjson_str(&value.to_string()).expect("scalar DesignDay SourceA raw");
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled.model.as_ref().expect("single Zone typed model");
+        let mut selected =
+            inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+        assert!(selected.admissible, "{:?}", selected.violations);
+        selected.environment = Some(
+            super::environment::environment_from_weather(
+                model,
+                &weather,
+                "inactive scalar DesignDay SourceA",
+            )
+            .expect("actual coverage"),
+        );
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                .expect("explicit DesignDay SourceA admission");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+        assert_eq!(
+            support.runtime_class,
+            crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+        );
+        assert!(
+            support.matched_capability_ids.is_empty() && support.matched_capabilities.is_empty()
+        );
+        assert!(!support.runtime_class.conformance_promotion_allowed());
+        assert!(
+            support
+                .source_consumed_objects
+                .iter()
+                .any(|row| row.object_type == "SizingPeriod:DesignDay")
+        );
+        assert!(
+            !support
+                .diagnostics
+                .diagnostics
+                .iter()
+                .any(|row| row.code == "UnsupportedAlgorithmIgnored"
+                    && row.object_type.as_deref() == Some("SizingPeriod:DesignDay"))
+        );
+        value["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("Yes");
+        let active = trace(&value, PortingScope::A);
+        assert!(
+            !active.admissible
+                && active
+                    .violations
+                    .iter()
+                    .any(|message| message.contains("active sizing-period"))
+        );
+        if !matches!(mode, "WetBulb" | "DewPoint") {
+            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        }
+    }
 }
 
 #[test]

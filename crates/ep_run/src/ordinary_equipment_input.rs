@@ -29,6 +29,7 @@ fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
     field(object, name).is_none_or(|value| blank(value) || text_is(value, choices))
 }
 
+mod design_days;
 mod electric;
 mod fields;
 mod infrared;
@@ -40,6 +41,10 @@ mod spaces;
 mod zone_groups;
 mod zone_lists;
 use fields::{admitted_field, required_fields};
+
+pub(crate) fn source_design_day_known_field(name: &str) -> bool {
+    design_days::known_field(name)
+}
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<OrdinaryEquipmentInput, String> {
     resolve_raw(raw, false, false)
@@ -96,6 +101,8 @@ fn resolve_raw(
         let source_space_family = source_space_ingress && family.0 == "Space";
         let source_space_list_family = source_space_list_ingress && family.0 == "SpaceList";
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
+        let source_design_day_family =
+            source_calendar_ingress && !source_b_ingress && family.0 == "SizingPeriod:DesignDay";
         let source_irt_family =
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
         let source_people_family = source_calendar_ingress && family.0 == "People";
@@ -215,27 +222,28 @@ fn resolve_raw(
             // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
             // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
             // or Unicode whitespace. Other families keep their old boundary.
-            let blank_name = if source_calendar_ingress
-                && matches!(
-                    family.0.as_str(),
-                    "OtherEquipment"
-                        | "ElectricEquipment"
-                        | "People"
-                        | "ZoneList"
-                        | "ZoneGroup"
-                        | "Space"
-                        | "SpaceList"
-                        | "ScheduleTypeLimits"
-                        | "Schedule:Constant"
-                        | "Schedule:Compact"
-                        | "Schedule:File"
-                        | "Schedule:Day:Hourly"
-                        | "Schedule:Day:Interval"
-                        | "Schedule:Day:List"
-                        | "Schedule:Week:Daily"
-                        | "Schedule:Week:Compact"
-                        | "Schedule:Year"
-                ) {
+            let blank_name = if source_design_day_family
+                || source_calendar_ingress
+                    && matches!(
+                        family.0.as_str(),
+                        "OtherEquipment"
+                            | "ElectricEquipment"
+                            | "People"
+                            | "ZoneList"
+                            | "ZoneGroup"
+                            | "Space"
+                            | "SpaceList"
+                            | "ScheduleTypeLimits"
+                            | "Schedule:Constant"
+                            | "Schedule:Compact"
+                            | "Schedule:File"
+                            | "Schedule:Day:Hourly"
+                            | "Schedule:Day:Interval"
+                            | "Schedule:Day:List"
+                            | "Schedule:Week:Daily"
+                            | "Schedule:Week:Compact"
+                            | "Schedule:Year"
+                    ) {
                 name.0.contains('\n')
                     || name
                         .0
@@ -283,6 +291,9 @@ fn resolve_raw(
                         && match family.0.as_str() {
                             "Material:InfraredTransparent" if source_irt_family => true,
                             "People" if source_people_family => !people::known_field(&field.0),
+                            "SizingPeriod:DesignDay" if source_design_day_family => {
+                                !design_days::known_field(&field.0)
+                            }
                             "Output:Diagnostics" => field.0 != "diagnostics",
                             "ScheduleTypeLimits" => !matches!(
                                 field.0.as_str(),
@@ -531,6 +542,9 @@ fn resolve_raw(
                                     field(object, "space_name"),
                                     Some(RawValue::String(_))
                                 )))
+                }
+                "SizingPeriod:DesignDay" if source_design_day_family => {
+                    design_days::admitted_object(object)
                 }
                 "SizingPeriod:DesignDay" => {
                     selected(

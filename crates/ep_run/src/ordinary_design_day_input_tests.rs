@@ -118,6 +118,217 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
     assert!(mismatched.setup_simulation_controls.is_none());
     crate::ordinary_design_day_input::project(&one, &mut mismatched, false)?;
     assert_eq!(mismatched.design_days, [expected[0].clone()]);
+
+    // SourceA hands original scalar/default-profile inputs to the genuine
+    // getter; legacy and SourceB continue their unchanged warning-free DTO path.
+    for (mode, operand, value) in [
+        ("WetBulb", "wetbulb_or_dewpoint_at_maximum_dry_bulb", 34.0),
+        ("DewPoint", "wetbulb_or_dewpoint_at_maximum_dry_bulb", 34.0),
+        ("HumidityRatio", "humidity_ratio_at_maximum_dry_bulb", 0.009),
+        ("Enthalpy", "enthalpy_at_maximum_dry_bulb", 50000.0),
+        (
+            "WetBulbProfileDefaultMultipliers",
+            "wetbulb_or_dewpoint_at_maximum_dry_bulb",
+            15.5,
+        ),
+    ] {
+        let mut candidate = document.clone();
+        let object = candidate["SizingPeriod:DesignDay"][COOLING]
+            .as_object_mut()
+            .ok_or("DD object")?;
+        object.insert("humidity_condition_type".into(), mode.into());
+        object.remove("wetbulb_or_dewpoint_at_maximum_dry_bulb");
+        object.insert(operand.into(), value.into());
+        object.insert("daily_wet_bulb_temperature_range".into(), 6.5.into());
+        object.remove("sky_clearness"); // Genuine ClearSky warning/default, not eager error.
+        for key in [
+            "dry_bulb_temperature_range_modifier_day_schedule_name",
+            "humidity_condition_day_schedule_name",
+            "beam_solar_day_schedule_name",
+            "diffuse_solar_day_schedule_name",
+        ] {
+            object.insert(key.into(), " Unused unbound day name ".into());
+        }
+        let raw = parse_epjson_str(&candidate.to_string())?;
+        crate::ordinary_equipment_input::resolve_source_a(&raw)?;
+        let mut prepared = configuration(2)?;
+        prepared.design_days = expected.to_vec();
+        crate::ordinary_design_day_input::prepare_source_a(&raw, &mut prepared, true)?;
+        assert!(prepared.design_days.is_empty());
+        assert!(prepared.setup_simulation_controls.is_none());
+        assert!(prepared.reverse_design_days);
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        let fields = ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?;
+        use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as DDValue;
+        assert_eq!(
+            fields["humidity_condition_type"],
+            DDValue::String(mode.into())
+        );
+        assert!(matches!(&fields[operand], DDValue::Number(_)));
+        assert!(!fields.contains_key("sky_clearness"));
+        assert_eq!(
+            fields["humidity_condition_day_schedule_name"],
+            DDValue::String(" Unused unbound day name ".into())
+        );
+        assert!(ip.is_object_unused("SizingPeriod:DesignDay", COOLING));
+        let mut old = configuration(2)?;
+        assert!(crate::ordinary_design_day_input::project_source(&raw, &mut old, false).is_err());
+        if !matches!(mode, "WetBulb" | "DewPoint") {
+            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        }
+    }
+    let mut opaque = document.clone();
+    let object = opaque["SizingPeriod:DesignDay"][COOLING]
+        .as_object_mut()
+        .ok_or("DD metadata object")?;
+    object.insert("humidity_condition_type".into(), "HumidityRatio".into());
+    object.remove("wetbulb_or_dewpoint_at_maximum_dry_bulb");
+    object.remove("humidity_ratio_at_maximum_dry_bulb");
+    // Unknown aliases cannot fill a selected operand; the real getter diagnoses
+    // its absence. The six JSON kinds remain original metadata without coercion.
+    object.insert("humidity_ratio".into(), 0.009.into());
+    for (key, value) in [
+        ("opaque_null", serde_json::json!(null)),
+        ("opaque_bool", serde_json::json!(true)),
+        ("opaque_number", serde_json::json!(7)),
+        ("opaque_string", serde_json::json!(" kept ")),
+        (
+            "opaque_array",
+            serde_json::json!([null, true, 7, " text ", {}, []]),
+        ),
+        (
+            "opaque_object",
+            serde_json::json!({"nested":[null,false,8]}),
+        ),
+    ] {
+        object.insert(key.into(), value);
+    }
+    let raw = parse_epjson_str(&opaque.to_string())?;
+    crate::ordinary_equipment_input::resolve_source_a(&raw)?;
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    let before = raw.clone();
+    let mut prepared = configuration(2)?;
+    crate::ordinary_design_day_input::prepare_source_a(&raw, &mut prepared, false)?;
+    assert_eq!(raw, before);
+    let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+    let fields = ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?;
+    use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as DDValue;
+    assert!(!fields.contains_key("humidity_ratio_at_maximum_dry_bulb"));
+    assert_eq!(fields["humidity_ratio"], DDValue::Number("0.009".into()));
+    assert_eq!(fields["opaque_null"], DDValue::Null);
+    assert_eq!(fields["opaque_bool"], DDValue::Bool(true));
+    assert_eq!(fields["opaque_number"], DDValue::Number("7".into()));
+    assert_eq!(fields["opaque_string"], DDValue::String(" kept ".into()));
+    assert!(matches!(&fields["opaque_array"], DDValue::Array(items) if items.len()==6));
+    assert!(
+        matches!(&fields["opaque_object"], DDValue::Object(items) if items.contains_key("nested"))
+    );
+    let hb = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+    let actual = hb.objects["SizingPeriod:DesignDay"]
+        .iter()
+        .find(|row| row.object_name == COOLING)
+        .ok_or("actual DD raw getter row")?;
+    assert!(
+        !actual
+            .fields
+            .contains_key("humidity_ratio_at_maximum_dry_bulb")
+    );
+    assert!(!actual.fields.contains_key("humidity_ratio"));
+    assert!(!actual.fields.keys().any(|key| key.starts_with("opaque_")));
+
+    // Native JSON integer-kind retrieval wraps u64 to i64 before Real64.
+    // The floating-kind control is intentionally outside the real DD range;
+    // this checks getter classification only, without running either engine.
+    for (token, expected) in [
+        ("18446744073709551615", -1.0),
+        ("18446744073709551615.0", 1.844_674_407_370_955_2e19),
+    ] {
+        let mut candidate = document.clone();
+        let authored: serde_json::Value = serde_json::from_str(token)?;
+        let authored_text = authored.to_string();
+        candidate["SizingPeriod:DesignDay"][COOLING]["wetbulb_or_dewpoint_at_maximum_dry_bulb"] =
+            authored;
+        let raw = parse_epjson_str(&candidate.to_string())?;
+        crate::ordinary_equipment_input::resolve_source_a(&raw)?;
+        let original = raw.clone();
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert_eq!(
+            ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?["wetbulb_or_dewpoint_at_maximum_dry_bulb"],
+            DDValue::Number(authored_text)
+        );
+        let hb = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+        let row = hb.objects["SizingPeriod:DesignDay"]
+            .iter()
+            .find(|row| row.object_name == COOLING)
+            .ok_or("source DD numeric row")?;
+        assert_eq!(
+            row.fields["wetbulb_or_dewpoint_at_maximum_dry_bulb"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(expected)
+        );
+        let legacy = crate::ordinary_heat_balance_input::resolve(&raw, &ip)?;
+        let row = legacy.objects["SizingPeriod:DesignDay"]
+            .iter()
+            .find(|row| row.object_name == COOLING)
+            .ok_or("legacy DD numeric row")?;
+        assert_eq!(
+            row.fields["wetbulb_or_dewpoint_at_maximum_dry_bulb"],
+            ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                1.844_674_407_370_955_2e19
+            )
+        );
+        assert_eq!(raw, original);
+    }
+    for (field, value) in [
+        ("humidity_condition_type", serde_json::json!(true)),
+        ("humidity_ratio_at_maximum_dry_bulb", serde_json::json!({})),
+        ("maximum_dry_bulb_temperature", serde_json::json!(71)),
+        ("idf_order", serde_json::json!(0.0)),
+        ("idf_max_fields", serde_json::json!(-1)),
+        ("idf_max_extensible_fields", serde_json::json!("0")),
+    ] {
+        let mut invalid = opaque.clone();
+        invalid["SizingPeriod:DesignDay"][COOLING][field] = value;
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_a(&parse_epjson_str(
+                &invalid.to_string()
+            )?)
+            .is_err(),
+            "{field}"
+        );
+    }
+    for (field, value) in [
+        (
+            "dry_bulb_temperature_range_modifier_type",
+            "MultiplierSchedule",
+        ),
+        ("humidity_condition_type", "RelativeHumiditySchedule"),
+        ("solar_model_indicator", "ASHRAETau"),
+        (
+            "begin_environment_reset_mode",
+            "SuppressAllBeginEnvironmentResets",
+        ),
+    ] {
+        let mut excluded = document.clone();
+        excluded["SizingPeriod:DesignDay"][COOLING][field] = value.into();
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_a(&parse_epjson_str(
+                &excluded.to_string()
+            )?)
+            .is_err(),
+            "{field}"
+        );
+    }
+    let mut one_source = configuration(1)?;
+    crate::ordinary_design_day_input::prepare_source_a(&one, &mut one_source, true)?;
+    assert!(one_source.reverse_design_days && one_source.design_days.is_empty());
+    let mut mismatch = configuration(1)?;
+    mismatch.design_days = expected.to_vec();
+    let prior = mismatch.design_days.clone();
+    assert!(
+        crate::ordinary_design_day_input::prepare_source_a(&lexical, &mut mismatch, true).is_err()
+    );
+    assert_eq!(mismatch.design_days, prior);
     Ok(())
 }
 

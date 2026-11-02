@@ -176,11 +176,20 @@ fn resolve_ordered(
                 {
                     continue;
                 }
+                // Native IP projects official fields only; original SourceA
+                // metadata remains in the raw/IP owners without coercion.
+                if source_order
+                    && family == "SizingPeriod:DesignDay"
+                    && !crate::ordinary_equipment_input::source_design_day_known_field(&field.0)
+                {
+                    continue;
+                }
                 let scalar = match value {
                     RawValue::String(value) => ProjectInputValue::String(value.clone()),
                     RawValue::Number(value) => {
                         let value = if matches!(family, "OtherEquipment" | "People")
-                            || (source_order && family == "ElectricEquipment")
+                            || (source_order
+                                && matches!(family, "ElectricEquipment" | "SizingPeriod:DesignDay"))
                         {
                             ep_model::classify_source_json_number(value)
                                 .map(ep_model::SourceJsonNumber::as_f64)

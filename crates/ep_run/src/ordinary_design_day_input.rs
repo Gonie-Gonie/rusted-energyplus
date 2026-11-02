@@ -96,6 +96,26 @@ pub(crate) fn project(
     project_ordered(raw, configuration, reverse, false)
 }
 
+/// SourceA preparation carries no DesignDay DTO or calculated weather.
+/// The real ReadUserWeatherInput/GetDesignDayData and GetProjectData children
+/// consume original IP values, including blank/default/error branches, later.
+pub(crate) fn prepare_source_a(
+    raw: &RawModel,
+    configuration: &mut WeatherEnvironmentConfiguration,
+    reverse: bool,
+) -> Result<(), String> {
+    let objects = raw.source_ordered_instances("SizingPeriod:DesignDay")?;
+    if i32::try_from(objects.len()).ok() != Some(configuration.design_day_count) {
+        return Err("DesignDay actual collection/count association differs".into());
+    }
+    // ReverseDD with one day must reach its genuine Severe callback. No
+    // weather, schedule profile, diagnostic or SimulationControl is replayed here.
+    configuration.design_days.clear();
+    configuration.setup_simulation_controls = None;
+    configuration.reverse_design_days = reverse;
+    Ok(())
+}
+
 pub(crate) fn project_source(
     raw: &RawModel,
     configuration: &mut WeatherEnvironmentConfiguration,
