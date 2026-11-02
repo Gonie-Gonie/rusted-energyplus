@@ -14,10 +14,10 @@ pub(crate) enum HeatBalanceWeatherDriver<'a> {
 }
 
 impl<'a> HeatBalanceWeatherDriver<'a> {
-    pub(crate) fn hourly_count(self) -> usize {
+    pub(crate) fn hourly_count(self) -> Result<usize, RuntimeError> {
         match self {
-            Self::Legacy(series) => series.hourly_dry_bulb_c().len(),
-            Self::Production(series) => series.hourly_count(),
+            Self::Legacy(series) => Ok(series.hourly_dry_bulb_c().len()),
+            Self::Production(series) => Ok(series.hourly_count()?),
         }
     }
 

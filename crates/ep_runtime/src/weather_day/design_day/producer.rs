@@ -206,6 +206,7 @@ impl WeatherSession {
         current_year: i32,
         do_weather_init_reporting: bool,
     ) -> Result<(), WeatherDayError> {
+        self.configuration.legacy()?;
         let ordinal = index
             .checked_add(1)
             .and_then(|value| i32::try_from(value).ok())
@@ -223,20 +224,23 @@ impl WeatherSession {
             self.state.environment.end_month_flag = false;
         }
         if self.state.global.begin_envrn_flag {
+            let time_zone_hours = self.configuration.legacy()?.site.time_zone_hours;
             let input = self
                 .configuration
+                .legacy_mut()?
                 .design_days
                 .get_mut(index)
                 .ok_or_else(|| WeatherDayError::admission("DesignDay input owner missing"))?;
             input.setup(
                 &mut self.state,
                 current_year,
-                self.configuration.site.time_zone_hours,
+                time_zone_hours,
                 do_weather_init_reporting,
             )?;
             self.state.environment.environment_name = input.name().into();
-            self.initialize_missing_values();
-            self.state.tomorrow_variables = self.configuration.design_days[index].daily_variables;
+            self.initialize_missing_values()?;
+            self.state.tomorrow_variables =
+                self.configuration.legacy()?.design_days[index].daily_variables;
         }
         if self.state.global.begin_day_flag {
             super::super::update_weather_data(&mut self.state);

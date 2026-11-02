@@ -840,12 +840,15 @@ struct RustRuntimeResult {
 
 struct PendingOrdinaryWeather {
     bytes: Vec<u8>,
-    configuration: WeatherEnvironmentConfiguration,
+    // Legacy eager callers require a real prepared weather configuration.
+    configuration: Option<WeatherEnvironmentConfiguration>,
+    reverse_design_days: bool,
 }
 
 struct PreparedRuntimeInputs {
-    sample_count: usize,
-    time_axis: TimeAxis,
+    // Absent for DD-only Source; actual scope is observed after primary.
+    sample_count: Option<usize>,
+    time_axis: Option<TimeAxis>,
     schedule_cache: Option<ScheduleSeriesCache>,
     zone_timestep_schedule_cache: Option<ScheduleSeriesCache>,
     weather_series: Option<ProductionWeatherTimestepSeries>,
@@ -1195,7 +1198,29 @@ fn run_with_optional_porting_scope_impl(
                 .unwrap_or(0),
         );
         if trace.admissible {
-            if let (Some(model), Some(weather_path)) = (typed_model, config.weather_path.as_ref()) {
+            if trace.source_design_day_only() {
+                let default_path = PathBuf::from("in.epw");
+                let path = config.weather_path.as_deref().unwrap_or(&default_path);
+                match crate::porting_scope::porting_source_design_day_trace(
+                    &raw_model,
+                    scope,
+                    path,
+                    config.weather_path.is_none(),
+                ) {
+                    Ok((environment, admission)) => {
+                        trace.violations.extend(
+                            crate::porting_scope::validate_source_design_day_environment(
+                                &environment,
+                                &admission,
+                            ),
+                        );
+                        trace.environment = Some(environment);
+                    }
+                    Err(error) => trace.violations.push(error),
+                }
+            } else if let (Some(model), Some(weather_path)) =
+                (typed_model, config.weather_path.as_ref())
+            {
                 match crate::porting_scope::porting_source_environment_trace(
                     &raw_model,
                     model,
@@ -1241,6 +1266,9 @@ fn run_with_optional_porting_scope_impl(
     } else {
         None
     };
+    let source_design_day_only = source_scope_trace
+        .as_ref()
+        .is_some_and(|trace| trace.source_design_day_only());
     let source_admission = source_scope_trace.as_ref().and_then(|trace| {
         crate::support::SourceSupportAdmission::from_validated_scope(&raw_model, trace)
     });
@@ -1297,6 +1325,7 @@ fn run_with_optional_porting_scope_impl(
         && assessment.allows_rust_runtime()
         && runtime_class_requires_weather(assessment.runtime_class)
         && config.weather_path.is_none()
+        && !source_design_day_only
     {
         diagnostics.error(
             "MissingWeatherFile",
@@ -1455,6 +1484,7 @@ fn run_with_optional_porting_scope_impl(
                     assessment.runtime_class,
                     &raw_model,
                     scope,
+                    source_design_day_only,
                 )
             },
         ) {
@@ -1481,7 +1511,11 @@ fn run_with_optional_porting_scope_impl(
             "rust_runtime_setup",
             "ep_run",
             runtime_setup_start.elapsed().as_secs_f64(),
-            "resolve runtime inputs before the loop; weather runtimes load rich EPW metadata, build the metadata-aware time axis, select source-order records, and precompute weather timesteps",
+            if source_design_day_only {
+                "retain optional actual weather-file input and defer DD environment preparation to genuine Source owners; no coverage axis or simulated events prepared"
+            } else {
+                "resolve runtime inputs before the loop; weather runtimes load rich EPW metadata, build the metadata-aware time axis, select source-order records, and precompute weather timesteps"
+            },
         );
 
         let runtime_start = Instant::now();
@@ -3591,6 +3625,7 @@ fn prepare_runtime_inputs(
     runtime_class: RuntimeClass,
     raw_model: &RawModel,
     scope: Option<crate::PortingScope>,
+    source_design_day_only: bool,
 ) -> Result<PreparedRuntimeInputs, String> {
     // The already-admitted CLI scope selects Source explicitly. Ordinary
     // calls retain the existing compatibility path and never enter a retry.
@@ -3614,179 +3649,212 @@ fn prepare_runtime_inputs(
     let source_initialization_required =
         runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility || scope.is_some();
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
+    let input_weather_path = config
+        .weather_path
+        .clone()
+        .or_else(|| source_design_day_only.then(|| PathBuf::from("in.epw")));
     let mut pending_ordinary_weather = None;
-    let (time_axis, weather_series, zone_timestep_schedule_cache) =
-        if runtime_class_requires_weather(runtime_class) {
-            let weather_path = config
-                .weather_path
-                .as_ref()
-                .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
-            let parsed_weather =
-                ep_runtime::weather::raw::load_parsed_epw_weather_file(weather_path)
-                    .map_err(|error| format!("failed to load EPW weather: {error}"))?;
-            let weather_file = &parsed_weather.physical_projection;
-            let time_axis = if let Some(source_scope) = scope {
-                // Coverage-only preparation, never DST/holiday/schedule input
-                // to the genuine Source owners attached from original bytes.
-                crate::porting_scope::source_coverage_axis(
-                    raw_model,
-                    source_scope,
-                    &model.typed,
-                    &weather_file.calendar_metadata,
-                )?
-            } else {
-                build_hourly_time_axis_with_weather_metadata(
-                    &model.typed,
-                    &weather_file.calendar_metadata,
-                )
-                .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?
-            };
-            if ep_runtime::weather::raw::production_trace::is_active() {
-                // Preview evidence remains separate from the live owner below.
-                let environment_weather = select_epw_environment_weather(weather_file, &time_axis)
-                    .map_err(|error| format!("failed to prepare EPW preview evidence: {error}"))?;
-                let selected = environment_weather
-                    .selected_source_record_indices
-                    .iter()
-                    .zip(environment_weather.hourly_records())
-                    // SourceA coverage excludes DDs; --hours is checked against
-                    // the actual completed Source environment scope below.
-                    .take(runtime_sample_count(
-                        config,
-                        &time_axis,
-                        scope != Some(crate::PortingScope::A),
-                    )?)
-                    .map(|(&index, &record)| {
-                        parsed_weather
-                            .raw_records
-                            .get(index)
-                            .copied()
-                            .map(|raw| (index, raw, record))
-                            .ok_or_else(|| "selected EPW source index has no raw owner".to_owned())
-                    })
-                    .collect::<Result<Vec<_>, _>>()?;
-                ep_runtime::weather::raw::production_trace::record_prepared(
-                    weather_path,
-                    parsed_weather.input_byte_length,
-                    &parsed_weather.raw_header,
-                    parsed_weather.stream_after_header,
-                    parsed_weather.final_stream,
-                    parsed_weather.raw_records.len(),
-                    &selected,
-                );
+    let (time_axis, weather_series, zone_timestep_schedule_cache) = if source_design_day_only {
+        if scope != Some(crate::PortingScope::A) {
+            return Err("DD-only preparation requires explicit SourceA admission".into());
+        }
+        let path = input_weather_path
+            .as_deref()
+            .ok_or("actual default weather path missing")?;
+        // Capture actual optional input bytes, not a fabricated weather file.
+        // Genuine OpenWeatherFile retains its later filesystem predicate.
+        let bytes = match std::fs::metadata(path) {
+            Ok(metadata) if !metadata.is_dir() => {
+                std::fs::read(path).map_err(|error| error.to_string())?
             }
-            let header = &parsed_weather.raw_header;
-            let fallback_site = ep_model::SiteLocation {
-                name: ep_model::NormalizedName(header.weather_location_title.clone()),
-                latitude_deg: header.latitude,
-                longitude_deg: header.longitude,
-                time_zone_hours: header.time_zone,
-                elevation_m: header.elevation,
-            };
-            let design_day_count = raw_model
-                .objects
-                .iter()
-                .filter(|(kind, _)| kind.0.eq_ignore_ascii_case("SizingPeriod:DesignDay"))
-                .map(|(_, objects)| objects.len())
-                .sum::<usize>();
-            let mut configuration = WeatherEnvironmentConfiguration::for_model(
-                &time_axis,
+            Ok(_) => Vec::new(),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Vec::new(),
+            Err(error) => return Err(error.to_string()),
+        };
+        pending_ordinary_weather = Some(PendingOrdinaryWeather {
+            bytes,
+            configuration: None,
+            reverse_design_days: crate::ordinary_design_day_input::capture_reverse_design_days()?,
+        });
+        (None, None, None)
+    } else if runtime_class_requires_weather(runtime_class) {
+        let weather_path = config
+            .weather_path
+            .as_ref()
+            .ok_or_else(|| "weather path is required for heat-balance runtime".to_string())?;
+        let parsed_weather = ep_runtime::weather::raw::load_parsed_epw_weather_file(weather_path)
+            .map_err(|error| format!("failed to load EPW weather: {error}"))?;
+        let weather_file = &parsed_weather.physical_projection;
+        let time_axis = if let Some(source_scope) = scope {
+            // Coverage-only preparation, never DST/holiday/schedule input
+            // to the genuine Source owners attached from original bytes.
+            crate::porting_scope::source_coverage_axis(
+                raw_model,
+                source_scope,
                 &model.typed,
-                &fallback_site,
-                i32::try_from(design_day_count).map_err(|error| error.to_string())?,
+                &weather_file.calendar_metadata,
+            )?
+        } else {
+            build_hourly_time_axis_with_weather_metadata(
+                &model.typed,
+                &weather_file.calendar_metadata,
             )
-            .map_err(|error| error.to_string())?;
-            let environment_inputs = crate::weather_solar_controls::capture_environment_inputs()?;
-            configuration.solar_controls =
-                crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
-            if source_initialization_required {
-                let reverse = crate::ordinary_design_day_input::capture_reverse_design_days()?;
-                if scope == Some(crate::PortingScope::A) {
-                    crate::ordinary_design_day_input::prepare_source_a(
-                        raw_model,
-                        &mut configuration,
-                        reverse,
-                    )?;
-                } else if scope.is_some() {
-                    crate::ordinary_design_day_input::project_source(
-                        raw_model,
-                        &mut configuration,
-                        reverse,
-                    )?;
-                } else {
-                    crate::ordinary_design_day_input::project(
-                        raw_model,
-                        &mut configuration,
-                        reverse,
-                    )?;
-                }
-            }
-            let bytes = std::fs::read(weather_path).map_err(|error| error.to_string())?;
-            let weather_series = if source_initialization_required {
-                pending_ordinary_weather = Some(PendingOrdinaryWeather {
-                    bytes,
-                    configuration,
-                });
-                None
+            .map_err(|error| format!("failed to build weather-aware time axis: {error}"))?
+        };
+        if ep_runtime::weather::raw::production_trace::is_active() {
+            // Preview evidence remains separate from the live owner below.
+            let environment_weather = select_epw_environment_weather(weather_file, &time_axis)
+                .map_err(|error| format!("failed to prepare EPW preview evidence: {error}"))?;
+            let selected = environment_weather
+                .selected_source_record_indices
+                .iter()
+                .zip(environment_weather.hourly_records())
+                // SourceA coverage excludes DDs; --hours is checked against
+                // the actual completed Source environment scope below.
+                .take(runtime_sample_count(
+                    config,
+                    &time_axis,
+                    scope != Some(crate::PortingScope::A),
+                )?)
+                .map(|(&index, &record)| {
+                    parsed_weather
+                        .raw_records
+                        .get(index)
+                        .copied()
+                        .map(|raw| (index, raw, record))
+                        .ok_or_else(|| "selected EPW source index has no raw owner".to_owned())
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            ep_runtime::weather::raw::production_trace::record_prepared(
+                weather_path,
+                parsed_weather.input_byte_length,
+                &parsed_weather.raw_header,
+                parsed_weather.stream_after_header,
+                parsed_weather.final_stream,
+                parsed_weather.raw_records.len(),
+                &selected,
+            );
+        }
+        let header = &parsed_weather.raw_header;
+        let fallback_site = ep_model::SiteLocation {
+            name: ep_model::NormalizedName(header.weather_location_title.clone()),
+            latitude_deg: header.latitude,
+            longitude_deg: header.longitude,
+            time_zone_hours: header.time_zone,
+            elevation_m: header.elevation,
+        };
+        let design_day_count = raw_model
+            .objects
+            .iter()
+            .filter(|(kind, _)| kind.0.eq_ignore_ascii_case("SizingPeriod:DesignDay"))
+            .map(|(_, objects)| objects.len())
+            .sum::<usize>();
+        let mut configuration = WeatherEnvironmentConfiguration::for_model(
+            &time_axis,
+            &model.typed,
+            &fallback_site,
+            i32::try_from(design_day_count).map_err(|error| error.to_string())?,
+        )
+        .map_err(|error| error.to_string())?;
+        let environment_inputs = crate::weather_solar_controls::capture_environment_inputs()?;
+        configuration.solar_controls =
+            crate::weather_solar_controls::resolve_controls(raw_model, &environment_inputs)?;
+        if source_initialization_required {
+            let reverse = crate::ordinary_design_day_input::capture_reverse_design_days()?;
+            if scope == Some(crate::PortingScope::A) {
+                crate::ordinary_design_day_input::prepare_source_a(
+                    raw_model,
+                    &mut configuration,
+                    reverse,
+                )?;
+            } else if scope.is_some() {
+                crate::ordinary_design_day_input::project_source(
+                    raw_model,
+                    &mut configuration,
+                    reverse,
+                )?;
             } else {
-                Some(
-                    ProductionWeatherTimestepSeries::from_bytes(bytes, configuration)
-                        .map_err(|error| format!("failed to open live EPW owner: {error}"))?,
-                )
-            };
-            let zone_timestep_schedule_cache = if scope.is_none()
-                && runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
-            {
-                let environment_axis = build_environment_time_axes_with_weather_metadata(
-                    &model.typed,
-                    &weather_file.calendar_metadata,
-                )
-                .map_err(|error| {
-                    format!("failed to build zone-timestep environment axis: {error}")
-                })?
-                .into_iter()
-                .next()
-                .ok_or_else(|| "no zone-timestep environment axis was available".to_string())?;
-                ep_runtime::psychrometrics::production_trace::register_environment_axis(
-                    &environment_axis,
-                );
-                let cache = precompute_schedule_cache_for_environment_time_axis(
-                    &model.typed,
-                    &environment_axis,
-                );
-                ep_runtime::schedules::production_trace::record_cache(
+                crate::ordinary_design_day_input::project(raw_model, &mut configuration, reverse)?;
+            }
+        }
+        let bytes = std::fs::read(weather_path).map_err(|error| error.to_string())?;
+        let weather_series = if source_initialization_required {
+            pending_ordinary_weather = Some(PendingOrdinaryWeather {
+                bytes,
+                reverse_design_days: configuration.reverse_design_days,
+                configuration: Some(configuration),
+            });
+            None
+        } else {
+            Some(
+                ProductionWeatherTimestepSeries::from_bytes(bytes, configuration)
+                    .map_err(|error| format!("failed to open live EPW owner: {error}"))?,
+            )
+        };
+        let zone_timestep_schedule_cache = if scope.is_none()
+            && runtime_class == RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+        {
+            let environment_axis = build_environment_time_axes_with_weather_metadata(
+                &model.typed,
+                &weather_file.calendar_metadata,
+            )
+            .map_err(|error| format!("failed to build zone-timestep environment axis: {error}"))?
+            .into_iter()
+            .next()
+            .ok_or_else(|| "no zone-timestep environment axis was available".to_string())?;
+            ep_runtime::psychrometrics::production_trace::register_environment_axis(
+                &environment_axis,
+            );
+            let cache = precompute_schedule_cache_for_environment_time_axis(
+                &model.typed,
+                &environment_axis,
+            );
+            ep_runtime::schedules::production_trace::record_cache(
                         ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineEnvironmentPrepared,
                         &cache,
                     );
-                Some(cache)
-            } else {
-                None
-            };
-            (time_axis, weather_series, zone_timestep_schedule_cache)
+            Some(cache)
         } else {
-            (
-                build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?,
-                None,
-                None,
-            )
+            None
         };
+        (
+            Some(time_axis),
+            weather_series,
+            zone_timestep_schedule_cache,
+        )
+    } else {
+        (
+            Some(build_hourly_time_axis(&model.typed).map_err(|error| error.to_string())?),
+            None,
+            None,
+        )
+    };
     // SourceA's weather-only coverage axis cannot bound active DD hours.
     // The completed SourceReportedRunScope remains the full-hour validator.
-    let sample_count = runtime_sample_count(
-        config,
-        &time_axis,
-        runtime_class_requires_weather(runtime_class) && scope != Some(crate::PortingScope::A),
-    )?;
+    let sample_count = time_axis
+        .as_ref()
+        .map(|axis| {
+            runtime_sample_count(
+                config,
+                axis,
+                runtime_class_requires_weather(runtime_class)
+                    && scope != Some(crate::PortingScope::A),
+            )
+        })
+        .transpose()?;
     let schedule_cache = if source_initialization_required {
         // No disposable cache or trace is produced from the pre-Project timestep.
         None
     } else {
-        let cache = precompute_schedule_cache_for_time_axis(&model.typed, &time_axis);
+        let time_axis = time_axis
+            .as_ref()
+            .ok_or("legacy schedule preparation requires its real time axis")?;
+        let cache = precompute_schedule_cache_for_time_axis(&model.typed, time_axis);
         ep_runtime::schedules::production_trace::record_cache(
             ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineHourlyPrepared,
             &cache,
         );
-        ep_runtime::psychrometrics::production_trace::register_time_axis(&time_axis);
+        ep_runtime::psychrometrics::production_trace::register_time_axis(time_axis);
         Some(cache)
     };
 
@@ -3838,8 +3906,7 @@ fn prepare_runtime_inputs(
                     )?
                 },
                 input_file_path: Some(config.input_path.clone()),
-                input_weather_file_path: config
-                    .weather_path
+                input_weather_file_path: input_weather_path
                     .clone()
                     .ok_or("actual weather path missing")?,
                 cli_dd_only: false,
@@ -3847,7 +3914,6 @@ fn prepare_runtime_inputs(
                 reverse_design_days: pending_ordinary_weather
                     .as_ref()
                     .ok_or("missing actual pending weather")?
-                    .configuration
                     .reverse_design_days,
             },
         )
@@ -3936,7 +4002,7 @@ fn execute_rust_runtime(
     scope: Option<crate::PortingScope>,
 ) -> Result<RuntimeExecutionOutcome, String> {
     let model = simulation_model.ok_or_else(|| "missing compiled simulation model".to_string())?;
-    let sample_count = runtime_inputs.sample_count;
+    // Actual Source scope follows primary; legacy sample count is read below.
     if runtime_class == RuntimeClass::OneZoneHeatBalanceCompatibility || scope.is_some() {
         let input = runtime_inputs
             .source_initialization_input
@@ -3973,16 +4039,17 @@ fn execute_rust_runtime(
             let steps = ctf_outputs.source_zone_timesteps_per_hour()?;
             model.typed.timestep.number_of_timesteps_per_hour = steps;
             let profile = ep_runtime::time_axis::time_axis_timestep_profile(&model.typed);
-            runtime_inputs.time_axis.zone_timestep = profile.zone_timestep;
-            runtime_inputs.time_axis.system_timestep = profile.system_timestep;
+            if let Some(axis) = runtime_inputs.time_axis.as_mut() {
+                axis.zone_timestep = profile.zone_timestep;
+                axis.system_timestep = profile.system_timestep;
+            }
             if let Some(reporting) = runtime_inputs.ordinary_warmup_reporting.as_mut() {
                 ctf_outputs.apply_source_reporting_controls(reporting)?;
             }
             if scope.is_some() {
                 // Explicit porting runs use the same real Source owners through
                 // primary, complete endrun and the completed own-file reader.
-                let weather = ctf_outputs
-                    .initialize_unopened_source_weather(pending.bytes, pending.configuration)?;
+                let weather = ctf_outputs.initialize_unopened_source_weather(pending.bytes)?;
                 runtime_inputs.weather_series = Some(weather);
                 let weather = runtime_inputs
                     .weather_series
@@ -4035,19 +4102,25 @@ fn execute_rust_runtime(
                     },
                 )));
             }
-            let weather =
-                ctf_outputs.initialize_source_weather(pending.bytes, pending.configuration)?;
-            let cache =
-                precompute_schedule_cache_for_time_axis(&model.typed, &runtime_inputs.time_axis);
+            let configuration = pending
+                .configuration
+                .ok_or("legacy weather requires its genuine prepared configuration")?;
+            let weather = ctf_outputs.initialize_source_weather(pending.bytes, configuration)?;
+            let time_axis = runtime_inputs
+                .time_axis
+                .as_ref()
+                .ok_or("legacy weather requires its genuine prepared time axis")?;
+            let cache = precompute_schedule_cache_for_time_axis(&model.typed, time_axis);
             ep_runtime::schedules::production_trace::record_cache(
                     ep_runtime::schedules::production_trace::ScheduleCacheOrigin::PipelineHourlyPrepared,&cache);
-            ep_runtime::psychrometrics::production_trace::register_time_axis(
-                &runtime_inputs.time_axis,
-            );
+            ep_runtime::psychrometrics::production_trace::register_time_axis(time_axis);
             runtime_inputs.schedule_cache = Some(cache);
             runtime_inputs.weather_series = Some(weather);
         }
     }
+    let sample_count = runtime_inputs
+        .sample_count
+        .ok_or("legacy execution requires its genuine prepared sample count")?;
     let cache = runtime_inputs
         .schedule_cache
         .as_ref()
@@ -8734,6 +8807,13 @@ mod tests {
             super::source_outcome::validate_requested_hours(&scope, Some(24)).unwrap(),
             24
         );
+        scope.do_des_day_sim = true;
+        scope.do_weath_sim = false;
+        assert_eq!(
+            super::source_outcome::validate_requested_hours(&scope, None).unwrap(),
+            120
+        );
+        assert!(super::source_outcome::validate_requested_hours(&scope, Some(24)).is_err());
     }
 
     #[test]

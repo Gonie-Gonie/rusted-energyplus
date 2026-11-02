@@ -80,8 +80,8 @@ pub(super) fn snapshot(session: &WeatherSession, weather: &Path, full_grids: boo
             "UseSnowValues":unavailable("existing native weather UseSnowValues owner absent")},
         "existing_configuration_rain_snow_inputs":{
             "owner":"WeatherSession.configuration.run_period",
-            "use_weather_file_rain_indicators":session.configuration.run_period.use_weather_file_rain_indicators,
-            "use_weather_file_snow_indicators":session.configuration.run_period.use_weather_file_snow_indicators,
+            "use_weather_file_rain_indicators":match session.configuration.legacy() { Ok(configuration) => json!(configuration.run_period.use_weather_file_rain_indicators), Err(_) => unavailable("genuine Source attachment has no legacy RunPeriod input") },
+            "use_weather_file_snow_indicators":match session.configuration.legacy() { Ok(configuration) => json!(configuration.run_period.use_weather_file_snow_indicators), Err(_) => unavailable("genuine Source attachment has no legacy RunPeriod input") },
             "native_weather_owner_equivalence_claimed":false,"counted_as_PASS":false},
         "actual_ems_overrides":unavailable("whole existing native EMS registration absent"),
         "whole_ground_water_solar_daylight_math_paired":false,

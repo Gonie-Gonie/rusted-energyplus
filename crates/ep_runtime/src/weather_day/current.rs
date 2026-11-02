@@ -144,6 +144,7 @@ impl WeatherSession {
         &mut self,
         source_ground_models: bool,
     ) -> Result<(), WeatherDayError> {
+        self.configuration.legacy()?;
         let state = &mut self.state;
         let hour = state.global.hour_of_day;
         let timestep = state.global.time_step;
@@ -252,7 +253,7 @@ impl WeatherSession {
             current.out_dew_point_temp = current.out_wet_bulb_temp;
         }
         // Selected DD profiles have no scheduled carriers after this real reset.
-        for input in &mut self.configuration.design_days {
+        for input in &mut self.configuration.legacy_mut()?.design_days {
             input.reset_site_schedule_values();
         }
         current.wind_speed = today.wind_speed;

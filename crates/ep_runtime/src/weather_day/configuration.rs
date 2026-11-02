@@ -29,6 +29,42 @@ impl WeatherSolarControls {
     }
 }
 
+/// Attachment carried by the same live weather session.
+/// Source has no prepared calendar, RunPeriod, weather series or legacy DTO.
+#[derive(Clone, Debug)]
+pub enum WeatherSessionAttachment {
+    /// Metadata retained only by the existing eager legacy adapter.
+    Legacy(Box<WeatherEnvironmentConfiguration>),
+    /// The genuine Source path borrows actual Project/WeatherManager owners.
+    Source,
+}
+
+impl WeatherSessionAttachment {
+    /// Borrow existing legacy metadata without manufacturing Source metadata.
+    /// # Errors
+    /// Genuine Source sessions have no legacy configuration.
+    pub fn legacy(&self) -> Result<&WeatherEnvironmentConfiguration, WeatherDayError> {
+        match self {
+            Self::Legacy(configuration) => Ok(configuration.as_ref()),
+            Self::Source => Err(WeatherDayError::admission(
+                "legacy weather configuration absent on genuine Source attachment",
+            )),
+        }
+    }
+
+    /// Mutably borrow the existing legacy configuration only.
+    /// # Errors
+    /// Genuine Source sessions have no legacy configuration.
+    pub fn legacy_mut(&mut self) -> Result<&mut WeatherEnvironmentConfiguration, WeatherDayError> {
+        match self {
+            Self::Legacy(configuration) => Ok(configuration.as_mut()),
+            Self::Source => Err(WeatherDayError::admission(
+                "legacy weather configuration absent on genuine Source attachment",
+            )),
+        }
+    }
+}
+
 /// Calendar/input controls and the retained actual selected DesignDay producers.
 #[derive(Clone, Debug)]
 pub struct WeatherEnvironmentConfiguration {

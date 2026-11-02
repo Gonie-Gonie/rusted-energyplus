@@ -1,6 +1,6 @@
 //! Source-order selected weather-environment, initialization and reader calls.
 
-pub use super::configuration::WeatherEnvironmentConfiguration;
+pub use super::configuration::{WeatherEnvironmentConfiguration, WeatherSessionAttachment};
 use super::configuration::{between, ordinal, weekday_index};
 use super::hourly::process_hour;
 use super::producer::{ProducedWeatherDay, produce_day};
@@ -19,8 +19,8 @@ use crate::weather::raw::{
 pub struct WeatherSession {
     /// Complete selected daily and auxiliary state.
     pub state: WeatherDayState,
-    /// Calendar and input controls; never a physical preview series.
-    pub configuration: WeatherEnvironmentConfiguration,
+    /// Legacy metadata or explicit absence on the genuine Source attachment.
+    pub configuration: WeatherSessionAttachment,
     /// Authoritative raw cursor/header/parser owner.
     pub cursor: RawEpwCursorOwner,
     /// Whether the selected environment is available after admission.
@@ -141,7 +141,7 @@ impl WeatherSession {
         let errors_found = cursor.header_errors();
         Ok(Self {
             state: std::mem::take(state),
-            configuration,
+            configuration: WeatherSessionAttachment::Legacy(Box::new(configuration)),
             cursor,
             available: false,
             errors_found,
@@ -157,6 +157,7 @@ impl WeatherSession {
 
     /// Admits the one selected nonactual weather run period, without reading data rows.
     pub fn get_next_environment(&mut self) -> Result<bool, WeatherDayError> {
+        self.configuration.legacy()?;
         let before = super::production_trace::snapshot(self);
         let result = self.admit_environment();
         super::production_trace::record_operation(
@@ -183,25 +184,32 @@ impl WeatherSession {
     pub(super) fn admit_selected_run_period(&mut self) -> Result<bool, WeatherDayError> {
         let first = self
             .configuration
+            .legacy()?
             .day_point(1)
             .ok_or_else(|| WeatherDayError::admission("missing first environment date"))?;
         let last = self
             .configuration
-            .day_point(self.configuration.total_days())
+            .legacy()?
+            .day_point(self.configuration.legacy()?.total_days())
             .ok_or_else(|| WeatherDayError::admission("missing last environment date"))?;
-        self.state.weather.envrn = self.configuration.design_day_count + 1;
+        self.state.weather.envrn = self.configuration.legacy()?.design_day_count + 1;
         self.state.weather.dates_should_be_reset = false;
         self.state.global.kind_of_sim = 3; // Constant::KindOfSim::RunPeriodWeather.
         self.state.environment.day_of_year = first.day_of_year as i32;
         self.state.environment.day_of_month =
-            self.configuration.run_period.begin_day_of_month as i32;
-        self.state.environment.month = self.configuration.run_period.begin_month as i32;
+            self.configuration.legacy()?.run_period.begin_day_of_month as i32;
+        self.state.environment.month = self.configuration.legacy()?.run_period.begin_month as i32;
         self.state.global.calendar_year = first.year as i32;
         self.state.global.calendar_year_chr = first.year.to_string();
-        self.state.global.num_of_day_in_envrn = self.configuration.total_days() as i32;
+        self.state.global.num_of_day_in_envrn = self.configuration.legacy()?.total_days() as i32;
         self.cursor.reopen_without_processing_header()?;
-        self.state.environment.environment_name =
-            self.configuration.run_period.name.0.to_ascii_uppercase();
+        self.state.environment.environment_name = self
+            .configuration
+            .legacy()?
+            .run_period
+            .name
+            .0
+            .to_ascii_uppercase();
         self.state.environment.cur_envir_num = self.state.weather.envrn;
         self.state.environment.run_period_start_day_of_week = 0;
         self.state.weather.leap_year_add = first.leap_year_add as i32;
@@ -211,18 +219,22 @@ impl WeatherSession {
         self.state.weather.num_special_days = header.number_special_days;
         self.state.weather.use_daylight_saving = self
             .configuration
+            .legacy()?
             .run_period
             .use_weather_file_daylight_saving_period;
         self.state.weather.use_special_days = self
             .configuration
+            .legacy()?
             .run_period
             .use_weather_file_holidays_and_special_days;
         self.state.weather.use_rain_values = self
             .configuration
+            .legacy()?
             .run_period
             .use_weather_file_rain_indicators;
         self.state.weather.use_snow_values = self
             .configuration
+            .legacy()?
             .run_period
             .use_weather_file_snow_indicators;
         if header.intervals_per_hour != 1 {
@@ -255,22 +267,26 @@ impl WeatherSession {
         if self.state.global.do_weath_sim {
             self.state.environment.environment_start_end = format!(
                 "{:02}/{:02}/{} - {:02}/{:02}/{}",
-                self.configuration.run_period.begin_month,
-                self.configuration.run_period.begin_day_of_month,
+                self.configuration.legacy()?.run_period.begin_month,
+                self.configuration.legacy()?.run_period.begin_day_of_month,
                 first.year,
-                self.configuration.run_period.end_month,
-                self.configuration.run_period.end_day_of_month,
+                self.configuration.legacy()?.run_period.end_month,
+                self.configuration.legacy()?.run_period.end_day_of_month,
                 last.year
             );
         }
         self.state.environment.run_period_start_day_of_week = weekday_index(first.day_of_week);
         self.state.weather.cur_sim_day_for_end_of_run_period =
-            self.configuration.total_days() as i32;
-        self.state.weather.daylight_saving_is_active =
-            self.configuration.time_axis.daylight_saving.active;
+            self.configuration.legacy()?.total_days() as i32;
+        self.state.weather.daylight_saving_is_active = self
+            .configuration
+            .legacy()?
+            .time_axis
+            .daylight_saving
+            .active;
         self.state.weather.start_dates_cycle_should_be_reset =
-            self.configuration.run_period.begin_month != 1
-                || self.configuration.run_period.begin_day_of_month != 1;
+            self.configuration.legacy()?.run_period.begin_month != 1
+                || self.configuration.legacy()?.run_period.begin_day_of_month != 1;
         self.state.weather.jan1_dates_should_be_reset = true;
         self.set_week_days = false;
         if self.state.global.begin_sim_flag && self.state.weather.get_environment_first_call {
@@ -281,6 +297,7 @@ impl WeatherSession {
 
     /// Advances source BeginEnvrn/BeginDay/EndEnvrn branches using current caller flags.
     pub fn initialize_weather(&mut self) -> Result<(), WeatherDayError> {
+        self.configuration.legacy()?;
         let before = super::production_trace::snapshot(self);
         let result = self.initialize_weather_body();
         super::production_trace::record_operation(
@@ -303,7 +320,7 @@ impl WeatherSession {
             self.state.environment.end_month_flag = false;
         }
         if self.state.global.begin_envrn_flag {
-            self.initialize_missing_values();
+            self.initialize_missing_values()?;
             self.cursor.set_weather_code_missed_count(0);
             self.read_weather_day(RawDayReadMode::FirstDay, 1, false)?;
         }
@@ -349,9 +366,10 @@ impl WeatherSession {
         }
         if !self.state.global.begin_day_flag
             && !self.state.global.warmup_flag
-            && (self.state.environment.month != self.configuration.run_period.begin_month as i32
+            && (self.state.environment.month
+                != self.configuration.legacy()?.run_period.begin_month as i32
                 || self.state.environment.day_of_month
-                    != self.configuration.run_period.begin_day_of_month as i32)
+                    != self.configuration.legacy()?.run_period.begin_day_of_month as i32)
             && !self.state.weather.dates_should_be_reset
         {
             self.state.weather.dates_should_be_reset = true;
@@ -364,7 +382,8 @@ impl WeatherSession {
         Ok(())
     }
 
-    pub(super) fn initialize_missing_values(&mut self) {
+    pub(super) fn initialize_missing_values(&mut self) -> Result<(), WeatherDayError> {
+        let steps = self.configuration.legacy()?.steps();
         let missing = &mut self.state.missing_values;
         missing.base.out_baro_press = self.state.environment.std_baro_press;
         missing.base.out_dry_bulb_temp = 6.0;
@@ -383,10 +402,11 @@ impl WeatherSession {
         missing.base.liquid_precip = 0.0;
         self.state.missed_counts = Default::default();
         self.state.out_of_range_counts = Default::default();
-        self.state.weather.is_rain_threshold = 0.8 / f64::from(self.configuration.steps());
+        self.state.weather.is_rain_threshold = 0.8 / f64::from(steps);
         if !self.state.weather.rp_read_all_weather_data {
             self.print_environment_stamp = true;
         }
+        Ok(())
     }
 
     /// Performs a genuine first-day search or next-day read at the current cursor.
@@ -396,6 +416,7 @@ impl WeatherSession {
         calendar_day: usize,
         backspace_after_read: bool,
     ) -> Result<(), WeatherDayError> {
+        self.configuration.legacy()?;
         let before = super::production_trace::snapshot(self);
         let prior_hour = self.tomorrow_produced.as_ref().map(|day| day.records[23]);
         let mut read_state = RawDayReadState {
@@ -404,10 +425,11 @@ impl WeatherSession {
             last_hour_set: self.state.weather.last_hour_set,
         };
         let selection = RawDayReadSelection {
-            start_month: self.configuration.run_period.begin_month as i32,
-            start_day: self.configuration.run_period.begin_day_of_month as i32,
+            start_month: self.configuration.legacy()?.run_period.begin_month as i32,
+            start_day: self.configuration.legacy()?.run_period.begin_day_of_month as i32,
             start_year: self
                 .configuration
+                .legacy()?
                 .day_point(1)
                 .map_or(0, |point| point.year as i32),
             match_year: false,
@@ -415,7 +437,7 @@ impl WeatherSession {
         };
         let mut sink = DayReadSink {
             state: &mut self.state,
-            configuration: &self.configuration,
+            configuration: self.configuration.legacy()?,
             calendar_day,
             current_cycle: &mut self.current_cycle,
             set_week_days: &mut self.set_week_days,
@@ -439,8 +461,8 @@ impl WeatherSession {
                 } else {
                     prior_hour
                 },
-                self.configuration.steps(),
-                self.configuration.first_policy(),
+                self.configuration.legacy()?.steps(),
+                self.configuration.legacy()?.first_policy(),
                 &mut self.state,
             )
             .map(|produced| {

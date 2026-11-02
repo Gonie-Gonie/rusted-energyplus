@@ -234,10 +234,9 @@ impl CtfRunOutputs {
     pub(crate) fn initialize_unopened_source_weather(
         &mut self,
         bytes: Vec<u8>,
-        configuration: ep_runtime::weather::day::WeatherEnvironmentConfiguration,
     ) -> Result<ep_runtime::weather::day::ProductionWeatherTimestepSeries, String> {
         self.reports
-            .initialize_unopened_source_weather(bytes, configuration)
+            .initialize_unopened_source_weather(bytes)
             .map_err(|e| e.to_string())
     }
 

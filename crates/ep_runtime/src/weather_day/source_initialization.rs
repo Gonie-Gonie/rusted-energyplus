@@ -2,8 +2,8 @@
 //! Full weather output/getter children are mandatory and no legacy phase is inferred.
 use super::source_weather_initialization::SourceWeatherEio;
 use super::{
-    SourceWeatherInitializationError, WeatherDayError, WeatherDayState,
-    WeatherEnvironmentConfiguration, WeatherSession,
+    SourceWeatherInitializationError, WeatherDayError, WeatherDayState, WeatherSession,
+    WeatherSessionAttachment,
 };
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::radiation::ordinary::source_children::SourceSolarReportFlags;
@@ -71,12 +71,11 @@ impl WeatherSession {
     /// environment list, weather arrays, interpolation or first-call flag is seeded.
     pub(crate) fn from_source_project_state(
         bytes: Vec<u8>,
-        configuration: WeatherEnvironmentConfiguration,
         state: &mut WeatherDayState,
     ) -> Result<Self, WeatherDayError> {
-        if state.global.time_steps_in_hour != configuration.steps() as i32 {
+        if state.global.time_steps_in_hour <= 0 {
             return Err(WeatherDayError::admission(
-                "actual Project/weather timestep association",
+                "actual positive Project timestep before Source weather attachment",
             ));
         }
         let cursor = RawEpwCursorOwner::from_open_input(
@@ -87,7 +86,7 @@ impl WeatherSession {
         );
         Ok(Self {
             state: std::mem::take(state),
-            configuration,
+            configuration: WeatherSessionAttachment::Source,
             cursor,
             available: false,
             errors_found: false,

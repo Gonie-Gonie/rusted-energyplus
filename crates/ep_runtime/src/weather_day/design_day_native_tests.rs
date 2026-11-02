@@ -293,7 +293,13 @@ fn verify_design_day_owners(
     initialized_years: &[i32; 2],
 ) -> TestResult {
     let session = series.session.borrow();
-    for (index, input) in session.configuration.design_days.iter().enumerate() {
+    for (index, input) in session
+        .configuration
+        .legacy()?
+        .design_days
+        .iter()
+        .enumerate()
+    {
         let raw = &native["DesDayInput"]["rows"][index]["value"];
         assert_eq!(input.name(), raw["Title"]);
         real(

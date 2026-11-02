@@ -45,6 +45,7 @@ impl ProductionWeatherTimestepSeries {
         }
         session
             .configuration
+            .legacy()?
             .register_design_day_predefined_reports(context.reports)
             .map_err(CtfInitializationError::Owner)?;
         // Actual ReadUserWeatherInput4820 precedes Station4828. The earlier

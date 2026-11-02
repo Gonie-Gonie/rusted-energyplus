@@ -394,8 +394,10 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         &mut crate::heat_balance::source_output_registration::SourceMtdFileHost,
     >,
 ) -> Result<HeatBalanceSimulation, RuntimeError> {
-    let hourly_count =
-        weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
+    let hourly_count = match weather_driver {
+        Some(driver) => driver.hourly_count()?,
+        None => weather_dry_bulb_c.len(),
+    };
     if hourly_count == 0 {
         return Err(RuntimeError::NoWeatherData);
     }
@@ -420,7 +422,7 @@ fn simulate_heat_balance_zone_air_temperatures_internal(
         .transpose()?;
     let radiation_input = reporting.and_then(|input| input.radiation_input);
     let zone_steps_per_hour = match weather_driver {
-        Some(HeatBalanceWeatherDriver::Production(weather)) => weather.zone_steps_per_hour(),
+        Some(HeatBalanceWeatherDriver::Production(weather)) => weather.zone_steps_per_hour()?,
         _ => model.typed.timestep.number_of_timesteps_per_hour.max(1),
     };
     let seconds_per_timestep = SECONDS_PER_HOUR / f64::from(zone_steps_per_hour);

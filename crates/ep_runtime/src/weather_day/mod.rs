@@ -51,7 +51,7 @@ pub use current::CurrentWeatherState;
 pub use design_day::{DesignDayHumidity, DesignDayInput, DesignDayParameters};
 pub use error::WeatherDayError;
 pub use handoff::update_weather_data;
-pub use lifecycle::{WeatherEnvironmentConfiguration, WeatherSession};
+pub use lifecycle::{WeatherEnvironmentConfiguration, WeatherSession, WeatherSessionAttachment};
 pub use production::{
     ProductionCtfHistoryClock, ProductionSolarMetadata, ProductionWarmupReportContext,
     ProductionWeatherContext, ProductionWeatherTimestepSeries, SetupSimulationCall,

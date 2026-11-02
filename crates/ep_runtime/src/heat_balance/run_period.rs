@@ -142,8 +142,10 @@ where
         HeatBalanceZoneConductionReportSource::SurfaceReport
     );
 
-    let hourly_count =
-        weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
+    let hourly_count = match weather_driver {
+        Some(driver) => driver.hourly_count()?,
+        None => weather_dry_bulb_c.len(),
+    };
     for hour_index in 0..options.sample_count.min(hourly_count) {
         if hour_index % 24 == 0 {
             if let Some(driver) = weather_driver {

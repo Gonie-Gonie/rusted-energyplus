@@ -129,6 +129,7 @@ impl ProductionWeatherTimestepSeries {
         let mut session = self.session.borrow_mut();
         let controls = session
             .configuration
+            .legacy()?
             .setup_simulation_controls
             .ok_or_else(|| {
                 WeatherDayError::admission(
@@ -144,8 +145,8 @@ impl ProductionWeatherTimestepSeries {
                 "selected SetupSimulation excludes active sizing producers",
             ));
         }
-        if session.configuration.design_days.len()
-            != session.configuration.design_day_count as usize
+        if session.configuration.legacy()?.design_days.len()
+            != session.configuration.legacy()?.design_day_count as usize
         {
             return Err(WeatherDayError::admission(
                 "actual DesignDay inputs do not match the environment count",
@@ -186,6 +187,7 @@ impl ProductionWeatherTimestepSeries {
             // after early SetPredefinedTables215 and before close/increment774.
             session
                 .configuration
+                .legacy()?
                 .register_design_day_predefined_reports(reports)
                 .map_err(CtfInitializationError::Owner)?;
             self.setup_design_day_reports_registered.set(true);
@@ -199,14 +201,14 @@ impl ProductionWeatherTimestepSeries {
             .ok_or_else(|| WeatherDayError::admission("environment counter overflow"))?;
         session.state.weather.dates_should_be_reset = false;
         let ordinal = session.state.weather.envrn;
-        if ordinal > session.configuration.design_day_count + 1 {
+        if ordinal > session.configuration.legacy()?.design_day_count + 1 {
             session.available = false;
             session.state.weather.envrn = 0;
             session.state.environment.cur_envir_num = 0;
             return Ok((false, session.errors_found));
         }
-        if ordinal <= session.configuration.design_day_count {
-            let input = session.configuration.design_days[(ordinal - 1) as usize].clone();
+        if ordinal <= session.configuration.legacy()?.design_day_count {
+            let input = session.configuration.legacy()?.design_days[(ordinal - 1) as usize].clone();
             input.select_environment(&mut session.state, ordinal)?;
             session.available = true;
         } else {

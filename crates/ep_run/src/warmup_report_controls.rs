@@ -58,7 +58,7 @@ fn resolve_admitted(
         || do_system_sizing
         || do_plant_sizing
         || do_hvac_sizing
-        || !do_weather_sim
+        || !(do_weather_sim || allow_active_design_days && do_des_day_sim && design_days)
         || (do_des_day_sim && design_days && !allow_active_design_days)
     {
         return Err(
@@ -245,7 +245,12 @@ mod tests {
         let no_weather = parse_epjson_str(
             r#"{"SimulationControl":{"control":{"run_simulation_for_sizing_periods":"Yes","run_simulation_for_weather_file_run_periods":"No"}},"SizingPeriod:DesignDay":{"day":{}}}"#,
         )?;
-        assert!(resolve_source_a(&no_weather).is_err());
+        assert!(!resolve_source_a(&no_weather)?.do_pure_load_calc);
+        assert!(resolve(&no_weather).is_err());
+        let no_periods = parse_epjson_str(
+            r#"{"SimulationControl":{"control":{"run_simulation_for_weather_file_run_periods":"No"}}}"#,
+        )?;
+        assert!(resolve_source_a(&no_periods).is_err());
         for field in [
             "do_space_heat_balance_for_sizing",
             "do_space_heat_balance_for_simulation",

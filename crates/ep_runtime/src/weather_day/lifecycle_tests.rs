@@ -71,7 +71,7 @@ fn consume_complete_day(
     first_record: usize,
 ) -> Result<(), Box<dyn std::error::Error>> {
     for hour_zero in 0..24 {
-        for timestep in 1..=series.zone_steps_per_hour() {
+        for timestep in 1..=series.zone_steps_per_hour()? {
             let current = series.current_for(first_record + hour_zero, timestep)?;
             assert_eq!(current.record.hour as usize, hour_zero + 1);
         }

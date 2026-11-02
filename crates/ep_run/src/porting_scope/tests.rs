@@ -2735,6 +2735,34 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
     assert!(!trace(&no_weather, PortingScope::A).admissible);
     active.as_object_mut().unwrap().remove("RunPeriod");
     assert!(!trace(&active, PortingScope::A).admissible);
+
+    // A genuine DD-only input has no weather RunPeriod or prepared clock.
+    let mut dd_only = no_weather;
+    dd_only.as_object_mut().unwrap().remove("RunPeriod");
+    dd_only["Site:Location"] = json!({"Actual DD Site":{
+        "latitude":39.74,"longitude":-105.18,"time_zone":-7,"elevation":1829
+    }});
+    let selected = trace(&dd_only, PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
+    assert!(selected.source_design_day_only());
+    assert!(!trace(&dd_only, PortingScope::B).admissible);
+    let raw = parse_epjson_str(&dd_only.to_string()).expect("DD-only raw input");
+    let (environment, admission) = super::environment::porting_source_design_day_trace(
+        &raw,
+        PortingScope::A,
+        std::path::Path::new("in.epw"),
+        true,
+    )
+    .expect("input-only DD admission");
+    assert!(
+        super::environment::validate_source_design_day_environment(&environment, &admission)
+            .is_empty()
+    );
+    assert_eq!(environment["weather_coverage"]["status"], "absent");
+    assert!(environment.get("first").is_none());
+    assert!(environment.get("calendar_year").is_none());
+    dd_only["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("No");
+    assert!(!trace(&dd_only, PortingScope::A).admissible);
 }
 
 #[test]

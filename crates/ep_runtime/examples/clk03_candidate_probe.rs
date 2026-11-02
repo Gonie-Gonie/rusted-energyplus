@@ -108,7 +108,7 @@ fn weather_sequence(
     session.state.global.begin_sim_flag = flag(&declared["BeginSimFlag"])?;
     session.state.global.do_weath_sim = flag(&declared["DoWeathSim"])?;
     session.state.global.do_des_day_sim = flag(&declared["DoDesDaySim"])?;
-    session.state.weather.envrn = session.configuration.design_day_count;
+    session.state.weather.envrn = session.configuration.legacy()?.design_day_count;
     let prepared = session_snapshot(&session, weather);
     let mut operations = Vec::new();
     let mut stop: Option<String> = None;

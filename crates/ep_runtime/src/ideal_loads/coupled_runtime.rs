@@ -5970,7 +5970,7 @@ fn simulate_direct_zone_purchased_air_coupled_heat_balance_with_driver(
         HeatBalanceWeatherDriver::Legacy(series) => Some(series.hourly_records()),
         HeatBalanceWeatherDriver::Production(_) => None,
     };
-    let hourly_count = weather_driver.hourly_count();
+    let hourly_count = weather_driver.hourly_count()?;
     if hourly_count == 0 {
         return Err(DirectZonePurchasedAirCoupledRuntimeError::HeatBalance(
             RuntimeError::NoWeatherData,

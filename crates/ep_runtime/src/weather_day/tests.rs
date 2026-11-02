@@ -1,4 +1,5 @@
 use super::handoff::update_weather_data;
+use super::{ProductionWeatherTimestepSeries, WeatherSession, WeatherSessionAttachment};
 
 #[path = "design_day_schedule_owner_tests.rs"]
 mod design_day_schedule_owners;
@@ -480,6 +481,43 @@ fn hour_access_preserves_other_intervals_and_has_native_slot_order() {
 
 #[test]
 fn source_constructor_defaults_and_allocation_are_distinct() {
+    // The real Source attachment accepts only the same Project owner and raw
+    // unopened storage. It cannot manufacture a legacy calendar or RunPeriod.
+    let mut zero_project = WeatherDayState::default();
+    assert!(WeatherSession::from_source_project_state(Vec::new(), &mut zero_project).is_err());
+    assert_eq!(zero_project.global, WeatherDayState::default().global);
+    let mut project = WeatherDayState::default();
+    project.global.time_steps_in_hour = 4;
+    project.weather.envrn = 17;
+    project.weather.num_of_envrn = 23;
+    project.environment.environment_name = "PROJECT OWNER TRANSPORT".into();
+    let globals = project.global.clone();
+    let series = ProductionWeatherTimestepSeries::from_unopened_source_project_state(
+        Vec::new(),
+        &mut project,
+    )
+    .expect("same Project owner without prepared metadata");
+    series.with_source_weather_session_mut(|session| {
+        assert!(matches!(
+            &session.configuration,
+            WeatherSessionAttachment::Source
+        ));
+        assert!(session.configuration.legacy().is_err());
+        assert!(session.configuration.legacy_mut().is_err());
+        assert_eq!(session.state.global, globals);
+        assert_eq!(session.state.weather.envrn, 17);
+        assert_eq!(session.state.weather.num_of_envrn, 23);
+        assert_eq!(
+            session.state.environment.environment_name,
+            "PROJECT OWNER TRANSPORT"
+        );
+        assert!(!session.state.today_values.is_allocated());
+        assert!(!session.state.tomorrow_values.is_allocated());
+    });
+    assert_eq!(project.global, WeatherDayState::default().global);
+    assert!(series.hourly_count().is_err());
+    assert!(series.zone_steps_per_hour().is_err());
+    assert!(series.first_hour_interpolation_starting_values().is_err());
     design_day_schedule_owners::verify().expect("genuine scheduled DesignDay getter owners");
     let state = WeatherDayState::default();
     assert_eq!(state.today_variables.integer_values(), [0; 8]);

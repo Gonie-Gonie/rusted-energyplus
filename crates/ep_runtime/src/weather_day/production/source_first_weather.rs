@@ -4,20 +4,17 @@ use crate::weather::day::SourceWeatherInitializationError;
 use crate::weather::day::source_initialization::{
     SourceWeatherInitializationChildren, SourceWeatherInitializationOwners,
 };
-use crate::weather::day::{
-    WeatherDayError, WeatherDayState, WeatherEnvironmentConfiguration, WeatherSession,
-};
+use crate::weather::day::{WeatherDayError, WeatherDayState, WeatherSession};
 impl ProductionWeatherTimestepSeries {
     /// Move genuine Project owners into an unopened weather session.
     /// # Errors
     /// Returns the actual prepared Project/timestep association boundary.
     pub fn from_unopened_source_project_state(
         bytes: Vec<u8>,
-        configuration: WeatherEnvironmentConfiguration,
         state: &mut WeatherDayState,
     ) -> Result<Self, WeatherDayError> {
         Ok(Self::from_session(
-            WeatherSession::from_source_project_state(bytes, configuration, state)?,
+            WeatherSession::from_source_project_state(bytes, state)?,
         ))
     }
     #[allow(

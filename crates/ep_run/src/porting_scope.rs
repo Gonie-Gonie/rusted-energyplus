@@ -22,7 +22,8 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
 pub(crate) use environment::{
-    porting_source_environment_trace, source_coverage_axis, validate_source_environment,
+    porting_source_design_day_trace, porting_source_environment_trace, source_coverage_axis,
+    validate_source_design_day_environment, validate_source_environment,
 };
 
 /// Frozen input family selected for card-based porting work.
@@ -78,6 +79,30 @@ pub struct PortingScopeTrace {
     pub environment: Option<Value>,
     /// Input provenance and the limits of this admission result.
     pub production: Value,
+}
+
+impl PortingScopeTrace {
+    /// Input selection only; actual project flags and environments are deferred.
+    pub(crate) fn source_design_day_only(&self) -> bool {
+        source_design_day_only_selection(
+            self.scope,
+            self.object_counts
+                .get("SizingPeriod:DesignDay")
+                .is_some_and(|n| *n > 0),
+            &self.settings,
+        )
+    }
+}
+
+fn source_design_day_only_selection(
+    scope: PortingScope,
+    design_days: bool,
+    settings: &Value,
+) -> bool {
+    scope == PortingScope::A
+        && design_days
+        && settings["simulation_control"]["run_simulation_for_sizing_periods"] == true
+        && settings["simulation_control"]["run_simulation_for_weather_file_run_periods"] == false
 }
 
 /// Inspects compiled inputs without running EP or reading any expected results.
@@ -158,7 +183,18 @@ pub fn inspect_porting_scope(
         {
             validate_empty_source_gain_bindings(raw, model, &mut violations);
         }
-        validate_typed_scope(model, scope, &mut violations);
+        validate_typed_scope(
+            model,
+            scope,
+            source_design_day_only_selection(
+                scope,
+                object_counts
+                    .get("SizingPeriod:DesignDay")
+                    .is_some_and(|n| *n > 0),
+                &settings,
+            ),
+            &mut violations,
+        );
         if scope == PortingScope::A {
             electric_equipment::validate(raw, model, &mut violations);
         } else if !model.electric_equipment.is_empty()
@@ -329,7 +365,9 @@ fn validate_project_controls(
         violations
             .push("active sizing-period environments are outside the weather-run scope".into());
     }
-    if control["run_simulation_for_weather_file_run_periods"] != true {
+    if control["run_simulation_for_weather_file_run_periods"] != true
+        && !source_design_day_only_selection(scope, design_days, settings)
+    {
         violations.push("weather-file RunPeriod execution must be enabled".into());
     }
     for (field, required) in [
@@ -468,7 +506,12 @@ fn validate_empty_source_gain_bindings(
     }
 }
 
-fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mut Vec<String>) {
+fn validate_typed_scope(
+    model: &TypedModel,
+    scope: PortingScope,
+    design_day_only: bool,
+    violations: &mut Vec<String>,
+) {
     if model.version != ep_model::Version::oracle_26_1_0() {
         violations.push("effective engine must match the locked EnergyPlus 26.1.0".into());
     }
@@ -724,10 +767,17 @@ fn validate_typed_scope(model: &TypedModel, scope: PortingScope, violations: &mu
     }
     if model.building.is_none()
         || model.global_geometry_rules.is_none()
-        || model.run_periods.len() != 1
+        || if design_day_only {
+            !model.run_periods.is_empty()
+        } else {
+            model.run_periods.len() != 1
+        }
     {
-        violations
-            .push("Building, GlobalGeometryRules and exactly one RunPeriod are required".into());
+        violations.push(if design_day_only {
+            "Building and GlobalGeometryRules are required; SourceA DD-only input requires no RunPeriod".into()
+        } else {
+            "Building, GlobalGeometryRules and exactly one RunPeriod are required".into()
+        });
     }
     if !matches!(
         model.timestep.number_of_timesteps_per_hour,

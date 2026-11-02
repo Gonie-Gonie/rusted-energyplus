@@ -227,15 +227,14 @@ impl ProductionWeatherTimestepSeries {
             ));
         }
         let mut session = self.session.borrow_mut();
+        let legacy_steps = session.configuration.legacy()?.steps();
         // SimulationManager.cc:549 completes the previous hour before the next
         // day resets HourOfDay. The weather handoff itself only writes this
         // clock on BeginEnvrn.
         if self
             .last_consumed
             .borrow()
-            .is_some_and(|(index, timestep)| {
-                index % 24 == 23 && timestep == session.configuration.steps()
-            })
+            .is_some_and(|(index, timestep)| index % 24 == 23 && timestep == legacy_steps)
         {
             session.state.global.previous_hour = session.state.global.hour_of_day;
         }
@@ -249,12 +248,11 @@ impl ProductionWeatherTimestepSeries {
     /// No weather buffer, cursor, previous-hour or timestep owner is transported.
     pub fn finish_warmup(&self) -> Result<(), WeatherDayError> {
         let mut session = self.session.borrow_mut();
+        let legacy_steps = session.configuration.legacy()?.steps();
         let actual_last_step = self
             .last_consumed
             .borrow()
-            .is_some_and(|(index, timestep)| {
-                index % 24 == 23 && timestep == session.configuration.steps()
-            });
+            .is_some_and(|(index, timestep)| index % 24 == 23 && timestep == legacy_steps);
         if !matches!(
             *self.current_phase.borrow(),
             Some(WeatherDayPhase::Warmup { .. })
@@ -273,10 +271,11 @@ impl ProductionWeatherTimestepSeries {
     }
 
     fn admit_phase(&self, phase: WeatherDayPhase) -> Result<(), WeatherDayError> {
+        self.session.borrow().configuration.legacy()?;
         let valid = match phase {
             WeatherDayPhase::Warmup { day } => day > 0,
             WeatherDayPhase::Run { day } => {
-                day > 0 && day <= self.session.borrow().configuration.total_days()
+                day > 0 && day <= self.session.borrow().configuration.legacy()?.total_days()
             }
         };
         if valid {
@@ -300,7 +299,7 @@ impl ProductionWeatherTimestepSeries {
             .borrow()
             .ok_or_else(|| WeatherDayError::admission("Today is not prepared"))?;
         let mut session = self.session.borrow_mut();
-        let steps = session.configuration.steps();
+        let steps = session.configuration.legacy()?.steps();
         if !(1..=steps).contains(&timestep) {
             return Err(WeatherDayError::admission("weather timestep outside hour"));
         }
@@ -330,7 +329,7 @@ impl ProductionWeatherTimestepSeries {
             session.state.global.end_hour_flag = timestep == steps;
             session.state.global.end_day_flag = hour_zero == 23 && timestep == steps;
             session.state.global.end_envrn_flag = matches!(phase, WeatherDayPhase::Run { .. })
-                && record_index + 1 == session.configuration.time_axis.points.len()
+                && record_index + 1 == session.configuration.legacy()?.time_axis.points.len()
                 && timestep == steps;
             // The shared day hook has already executed BeginDay Initialize.
             if !session.state.global.begin_day_flag {
@@ -372,10 +371,11 @@ impl ProductionWeatherTimestepSeries {
         sample.horizontal_infrared_radiation_w_per_m2 = weather.horiz_ir_sky;
         let period_start = ((day - 1) / 20) * 20;
         let period_days = 20
-            .min(session.configuration.total_days() - period_start)
+            .min(session.configuration.legacy()?.total_days() - period_start)
             .max(1);
         let period_point = session
             .configuration
+            .legacy()?
             .day_point(period_start + 1)
             .ok_or_else(|| WeatherDayError::admission("missing shadowing calendar metadata"))?;
         // Preserve existing solar wrapper's non-leap metadata policy. The actual
@@ -451,8 +451,8 @@ impl ProductionWeatherTimestepSeries {
     pub fn finish_environment(&self) -> Result<(), WeatherDayError> {
         let mut session = self.session.borrow_mut();
         let last = (
-            session.configuration.time_axis.points.len() - 1,
-            session.configuration.steps(),
+            session.configuration.legacy()?.time_axis.points.len() - 1,
+            session.configuration.legacy()?.steps(),
         );
         if *self.last_consumed.borrow() != Some(last) {
             return Ok(());
@@ -469,19 +469,31 @@ impl ProductionWeatherTimestepSeries {
     }
 
     /// Number of metadata-axis hours; no placeholder weather values are returned.
-    #[must_use]
-    pub fn hourly_count(&self) -> usize {
-        self.session.borrow().configuration.time_axis.points.len()
+    /// # Errors
+    /// Genuine Source sessions have no legacy metadata axis.
+    pub fn hourly_count(&self) -> Result<usize, WeatherDayError> {
+        Ok(self
+            .session
+            .borrow()
+            .configuration
+            .legacy()?
+            .time_axis
+            .points
+            .len())
     }
     /// Zone timesteps in each hour.
-    #[must_use]
-    pub fn zone_steps_per_hour(&self) -> u32 {
-        self.session.borrow().configuration.steps()
+    /// # Errors
+    /// This legacy adapter is unavailable on genuine Source sessions.
+    pub fn zone_steps_per_hour(&self) -> Result<u32, WeatherDayError> {
+        Ok(self.session.borrow().configuration.legacy()?.steps())
     }
     /// RunPeriod's declared first-hour policy.
-    #[must_use]
-    pub fn first_hour_interpolation_starting_values(&self) -> FirstHourInterpolationStartingValues {
-        self.session.borrow().configuration.first_policy()
+    /// # Errors
+    /// Genuine Source sessions have no legacy RunPeriod interpolation policy.
+    pub fn first_hour_interpolation_starting_values(
+        &self,
+    ) -> Result<FirstHourInterpolationStartingValues, WeatherDayError> {
+        Ok(self.session.borrow().configuration.legacy()?.first_policy())
     }
     /// Borrow only actual report operands after the genuine current-step call.
     pub fn warmup_report_context(&self) -> Result<ProductionWarmupReportContext, WeatherDayError> {

@@ -97,8 +97,10 @@ where
         HeatBalanceSurfaceLoopZoneAirCorrection,
     ) -> Result<(), RuntimeError>,
 {
-    let hourly_count =
-        weather_driver.map_or(weather_dry_bulb_c.len(), |driver| driver.hourly_count());
+    let hourly_count = match weather_driver {
+        Some(driver) => driver.hourly_count()?,
+        None => weather_dry_bulb_c.len(),
+    };
     if !options.enabled || options.maximum_days == 0 || hourly_count == 0 {
         return Ok(HeatBalanceWarmupSummary::disabled());
     }

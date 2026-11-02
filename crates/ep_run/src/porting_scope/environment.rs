@@ -44,6 +44,55 @@ pub(crate) fn porting_source_environment_trace(
     Ok((trace, admission))
 }
 
+/// DD-only input admission has no prepared weather coverage, dates or physics.
+/// The selected path is the actual explicit/default CLI operand, observed here
+/// only for trace metadata; genuine OpenWeatherFile repeats its own predicate.
+pub(crate) fn porting_source_design_day_trace(
+    raw: &RawModel,
+    scope: PortingScope,
+    weather_path: &Path,
+    default_weather_path: bool,
+) -> Result<(Value, SourceCalendarInputAdmission), String> {
+    if scope != PortingScope::A {
+        return Err("DD-only preparation requires explicit SourceA".into());
+    }
+    let admission = SourceCalendarInputAdmission::from_raw(raw, scope)?;
+    let present = match std::fs::metadata(weather_path) {
+        Ok(metadata) => !metadata.is_dir(),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => false,
+        Err(error) => return Err(error.to_string()),
+    };
+    Ok((
+        json!({
+            "source": "SourceA DD-only input admission; real environment getters deferred",
+            "trace_semantics": "input and filesystem observation only; no simulated events",
+            "weather_coverage": {"status":"absent","reason":"no weather primary selected"},
+            "weather_input": {"path":weather_path.display().to_string(),
+                "native_default_in_epw":default_weather_path,
+                "observed_file_present_before_execution":present},
+            "source_calendar_controls": {"status":"deferred_to_execution",
+                "execution_owner":"actual Source OpenWeatherFile, Site:Location and DesignDay owners",
+                "preview_values_used_by_Source":false},
+        }),
+        admission,
+    ))
+}
+
+pub(crate) fn validate_source_design_day_environment(
+    environment: &Value,
+    _admission: &SourceCalendarInputAdmission,
+) -> Vec<String> {
+    if environment["weather_coverage"]["status"] != "absent"
+        || environment["source_calendar_controls"]["status"] != "deferred_to_execution"
+        || environment["source_calendar_controls"]["preview_values_used_by_Source"] != false
+        || environment["source_calendar_controls"]["execution_owner"]
+            != "actual Source OpenWeatherFile, Site:Location and DesignDay owners"
+    {
+        return vec!["DD-only input trace lacks its genuine deferred-owner admission".into()];
+    }
+    Vec::new()
+}
+
 /// Civil dates, weather coverage and step counts only. The actual Source route
 /// consumes no DST/holiday/schedule values from this preparation-time axis.
 /// Native's surprising end-Nth predicate must reach the genuine calendar child,

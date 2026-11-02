@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 156 paired physical cases and 4,254,318 reported values with zero
+contains 158 paired physical cases and 4,385,262 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,25 +125,24 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 104 recorded Source builds,
-97 with accepted pairs and seven without accepted pairs, including one build
+validate the consumer corrections. There are 105 recorded Source builds,
+98 with accepted pairs and seven without accepted pairs, including one build
 superseded before any Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
 
-Explicit Source A executes active `SizingPeriod:DesignDay` environments alongside
-a real EPW and one weather RunPeriod, with sizing off. Raw getters retain the
-four dry-bulb, eight humidity, five solar and both official reset selectors;
-the finite active witness covers four dry, four humidity and all five solar modes.
-Five DDs plus weather report 144 actual hours: 120 DD and 24 weather hours.
-All 127 series and 71,424 values pass fixed declared policies. Nine live site
-bindings distinguish their own DD operands from cross-environment resets;
-actual Site solar is nonzero in every model and zero at night, separately from
-unconditional scheduled SPSite values. Full six-environment streams, ancillary
-records, CTF, 30 climatic cells and six observed warmup counts agree. Three
-existing tests pass without new functions. Earlier inactive-matrix evidence is
-retained. B/legacy stay inactive; sizing, DD-only/no-EPW, alternate sky and broader
-value/composition domains remain bounded. No capability is promoted.
+Explicit Source A executes active `SizingPeriod:DesignDay` environments with
+sizing off, including DD-only without a RunPeriod or weather argument. The new
+five-DD input uses genuine Site:Location and an absent default `in.epw`; its
+120 actual hours and 59,520 values pass unchanged policies. A separate regression
+uses the exact105 input and EPW, retained Native105 and fresh Source109:144 hours
+and 71,424 values pass. This is one new input and two physical comparisons.
+The actual Source weather state/cursor carries no fabricated legacy calendar,
+configuration or axis. Nine site owners, all five public solar modes, complete
+streams/ancillary/CTF, 30 climatic cells and actual5/6warmup reports agree.
+Earlier evidence remains retained. Four dry/four humidity/five solar choices
+remain finite coverage; other values/compositions, alternate sky, sizing and
+B/legacy active DDs remain bounded. No capability is promoted.
 
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
