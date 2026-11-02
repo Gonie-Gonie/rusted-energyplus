@@ -8,8 +8,16 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportI
 }
 
 /// SourceA report/input metadata; real DD warmup/environment owners stay live.
-/// Positive sizing and the existing SourceB/legacy entry remain unchanged.
+/// Positive sizing and the unscoped legacy entry remain unchanged.
 pub(crate) fn resolve_source_a(
+    raw: &RawModel,
+) -> Result<HeatBalanceOrdinaryWarmupReportInputs, String> {
+    resolve_admitted(raw, true)
+}
+
+/// SourceB shares the same actual Project flags and report metadata owners.
+/// Its hard-sized sensible/no-OA equipment boundary remains separate admission.
+pub(crate) fn resolve_source_b(
     raw: &RawModel,
 ) -> Result<HeatBalanceOrdinaryWarmupReportInputs, String> {
     resolve_admitted(raw, true)
@@ -232,6 +240,7 @@ mod tests {
         )?;
         assert!(resolve(&active).is_err());
         assert!(!resolve_source_a(&active)?.do_pure_load_calc);
+        assert_eq!(resolve_source_b(&active)?, resolve_source_a(&active)?);
         for field in [
             "do_zone_sizing_calculation",
             "do_system_sizing_calculation",
@@ -241,16 +250,22 @@ mod tests {
                 r#"{{"SimulationControl":{{"control":{{"{field}":"Yes","run_simulation_for_sizing_periods":"Yes","run_simulation_for_weather_file_run_periods":"Yes"}}}},"SizingPeriod:DesignDay":{{"day":{{}}}}}}"#
             ))?;
             assert!(resolve_source_a(&raw).is_err(), "{field}");
+            assert!(resolve_source_b(&raw).is_err(), "{field}");
         }
         let no_weather = parse_epjson_str(
             r#"{"SimulationControl":{"control":{"run_simulation_for_sizing_periods":"Yes","run_simulation_for_weather_file_run_periods":"No"}},"SizingPeriod:DesignDay":{"day":{}}}"#,
         )?;
         assert!(!resolve_source_a(&no_weather)?.do_pure_load_calc);
+        assert_eq!(
+            resolve_source_b(&no_weather)?,
+            resolve_source_a(&no_weather)?
+        );
         assert!(resolve(&no_weather).is_err());
         let no_periods = parse_epjson_str(
             r#"{"SimulationControl":{"control":{"run_simulation_for_weather_file_run_periods":"No"}}}"#,
         )?;
         assert!(resolve_source_a(&no_periods).is_err());
+        assert!(resolve_source_b(&no_periods).is_err());
         for field in [
             "do_space_heat_balance_for_sizing",
             "do_space_heat_balance_for_simulation",

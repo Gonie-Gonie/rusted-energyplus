@@ -96,7 +96,7 @@ pub(crate) fn project(
     project_ordered(raw, configuration, reverse, false)
 }
 
-/// SourceA preparation carries no DesignDay DTO or calculated weather.
+/// Explicit Source preparation carries no DesignDay DTO or calculated weather.
 /// The real ReadUserWeatherInput/GetDesignDayData and GetProjectData children
 /// consume original IP values, including blank/default/error branches, later.
 pub(crate) fn prepare_source_a(
@@ -116,12 +116,13 @@ pub(crate) fn prepare_source_a(
     Ok(())
 }
 
+/// SourceB uses the same raw count/reverse transport, with no eager DesignDay DTO.
 pub(crate) fn project_source(
     raw: &RawModel,
     configuration: &mut WeatherEnvironmentConfiguration,
     reverse: bool,
 ) -> Result<(), String> {
-    project_ordered(raw, configuration, reverse, true)
+    prepare_source_a(raw, configuration, reverse)
 }
 
 fn project_ordered(

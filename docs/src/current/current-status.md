@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 159 paired physical cases and 4,397,166 reported values with zero
+contains 161 paired physical cases and 4,517,022 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,27 +125,32 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 105 recorded Source builds,
-98 with accepted pairs and seven without accepted pairs, including one build
+validate the consumer corrections. There are 106 recorded Source builds,
+99 with accepted pairs and seven without accepted pairs, including one build
 superseded before any Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
 
-Explicit Source A executes active `SizingPeriod:DesignDay` environments with
-sizing off, alongside real weather or DD-only without a RunPeriod or EPW.
-Retained finite witnesses cover all eight humidity selectors, four dry-bulb and
-five solar choices. The latest four-DD case uses one timestep per hour and
-reports 96 actual hours:124 series and 11,904 values pass unchanged inherited
-policies and declared Dewpoint/rain/snow rules. Raw versus effective dewpoint,
-pressure correction, real DayType/DST, three Day owners, full streams/ancillary,
-CTF, 24 climatic cells and four observed warmup counts agree. Source matches
-Native's four warning records under the complete strict ERR comparison.
-Rain reaches the wet outside-film consumer. Snow flags/current reflectance run
-with unity defaults and zero solar in snowy DDs; a nontrivial snow-ground-solar
-change is unobserved. Build109 and prior five-test authority are reused; no new
-build or test execution is counted. Earlier evidence stays retained. Arbitrary
-values/compositions, alternate sky, sizing and B/legacy active DDs remain bounded.
-No capability is promoted.
+Explicit Source A and bounded Source B execute active DesignDays with sizing
+off, either beside real weather or DD-only without a RunPeriod or EPW. Retained
+A witnesses cover all eight humidity selectors, four dry-bulb and five solar
+choices. Earlier rain wet-film, raw/effective dewpoint, pressure, DayType/DST and
+TS1 evidence remains retained. Snow uses unity reflectance and zero solar in
+snowy DDs; nontrivial snow-ground-solar change remains unobserved.
+
+Two B inputs preserve the original 102 output rules, nine Day owners, two Site
+solar rules and two separately declared Facility meter rules. NoLimit reports
+120 DD hours; hard flow/capacity limits report 120 DD hours plus 24 weather hours.
+All 119,856 values pass the original limits, complete ordered streams, whole EIO,
+ERR/END, dictionaries, SHD and actual warmup checks. CTF coefficient reports, DXF
+and tabular CSV are unrequested; paired absence is checked with zero coefficient
+rows or climatic cells credited. Actual CTF surface physics remains compared.
+All six surfaces retain NoSun/NoWind and the original 1000 W gain, availability
+and thermostats. Positive Site solar does not prove solar-to-B-surface/HVAC
+coupling. Build110 and four existing test executions are counted once, with no
+new test function. Private flow caches/operating histories, arbitrary values
+and combinations, OA/latent control, sizing and legacy active DDs remain bounded.
+No capability or frozen CON-01 identity is promoted.
 
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including

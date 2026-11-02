@@ -119,8 +119,8 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
     crate::ordinary_design_day_input::project(&one, &mut mismatched, false)?;
     assert_eq!(mismatched.design_days, [expected[0].clone()]);
 
-    // SourceA hands original scalar/default-profile inputs to the genuine
-    // getter; legacy and SourceB continue their unchanged warning-free DTO path.
+    // Both explicit Source lanes hand original scalar/default-profile inputs
+    // to the same genuine getter. Unscoped legacy retains its DTO boundary.
     for (mode, operand, value) in [
         ("WetBulb", "wetbulb_or_dewpoint_at_maximum_dry_bulb", 34.0),
         ("DewPoint", "wetbulb_or_dewpoint_at_maximum_dry_bulb", 34.0),
@@ -171,10 +171,21 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
             DDValue::String(" Unused unbound day name ".into())
         );
         assert!(ip.is_object_unused("SizingPeriod:DesignDay", COOLING));
-        let mut old = configuration(2)?;
-        assert!(crate::ordinary_design_day_input::project_source(&raw, &mut old, false).is_err());
+        crate::ordinary_equipment_input::resolve_source_b(&raw)?;
+        let b_ip = crate::ordinary_input_processor::resolve_source_b(&raw)?;
+        assert_eq!(
+            b_ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?,
+            fields
+        );
+        let mut b_prepared = configuration(2)?;
+        b_prepared.design_days = expected.to_vec();
+        crate::ordinary_design_day_input::project_source(&raw, &mut b_prepared, true)?;
+        assert!(
+            b_prepared.design_days.is_empty()
+                && b_prepared.setup_simulation_controls.is_none()
+                && b_prepared.reverse_design_days
+        );
         if !matches!(mode, "WetBulb" | "DewPoint") {
-            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
             assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
         }
     }
@@ -206,13 +217,18 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
     }
     let raw = parse_epjson_str(&opaque.to_string())?;
     crate::ordinary_equipment_input::resolve_source_a(&raw)?;
-    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    crate::ordinary_equipment_input::resolve_source_b(&raw)?;
     let before = raw.clone();
     let mut prepared = configuration(2)?;
     crate::ordinary_design_day_input::prepare_source_a(&raw, &mut prepared, false)?;
     assert_eq!(raw, before);
     let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
     let fields = ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?;
+    let b_ip = crate::ordinary_input_processor::resolve_source_b(&raw)?;
+    assert_eq!(
+        b_ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?,
+        fields
+    );
     use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as DDValue;
     assert!(!fields.contains_key("humidity_ratio_at_maximum_dry_bulb"));
     assert_eq!(fields["humidity_ratio"], DDValue::Number("0.009".into()));
@@ -296,6 +312,13 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
             .is_err(),
             "{field}"
         );
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_b(&parse_epjson_str(
+                &invalid.to_string()
+            )?)
+            .is_err(),
+            "{field}"
+        );
     }
     // Distinct selected roles reach the same original raw/IP/HB owners. This
     // is admission/custody evidence; actual schedule lookup and physics belong
@@ -364,10 +387,16 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
         }
         let raw = parse_epjson_str(&candidate.to_string())?;
         crate::ordinary_equipment_input::resolve_source_a(&raw)?;
-        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+        crate::ordinary_equipment_input::resolve_source_b(&raw)?;
         assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
         let original = raw.clone();
         let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        let b_ip = crate::ordinary_input_processor::resolve_source_b(&raw)?;
+        assert_eq!(
+            b_ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?,
+            ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?
+        );
+        assert_eq!(b_ip.get_num_objects_found("Schedule:Day:Hourly"), 1);
         assert_eq!(ip.get_num_objects_found("Schedule:Day:Hourly"), 1);
         let fields = ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?;
         for (field, value) in [
@@ -423,9 +452,15 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
             .remove("humidity_condition_day_schedule_name");
         let absent = parse_epjson_str(&candidate.to_string())?;
         crate::ordinary_equipment_input::resolve_source_a(&absent)?;
-        assert!(crate::ordinary_equipment_input::resolve_source_b(&absent).is_err());
+        crate::ordinary_equipment_input::resolve_source_b(&absent)?;
         assert!(crate::ordinary_equipment_input::resolve(&absent).is_err());
         let ip = crate::ordinary_input_processor::resolve_source_a(&absent)?;
+        let b_ip = crate::ordinary_input_processor::resolve_source_b(&absent)?;
+        assert_eq!(
+            b_ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?,
+            ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?
+        );
+        assert_eq!(b_ip.get_num_objects_found("Schedule:Day:Hourly"), 0);
         assert_eq!(ip.get_num_objects_found("Schedule:Day:Hourly"), 0);
         assert!(
             !ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?
@@ -453,6 +488,12 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
             DDValue::Null
         );
         assert!(crate::ordinary_heat_balance_input::resolve_source(&raw, &ip).is_err());
+        let b_ip = crate::ordinary_input_processor::resolve_source_b(&raw)?;
+        assert_eq!(
+            b_ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?[field],
+            DDValue::Null
+        );
+        assert!(crate::ordinary_heat_balance_input::resolve_source(&raw, &b_ip).is_err());
     }
     for (field, value) in [
         (
@@ -475,6 +516,13 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
             .is_err(),
             "{field}"
         );
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_b(&parse_epjson_str(
+                &invalid.to_string()
+            )?)
+            .is_err(),
+            "{field}"
+        );
     }
     for (field, value) in [
         ("dry_bulb_temperature_range_modifier_type", "UnknownDryBulb"),
@@ -491,6 +539,13 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
         invalid["SizingPeriod:DesignDay"][COOLING][field] = value.into();
         assert!(
             crate::ordinary_equipment_input::resolve_source_a(&parse_epjson_str(
+                &invalid.to_string()
+            )?)
+            .is_err(),
+            "{field}"
+        );
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_b(&parse_epjson_str(
                 &invalid.to_string()
             )?)
             .is_err(),

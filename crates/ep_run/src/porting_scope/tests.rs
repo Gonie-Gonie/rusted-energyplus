@@ -2556,12 +2556,18 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
     let mut bounded_b = input(PortingScope::B);
     bounded_b["SizingPeriod:DesignDay"] = value["SizingPeriod:DesignDay"].clone();
     bounded_b["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("Yes");
-    assert!(
-        trace(&bounded_b, PortingScope::B)
-            .violations
-            .iter()
-            .any(|message| message.contains("active sizing-period"))
-    );
+    let selected_b = trace(&bounded_b, PortingScope::B);
+    assert!(selected_b.admissible, "{:?}", selected_b.violations);
+    assert!(selected_b.inactive_branches.is_empty());
+    for field in [
+        "do_zone_sizing_calculation",
+        "do_system_sizing_calculation",
+        "do_plant_sizing_calculation",
+    ] {
+        let mut sizing = bounded_b.clone();
+        sizing["SimulationControl"]["Control"][field] = json!("Yes");
+        assert!(!trace(&sizing, PortingScope::B).admissible, "{field}");
+    }
 
     // Explicit SourceA consumes scalar/default-profile DesignDays
     // without inheriting the frozen one-Zone capability or ignored-DD warning.
@@ -2641,7 +2647,8 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
         assert!(active.admissible, "{:?}", active.violations);
         assert!(active.inactive_branches.is_empty());
         if !matches!(mode, "WetBulb" | "DewPoint") {
-            assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+            crate::ordinary_equipment_input::resolve_source_b(&raw)
+                .expect("same SourceB scalar DD admission");
             assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
         }
     }
@@ -2668,7 +2675,8 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
     value["Schedule:Day:Hourly"][" actual day "] = day.into();
     let raw = parse_epjson_str(&value.to_string()).expect("scheduled inactive DD raw");
     crate::ordinary_equipment_input::resolve_source_a(&raw).expect("scheduled SourceA admission");
-    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    crate::ordinary_equipment_input::resolve_source_b(&raw)
+        .expect("same SourceB scheduled DD raw admission");
     assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
     let compiled = ep_compiler::compile_raw_model_for_source(&raw);
     assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
@@ -2742,27 +2750,91 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
     dd_only["Site:Location"] = json!({"Actual DD Site":{
         "latitude":39.74,"longitude":-105.18,"time_zone":-7,"elevation":1829
     }});
-    let selected = trace(&dd_only, PortingScope::A);
-    assert!(selected.admissible, "{:?}", selected.violations);
-    assert!(selected.source_design_day_only());
-    assert!(!trace(&dd_only, PortingScope::B).admissible);
-    let raw = parse_epjson_str(&dd_only.to_string()).expect("DD-only raw input");
-    let (environment, admission) = super::environment::porting_source_design_day_trace(
-        &raw,
-        PortingScope::A,
-        std::path::Path::new("in.epw"),
-        true,
-    )
-    .expect("input-only DD admission");
-    assert!(
-        super::environment::validate_source_design_day_environment(&environment, &admission)
+    for selected_scope in [PortingScope::A, PortingScope::B] {
+        let mut candidate = if selected_scope == PortingScope::A {
+            dd_only.clone()
+        } else {
+            let mut b = input(PortingScope::B);
+            for family in [
+                "SimulationControl",
+                "SizingPeriod:DesignDay",
+                "Schedule:Day:Hourly",
+                "Site:Location",
+            ] {
+                b[family] = dd_only[family].clone();
+            }
+            b.as_object_mut().unwrap().remove("RunPeriod");
+            b
+        };
+        let mut selected = trace(&candidate, selected_scope);
+        assert!(selected.admissible, "{:?}", selected.violations);
+        assert!(selected.source_design_day_only());
+        let raw = parse_epjson_str(&candidate.to_string()).expect("DD-only raw input");
+        let (environment, calendar_admission) =
+            super::environment::porting_source_design_day_trace(
+                &raw,
+                selected_scope,
+                std::path::Path::new("in.epw"),
+                true,
+            )
+            .expect("input-only DD admission");
+        assert!(
+            super::environment::validate_source_design_day_environment(
+                &environment,
+                &calendar_admission
+            )
             .is_empty()
-    );
-    assert_eq!(environment["weather_coverage"]["status"], "absent");
-    assert!(environment.get("first").is_none());
-    assert!(environment.get("calendar_year").is_none());
-    dd_only["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("No");
-    assert!(!trace(&dd_only, PortingScope::A).admissible);
+        );
+        assert_eq!(environment["weather_coverage"]["status"], "absent");
+        assert!(environment.get("first").is_none());
+        assert!(environment.get("calendar_year").is_none());
+        selected.environment = Some(environment);
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+        let model = compiled.model.as_ref().expect("Source DD-only typed model");
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                .expect("Source DD-only support admission");
+        let support = crate::support::assess_support_with_source_admission(
+            &raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission),
+        );
+        assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+        assert_eq!(
+            support.runtime_class,
+            match selected_scope {
+                PortingScope::A => crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility,
+                PortingScope::B => crate::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility,
+            }
+        );
+        if selected_scope == PortingScope::A {
+            assert!(
+                support.matched_capability_ids.is_empty()
+                    && support.matched_capabilities.is_empty()
+            );
+            assert!(!support.runtime_class.conformance_promotion_allowed());
+        } else {
+            // Preserve the existing SourceB class/capability policy; DD input
+            // consumption is separately validated and grants no new capability.
+            assert!(!support.matched_capability_ids.is_empty());
+            assert!(support.runtime_class.conformance_promotion_allowed());
+        }
+        assert!(
+            support
+                .source_consumed_objects
+                .iter()
+                .any(|row| row.object_type == "SizingPeriod:DesignDay" && row.count == 1)
+        );
+        candidate["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] =
+            json!("No");
+        assert!(!trace(&candidate, selected_scope).admissible);
+    }
 }
 
 #[test]

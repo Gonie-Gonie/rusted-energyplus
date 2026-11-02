@@ -102,7 +102,7 @@ fn resolve_raw(
         let source_space_list_family = source_space_list_ingress && family.0 == "SpaceList";
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
         let source_design_day_family =
-            source_calendar_ingress && !source_b_ingress && family.0 == "SizingPeriod:DesignDay";
+            source_calendar_ingress && family.0 == "SizingPeriod:DesignDay";
         let source_irt_family =
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
         let source_people_family = source_calendar_ingress && family.0 == "People";

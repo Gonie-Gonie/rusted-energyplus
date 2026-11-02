@@ -3655,8 +3655,8 @@ fn prepare_runtime_inputs(
         .or_else(|| source_design_day_only.then(|| PathBuf::from("in.epw")));
     let mut pending_ordinary_weather = None;
     let (time_axis, weather_series, zone_timestep_schedule_cache) = if source_design_day_only {
-        if scope != Some(crate::PortingScope::A) {
-            return Err("DD-only preparation requires explicit SourceA admission".into());
+        if scope.is_none() {
+            return Err("DD-only preparation requires explicit Source admission".into());
         }
         let path = input_weather_path
             .as_deref()
@@ -3709,13 +3709,9 @@ fn prepare_runtime_inputs(
                 .selected_source_record_indices
                 .iter()
                 .zip(environment_weather.hourly_records())
-                // SourceA coverage excludes DDs; --hours is checked against
+                // Explicit Source coverage excludes DDs; --hours is checked against
                 // the actual completed Source environment scope below.
-                .take(runtime_sample_count(
-                    config,
-                    &time_axis,
-                    scope != Some(crate::PortingScope::A),
-                )?)
+                .take(runtime_sample_count(config, &time_axis, scope.is_none())?)
                 .map(|(&index, &record)| {
                     parsed_weather
                         .raw_records
@@ -3829,7 +3825,7 @@ fn prepare_runtime_inputs(
             None,
         )
     };
-    // SourceA's weather-only coverage axis cannot bound active DD hours.
+    // Explicit Source weather-only coverage cannot bound active DD hours.
     // The completed SourceReportedRunScope remains the full-hour validator.
     let sample_count = time_axis
         .as_ref()
@@ -3837,8 +3833,7 @@ fn prepare_runtime_inputs(
             runtime_sample_count(
                 config,
                 axis,
-                runtime_class_requires_weather(runtime_class)
-                    && scope != Some(crate::PortingScope::A),
+                runtime_class_requires_weather(runtime_class) && scope.is_none(),
             )
         })
         .transpose()?;
@@ -3960,6 +3955,8 @@ fn prepare_runtime_inputs(
         ordinary_warmup_reporting: if source_initialization_required {
             let mut input = if scope == Some(crate::PortingScope::A) {
                 crate::warmup_report_controls::resolve_source_a(raw_model)?
+            } else if scope == Some(crate::PortingScope::B) {
+                crate::warmup_report_controls::resolve_source_b(raw_model)?
             } else {
                 crate::warmup_report_controls::resolve(raw_model)?
             };

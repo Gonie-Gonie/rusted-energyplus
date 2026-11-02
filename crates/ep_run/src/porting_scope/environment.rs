@@ -53,9 +53,6 @@ pub(crate) fn porting_source_design_day_trace(
     weather_path: &Path,
     default_weather_path: bool,
 ) -> Result<(Value, SourceCalendarInputAdmission), String> {
-    if scope != PortingScope::A {
-        return Err("DD-only preparation requires explicit SourceA".into());
-    }
     let admission = SourceCalendarInputAdmission::from_raw(raw, scope)?;
     let present = match std::fs::metadata(weather_path) {
         Ok(metadata) => !metadata.is_dir(),
@@ -64,7 +61,7 @@ pub(crate) fn porting_source_design_day_trace(
     };
     Ok((
         json!({
-            "source": "SourceA DD-only input admission; real environment getters deferred",
+            "source": format!("Source{} DD-only input admission; real environment getters deferred", scope.id()),
             "trace_semantics": "input and filesystem observation only; no simulated events",
             "weather_coverage": {"status":"absent","reason":"no weather primary selected"},
             "weather_input": {"path":weather_path.display().to_string(),

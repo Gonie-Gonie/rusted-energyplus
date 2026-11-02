@@ -88,7 +88,7 @@ impl SourceSupportAdmission {
         }
         let covered_objects = [
             "HeatBalanceAlgorithm",
-            // Only explicit SourceA admits the scalar/default-profile DD branch.
+            // Both explicit Source lanes use the same genuine raw DesignDay getter.
             "SizingPeriod:DesignDay",
             // Only the validated Source A resolver can reach this real family.
             "ElectricEquipment",
@@ -127,11 +127,9 @@ impl SourceSupportAdmission {
         ]
         .into_iter()
         .filter(|family| {
-            (trace.scope == PortingScope::A || *family != "SizingPeriod:DesignDay")
-                && raw
-                    .objects
-                    .get(&ObjectType((*family).into()))
-                    .is_some_and(|objects| !objects.is_empty())
+            raw.objects
+                .get(&ObjectType((*family).into()))
+                .is_some_and(|objects| !objects.is_empty())
         })
         .collect();
         // Scope and the same raw resolver already check every effective enum

@@ -85,7 +85,6 @@ impl PortingScopeTrace {
     /// Input selection only; actual project flags and environments are deferred.
     pub(crate) fn source_design_day_only(&self) -> bool {
         source_design_day_only_selection(
-            self.scope,
             self.object_counts
                 .get("SizingPeriod:DesignDay")
                 .is_some_and(|n| *n > 0),
@@ -94,13 +93,8 @@ impl PortingScopeTrace {
     }
 }
 
-fn source_design_day_only_selection(
-    scope: PortingScope,
-    design_days: bool,
-    settings: &Value,
-) -> bool {
-    scope == PortingScope::A
-        && design_days
+fn source_design_day_only_selection(design_days: bool, settings: &Value) -> bool {
+    design_days
         && settings["simulation_control"]["run_simulation_for_sizing_periods"] == true
         && settings["simulation_control"]["run_simulation_for_weather_file_run_periods"] == false
 }
@@ -155,7 +149,7 @@ pub fn inspect_porting_scope(
     {
         violations.push(error);
     }
-    validate_project_controls(raw, &settings, scope, &mut violations);
+    validate_project_controls(raw, &settings, &mut violations);
     if object_counts.contains_key("SizingPeriod:DesignDay")
         && settings["simulation_control"]["run_simulation_for_sizing_periods"] == false
     {
@@ -187,7 +181,6 @@ pub fn inspect_porting_scope(
             model,
             scope,
             source_design_day_only_selection(
-                scope,
                 object_counts
                     .get("SizingPeriod:DesignDay")
                     .is_some_and(|n| *n > 0),
@@ -310,12 +303,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             ))
 }
 
-fn validate_project_controls(
-    raw: &RawModel,
-    settings: &Value,
-    scope: PortingScope,
-    violations: &mut Vec<String>,
-) {
+fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut Vec<String>) {
     for kind in [
         "SimulationControl",
         "HeatBalanceAlgorithm",
@@ -356,17 +344,10 @@ fn validate_project_controls(
         .objects
         .iter()
         .any(|(key, values)| key.0 == "SizingPeriod:DesignDay" && !values.is_empty());
-    // SourceA uses genuine DD primary environments, separately from sizing.
-    // SourceB retains its inactive-DD boundary; weather/RunPeriod guards remain.
-    if scope != PortingScope::A
-        && design_days
-        && control["run_simulation_for_sizing_periods"] == true
-    {
-        violations
-            .push("active sizing-period environments are outside the weather-run scope".into());
-    }
+    // Both explicit Source lanes execute genuine DD primary environments.
+    // Sizing remains separately fenced; weather/RunPeriod guards remain live.
     if control["run_simulation_for_weather_file_run_periods"] != true
-        && !source_design_day_only_selection(scope, design_days, settings)
+        && !source_design_day_only_selection(design_days, settings)
     {
         violations.push("weather-file RunPeriod execution must be enabled".into());
     }
@@ -774,7 +755,7 @@ fn validate_typed_scope(
         }
     {
         violations.push(if design_day_only {
-            "Building and GlobalGeometryRules are required; SourceA DD-only input requires no RunPeriod".into()
+            "Building and GlobalGeometryRules are required; Source DD-only input requires no RunPeriod".into()
         } else {
             "Building, GlobalGeometryRules and exactly one RunPeriod are required".into()
         });
