@@ -4,6 +4,21 @@ use ep_runtime::HeatBalanceOrdinaryWarmupReportInputs;
 use ep_runtime::heat_balance::inside_convection_dispatcher::NoUserConvectionInput;
 
 pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportInputs, String> {
+    resolve_admitted(raw, false)
+}
+
+/// SourceA report/input metadata; real DD warmup/environment owners stay live.
+/// Positive sizing and the existing SourceB/legacy entry remain unchanged.
+pub(crate) fn resolve_source_a(
+    raw: &RawModel,
+) -> Result<HeatBalanceOrdinaryWarmupReportInputs, String> {
+    resolve_admitted(raw, true)
+}
+
+fn resolve_admitted(
+    raw: &RawModel,
+    allow_active_design_days: bool,
+) -> Result<HeatBalanceOrdinaryWarmupReportInputs, String> {
     let control = raw.objects.get(&ObjectType("SimulationControl".into()));
     if control.is_some_and(|instances| instances.len() > 1) {
         return Err("ordinary A reporting requires the admitted unique SimulationControl".into());
@@ -44,7 +59,7 @@ pub(crate) fn resolve(raw: &RawModel) -> Result<HeatBalanceOrdinaryWarmupReportI
         || do_plant_sizing
         || do_hvac_sizing
         || !do_weather_sim
-        || (do_des_day_sim && design_days)
+        || (do_des_day_sim && design_days && !allow_active_design_days)
     {
         return Err(
             "ordinary A warmup reporting excludes active sizing/pure-load environments".into(),
@@ -212,6 +227,25 @@ mod tests {
             r#"{"SimulationControl":{"control":{"run_simulation_for_weather_file_run_periods":"No"}}}"#,
         )?;
         assert!(resolve(&raw).is_err());
+        let active = parse_epjson_str(
+            r#"{"SimulationControl":{"control":{"run_simulation_for_sizing_periods":"Yes","run_simulation_for_weather_file_run_periods":"Yes"}},"SizingPeriod:DesignDay":{"day":{}}}"#,
+        )?;
+        assert!(resolve(&active).is_err());
+        assert!(!resolve_source_a(&active)?.do_pure_load_calc);
+        for field in [
+            "do_zone_sizing_calculation",
+            "do_system_sizing_calculation",
+            "do_plant_sizing_calculation",
+        ] {
+            let raw = parse_epjson_str(&format!(
+                r#"{{"SimulationControl":{{"control":{{"{field}":"Yes","run_simulation_for_sizing_periods":"Yes","run_simulation_for_weather_file_run_periods":"Yes"}}}},"SizingPeriod:DesignDay":{{"day":{{}}}}}}"#
+            ))?;
+            assert!(resolve_source_a(&raw).is_err(), "{field}");
+        }
+        let no_weather = parse_epjson_str(
+            r#"{"SimulationControl":{"control":{"run_simulation_for_sizing_periods":"Yes","run_simulation_for_weather_file_run_periods":"No"}},"SizingPeriod:DesignDay":{"day":{}}}"#,
+        )?;
+        assert!(resolve_source_a(&no_weather).is_err());
         for field in [
             "do_space_heat_balance_for_sizing",
             "do_space_heat_balance_for_simulation",

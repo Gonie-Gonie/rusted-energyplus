@@ -2542,19 +2542,28 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
     value["ZoneInfiltration:DesignFlowRate"] = json!({"Infiltration":{"design_flow_rate":0.01}});
     assert!(!trace(&value, PortingScope::A).admissible);
     let mut value = input(PortingScope::A);
-    value["SizingPeriod:DesignDay"] = json!({"Day":{}});
+    value["SizingPeriod:DesignDay"] = json!({"Day":{
+        "month":7,"day_of_month":21,"day_type":"SummerDesignDay",
+        "maximum_dry_bulb_temperature":32,"daily_dry_bulb_temperature_range":12,
+        "humidity_condition_type":"WetBulb","wetbulb_or_dewpoint_at_maximum_dry_bulb":15,
+        "wind_speed":2,"wind_direction":0,"sky_clearness":1
+    }});
     assert!(trace(&value, PortingScope::A).admissible);
     value["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("Yes");
     let actual = trace(&value, PortingScope::A);
-    assert!(!actual.admissible);
+    assert!(actual.admissible, "{:?}", actual.violations);
+    assert!(actual.inactive_branches.is_empty());
+    let mut bounded_b = input(PortingScope::B);
+    bounded_b["SizingPeriod:DesignDay"] = value["SizingPeriod:DesignDay"].clone();
+    bounded_b["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("Yes");
     assert!(
-        actual
+        trace(&bounded_b, PortingScope::B)
             .violations
             .iter()
             .any(|message| message.contains("active sizing-period"))
     );
 
-    // Explicit SourceA consumes inactive scalar/default-profile DesignDays
+    // Explicit SourceA consumes scalar/default-profile DesignDays
     // without inheriting the frozen one-Zone capability or ignored-DD warning.
     let weather = single_day_weather_fixture();
     for (mode, operand, amount) in [
@@ -2629,13 +2638,8 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
         );
         value["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("Yes");
         let active = trace(&value, PortingScope::A);
-        assert!(
-            !active.admissible
-                && active
-                    .violations
-                    .iter()
-                    .any(|message| message.contains("active sizing-period"))
-        );
+        assert!(active.admissible, "{:?}", active.violations);
+        assert!(active.inactive_branches.is_empty());
         if !matches!(mode, "WetBulb" | "DewPoint") {
             assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
             assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
@@ -2712,14 +2716,25 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
             .any(|row| row.code == "UnsupportedAlgorithmIgnored"
                 && row.object_type.as_deref() == Some("SizingPeriod:DesignDay"))
     );
+    let mut active = value.clone();
+    active["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] = json!("Yes");
+    let selected = trace(&active, PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
     for field in [
-        "run_simulation_for_sizing_periods",
         "do_zone_sizing_calculation",
+        "do_system_sizing_calculation",
+        "do_plant_sizing_calculation",
     ] {
-        let mut active = value.clone();
-        active["SimulationControl"]["Control"][field] = json!("Yes");
-        assert!(!trace(&active, PortingScope::A).admissible, "{field}");
+        let mut sizing = active.clone();
+        sizing["SimulationControl"]["Control"][field] = json!("Yes");
+        assert!(!trace(&sizing, PortingScope::A).admissible, "{field}");
     }
+    let mut no_weather = active.clone();
+    no_weather["SimulationControl"]["Control"]["run_simulation_for_weather_file_run_periods"] =
+        json!("No");
+    assert!(!trace(&no_weather, PortingScope::A).admissible);
+    active.as_object_mut().unwrap().remove("RunPeriod");
+    assert!(!trace(&active, PortingScope::A).admissible);
 }
 
 #[test]

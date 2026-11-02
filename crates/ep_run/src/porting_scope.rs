@@ -130,7 +130,7 @@ pub fn inspect_porting_scope(
     {
         violations.push(error);
     }
-    validate_project_controls(raw, &settings, &mut violations);
+    validate_project_controls(raw, &settings, scope, &mut violations);
     if object_counts.contains_key("SizingPeriod:DesignDay")
         && settings["simulation_control"]["run_simulation_for_sizing_periods"] == false
     {
@@ -274,7 +274,12 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             ))
 }
 
-fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut Vec<String>) {
+fn validate_project_controls(
+    raw: &RawModel,
+    settings: &Value,
+    scope: PortingScope,
+    violations: &mut Vec<String>,
+) {
     for kind in [
         "SimulationControl",
         "HeatBalanceAlgorithm",
@@ -315,7 +320,12 @@ fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut 
         .objects
         .iter()
         .any(|(key, values)| key.0 == "SizingPeriod:DesignDay" && !values.is_empty());
-    if design_days && control["run_simulation_for_sizing_periods"] == true {
+    // SourceA uses genuine DD primary environments, separately from sizing.
+    // SourceB retains its inactive-DD boundary; weather/RunPeriod guards remain.
+    if scope != PortingScope::A
+        && design_days
+        && control["run_simulation_for_sizing_periods"] == true
+    {
         violations
             .push("active sizing-period environments are outside the weather-run scope".into());
     }

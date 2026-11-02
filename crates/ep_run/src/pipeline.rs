@@ -3649,7 +3649,13 @@ fn prepare_runtime_inputs(
                     .selected_source_record_indices
                     .iter()
                     .zip(environment_weather.hourly_records())
-                    .take(runtime_sample_count(config, &time_axis, true)?)
+                    // SourceA coverage excludes DDs; --hours is checked against
+                    // the actual completed Source environment scope below.
+                    .take(runtime_sample_count(
+                        config,
+                        &time_axis,
+                        scope != Some(crate::PortingScope::A),
+                    )?)
                     .map(|(&index, &record)| {
                         parsed_weather
                             .raw_records
@@ -3764,10 +3770,12 @@ fn prepare_runtime_inputs(
                 None,
             )
         };
+    // SourceA's weather-only coverage axis cannot bound active DD hours.
+    // The completed SourceReportedRunScope remains the full-hour validator.
     let sample_count = runtime_sample_count(
         config,
         &time_axis,
-        runtime_class_requires_weather(runtime_class),
+        runtime_class_requires_weather(runtime_class) && scope != Some(crate::PortingScope::A),
     )?;
     let schedule_cache = if source_initialization_required {
         // No disposable cache or trace is produced from the pre-Project timestep.
@@ -3884,7 +3892,11 @@ fn prepare_runtime_inputs(
             None
         },
         ordinary_warmup_reporting: if source_initialization_required {
-            let mut input = crate::warmup_report_controls::resolve(raw_model)?;
+            let mut input = if scope == Some(crate::PortingScope::A) {
+                crate::warmup_report_controls::resolve_source_a(raw_model)?
+            } else {
+                crate::warmup_report_controls::resolve(raw_model)?
+            };
             let (equipment, radiation) = if scope == Some(crate::PortingScope::B) {
                 crate::ordinary_equipment_input::resolve_with_radiation_source_b(
                     raw_model,
@@ -8676,6 +8688,52 @@ mod tests {
         assert!(!runtime_class_requires_weather(
             RuntimeClass::IdealLoadsFixtureDemandDiagnostic
         ));
+        // This is selected-environment metadata, never manufactured weather.
+        use ep_runtime::heat_balance::source_reported_catalog::{
+            SourceReportedEnvironmentScope, SourceReportedRunScope,
+        };
+        let mut scope = SourceReportedRunScope {
+            do_des_day_sim: true,
+            do_weath_sim: true,
+            dd_only: false,
+            full_annual_run: false,
+            environments: (1..=5)
+                .map(|ordinal| SourceReportedEnvironmentScope {
+                    ordinal,
+                    title: format!("authored DD {ordinal}"),
+                    kind_of_environment: 1,
+                    total_days: 1,
+                })
+                .collect(),
+        };
+        scope.environments.push(SourceReportedEnvironmentScope {
+            ordinal: 6,
+            title: "authored weather period".into(),
+            kind_of_environment: 3,
+            total_days: 1,
+        });
+        assert_eq!(
+            super::source_outcome::validate_requested_hours(&scope, None).unwrap(),
+            144
+        );
+        assert_eq!(
+            super::source_outcome::validate_requested_hours(&scope, Some(144)).unwrap(),
+            144
+        );
+        assert!(matches!(
+            super::source_outcome::validate_requested_hours(&scope, Some(24)),
+            Err(
+                super::source_outcome::SourceScopeError::RequestedHoursMismatch {
+                    requested: 24,
+                    native: 144,
+                }
+            )
+        ));
+        scope.do_des_day_sim = false;
+        assert_eq!(
+            super::source_outcome::validate_requested_hours(&scope, Some(24)).unwrap(),
+            24
+        );
     }
 
     #[test]

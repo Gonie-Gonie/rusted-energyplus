@@ -1,4 +1,4 @@
-//! SourceA inactive DesignDay selectors; genuine getters own all effects.
+//! SourceA DesignDay selectors; genuine getters and weather owners own all effects.
 use super::selected;
 use ep_raw_model::RawObject;
 
