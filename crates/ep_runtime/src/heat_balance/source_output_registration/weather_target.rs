@@ -36,6 +36,10 @@ pub(crate) enum SourceWeatherRealOutputField {
     SkyClearness,
     SkyBrightness,
     WaterMainsTemperature,
+    SizingPeriodDryBulbSchedule { environment: i32 },
+    SizingPeriodHumiditySchedule { environment: i32 },
+    SizingPeriodBeamSolarSchedule { environment: i32 },
+    SizingPeriodDiffuseSolarSchedule { environment: i32 },
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceWeatherIntegerOutputField {

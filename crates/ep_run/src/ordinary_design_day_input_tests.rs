@@ -297,28 +297,222 @@ pub(super) fn verify_admitted_design_day_projection() -> TestResult {
             "{field}"
         );
     }
-    for (field, value) in [
+    // Distinct selected roles reach the same original raw/IP/HB owners. This
+    // is admission/custody evidence; actual schedule lookup and physics belong
+    // to their separate genuine-owner and physical tests.
+    const DAY_NAME: &str = " 104 actual day ";
+    for (dry, humidity, solar, reset) in [
         (
-            "dry_bulb_temperature_range_modifier_type",
             "MultiplierSchedule",
+            "WetBulb",
+            "ASHRAEClearSky",
+            "FullResetAtBeginEnvironment",
         ),
-        ("humidity_condition_type", "RelativeHumiditySchedule"),
-        ("solar_model_indicator", "ASHRAETau"),
         (
-            "begin_environment_reset_mode",
+            "DifferenceSchedule",
+            "DewPoint",
+            "ZhangHuang",
+            "FullResetAtBeginEnvironment",
+        ),
+        (
+            "TemperatureProfileSchedule",
+            "RelativeHumiditySchedule",
+            "Schedule",
+            "SuppressAllBeginEnvironmentResets",
+        ),
+        (
+            "DefaultMultipliers",
+            "WetBulbProfileDifferenceSchedule",
+            "ASHRAETau",
+            "FullResetAtBeginEnvironment",
+        ),
+        (
+            "DefaultMultipliers",
+            "WetBulbProfileMultiplierSchedule",
+            "ASHRAETau2017",
             "SuppressAllBeginEnvironmentResets",
         ),
     ] {
-        let mut excluded = document.clone();
-        excluded["SizingPeriod:DesignDay"][COOLING][field] = value.into();
+        let mut candidate = document.clone();
+        let mut day = serde_json::Map::new();
+        for hour in 1..=24 {
+            day.insert(format!("hour_{hour}"), 0.5.into());
+        }
+        candidate["Schedule:Day:Hourly"] = serde_json::json!({});
+        candidate["Schedule:Day:Hourly"][DAY_NAME] = day.into();
+        let object = candidate["SizingPeriod:DesignDay"][COOLING]
+            .as_object_mut()
+            .ok_or("selected DD object")?;
+        for (field, value) in [
+            ("dry_bulb_temperature_range_modifier_type", dry),
+            ("humidity_condition_type", humidity),
+            ("solar_model_indicator", solar),
+            ("begin_environment_reset_mode", reset),
+        ] {
+            object.insert(field.into(), value.into());
+        }
+        for field in [
+            "dry_bulb_temperature_range_modifier_day_schedule_name",
+            "humidity_condition_day_schedule_name",
+            "beam_solar_day_schedule_name",
+            "diffuse_solar_day_schedule_name",
+        ] {
+            object.insert(field.into(), DAY_NAME.into());
+        }
+        if dry == "TemperatureProfileSchedule" {
+            object.remove("maximum_dry_bulb_temperature");
+        }
+        let raw = parse_epjson_str(&candidate.to_string())?;
+        crate::ordinary_equipment_input::resolve_source_a(&raw)?;
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        let original = raw.clone();
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert_eq!(ip.get_num_objects_found("Schedule:Day:Hourly"), 1);
+        let fields = ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?;
+        for (field, value) in [
+            ("dry_bulb_temperature_range_modifier_type", dry),
+            ("humidity_condition_type", humidity),
+            ("solar_model_indicator", solar),
+            ("begin_environment_reset_mode", reset),
+        ] {
+            assert_eq!(fields[field], DDValue::String(value.into()));
+        }
+        assert_eq!(
+            fields.contains_key("maximum_dry_bulb_temperature"),
+            dry != "TemperatureProfileSchedule"
+        );
+        let hb = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)?;
+        let actual = hb.objects["SizingPeriod:DesignDay"]
+            .iter()
+            .find(|row| row.object_name == COOLING)
+            .ok_or("selected DD HB row")?;
+        for field in [
+            "dry_bulb_temperature_range_modifier_day_schedule_name",
+            "humidity_condition_day_schedule_name",
+            "beam_solar_day_schedule_name",
+            "diffuse_solar_day_schedule_name",
+        ] {
+            assert_eq!(fields[field], DDValue::String(DAY_NAME.into()));
+            assert_eq!(
+                actual.fields[field],
+                ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                    DAY_NAME.into()
+                )
+            );
+        }
+        let mut prepared = configuration(2)?;
+        prepared.design_days = expected.to_vec();
+        crate::ordinary_design_day_input::prepare_source_a(&raw, &mut prepared, true)?;
+        assert!(
+            prepared.design_days.is_empty()
+                && prepared.setup_simulation_controls.is_none()
+                && prepared.reverse_design_days
+        );
+        assert_eq!(raw, original);
+
+        // Missing lookup tables/names are not repaired or resolved by admission.
+        // The original selected getter must own its warning/severe ordering.
+        candidate
+            .as_object_mut()
+            .ok_or("DD root")?
+            .remove("Schedule:Day:Hourly");
+        candidate["SizingPeriod:DesignDay"][COOLING]
+            .as_object_mut()
+            .ok_or("missing named-day DD")?
+            .remove("humidity_condition_day_schedule_name");
+        let absent = parse_epjson_str(&candidate.to_string())?;
+        crate::ordinary_equipment_input::resolve_source_a(&absent)?;
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&absent).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&absent).is_err());
+        let ip = crate::ordinary_input_processor::resolve_source_a(&absent)?;
+        assert_eq!(ip.get_num_objects_found("Schedule:Day:Hourly"), 0);
+        assert!(
+            !ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?
+                .contains_key("humidity_condition_day_schedule_name")
+        );
+        let mut prepared = configuration(2)?;
+        crate::ordinary_design_day_input::prepare_source_a(&absent, &mut prepared, false)?;
+        assert!(prepared.design_days.is_empty());
+    }
+    // Known optional-name nulls retain their original representation at the
+    // raw/IP boundary and fail HB scalar projection without defaulting.
+    for field in [
+        "dry_bulb_temperature_range_modifier_day_schedule_name",
+        "humidity_condition_day_schedule_name",
+        "beam_solar_day_schedule_name",
+        "diffuse_solar_day_schedule_name",
+    ] {
+        let mut candidate = document.clone();
+        candidate["SizingPeriod:DesignDay"][COOLING][field] = serde_json::Value::Null;
+        let raw = parse_epjson_str(&candidate.to_string())?;
+        crate::ordinary_equipment_input::resolve_source_a(&raw)?;
+        let ip = crate::ordinary_input_processor::resolve_source_a(&raw)?;
+        assert_eq!(
+            ip.source_raw_object_fields("SizingPeriod:DesignDay", COOLING)?[field],
+            DDValue::Null
+        );
+        assert!(crate::ordinary_heat_balance_input::resolve_source(&raw, &ip).is_err());
+    }
+    for (field, value) in [
+        (
+            "dry_bulb_temperature_range_modifier_day_schedule_name",
+            serde_json::json!(true),
+        ),
+        (
+            "humidity_condition_day_schedule_name",
+            serde_json::json!([]),
+        ),
+        ("beam_solar_day_schedule_name", serde_json::json!({})),
+        ("diffuse_solar_day_schedule_name", serde_json::json!(17)),
+    ] {
+        let mut invalid = document.clone();
+        invalid["SizingPeriod:DesignDay"][COOLING][field] = value;
         assert!(
             crate::ordinary_equipment_input::resolve_source_a(&parse_epjson_str(
-                &excluded.to_string()
+                &invalid.to_string()
             )?)
             .is_err(),
             "{field}"
         );
     }
+    for (field, value) in [
+        ("dry_bulb_temperature_range_modifier_type", "UnknownDryBulb"),
+        ("humidity_condition_type", "UnknownHumidity"),
+        ("solar_model_indicator", "UnknownSolar"),
+        // Preserve the official SuppressAll key without renaming it to the
+        // different Native getter spelling. Runtime tests own the actual flag.
+        (
+            "begin_environment_reset_mode",
+            "SuppressThermalResetAtBeginEnvironment",
+        ),
+    ] {
+        let mut invalid = document.clone();
+        invalid["SizingPeriod:DesignDay"][COOLING][field] = value.into();
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_a(&parse_epjson_str(
+                &invalid.to_string()
+            )?)
+            .is_err(),
+            "{field}"
+        );
+    }
+    let mut empty_table = document.clone();
+    empty_table["SizingPeriod:DesignDay"] = serde_json::json!({});
+    let empty = parse_epjson_str(&empty_table.to_string())?;
+    crate::ordinary_equipment_input::resolve_source_a(&empty)?;
+    let ip = crate::ordinary_input_processor::resolve_source_a(&empty)?;
+    assert_eq!(ip.get_num_objects_found("SizingPeriod:DesignDay"), 0);
+    let mut prepared = configuration(0)?;
+    crate::ordinary_design_day_input::prepare_source_a(&empty, &mut prepared, false)?;
+    assert!(prepared.design_days.is_empty());
+    empty_table["SizingPeriod:DesignDay"] = serde_json::json!({"present but empty":{}});
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_a(&parse_epjson_str(
+            &empty_table.to_string()
+        )?)
+        .is_err()
+    );
     let mut one_source = configuration(1)?;
     crate::ordinary_design_day_input::prepare_source_a(&one, &mut one_source, true)?;
     assert!(one_source.reverse_design_days && one_source.design_days.is_empty());

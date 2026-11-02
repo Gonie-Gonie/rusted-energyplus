@@ -1,8 +1,58 @@
 //! Genuine native Schedule pointer use propagation and selected min/max.
-use super::{SelectedScheduleData, SelectedScheduleManager, SourceScheduleIndex};
+use super::{
+    SelectedScheduleData, SelectedScheduleManager, SourceDayScheduleIndex, SourceScheduleIndex,
+};
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as E;
 use crate::weather::day::WeatherGlobalState;
 impl SelectedScheduleManager {
+    /// Native GetDaySchedule2640–2662 consumes the already processed real map.
+    pub(crate) fn get_source_day_schedule(
+        &mut self,
+        name: &str,
+    ) -> Result<Option<SourceDayScheduleIndex>, E> {
+        let Some(&number) = self.day_schedule_map.get(name) else {
+            return Ok(None);
+        };
+        let day = self.day_schedules.get_mut(number).ok_or(E::Unavailable(
+            "actual GetDaySchedule map/index association",
+        ))?;
+        day.is_used = true;
+        Ok(Some(SourceDayScheduleIndex(number)))
+    }
+
+    /// Native DaySchedule::getDayVals returns the sole retained tsVals owner.
+    pub(crate) fn source_day_values(&self, index: SourceDayScheduleIndex) -> Result<&[f64], E> {
+        self.day_schedules
+            .get(index.0)
+            .map(|day| day.timestep_values.as_slice())
+            .ok_or(E::Unavailable("actual DaySchedule getDayVals pointer"))
+    }
+
+    /// Native ScheduleBase3376 inclusive bound, using its actual cached reducer.
+    pub(crate) fn source_day_check_min(
+        &mut self,
+        index: SourceDayScheduleIndex,
+        minimum: f64,
+        clock: &WeatherGlobalState,
+    ) -> Result<bool, E> {
+        let (actual_minimum, _) = self.source_day_min_max_with_clock(index.0, clock)?;
+        Ok(f64::from(f32::EPSILON) >= minimum - actual_minimum)
+    }
+
+    /// Native ScheduleBase3410–3413 evaluates both inclusive checks in order.
+    pub(crate) fn source_day_check_min_max(
+        &mut self,
+        index: SourceDayScheduleIndex,
+        minimum: f64,
+        maximum: f64,
+        clock: &WeatherGlobalState,
+    ) -> Result<bool, E> {
+        let (actual_minimum, actual_maximum) =
+            self.source_day_min_max_with_clock(index.0, clock)?;
+        let min_ok = f64::from(f32::EPSILON) >= minimum - actual_minimum;
+        let max_ok = actual_maximum - maximum <= f64::from(f32::EPSILON);
+        Ok(min_ok && max_ok)
+    }
     pub(crate) fn get_source_schedule(
         &mut self,
         name: &str,

@@ -74,6 +74,7 @@ fn unit(v: SourceOutputUnits) -> i32 {
         U::Invalid => -1,
         U::Dimensionless => 6,
         U::C => 1,
+        U::DeltaC => 25,
         U::Pa => 4,
         U::M => 21,
         U::KgPerM3 => 36,

@@ -1,4 +1,7 @@
 use super::handoff::update_weather_data;
+
+#[path = "design_day_schedule_owner_tests.rs"]
+mod design_day_schedule_owners;
 use super::state::{
     DailyWeatherVariables, ExtendedWeatherVars, WeatherDayState, WeatherDayValues,
     WeatherDayValuesError, WeatherEnvironmentState, WeatherGlobalState, WeatherOwnerState,
@@ -477,6 +480,7 @@ fn hour_access_preserves_other_intervals_and_has_native_slot_order() {
 
 #[test]
 fn source_constructor_defaults_and_allocation_are_distinct() {
+    design_day_schedule_owners::verify().expect("genuine scheduled DesignDay getter owners");
     let state = WeatherDayState::default();
     assert_eq!(state.today_variables.integer_values(), [0; 8]);
     assert_eq!(

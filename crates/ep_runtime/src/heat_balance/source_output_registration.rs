@@ -224,6 +224,7 @@ pub(crate) enum SourceOutputUnits {
     M3,
     Ach,
     JPerKgK,
+    DeltaC,
     Ppm,
     Clo,
 }
@@ -232,6 +233,7 @@ impl SourceOutputUnits {
         match self {
             Self::Invalid | Self::Dimensionless => "",
             Self::C => "C",
+            Self::DeltaC => "deltaC",
             Self::Pa => "Pa",
             Self::M => "m",
             Self::KgPerM3 => "kg/m3",

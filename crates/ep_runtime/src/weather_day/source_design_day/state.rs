@@ -1,6 +1,6 @@
 //! Complete genuine native constructors, independent of selected/config DD owners.
 use super::Error;
-use std::convert::Infallible;
+use crate::heat_balance::selected_schedule_manager::SourceDayScheduleIndex;
 
 /// Native DesignDayData225–256, including the four actual null day-schedule pointers.
 #[derive(Clone, Debug, PartialEq)]
@@ -22,10 +22,10 @@ pub(crate) struct SourceDesignDayData {
     pub(crate) daylight_saving_indicator: i32,
     pub(crate) solar_model: i32,
     pub(crate) dry_bulb_range_type: i32,
-    pub(crate) temperature_range_schedule: Option<Infallible>,
-    pub(crate) humidity_indicator_schedule: Option<Infallible>,
-    pub(crate) beam_solar_schedule: Option<Infallible>,
-    pub(crate) diffuse_solar_schedule: Option<Infallible>,
+    pub(crate) temperature_range_schedule: Option<SourceDayScheduleIndex>,
+    pub(crate) humidity_indicator_schedule: Option<SourceDayScheduleIndex>,
+    pub(crate) beam_solar_schedule: Option<SourceDayScheduleIndex>,
+    pub(crate) diffuse_solar_schedule: Option<SourceDayScheduleIndex>,
     pub(crate) tau_beam: f64,
     pub(crate) tau_diffuse: f64,
     pub(crate) daily_wet_bulb_range: f64,

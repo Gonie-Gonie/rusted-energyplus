@@ -2641,6 +2641,85 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
             assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
         }
     }
+
+    // Named-day profiles can omit max DB and retain the official reset key
+    // while entering the same nonpromotable inactive Source class.
+    let mut value = self::input(PortingScope::A);
+    value["SizingPeriod:DesignDay"] = json!({"Scheduled DD":{
+        "month":7,"day_of_month":21,"day_type":"SummerDesignDay",
+        "dry_bulb_temperature_range_modifier_type":"TemperatureProfileSchedule",
+        "dry_bulb_temperature_range_modifier_day_schedule_name":" actual day ",
+        "humidity_condition_type":"RelativeHumiditySchedule",
+        "humidity_condition_day_schedule_name":" actual day ",
+        "solar_model_indicator":"Schedule", "beam_solar_day_schedule_name":" actual day ",
+        "diffuse_solar_day_schedule_name":" actual day ",
+        "begin_environment_reset_mode":"SuppressAllBeginEnvironmentResets",
+        "wind_speed":2,"wind_direction":0
+    }});
+    let mut day = serde_json::Map::new();
+    for hour in 1..=24 {
+        day.insert(format!("hour_{hour}"), 0.5.into());
+    }
+    value["Schedule:Day:Hourly"] = json!({});
+    value["Schedule:Day:Hourly"][" actual day "] = day.into();
+    let raw = parse_epjson_str(&value.to_string()).expect("scheduled inactive DD raw");
+    crate::ordinary_equipment_input::resolve_source_a(&raw).expect("scheduled SourceA admission");
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+    let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+    let model = compiled.model.as_ref().expect("typed weather Zone");
+    let mut selected = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A);
+    assert!(selected.admissible, "{:?}", selected.violations);
+    selected.environment = Some(
+        super::environment::environment_from_weather(
+            model,
+            &weather,
+            "scheduled inactive DD SourceA",
+        )
+        .expect("weather coverage"),
+    );
+    let admission = crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+        .expect("scheduled inactive SourceA support");
+    let support = crate::support::assess_support_with_source_admission(
+        &raw,
+        &compiled.report,
+        Some(model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&admission),
+    );
+    assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+    assert_eq!(
+        support.runtime_class,
+        crate::RuntimeClass::SourceMultiZoneHeatBalanceCompatibility
+    );
+    assert!(support.matched_capability_ids.is_empty() && support.matched_capabilities.is_empty());
+    assert!(!support.runtime_class.conformance_promotion_allowed());
+    assert!(
+        support
+            .source_consumed_objects
+            .iter()
+            .any(|row| row.object_type == "SizingPeriod:DesignDay" && row.count == 1)
+    );
+    assert!(
+        !support
+            .diagnostics
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "UnsupportedAlgorithmIgnored"
+                && row.object_type.as_deref() == Some("SizingPeriod:DesignDay"))
+    );
+    for field in [
+        "run_simulation_for_sizing_periods",
+        "do_zone_sizing_calculation",
+    ] {
+        let mut active = value.clone();
+        active["SimulationControl"]["Control"][field] = json!("Yes");
+        assert!(!trace(&active, PortingScope::A).admissible, "{field}");
+    }
 }
 
 #[test]

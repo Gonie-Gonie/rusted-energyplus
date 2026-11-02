@@ -67,6 +67,18 @@ impl SourceRealOutputOwners for SourceWeatherOutputOwners<'_> {
             Real::SkyClearness => self.daylighting_sky_clearness,
             Real::SkyBrightness => self.daylighting_sky_brightness,
             Real::WaterMainsTemperature => self.water_mains_temperature,
+            Real::SizingPeriodDryBulbSchedule { .. }
+            | Real::SizingPeriodHumiditySchedule { .. }
+            | Real::SizingPeriodBeamSolarSchedule { .. }
+            | Real::SizingPeriodDiffuseSolarSchedule { .. } => {
+                return super::source_design_day::SourceDesignDaySiteScheduleOutputOwners {
+                    schedules: &self
+                        .weather
+                        .source_design_day_input
+                        .sizing_period_site_schedules,
+                }
+                .resolve(target);
+            }
         })
     }
 }

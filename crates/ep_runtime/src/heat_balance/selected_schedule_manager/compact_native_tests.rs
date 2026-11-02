@@ -503,6 +503,51 @@ fn verify_authored_regular_schedule_graph(fixture: &Value) -> TestResult<()> {
             .get("D")
             .ok_or("actual Hourly D owner")?;
         assert_eq!((h, d), (1, 2)); // Both precede remaining Compact-generated Day.
+        // Direct DaySchedule lookup uses the real processed owner and its flags.
+        let mut direct_day = manager.clone();
+        direct_day.day_schedules[h].is_used = false;
+        let before_missing = direct_day.clone();
+        assert_eq!(
+            direct_day.get_source_day_schedule("not an authored day")?,
+            None
+        );
+        assert_eq!(direct_day, before_missing);
+        let direct = direct_day
+            .get_source_day_schedule("H")?
+            .ok_or("actual direct Day H")?;
+        assert_eq!(direct.0, h);
+        assert!(direct_day.day_schedules[h].is_used);
+        assert_eq!(direct_day.day_schedules[d], before_missing.day_schedules[d]);
+        assert_eq!(
+            direct_day.source_day_values(direct)?,
+            manager.day_schedules[h].timestep_values
+        );
+        let live_clock = WeatherGlobalState {
+            time_steps_in_hour: 4,
+            ..Default::default()
+        };
+        assert!(direct_day.source_day_check_min_max(direct, 0.0, 1.0, &live_clock)?);
+        assert!(direct_day.day_schedules[h].is_min_max_set);
+        assert_eq!(
+            (
+                direct_day.day_schedules[h].min_value,
+                direct_day.day_schedules[h].max_value
+            ),
+            (0.0, 1.0)
+        );
+        assert!(direct_day.source_day_check_min(
+            direct,
+            f64::from(f32::EPSILON) / 2.0,
+            &live_clock
+        )?);
+        assert!(!direct_day.source_day_check_min(
+            direct,
+            2.0 * f64::from(f32::EPSILON),
+            &live_clock
+        )?);
+        assert!(!direct_day.source_day_check_min_max(direct, 0.0, 0.5, &live_clock)?);
+        direct_day.day_schedules[h].timestep_values[0] = 0.375;
+        assert_eq!(direct_day.source_day_values(direct)?[0], 0.375);
         assert_eq!(manager.day_schedules[h].sum_timestep_values, 48.0);
         assert!(
             manager.day_schedules[d]

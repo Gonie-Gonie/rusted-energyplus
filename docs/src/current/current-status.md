@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 154 paired physical cases and 4,171,086 reported values with zero
+contains 155 paired physical cases and 4,182,894 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,21 +125,24 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 101 recorded Source builds,
-95 with accepted pairs and six unaccepted-only builds. B/legacy Electric,
+validate the consumer corrections. There are 103 recorded Source builds,
+96 with accepted pairs and seven without accepted pairs, including one build
+superseded before any Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
 
-Explicit Source A now consumes inactive `SizingPeriod:DesignDay` inputs with
-five scalar/default-profile humidity modes, DefaultMultipliers dry-bulb,
-ASHRAEClearSky and FullResetAtBeginEnvironment. Unused names and six-kind JSON
-metadata retain original custody; integer JSON keeps Native signed conversion.
-One single-Zone weather case compares 116 series and 10,848 values with zero
-tolerance/RMSE failures, whole ancillary records, 19 actual warmup days and all
-six climatic rows/36 value cells. Two existing tests pass without new functions.
-Active design-day/sizing execution, humidity/Tomorrow trajectories, schedule or
-alternate solar/reset branches and arbitrary scalar cross-products remain open;
-Source B/legacy keep their narrower admission. No capability is promoted.
+Explicit Source A consumes inactive `SizingPeriod:DesignDay` inputs with all
+four dry-bulb, eight humidity and five solar selectors and both official reset
+enums, preserving Native reset-key behavior. One single-Zone weather input has
+320 selector combinations plus shared-Day reuse and two negative profiles;
+126 series and 11,808 values pass fixed declared limits, with 323 climatic rows,
+ten wildcard site outputs, whole ancillary records and 19 actual warmup days.
+Inactive DDs still execute genuine setup during kickoff, including Tau/Tau2017
+and ZhangHuang; primary weather reports do not directly expose their private
+nonzero trajectories. Four existing test executions are retained without new
+functions or reruns. Active-DD primary reporting/sizing, alternate sky and broader
+value/composition domains remain open; B/legacy stay narrower. No capability is
+promoted.
 
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including

@@ -1,4 +1,4 @@
-//! SourceA scalar/default-profile DesignDay admission; genuine getters own effects.
+//! SourceA inactive DesignDay selectors; genuine getters own all effects.
 use super::selected;
 use ep_raw_model::RawObject;
 
@@ -6,7 +6,12 @@ pub(super) fn admitted_object(object: &RawObject) -> bool {
     selected(
         object,
         "dry_bulb_temperature_range_modifier_type",
-        &["DefaultMultipliers"],
+        &[
+            "DefaultMultipliers",
+            "MultiplierSchedule",
+            "DifferenceSchedule",
+            "TemperatureProfileSchedule",
+        ],
     ) && selected(
         object,
         "humidity_condition_type",
@@ -16,15 +21,30 @@ pub(super) fn admitted_object(object: &RawObject) -> bool {
             "HumidityRatio",
             "Enthalpy",
             "WetBulbProfileDefaultMultipliers",
+            "RelativeHumiditySchedule",
+            "WetBulbProfileDifferenceSchedule",
+            "WetBulbProfileMultiplierSchedule",
         ],
-    ) && selected(object, "solar_model_indicator", &["ASHRAEClearSky"])
-        && selected(
-            object,
-            "begin_environment_reset_mode",
-            &["FullResetAtBeginEnvironment"],
-        )
-    // Named-day references are unused on these exact selector branches.
-    // Their schema-string presence is preserved for the genuine raw getter.
+    ) && selected(
+        object,
+        "solar_model_indicator",
+        &[
+            "ASHRAEClearSky",
+            "ZhangHuang",
+            "Schedule",
+            "ASHRAETau",
+            "ASHRAETau2017",
+        ],
+    ) && selected(
+        object,
+        "begin_environment_reset_mode",
+        &[
+            "FullResetAtBeginEnvironment",
+            "SuppressAllBeginEnvironmentResets",
+        ],
+    )
+    // Original named-day strings are preserved. Genuine Source getters resolve
+    // only the selected dry-bulb, humidity and solar schedule roles.
 }
 
 // The official instance schema has no additionalProperties=false. Unknown

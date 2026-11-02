@@ -93,3 +93,55 @@ pub(super) fn warning_empty(
     }
     Ok(())
 }
+
+/// UtilityRoutines1564–1568.
+pub(super) fn item_not_found(
+    backend: &mut SourceErrorBackend<'_>,
+    title: &str,
+    field: &str,
+    value: &str,
+) -> Result<(), Error> {
+    severe_header(backend, title)?;
+    backend.show_continue_error(&format!("{field} = {value}, item not found."))?;
+    Ok(())
+}
+/// UtilityRoutines1747–1755, with the actual DD humidity fallback argument.
+pub(super) fn missing_humidity(
+    backend: &mut SourceErrorBackend<'_>,
+    title: &str,
+    field: &str,
+    value: &str,
+) -> Result<(), Error> {
+    warning_header(backend, title)?;
+    backend.show_continue_error(&format!("{field} = {value}, item not found, Default Humidity (constant for day using Humidity Indicator Temp). will be used."))?;
+    Ok(())
+}
+/// ScheduleManager3937–3952, inclusive minimum and no trailing message.
+pub(super) fn bad_min(
+    backend: &mut SourceErrorBackend<'_>,
+    title: &str,
+    field: &str,
+    value: &str,
+    minimum: f64,
+) -> Result<(), Error> {
+    severe_header(backend, title)?;
+    backend.show_continue_error(&format!(
+        "{field} = {value}, schedule contains values that are < {minimum}"
+    ))?;
+    Ok(())
+}
+/// ScheduleManager3971–3993, two inclusive bounds and no trailing message.
+pub(super) fn bad_min_max(
+    backend: &mut SourceErrorBackend<'_>,
+    title: &str,
+    field: &str,
+    value: &str,
+    minimum: f64,
+    maximum: f64,
+) -> Result<(), Error> {
+    severe_header(backend, title)?;
+    backend.show_continue_error(&format!(
+        "{field} = {value}, schedule contains values that are < {minimum} and/or > {maximum}"
+    ))?;
+    Ok(())
+}

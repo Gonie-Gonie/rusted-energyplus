@@ -60,11 +60,14 @@ impl WeatherSession {
     /// Real GetDesignDayData child bridge. The caller supplies the existing
     /// predefined registry/table separately; all weather/IP arguments are live
     /// borrows of the owners already allocated by this ReadUser invocation.
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn read_source_design_day_input(
         &mut self,
         owners: &mut SourceWeatherInitializationOwners<'_, '_>,
         registry: &crate::heat_balance::predefined_tables::PredefinedRegistry,
         table: &mut crate::heat_balance::ctf_reports::PredefinedStringTable,
+        schedules: &mut crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
+        output: &mut impl super::source_design_day::SourceDesignDayOutputRegistration,
         errors_found: &mut bool,
     ) -> Result<(), Failure> {
         let weather = &mut self.state.weather;
@@ -73,6 +76,13 @@ impl WeatherSession {
             &mut super::source_design_day::SourceDesignDayInputOwners {
                 raw: owners.raw,
                 input: owners.input,
+                schedules,
+                output,
+                registration: owners.registration,
+                files: owners.files,
+                eio: owners.eio,
+                globals: owners.globals,
+                developer_flag: &owners.system.developer_flag,
                 shortcut: owners.shortcut,
                 clock: &self.state.global,
                 force_begin_env_reset_suppress: &self

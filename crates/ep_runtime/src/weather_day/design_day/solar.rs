@@ -183,6 +183,92 @@ pub(in super::super) fn clear_sky_radiation(
     (beam, diffuse)
 }
 
+// Native WeatherManager4025-4060 AirMass; SunIsUpValue is handled by the caller
+// and again by ASHRAETauModel, retaining both genuine guards.
+fn air_mass(cosine_zenith: f64) -> f64 {
+    if cosine_zenith <= 0.001 {
+        37.07837343
+    } else if cosine_zenith >= 1.0 {
+        1.0
+    } else {
+        let sun_altitude_degrees = cosine_zenith.asin() / (std::f64::consts::PI / 180.0);
+        1.0 / (cosine_zenith + 0.50572 * (6.07995 + sun_altitude_degrees).powf(-1.6364))
+    }
+}
+
+// Native WeatherManager4064-4110 ASHRAETauModel. The third result is the actual
+// global-horizontal local even though SetUpDesignDay does not subsequently use it.
+pub(in super::super) fn tau_radiation(
+    model: i32,
+    extraterrestrial: f64,
+    cosine_zenith: f64,
+    tau_beam: f64,
+    tau_diffuse: f64,
+) -> (f64, f64, f64) {
+    if cosine_zenith < 0.00001 || tau_beam <= 0.0 || tau_diffuse <= 0.0 {
+        (0.0, 0.0, 0.0)
+    } else {
+        let (ab, ad) = if model == 3 {
+            (
+                1.219 - 0.043 * tau_beam - 0.151 * tau_diffuse - 0.204 * tau_beam * tau_diffuse,
+                0.202 + 0.852 * tau_beam - 0.007 * tau_diffuse - 0.357 * tau_beam * tau_diffuse,
+            )
+        } else {
+            (
+                1.454 - 0.406 * tau_beam - 0.268 * tau_diffuse + 0.021 * tau_beam * tau_diffuse,
+                0.507 + 0.205 * tau_beam - 0.080 * tau_diffuse - 0.190 * tau_beam * tau_diffuse,
+            )
+        };
+        let mass = air_mass(cosine_zenith);
+        let beam = extraterrestrial * (-tau_beam * mass.powf(ab)).exp();
+        let diffuse = extraterrestrial * (-tau_diffuse * mass.powf(ad)).exp();
+        let global = beam * cosine_zenith + diffuse;
+        (beam, diffuse, global)
+    }
+}
+
+// Native WeatherManager3510-3520 constants and3911-3937 Zhang-Huang child.
+// Current and three-hours-prior operands come from the actual Tomorrow owner
+// at the call site, rather than a separately prepared temperature trajectory.
+pub(in super::super) fn zhang_huang_radiation(
+    sin_solar_altitude: f64,
+    sky_clearness: f64,
+    dry_bulb: f64,
+    previous_dry_bulb: f64,
+    relative_humidity: f64,
+    wind_speed: f64,
+) -> (f64, f64) {
+    let sky_cover = 1.0 - sky_clearness;
+    // ObjexxFCL max(first, 0.0) keeps its first operand on ties/unordered input.
+    let total_sky_cover = if sky_cover < 0.0 { 0.0 } else { sky_cover };
+    let global = (1355.0
+        * sin_solar_altitude
+        * (0.5598
+            + 0.4982 * total_sky_cover
+            + -0.6762 * (total_sky_cover * total_sky_cover)
+            + 0.02842 * (dry_bulb - previous_dry_bulb)
+            + -0.00317 * relative_humidity
+            + 0.014 * wind_speed)
+        + -17.853)
+        / 0.843;
+    let global = if global < 0.0 { 0.0 } else { global };
+    let kt = global / (1367.0 * sin_solar_altitude);
+    let ktc = 0.4268 + 0.1934 * sin_solar_altitude;
+    let kds = if kt < ktc {
+        (3.996 - 3.862 * sin_solar_altitude + 1.54 * (sin_solar_altitude * sin_solar_altitude))
+            * (kt * kt * kt)
+    } else {
+        let complement = 1.0 - kt;
+        kt - (1.107
+            + 0.03569 * sin_solar_altitude
+            + 1.681 * (sin_solar_altitude * sin_solar_altitude))
+            * (complement * complement * complement)
+    };
+    let beam = 1355.0 * sin_solar_altitude * kds * ((1.0 - kt) / (1.0 - kds));
+    let diffuse = 1355.0 * sin_solar_altitude * ((kt - kds) / (1.0 - kds));
+    (beam, diffuse)
+}
+
 // Narrow cfg-only transport to the actual full Source daily function.
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 impl crate::weather::day::WeatherDayState {

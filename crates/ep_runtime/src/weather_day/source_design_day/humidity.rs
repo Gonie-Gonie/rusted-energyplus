@@ -1,7 +1,7 @@
 //! Native6247–6467 humidity switch and actual default-profile/diagnostic order.
 use super::diagnostics;
 use super::getter::fill_default_profile;
-use super::state::SourceDesignDayModifierGrid;
+use super::state::{SourceDesignDayModifierGrid, SourceSizingPeriodSiteSchedule};
 use super::*;
 const HUMIDITY_NAMES: [&str; 8] = [
     "WETBULB",
@@ -13,9 +13,13 @@ const HUMIDITY_NAMES: [&str; 8] = [
     "WETBULBPROFILEDIFFERENCESCHEDULE",
     "WETBULBPROFILEMULTIPLIERSCHEDULE",
 ];
+// Preserve Native humidity switch cases and diagnostic ordering.
+#[allow(clippy::too_many_arguments, clippy::collapsible_match)]
 pub(super) fn read(
     d: &mut SourceDesignDayData,
     modifiers: &mut Option<Vec<Option<SourceDesignDayModifierGrid>>>,
+    numbers: &mut Vec<i32>,
+    sites: &[SourceSizingPeriodSiteSchedule],
     environment: i32,
     o: &mut SourceDesignDayInputOwners<'_, '_>,
     errors: &mut bool,
@@ -98,7 +102,7 @@ pub(super) fn read(
                 ));
             }
         }
-        4 => {} // unitType only feeds later unavailable schedule registration.
+        4 => {} // Native unitType Percentage is used by the scheduled child below.
         5..=7 => {
             if o.shortcut.numeric_field_blanks[4] {
                 diagnostics::empty(
@@ -136,9 +140,79 @@ pub(super) fn read(
             )?;
             *errors = true;
         } else {
-            return Err(Error::Unavailable(
-                "GetDesignDayData6378 actual Sched::GetDaySchedule humidity child",
-            ));
+            let name = o.shortcut.alpha_args[5].clone();
+            d.humidity_indicator_schedule = o.schedules.get_source_day_schedule(&name)?;
+            if let Some(day) = d.humidity_indicator_schedule {
+                super::schedules::copy_values(
+                    modifiers,
+                    environment,
+                    o.clock.time_steps_in_hour,
+                    o.schedules.source_day_values(day)?,
+                    super::schedules::ProfileField::Humidity,
+                )?;
+                use crate::heat_balance::source_output_registration::{
+                    SourceOutputUnits as Units, SourceWeatherRealOutputField as Field,
+                };
+                let units = if d.humidity_indicator_type == 4 {
+                    Units::Percentage
+                } else {
+                    Units::Dimensionless
+                };
+                super::output::register(
+                    numbers,
+                    sites,
+                    day,
+                    Field::SizingPeriodHumiditySchedule { environment },
+                    "Sizing Period Site Humidity Condition Schedule Value",
+                    &name,
+                    units,
+                    o,
+                )?;
+                match d.humidity_indicator_type {
+                    4 | 7 => {
+                        let maximum = if d.humidity_indicator_type == 4 {
+                            100.0
+                        } else {
+                            1.0
+                        };
+                        if !o
+                            .schedules
+                            .source_day_check_min_max(day, 0.0, maximum, o.clock)?
+                        {
+                            diagnostics::bad_min_max(
+                                o.backend,
+                                &d.title,
+                                &o.shortcut.alpha_field_names[5],
+                                &name,
+                                0.0,
+                                maximum,
+                            )?;
+                            *errors = true;
+                        }
+                    }
+                    6 => {
+                        if !o.schedules.source_day_check_min(day, 0.0, o.clock)? {
+                            diagnostics::bad_min(
+                                o.backend,
+                                &d.title,
+                                &o.shortcut.alpha_field_names[5],
+                                &name,
+                                0.0,
+                            )?;
+                            *errors = true;
+                        }
+                    }
+                    _ => {}
+                }
+            } else {
+                // Native warning only; the selector and zero constructor modifiers remain.
+                diagnostics::missing_humidity(
+                    o.backend,
+                    &d.title,
+                    &o.shortcut.alpha_field_names[5],
+                    &name,
+                )?;
+            }
         }
     } else if d.humidity_indicator_type == 5 {
         fill_default_profile(

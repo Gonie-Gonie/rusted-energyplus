@@ -1,10 +1,12 @@
 //! Genuine GetDesignDayData5936–6655 on the sole shared input and weather owners.
-//! Schedule lookup is an honest first-operation boundary; no typed-input replay.
+//! Day-schedule lookup and output bindings borrow the actual retained owners.
 mod current;
 mod diagnostics;
 mod getter;
 mod humidity;
+mod output;
 mod reports;
+mod schedules;
 mod setup;
 mod state;
 mod validation;
@@ -18,12 +20,26 @@ use crate::heat_balance::selected_heat_balance_input::{
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputProcessorShortCut,
 };
+pub(crate) use output::{
+    SourceDesignDayOutputContext, SourceDesignDayOutputRegistration,
+    SourceDesignDaySiteScheduleOutputOwners,
+};
 pub(crate) use setup::SourceDesignDaySetupOwners;
 pub(crate) use state::{SourceDesignDayData, SourceDesignDayInputState, SourceDesignDayModifiers};
 
 pub(crate) struct SourceDesignDayInputOwners<'a, 'backend> {
     pub(crate) raw: &'a SelectedHeatBalanceInput,
     pub(crate) input: &'a mut SelectedInputProcessor,
+    pub(crate) schedules:
+        &'a mut crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
+    pub(crate) output: &'a mut dyn SourceDesignDayOutputRegistration,
+    pub(crate) registration:
+        &'a mut crate::heat_balance::source_output_registration::SourceOutputRegistration,
+    pub(crate) files: &'a mut dyn super::source_initialization::SourceWeatherReportFiles,
+    pub(crate) eio: &'a mut dyn super::source_weather_initialization::SourceWeatherEio,
+    pub(crate) globals:
+        &'a crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
+    pub(crate) developer_flag: &'a bool,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) force_begin_env_reset_suppress: &'a bool,

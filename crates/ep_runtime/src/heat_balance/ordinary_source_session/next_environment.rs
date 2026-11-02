@@ -113,7 +113,20 @@ impl<H: SourceOutputFileHost> SourceWeatherInitializationChildren for FirstWeath
         owners: &mut SourceWeatherInitializationOwners<'_, '_>,
         errors_found: &mut bool,
     ) -> Result<(), Failure> {
-        session.read_source_design_day_input(owners, self.registry, self.table, errors_found)
+        let mut output = crate::weather::day::SourceDesignDayOutputContext {
+            output_host: self.output_host,
+            prescan: self.prescan,
+            report_inputs: self.report_inputs,
+            minimum_report_frequency: self.minimum_report_frequency,
+        };
+        session.read_source_design_day_input(
+            owners,
+            self.registry,
+            self.table,
+            self.schedules,
+            &mut output,
+            errors_found,
+        )
     }
 }
 impl SourceInitializationFiles {

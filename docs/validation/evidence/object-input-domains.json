@@ -311,9 +311,9 @@
       "Source A ElectricEquipment uses real retained ZoneElectric rows on the bounded closed opaque Zone/Space/ZoneList/SpaceList route. EquipmentLevel, Watts/Area and Watts/Person read the selected operand, final Space floor and prior all-family People totals. Ordered list members retain singleton prefixes; empty SpaceLists retain zero ranges. Defaults and retaincase subcategory, strict known schema fields and ignored retained unknown instance JSON reach the genuine getter, nominal/minmax, Which bindings, component heat and Electricity Facility consumers. Source B/legacy Electric, EMS/demand, Group compositions, multiple/remainder Spaces, Space heat balance/HVAC and arbitrary/full-object combinations remain unvalidated; no frozen capability promotion."
     ],
     "SizingPeriod:DesignDay": [
-      "Explicit Source A consumes inactive SizingPeriod:DesignDay declarations through the original raw/IP getter with DefaultMultipliers dry-bulb profiles, WetBulb, DewPoint, HumidityRatio, Enthalpy or WetBulbProfileDefaultMultipliers humidity, ASHRAEClearSky and FullResetAtBeginEnvironment. Unused day names remain schema strings without dereference. Known27 fields and three reserved integer metadata fields retain validation; schema-open unknown members keep all six JSON kinds in original raw/IP, excluded from known getter operands. Integer JSON, including u64, uses Native signed-int64 retrieval before Real64; float-kind stays floating.",
-      "One same-input one-Zone24h weather case contains six inactive declarations covering all five humidity modes, WB33-to32 warning/clamp, omitted sky warning/default and integeru64MAX-to-1. All116 inherited ESO/MTR policies/10848 values pass with3457 raw differences and zero point/RMSE failures. Complete ordered dictionaries/clocks/footers, EIO/ERR/END/RDD/MDD/MTD/DXF under narrow identity exceptions, complete CTF records,19 actual warmup days and six public climatic rows/all36 value cells match. Source class is nonpromotable with no capability IDs, including this single-Zone case.",
-      "This physically witnesses inactive getter/default modifier construction and public climatic inputs only. Active design-day/sizing execution, SetUpDesignDay humidity/Tomorrow trajectories, schedule-dependent humidity/dry-bulb/solar selectors, alternate solar/reset models and arbitrary scalar/composition cross-products remain unvalidated. Source B and unscoped legacy retain narrower warning-free WetBulb/DewPoint DTO admission. Values reaching an undefined Native float-to-i32 conversion remain outside the retained Source domain. No full-object or frozen conformance promotion."
+      "Explicit Source A admits inactive SizingPeriod:DesignDay declarations through the original raw/IP getter with all4 dry-bulb,8 humidity and5 solar selectors and both official reset enums. Real processed Day schedules supply selected modifiers and global DayNum deduplication retains the first actual Which registration across roles. Unknown six-kind JSON metadata and integer signed-int64 conversion retain their original custody; all27 known-field validators remain. The official SuppressAllBeginEnvironmentResets spelling retains Native getter behavior and does not enable its differently spelled reset-suppression flag.",
+      "One paired one-Zone24h weather input contains320 selector combinations plus first-cross-role Day reuse and two all-negative temperature profiles. All116 inherited policy rows stay unchanged;10 separately declared site rules apply. All126 series/11808 values pass fixed declared limits with3457 raw differences and zero point/RMSE failures. Four wildcard DD-variable requests expose all10 first-global-Day site outputs and absence of shared alternate roles; all960 site samples per engine are actual weather-reset -999. All323 climatic rows/1938 value cells,40 RH N/A cells, observed negative-profile maximum text, complete dictionaries/clocks/footers, whole ancillary records under narrow identity exceptions, CTF and19 actual warmupdays match.",
+      "Inactive DDs still execute genuine SetUpDesignDay during unconditional kickoff, including the real Tau/Tau2017 and ZhangHuang children. Completion establishes traversal; these primary weather reports do not directly observe each private nonzero DD temperature, humidity, solar or modifier trajectory. Existing real-owner tests separately cover processed schedules, nonzero modifiers, first-global-Num Which bindings, mutable output owners, diagnostics and negative maximum seeds. Active-DD primary reporting/sizing, alternate sky models, broader scalar/composition cross-products and full-object parity remain unvalidated. SourceB/legacy retain narrower WetBulb/DewPoint admission; warmup-day integers require the defined i32 domain and Native-undefined conversions remain held. No capability or frozen conformance promotion."
     ]
   },
   "verification": {
@@ -45050,7 +45050,7 @@
           "max_abs_delta": 1.1891643225681037e-10,
           "max_rmse_delta": 4.119669469162967e-11
         },
-        "effective_state": "One closed opaque Zone, six inactive DesignDays/five humidity modes and one24h weather RunPeriod. Genuine getter/default modifier construction and six public climatic rows include WB33-to32/omitted-sky warnings, unused names,6kind metadata and integeru64MAX-to-1. Active SetUpDesignDay humidity/Tomorrow trajectories are not physically exercised.",
+        "effective_state": "One closed opaque Zone, six inactive DesignDays/five humidity modes and one24h weather RunPeriod. Genuine getter/default modifier construction and six public climatic rows include WB33-to32/omitted-sky warnings, unused names,6kind metadata and integeru64MAX-to-1. Inactive DDs still execute genuine SetUpDesignDay during kickoff; the weather reports do not directly observe their complete humidity/Tomorrow trajectories.",
         "current_primary_observation": {
           "raw_DesignDays": 6,
           "humidity_modes": [
@@ -45095,12 +45095,173 @@
             "bytes": 5775
           }
         }
+      },
+      {
+        "id": "A-INACTIVE-DESIGN-DAY-SELECTOR-MATRIX-104-24H",
+        "group": "SizingPeriod:DesignDay",
+        "source_build": "scheduled-design-day-solar-104",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "input": {
+          "path": ".runtime/object-expansion/unit104-prep/design-day-scheduled-matrix-pilot-proposal02/A-INACTIVE-DESIGN-DAY-SELECTOR-MATRIX-104-24H/input.epJSON",
+          "sha256": "0d2e80f250c15f105d2e32f48d616f0a9ddb30d1d4b4b5c24683d82a6dbae53e",
+          "bytes": 486333
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/design-day-scheduled-104/native-01/command/receipt.json",
+          "sha256": "179de2adbe5dde4c5934d9cb09ce4dc8a3db3fb352f40729c96920c1a32f8104",
+          "bytes": 10990
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/design-day-scheduled-104/source-01/command/receipt.json",
+          "sha256": "175d4d275b2a7948af3333d309aa8d40973254fa622902981dbd0c2dad675e44",
+          "bytes": 11948
+        },
+        "source_summary": {
+          "path": ".runtime/porting/design-day-scheduled-104/source-01/output/run-summary.json",
+          "sha256": "3283c9b10bbc264cb10e7f72fa024eb4b93baa21c8c0051afd88cb15b07d6c5d",
+          "bytes": 110861
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-107/eplus-rs.exe",
+          "sha256": "9b32a75f4bbcd78e78d2e186eb06ccafea43c235a10f76d0c436dccb2061821a",
+          "bytes": 80065550
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e2/e257c1f5494090325c8e6c8bdf406a712fba156d9290c96d85a34c45924bd929",
+          "sha256": "e257c1f5494090325c8e6c8bdf406a712fba156d9290c96d85a34c45924bd929"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-107/receipt.json",
+          "sha256": "ead2b31d4d6b76c9d678efa41ee76efe5b0538d780984efa665167b7d997663d",
+          "bytes": 7739
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit104-prep/actual-independent-readback02.json",
+          "sha256": "5737113d06d670d857b034dc77534dbf762b9319f30008993276fb9bf6f0c5e7",
+          "bytes": 847115
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit104-prep/reader-bindings02.json",
+          "sha256": "b7972ed4057dbf63e9dc92c198974a15ef4d7862bcb8653985685e37efb4c5e5",
+          "bytes": 2789
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit104-prep/design-day-scheduled-matrix-pilot-proposal02/proposal.json",
+          "sha256": "8c79b877e371e4839f6fa4112128409a9e096396a358a6ffa94d203c09df9989",
+          "bytes": 7994
+        },
+        "totals": {
+          "series": 126,
+          "samples": 11808,
+          "raw_operand_unequal": 3457,
+          "parsed_binary64_unequal": 3457,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "input_format": "epJSON",
+        "full_reported_stream_scope": {
+          "ESO": "All122 emitted Timestep series/11712 values,96 genuine clocks, full ordered dictionaries/IDs/metadata/footer/EOF. Original112 requests plus4 wildcard DD variable requests expose every actual key.",
+          "MTR": "All4 authored Hourly series/96 values,24 genuine clocks, full ordered dictionary/owner/footer/EOF.",
+          "original_full_reported_profile_rows": false,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit104-prep/design-day-scheduled-matrix-pilot-proposal01/A-INACTIVE-DESIGN-DAY-SELECTOR-MATRIX-104-24H/derived-policy.json",
+            "sha256": "93423ab27f8d3ad57400fa4f0cac9e568503d29c5c003902f8110dd49dfeb174",
+            "bytes": 44092
+          },
+          "all_original112_ESO_and4_MTR_accepted_baseline_policy_rows_exact": true,
+          "numerical_limits_changed": false,
+          "new_site_policy": "Ten actual site series retain same-unit inherited C/Wm2 limits; dimensionless/percent/deltaC use separately declared exact -999 reset-scalar limits. No nonzero trajectory or original-policy expansion.",
+          "qualification": "Original absolute OR relative point gate, serial binary64 SSE/actual count/sqrt RMSE and uncapped failures. Only inherited humidity policy index1 retains canonical Zone Timestep while actual producer is HVAC/Average/empty units; declared schedule scalar units remain original metadata."
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.1891643225681037e-10,
+          "max_rmse_delta": 4.119669469162967e-11
+        },
+        "effective_state": "One closed opaque Zone,323 inactive DD statements and one24h weather RunPeriod.320 combinations cover4 dry-bulb x8 humidity x5 solar x2 official reset selectors; a first-global-DayNum cross-role reuse and two all-negative temperature profiles add three statements. Genuine DD setup executes during kickoff, while primary reports are weather-run outputs. Public climatic inputs and actual weather-reset site outputs do not directly expose private DD timestep trajectories.",
+        "current_primary_observation": {
+          "raw_DesignDays": 323,
+          "selector_dimensions": [
+            4,
+            8,
+            5,
+            2
+          ],
+          "cartesian_statements": 320,
+          "additional_statements": 3,
+          "public_climatic_rows": 323,
+          "public_climatic_value_cells": 1938,
+          "RelativeHumiditySchedule_NA_rows": 40,
+          "actual_warmup_days": 19,
+          "Native_climatic_table": {
+            "path": ".runtime/porting/design-day-scheduled-104/native-01/output/nativetbl.csv",
+            "sha256": "92200f8f870fad4a6d805a9f74fb008bd28de7a91e016dd47992db78b0d3467b",
+            "bytes": 124932
+          },
+          "Source_climatic_table": {
+            "path": ".runtime/porting/design-day-scheduled-104/source-01/output/eplustbl.csv",
+            "sha256": "9108432ecb7ce86bb1cdef608105ec99fb7587b7ccb033308d0eac00c38a6565",
+            "bytes": 124858
+          },
+          "support_assessment": {
+            "path": ".runtime/porting/design-day-scheduled-104/source-01/output/support-assessment.json",
+            "sha256": "0fe473f57935871fe4c083630ac4ab8d8069e67dedc3633e539818ce0db6de84",
+            "bytes": 10458
+          },
+          "source_runtime_class": "source-multizone-heat-balance-compatibility",
+          "source_consumed_DesignDays": 323,
+          "single_Zone_case_not_in_multizone_case_totals": true,
+          "actual_site_output_series": 10,
+          "actual_site_samples_per_engine": 960,
+          "actual_global_first_Day_registration_and_shared_role_absence": {
+            "selected_schedule_visits": 494,
+            "first_global_DayNum_output_series": 10,
+            "shared_other_roles_absent_under_wildcard_requests": true,
+            "private_Num_Used_or_Which_observed": false,
+            "full_actual_bindings": {
+              "path": ".runtime/object-expansion/unit104-prep/actual-independent-readback02.json",
+              "sha256": "5737113d06d670d857b034dc77534dbf762b9319f30008993276fb9bf6f0c5e7",
+              "bytes": 847115
+            }
+          },
+          "private_Num_Used_Which_or_modifier_arrays_observed": false,
+          "private_DD_trajectories_observed": false,
+          "DD_kickoff_setup_executes": true,
+          "active_design_day_primary_reporting_exercised": false,
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit104-prep/actual-independent-readback02.json",
+            "sha256": "5737113d06d670d857b034dc77534dbf762b9319f30008993276fb9bf6f0c5e7",
+            "bytes": 847115
+          },
+          "independent_full_actual_peer": {
+            "path": ".runtime/object-expansion/unit104-prep/independent-actual-physical-peer01.json",
+            "sha256": "c09370e22e9e4cd362110bcfb31d79da1675ff9caa63f6f25767bc91f00ec066",
+            "bytes": 9160
+          }
+        }
       }
     ],
     "totals": {
-      "paired_cases": 154,
-      "reported_samples": 4171086,
-      "raw_operand_unequal": 903004,
+      "paired_cases": 155,
+      "reported_samples": 4182894,
+      "raw_operand_unequal": 906461,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -46823,6 +46984,40 @@
           "sha256": "c7827607c8de86dcdd6cd35a4ec14a4307c3435d19d4707cee1c5dd389a710d3",
           "bytes": 80019874
         }
+      },
+      {
+        "id": "scheduled-design-day-104",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-106/receipt.json",
+          "sha256": "7e0e6f44d078fd5977c5c7b5c0b4e90a227a10e3201f32b8f01482428ab67a8a",
+          "bytes": 7460
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/7d/7dfead0180a97cc7d567faf15e784763c02adbed3e382e83a75972de10b2cc04",
+          "sha256": "7dfead0180a97cc7d567faf15e784763c02adbed3e382e83a75972de10b2cc04"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-106/eplus-rs.exe",
+          "sha256": "bcd66c68f772b8f79792b536f9132cf582be092383200fbc424e61efcb1af417",
+          "bytes": 80069503
+        }
+      },
+      {
+        "id": "scheduled-design-day-solar-104",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-107/receipt.json",
+          "sha256": "ead2b31d4d6b76c9d678efa41ee76efe5b0538d780984efa665167b7d997663d",
+          "bytes": 7739
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e2/e257c1f5494090325c8e6c8bdf406a712fba156d9290c96d85a34c45924bd929",
+          "sha256": "e257c1f5494090325c8e6c8bdf406a712fba156d9290c96d85a34c45924bd929"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-107/eplus-rs.exe",
+          "sha256": "9b32a75f4bbcd78e78d2e186eb06ccafea43c235a10f76d0c436dccb2061821a",
+          "bytes": 80065550
+        }
       }
     ],
     "focused_since_workspace": {
@@ -47031,16 +47226,18 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 101,
-      "builds_with_accepted_paired_cases": 95,
+      "actual_recorded_builds": 103,
+      "builds_with_accepted_paired_cases": 96,
       "builds_with_only_retained_failed_Source_attempts": 3,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 6,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "101 recorded Source builds:95 have accepted pairs and6 are unaccepted-only. Failed/unaccepted attempts contribute no paired cases or samples.",
+      "qualification": "103 recorded Source builds:96 have accepted pairs;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Seven builds have no accepted pair. Unaccepted attempts and unlaunched builds contribute no paired cases or samples.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 2,
-      "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0
+      "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
+      "builds_without_Source_execution": 1,
+      "builds_without_accepted_paired_cases": 7
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",
@@ -49294,7 +49491,146 @@
       "actual_warmup_days": 19,
       "public_climatic_rows": 6,
       "public_climatic_value_cells": 36,
-      "scope": "Inactive getter/default modifier construction/public climatic inputs plus original weather RunPeriod. No activeDD humidity/Tomorrow trajectory, private modifier observation, arbitrary scalar cross-product, full-object or frozen capability promotion. SourceB/legacy remain narrower; singleton excluded from multizone totals."
+      "scope": "Inactive getter/default modifier construction/public climatic inputs plus original weather RunPeriod. Genuine DD SetUpDesignDay executes during kickoff despite primary DD reporting being disabled; complete private humidity/Tomorrow trajectories and modifiers remain unobserved. No active-DD primary reporting, arbitrary scalar cross-product, full-object or frozen capability promotion. SourceB/legacy remain narrower; singleton excluded from multizone totals."
+    },
+    "current_inactive_DesignDay_scheduled_matrix_live_pair": {
+      "source_build": "scheduled-design-day-solar-104",
+      "case_rows": [
+        "A-INACTIVE-DESIGN-DAY-SELECTOR-MATRIX-104-24H"
+      ],
+      "Root_independent_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit104-prep/actual-independent-readback02.json",
+        "sha256": "5737113d06d670d857b034dc77534dbf762b9319f30008993276fb9bf6f0c5e7",
+        "bytes": 847115
+      },
+      "independent_full_actual_peer": {
+        "path": ".runtime/object-expansion/unit104-prep/independent-actual-physical-peer01.json",
+        "sha256": "c09370e22e9e4cd362110bcfb31d79da1675ff9caa63f6f25767bc91f00ec066",
+        "bytes": 9160
+      },
+      "Native_launch": {
+        "path": ".runtime/porting/design-day-scheduled-104/native-01/launch/launch.json",
+        "sha256": "f164cfbd8dcfd10104d8d3eee1486e1f06abdbbc1a71c0c8f3d7880c85c13e4f",
+        "bytes": 11456
+      },
+      "Source_launch": {
+        "path": ".runtime/porting/design-day-scheduled-104/source-01/launch/launch.json",
+        "sha256": "919e751c171216b6b0b39c1c91354da5893d236095bc06199a0ce0833884edd9",
+        "bytes": 18175
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit104-prep/design-day-scheduled-matrix-pilot-proposal02/proposal.json",
+        "sha256": "8c79b877e371e4839f6fa4112128409a9e096396a358a6ffa94d203c09df9989",
+        "bytes": 7994
+      },
+      "scientific_plan": {
+        "path": ".runtime/object-expansion/unit104-prep/design-day-scheduled-matrix-pilot-proposal02/scientific-plan.json",
+        "sha256": "4143a8ef1867adb8d6052410d787cf10d069a274eb651972fdedfbeb1e233983",
+        "bytes": 7473
+      },
+      "Native_historical_quality": {
+        "path": ".runtime/object-expansion/unit104-prep/accepted-quality.json",
+        "sha256": "580db48273eecd1a2b6ae2283179bb14d311f16e050463fffbc3e1a5c83939ae",
+        "bytes": 12308
+      },
+      "Source_final_quality": {
+        "path": ".runtime/object-expansion/unit104-prep/accepted-quality04.json",
+        "sha256": "2e09167fdcd5fed539cea33db00d0e4bd2ba5cb2b01182f2cc62c1206cc357e5",
+        "bytes": 11527
+      },
+      "current_code_authority": {
+        "path": ".runtime/object-expansion/unit104-prep/final-formatted-code-authority04.json",
+        "sha256": "4733e35a1f735f6c7c6d518073e6ce57a86abbbb0f0dba9b47a0ad2de2568530",
+        "bytes": 5611
+      },
+      "actual_custody": {
+        "Native_custody": {
+          "path": ".runtime/object-expansion/unit104-prep/root-native-custody01.json",
+          "sha256": "fd40a7688f432c8e1a86cede3ae1229560481948325ce04e0d229ee818dc58e4",
+          "bytes": 1181
+        },
+        "Source_custody": {
+          "path": ".runtime/object-expansion/unit104-prep/root-source-custody01.json",
+          "sha256": "604afd637d64a8f10cefc6aba3890c0317d31ca22e8e557c60dd651aa9a96220",
+          "bytes": 1181
+        },
+        "source_bridge": {
+          "path": ".runtime/object-expansion/unit104-prep/root-build-bridge01.json",
+          "sha256": "a57a6a96ad60a0110b5c39ae0de1e62e2f6da248317b8321d8f0326dc10871f6",
+          "bytes": 3405
+        },
+        "Source_completion": {
+          "path": ".runtime/object-expansion/unit104-prep/root-source-completion01.json",
+          "sha256": "410b97dbc2cfea241a70adab22fab204964fbedd995d575df759b1604af96589",
+          "bytes": 2113
+        }
+      },
+      "build_rows": [
+        {
+          "path": ".runtime/object-expansion/build106-row.json",
+          "sha256": "1cd6fee54333c602396d63f2b86dffe1558245bca177233746e6fe89684f10c8",
+          "bytes": 675
+        },
+        {
+          "path": ".runtime/object-expansion/build107-row.json",
+          "sha256": "7eec438e02dfbaeb43dd781afbc42ba0336c69fe5c73a164cd098185a9cd215a",
+          "bytes": 681
+        }
+      ],
+      "actual_default_Source_build": {
+        "path": ".runtime/object-expansion/build107-row.json",
+        "sha256": "7eec438e02dfbaeb43dd781afbc42ba0336c69fe5c73a164cd098185a9cd215a",
+        "bytes": 681
+      },
+      "superseded_unlaunched_Source_build": {
+        "build": {
+          "path": ".runtime/object-expansion/build106-row.json",
+          "sha256": "1cd6fee54333c602396d63f2b86dffe1558245bca177233746e6fe89684f10c8",
+          "bytes": 675
+        },
+        "Source_executions": 0,
+        "reason": "Static kickoff audit found missing genuine solar children before any Source actor; retained as an unlaunched superseded default build. Completed Native01 historical pins remain immutable."
+      },
+      "existing_actual_test_functions": 4,
+      "new_test_functions": 0,
+      "existing_test_results_reused_without_rerun": 4,
+      "current_solar_quality_new_test_executions": 0,
+      "retained_quality_negatives": [
+        {
+          "path": ".runtime/object-expansion/unit104-prep/quality01/receipt.json",
+          "sha256": "941c6432973d97c277800281a40773937ca38305c2a5c11174982b25fc939a0f",
+          "bytes": 6773
+        },
+        {
+          "path": ".runtime/object-expansion/unit104-prep/quality02/receipt.json",
+          "sha256": "b5c03ff482c3fbd8e02710360c219194c3e9ad4b8b4f0026b4d7a9e51b879481",
+          "bytes": 8517
+        }
+      ],
+      "actual_engine_inventory": {
+        "Native_executions": 1,
+        "Source_executions": 1,
+        "Native_replays": 0,
+        "Source_replays": 0,
+        "engine_failures": 0
+      },
+      "prior103_qualification_correction": {
+        "provenance": {
+          "path": ".runtime/object-expansion/unit104-prep/independent-kickoff-gap-audit01.json",
+          "sha256": "5ffd5c14951ff6707f23204801141a4323bc2bfa824acac54d47d1c1f971f805",
+          "bytes": 11406
+        },
+        "approved_text_paths": [
+          "verification.cases[153].effective_state",
+          "verification.current_inactive_DesignDay_scalars_live_pair.scope"
+        ],
+        "all_original_numeric_input_output_and_receipt_evidence_unchanged": true,
+        "reason": "Inactive primary reporting does not suppress unconditional kickoff SetUpDesignDay; direct private trajectory observation remains unclaimed."
+      },
+      "actual_warmup_days": 19,
+      "public_climatic_rows": 323,
+      "public_climatic_value_cells": 1938,
+      "scope": "One inactive-selector matrix weather pair; genuine DD kickoff completion and public climatic/site reset observations. No active-DD primary reporting, private trajectory parity, sizing, arbitrary scalar/composition or capability promotion. SourceB/legacy remain narrower; singleton excluded from multizone totals."
     }
   },
   "additional_native_type_calibrations": [

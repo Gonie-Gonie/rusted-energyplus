@@ -26,6 +26,7 @@ mod source_environment_types;
 pub use source_run_period::SourceRunPeriodData;
 pub use source_user_input::SourceWeatherProperty;
 pub(crate) mod source_design_day;
+pub(crate) use source_design_day::SourceDesignDayOutputContext;
 pub(crate) mod source_initialization;
 mod source_initialization_error;
 pub(crate) mod source_next_environment;

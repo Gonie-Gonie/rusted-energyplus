@@ -176,23 +176,22 @@ impl SourceDesignDayInputState {
                     o.interpolation,
                     false,
                 )?;
-            } else if o.shortcut.alpha_field_blanks[3] {
-                diagnostics::empty(
-                    o.backend,
-                    &d.title,
-                    &o.shortcut.alpha_field_names[3],
-                    &o.shortcut.alpha_field_names[2],
-                    "SCHEDULE",
-                )?;
-                *errors = true;
             } else {
-                return Err(Error::Unavailable(
-                    "GetDesignDayData6178 actual Sched::GetDaySchedule dry-bulb child",
-                ));
+                super::schedules::dry_bulb(
+                    d,
+                    &mut self.design_day_modifiers,
+                    &mut self.sizing_period_site_schedule_numbers,
+                    &self.sizing_period_site_schedules,
+                    environment_number,
+                    o,
+                    errors,
+                )?;
             }
             super::humidity::read(
                 d,
                 &mut self.design_day_modifiers,
+                &mut self.sizing_period_site_schedule_numbers,
+                &self.sizing_period_site_schedules,
                 environment_number,
                 o,
                 errors,
@@ -214,34 +213,15 @@ impl SourceDesignDayInputState {
                 }
             }
             if d.solar_model == 2 {
-                if o.shortcut.alpha_field_blanks[10] {
-                    diagnostics::empty(
-                        o.backend,
-                        &d.title,
-                        &o.shortcut.alpha_field_names[10],
-                        "",
-                        "",
-                    )?;
-                    *errors = true;
-                } else {
-                    return Err(Error::Unavailable(
-                        "GetDesignDayData6486 actual Sched::GetDaySchedule beam child",
-                    ));
-                }
-                if o.shortcut.alpha_field_blanks[11] {
-                    diagnostics::empty(
-                        o.backend,
-                        &d.title,
-                        &o.shortcut.alpha_field_names[11],
-                        "",
-                        "",
-                    )?;
-                    *errors = true;
-                } else {
-                    return Err(Error::Unavailable(
-                        "GetDesignDayData6523 actual Sched::GetDaySchedule diffuse child",
-                    ));
-                }
+                super::schedules::solar(
+                    d,
+                    &mut self.design_day_modifiers,
+                    &mut self.sizing_period_site_schedule_numbers,
+                    &self.sizing_period_site_schedules,
+                    environment_number,
+                    o,
+                    errors,
+                )?;
             } else if d.solar_model == 0 && o.shortcut.numeric_field_blanks[13] {
                 // Literal6556 argument order: defaultVal is alpha *field name*,
                 // depFieldName is alpha *value*, depFieldVal is the fallback text.

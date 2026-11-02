@@ -5,7 +5,9 @@ use super::{
     SourcePsychrometricAccess, WeatherDayValues, WeatherEnvironmentState, ordinal,
 };
 use crate::weather::day::WeatherVars;
-use crate::weather::day::design_day::solar::{Coefficients, clear_sky_radiation};
+use crate::weather::day::design_day::solar::{
+    Coefficients, clear_sky_radiation, tau_radiation, zhang_huang_radiation,
+};
 use crate::weather::day::source_design_day::state::SourceDesignDayModifierGrid;
 #[derive(Clone, Copy)]
 pub(super) enum HumidityState {
@@ -203,14 +205,31 @@ pub(super) fn write(
                             (Some(beam), Some(diffuse))
                         }
                         3 | 4 => {
-                            return Err(Error::Unavailable(
-                                "actual SetUpDesignDay ASHRAETauModel child3905",
-                            ));
+                            let extraterrestrial = 1367.0 * coefficients.annual_variation;
+                            let (beam, diffuse, _global) = tau_radiation(
+                                input.solar_model,
+                                extraterrestrial,
+                                cosine_zenith,
+                                input.tau_beam,
+                                input.tau_diffuse,
+                            );
+                            (Some(beam), Some(diffuse))
                         }
                         1 => {
-                            return Err(Error::Unavailable(
-                                "actual SetUpDesignDay ZhangHuang prior-hour weather read3911",
-                            ));
+                            let hour_three_ago = (hour + 20) % 24 + 1;
+                            // Native3911 reads the real retained/current Tomorrow at this
+                            // point in the hour-major loop, after the current sky writes.
+                            let current = self::slot(tomorrow, hour, timestep)?;
+                            let previous = self::slot(tomorrow, hour_three_ago, timestep)?;
+                            let (beam, diffuse) = zhang_huang_radiation(
+                                cosine_zenith,
+                                input.sky_clearness,
+                                current.out_dry_bulb_temp,
+                                previous.out_dry_bulb_temp,
+                                current.out_rel_hum,
+                                current.wind_speed,
+                            );
+                            (Some(beam), Some(diffuse))
                         }
                         _ => (None, None), // Native default leaves both locals uninitialized.
                     }
@@ -222,6 +241,7 @@ pub(super) fn write(
             if environment.ignore_solar_radiation || environment.ignore_diffuse_radiation {
                 diffuse = Some(0.0);
             }
+            let slot = slot_mut(tomorrow, hour, timestep)?;
             slot.beam_solar_rad = beam.ok_or(Error::Unavailable(
                 "actual SetUpDesignDay uninitialized BeamRad read3951",
             ))?;

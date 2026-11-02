@@ -71,6 +71,10 @@ pub struct SelectedScheduleInput {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct SourceScheduleIndex(pub(crate) usize);
 
+/// Actual ScheduleManager DaySchedule::Num, independent of yearly Schedule IDs.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct SourceDayScheduleIndex(pub(crate) usize);
+
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SelectedScheduleType {
     pub(crate) name: String,
