@@ -312,8 +312,8 @@
     ],
     "SizingPeriod:DesignDay": [
       "Explicit SourceA admits active DesignDay environments with sizing off, either alongside the existing real EPW/one RunPeriod route or DD-only with no RunPeriod. The new Source attachment carries the same actual Project weather state and unopened cursor without prepared legacy configuration, calendar or axis. Optional weather/default in.epw and real Site:Location remain actual Source getter effects; B/legacy and positive-sizing boundaries remain unchanged.",
-      "The new five-DD-only case reports120 actual hours/127series59520values; a separate exact105 weather regression reuses retained accepted Native105 and fresh Source109 for144actual hours/127series71424values. Both full comparisons pass fixed declared policies. Nine first-owner schedule outputs check864 own-DD operands and3456/4320 other-environment resets per engine; all five public solar modes, complete ordered streams/ancillary/CTF, five climatic rows30cells and actual5/6warmup reports are checked. The regression is not another independent new input or a Native replay.",
-      "Earlier scalar/inactive-matrix/active-with-weather evidence remains retained. The active selector witness remains4dry/4humidity/5solar, not the full Cartesian product or arbitrary legal values/compositions. Private FileExists/Num/Used/Which and complete private trajectories are unobserved. Alternate sky, broader humidity/daytype/value/Space/group/HVAC combinations, sizing, B/legacy active-DD and full-object/frozen capability promotion remain bounded."
+      "A further one-Zone four-DD/TS1 comparison reports96actual hours,124series11904values under unchanged117inherited rows and declared Dewpoint/originalC plus exact rain/snow rules. Three real dry-Day owners check72own+216other samples per engine. RawDP18/climatic getter differs from effective EIO after actual saturation correction; entered120000Pa becomes real standard pressure, while valid82000Pa remains. Actual WinterDesignDay/CustomDay1/CustomDay2/Friday and DST, full streams/ancillary/CTF, four climatic rows24cells, four matched warnings and four observed warmup counts agree. The same defaultBuild109 and priorQA5 are reused with no new build/test execution.",
+      "Across retained105/107 witnesses all8humidity selectors have finite active evidence, alongside prior4dry/5solar modes; no full Cartesian product or arbitrary legal value/composition completion follows. Rain reaches the existing default wet outside-film/wetbulb consumer. Snow flag/current/monthly-reflectance branch is exercised under unity modifiers; both snowy DDs have zero solar, so nontrivial snow-ground-solar effect is unobserved. Private FileExists/Num/Used/Which/complete trajectories, alternate sky, sizing, B/legacy activeDD and broader gain/Space/group/HVAC composition remain bounded. No registry/capability/conformance promotion."
     ]
   },
   "verification": {
@@ -45848,12 +45848,268 @@
           "original_numeric_policies_unchanged": true,
           "private_FileExists_Num_Used_Which_not_observed": true
         }
+      },
+      {
+        "id": "A-DESIGN-DAY-REMAINING-HUMIDITY-WEATHER-107-96H",
+        "group": "SizingPeriod:DesignDay",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "source_build": "optional-weather-design-day-only-106",
+        "input": {
+          "path": ".runtime/object-expansion/unit107-prep/humidity-weather-pilot-proposal01/A-DESIGN-DAY-REMAINING-HUMIDITY-WEATHER-107-96H/input.epJSON",
+          "sha256": "2a8e38200e2b63a753bc4a6cc97e019d136ec3ca9921fd85824f736e6b8bf85f",
+          "bytes": 87805
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/design-day-humidity-weather-107/native-01/command/receipt.json",
+          "sha256": "a4edce8066454f0c2951368c6b8c026f60fbf60f9a449f1385eb3239fc6c3bf4",
+          "bytes": 6923
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/design-day-humidity-weather-107/source-01/command/receipt.json",
+          "sha256": "e348401e3f7bc3074dc921555a72f5c61656241b44f7dcd8b9b655e44c7f90f8",
+          "bytes": 7602
+        },
+        "source_summary": {
+          "path": ".runtime/porting/design-day-humidity-weather-107/source-01/output/run-summary.json",
+          "sha256": "bbe11ed7469c896311013d318a35f02220050dfa84b06a8cd130696960d13bcb",
+          "bytes": 51633
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-109/eplus-rs.exe",
+          "sha256": "79324a0dc1f683aabec16d2ee052eb766abdcc4f62ad104822f5730d325b11a8",
+          "bytes": 80108941
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e1/e191d98192eeeaae6ecce2945e72da233d737c9ca906feefef60562c8c38afb0",
+          "sha256": "e191d98192eeeaae6ecce2945e72da233d737c9ca906feefef60562c8c38afb0"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-109/receipt.json",
+          "sha256": "40413648881e321f8b32eb713a4a43f59a5d5a7b2e373ae7b1faf176983aff3a",
+          "bytes": 7310
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit107-prep/actual-independent-readback01.json",
+          "sha256": "e37ffd27f02e3c205f3c903a2917c67faa7f903f5ba51925bbbc47e309317d1f",
+          "bytes": 271050
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit107-prep/reader-bindings01.json",
+          "sha256": "3a992394fa5ccbcd59fb711cc41a13d407237f8c283e50c3ae9d6bb5cf5999a5",
+          "bytes": 3049
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit107-prep/humidity-weather-pilot-proposal01/proposal.json",
+          "sha256": "68eec581fbd92b4aa341c31c65ef3d1a3d779ffc1c013d138ab0d701426c482e",
+          "bytes": 6213
+        },
+        "totals": {
+          "series": 124,
+          "samples": 11904,
+          "raw_operand_unequal": 1417,
+          "parsed_binary64_unequal": 1417,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.3233147910796106e-10,
+          "max_rmse_delta": 3.1724640961866585e-11
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All120 genuine Timestep series/11520 values across4ordered DD environments atTS1; full dictionary/RIDs/bodyorder/metadata/clocks/footer/EOF.",
+          "MTR": "All4 genuine Hourly series/384 values across the same4ordered environments; full dictionary/owners/clocks/body/footer/EOF.",
+          "original_full_reported_profile_rows": false,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit107-prep/humidity-weather-pilot-proposal01/A-DESIGN-DAY-REMAINING-HUMIDITY-WEATHER-107-96H/derived-policy.json",
+            "sha256": "351d4a4a13bd0b906a1ec91211efa27bfc5768394578ee4d6b05c539bf43bae2",
+            "bytes": 34153
+          },
+          "inherited105_117_ESO_rows_literal_exact": true,
+          "original112_ESO_and4_MTR_rows_unchanged": true,
+          "added_Dewpoint_with_original_Wetbulb_C_caps": 1,
+          "added_exact_integer_rain_snow_rules": 2,
+          "numerical_limits_changed": false,
+          "qualification": "Original OR point gate, ordered serial binary64 SSE/actual count/sqrt RMSE, all uncapped failures. Three dry Day owners retain original rules. No Pa/expected-weather rule or original policy relaxation; canonical original humidity1 remains actualHVAC/Average/empty units."
+        },
+        "effective_state": "One four-DD/no-RunPeriod/no-EPW SourceA input atTS1 reports96real hours. DewPoint/Enthalpy/HumidityRatio/WetBulbProfileDefaultMultipliers complete the remaining finite active humidity selectors. RawDP18 climatic getter versus effective EIO correction, entered pressure correction, real DayType/DST, rain/wet-film and snow flags are observed. Snow monthly-reflectance branch uses unity defaults and both snowyDDs have zero solar; nontrivial snow-ground-solar change remains unobserved. Retained Build109/QA5, no new code/build/tests or arbitrary-value/capability promotion.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Source_image_reused": 109,
+          "new_Source_builds": 0,
+          "retained_actual_test_executions": 5,
+          "new_test_executions": 0,
+          "new_test_functions": 0
+        },
+        "current_primary_observation": {
+          "input_objects": 186,
+          "raw_DesignDays": 4,
+          "timesteps_per_hour": 1,
+          "retained_authored_Day_objects": 13,
+          "raw_OutputVariable_requests": 118,
+          "reporting_environments": [
+            {
+              "kind_of_environment": 1,
+              "ordinal": 1,
+              "selected_by_primary_flags": true,
+              "title": "107 001 DEWPOINT WINTER RAIN",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 2,
+              "selected_by_primary_flags": true,
+              "title": "107 002 ENTHALPY CUSTOM1 SNOW DST",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 3,
+              "selected_by_primary_flags": true,
+              "title": "107 003 HUMIDITYRATIO CUSTOM2",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 4,
+              "selected_by_primary_flags": true,
+              "title": "107 004 WBDEFAULT PROFILE RAIN SNOW DST",
+              "total_days": 1
+            }
+          ],
+          "actual_complete_reporting_hours": 96,
+          "actual_DD_reporting_hours": 96,
+          "weather_reporting_hours": 0,
+          "hours_cli_argument": null,
+          "actual_warmup_days": [
+            20,
+            6,
+            19,
+            18
+          ],
+          "public_climatic_rows": 4,
+          "public_climatic_value_cells": 24,
+          "actual_CTF_records": 15,
+          "observed_matched_warning_records": 4,
+          "public_DD_setup_observations": {
+            "exact_Native_Source_design_rows": [
+              [
+                "Environment:Design Day Data",
+                "12.00",
+                "4.00",
+                "DefaultMultipliers",
+                "Dewpoint",
+                "12.00",
+                "{C}",
+                "81198",
+                "0",
+                "0.0",
+                "0.40",
+                "Yes",
+                "No"
+              ],
+              [
+                "Environment:Design Day Data",
+                "24.00",
+                "6.00",
+                "MultiplierSchedule",
+                "Enthalpy",
+                "55000.00",
+                "{J/kgDryAir}",
+                "81198",
+                "0",
+                "4.9",
+                "1.00",
+                "No",
+                "Yes"
+              ],
+              [
+                "Environment:Design Day Data",
+                "28.00",
+                "6.00",
+                "DifferenceSchedule",
+                "HumidityRatio",
+                "1.8000E-002",
+                "{kgWater/kgDryAir}",
+                "82000",
+                "180",
+                "4.9",
+                "1.20",
+                "No",
+                "No"
+              ],
+              [
+                "Environment:Design Day Data",
+                "32.00",
+                "6.00",
+                "TemperatureProfile",
+                "WetBulbProfileDefaultMultipliers",
+                "18.00",
+                "{C}",
+                "81198",
+                "0",
+                "4.9",
+                "0.00",
+                "Yes",
+                "Yes"
+              ]
+            ],
+            "raw_Dewpoint_getter_operand": 18.0,
+            "effective_Dewpoint_public_EIO": "12.00",
+            "entered_pressure": 120000.0,
+            "effective_pressure_public_EIO": "81198",
+            "observed_warning_lines": [
+              "   ** Warning ** Timestep: Requested number (1) is less than the suggested minimum of 4.",
+              "   ** Warning ** SizingPeriod:DesignDay=\"107 001 DEWPOINT WINTER RAIN\", range check data.",
+              "   ** Warning ** GetDesignDayData: SizingPeriod:DesignDay = 107 004 WBDEFAULT PROFILE RAIN SNOW DST",
+              "   ** Warning ** SetUpDesignDay: Entered DesignDay Barometric Pressure=120000 differs by more than 10% from Standard Barometric Pressure=81198."
+            ],
+            "qualification": "Full EIO and ERR equality remains strict. Scalar field/source-stage observations only, no computed expected weather history or fixed warning/CTF/warmup count."
+          },
+          "actual_first_owner_site_bindings": 3,
+          "actual_own_DD_input_operand_samples_per_engine": 72,
+          "actual_cross_environment_reset_samples_per_engine": 216,
+          "single_Zone_case_not_in_multizone_case_totals": true,
+          "source_runtime_class": "source-multizone-heat-balance-compatibility",
+          "Source_scope_trace": {
+            "path": ".runtime/porting/design-day-humidity-weather-107/source-01/output/porting_scope.json",
+            "sha256": "0058d56f712d3461d161ff0dc6728a886f6e5f8c212e3e06a5eba09eb64a0f91",
+            "bytes": 6162
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit107-prep/actual-independent-readback01.json",
+            "sha256": "e37ffd27f02e3c205f3c903a2917c67faa7f903f5ba51925bbbc47e309317d1f",
+            "bytes": 271050
+          },
+          "independent_full_actual_peer": {
+            "path": ".runtime/object-expansion/unit107-prep/author-independent-actual-physical-peer01.json",
+            "sha256": "d9037b8e317e1cec2a36923a405a5d718ab41b7f0472c9da86c68952c65bda60",
+            "bytes": 96421
+          },
+          "private_Num_Used_Which_FileExists_and_complete_trajectories_observed": false
+        }
       }
     ],
     "totals": {
-      "paired_cases": 158,
-      "reported_samples": 4385262,
-      "raw_operand_unequal": 964408,
+      "paired_cases": 159,
+      "reported_samples": 4397166,
+      "raw_operand_unequal": 965825,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -50494,6 +50750,78 @@
       "fresh_comparisons": 2,
       "singleton_cases_excluded_from_multizone_totals": true,
       "scope": "One new DD-only input and one same105-input weather regression using historical Native105 plus Source109. No arbitrary values, Cartesian/full-object/sizing/Blegacy-active-DD or capability/conformance promotion."
+    },
+    "current_active_DesignDay_remaining_humidity_TS1_live_pair": {
+      "source_build": "optional-weather-design-day-only-106",
+      "actual_reused_Source_build": {
+        "path": ".runtime/object-expansion/build109-row.json",
+        "sha256": "1a3bcb8c81c8fb5a2fcd5d34445435764b649a999eb4701e98aa51cab98e6f7b",
+        "bytes": 687
+      },
+      "case_rows": [
+        "A-DESIGN-DAY-REMAINING-HUMIDITY-WEATHER-107-96H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit107-prep/actual-independent-readback01.json",
+        "sha256": "e37ffd27f02e3c205f3c903a2917c67faa7f903f5ba51925bbbc47e309317d1f",
+        "bytes": 271050
+      },
+      "independent_actual_peer": {
+        "path": ".runtime/object-expansion/unit107-prep/author-independent-actual-physical-peer01.json",
+        "sha256": "d9037b8e317e1cec2a36923a405a5d718ab41b7f0472c9da86c68952c65bda60",
+        "bytes": 96421
+      },
+      "Native_launch": {
+        "path": ".runtime/porting/design-day-humidity-weather-107/native-01/launch/launch.json",
+        "sha256": "f090d72d796e6105e7510adcf3d13bc52e0ad178ccd441907b62f35abe0c8eab",
+        "bytes": 12117
+      },
+      "Source_launch": {
+        "path": ".runtime/porting/design-day-humidity-weather-107/source-01/launch/launch.json",
+        "sha256": "da44c1375ede26e512ed4d7f44fc2650ea34865cc4f06537e659c7ae5421f4ce",
+        "bytes": 19034
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit107-prep/humidity-weather-pilot-proposal01/proposal.json",
+        "sha256": "68eec581fbd92b4aa341c31c65ef3d1a3d779ffc1c013d138ab0d701426c482e",
+        "bytes": 6213
+      },
+      "retained_quality": {
+        "path": ".runtime/object-expansion/unit106-prep/accepted-quality.json",
+        "sha256": "553d90224ce0c01315661875c3203128eb621703bc0c7fefd44ff83978b3183c",
+        "bytes": 12675
+      },
+      "retained_build_quality_authority": {
+        "path": ".runtime/object-expansion/unit107-prep/retained-build109-quality-authority01.json",
+        "sha256": "cf929a5bbb4bab456ddd86d9249f6394e35cdb5a0406b1f0fb09c14670d1e19b",
+        "bytes": 1454
+      },
+      "actual_custody": {
+        "Native": {
+          "path": ".runtime/object-expansion/unit107-prep/root-native-custody01.json",
+          "sha256": "c93cc058295cb28744531bdb39af888c2e2e35ba22d55199dff800ec98eed600",
+          "bytes": 1462
+        },
+        "Source": {
+          "path": ".runtime/object-expansion/unit107-prep/root-source-custody01.json",
+          "sha256": "02b2263d43a26384b96db214e675789f49d6dbaa41a7ac649f628173df0a47b6",
+          "bytes": 1015
+        },
+        "Source_completion": {
+          "path": ".runtime/object-expansion/unit107-prep/root-source-completion01.json",
+          "sha256": "4534b3d381498471b1379bf9ea71858815e745d3515b8b69ac7d019846e51cf0",
+          "bytes": 2104
+        }
+      },
+      "retained_actual_existing_test_executions": 5,
+      "new_test_executions": 0,
+      "new_test_functions": 0,
+      "new_builds": 0,
+      "actual_fresh_Native_executions": 1,
+      "actual_fresh_Source_executions": 1,
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "scope": "One four-DD/no-RunPeriod/no-EPW SourceA input atTS1 reports96real hours. DewPoint/Enthalpy/HumidityRatio/WetBulbProfileDefaultMultipliers complete the remaining finite active humidity selectors. RawDP18 climatic getter versus effective EIO correction, entered pressure correction, real DayType/DST, rain/wet-film and snow flags are observed. Snow monthly-reflectance branch uses unity defaults and both snowyDDs have zero solar; nontrivial snow-ground-solar change remains unobserved. Retained Build109/QA5, no new code/build/tests or arbitrary-value/capability promotion."
     }
   },
   "additional_native_type_calibrations": [

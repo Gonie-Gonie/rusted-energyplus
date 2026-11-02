@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 158 paired physical cases and 4,385,262 reported values with zero
+contains 159 paired physical cases and 4,397,166 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -132,17 +132,20 @@ Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
 
 Explicit Source A executes active `SizingPeriod:DesignDay` environments with
-sizing off, including DD-only without a RunPeriod or weather argument. The new
-five-DD input uses genuine Site:Location and an absent default `in.epw`; its
-120 actual hours and 59,520 values pass unchanged policies. A separate regression
-uses the exact105 input and EPW, retained Native105 and fresh Source109:144 hours
-and 71,424 values pass. This is one new input and two physical comparisons.
-The actual Source weather state/cursor carries no fabricated legacy calendar,
-configuration or axis. Nine site owners, all five public solar modes, complete
-streams/ancillary/CTF, 30 climatic cells and actual5/6warmup reports agree.
-Earlier evidence remains retained. Four dry/four humidity/five solar choices
-remain finite coverage; other values/compositions, alternate sky, sizing and
-B/legacy active DDs remain bounded. No capability is promoted.
+sizing off, alongside real weather or DD-only without a RunPeriod or EPW.
+Retained finite witnesses cover all eight humidity selectors, four dry-bulb and
+five solar choices. The latest four-DD case uses one timestep per hour and
+reports 96 actual hours:124 series and 11,904 values pass unchanged inherited
+policies and declared Dewpoint/rain/snow rules. Raw versus effective dewpoint,
+pressure correction, real DayType/DST, three Day owners, full streams/ancillary,
+CTF, 24 climatic cells and four observed warmup counts agree. Source matches
+Native's four warning records under the complete strict ERR comparison.
+Rain reaches the wet outside-film consumer. Snow flags/current reflectance run
+with unity defaults and zero solar in snowy DDs; a nontrivial snow-ground-solar
+change is unobserved. Build109 and prior five-test authority are reused; no new
+build or test execution is counted. Earlier evidence stays retained. Arbitrary
+values/compositions, alternate sky, sizing and B/legacy active DDs remain bounded.
+No capability is promoted.
 
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
