@@ -275,9 +275,94 @@ impl OrdinarySolarRadiation {
                 .ok_or(Error::Unavailable("actual window ground bounds"))? = 0.0;
         }
         if control.calculate_solar_reflections {
-            return Err(Error::Unavailable(
-                "InitSolarHeatGains actual reflection interpolation2837",
-            ));
+            let hour = ordinal(globals.hour_of_day)?;
+            let previous = ordinal(globals.previous_hour)?;
+            for number in 1..=count {
+                let surface = &geometry.final_surfaces.as_ref().ok_or(Error::Unavailable(
+                    "same final Surface reflection multiplier",
+                ))?[number - 1];
+                let multiplier = surface.incident_solar_multiplier;
+                if surface.use_ground_surface_reflectance {
+                    return Err(Error::Unavailable(
+                        "positive GroundSurfsProperty reflection interpolation",
+                    ));
+                }
+                let weather = &environment.current_weather;
+                let reflectance = weather.gnd_reflectance;
+                let diffuse = weather.dif_solar_rad * multiplier;
+                let beam = weather.beam_solar_rad * multiplier;
+                let windows = geometry
+                    .window_arrays
+                    .as_mut()
+                    .ok_or(Error::Unavailable("same actual reflected-solar arrays"))?;
+                // Native writes the window-ground beam value before updating
+                // its interpolated scalar factor. Preserve that order.
+                *windows
+                    .surf_win_sky_gnd_solar_inc
+                    .get_mut(number - 1)
+                    .ok_or(Error::Unavailable("actual window-ground ordinal"))? =
+                    diffuse * reflectance * windows.surf_refl_fac_sky_sol_gnd.read([number])?;
+                *windows
+                    .surf_win_bm_gnd_solar_inc
+                    .get_mut(number - 1)
+                    .ok_or(Error::Unavailable("actual window-ground ordinal"))? = beam
+                    * weather.solar_direction_cosines[2]
+                    * reflectance
+                    * windows.surf_bm_to_diff_refl_fac_gnd.read([number])?;
+                windows.surf_bm_to_bm_refl_fac_obs.set(
+                    [number],
+                    globals.weight_now
+                        * windows
+                            .surf_refl_fac_bm_to_bm_sol_obs
+                            .read([hour, number])?
+                        + globals.weight_previous_hour
+                            * windows
+                                .surf_refl_fac_bm_to_bm_sol_obs
+                                .read([previous, number])?,
+                )?;
+                windows.surf_bm_to_diff_refl_fac_obs.set(
+                    [number],
+                    globals.weight_now
+                        * windows
+                            .surf_refl_fac_bm_to_diff_sol_obs
+                            .read([hour, number])?
+                        + globals.weight_previous_hour
+                            * windows
+                                .surf_refl_fac_bm_to_diff_sol_obs
+                                .read([previous, number])?,
+                )?;
+                windows.surf_bm_to_diff_refl_fac_gnd.set(
+                    [number],
+                    globals.weight_now
+                        * windows
+                            .surf_refl_fac_bm_to_diff_sol_gnd
+                            .read([hour, number])?
+                        + globals.weight_previous_hour
+                            * windows
+                                .surf_refl_fac_bm_to_diff_sol_gnd
+                                .read([previous, number])?,
+                )?;
+                add(
+                    &mut arrays.surf_sky_solar_inc,
+                    number,
+                    beam * (windows.surf_bm_to_bm_refl_fac_obs.read([number])?
+                        + windows.surf_bm_to_diff_refl_fac_obs.read([number])?)
+                        + diffuse * windows.surf_refl_fac_sky_sol_obs.read([number])?,
+                )?;
+                set(
+                    &mut arrays.surf_gnd_solar_inc,
+                    number,
+                    beam * weather.solar_direction_cosines[2]
+                        * reflectance
+                        * windows.surf_bm_to_diff_refl_fac_gnd.read([number])?
+                        + diffuse
+                            * reflectance
+                            * windows.surf_refl_fac_sky_sol_gnd.read([number])?,
+                )?;
+                windows
+                    .surf_sky_diff_refl_fac_gnd
+                    .set([number], windows.surf_refl_fac_sky_sol_gnd.read([number])?)?;
+            }
         }
         // Actual CalcWindowProfileAngles10729 performs these local weather
         // operations even with no window rows, then traverses the same ranges.
@@ -432,6 +517,28 @@ impl OrdinarySolarRadiation {
                         .read([number])?
                     + hb.surf_q_rad_sw_out_inc_sky_diff_refl_gnd.read([number])?,
             )?;
+            if control.calculate_solar_reflections {
+                hb.surf_q_rad_sw_out_inc_bm_to_bm_refl_obs.set(
+                    [number],
+                    windows.surf_bm_to_bm_refl_fac_obs.read([number])? * beam,
+                )?;
+                hb.surf_q_rad_sw_out_inc_bm_to_diff_refl_obs.set(
+                    [number],
+                    windows.surf_bm_to_diff_refl_fac_obs.read([number])? * beam,
+                )?;
+                hb.surf_q_rad_sw_out_inc_sky_diff_refl_obs.set(
+                    [number],
+                    diffuse * windows.surf_refl_fac_sky_sol_obs.read([number])?,
+                )?;
+                hb.surf_q_rad_sw_out_incident.set(
+                    [number],
+                    hb.surf_q_rad_sw_out_incident.read([number])?
+                        + (hb.surf_q_rad_sw_out_inc_bm_to_bm_refl_obs.read([number])?
+                            + hb.surf_q_rad_sw_out_inc_bm_to_diff_refl_obs
+                                .read([number])?
+                            + hb.surf_q_rad_sw_out_inc_sky_diff_refl_obs.read([number])?),
+                )?;
+            }
         }
         if !modules.tdd_pipe.as_deref().unwrap_or_default().is_empty() {
             return Err(Error::Unavailable(

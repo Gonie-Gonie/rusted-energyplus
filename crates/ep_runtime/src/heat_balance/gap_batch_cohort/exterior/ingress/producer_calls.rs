@@ -40,7 +40,7 @@ impl GainFactory {
             .shadowing_input
             .as_ref()
             .ok_or("real shadowing getter owner")?;
-        let control = &self.reports.heat_balance_input_state;
+        let control = &mut self.reports.heat_balance_input_state;
         let project = self
             .reports
             .selected_project_data
@@ -57,7 +57,6 @@ impl GainFactory {
             report_flags: &mut self.reports.source_report_flags,
             globals,
             clock: &self.weather.global,
-            control,
             zones,
             shadowing,
             daylighting: &mut self.daylighting,

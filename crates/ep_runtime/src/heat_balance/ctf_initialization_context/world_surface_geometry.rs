@@ -230,7 +230,7 @@ impl CtfInitializationContext<'_> {
             .calculate_final_centroids(&mut self.backend, environment)
             .map_err(hb_input_error)?;
         state
-            .read_empty_surface_solar_inputs(&mut owners)
+            .read_empty_surface_solar_inputs(&mut owners, self.eio)
             .map_err(hb_input_error)?;
         state
             .build_opaque_surface_lists(

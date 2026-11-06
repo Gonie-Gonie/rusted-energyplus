@@ -9,7 +9,10 @@ mod heat_gain;
 mod initialization;
 mod opaque_exterior;
 mod period;
+mod pierce_surface;
 mod polygon_overlap;
+pub(crate) mod reflection;
+mod reflection_factors;
 mod shadow_driver;
 mod sky;
 pub(crate) mod state;
@@ -130,6 +133,7 @@ pub(crate) trait SourceSolarChildren {
         &mut self,
         solar: &mut OrdinarySolarRadiation,
         geometry: &mut SurfaceGeometryInputState,
+        control: &SelectedHeatBalanceInputState,
         globals: &WeatherGlobalState,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error>;

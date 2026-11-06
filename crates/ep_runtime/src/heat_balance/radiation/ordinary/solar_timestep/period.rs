@@ -681,11 +681,34 @@ impl OrdinarySolarRadiation {
                 diagnostic_flags,
             )?;
             if control.calculate_solar_reflections {
-                return Err(Error::Unavailable(
-                    "PerformSolarCalculations actual reflected-solar children",
-                ));
+                self.source_calc_beam_solar_diffuse_reflection_factors(
+                    geometry,
+                    control,
+                    globals,
+                    environment,
+                    shadowing,
+                    backend,
+                )?;
+                self.source_calc_beam_solar_specular_reflection_factors(
+                    geometry,
+                    control,
+                    globals,
+                    environment,
+                    shadowing,
+                    backend,
+                )?;
+                if globals.begin_sim_flag {
+                    self.source_calc_sky_solar_diffuse_reflection_factors(
+                        geometry,
+                        control,
+                        globals,
+                        environment,
+                        shadowing,
+                        backend,
+                    )?;
+                }
             }
-            children.calc_daylight_coefficients(self, geometry, globals, backend)?;
+            children.calc_daylight_coefficients(self, geometry, control, globals, backend)?;
         }
         if !globals.warmup_flag {
             self.solar_timestep.shadowing_days_left -= 1;

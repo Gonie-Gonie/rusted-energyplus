@@ -3,6 +3,7 @@
 use super::{
     Error, SourceErrorBackend, SurfaceClass, SurfaceGeometryInputState, SurfaceGetterOwners, signed,
 };
+use std::io::Write;
 
 fn index(value: i32) -> Result<usize, Error> {
     value
@@ -159,8 +160,9 @@ impl SurfaceGeometryInputState {
     /// After the real centroid, consume the empty renewables/movable callers
     /// and the sole Building getter's actual CalcSolRefl predicate2597.
     pub(crate) fn read_empty_surface_solar_inputs(
-        &self,
+        &mut self,
         owners: &mut SurfaceGetterOwners<'_>,
+        eio: &mut dyn Write,
     ) -> Result<(), Error> {
         self.setup_empty_shade_surface_solar_inputs(owners)?;
         owners.shortcut.current_module_object = "SurfaceControl:MovableInsulation".into();
@@ -174,9 +176,62 @@ impl SurfaceGeometryInputState {
         // At zero11780-12007 has no argument reset, material mutation or list
         // assignment. Source literal constructor insulation flags stay retained.
         if owners.control.calculate_solar_reflections {
-            return Err(Error::Unavailable(
-                "positive shading-surface reflectance getter",
-            ));
+            // Actual7273-7423: this caller executes even with no reflectance
+            // objects and no shading surfaces. Its header is not optional.
+            let rows = self.final_surfaces.as_ref().ok_or(Error::Unavailable(
+                "same final Surface reflectance getter owner",
+            ))?;
+            for (i, surface) in rows.iter().enumerate() {
+                if !matches!(
+                    surface.row.class,
+                    SurfaceClass::Shading
+                        | SurfaceClass::DetachedFixed
+                        | SurfaceClass::DetachedBuilding
+                ) {
+                    continue;
+                }
+                let arrays = self
+                    .parallel_arrays
+                    .as_mut()
+                    .ok_or(Error::Unavailable("same Surface reflectance arrays"))?;
+                *arrays
+                    .surf_shadow_diffuse_sol_refl
+                    .get_mut(i)
+                    .ok_or(Error::Unavailable("actual reflectance ordinal"))? = 0.2;
+                *arrays
+                    .surf_shadow_diffuse_vis_refl
+                    .get_mut(i)
+                    .ok_or(Error::Unavailable("actual reflectance ordinal"))? = 0.2;
+                *arrays
+                    .surf_shadow_glazing_frac
+                    .get_mut(i)
+                    .ok_or(Error::Unavailable("actual reflectance ordinal"))? = 0.0;
+                *arrays
+                    .surf_shadow_glazing_construct
+                    .get_mut(i)
+                    .ok_or(Error::Unavailable("actual reflectance ordinal"))? = 0;
+            }
+            owners.shortcut.current_module_object = "ShadingProperty:Reflectance".into();
+            if owners
+                .input
+                .get_num_objects_found(&owners.shortcut.current_module_object)
+                != 0
+            {
+                return Err(Error::Unavailable(
+                    "positive ShadingProperty:Reflectance getter",
+                ));
+            }
+            eio.write_all(b"! <ShadingProperty Reflectance>,Shading Surface Name,Shading Type,Diffuse Solar Reflectance, Diffuse Visible Reflectance,Surface Glazing Fraction,Surface Glazing Construction\n")?;
+            for surface in rows {
+                if matches!(
+                    surface.row.class,
+                    SurfaceClass::Shading
+                        | SurfaceClass::DetachedFixed
+                        | SurfaceClass::DetachedBuilding
+                ) {
+                    return Err(Error::Unavailable("positive shading reflectance EIO row"));
+                }
+            }
         }
         Ok(())
     }

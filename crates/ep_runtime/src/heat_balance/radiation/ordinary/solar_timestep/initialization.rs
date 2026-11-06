@@ -9,7 +9,7 @@ impl OrdinarySolarRadiation {
         &mut self,
         geometry: &mut SurfaceGeometryInputState,
         zones: &SelectedZoneInputOwners,
-        control: &SelectedHeatBalanceInputState,
+        control: &mut SelectedHeatBalanceInputState,
         globals: &WeatherGlobalState,
         environment: &WeatherEnvironmentState,
         shadowing: &SourceShadowingInput,
@@ -115,9 +115,12 @@ impl OrdinarySolarRadiation {
             }
             if control.calculate_solar_reflections {
                 backend.display_string("Initializing Solar Reflection Factors")?;
-                return Err(Error::Unavailable(
-                    "InitSolarCalculations actual InitSolReflRecSurf",
-                ));
+                self.source_init_solar_reflection_receivers(
+                    geometry,
+                    control,
+                    environment,
+                    backend,
+                )?;
             }
             if self.solar_timestep.first_time {
                 backend.display_string("Proceeding with Initializing Solar Calculations")?;

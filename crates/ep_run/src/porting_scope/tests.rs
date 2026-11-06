@@ -2308,21 +2308,21 @@ fn default_controls_and_source_adjustments_are_observable() {
     assert!(!trace(&value, PortingScope::A).admissible);
 
     // This tests the input boundary only, not Source activation or window
-    // transport. Actual opaque consumers already branch on the real enum;
-    // reflection and positive window/TDD children remain separately guarded.
+    // transport. All five choices reach the genuine opaque solar branches;
+    // positive window/TDD and specular shading children remain guarded.
     for scope in [PortingScope::A, PortingScope::B] {
-        for (distribution, accepted) in [
-            ("MinimalShadowing", true),
-            ("FullExterior", true),
-            ("FullInteriorAndExterior", true),
-            ("FullExteriorWithReflections", false),
-            ("FullInteriorAndExteriorWithReflections", false),
+        for distribution in [
+            "MinimalShadowing",
+            "FullExterior",
+            "FullInteriorAndExterior",
+            "FullExteriorWithReflections",
+            "FullInteriorAndExteriorWithReflections",
         ] {
             let mut authored = input(scope);
             authored["Building"]["Building"]["solar_distribution"] = json!(distribution);
             let actual = trace(&authored, scope);
-            assert_eq!(
-                actual.admissible, accepted,
+            assert!(
+                actual.admissible,
                 "{scope:?}/{distribution}: {:?}",
                 actual.violations
             );
@@ -2331,14 +2331,6 @@ fn default_controls_and_source_adjustments_are_observable() {
                 distribution
             );
             assert_eq!(actual.production["conformance_claim"], false);
-            if !accepted {
-                assert!(
-                    actual
-                        .violations
-                        .iter()
-                        .any(|message| message.contains("solar reflection"))
-                );
-            }
             let raw = parse_epjson_str(&authored.to_string()).expect("schema-valid solar enum");
             let ordinary = match scope {
                 PortingScope::A => crate::ordinary_equipment_input::resolve(&raw),

@@ -53,7 +53,8 @@
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
         "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
-      "Ten named Surface Outside Face Sunlit Fraction requests join all 105 inherited multizone requests. All 115 real Timestep series/11,040 values retain strict scalar policy and actual ReportID, owner and clock bindings in ESO and Source JSON/CSV; meters are genuinely absent. Other producers and full-object combinations remain bounded."
+      "Ten named Surface Outside Face Sunlit Fraction requests join all 105 inherited multizone requests. All 115 real Timestep series/11,040 values retain strict scalar policy and actual ReportID, owner and clock bindings in ESO and Source JSON/CSV; meters are genuinely absent. Other producers and full-object combinations remain bounded.",
+      "Thirty named obstruction-reflection W/m2 requests retain actual Zone/Average/Timestep owners and original A policy6 limits alongside 115 literal inherited rules. All 145 series and 13,920 values pass complete ESO and Source JSON/CSV joins; all 30 new series match exactly. Meters are genuinely absent; other producers and full-object combinations remain bounded."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -86,7 +87,8 @@
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
         "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
       "Source B additionally validates a NoLimit five-DesignDay composition with only ROOF and WALL Y0 changed to SunExposed/WindExposed. All 115 series/54,480 values pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams exactly while exposed-face and demand/supply results change. This establishes joint exposure-to-surface/HVAC behavior for the declared case. The other four faces remain NoSun/NoWind. Arbitrary values/combinations, separate Sun/Wind attribution, subsurfaces, authored shades, OA/latent control, sizing and frozen CON-01 promotion remain outside this evidence. Whole EIO/SHD and five warmup counts agree; unrequested coefficient, DXF and tabular reports receive no credit.",
-      "A bounded two-Zone opaque weather case composes ten SunExposed/NoWind exterior walls/roofs with two Ground floors. Both engines report 37 material partial-fraction samples on the declared ZULU wall and roof. All 115 series/11,040 values pass unchanged limits. This establishes cross-Zone geometric shading for the declared composition; reciprocal shading, baseline thermal causality, positive shadow-shadow area, arbitrary combinations and full-object conformance remain unestablished."
+      "A bounded two-Zone opaque weather case composes ten SunExposed/NoWind exterior walls/roofs with two Ground floors. Both engines report 37 material partial-fraction samples on the declared ZULU wall and roof. All 115 series/11,040 values pass unchanged limits. This establishes cross-Zone geometric shading for the declared composition; reciprocal shading, baseline thermal causality, positive shadow-shadow area, arbitrary combinations and full-object conformance remain unestablished.",
+      "A retained two-Zone opaque composition now includes actual obstruction-reflected beam-to-diffuse and sky-diffuse irradiance. All 145 series and 13,920 values pass unchanged limits; 84 beam and 185 sky paired positive samples and 960 opaque specular zero samples per engine are observed. This is finite public irradiance evidence, without private Native hit ownership or baseline thermal attribution."
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -123,10 +125,11 @@
     "Building": [
       "opaque FullInteriorAndExterior admission now follows real retained solar enum and existing consumers",
       "actual no-window/TDD/subsurface conditions keep the Original extra back-surface child inactive; no zero stand-ins",
-      "existing test checks all five solar enums across A/B: three nonreflection selections admitted, both reflection selections retain bounds",
+      "existing input test checks all five solar enums across A/B; all are admitted for the retained opaque routes, while positive window and reflective-shading transport remain guarded",
       "same-input whole Source completion, actual Building EIO and byte-identical complete SHD; no arbitrary Building/window/reflection combination promotion",
       "Positive max/min warmup-day and convergence tolerance operands feed real convergence criteria; Severe effects use actual kickoff/developer/warmup/doingSizing flags rather than constructor legacy phase copies, retaining continuation/summary/reset order.",
-      "Same-input one-day strict1e-6 warmup case matches all5352 samples under unchanged limits, exact two Severe/seven Continue diagnostics, Loads Initialization category/warmup/END counts and one warmup day EIO; optional failure and phase permutations remain unit-scoped, active sizing stays bounded."
+      "Same-input one-day strict1e-6 warmup case matches all5352 samples under unchanged limits, exact two Severe/seven Continue diagnostics, Loads Initialization category/warmup/END counts and one warmup day EIO; optional failure and phase permutations remain unit-scoped, active sizing stays bounded.",
+      "Opaque exterior reflection selections now reach the retained Source solar consumers under existing model restrictions. One two-Zone Source A FullExteriorWithReflections case compares 145 series and 13,920 values: positive beam-to-diffuse and sky-diffuse obstruction irradiance agree, while all 10 opaque specular series are zero. Windows, authored reflective shades, private Native state, baseline thermal causality and arbitrary/full-object combinations remain unestablished."
     ],
     "GlobalGeometryRules": [
         "all four starting corners, both vertex entry directions and World/Relative selection reach the real Source vertex consumer",
@@ -47814,12 +47817,1008 @@
           "matched_capability_ids": [],
           "private_owners_and_complete_trajectories_observed": false
         }
+      },
+      {
+        "id": "A-OPAQUE-EXTERIOR-REFLECTION-111-24H",
+        "group": "Building",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "source_build": "source-opaque-exterior-reflections-111",
+        "input": {
+          "path": ".runtime/object-expansion/unit111-prep/opaque-exterior-reflection-pilot-proposal01/input.idf",
+          "sha256": "b166c06e29ab6c1cea58dc1cf70f54d4987c8892d6c82a319d24d617c9004800",
+          "bytes": 19583
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "input_format": "IDF",
+        "native_receipt": {
+          "path": ".runtime/porting/opaque-exterior-reflection-111/native-01/command/receipt.json",
+          "sha256": "e2a627be76c7ed80cfc8e6de241176262ebcaedea032c3760786ecf82c3b1f2b",
+          "bytes": 10400
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/opaque-exterior-reflection-111/source-01/command/receipt.json",
+          "sha256": "e89a7569a9d4abce0e76fd6df40a990f64378db6a8a65b96ccc31ba78d07d015",
+          "bytes": 11068
+        },
+        "source_summary": {
+          "path": ".runtime/porting/opaque-exterior-reflection-111/source-01/output/run-summary.json",
+          "sha256": "ce634f19e881fa24ed39189e511d0b9d16cca0f5b7af4382d663c3e7643dbc7e",
+          "bytes": 60164
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-112/eplus-rs.exe",
+          "sha256": "6baee6ec198554ca189d963f13f499258280c9eed0061f7746d56af560235d16",
+          "bytes": 80459604
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/46/4644bc7e4f8af1ca187a3ff00030d3a52abded1e6f5acae87809970fd9e37256",
+          "sha256": "4644bc7e4f8af1ca187a3ff00030d3a52abded1e6f5acae87809970fd9e37256"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-112/receipt.json",
+          "sha256": "0f5de63388638851e0d5e2553a3d4622cde4f60daa6683cc15ced06bee745f31",
+          "bytes": 7039
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit111-prep/actual-independent-readback01.json",
+          "sha256": "36e453e4880b9f31fbfea4caeae68b47f3adeb90b12158d9586bd58ed53a8e32",
+          "bytes": 434692
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit111-prep/reader-bindings01.json",
+          "sha256": "85ca8d1d5558bfa28d2b52d9d1109fc86fbe729340b46f24f9432437e938e250",
+          "bytes": 3426
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit111-prep/opaque-exterior-reflection-pilot-proposal01/recipe.json",
+          "sha256": "4c0f31227449758f7b2a3ac4591b4e5652e36e0ed84413048e030020ab9f5fde",
+          "bytes": 10423
+        },
+        "totals": {
+          "series": 145,
+          "samples": 13920,
+          "raw_operand_unequal": 36,
+          "parsed_binary64_unequal": 36,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 8.171241461241152e-14,
+          "max_rmse_delta": 8.829821787518893e-15
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All145 actual Timestep series/13920values with complete dictionary/body/clocks/footer/EOF and exact Source JSON/CSV token-bit-owner-clock joins.",
+          "MTR": "No meter requests/series; authenticated physical absence.",
+          "inherited110_requests_and_policy_rows_literal_exact": 115,
+          "new_named_obstruction_reflection_requests": 30,
+          "new30_series_bit_exact": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "baseline_policy": {
+            "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/derived-policy.json",
+            "sha256": "558947783608ca438a72addeb274d7a0c63797555c3a4013b18635f908c5f1f5",
+            "bytes": 59223
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit111-prep/opaque-exterior-reflection-pilot-proposal01/derived-policy.json",
+            "sha256": "5d93a879588a734e8dab8b10cfc119dabbeeeab2e20eda7398997b66914cee7a",
+            "bytes": 85664
+          },
+          "inherited105_A80_and10_fraction_rules_exact": true,
+          "new30_basis_original_A_policy_index": 6,
+          "new30_units": "W/m2",
+          "new30_atol": 1e-05,
+          "new30_rtol": 0.0,
+          "new30_rmse_max": 1e-05,
+          "numerical_limits_changed": false,
+          "qualification": "Original accepted80 rules1/51 retain canonical kgWater/kgDryAir and requested Zone Timestep clocks. Both actual unique RDD producers remain HVAC/Average/empty units, identically authenticated in ESO and Source catalog/JSON/CSV. No added waiver."
+        },
+        "effective_state": "One bounded two-Zone opaque24h weather composition changes only Building FullExterior to FullExteriorWithReflections and adds30 named obstruction-reflected irradiance requests. Actual beam-to-diffuse and sky-diffuse positive observations agree; all 10 opaque specular series are genuine zeros. No private Native receiver/hit/traversal, baseline110 thermal causality, glazed specular transport, arbitrary combinations or full-object/frozen capability claim.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "actual_default_Source_build": 112,
+          "new_Source_build_executions": 1,
+          "actual_existing_test_executions": 1,
+          "existing_test_functions_extended": 1,
+          "new_test_functions": 0,
+          "publication110": {
+            "path": ".runtime/object-expansion/unit110-prep/publish01/receipt.json",
+            "sha256": "3404f7147c000218ac76ee7c0c22038e9810737ac2b061d185350d414d546b6d",
+            "bytes": 4764
+          },
+          "actual_build_quality_authority": {
+            "path": ".runtime/object-expansion/unit111-prep/actual-build112-quality-authority01.json",
+            "sha256": "978500892d51bcf7f16ef99ac5e9984312f2e0dbcc5c5d2a61ec7e58c19019e1",
+            "bytes": 3225
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit111-prep/accepted-quality.json",
+            "sha256": "45fa37df6fc0eb1611343023d25e9f9b91f39ed091ef54e3f1ee3f186e4653c7",
+            "bytes": 7452
+          },
+          "actual_build_and_engine_epoch": {
+            "head": "1227cfb7731b9cc90f92820db67129ea130ab35a",
+            "worktree_clean": false,
+            "porcelain_v1_nul_utf8": " M crates/ep_run/src/porting_scope.rs\u0000 M crates/ep_run/src/porting_scope/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ctf_initialization_context/world_surface_geometry.rs\u0000 M crates/ep_runtime/src/heat_balance/gap_batch_cohort/exterior/ingress/producer_calls.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/provider_host.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/heat_gain.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/initialization.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/period.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/source_children.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/final_zero_suffix.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface/window_arrays.rs\u0000?? crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/pierce_surface.rs\u0000?? crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/reflection.rs\u0000?? crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/reflection_factors.rs\u0000"
+          },
+          "changed_Source_files": 17,
+          "complete_current_and_archived_Source_files": 4665,
+          "retained_first_quality_attempt": {
+            "receipt": {
+              "path": ".runtime/object-expansion/unit111-prep/quality01/receipt.json",
+              "sha256": "f8536215c49cc3ee0ebdbb1f0221c20d370db49f5f5017fc293a77d58179a42f",
+              "bytes": 6041
+            },
+            "exit_codes": [
+              0,
+              0,
+              101
+            ],
+            "engine_attempt": false,
+            "accepted_sample_credit": 0
+          }
+        },
+        "current_primary_observation": {
+          "Zones": 2,
+          "surfaces": 12,
+          "timesteps_per_hour": 4,
+          "raw_OutputVariable_requests": 145,
+          "actual_reporting_hours": 24,
+          "actual_DD_reporting_hours": 0,
+          "weather_reporting_hours": 24,
+          "hours_cli_argument": null,
+          "reporting_environments": [
+            {
+              "kind_of_environment": 1,
+              "ordinal": 1,
+              "selected_by_primary_flags": false,
+              "title": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 2,
+              "selected_by_primary_flags": false,
+              "title": "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 3,
+              "ordinal": 3,
+              "selected_by_primary_flags": true,
+              "title": "RUN PERIOD 1",
+              "total_days": 1
+            }
+          ],
+          "actual_warmup_days": [
+            6
+          ],
+          "actual_obstruction_reflection": {
+            "passed": true,
+            "positive_producer_satisfied": {
+              "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area": true,
+              "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area": true
+            },
+            "observations": [
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL001",
+                "report_id": 12,
+                "Native_positive_samples": 37,
+                "Source_positive_samples": 37,
+                "same_clock_paired_positive_samples": 37,
+                "first": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4389,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.054029380525893636",
+                    "value": 0.054029380525893636,
+                    "physical_line": 4395,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4211
+                  },
+                  "Source": {
+                    "token": "0.054029380525893636",
+                    "value": 0.054029380525893636,
+                    "physical_line": 4395,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4211
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL001",
+                "report_id": 14,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL002",
+                "report_id": 16,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL002",
+                "report_id": 18,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL003",
+                "report_id": 20,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL003",
+                "report_id": 22,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL004",
+                "report_id": 24,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:WALL004",
+                "report_id": 26,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:ROOF001",
+                "report_id": 28,
+                "Native_positive_samples": 37,
+                "Source_positive_samples": 37,
+                "same_clock_paired_positive_samples": 37,
+                "first": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4389,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.003358253030113183",
+                    "value": 0.003358253030113183,
+                    "physical_line": 4411,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4227
+                  },
+                  "Source": {
+                    "token": "0.003358253030113183",
+                    "value": 0.003358253030113183,
+                    "physical_line": 4411,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4227
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ZULU:ROOF001",
+                "report_id": 30,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL001",
+                "report_id": 32,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL001",
+                "report_id": 34,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL002",
+                "report_id": 36,
+                "Native_positive_samples": 37,
+                "Source_positive_samples": 37,
+                "same_clock_paired_positive_samples": 37,
+                "first": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4389,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.013488504133083126",
+                    "value": 0.013488504133083126,
+                    "physical_line": 4419,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4235
+                  },
+                  "Source": {
+                    "token": "0.013488504133083126",
+                    "value": 0.013488504133083126,
+                    "physical_line": 4419,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4235
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL002",
+                "report_id": 38,
+                "Native_positive_samples": 28,
+                "Source_positive_samples": 28,
+                "same_clock_paired_positive_samples": 28,
+                "first": {
+                  "sample_index": 32,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 9",
+                      " 0.00",
+                      "15.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4827,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "1.1603423679436118",
+                    "value": 1.1603423679436118,
+                    "physical_line": 4859,
+                    "stamp_index": 32,
+                    "stream_data_ordinal": 4672
+                  },
+                  "Source": {
+                    "token": "1.1603423679436118",
+                    "value": 1.1603423679436118,
+                    "physical_line": 4859,
+                    "stamp_index": 32,
+                    "stream_data_ordinal": 4672
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL003",
+                "report_id": 40,
+                "Native_positive_samples": 37,
+                "Source_positive_samples": 37,
+                "same_clock_paired_positive_samples": 37,
+                "first": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4389,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.11108689030267124",
+                    "value": 0.11108689030267124,
+                    "physical_line": 4423,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4239
+                  },
+                  "Source": {
+                    "token": "0.11108689030267124",
+                    "value": 0.11108689030267124,
+                    "physical_line": 4423,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4239
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL003",
+                "report_id": 42,
+                "Native_positive_samples": 28,
+                "Source_positive_samples": 28,
+                "same_clock_paired_positive_samples": 28,
+                "first": {
+                  "sample_index": 32,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 9",
+                      " 0.00",
+                      "15.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4827,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "3.772625043712117",
+                    "value": 3.772625043712117,
+                    "physical_line": 4863,
+                    "stamp_index": 32,
+                    "stream_data_ordinal": 4676
+                  },
+                  "Source": {
+                    "token": "3.772625043712117",
+                    "value": 3.772625043712117,
+                    "physical_line": 4863,
+                    "stamp_index": 32,
+                    "stream_data_ordinal": 4676
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL004",
+                "report_id": 44,
+                "Native_positive_samples": 37,
+                "Source_positive_samples": 37,
+                "same_clock_paired_positive_samples": 37,
+                "first": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4389,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.013488504133083118",
+                    "value": 0.013488504133083118,
+                    "physical_line": 4427,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4243
+                  },
+                  "Source": {
+                    "token": "0.013488504133083118",
+                    "value": 0.013488504133083118,
+                    "physical_line": 4427,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4243
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:WALL004",
+                "report_id": 46,
+                "Native_positive_samples": 28,
+                "Source_positive_samples": 28,
+                "same_clock_paired_positive_samples": 28,
+                "first": {
+                  "sample_index": 32,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 9",
+                      " 0.00",
+                      "15.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4827,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.017317945911995192",
+                    "value": 0.017317945911995192,
+                    "physical_line": 4867,
+                    "stamp_index": 32,
+                    "stream_data_ordinal": 4680
+                  },
+                  "Source": {
+                    "token": "0.017317945911995192",
+                    "value": 0.017317945911995192,
+                    "physical_line": 4867,
+                    "stamp_index": 32,
+                    "stream_data_ordinal": 4680
+                  }
+                }
+              },
+              {
+                "name": "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:ROOF001",
+                "report_id": 48,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              },
+              {
+                "name": "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area",
+                "key": "ALPHA:ROOF001",
+                "report_id": 50,
+                "Native_positive_samples": 0,
+                "Source_positive_samples": 0,
+                "same_clock_paired_positive_samples": 0,
+                "first": null
+              }
+            ],
+            "opaque_specular": [
+              {
+                "key": "ZULU:WALL001",
+                "report_id": 13,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ZULU:WALL002",
+                "report_id": 17,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ZULU:WALL003",
+                "report_id": 21,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ZULU:WALL004",
+                "report_id": 25,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ZULU:ROOF001",
+                "report_id": 29,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ALPHA:WALL001",
+                "report_id": 33,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ALPHA:WALL002",
+                "report_id": 37,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ALPHA:WALL003",
+                "report_id": 41,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ALPHA:WALL004",
+                "report_id": 45,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              },
+              {
+                "key": "ALPHA:ROOF001",
+                "report_id": 49,
+                "samples": 96,
+                "numeric_zero_samples": {
+                  "Native": 96,
+                  "Source": 96
+                }
+              }
+            ],
+            "Native_private_traversal_observed": false,
+            "baseline_thermal_causal_claim": false
+          },
+          "positive_paired_samples_by_producer": {
+            "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area": 84,
+            "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area": 185
+          },
+          "opaque_specular_numeric_zero_samples_per_engine": 960,
+          "inherited_fraction_counts_observations_only": {
+            "observations": [
+              {
+                "key": "ZULU:WALL001",
+                "report_id": 11,
+                "actual_Native_partial_samples": 37,
+                "actual_Source_partial_samples": 37,
+                "actual_paired_partial_samples": 37,
+                "Native_min": 0.0,
+                "Native_max": 0.631169,
+                "Source_min": 0.0,
+                "Source_max": 0.631169,
+                "first_actual_paired_partial": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4389,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.631169",
+                    "value": 0.631169,
+                    "physical_line": 4394,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4210
+                  },
+                  "Source": {
+                    "token": "0.631169",
+                    "value": 0.631169,
+                    "physical_line": 4394,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4210
+                  }
+                }
+              },
+              {
+                "key": "ZULU:WALL002",
+                "report_id": 15,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ZULU:WALL003",
+                "report_id": 19,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 0.0,
+                "Source_min": 0.0,
+                "Source_max": 0.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ZULU:WALL004",
+                "report_id": 23,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ZULU:ROOF001",
+                "report_id": 27,
+                "actual_Native_partial_samples": 37,
+                "actual_Source_partial_samples": 37,
+                "actual_paired_partial_samples": 37,
+                "Native_min": 0.0,
+                "Native_max": 0.9589223694525001,
+                "Source_min": 0.0,
+                "Source_max": 0.9589223694525001,
+                "first_actual_paired_partial": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 4389,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.9589223694525001",
+                    "value": 0.9589223694525001,
+                    "physical_line": 4410,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4226
+                  },
+                  "Source": {
+                    "token": "0.9589223694525001",
+                    "value": 0.9589223694525001,
+                    "physical_line": 4410,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 4226
+                  }
+                }
+              },
+              {
+                "key": "ALPHA:WALL001",
+                "report_id": 31,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:WALL002",
+                "report_id": 35,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:WALL003",
+                "report_id": 39,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 0.0,
+                "Source_min": 0.0,
+                "Source_max": 0.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:WALL004",
+                "report_id": 43,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:ROOF001",
+                "report_id": 47,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              }
+            ],
+            "new_activation_prerequisite": false,
+            "required_partial_sample_count": null,
+            "reciprocal_shading_claim": false,
+            "baseline_thermal_causal_claim": false
+          },
+          "actual_Source_geometry": {
+            "actual_trace": {
+              "path": ".runtime/porting/opaque-exterior-reflection-111/source-01/output/geometry-consumers.json",
+              "sha256": "f1a599a4802798f5e4f517fcc6abb5ad0c312862dc096928fca04339776bc12f",
+              "bytes": 55995
+            },
+            "actual_compiled": {
+              "path": ".runtime/porting/opaque-exterior-reflection-111/source-01/output/compiled-geometry.json",
+              "sha256": "d58b132a3256f56e0e4f358fdda7490674fe14c87d8c2b1ac6d8865675f2052c",
+              "bytes": 38852
+            },
+            "authored_geometry_audit": {
+              "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/authored-geometry-audit.json",
+              "sha256": "f9c09baf62a9d963f2b912819a7f9d3440acf98177f6f2e9da7bc92fed510cf2",
+              "bytes": 10092
+            },
+            "all12_surface_vertices_and_owners_exact": true,
+            "two_Zones_Spaces_enclosures": true,
+            "observer_supplies_inputs": false,
+            "private_Native_allocations_observed": false
+          },
+          "whole_public_ancillary_readback": {
+            "path": ".runtime/object-expansion/unit111-prep/actual-independent-readback01.json",
+            "sha256": "36e453e4880b9f31fbfea4caeae68b47f3adeb90b12158d9586bd58ed53a8e32",
+            "bytes": 434692
+          },
+          "requested_CTF_constructions": 3,
+          "DXF_logical_pairs": 533,
+          "full_CSV_table_rows": 1710,
+          "inactive_DesignDay_climatic_cells": 12,
+          "actual_custody": {
+            "actual_Native_custody": {
+              "path": ".runtime/object-expansion/unit111-prep/root-native-custody01.json",
+              "sha256": "28cce3dfc64dbb8cf36cb95ea5d15272a99143d521b892d9fdcc2d32e5733ef6",
+              "bytes": 2669
+            },
+            "actual_Source_custody": {
+              "path": ".runtime/object-expansion/unit111-prep/root-source-custody01.json",
+              "sha256": "4fdd2fe9ef24c5799d2a31819d0df08c30cd5cf586dc8217f1abce802bd2493b",
+              "bytes": 2742
+            },
+            "actual_Source_completion": {
+              "path": ".runtime/object-expansion/unit111-prep/root-source-completion01.json",
+              "sha256": "262ee2526662ee1dc400f881b243f6bdd8e2648652857d88b3772ba56692d5f8",
+              "bytes": 1502
+            }
+          },
+          "Root_pre_Source_Native_activation_review": {
+            "path": ".runtime/object-expansion/unit111-prep/root-native-activation-review01.json",
+            "sha256": "6d58f1074fd8eaec4fe90e3c20889f03b0cd84ed94617501a5da3d64370a98ba",
+            "bytes": 14998
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit111-prep/actual-independent-readback01.json",
+            "sha256": "36e453e4880b9f31fbfea4caeae68b47f3adeb90b12158d9586bd58ed53a8e32",
+            "bytes": 434692
+          },
+          "independent_full_actual_physical_peer": {
+            "path": ".runtime/object-expansion/unit111-prep/physical-peer01/proof01.json",
+            "sha256": "83ba32c12f7f05e9f42454d0115dc350ad19ae028a144617f5b6b5ff80a0809c",
+            "bytes": 396427
+          },
+          "Root_peer_review": {
+            "path": ".runtime/object-expansion/unit111-prep/root-physical-peer-review01.json",
+            "sha256": "93e9f15e226dd0a5ff0e9b1c6dff287c3a24893a9692da1502e5d5c4512f815a",
+            "bytes": 1486
+          },
+          "source_runtime_class": "source-multizone-heat-balance-compatibility",
+          "matched_capability_ids": []
+        }
       }
     ],
     "totals": {
-      "paired_cases": 163,
-      "reported_samples": 4582542,
-      "raw_operand_unequal": 997326,
+      "paired_cases": 164,
+      "reported_samples": 4596462,
+      "raw_operand_unequal": 997362,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -49644,6 +50643,23 @@
           "sha256": "51bc350ee00de9835474e61dfc0c3cfdf0b49b538a8d54849fb661d317498024",
           "bytes": 80307809
         }
+      },
+      {
+        "id": "source-opaque-exterior-reflections-111",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-112/receipt.json",
+          "sha256": "0f5de63388638851e0d5e2553a3d4622cde4f60daa6683cc15ced06bee745f31",
+          "bytes": 7039
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/46/4644bc7e4f8af1ca187a3ff00030d3a52abded1e6f5acae87809970fd9e37256",
+          "sha256": "4644bc7e4f8af1ca187a3ff00030d3a52abded1e6f5acae87809970fd9e37256"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-112/eplus-rs.exe",
+          "sha256": "6baee6ec198554ca189d963f13f499258280c9eed0061f7746d56af560235d16",
+          "bytes": 80459604
+        }
       }
     ],
     "focused_since_workspace": {
@@ -49889,14 +50905,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 107,
-      "builds_with_accepted_paired_cases": 100,
+      "actual_recorded_builds": 108,
+      "builds_with_accepted_paired_cases": 101,
       "builds_with_only_retained_failed_Source_attempts": 3,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 6,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "107 recorded Source builds:100 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
+      "qualification": "108 recorded Source builds:101 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 2,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 1,
@@ -53226,6 +54242,82 @@
       "Native_replays": 0,
       "Source_replays": 0,
       "scope": "One bounded two-Zone opaque24h weather composition: separated closed ZULU300m3/100m2 receiver and ALPHA48m3/8m2 blocker, ten SunExposed/NoWind Outdoors walls/roofs and two Ground floors with twelve authored18C monthly values. Material partial public fractions on ZULU WALL001 establish cross-Zone geometric shading. No reciprocal/mutual requirement, baseline80 thermal causality, positive shadow-shadow area, private Native owner or arbitrary-combination/full-object/frozen-conformance claim."
+    },
+    "current_opaque_exterior_reflection_live_pair": {
+      "source_build": "source-opaque-exterior-reflections-111",
+      "actual_Source_build": {
+        "path": ".runtime/object-expansion/build112-row.json",
+        "sha256": "9ff7cc28a805fb90118ef8d07e323b34f314b8a279a9a896391c8dd14571a529",
+        "bytes": 689
+      },
+      "actual_build_quality_authority": {
+        "path": ".runtime/object-expansion/unit111-prep/actual-build112-quality-authority01.json",
+        "sha256": "978500892d51bcf7f16ef99ac5e9984312f2e0dbcc5c5d2a61ec7e58c19019e1",
+        "bytes": 3225
+      },
+      "actual_quality": {
+        "path": ".runtime/object-expansion/unit111-prep/accepted-quality.json",
+        "sha256": "45fa37df6fc0eb1611343023d25e9f9b91f39ed091ef54e3f1ee3f186e4653c7",
+        "bytes": 7452
+      },
+      "case_rows": [
+        "A-OPAQUE-EXTERIOR-REFLECTION-111-24H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit111-prep/actual-independent-readback01.json",
+        "sha256": "36e453e4880b9f31fbfea4caeae68b47f3adeb90b12158d9586bd58ed53a8e32",
+        "bytes": 434692
+      },
+      "independent_actual_full_physical_peer": {
+        "path": ".runtime/object-expansion/unit111-prep/physical-peer01/proof01.json",
+        "sha256": "83ba32c12f7f05e9f42454d0115dc350ad19ae028a144617f5b6b5ff80a0809c",
+        "bytes": 396427
+      },
+      "Root_physical_peer_review": {
+        "path": ".runtime/object-expansion/unit111-prep/root-physical-peer-review01.json",
+        "sha256": "93e9f15e226dd0a5ff0e9b1c6dff287c3a24893a9692da1502e5d5c4512f815a",
+        "bytes": 1486
+      },
+      "actual_custody": {
+        "actual_Native_custody": {
+          "path": ".runtime/object-expansion/unit111-prep/root-native-custody01.json",
+          "sha256": "28cce3dfc64dbb8cf36cb95ea5d15272a99143d521b892d9fdcc2d32e5733ef6",
+          "bytes": 2669
+        },
+        "actual_Source_custody": {
+          "path": ".runtime/object-expansion/unit111-prep/root-source-custody01.json",
+          "sha256": "4fdd2fe9ef24c5799d2a31819d0df08c30cd5cf586dc8217f1abce802bd2493b",
+          "bytes": 2742
+        },
+        "actual_Source_completion": {
+          "path": ".runtime/object-expansion/unit111-prep/root-source-completion01.json",
+          "sha256": "262ee2526662ee1dc400f881b243f6bdd8e2648652857d88b3772ba56692d5f8",
+          "bytes": 1502
+        }
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit111-prep/opaque-exterior-reflection-pilot-proposal01/recipe.json",
+        "sha256": "4c0f31227449758f7b2a3ac4591b4e5652e36e0ed84413048e030020ab9f5fde",
+        "bytes": 10423
+      },
+      "publication110": {
+        "path": ".runtime/object-expansion/unit110-prep/publish01/receipt.json",
+        "sha256": "3404f7147c000218ac76ee7c0c22038e9810737ac2b061d185350d414d546b6d",
+        "bytes": 4764
+      },
+      "positive_paired_samples_by_producer": {
+        "Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area": 84,
+        "Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area": 185
+      },
+      "opaque_specular_numeric_zero_samples_per_engine": 960,
+      "new_test_executions": 1,
+      "new_test_functions": 0,
+      "new_builds": 1,
+      "actual_fresh_Native_executions": 1,
+      "actual_fresh_Source_executions": 1,
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "scope": "One bounded two-Zone opaque24h weather composition changes only Building FullExterior to FullExteriorWithReflections and adds30 named obstruction-reflected irradiance requests. Actual beam-to-diffuse and sky-diffuse positive observations agree; all 10 opaque specular series are genuine zeros. No private Native receiver/hit/traversal, baseline110 thermal causality, glazed specular transport, arbitrary combinations or full-object/frozen capability claim."
     }
   },
   "additional_native_type_calibrations": [

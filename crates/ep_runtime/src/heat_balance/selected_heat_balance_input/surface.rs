@@ -21,6 +21,7 @@ mod derived_arrays;
 mod diagnostics;
 mod empty_subsurfaces;
 mod final_mapping;
+pub(crate) use final_mapping::FinalSurface;
 mod final_zero_suffix;
 mod floor_areas;
 mod foundation;
@@ -199,6 +200,10 @@ impl Default for SurfaceTmpInput {
 
 #[derive(Clone, Debug, Default, PartialEq)]
 pub(crate) struct SurfaceGeometryInputState {
+    /// DataSurfaces constructor state, written by InitSolReflRecSurf.
+    pub(crate) max_rec_pts: i32,
+    pub(crate) max_refl_rays: i32,
+    pub(crate) ground_level_z: f64,
     pub(crate) entered_once: bool,
     pub(crate) warning_displayed: bool,
     /// Actual SurfaceGeometryData NoGroundTempObjWarning constructortrue;

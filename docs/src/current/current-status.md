@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 163 paired physical cases and 4,582,542 reported values with zero
+contains 164 paired physical cases and 4,596,462 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 107 recorded Source builds,
-100 with accepted pairs and seven without accepted pairs, including one build
+validate the consumer corrections. There are 108 recorded Source builds,
+101 with accepted pairs and seven without accepted pairs, including one build
 superseded before any Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -167,6 +167,15 @@ within their recorded identity boundaries. This finite case does not establish
 reciprocal shading, baseline thermal causality, positive shadow-shadow area or
 arbitrary object combinations.
 
+The opaque Source route now calculates exterior reflections. One retained
+two-Zone case changes the Building solar selection and adds 30 named irradiance
+requests. All 145 series and 13,920 values pass unchanged limits; all 30 new series
+match exactly. Beam-to-diffuse and sky-diffuse obstruction irradiance have 84
+and 185 paired positive samples; all 960 opaque specular samples per engine are
+zero. Whole requested reports, geometry and six warmup days agree. Windows,
+authored reflective shades, private Native hit ownership, baseline thermal
+causality and arbitrary/full-object combinations remain unestablished.
+
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
 the getter's Ceiling alias. Exact reverse Material
@@ -174,8 +183,8 @@ identity retains the Native fast path; differing counts or layer identities use
 an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
 retain Native's warning sequence. Infrared-transparent constructions retain
 their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
-and list factors and opposite coincident vertices. Twenty-six 24-hour two-Zone
-cases cover 660,624 derived values with zero tolerance or RMSE failures;
+and list factors and opposite coincident vertices. Twenty-seven 24-hour two-Zone
+cases cover 674,544 derived values with zero tolerance or RMSE failures;
 the maximum absolute difference is 3.8198777474462986e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Multiple/remainder Spaces, Space heat balance, Source B authored Spaces,

@@ -305,6 +305,7 @@ pub struct OrdinarySolarRadiation {
     solar_initialized: bool,
     radiant_exchange: OrdinaryRadiantExchangeState,
     pub(crate) solar_timestep: Box<solar_timestep::SourceSolarTimestepState>,
+    pub(crate) solar_reflection: Box<solar_timestep::reflection::SourceSolarReflectionState>,
 }
 
 impl OrdinarySolarRadiation {
@@ -321,6 +322,7 @@ impl OrdinarySolarRadiation {
             solar_initialized: false,
             radiant_exchange: OrdinaryRadiantExchangeState::default(),
             solar_timestep: Box::default(),
+            solar_reflection: Box::default(),
         }
     }
 

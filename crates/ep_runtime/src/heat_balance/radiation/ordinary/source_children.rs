@@ -67,7 +67,6 @@ pub(crate) struct SourceSolarChildOwners<'a, H, D> {
     pub(crate) report_flags: &'a mut SourceSolarReportFlags,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
     pub(crate) clock: &'a WeatherGlobalState,
-    pub(crate) control: &'a SelectedHeatBalanceInputState,
     pub(crate) zones: &'a SelectedZoneInputOwners,
     #[allow(
         dead_code,
@@ -212,6 +211,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
         &mut self,
         solar: &mut OrdinarySolarRadiation,
         geometry: &mut SurfaceGeometryInputState,
+        control: &SelectedHeatBalanceInputState,
         _clock: &WeatherGlobalState,
         backend: &mut SourceErrorBackend<'_>,
     ) -> Result<(), Error> {
@@ -221,7 +221,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceSolarChildren
             self.zones,
             solar,
             geometry,
-            self.control,
+            control,
             self.gain_modules,
             backend,
         )

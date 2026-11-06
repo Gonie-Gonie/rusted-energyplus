@@ -14,7 +14,7 @@ use ep_model::{
     AutosizeOrNumber, DehumidificationControlType, DemandControlledVentilationType,
     HeatRecoveryType, HumidificationControlType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm,
     OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm,
-    SolarDistribution, TypedModel,
+    TypedModel,
 };
 use ep_raw_model::RawModel;
 use serde::Serialize;
@@ -766,23 +766,13 @@ fn validate_typed_scope(
     ) {
         violations.push("Timestep must use an EnergyPlus divisor of 60 minutes".into());
     }
-    if let Some(building) = &model.building {
-        if !matches!(
-            building.solar_distribution,
-            SolarDistribution::MinimalShadowing
-                | SolarDistribution::FullExterior
-                | SolarDistribution::FullInteriorAndExterior
-        ) {
-            violations
-                .push("solar reflection branches are outside the selected opaque scope".into());
-        }
-        if building.loads_convergence_tolerance_w <= 0.0
+    if let Some(building) = &model.building
+        && (building.loads_convergence_tolerance_w <= 0.0
             || building.temperature_convergence_tolerance_delta_c <= 0.0
             || building.minimum_number_of_warmup_days == 0
-            || building.maximum_number_of_warmup_days == 0
-        {
-            violations.push("warmup day counts and convergence tolerances must be positive".into());
-        }
+            || building.maximum_number_of_warmup_days == 0)
+    {
+        violations.push("warmup day counts and convergence tolerances must be positive".into());
     }
     for zone in &model.zones {
         // The real getter stores Zone N6 in a Native signed int. All live

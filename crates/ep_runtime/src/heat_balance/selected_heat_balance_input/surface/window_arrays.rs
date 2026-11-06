@@ -6,6 +6,19 @@ use super::Error;
 #[allow(dead_code)]
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SurfaceWindowArrays {
+    /// SolarReflectionManager223-233: distinct hourly and sky producer arrays.
+    pub(crate) surf_refl_fac_bm_to_diff_sol_obs:
+        crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 2>,
+    pub(crate) surf_refl_fac_bm_to_diff_sol_gnd:
+        crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 2>,
+    pub(crate) surf_refl_fac_bm_to_bm_sol_obs:
+        crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 2>,
+    pub(crate) surf_cos_inc_ave_bm_to_bm_sol_obs:
+        crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 2>,
+    pub(crate) surf_refl_fac_sky_sol_obs:
+        crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
+    pub(crate) surf_refl_fac_sky_sol_gnd:
+        crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<f64, 1>,
     /// SolarShading.cc937: SurfSunCosHourly, unallocated until Solar AllocateModuleArrays.
     pub(crate) surf_sun_cos_hourly:
         crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray<
@@ -279,6 +292,12 @@ impl SurfaceWindowArrays {
                 "Source solid-window matrix storage size",
             ))?;
         Ok(Self {
+            surf_refl_fac_bm_to_diff_sol_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_refl_fac_bm_to_diff_sol_gnd: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_refl_fac_bm_to_bm_sol_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_cos_inc_ave_bm_to_bm_sol_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_refl_fac_sky_sol_obs: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
+            surf_refl_fac_sky_sol_gnd: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
             surf_sun_cos_hourly: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
             surf_sunlit_area: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
             surf_sunlit_frac: crate::heat_balance::radiation::ordinary::solar_timestep::array::SourceSolarArray::default(),
