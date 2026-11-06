@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-11-02
+last_reviewed: 2026-11-06
 ---
 
 # Current Status
@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 161 paired physical cases and 4,517,022 reported values with zero
+contains 162 paired physical cases and 4,571,502 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 106 recorded Source builds,
-99 with accepted pairs and seven without accepted pairs, including one build
+validate the consumer corrections. There are 107 recorded Source builds,
+100 with accepted pairs and seven without accepted pairs, including one build
 superseded before any Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -145,12 +145,17 @@ All 119,856 values pass the original limits, complete ordered streams, whole EIO
 ERR/END, dictionaries, SHD and actual warmup checks. CTF coefficient reports, DXF
 and tabular CSV are unrequested; paired absence is checked with zero coefficient
 rows or climatic cells credited. Actual CTF surface physics remains compared.
-All six surfaces retain NoSun/NoWind and the original 1000 W gain, availability
-and thermostats. Positive Site solar does not prove solar-to-B-surface/HVAC
-coupling. Build110 and four existing test executions are counted once, with no
-new test function. Private flow caches/operating histories, arbitrary values
-and combinations, OA/latent control, sizing and legacy active DDs remain bounded.
-No capability or frozen CON-01 identity is promoted.
+Those two B cases retain six NoSun/NoWind surfaces; their positive Site solar
+alone does not establish surface/HVAC coupling. A further NoLimit case changes
+only ROOF and WALL Y0 to SunExposed/WindExposed. All 115 series and 54,480 values
+pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams
+exactly, while all 16 exposed-face and 15 demand-or-supply series change. This
+establishes joint exposure-to-surface/HVAC behavior for that declared case.
+Whole EIO/SHD and five warmup reports agree. Unrequested coefficient, DXF and
+tabular reports receive no credit. Separate Sun/Wind effects, private film/local
+wind/HAT, arbitrary values/combinations, OA/latent control, sizing and legacy
+active DDs remain outside this evidence. No capability or frozen CON-01 identity
+is promoted.
 
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including

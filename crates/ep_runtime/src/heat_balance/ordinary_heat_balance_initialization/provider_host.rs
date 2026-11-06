@@ -148,16 +148,25 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitHeatBalan
             dictionary_host: self.dictionary_host,
             eio: self.eio,
         };
+        let diagnostic_flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+            kickoff: &owners.globals.kickoff_simulation,
+            developer: &owners.project.system.developer_flag,
+            warmup: &owners.clock.warmup_flag,
+            doing_sizing: &owners.globals.doing_sizing,
+        };
         owners.radiation.source_perform_solar_calculations(
             owners.geometry,
             owners.control,
             owners.clock,
             owners.environment,
             owners.shadowing,
+            &owners.project.system.shadowing_clipping,
+            owners.globals,
             owners.globals.kickoff_sizing,
             owners.globals.kickoff_simulation,
             &mut children,
             owners.backend,
+            &diagnostic_flags,
         )
     }
     unavailable_child!(

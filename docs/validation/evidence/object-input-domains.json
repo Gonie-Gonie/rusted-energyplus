@@ -1,6 +1,6 @@
 {
   "schema": "object-input-domain-verification.v1",
-  "reviewed_on": "2026-11-02",
+  "reviewed_on": "2026-11-06",
   "corpus": {
     "input_files": 188,
     "idf_files": 176,
@@ -83,7 +83,8 @@
         "Current SourceA composes the existing bounded opaque multizone geometry with exactly one authored whole-Zone Space per Zone. Six unchanged blank-Space surfaces per Zone bind to the real sole Space; separate typed-ID/Source-number/World/construction/material/enclosure associations and independent Space/Zone order remain observable. Effective floor6 can coexist with geometric12 and unchanged DXF coordinates/extents. Existing normal Wall/Wall or Roof/Floor reciprocal stack1..10/reversed-identity/finiteNominalU and sole-layer exact-IRT Wall fences remain; Group compositions with authored Spaces or nonempty SpaceLists, multiple/remainder Spaces, SpaceHB, SourceB authored Spaces, windows and HVAC and broader combinations remain unestablished. Full EIO/ERR/DXF/publicCTF/warmup comparisons retain existing identity/elapsed exceptions and no conformance promotion.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
+      "Source B additionally validates a NoLimit five-DesignDay composition with only ROOF and WALL Y0 changed to SunExposed/WindExposed. All 115 series/54,480 values pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams exactly while exposed-face and demand/supply results change. This establishes joint exposure-to-surface/HVAC behavior for the declared case. The other four faces remain NoSun/NoWind. Arbitrary values/combinations, separate Sun/Wind attribution, subsurfaces, authored shades, OA/latent control, sizing and frozen CON-01 promotion remain outside this evidence. Whole EIO/SHD and five warmup counts agree; unrequested coefficient, DXF and tabular reports receive no credit."
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -315,7 +316,8 @@
       "A further one-Zone four-DD/TS1 comparison reports96actual hours,124series11904values under unchanged117inherited rows and declared Dewpoint/originalC plus exact rain/snow rules. Three real dry-Day owners check72own+216other samples per engine. RawDP18/climatic getter differs from effective EIO after actual saturation correction; entered120000Pa becomes real standard pressure, while valid82000Pa remains. Actual WinterDesignDay/CustomDay1/CustomDay2/Friday and DST, full streams/ancillary/CTF, four climatic rows24cells, four matched warnings and four observed warmup counts agree. The same defaultBuild109 and priorQA5 are reused with no new build/test execution.",
       "Across retained105/107 witnesses all8humidity selectors have finite active evidence, alongside prior4dry/5solar modes; no full Cartesian product or arbitrary legal value/composition completion follows. Rain reaches the existing default wet outside-film/wetbulb consumer. Snow flag/current/monthly-reflectance branch is exercised under unity modifiers; both snowy DDs have zero solar, so nontrivial snow-ground-solar effect is unobserved. Private FileExists/Num/Used/Which/complete trajectories, alternate sky, sizing, legacy activeDD and broader gain/Space/group/HVAC composition remain bounded. No registry/capability/conformance promotion.",
       "Two newSourceB finiteinputs retain originalB102policy/requestlexemes, nineacceptedDay+twoSiteSolar rules andtwo separatelydeclaredFacilityJ1/0/1meters. NoLimitreports5DD120h/54480values; combined0.02m3/s+120W hardlimits report5DD120h+Jan1weather24h/65376values. All119856values/230series passactualoriginal OR/serialSSE/count/sqrt rules. Fullorderedstreams, schedule/thermostat publicseries, ninefirstDayowners864own+3456/4320sentinel samples, wholeEIO/ERR/END/RDD/MDD/MTD/SHD anddynamic5/6warmupcounts agree. NoOutput:Constructions, drawingortabularrequest isauthored: CTFcoefficientrows/DXF/tabularCSV pairedabsence isauthenticated, zero publiccoefficientrows/climaticcells credited. GenuineCTFalgorithm andpublicsurfacephysics remaincompared. DefaultBuild110 andfour existingtestexecutions countonce; no newtestfunction.",
-      "BothBinputs keepall6OutdoorsNoSunNoWind surfaces and1000Wgain/availability/thermostats exact; no solar-to-B-surface/HVAC couplingproof follows frompositiveSiteSolar. BprivateNum/Used/Which/BeginEnvrn/flowcache values andfulloperatinghistories are unobserved. AllfourBlimitmodes/arbitraryselectors/values/dates/envelopes/Space/gain/OA/latent/sizing compositions, legacy andfullobjectcompletion remainunvalidated. ExistingBcomponentclasseligibility isnotnewCON15 conformance; ad-hocclaims/release evidence remainfalse. No capabilitypromotion."
+      "BothBinputs keepall6OutdoorsNoSunNoWind surfaces and1000Wgain/availability/thermostats exact; no solar-to-B-surface/HVAC couplingproof follows frompositiveSiteSolar. BprivateNum/Used/Which/BeginEnvrn/flowcache values andfulloperatinghistories are unobserved. AllfourBlimitmodes/arbitraryselectors/values/dates/envelopes/Space/gain/OA/latent/sizing compositions, legacy andfullobjectcompletion remainunvalidated. ExistingBcomponentclasseligibility isnotnewCON15 conformance; ad-hocclaims/release evidence remainfalse. No capabilitypromotion.",
+      "Source B additionally validates a NoLimit five-DesignDay composition with only ROOF and WALL Y0 changed to SunExposed/WindExposed. All 115 series/54,480 values pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams exactly while exposed-face and demand/supply results change. This establishes joint exposure-to-surface/HVAC behavior for the declared case. The other four faces remain NoSun/NoWind. Arbitrary values/combinations, separate Sun/Wind attribution, subsurfaces, authored shades, OA/latent control, sizing and frozen CON-01 promotion remain outside this evidence. Whole EIO/SHD and five warmup counts agree; unrequested coefficient, DXF and tabular reports receive no credit."
     ]
   },
   "verification": {
@@ -46544,12 +46546,440 @@
           },
           "private_owners_and_complete_trajectories_observed": false
         }
+      },
+      {
+        "id": "B-NOLIMIT-FIVE-SOLAR-EXPOSED-SURFACES-109-120H",
+        "group": "SizingPeriod:DesignDay",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-b-positive-general-shadows-109",
+        "input": {
+          "path": ".runtime/object-expansion/unit109-prep/source-b-exposed-surface-pilot-proposal01/B-NOLIMIT-FIVE-SOLAR-EXPOSED-SURFACES-109-120H/input.epJSON",
+          "sha256": "9900c49a7c05b4d0890c1d3f793635b9778459bf333d76387187dda0096cecd9",
+          "bytes": 82863
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/source-b-exposed-surface-109/native-01/command/receipt.json",
+          "sha256": "fa8ff34fc90c6cfc55f5621bf0f1891275eab199bae5af1d592d52198c7f289f",
+          "bytes": 6939
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/source-b-exposed-surface-109/source-02/command/receipt.json",
+          "sha256": "4f333cc2ff3a3f4037fa0e1b2345348a66aaa7405dd8fb6b4ea99c80eb68d201",
+          "bytes": 10234
+        },
+        "source_summary": {
+          "path": ".runtime/porting/source-b-exposed-surface-109/source-02/output/run-summary.json",
+          "sha256": "560d12ebbd6aceaa12d8d99f96b8fe27472e7119976da14433d490c1fd5a5289",
+          "bytes": 65753
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-111/eplus-rs.exe",
+          "sha256": "51bc350ee00de9835474e61dfc0c3cfdf0b49b538a8d54849fb661d317498024",
+          "bytes": 80307809
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1d/1dc224fa75acecc602026c87e77ea21d07f1b92a6dce481f378129083391adf5",
+          "sha256": "1dc224fa75acecc602026c87e77ea21d07f1b92a6dce481f378129083391adf5"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-111/receipt.json",
+          "sha256": "1ee4fc371e97e9530559f484b1fe6e552079e36620f16ba7c507316eebdf0348",
+          "bytes": 6769
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit109-prep/actual-independent-readback01.json",
+          "sha256": "548f285aebeb318aa299f1b61c228463b3d35e953098d56691ff5d082f52df7d",
+          "bytes": 516420
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit109-prep/reader-bindings02.json",
+          "sha256": "713ad2ee75ee7989c89cc23cb0a137543d6bb9de6e9f03b3bbc16020d2712490",
+          "bytes": 5710
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit109-prep/source-b-exposed-surface-pilot-proposal02/proposal.json",
+          "sha256": "21391372d18493dd1fea8fa3c788a92fcdb20c72dce00e18f1d7a82bd039da59",
+          "bytes": 8370
+        },
+        "totals": {
+          "series": 115,
+          "samples": 54480,
+          "raw_operand_unequal": 10997,
+          "parsed_binary64_unequal": 10997,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.3283064365386963e-09,
+          "max_rmse_delta": 5.090687930570946e-10
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All113 actualTimestep series54240values andcompletefive-environment dictionaries/metadata/bodyorder/clocks/footer/EOF.",
+          "MTR": "All2 actualFacilityHourly series240values inthesamefiveordered environments.",
+          "original_full_reported_B102_profile_rows": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "entire_original108_derived_policy": {
+            "path": ".runtime/object-expansion/unit108-prep/source-b-physical-pilot-proposal01/derived-policy.json",
+            "sha256": "ec5b92d8392cba423a87651cce1016cff38f516f666d65990ca15337991b9e1d",
+            "bytes": 33797
+          },
+          "all113_variable_and2meter_rules_literal_exact": true,
+          "numerical_limits_changed": false,
+          "qualification": "Original ORgate/serialbinary64SSE/actualcount/sqrtRMSE/alluncappedfailures; retainedBhumidity/scalarproducerqualifications, no scaling/resampling ornewnumeric/metadatawaiver."
+        },
+        "effective_state": "One bounded B NoLimit five-DD/120-hour composition changes only four ROOF and WALL Y0 Sun/Wind exposure strings. Same-engine accepted108 companions retain all 15 weather/Day forcing streams while exposed-face and demand-or-supply outputs change. Four other Outdoors NoSun/NoWind faces, 1000 W gain, availability, thermostats, geometry and all other input bytes remain. This observes joint Sun/Wind-to-surface/HVAC composition only. Separate Sun/Wind causality, private HAT/film/local wind/flow caches, arbitrary values/combinations and frozen CON-01 promotion remain outside the evidence.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 2,
+          "Native_reference_reuse": "Same successful Native109 input execution retained across the Source repair; no Native replay and no unrelated historical oracle.",
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "Source110_failed_attempts": 1,
+          "Source111_fresh_attempts": 1,
+          "Source111_accepted_attempts": 1,
+          "Source_image_reused": false,
+          "new_Source_builds": 1,
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit109-prep/accepted-quality.json",
+            "sha256": "e8060607c6f954429747f79898be1cb259ffcd71fa149bd03514227a5164aad4",
+            "bytes": 6072
+          },
+          "new_test_executions": 0,
+          "new_test_functions": 0,
+          "retained_first_quality": {
+            "path": ".runtime/object-expansion/unit109-prep/quality01/receipt.json",
+            "sha256": "23f2c30541c24f797f5beb7580bbd0332d466b3862f9bfced631b03f557ec79f",
+            "bytes": 5383
+          },
+          "independent_lint_correction_review": {
+            "path": ".runtime/object-expansion/unit109-prep/lint-correction-review01.json",
+            "sha256": "2de2072eb349e317a52bfa0b79154cef9d429043e5b24d2697b5e23d021cf769",
+            "bytes": 5913
+          },
+          "retained_first_Source_failure": {
+            "path": ".runtime/object-expansion/unit109-prep/root-source-first-failure01.json",
+            "sha256": "c1e8ceab46b9fbc7c8ce862000c38c7d2fa877c565710a8cb5f403c37496d728",
+            "bytes": 3449
+          },
+          "reviewed_Source110_to111_bridge": {
+            "path": ".runtime/object-expansion/unit109-prep/source110-to111-bridge01.json",
+            "sha256": "b5ff87b9c5d86410144f91f3eb2aaad41f2928e3ac72640aa83ae519562fd026",
+            "bytes": 12419
+          },
+          "publication108": {
+            "path": ".runtime/object-expansion/unit108-prep/publish01/receipt.json",
+            "sha256": "3c054e5d29de9740a3556c934140a56f92c1c315cf7f049a436e8c578b7a1ed9",
+            "bytes": 5085
+          },
+          "accepted108_NoLimit_companion": {
+            "ready": true,
+            "publication108": {
+              "path": ".runtime/object-expansion/unit108-prep/publish01/receipt.json",
+              "sha256": "3c054e5d29de9740a3556c934140a56f92c1c315cf7f049a436e8c578b7a1ed9",
+              "bytes": 5085
+            },
+            "readback": {
+              "path": ".runtime/object-expansion/unit108-prep/case1-actual-independent-readback02.json",
+              "sha256": "db3714cdbcf4f387528a6aa09c612bb99ac0e889058a3e6a67e471b5675a7bb4",
+              "bytes": 390787
+            },
+            "physical_peer": {
+              "path": ".runtime/object-expansion/unit108-prep/author-independent-actual-physical-peer01.json",
+              "sha256": "e26665b1a7285878fef7303c0d7e8bf31340eb1118944e4e113437b36243479d",
+              "bytes": 318567
+            }
+          }
+        },
+        "current_primary_observation": {
+          "input_objects": 168,
+          "raw_DesignDays": 5,
+          "timesteps_per_hour": 4,
+          "retained_authored_Day_objects": 13,
+          "raw_OutputVariable_requests": 108,
+          "raw_MeterFileOnly_requests": 2,
+          "reporting_environments": [
+            {
+              "kind_of_environment": 1,
+              "ordinal": 1,
+              "selected_by_primary_flags": true,
+              "title": "105 001 CLEAR SKY DEFAULT",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 2,
+              "selected_by_primary_flags": true,
+              "title": "105 002 ZH MULTIPLIERS",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 3,
+              "selected_by_primary_flags": true,
+              "title": "105 003 TAU DIFFERENCES",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 4,
+              "selected_by_primary_flags": true,
+              "title": "105 004 TAU2017 SHARED",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 5,
+              "selected_by_primary_flags": true,
+              "title": "105 005 SCHEDULE PROFILE RH",
+              "total_days": 1
+            }
+          ],
+          "actual_complete_reporting_hours": 120,
+          "actual_DD_reporting_hours": 120,
+          "weather_reporting_hours": 0,
+          "hours_cli_argument": null,
+          "actual_warmup_days": [
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "actual_first_owner_site_bindings": 9,
+          "actual_own_DD_input_operand_samples_per_engine": 864,
+          "actual_cross_environment_reset_samples_per_engine": 3456,
+          "actual_joint_sun_wind_activation": [
+            {
+              "engine": "Native",
+              "unchanged_forcing_series": 15,
+              "unchanged_forcing_sample_records": 7200,
+              "changed_exposed_face_series": 16,
+              "changed_exposed_face_sample_records": 7680,
+              "changed_demand_or_supply_series": 15,
+              "changed_demand_or_supply_sample_records": 4302,
+              "worst_actual_exposed_face": {
+                "key": "ROOF",
+                "name": "Surface Outside Face Conduction Heat Transfer Rate",
+                "units": "W",
+                "frequency": "Timestep",
+                "stage": "Zone",
+                "store": "Average",
+                "baseline_report_id": 66,
+                "exposed_report_id": 66,
+                "samples": 480,
+                "raw_operand_unequal": 480,
+                "parsed_binary64_unequal": 480,
+                "numerically_changed_samples": 480,
+                "max_abs_difference": 464.8722910170658,
+                "worst_actual": {
+                  "sample_index": 136,
+                  "clock": [
+                    "2",
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    "11",
+                    " 0.00",
+                    "15.00",
+                    "SummerDesignDay"
+                  ],
+                  "environment": {
+                    "environment_ordinal": 2,
+                    "environment_title": "105 002 ZH MULTIPLIERS",
+                    "local_clock_index": 40
+                  },
+                  "baseline108": "5.733659918988792",
+                  "exposed109": "-459.138631098077",
+                  "abs_delta": 464.8722910170658
+                }
+              },
+              "worst_actual_demand_or_supply": {
+                "key": "ZONE ONE IDEAL LOADS",
+                "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+                "units": "J",
+                "frequency": "Timestep",
+                "stage": "HVAC",
+                "store": "Sum",
+                "baseline_report_id": 214,
+                "exposed_report_id": 214,
+                "samples": 480,
+                "raw_operand_unequal": 394,
+                "parsed_binary64_unequal": 394,
+                "numerically_changed_samples": 394,
+                "max_abs_difference": 81738.5449606519,
+                "worst_actual": {
+                  "sample_index": 63,
+                  "clock": [
+                    "2",
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    "16",
+                    "45.00",
+                    "60.00",
+                    "SummerDesignDay"
+                  ],
+                  "environment": {
+                    "environment_ordinal": 1,
+                    "environment_title": "105 001 CLEAR SKY DEFAULT",
+                    "local_clock_index": 63
+                  },
+                  "baseline108": "758457.0947855756",
+                  "exposed109": "840195.6397462275",
+                  "abs_delta": 81738.5449606519
+                }
+              }
+            },
+            {
+              "engine": "Source",
+              "unchanged_forcing_series": 15,
+              "unchanged_forcing_sample_records": 7200,
+              "changed_exposed_face_series": 16,
+              "changed_exposed_face_sample_records": 7680,
+              "changed_demand_or_supply_series": 15,
+              "changed_demand_or_supply_sample_records": 4302,
+              "worst_actual_exposed_face": {
+                "key": "ROOF",
+                "name": "Surface Outside Face Conduction Heat Transfer Rate",
+                "units": "W",
+                "frequency": "Timestep",
+                "stage": "Zone",
+                "store": "Average",
+                "baseline_report_id": 66,
+                "exposed_report_id": 66,
+                "samples": 480,
+                "raw_operand_unequal": 480,
+                "parsed_binary64_unequal": 480,
+                "numerically_changed_samples": 480,
+                "max_abs_difference": 464.8722910170658,
+                "worst_actual": {
+                  "sample_index": 136,
+                  "clock": [
+                    "2",
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    "11",
+                    " 0.00",
+                    "15.00",
+                    "SummerDesignDay"
+                  ],
+                  "environment": {
+                    "environment_ordinal": 2,
+                    "environment_title": "105 002 ZH MULTIPLIERS",
+                    "local_clock_index": 40
+                  },
+                  "baseline108": "5.733659918988792",
+                  "exposed109": "-459.138631098077",
+                  "abs_delta": 464.8722910170658
+                }
+              },
+              "worst_actual_demand_or_supply": {
+                "key": "ZONE ONE IDEAL LOADS",
+                "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+                "units": "J",
+                "frequency": "Timestep",
+                "stage": "HVAC",
+                "store": "Sum",
+                "baseline_report_id": 214,
+                "exposed_report_id": 214,
+                "samples": 480,
+                "raw_operand_unequal": 394,
+                "parsed_binary64_unequal": 394,
+                "numerically_changed_samples": 394,
+                "max_abs_difference": 81738.54496065213,
+                "worst_actual": {
+                  "sample_index": 63,
+                  "clock": [
+                    "2",
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    "16",
+                    "45.00",
+                    "60.00",
+                    "SummerDesignDay"
+                  ],
+                  "environment": {
+                    "environment_ordinal": 1,
+                    "environment_title": "105 001 CLEAR SKY DEFAULT",
+                    "local_clock_index": 63
+                  },
+                  "baseline108": "758457.0947855748",
+                  "exposed109": "840195.639746227",
+                  "abs_delta": 81738.54496065213
+                }
+              }
+            }
+          ],
+          "public_CTF_coefficient_rows": 0,
+          "CTF_coefficient_report_requested": false,
+          "DXF_and_tabular_CSV_requested": false,
+          "strict_paired_absence_CTF_DXF_tabular": true,
+          "climatic_table_observed": false,
+          "public_climatic_value_cells": 0,
+          "whole_EIO_and_SHD_compared": true,
+          "actual_custody": {
+            "Native": {
+              "path": ".runtime/object-expansion/unit109-prep/root-native-custody01.json",
+              "sha256": "674663401c5865230e2983bb780db14539b8e4bb4876462d00ecddfc00d3206a",
+              "bytes": 1218
+            },
+            "Source": {
+              "path": ".runtime/object-expansion/unit109-prep/root-source-custody02.json",
+              "sha256": "2fd02fe52a780aa54327082ebdee7fe5b662a5227390167762dbd3110eba8c61",
+              "bytes": 2796
+            },
+            "Source_completion": {
+              "path": ".runtime/object-expansion/unit109-prep/root-source-completion02.json",
+              "sha256": "4247d2ff4f2bf6eb3b2ac296b29001336ed3c766daf384330c55dd3e1750394b",
+              "bytes": 2244
+            }
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit109-prep/actual-independent-readback01.json",
+            "sha256": "548f285aebeb318aa299f1b61c228463b3d35e953098d56691ff5d082f52df7d",
+            "bytes": 516420
+          },
+          "independent_full_actual_physical_and_activation_peer": {
+            "path": ".runtime/object-expansion/unit109-prep/physical-peer01/actual-physical-peer01.json",
+            "sha256": "38f150f117b39adaecd1163f5589a87483e96a11cbe96e84e194dea42af38a7b",
+            "bytes": 537257
+          },
+          "single_Zone_not_in_multizone_totals": true,
+          "source_runtime_class": "ideal-loads-direct-zone-coupled-compatibility",
+          "Source_scope_trace": {
+            "path": ".runtime/porting/source-b-exposed-surface-109/source-02/output/porting_scope.json",
+            "sha256": "76433451c38b7f8030eaff76a2ba81df614fc9c8055c564e0d7b6d6cffaeb340",
+            "bytes": 6890
+          },
+          "private_owners_and_complete_trajectories_observed": false
+        }
       }
     ],
     "totals": {
-      "paired_cases": 161,
-      "reported_samples": 4517022,
-      "raw_operand_unequal": 983232,
+      "paired_cases": 162,
+      "reported_samples": 4571502,
+      "raw_operand_unequal": 994229,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -48357,6 +48787,23 @@
           "sha256": "b5413523162e8a283bc46c1241d514725d710fa3c090086dffd9b5f49b0fce95",
           "bytes": 80110504
         }
+      },
+      {
+        "id": "source-b-positive-general-shadows-109",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-111/receipt.json",
+          "sha256": "1ee4fc371e97e9530559f484b1fe6e552079e36620f16ba7c507316eebdf0348",
+          "bytes": 6769
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1d/1dc224fa75acecc602026c87e77ea21d07f1b92a6dce481f378129083391adf5",
+          "sha256": "1dc224fa75acecc602026c87e77ea21d07f1b92a6dce481f378129083391adf5"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-111/eplus-rs.exe",
+          "sha256": "51bc350ee00de9835474e61dfc0c3cfdf0b49b538a8d54849fb661d317498024",
+          "bytes": 80307809
+        }
       }
     ],
     "focused_since_workspace": {
@@ -48562,17 +49009,54 @@
         "admitted_cases": 0,
         "admitted_samples": 0,
         "classification": "Actual first Source execution reached endrun after96 clocks but failed on real positive Electric VeriSum ZonePtr. Partial outputs remain unchanged/unaccepted; no completed-footer claim."
+      },
+      {
+        "unit": 109,
+        "scope": "B",
+        "source_build": "source-b-active-design-days-108",
+        "build_row": {
+          "path": ".runtime/object-expansion/build110-row.json",
+          "sha256": "305021e3953393453c424bc2a53619115d251d17fc2c1d2593c37e6a4d292f3c",
+          "bytes": 682
+        },
+        "Source_launch": {
+          "path": ".runtime/porting/source-b-exposed-surface-109/source-01/launch/launch.json",
+          "sha256": "d9a0c7d7d578c008dfc9bb334e100521eaa3b8e7eb9101b071bdf98b1438edb5",
+          "bytes": 16772
+        },
+        "actual_Source_receipt": {
+          "path": ".runtime/porting/source-b-exposed-surface-109/source-01/command/receipt.json",
+          "sha256": "75ee8be01ea5329d520ba1ee27f6c9cd3a1a40f415f6e264d1e0edeb04cbd0c4",
+          "bytes": 7619
+        },
+        "failed_summary": {
+          "path": ".runtime/porting/source-b-exposed-surface-109/source-01/output/run-summary.json",
+          "sha256": "145b930764151eb101abfc9270b534a2aabf83e785b53f26930131a1776af1dc",
+          "bytes": 24680
+        },
+        "retained_failure": {
+          "path": ".runtime/object-expansion/unit109-prep/root-source-first-failure01.json",
+          "sha256": "c1e8ceab46b9fbc7c8ce862000c38c7d2fa877c565710a8cb5f403c37496d728",
+          "bytes": 3449
+        },
+        "actual_Source_executions": 1,
+        "exit_code": 6,
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "build_already_has_accepted108_pairs": true,
+        "classification": "First exposed109 Source110 invocation reached genuine positive general-caster SHADOW and failed on an unavailable polygon child. Build110 retains its accepted108 pairs; this failed109 attempt adds no accepted case/sample and no additional build row. Retained Native109 is paired only after repaired Source111 completes and passes."
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 106,
-      "builds_with_accepted_paired_cases": 99,
+      "actual_recorded_builds": 107,
+      "builds_with_accepted_paired_cases": 100,
       "builds_with_only_retained_failed_Source_attempts": 3,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 6,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "106 recorded Source builds:99 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
+      "qualification": "107 recorded Source builds:100 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 2,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 1,
@@ -51369,6 +51853,277 @@
       "NoSunNoWind_all6_surfaces": true,
       "solar_to_B_surface_HVAC_effect_observed": false,
       "case_and_build_and_test_accounting_counted_once": true
+    },
+    "current_SourceB_joint_sun_wind_surface_HVAC_live_pair": {
+      "source_build": "source-b-positive-general-shadows-109",
+      "actual_Source_build": {
+        "path": ".runtime/object-expansion/build111-row.json",
+        "sha256": "682d0c13067de3c39578052b86ccdc8bd0b6427264fb026cbdc40aa996fb84a4",
+        "bytes": 688
+      },
+      "actual_quality": {
+        "path": ".runtime/object-expansion/unit109-prep/accepted-quality.json",
+        "sha256": "e8060607c6f954429747f79898be1cb259ffcd71fa149bd03514227a5164aad4",
+        "bytes": 6072
+      },
+      "case_rows": [
+        "B-NOLIMIT-FIVE-SOLAR-EXPOSED-SURFACES-109-120H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit109-prep/actual-independent-readback01.json",
+        "sha256": "548f285aebeb318aa299f1b61c228463b3d35e953098d56691ff5d082f52df7d",
+        "bytes": 516420
+      },
+      "independent_actual_full_physical_and_activation_peer": {
+        "path": ".runtime/object-expansion/unit109-prep/physical-peer01/actual-physical-peer01.json",
+        "sha256": "38f150f117b39adaecd1163f5589a87483e96a11cbe96e84e194dea42af38a7b",
+        "bytes": 537257
+      },
+      "actual_custody": {
+        "Native": {
+          "path": ".runtime/object-expansion/unit109-prep/root-native-custody01.json",
+          "sha256": "674663401c5865230e2983bb780db14539b8e4bb4876462d00ecddfc00d3206a",
+          "bytes": 1218
+        },
+        "Source": {
+          "path": ".runtime/object-expansion/unit109-prep/root-source-custody02.json",
+          "sha256": "2fd02fe52a780aa54327082ebdee7fe5b662a5227390167762dbd3110eba8c61",
+          "bytes": 2796
+        },
+        "Source_completion": {
+          "path": ".runtime/object-expansion/unit109-prep/root-source-completion02.json",
+          "sha256": "4247d2ff4f2bf6eb3b2ac296b29001336ed3c766daf384330c55dd3e1750394b",
+          "bytes": 2244
+        }
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit109-prep/source-b-exposed-surface-pilot-proposal02/proposal.json",
+        "sha256": "21391372d18493dd1fea8fa3c788a92fcdb20c72dce00e18f1d7a82bd039da59",
+        "bytes": 8370
+      },
+      "publication108": {
+        "path": ".runtime/object-expansion/unit108-prep/publish01/receipt.json",
+        "sha256": "3c054e5d29de9740a3556c934140a56f92c1c315cf7f049a436e8c578b7a1ed9",
+        "bytes": 5085
+      },
+      "accepted108_NoLimit_companion": {
+        "ready": true,
+        "publication108": {
+          "path": ".runtime/object-expansion/unit108-prep/publish01/receipt.json",
+          "sha256": "3c054e5d29de9740a3556c934140a56f92c1c315cf7f049a436e8c578b7a1ed9",
+          "bytes": 5085
+        },
+        "readback": {
+          "path": ".runtime/object-expansion/unit108-prep/case1-actual-independent-readback02.json",
+          "sha256": "db3714cdbcf4f387528a6aa09c612bb99ac0e889058a3e6a67e471b5675a7bb4",
+          "bytes": 390787
+        },
+        "physical_peer": {
+          "path": ".runtime/object-expansion/unit108-prep/author-independent-actual-physical-peer01.json",
+          "sha256": "e26665b1a7285878fef7303c0d7e8bf31340eb1118944e4e113437b36243479d",
+          "bytes": 318567
+        }
+      },
+      "retained_first_Source110_failure": {
+        "path": ".runtime/object-expansion/unit109-prep/root-source-first-failure01.json",
+        "sha256": "c1e8ceab46b9fbc7c8ce862000c38c7d2fa877c565710a8cb5f403c37496d728",
+        "bytes": 3449
+      },
+      "reviewed_Source110_to111_bridge": {
+        "path": ".runtime/object-expansion/unit109-prep/source110-to111-bridge01.json",
+        "sha256": "b5ff87b9c5d86410144f91f3eb2aaad41f2928e3ac72640aa83ae519562fd026",
+        "bytes": 12419
+      },
+      "retained_first_quality": {
+        "path": ".runtime/object-expansion/unit109-prep/quality01/receipt.json",
+        "sha256": "23f2c30541c24f797f5beb7580bbd0332d466b3862f9bfced631b03f557ec79f",
+        "bytes": 5383
+      },
+      "independent_lint_correction_review": {
+        "path": ".runtime/object-expansion/unit109-prep/lint-correction-review01.json",
+        "sha256": "2de2072eb349e317a52bfa0b79154cef9d429043e5b24d2697b5e23d021cf769",
+        "bytes": 5913
+      },
+      "actual_joint_activation": [
+        {
+          "engine": "Native",
+          "unchanged_forcing_series": 15,
+          "unchanged_forcing_sample_records": 7200,
+          "changed_exposed_face_series": 16,
+          "changed_exposed_face_sample_records": 7680,
+          "changed_demand_or_supply_series": 15,
+          "changed_demand_or_supply_sample_records": 4302,
+          "worst_actual_exposed_face": {
+            "key": "ROOF",
+            "name": "Surface Outside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "stage": "Zone",
+            "store": "Average",
+            "baseline_report_id": 66,
+            "exposed_report_id": 66,
+            "samples": 480,
+            "raw_operand_unequal": 480,
+            "parsed_binary64_unequal": 480,
+            "numerically_changed_samples": 480,
+            "max_abs_difference": 464.8722910170658,
+            "worst_actual": {
+              "sample_index": 136,
+              "clock": [
+                "2",
+                "1",
+                " 7",
+                "21",
+                " 0",
+                "11",
+                " 0.00",
+                "15.00",
+                "SummerDesignDay"
+              ],
+              "environment": {
+                "environment_ordinal": 2,
+                "environment_title": "105 002 ZH MULTIPLIERS",
+                "local_clock_index": 40
+              },
+              "baseline108": "5.733659918988792",
+              "exposed109": "-459.138631098077",
+              "abs_delta": 464.8722910170658
+            }
+          },
+          "worst_actual_demand_or_supply": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "stage": "HVAC",
+            "store": "Sum",
+            "baseline_report_id": 214,
+            "exposed_report_id": 214,
+            "samples": 480,
+            "raw_operand_unequal": 394,
+            "parsed_binary64_unequal": 394,
+            "numerically_changed_samples": 394,
+            "max_abs_difference": 81738.5449606519,
+            "worst_actual": {
+              "sample_index": 63,
+              "clock": [
+                "2",
+                "1",
+                " 7",
+                "21",
+                " 0",
+                "16",
+                "45.00",
+                "60.00",
+                "SummerDesignDay"
+              ],
+              "environment": {
+                "environment_ordinal": 1,
+                "environment_title": "105 001 CLEAR SKY DEFAULT",
+                "local_clock_index": 63
+              },
+              "baseline108": "758457.0947855756",
+              "exposed109": "840195.6397462275",
+              "abs_delta": 81738.5449606519
+            }
+          }
+        },
+        {
+          "engine": "Source",
+          "unchanged_forcing_series": 15,
+          "unchanged_forcing_sample_records": 7200,
+          "changed_exposed_face_series": 16,
+          "changed_exposed_face_sample_records": 7680,
+          "changed_demand_or_supply_series": 15,
+          "changed_demand_or_supply_sample_records": 4302,
+          "worst_actual_exposed_face": {
+            "key": "ROOF",
+            "name": "Surface Outside Face Conduction Heat Transfer Rate",
+            "units": "W",
+            "frequency": "Timestep",
+            "stage": "Zone",
+            "store": "Average",
+            "baseline_report_id": 66,
+            "exposed_report_id": 66,
+            "samples": 480,
+            "raw_operand_unequal": 480,
+            "parsed_binary64_unequal": 480,
+            "numerically_changed_samples": 480,
+            "max_abs_difference": 464.8722910170658,
+            "worst_actual": {
+              "sample_index": 136,
+              "clock": [
+                "2",
+                "1",
+                " 7",
+                "21",
+                " 0",
+                "11",
+                " 0.00",
+                "15.00",
+                "SummerDesignDay"
+              ],
+              "environment": {
+                "environment_ordinal": 2,
+                "environment_title": "105 002 ZH MULTIPLIERS",
+                "local_clock_index": 40
+              },
+              "baseline108": "5.733659918988792",
+              "exposed109": "-459.138631098077",
+              "abs_delta": 464.8722910170658
+            }
+          },
+          "worst_actual_demand_or_supply": {
+            "key": "ZONE ONE IDEAL LOADS",
+            "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+            "units": "J",
+            "frequency": "Timestep",
+            "stage": "HVAC",
+            "store": "Sum",
+            "baseline_report_id": 214,
+            "exposed_report_id": 214,
+            "samples": 480,
+            "raw_operand_unequal": 394,
+            "parsed_binary64_unequal": 394,
+            "numerically_changed_samples": 394,
+            "max_abs_difference": 81738.54496065213,
+            "worst_actual": {
+              "sample_index": 63,
+              "clock": [
+                "2",
+                "1",
+                " 7",
+                "21",
+                " 0",
+                "16",
+                "45.00",
+                "60.00",
+                "SummerDesignDay"
+              ],
+              "environment": {
+                "environment_ordinal": 1,
+                "environment_title": "105 001 CLEAR SKY DEFAULT",
+                "local_clock_index": 63
+              },
+              "baseline108": "758457.0947855748",
+              "exposed109": "840195.639746227",
+              "abs_delta": 81738.54496065213
+            }
+          }
+        }
+      ],
+      "new_test_executions": 0,
+      "new_test_functions": 0,
+      "new_builds": 1,
+      "actual_fresh_Native_executions": 1,
+      "actual_fresh_Source_executions": 2,
+      "actual_Source110_failed_attempts": 1,
+      "actual_Source111_attempts": 1,
+      "actual_Source111_accepted_attempts": 1,
+      "Native_reference_retained_from_same109": true,
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "scope": "One bounded B NoLimit five-DD/120-hour composition changes only four ROOF and WALL Y0 Sun/Wind exposure strings. Same-engine accepted108 companions retain all 15 weather/Day forcing streams while exposed-face and demand-or-supply outputs change. Four other Outdoors NoSun/NoWind faces, 1000 W gain, availability, thermostats, geometry and all other input bytes remain. This observes joint Sun/Wind-to-surface/HVAC composition only. Separate Sun/Wind causality, private HAT/film/local wind/flow caches, arbitrary values/combinations and frozen CON-01 promotion remain outside the evidence."
     }
   },
   "additional_native_type_calibrations": [

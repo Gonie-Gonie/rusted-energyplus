@@ -99,15 +99,24 @@ impl GainFactory {
         // shadow-combination readiness replacement. The true SkyDif runs whole.
         self.radiation.solar_timestep.calc_sky_dif_shading = true;
         let transmittance_varies = self.geometry.shading_transmittance_varies;
+        let diagnostic_flags = hb::error_backend::SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &project.system.developer_flag,
+            warmup: &self.weather.global.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
         self.radiation
             .source_sky_diffuse_solar_shading(
                 &mut self.geometry,
                 control,
                 &self.weather.global,
-                shadowing.detailed_sky_diffuse_algorithm,
+                shadowing,
+                &project.system.shadowing_clipping,
+                globals,
                 transmittance_varies,
                 &mut children,
                 &mut backend,
+                &diagnostic_flags,
             )
             .map_err(|error| {
                 invalid(&format!(
@@ -158,6 +167,23 @@ impl GainFactory {
     }
 
     pub(crate) fn actual_figure(&mut self) -> Result {
+        let project = self
+            .reports
+            .selected_project_data
+            .as_ref()
+            .ok_or("same Project")?;
+        let globals = self
+            .reports
+            .selected_heat_balance_globals
+            .as_ref()
+            .ok_or("same globals")?;
+        let mut backend = error_backend(&mut self.error_state, &mut self.errors, &mut self.console);
+        let diagnostic_flags = hb::error_backend::SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &project.system.developer_flag,
+            warmup: &self.weather.global.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
         self.radiation.source_figure_solar_beam_at_timestep(
             &mut self.geometry,
             &self.reports.heat_balance_input_state,
@@ -166,8 +192,12 @@ impl GainFactory {
                 .shadowing_input
                 .as_ref()
                 .ok_or("same shadowing input owner")?,
+            &project.system.shadowing_clipping,
+            globals,
             usize::try_from(self.weather.global.hour_of_day)?,
             usize::try_from(self.weather.global.time_step)?,
+            &mut backend,
+            &diagnostic_flags,
         )?;
         Ok(())
     }

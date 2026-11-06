@@ -1,5 +1,10 @@
 //! Actual Source Perez components and 6x24 diffuse sky integration.
 use super::*;
+use crate::heat_balance::error_backend::SourceDiagnosticFlags;
+use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+use crate::heat_balance::selected_heat_balance_input::shadowing::{
+    ShadowingSystemSettings, SourceShadowingInput,
+};
 use std::f64::consts::PI;
 
 const EPS: f64 = 1.0e-10;
@@ -240,13 +245,16 @@ impl OrdinarySolarRadiation {
         geometry: &mut SurfaceGeometryInputState,
         control: &SelectedHeatBalanceInputState,
         globals: &WeatherGlobalState,
-        detailed_sky_diffuse: bool,
+        shadowing: &SourceShadowingInput,
+        clipping: &ShadowingSystemSettings,
+        hb_globals: &SelectedHeatBalanceGlobals,
         shading_transmittance_varies: bool,
         children: &mut dyn SourceSolarChildren,
         backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: &SourceDiagnosticFlags<'_>,
     ) -> Result<(), Error> {
         let count = surface_count(geometry)?;
-        let detailed = detailed_sky_diffuse
+        let detailed = shadowing.detailed_sky_diffuse_algorithm
             && shading_transmittance_varies
             && control.solar_distribution != SelectedSolarDistribution::Minimal;
         self.solar_timestep.shading.surf_sunlit_area.fill(0.0)?;
@@ -353,7 +361,16 @@ impl OrdinarySolarRadiation {
                         .surf_sun_cos_theta
                         .set([number], cosine)?;
                 }
-                self.source_shadow(geometry, 24, 0)?;
+                self.source_shadow(
+                    geometry,
+                    shadowing,
+                    clipping,
+                    hb_globals,
+                    24,
+                    0,
+                    backend,
+                    diagnostic_flags,
+                )?;
                 for &number in &geometry.surface_lists.all_exterior_solar_and_shading {
                     let number = ordinal(number)?;
                     let cosine = self

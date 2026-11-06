@@ -1,7 +1,11 @@
 //! Actual MinimalShadowing combination, SHADOW and period SUN3/SUN4 producers.
 use super::state::SourceShadowCombination;
 use super::*;
-use crate::heat_balance::selected_heat_balance_input::shadowing::SourceShadowingInput;
+use crate::heat_balance::error_backend::SourceDiagnosticFlags;
+use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+use crate::heat_balance::selected_heat_balance_input::shadowing::{
+    ShadowingSystemSettings, SourceShadowingInput,
+};
 use std::f64::consts::PI;
 
 fn sun3(day: i32) -> (f64, f64) {
@@ -201,76 +205,6 @@ impl OrdinarySolarRadiation {
         Ok(())
     }
 
-    pub(crate) fn source_shadow(
-        &mut self,
-        geometry: &SurfaceGeometryInputState,
-        _hour: usize,
-        _step: usize,
-    ) -> Result<(), Error> {
-        if self.solar_timestep.shadow_one_time_flag {
-            let vertices = geometry.coordinate.max_vertices_per_surface + 1;
-            self.solar_timestep.x_vrt.dimension([vertices], None)?;
-            self.solar_timestep.y_vrt.dimension([vertices], None)?;
-            self.solar_timestep.z_vrt.dimension([vertices], None)?;
-            self.solar_timestep.x_vrt.fill(0.0)?;
-            self.solar_timestep.y_vrt.fill(0.0)?;
-            self.solar_timestep.z_vrt.fill(0.0)?;
-            self.solar_timestep.shadow_one_time_flag = false;
-        }
-        self.solar_timestep.shading.surf_sunlit_area.fill(0.0)?;
-        for number in 1..=surface_count(geometry)? {
-            let combination = self
-                .solar_timestep
-                .shadow_combinations
-                .as_ref()
-                .and_then(|rows| rows.get(number - 1))
-                .ok_or(Error::Unavailable("actual ShadowComb allocation"))?;
-            if !combination.use_this_surface {
-                continue;
-            }
-            self.solar_timestep
-                .shading
-                .surf_sunlit_area
-                .set([number], 0.0)?;
-            let general = combination.num_gen_surface;
-            self.solar_timestep.ngsshc = 0;
-            let back = combination.num_back_surface;
-            self.solar_timestep.nbkshc = 0;
-            let sub = combination.num_sub_surface;
-            self.solar_timestep.nrvlhc = 0;
-            self.solar_timestep.nsbshc = 0;
-            self.solar_timestep.lochca = 1;
-            if self
-                .solar_timestep
-                .shading
-                .surf_sun_cos_theta
-                .read([number])?
-                < 0.00001
-            {
-                self.solar_timestep
-                    .shading
-                    .surf_sunlit_area
-                    .set([number], 0.0)?;
-                // Actual SHDSBS9302 does nothing iff NSBS<=0. Neither a clock
-                // nor an admission boolean is used as the subsurface count.
-                if sub > 0 {
-                    return Err(Error::Unavailable("SHDSBS reached positive NSBS"));
-                }
-                let _ = back;
-            } else if general <= 0 && sub <= 0 {
-                self.solar_timestep.shading.surf_sunlit_area.set(
-                    [number],
-                    source_surface(geometry, number)?.net_area_shadow_calc,
-                )?;
-            } else {
-                return Err(Error::Unavailable(
-                    "SHADOW reached polygon or subsurface child",
-                ));
-            }
-        }
-        Ok(())
-    }
-
     fn source_sun4(
         &mut self,
         time: f64,
@@ -304,11 +238,15 @@ impl OrdinarySolarRadiation {
         globals: &WeatherGlobalState,
         environment: &WeatherEnvironmentState,
         shadowing: &SourceShadowingInput,
+        clipping: &ShadowingSystemSettings,
+        hb_globals: &SelectedHeatBalanceGlobals,
         kickoff_sizing: bool,
         kickoff_simulation: bool,
         equation: f64,
         sin_declination: f64,
         cos_declination: f64,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: &SourceDiagnosticFlags<'_>,
     ) -> Result<(), Error> {
         if self.solar_timestep.init_complex_once {
             self.source_init_complex_windows()?;
@@ -516,7 +454,16 @@ impl OrdinarySolarRadiation {
         for &hour in &hours {
             for &step in &time_steps {
                 self.source_figure_solar_beam_at_timestep(
-                    geometry, control, globals, shadowing, hour, step,
+                    geometry,
+                    control,
+                    globals,
+                    shadowing,
+                    clipping,
+                    hb_globals,
+                    hour,
+                    step,
+                    backend,
+                    diagnostic_flags,
                 )?;
             }
         }
@@ -532,8 +479,12 @@ impl OrdinarySolarRadiation {
         control: &SelectedHeatBalanceInputState,
         globals: &WeatherGlobalState,
         shadowing: &SourceShadowingInput,
+        clipping: &ShadowingSystemSettings,
+        hb_globals: &SelectedHeatBalanceGlobals,
         hour: usize,
         step: usize,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: &SourceDiagnosticFlags<'_>,
     ) -> Result<(), Error> {
         let count = surface_count(geometry)?;
         let steps = ordinal(globals.time_steps_in_hour)?;
@@ -564,7 +515,16 @@ impl OrdinarySolarRadiation {
         }
         // SourceShadingMethod currently has exactly the real admitted
         // PolygonClipping variant; Scheduled/Imported remain input-bound.
-        self.source_shadow(geometry, hour, step)?;
+        self.source_shadow(
+            geometry,
+            shadowing,
+            clipping,
+            hb_globals,
+            hour,
+            step,
+            backend,
+            diagnostic_flags,
+        )?;
         for number in 1..=count {
             let surface = source_surface(geometry, number)?;
             if surface.area >= 1.0e-10 {
@@ -638,10 +598,13 @@ impl OrdinarySolarRadiation {
         globals: &WeatherGlobalState,
         environment: &WeatherEnvironmentState,
         shadowing: &SourceShadowingInput,
+        clipping: &ShadowingSystemSettings,
+        hb_globals: &SelectedHeatBalanceGlobals,
         kickoff_sizing: bool,
         kickoff_simulation: bool,
         children: &mut dyn SourceSolarChildren,
         backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: &SourceDiagnosticFlags<'_>,
     ) -> Result<(), Error> {
         if globals.begin_sim_flag {
             self.solar_timestep.calc_sky_dif_shading = true;
@@ -650,10 +613,13 @@ impl OrdinarySolarRadiation {
                 geometry,
                 control,
                 globals,
-                shadowing.detailed_sky_diffuse_algorithm,
+                shadowing,
+                clipping,
+                hb_globals,
                 transmittance_varies,
                 children,
                 backend,
+                diagnostic_flags,
             )?;
             self.solar_timestep.calc_sky_dif_shading = false;
         }
@@ -704,11 +670,15 @@ impl OrdinarySolarRadiation {
                 globals,
                 environment,
                 shadowing,
+                clipping,
+                hb_globals,
                 kickoff_sizing,
                 kickoff_simulation,
                 equation,
                 sin_declination,
                 cos_declination,
+                backend,
+                diagnostic_flags,
             )?;
             if control.calculate_solar_reflections {
                 return Err(Error::Unavailable(

@@ -9,6 +9,8 @@ mod heat_gain;
 mod initialization;
 mod opaque_exterior;
 mod period;
+mod polygon_overlap;
+mod shadow_driver;
 mod sky;
 pub(crate) mod state;
 use super::OrdinarySolarRadiation;

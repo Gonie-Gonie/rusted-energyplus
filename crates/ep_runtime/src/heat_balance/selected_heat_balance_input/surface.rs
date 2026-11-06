@@ -125,6 +125,8 @@ pub(crate) struct SurfaceTmpInput {
     pub(crate) is_air_boundary_surface: bool,
     pub(crate) is_shadow_possible_obstruction: bool,
     pub(crate) is_shadowing: bool,
+    /// SurfaceData.hh841 constructor0; positive authored shade schedule getters stay excluded.
+    pub(crate) sched_min_value: f64,
     pub(crate) shape: crate::geometry::SourceProcessShape,
     pub(crate) vertices_processed: bool,
     pub(crate) x_shift: f64,
@@ -174,6 +176,7 @@ impl Default for SurfaceTmpInput {
             is_air_boundary_surface: Default::default(),
             is_shadow_possible_obstruction: Default::default(),
             is_shadowing: Default::default(),
+            sched_min_value: 0.0,
             shape: Default::default(),
             vertices_processed: Default::default(),
             x_shift: Default::default(),

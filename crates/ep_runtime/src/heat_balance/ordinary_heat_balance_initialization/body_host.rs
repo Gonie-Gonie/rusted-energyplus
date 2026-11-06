@@ -115,6 +115,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 environment: o.environment,
                 weather_owner: o.weather,
                 shadowing: o.shadowing,
+                project: o.project,
                 materials: o.materials,
                 bounds: &o.startup.construction_bounds,
                 input: o.input,

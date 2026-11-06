@@ -30,6 +30,8 @@ pub(crate) struct SourceInitHeatBalanceOwners<'a, 'b> {
     pub(crate) environment: &'a mut WeatherEnvironmentState,
     pub(crate) weather_owner: &'a WeatherOwnerState,
     pub(crate) shadowing: &'a SourceShadowingInput,
+    /// Reborrow the sole process/getter clipping settings for this InitHB call.
+    pub(crate) project: &'a crate::heat_balance::selected_project_data::SelectedProjectData,
     pub(crate) materials: &'a SelectedMaterialData,
     pub(crate) bounds: &'a SelectedConstructionBounds,
     pub(crate) input: &'a mut SelectedInputProcessor,

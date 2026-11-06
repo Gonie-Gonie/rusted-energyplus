@@ -429,6 +429,7 @@ fn allocate(
             environment: &mut f.weather.environment,
             weather_owner: &f.weather.weather,
             shadowing: &shadowing,
+            project: &f.project,
             materials: &f.ancillary.selected_material_data,
             bounds: &f.startup.construction_bounds,
             input: &mut f.input,

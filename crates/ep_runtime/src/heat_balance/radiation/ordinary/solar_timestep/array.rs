@@ -34,8 +34,9 @@ impl<T: Copy, const N: usize> SourceSolarArray<T, N> {
             .ok_or(Error::Unavailable("actual Source Solar array allocation"))?;
         let mut offset = 0;
         let mut stride = 1;
-        // ObjexxFCL first dimension varies fastest. Source ordinal arguments
-        // remain one-based; a zero extent is allocated and contains no values.
+        // Internal backing stride; callers preserve logical one-based Source
+        // ordinals. Native Array2 tuned linear loops must use logical [NS,N]
+        // here: Native's second index varies fastest. Zero extents stay empty.
         for axis in 0..N {
             if indices[axis] == 0 || indices[axis] > dimensions[axis] {
                 return Err(Error::Unavailable("actual Source Solar ordinal bounds"));
