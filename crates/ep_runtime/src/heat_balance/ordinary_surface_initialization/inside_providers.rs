@@ -19,6 +19,8 @@ use ep_model::ReportInputs;
 /// The same controller used by InitSurface473 is borrowed after that call.
 /// Constructor limits/clock/globals remain in the caller's actual live owners.
 pub(crate) struct SourceOrdinaryInsideCtfHost<'a> {
+    pub(crate) physical:
+        &'a [crate::heat_balance::convection::surface_environment::source_rows::SourceSurfaceOutdoorState],
     pub(crate) convection: &'a mut SourceInsideConvection,
     pub(crate) equipment: &'a mut OrdinaryEquipment,
     pub(crate) constructions: &'a SelectedHeatBalanceInputState,
@@ -68,6 +70,7 @@ impl SourceInsideCtfProviders for SourceOrdinaryInsideCtfHost<'_> {
             self.reports,
             self.scan,
             crate::heat_balance::inside_convection_dispatcher::source::SourceInsideConvectionPropertyOwners {
+                physical: self.physical,
                 environment: self.environment, hvac: self.hvac,
                 psychrometrics: self.psychrometrics, recurring: self.recurring_errors,
                 developer: self.developer,

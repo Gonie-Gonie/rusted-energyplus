@@ -80,6 +80,10 @@ impl SourceRealOutputOwners for SourceSurfaceOutputOwners<'_> {
                 .surf_temp_out
                 .as_ref()
                 .and_then(|values| values.get(i)),
+            SourceSurfaceOutputField::SurfHConvInt => arrays
+                .surf_h_conv_int
+                .as_ref()
+                .and_then(|values| values.get(i)),
             SourceSurfaceOutputField::SurfOpaqInsFaceCond => self
                 .history
                 .flux_reports

@@ -801,6 +801,7 @@ fn validate_typed_scope(
             InsideSurfaceConvectionAlgorithm::Simple
                 | InsideSurfaceConvectionAlgorithm::Tarp
                 | InsideSurfaceConvectionAlgorithm::CeilingDiffuser
+                | InsideSurfaceConvectionAlgorithm::AstmC1340
         ) || !matches!(
             zone.outside_convection_algorithm.effective(),
             OutsideSurfaceConvectionAlgorithm::SimpleCombined
@@ -808,7 +809,7 @@ fn validate_typed_scope(
                 | OutsideSurfaceConvectionAlgorithm::MoWitt
                 | OutsideSurfaceConvectionAlgorithm::Doe2
         ) {
-            violations.push("selected effective Zone convection requires Simple/TARP/CeilingDiffuser inside and a nonadaptive outside algorithm".into());
+            violations.push("selected effective Zone convection requires Simple/TARP/CeilingDiffuser/ASTMC1340 inside and a nonadaptive outside algorithm".into());
         }
     }
     for surface in &model.surfaces {

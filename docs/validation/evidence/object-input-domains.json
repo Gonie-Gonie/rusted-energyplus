@@ -54,7 +54,8 @@
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
         "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
       "Ten named Surface Outside Face Sunlit Fraction requests join all 105 inherited multizone requests. All 115 real Timestep series/11,040 values retain strict scalar policy and actual ReportID, owner and clock bindings in ESO and Source JSON/CSV; meters are genuinely absent. Other producers and full-object combinations remain bounded.",
-      "Thirty named obstruction-reflection W/m2 requests retain actual Zone/Average/Timestep owners and original A policy6 limits alongside 115 literal inherited rules. All 145 series and 13,920 values pass complete ESO and Source JSON/CSV joins; all 30 new series match exactly. Meters are genuinely absent; other producers and full-object combinations remain bounded."
+      "Thirty named obstruction-reflection W/m2 requests retain actual Zone/Average/Timestep owners and original A policy6 limits alongside 115 literal inherited rules. All 145 series and 13,920 values pass complete ESO and Source JSON/CSV joins; all 30 new series match exactly. Meters are genuinely absent; other producers and full-object combinations remain bounded.",
+      "Six named Surface Inside Face Convection Heat Transfer Coefficient requests read the sole live SurfHConvInt cells as Zone/Average/Timestep W/m2-K. Their new explicit atol/RMSE1e-9, rtol0 rules leave113 inherited variable and2 meter rules unchanged. One Source B five-DesignDay case passes119 Timestep ESO plus2 genuine Hourly MTR series/57,360 values, with complete Source JSON/CSV owner-clock joins. No sealed policy, unit waiver or full-object promotion is introduced."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -102,11 +103,12 @@
       "lossless actual Zone selection; SetByZone resolution preserves stored surface model identity",
       "actual Simple threshold/sign correlation with per-Space MAT and outward cosine",
       "sole live SurfHConvInt raw write, unconditional Source max and separate caller lower-limit read; no global high cap",
-      "Simple/TARP/CeilingDiffuser validated Source admission; genuine ASTMC1340/adaptive/surface-local/user/EMS/Kiva/window children and legacy arbitrary execution remain bounded",
+      "Simple/TARP/CeilingDiffuser/ASTMC1340 validated Source admission; adaptive, surface-local/user/EMS/Kiva/window children and legacy arbitrary execution remain bounded",
       "CeilingDiffuser executes genuine GetUser then mutable live-Zone NodeCheck/fallback, refreshed views, whole-Zone prepass and ordinary per-surface no-op; actual MAT/humidity, physical Node temperature/mass flow, weather pressure, volume and multipliers are borrowed",
       "exact nested Psat/dew-point/density calls precede the minimum-flow gate, retaining one real cache/error-index/work-string owner, live recurring/timestamp/optional effects and negative-density Fatal order",
       "floor/ceiling/wall forced correlations, low-ACH natural/blended branch and sole lower clamp preserve Original conditions; forced ACH>=3 returns before the natural window child",
-      "same-input B102 actual Source completes9792 samples and true deleted-empty MTR lifecycle; both reported Node owners show21zero/75positive averages, without claiming exact earlier ACH branch counts"
+      "same-input B102 actual Source completes9792 samples and true deleted-empty MTR lifecycle; both reported Node owners show21zero/75positive averages, without claiming exact earlier ACH branch counts",
+      "ASTMC1340 now borrows actual ZoneAirNode flow, psychrometric density, Zone volume and multipliers for uncapped SystemACH on every surface. The non-Outdoors branch uses derived air speed; Outdoors faces use actual surface wind regardless of NoWind. One Source B five-DesignDay case with a Ground floor passes all121 series/57,360 values, including six live inside coefficients under explicit1e-9 W/m2-K limits. Positive public flow confirms activation; private convection-entry ACH and arbitrary combinations remain unestablished."
     ],
     "SurfaceConvectionAlgorithm:Outside": [
       "real singleton IP getter, omitted/blank DOE-2 default, strict string types and exact unnamed keys",
@@ -142,7 +144,7 @@
         "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
     ],
     "Zone": [
-        "authored Simple/TARP/CeilingDiffuser inside and SimpleCombined/TARP/MoWiTT/DOE-2 outside retain strict optional alpha/default inheritance and immutable typed Override provenance",
+        "authored Simple/TARP/CeilingDiffuser/ASTMC1340 inside and SimpleCombined/TARP/MoWiTT/DOE-2 outside retain strict optional alpha/default inheritance and immutable typed Override provenance",
         "real Source GetZoneData resolves each supplied local selection versus retained global enums; same actual Zone owners feed both coefficient dispatchers",
         "narrow validated Source-admission fact covers only these consumed local alphas; legacy, unsupported enums, other Zone features and surface overrides stay bounded",
         "existing enum table checks all3x4 local selections with differing globals across A/B, actual raw/IP/projection/environment custody and legacy rejection",
@@ -48813,12 +48815,407 @@
           "source_runtime_class": "source-multizone-heat-balance-compatibility",
           "matched_capability_ids": []
         }
+      },
+      {
+        "id": "B-ASTMC1340-SYSTEM-ACH-112-120H",
+        "group": "SurfaceConvectionAlgorithm:Inside",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-ASTMC1340-system-ACH-112",
+        "input": {
+          "path": ".runtime/object-expansion/unit112-prep/astm1340-pilot-proposal01/input.epJSON",
+          "sha256": "17cc56192ea1678d7a853439e5bcf333bfaeff2d7b4fb1839ddb2379ab9a8c4a",
+          "bytes": 84831
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/astm1340-system-ach-112/native-01/command/receipt.json",
+          "sha256": "c4adfcfba54aa365c27a9559790fda733eaf28cd329182cc114617ff6f96f9af",
+          "bytes": 9221
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/astm1340-system-ach-112/source-01/command/receipt.json",
+          "sha256": "ab03297cb86dba9cc7a27f30105747563a023ede59aab3011930e1fc8393bbb4",
+          "bytes": 9899
+        },
+        "source_summary": {
+          "path": ".runtime/porting/astm1340-system-ach-112/source-01/output/run-summary.json",
+          "sha256": "23fe1ca84dd4b6c5a7bb52eb9d8351a2c71a506d6ace2cb96c341a4ca608932f",
+          "bytes": 67582
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-113/eplus-rs.exe",
+          "sha256": "d4372179c14a266fd70821f5a6784844b75157c28785b10af39ae6709dea4ec5",
+          "bytes": 80466804
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/6e/6e16d6b18eb6e6c4cb043e1ecf07f0bde7a275568dd94ebc88a0a4a8ac80eff6",
+          "sha256": "6e16d6b18eb6e6c4cb043e1ecf07f0bde7a275568dd94ebc88a0a4a8ac80eff6"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-113/receipt.json",
+          "sha256": "ae765df0a0dd52a2eb9bd7a8336c38b43df04a8afed145db95a6e43fb2c4bd7d",
+          "bytes": 6712
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit112-prep/actual-independent-readback01.json",
+          "sha256": "22dd6ebb20eba9b453d0f5eb01c26fd193f7719f0f94c70cfa359155245ff37a",
+          "bytes": 1093796
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit112-prep/reader-bindings01.json",
+          "sha256": "dd877fcb006f98587230edb13645c29c77b986194839ef1c78f6b8d18022c718",
+          "bytes": 3392
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit112-prep/astm1340-pilot-proposal01/recipe.json",
+          "sha256": "f10c49c933a42534302fe30139f3a6d8e88d6716f59e5126547c8f9cdb963312",
+          "bytes": 11954
+        },
+        "totals": {
+          "series": 121,
+          "samples": 57360,
+          "raw_operand_unequal": 22072,
+          "parsed_binary64_unequal": 22072,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.4336546882987022e-07,
+          "max_rmse_delta": 1.4109515464834062e-08
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All119 actual Timestep series/57120 values across5 ordered DesignDays with complete dictionary/body/clocks/footer/EOF and exact Source JSON/CSV token-bit-owner-clock joins.",
+          "MTR": "Two genuine Hourly Facility streams/240 values with complete physical body and exact Source JSON/CSV joins.",
+          "inherited113_variable_and2meter_rules_literal_exact": true,
+          "new_named_coefficient_requests": 6,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "baseline_policy": {
+            "path": ".runtime/object-expansion/unit108-prep/source-b-physical-pilot-proposal01/derived-policy.json",
+            "sha256": "ec5b92d8392cba423a87651cce1016cff38f516f666d65990ca15337991b9e1d",
+            "bytes": 33797
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit112-prep/astm1340-pilot-proposal01/derived-policy.json",
+            "sha256": "7af42729795cf70f74abc9ddd69a4233eb3af6971954795c36117e8bd3a26637",
+            "bytes": 36765
+          },
+          "inherited113_variable_and2meter_rules_unchanged": true,
+          "new6_quantity_rules": "Explicit coefficient rules predeclared before engines; no corresponding W/m2-K rule exists in sealed A/B profiles.",
+          "new6_units": "W/m2-K",
+          "new6_atol": 1e-09,
+          "new6_rtol": 0.0,
+          "new6_rmse_max": 1e-09,
+          "global_contract_changed": false,
+          "new_unit_or_metadata_waiver": false,
+          "qualification": "Original B102 selectors and limits remain unchanged. Each requested clock is distinct from actual unique Native RDD Zone/HVAC producer, authenticated identically in Source RDD/ESO/catalog and both exports. Only inherited index1 humidity canonical kgWater/kgDryAir has HVAC/Average/empty units; inherited scalar schedule descriptions remain; no new waiver."
+        },
+        "effective_state": "One bounded one-Zone Source B five-DesignDay120h composition inherits global ASTMC1340, makes one existing Floor Ground and authors12 controlled18C ground temperatures. Actual positive public ZoneAirNode mass flow and six live inside-convection coefficient outputs pass strict complete-stream policies. Public low-flow and flow-derived>100 indicators do not instrument private Native convection-entry ACH, psychrometric caches or call history. No arbitrary/full-object or frozen capability promotion.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "actual_default_Source_build": 113,
+          "new_Source_build_executions": 1,
+          "actual_existing_test_executions": 3,
+          "actual_successful_existing_test_executions": 2,
+          "retained_failed_existing_test_executions": 1,
+          "existing_test_functions_extended": 2,
+          "new_test_functions": 0,
+          "publication111": {
+            "path": ".runtime/object-expansion/unit111-prep/publish01/receipt.json",
+            "sha256": "1dbede0a626d01aaa3ac5bca811dc8acc5988c21e608d24a66ac9b6c9ea91257",
+            "bytes": 6488
+          },
+          "actual_build_quality_authority": {
+            "path": ".runtime/object-expansion/unit112-prep/actual-build113-quality-authority01.json",
+            "sha256": "2f337f1b903f9bc89ffcdb02de65f77c8c4d6e5b46d82a5efdd7171f0f003b2d",
+            "bytes": 3140
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit112-prep/accepted-quality.json",
+            "sha256": "1c679acf852bbc8c488128112344d42e36e36505a2b64afeed0185fdea7bb17f",
+            "bytes": 8418
+          },
+          "actual_build_and_engine_epoch": {
+            "head": "d25d39cbac9f1f8a3d73f8425962336088df7e0a",
+            "worktree_clean": false,
+            "porcelain_v1_nul_utf8": " M crates/ep_run/src/ordinary_equipment_input.rs\u0000 M crates/ep_run/src/porting_scope.rs\u0000 M crates/ep_run/src/porting_scope/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/inside_convection_dispatcher.rs\u0000 M crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/source.rs\u0000 M crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/source/ceiling.rs\u0000 M crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/source/ceiling/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_entry.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/inside_providers.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/output.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/provider_host.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_surface_initialization/registration.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/control.rs\u0000 M crates/ep_runtime/src/heat_balance/source_output_registration/bound_real.rs\u0000?? crates/ep_runtime/src/heat_balance/inside_convection_dispatcher/source/astm.rs\u0000"
+          },
+          "changed_Source_files": 16,
+          "complete_current_and_archived_Source_files": 4666,
+          "retained_first_quality_attempt": {
+            "receipt": {
+              "path": ".runtime/object-expansion/unit112-prep/quality01/receipt.json",
+              "sha256": "3c53b633c422d0d421f27a054a806637c22af7bbee92a55edda413d22ce6245e",
+              "bytes": 6643
+            },
+            "exit_codes": [
+              0,
+              0,
+              0,
+              101
+            ],
+            "engine_attempt": false,
+            "accepted_sample_credit": 0,
+            "qualification": "Existing test used the intentionally restricted legacy resolver; only four existing test calls were corrected to the actual Source routes before accepted QA. Source kernel unchanged by that test correction."
+          }
+        },
+        "current_primary_observation": {
+          "Zones": 1,
+          "surfaces": 6,
+          "timesteps_per_hour": 4,
+          "raw_OutputVariable_requests": 114,
+          "raw_OutputMeterFileOnly_requests": 2,
+          "actual_reporting_hours": 120,
+          "actual_DD_reporting_hours": 120,
+          "weather_reporting_hours": 0,
+          "hours_cli_argument": null,
+          "DDOnly": false,
+          "reporting_environments": [
+            {
+              "kind_of_environment": 1,
+              "ordinal": 1,
+              "selected_by_primary_flags": true,
+              "title": "105 001 CLEAR SKY DEFAULT",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 2,
+              "selected_by_primary_flags": true,
+              "title": "105 002 ZH MULTIPLIERS",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 3,
+              "selected_by_primary_flags": true,
+              "title": "105 003 TAU DIFFERENCES",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 4,
+              "selected_by_primary_flags": true,
+              "title": "105 004 TAU2017 SHARED",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 5,
+              "selected_by_primary_flags": true,
+              "title": "105 005 SCHEDULE PROFILE RH",
+              "total_days": 1
+            }
+          ],
+          "actual_warmup_days": [
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "actual_ASTMC1340_and_system_flow": {
+            "passed": true,
+            "actual_positive_counts": {
+              "Native": {
+                "actual_positive_samples": 372,
+                "actual_low_positive_below_0_01_samples": 126,
+                "public_indicator_above100_samples": 240,
+                "public_indicator_unavailable_samples": 0
+              },
+              "Source": {
+                "actual_positive_samples": 372,
+                "actual_low_positive_below_0_01_samples": 126,
+                "public_indicator_above100_samples": 240,
+                "public_indicator_unavailable_samples": 0
+              }
+            },
+            "same_clock_paired_positive_samples": 372,
+            "first": {
+              "sample_index": 17,
+              "clock": [
+                "2",
+                "1",
+                " 7",
+                "21",
+                " 0",
+                " 5",
+                "15.00",
+                "30.00",
+                "SummerDesignDay"
+              ],
+              "environment": {
+                "environment_ordinal": 1,
+                "environment_title": "105 001 CLEAR SKY DEFAULT",
+                "local_clock_index": 17
+              },
+              "Native": "0.00007408263256427983",
+              "Source": "0.00007408263256428176"
+            },
+            "six_coefficient_RIDs": [
+              {
+                "key": "WALL X0",
+                "report_id": 24,
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "W/m2-K",
+                  "raw": "Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]"
+                }
+              },
+              {
+                "key": "WALL X1",
+                "report_id": 33,
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "W/m2-K",
+                  "raw": "Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]"
+                }
+              },
+              {
+                "key": "WALL Y0",
+                "report_id": 42,
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "W/m2-K",
+                  "raw": "Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]"
+                }
+              },
+              {
+                "key": "WALL Y1",
+                "report_id": 51,
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "W/m2-K",
+                  "raw": "Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]"
+                }
+              },
+              {
+                "key": "FLOOR",
+                "report_id": 60,
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "W/m2-K",
+                  "raw": "Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]"
+                }
+              },
+              {
+                "key": "ROOF",
+                "report_id": 69,
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "W/m2-K",
+                  "raw": "Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]"
+                }
+              }
+            ],
+            "private_Native_convection_entry_ACH_or_call_history_observed": false,
+            "qualification": "Public node averages/prescribed DD pressure/code-map calculations do not instrument Native private convection-entry operands, psych caches or call histories. Lowflow and >100 counts are observations only; no minflow/cap is inserted and no syntheticwind/cache is supplied."
+          },
+          "actual_Source_geometry": {
+            "actual_trace": {
+              "path": ".runtime/porting/astm1340-system-ach-112/source-01/output/geometry-consumers.json",
+              "sha256": "941b0d235edcdf7478231a1a6c14d4731e4066d740bcab154d18376a7fbc9d1c",
+              "bytes": 28291
+            },
+            "actual_compiled": {
+              "path": ".runtime/porting/astm1340-system-ach-112/source-01/output/compiled-geometry.json",
+              "sha256": "41767c15821f7a911e540ae8740491f44a31cef3465770d31e99f671d37105fe",
+              "bytes": 18994
+            },
+            "all6_World_vertices_ZoneSpace_enclosures_exact": true,
+            "actual_Ground_floor": true,
+            "actual_global_and_effective_Zone_algorithm": "ASTMC1340",
+            "actual12_ground_months_C": [
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0
+            ],
+            "private_Native_geometry_or_ACH_observed": false
+          },
+          "whole_public_ancillary_readback": {
+            "path": ".runtime/object-expansion/unit112-prep/actual-independent-readback01.json",
+            "sha256": "22dd6ebb20eba9b453d0f5eb01c26fd193f7719f0f94c70cfa359155245ff37a",
+            "bytes": 1093796
+          },
+          "requested_CTF_coefficients": false,
+          "DXF_requested": false,
+          "tabular_CSV_requested": false,
+          "climatic_cells_credited": 0,
+          "actual_custody": {
+            "actual_Native_custody": {
+              "path": ".runtime/object-expansion/unit112-prep/root-native-custody01.json",
+              "sha256": "b3c5e76f666c5ebdae0530d09f3234e6dccf572e08cc3d69aad25248d4d60416",
+              "bytes": 2568
+            },
+            "actual_Source_custody": {
+              "path": ".runtime/object-expansion/unit112-prep/root-source-custody01.json",
+              "sha256": "0b14acc6ff455b99c927d9141048c84ae9e7c0bfe00fe5a0ed1e23e61ea85332",
+              "bytes": 2568
+            },
+            "actual_Source_completion": {
+              "path": ".runtime/object-expansion/unit112-prep/root-source-completion01.json",
+              "sha256": "7372d3db4fb7058b912d6c153ed963ea2d3631f6075a6c3b2c72e160be395f58",
+              "bytes": 2406
+            }
+          },
+          "Root_pre_Source_Native_activation_review": {
+            "path": ".runtime/object-expansion/unit112-prep/root-native-activation-review01.json",
+            "sha256": "13282e9c594b6e0edb4b09928a786cd28798f705ca44903fbbee36fc62f0f9e6",
+            "bytes": 3402
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit112-prep/actual-independent-readback01.json",
+            "sha256": "22dd6ebb20eba9b453d0f5eb01c26fd193f7719f0f94c70cfa359155245ff37a",
+            "bytes": 1093796
+          },
+          "independent_full_actual_physical_peer": {
+            "path": ".runtime/object-expansion/unit112-prep/physical-peer01/proof01.json",
+            "sha256": "a509dd5378517fad69419e90cd5f928ca899f35dfab4de7fac646e8193fb5fba",
+            "bytes": 1352487
+          },
+          "Root_peer_review": {
+            "path": ".runtime/object-expansion/unit112-prep/root-physical-peer-review01.json",
+            "sha256": "877fbca3856bc1ab4b92a6eee7cc193a60c9934029b51c23291844e75af7c4c7",
+            "bytes": 1509
+          },
+          "source_runtime_class": "ideal-loads-direct-zone-coupled-compatibility",
+          "matched_capability_ids": [
+            "ideal_loads_no_oa_sensible"
+          ],
+          "capability_or_gate_promotion": false
+        }
       }
     ],
     "totals": {
-      "paired_cases": 164,
-      "reported_samples": 4596462,
-      "raw_operand_unequal": 997362,
+      "paired_cases": 165,
+      "reported_samples": 4653822,
+      "raw_operand_unequal": 1019434,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -50660,6 +51057,23 @@
           "sha256": "6baee6ec198554ca189d963f13f499258280c9eed0061f7746d56af560235d16",
           "bytes": 80459604
         }
+      },
+      {
+        "id": "source-ASTMC1340-system-ACH-112",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-113/receipt.json",
+          "sha256": "ae765df0a0dd52a2eb9bd7a8336c38b43df04a8afed145db95a6e43fb2c4bd7d",
+          "bytes": 6712
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/6e/6e16d6b18eb6e6c4cb043e1ecf07f0bde7a275568dd94ebc88a0a4a8ac80eff6",
+          "sha256": "6e16d6b18eb6e6c4cb043e1ecf07f0bde7a275568dd94ebc88a0a4a8ac80eff6"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-113/eplus-rs.exe",
+          "sha256": "d4372179c14a266fd70821f5a6784844b75157c28785b10af39ae6709dea4ec5",
+          "bytes": 80466804
+        }
       }
     ],
     "focused_since_workspace": {
@@ -50905,14 +51319,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 108,
-      "builds_with_accepted_paired_cases": 101,
+      "actual_recorded_builds": 109,
+      "builds_with_accepted_paired_cases": 102,
       "builds_with_only_retained_failed_Source_attempts": 3,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 6,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "108 recorded Source builds:101 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
+      "qualification": "109 recorded Source builds:102 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 2,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 1,
@@ -54318,6 +54732,88 @@
       "Native_replays": 0,
       "Source_replays": 0,
       "scope": "One bounded two-Zone opaque24h weather composition changes only Building FullExterior to FullExteriorWithReflections and adds30 named obstruction-reflected irradiance requests. Actual beam-to-diffuse and sky-diffuse positive observations agree; all 10 opaque specular series are genuine zeros. No private Native receiver/hit/traversal, baseline110 thermal causality, glazed specular transport, arbitrary combinations or full-object/frozen capability claim."
+    },
+    "current_ASTMC1340_system_ACH_live_pair": {
+      "source_build": "source-ASTMC1340-system-ACH-112",
+      "actual_Source_build": {
+        "path": ".runtime/object-expansion/build113-row.json",
+        "sha256": "90abaff9c7fe2da7a49cf5134c163fa99083c687daacd6c2f03e8d1ed7960d44",
+        "bytes": 682
+      },
+      "actual_build_quality_authority": {
+        "path": ".runtime/object-expansion/unit112-prep/actual-build113-quality-authority01.json",
+        "sha256": "2f337f1b903f9bc89ffcdb02de65f77c8c4d6e5b46d82a5efdd7171f0f003b2d",
+        "bytes": 3140
+      },
+      "actual_quality": {
+        "path": ".runtime/object-expansion/unit112-prep/accepted-quality.json",
+        "sha256": "1c679acf852bbc8c488128112344d42e36e36505a2b64afeed0185fdea7bb17f",
+        "bytes": 8418
+      },
+      "case_rows": [
+        "B-ASTMC1340-SYSTEM-ACH-112-120H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit112-prep/actual-independent-readback01.json",
+        "sha256": "22dd6ebb20eba9b453d0f5eb01c26fd193f7719f0f94c70cfa359155245ff37a",
+        "bytes": 1093796
+      },
+      "independent_actual_full_physical_peer": {
+        "path": ".runtime/object-expansion/unit112-prep/physical-peer01/proof01.json",
+        "sha256": "a509dd5378517fad69419e90cd5f928ca899f35dfab4de7fac646e8193fb5fba",
+        "bytes": 1352487
+      },
+      "Root_physical_peer_review": {
+        "path": ".runtime/object-expansion/unit112-prep/root-physical-peer-review01.json",
+        "sha256": "877fbca3856bc1ab4b92a6eee7cc193a60c9934029b51c23291844e75af7c4c7",
+        "bytes": 1509
+      },
+      "actual_custody": {
+        "actual_Native_custody": {
+          "path": ".runtime/object-expansion/unit112-prep/root-native-custody01.json",
+          "sha256": "b3c5e76f666c5ebdae0530d09f3234e6dccf572e08cc3d69aad25248d4d60416",
+          "bytes": 2568
+        },
+        "actual_Source_custody": {
+          "path": ".runtime/object-expansion/unit112-prep/root-source-custody01.json",
+          "sha256": "0b14acc6ff455b99c927d9141048c84ae9e7c0bfe00fe5a0ed1e23e61ea85332",
+          "bytes": 2568
+        },
+        "actual_Source_completion": {
+          "path": ".runtime/object-expansion/unit112-prep/root-source-completion01.json",
+          "sha256": "7372d3db4fb7058b912d6c153ed963ea2d3631f6075a6c3b2c72e160be395f58",
+          "bytes": 2406
+        }
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit112-prep/astm1340-pilot-proposal01/recipe.json",
+        "sha256": "f10c49c933a42534302fe30139f3a6d8e88d6716f59e5126547c8f9cdb963312",
+        "bytes": 11954
+      },
+      "publication111": {
+        "path": ".runtime/object-expansion/unit111-prep/publish01/receipt.json",
+        "sha256": "1dbede0a626d01aaa3ac5bca811dc8acc5988c21e608d24a66ac9b6c9ea91257",
+        "bytes": 6488
+      },
+      "same_clock_paired_positive_public_flow_samples": 372,
+      "coefficient_quantity_rules": {
+        "new_explicit_rules": 6,
+        "units": "W/m2-K",
+        "atol": 1e-09,
+        "rtol": 0.0,
+        "rmse_max": 1e-09,
+        "inherited115_rules_unchanged": true
+      },
+      "new_test_executions": 3,
+      "new_successful_test_executions": 2,
+      "retained_failed_test_executions": 1,
+      "new_test_functions": 0,
+      "new_builds": 1,
+      "actual_fresh_Native_executions": 1,
+      "actual_fresh_Source_executions": 1,
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "scope": "One bounded one-Zone Source B five-DesignDay120h composition inherits global ASTMC1340, makes one existing Floor Ground and authors12 controlled18C ground temperatures. Actual positive public ZoneAirNode mass flow and six live inside-convection coefficient outputs pass strict complete-stream policies. Public low-flow and flow-derived>100 indicators do not instrument private Native convection-entry ACH, psychrometric caches or call history. No arbitrary/full-object or frozen capability promotion."
     }
   },
   "additional_native_type_calibrations": [

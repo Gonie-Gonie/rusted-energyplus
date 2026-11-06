@@ -1,6 +1,7 @@
 //! Genuine Tmp / iteration SurfTempIn entry, borrowing the sole Source owners.
 //! Static scalar views are temporary; no mutable Surface convection metadata,
 //! temperature, Space air, equipment flag, or HConv mirror is retained here.
+mod astm;
 mod ceiling;
 mod cold_external;
 use super::{
@@ -35,6 +36,8 @@ use ep_model::{ReportInputs, SurfaceId, SurfaceType};
 /// Live property/diagnostic roots borrowed by both genuine convection callers.
 /// Every phase, Node, psychrometric cache and recurrence cell stays in its owner.
 pub(crate) struct SourceInsideConvectionPropertyOwners<'a> {
+    pub(crate) physical:
+        &'a [crate::heat_balance::convection::surface_environment::source_rows::SourceSurfaceOutdoorState],
     pub(crate) environment: &'a crate::weather::day::WeatherEnvironmentState,
     pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
     pub(crate) psychrometrics: &'a mut crate::psychrometrics::SourcePsychrometricAccess,
@@ -52,6 +55,7 @@ fn index(number: i32) -> Result<usize, Error> {
 fn translate(error: InsideConvectionError) -> Error {
     match error {
         InsideConvectionError::Backend(value) => Error::Backend(value),
+        InsideConvectionError::SourceChild(value) => *value,
         InsideConvectionError::Scan(_) => {
             Error::Unavailable("actual convection report scan arguments")
         }
@@ -688,6 +692,23 @@ impl SourceInsideConvection {
             &temperatures,
             control.low_hconv_limit,
             ConvectionEntry::Source,
+            &mut |i, tsurf, mat, coefficients| {
+                astm::initialize_surface(
+                    i,
+                    tsurf,
+                    mat,
+                    geometry,
+                    zones,
+                    equipment,
+                    globals,
+                    clock,
+                    &mut properties,
+                    control.low_hconv_limit,
+                    coefficients,
+                    backend,
+                )
+                .map_err(|error| InsideConvectionError::SourceChild(Box::new(error)))
+            },
         )
         .map_err(translate)
     }

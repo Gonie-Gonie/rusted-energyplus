@@ -480,7 +480,12 @@ fn resolve_raw(
                     selected(object, "algorithm", &["ConductionTransferFunction"])
                 }
                 "SurfaceConvectionAlgorithm:Inside" => {
-                    selected(object, "algorithm", &["Simple", "TARP", "CeilingDiffuser"])
+                    let algorithms: &[&str] = if source_calendar_ingress {
+                        &["Simple", "TARP", "CeilingDiffuser", "ASTMC1340"]
+                    } else {
+                        &["Simple", "TARP", "CeilingDiffuser"]
+                    };
+                    selected(object, "algorithm", algorithms)
                 }
                 "SurfaceConvectionAlgorithm:Outside" => selected(
                     object,
@@ -495,10 +500,15 @@ fn resolve_raw(
                 "Zone" => {
                     // The real GetZoneData writes these same enums into the
                     // owning Zone; both Source dispatchers resolve SetByZone.
+                    let inside_algorithms: &[&str] = if source_calendar_ingress {
+                        &["Simple", "TARP", "CeilingDiffuser", "ASTMC1340"]
+                    } else {
+                        &["Simple", "TARP", "CeilingDiffuser"]
+                    };
                     selected(
                         object,
                         "zone_inside_convection_algorithm",
-                        &["Simple", "TARP", "CeilingDiffuser"],
+                        inside_algorithms,
                     ) && selected(
                         object,
                         "zone_outside_convection_algorithm",

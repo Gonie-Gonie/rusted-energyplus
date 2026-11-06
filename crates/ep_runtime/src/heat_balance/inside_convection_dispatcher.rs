@@ -61,6 +61,8 @@ pub enum InsideConvectionError {
     Scan(ReportScanUnavailable),
     /// The genuine borrowed backend stopped at this actual diagnostic.
     Backend(SourceErrorBackendFailure),
+    /// Preserve the real Source property/input/diagnostic child failure.
+    SourceChild(Box<super::selected_heat_balance_input::HeatBalanceInputError>),
 }
 impl From<InsideConvectionUnavailable> for InsideConvectionError {
     fn from(value: InsideConvectionUnavailable) -> Self {
@@ -73,6 +75,7 @@ impl std::fmt::Display for InsideConvectionError {
             Self::Unavailable(e) => write!(f, "inside convection owner unavailable: {e:?}"),
             Self::Scan(e) => write!(f, "inside convection report scan unavailable: {e:?}"),
             Self::Backend(e) => std::fmt::Display::fmt(e, f),
+            Self::SourceChild(e) => std::fmt::Display::fmt(e, f),
         }
     }
 }
@@ -80,6 +83,7 @@ impl std::error::Error for InsideConvectionError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Backend(e) => Some(e),
+            Self::SourceChild(e) => Some(e.as_ref()),
             _ => None,
         }
     }
@@ -809,9 +813,13 @@ fn validate<
         return Err(InsideConvectionUnavailable::TemperatureOwner);
     }
     if entry == ConvectionEntry::Legacy
-        && zones
-            .iter()
-            .any(|zone| zone.inside_algorithm == InsideSurfaceConvectionAlgorithm::CeilingDiffuser)
+        && zones.iter().any(|zone| {
+            matches!(
+                zone.inside_algorithm,
+                InsideSurfaceConvectionAlgorithm::CeilingDiffuser
+                    | InsideSurfaceConvectionAlgorithm::AstmC1340
+            )
+        })
     {
         return Err(InsideConvectionUnavailable::AlgorithmOrSurface);
     }
@@ -829,6 +837,7 @@ fn validate_static_geometry(
             InsideSurfaceConvectionAlgorithm::Simple
                 | InsideSurfaceConvectionAlgorithm::Tarp
                 | InsideSurfaceConvectionAlgorithm::CeilingDiffuser
+                | InsideSurfaceConvectionAlgorithm::AstmC1340
         ) {
             return Err(InsideConvectionUnavailable::AlgorithmOrSurface);
         }
@@ -1135,6 +1144,7 @@ fn initialize_inside_convection_body<
         temperatures,
         actual_low_limit,
         entry,
+        &mut |_, _, _, _| Err(InsideConvectionUnavailable::AlgorithmOrSurface.into()),
     )
 }
 
@@ -1281,6 +1291,7 @@ fn initialize_inside_convection_surfaces<
     temperatures: &T,
     actual_low_limit: f64,
     entry: ConvectionEntry,
+    astm: &mut dyn FnMut(usize, f64, f64, &mut H) -> Result<(), InsideConvectionError>,
 ) -> Result<(), InsideConvectionError> {
     for group in layout.groups() {
         let mat = *space_air
@@ -1314,7 +1325,19 @@ fn initialize_inside_convection_surfaces<
                 }
                 continue;
             }
-            if algorithm == InsideSurfaceConvectionAlgorithm::Simple {
+            if algorithm == InsideSurfaceConvectionAlgorithm::AstmC1340 {
+                if entry != ConvectionEntry::Source {
+                    return Err(InsideConvectionUnavailable::AlgorithmOrSurface.into());
+                }
+                // Actual352 calls the complete wrapper at this Surface position
+                // using the same temperature and Space MAT as Simple/TARP.
+                astm(
+                    index,
+                    *temperatures.borrow_temperature(index)?,
+                    mat,
+                    coefficients,
+                )?;
+            } else if algorithm == InsideSurfaceConvectionAlgorithm::Simple {
                 // Actual non-Kiva1896 writes this same Source cell before the
                 // wrapper's unconditional Objexx max assignment1900.
                 coefficients.set_coefficient(

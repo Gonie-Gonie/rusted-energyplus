@@ -819,7 +819,6 @@ fn simple_resolves_zone_without_relabeling_and_writes_the_real_low_limit()
     for unsupported in [
         InsideSurfaceConvectionAlgorithm::TrombeWall,
         InsideSurfaceConvectionAlgorithm::AdaptiveConvectionAlgorithm,
-        InsideSurfaceConvectionAlgorithm::AstmC1340,
     ] {
         zones[0].inside_algorithm = unsupported;
         assert_eq!(

@@ -70,9 +70,9 @@ fn limit_ach(mut ach: f64, mass_flow: f64) -> f64 {
     ach
 }
 
-/// CalcZoneSystemACH2050 -> CalcZoneSystemVolFlowRate2108 -> MinFlow2123.
-/// Property diagnostics happen even when the eventual mass flow gate is zero.
-pub(super) fn ach(
+/// Uncapped CalcZoneSystemACH2050 -> CalcZoneSystemVolFlowRate2108.
+/// Every property call remains reached even for a zero physical Node mass flow.
+pub(super) fn system_ach(
     zone: &SelectedZoneData,
     equipment: &OrdinaryEquipment,
     globals: &SelectedHeatBalanceGlobals,
@@ -123,6 +123,19 @@ pub(super) fn ach(
     } else {
         0.0
     };
+    Ok(ach)
+}
+
+/// CalcCeilingDiffuserACH2123 retains its own MinFlow and correlation caps.
+pub(super) fn ach(
+    zone: &SelectedZoneData,
+    equipment: &OrdinaryEquipment,
+    globals: &SelectedHeatBalanceGlobals,
+    clock: &WeatherGlobalState,
+    properties: &mut SourceInsideConvectionPropertyOwners<'_>,
+    backend: &mut SourceErrorBackend<'_>,
+) -> Result<f64, Error> {
+    let ach = system_ach(zone, equipment, globals, clock, properties, backend)?;
     let zone_mult = f64::from(multiplier(zone)?);
     let mass_flow = if !clock.begin_envrn_flag && zone.system_zone_node_number > 0 {
         *equipment

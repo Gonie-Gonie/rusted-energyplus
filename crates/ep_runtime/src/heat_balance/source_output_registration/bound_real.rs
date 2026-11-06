@@ -16,6 +16,7 @@ use crate::{
 pub(crate) enum SourceSurfaceOutputField {
     SurfTempIn,
     SurfTempOut,
+    SurfHConvInt,
     SurfOpaqInsFaceCond,
     SurfOpaqInsFaceCondFlux,
     SurfOpaqOutFaceCond,

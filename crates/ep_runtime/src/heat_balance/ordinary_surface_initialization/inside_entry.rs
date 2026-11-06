@@ -171,6 +171,7 @@ impl OrdinarySurfaceInitialization {
         }
         {
             let mut providers = SourceOrdinaryInsideCtfHost {
+                physical: o.physical_surfaces,
                 convection: o.convection,
                 equipment: o.equipment,
                 constructions: o.control,

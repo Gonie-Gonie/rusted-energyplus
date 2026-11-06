@@ -3951,6 +3951,7 @@ fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
             ("TARP", I::Tarp),
             ("Simple", I::Simple),
             ("CeilingDiffuser", I::CeilingDiffuser),
+            ("ASTMC1340", I::AstmC1340),
         ] {
             for (outside, expected_outside) in [
                 ("DOE-2", O::Doe2),
@@ -3978,12 +3979,12 @@ fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
                         && !zone.outside_convection_algorithm.is_override()
                 );
                 let ip = match scope {
-                    PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
+                    PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&raw),
                     PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
                 }
                 .expect("actual IP admission");
                 assert!(ip.has_object(INSIDE, " ") && ip.has_object(OUTSIDE, ""));
-                let projected = crate::ordinary_heat_balance_input::resolve(&raw, &ip)
+                let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
                     .expect("actual getter operands");
                 assert_eq!(projected.objects[INSIDE][0].object_name, " ");
                 assert_eq!(projected.objects[OUTSIDE][0].object_name, "");
@@ -4076,14 +4077,16 @@ fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
                     Some(expected_outside)
                 );
                 let local_ip = match scope {
-                    PortingScope::A => crate::ordinary_input_processor::resolve(&local_raw),
+                    PortingScope::A => {
+                        crate::ordinary_input_processor::resolve_source_a(&local_raw)
+                    }
                     PortingScope::B => {
                         crate::ordinary_input_processor::resolve_source_b(&local_raw)
                     }
                 }
                 .expect("actual local raw/IP admission");
                 let local_projection =
-                    crate::ordinary_heat_balance_input::resolve(&local_raw, &local_ip)
+                    crate::ordinary_heat_balance_input::resolve_source(&local_raw, &local_ip)
                         .expect("same Source GetZoneData raw alpha operands");
                 let actual_zone = &local_projection.objects["Zone"][0];
                 for (field, expected) in [
@@ -4174,7 +4177,6 @@ fn global_convection_enums_reach_validated_source_support_and_inherited_zone() {
                 "zone_inside_convection_algorithm",
                 "AdaptiveConvectionAlgorithm",
             ),
-            ("zone_inside_convection_algorithm", "ASTMC1340"),
             (
                 "zone_outside_convection_algorithm",
                 "AdaptiveConvectionAlgorithm",

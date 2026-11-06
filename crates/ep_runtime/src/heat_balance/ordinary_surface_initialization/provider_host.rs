@@ -228,6 +228,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
             owners.report_inputs,
             owners.scan,
             crate::heat_balance::inside_convection_dispatcher::source::SourceInsideConvectionPropertyOwners {
+                physical: owners.physical_surfaces,
                 environment: owners.environment, hvac: self.hvac,
                 psychrometrics: self.psychrometrics, recurring: self.recurring,
                 developer: &owners.project.system.developer_flag,

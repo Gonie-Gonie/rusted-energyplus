@@ -25,6 +25,7 @@ impl SelectedHeatBalanceInputState {
             match values.alphas[0].as_str() {
                 "SIMPLE" => (InsideSurfaceConvectionAlgorithm::Simple, "Simple"),
                 "TARP" => (InsideSurfaceConvectionAlgorithm::Tarp, "TARP"),
+                "ASTMC1340" => (InsideSurfaceConvectionAlgorithm::AstmC1340, "ASTMC1340"),
                 "CEILINGDIFFUSER" => (
                     InsideSurfaceConvectionAlgorithm::CeilingDiffuser,
                     "CeilingDiffuser",

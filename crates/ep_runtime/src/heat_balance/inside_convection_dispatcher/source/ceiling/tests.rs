@@ -65,6 +65,7 @@ impl Caller {
             sqlite: None,
         };
         let mut properties = SourceInsideConvectionPropertyOwners {
+            physical: &[],
             environment: &self.environment,
             hvac: &self.hvac,
             psychrometrics: &mut self.psychrometrics,
@@ -433,6 +434,7 @@ fn source_ceiling_getuser_nodecheck_and_zone_prepass_keep_live_owners_once_and_o
             &temperatures,
             99.0,
             ConvectionEntry::Source,
+            &mut |_, _, _, _| Err(Unavailable::AlgorithmOrSurface.into()),
         )?;
         assert_eq!(
             [
