@@ -52,7 +52,8 @@
         "Actual request/Which/ReportID owners retain full dictionaries, genuine clocks, metadata, footer/EOF and all raw samples. Tested distinct-owner equal public labels remain separately bound by actual ReportID/nominal owner order; no value sorting is used. The separate whole-Zone authored-Space witness has351uniqueTimestepESO and13realHourlyMTR series/34008values/262object-Space-Zone-Facility relations. All289prior variable and13meter policies remain exact and62new Space/gain selectors copy originalCount1e-9/W.001/J1 limits. Count units are empty, rates Average and energies Sum. Original humidity1/51 canonicalZone policies stay unchanged despite actualHVAC/Average/emptyunit producer metadata; allnew62 producers are genuineZone. ASCII report-key folding never trims literal whitespace. Other producers/backends/model combinations, expected timestep arrays and full-object/frozen conformance are not established.",
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
-        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated."
+        "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
+      "Ten named Surface Outside Face Sunlit Fraction requests join all 105 inherited multizone requests. All 115 real Timestep series/11,040 values retain strict scalar policy and actual ReportID, owner and clock bindings in ESO and Source JSON/CSV; meters are genuinely absent. Other producers and full-object combinations remain bounded."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -84,13 +85,15 @@
         "Source A accepts SpaceLists whose actual members are authored whole-Zone Spaces, exactly one Space per Zone, and omitted or [] member arrays with no authored Space family required. Positive members retain order, a Space prefix even for singleton lists, and the full selected count/load per member. Empty targets retain dense raw k..k bindings and create no gain objects, names, object outputs or meters. Unconditional schema kinds, required fields, enums and numeric bounds remain checked. An all-zero People or OtherEquipment family skips its entire getter body and reference checks; in a mixed family, occupancy/equipment schedules are checked before the member loop, while activity/comfort, member sizing and fraction-sum checks skip empty targets. Two accepted cases retain 469+145 series, 58008 values, 325+20 public joins, and all 40 zero-case total selectors under unchanged limits; the zero case has genuine MTR and object-nominal absence. Source gain allocations are not exported by the primary trace; separate existing owner tests cover them. Default-Space effective floor in the zero case is inferred from public Zone floor and its sole default Space; Source geometry reports its actual floor. Other ZoneList/Space combinations, Source B, multiple/remainder Spaces, Space heat balance, Group compositions with authored Spaces or nonempty SpaceLists, arbitrary combinations and full-object/frozen conformance remain unvalidated.",
         "Explicit Source A admits positive ZoneGroups on the bounded closed opaque implicit-Space ZoneList route. The real original-IP GetZoneData phase retains Name, positive stored signed integer multiplier1..i32MAX/default1, actual referenced ListNum and ordered diagnostics; Zone.ListGroup receives the actual ListNum rather than the Group ordinal. Raw names use ASCII folding without trimming; actual JSON-map order or retained IDF declaration order reaches the shared original-IP getter. The schema has no maximum: the signed range is the existing defined owner boundary. Direct epJSON floating storage kinds remain rejected; authored IDF numeric spellings follow Native integer conversion before the stored-kind check. Checked Zone-by-list products keep defined signed-owner arithmetic; existing reciprocal interzone pairs require equal Zone and list factors. Local object/Zone gains and design sizing remain per physical Zone; real Facility energy membership applies each actual nominal owner Zone.Multiplier*ListMultiplier. Ordered System list reductions use Zone.Multiplier only, then four real Group outputs read the referenced list times Group.Multiplier. The accepted factor2 case has 36 public nominal owners, 408 series/38232 values and195 public joins under unchanged scalar limits, exact public EIO Zone factors1/1 and list factors2/2, and13 positive Facility meters. All16 System streams/1536 samples are genuine zeros; nonzero/reset/order and actual ListNum-versus-GroupNum behavior are separate passed existing-owner tests. The route retains the separate SourceMultiZone class with empty one-Zone capability IDs and no promotion. No private Native Group/List/gain allocation or physical Source private Group/gain allocation is claimed. Group compositions with authored Spaces or nonempty SpaceLists, Source B groups, Space heat balance, optional-comfort/group cross-products, HVAC, arbitrary legal combinations and full-object/frozen-capability promotion remain unvalidated.",
         "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
-      "Source B additionally validates a NoLimit five-DesignDay composition with only ROOF and WALL Y0 changed to SunExposed/WindExposed. All 115 series/54,480 values pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams exactly while exposed-face and demand/supply results change. This establishes joint exposure-to-surface/HVAC behavior for the declared case. The other four faces remain NoSun/NoWind. Arbitrary values/combinations, separate Sun/Wind attribution, subsurfaces, authored shades, OA/latent control, sizing and frozen CON-01 promotion remain outside this evidence. Whole EIO/SHD and five warmup counts agree; unrequested coefficient, DXF and tabular reports receive no credit."
+      "Source B additionally validates a NoLimit five-DesignDay composition with only ROOF and WALL Y0 changed to SunExposed/WindExposed. All 115 series/54,480 values pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams exactly while exposed-face and demand/supply results change. This establishes joint exposure-to-surface/HVAC behavior for the declared case. The other four faces remain NoSun/NoWind. Arbitrary values/combinations, separate Sun/Wind attribution, subsurfaces, authored shades, OA/latent control, sizing and frozen CON-01 promotion remain outside this evidence. Whole EIO/SHD and five warmup counts agree; unrequested coefficient, DXF and tabular reports receive no credit.",
+      "A bounded two-Zone opaque weather case composes ten SunExposed/NoWind exterior walls/roofs with two Ground floors. Both engines report 37 material partial-fraction samples on the declared ZULU wall and roof. All 115 series/11,040 values pass unchanged limits. This establishes cross-Zone geometric shading for the declared composition; reciprocal shading, baseline thermal causality, positive shadow-shadow area, arbitrary combinations and full-object conformance remain unestablished."
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
       "numeric-only singleton keys/counts and converted IDF blank versus direct epJSON types",
       "real factory warning and current-month weather/reporting owner",
-      "Source-only validated monthly weather support now feeds the genuine Ground surface history and boundary consumers; FCfactor/Kiva and sibling ground families remain bounded"
+      "Source-only validated monthly weather support now feeds the genuine Ground surface history and boundary consumers; FCfactor/Kiva and sibling ground families remain bounded",
+      "The accepted two-Zone opaque composition uses two Ground floors and twelve authored 18C monthly values through the existing owner. This is a controlled prescribed boundary; it does not isolate ground or solar thermal causality."
     ],
     "SurfaceConvectionAlgorithm:Inside": [
       "real singleton IP getter, omitted/blank defaults, strict string types and exact unnamed keys",
@@ -46974,12 +46977,849 @@
           },
           "private_owners_and_complete_trajectories_observed": false
         }
+      },
+      {
+        "id": "A-CROSS-ZONE-OPAQUE-SHADOW-110-24H",
+        "group": "BuildingSurface:Detailed",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "source_build": "source-b-positive-general-shadows-109",
+        "input": {
+          "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/input.idf",
+          "sha256": "25f89a28fe5a19dfd64b8a55cd22aeb812b76d7d06f424ce8085a3110b6c3846",
+          "bytes": 15333
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "input_format": "IDF",
+        "native_receipt": {
+          "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/command/receipt.json",
+          "sha256": "2f78719e8321076e96e358632493a56e71e647c1a926f6978fd1e126665aa28f",
+          "bytes": 7456
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/command/receipt.json",
+          "sha256": "1f122c1611731994c24ebb765fd8cd42bd5f69511b8b3a123ecc405770e677b8",
+          "bytes": 8124
+        },
+        "source_summary": {
+          "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/run-summary.json",
+          "sha256": "b2481a661591eff8c67a98adaabaeb7323557862c263e1a03bcbb76e7dcada3b",
+          "bytes": 49123
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-111/eplus-rs.exe",
+          "sha256": "51bc350ee00de9835474e61dfc0c3cfdf0b49b538a8d54849fb661d317498024",
+          "bytes": 80307809
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1d/1dc224fa75acecc602026c87e77ea21d07f1b92a6dce481f378129083391adf5",
+          "sha256": "1dc224fa75acecc602026c87e77ea21d07f1b92a6dce481f378129083391adf5"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-111/receipt.json",
+          "sha256": "1ee4fc371e97e9530559f484b1fe6e552079e36620f16ba7c507316eebdf0348",
+          "bytes": 6769
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit110-prep/actual-independent-readback01.json",
+          "sha256": "c053e9f09bbdb214ffa51806839c5d051162ce6012720c62486131ff31f24156",
+          "bytes": 337919
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit110-prep/reader-bindings01.json",
+          "sha256": "92acc99dca4405980c15e53094cfb10c32b1090a2337fecf5658cf35ceccd010",
+          "bytes": 3649
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/recipe.json",
+          "sha256": "6db02ff5cfc575bb4151384f047b0041e9f4c4689aefb922cbd5763e17e4944b",
+          "bytes": 50774
+        },
+        "totals": {
+          "series": 115,
+          "samples": 11040,
+          "raw_operand_unequal": 3097,
+          "parsed_binary64_unequal": 3097,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.9099388737231493e-11,
+          "max_rmse_delta": 2.868575221596918e-12
+        },
+        "full_reported_stream_scope": {
+          "ESO": "All 115 actual Timestep series and 11040 values; complete ordered dictionary, body shape, clocks, footer and EOF.",
+          "MTR": "No meter requests, no meter series; physical MTR absence authenticated in both engines.",
+          "inherited_A80_requests": 105,
+          "new_named_public_sunlit_fraction_requests": 10,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "original_policy": {
+            "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/baseline-derived-policy.json",
+            "sha256": "146b0914eb09427efb97b5ebf3fff54d12e1d408dc199f5df5d63adbeb93e890",
+            "bytes": 42682
+          },
+          "derived_policy": {
+            "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/derived-policy.json",
+            "sha256": "558947783608ca438a72addeb274d7a0c63797555c3a4013b18635f908c5f1f5",
+            "bytes": 59223
+          },
+          "all105_inherited_requests_and_rules_literal_exact": true,
+          "new10_fraction_rules": "Timestep/Zone/Average/empty units; unchanged scalar atol=rmse_max=1e-9 and rtol=0.",
+          "numerical_limits_changed": false,
+          "qualification": "Original accepted80 rules1/51 retain canonical kgWater/kgDryAir and requested Zone Timestep clocks. Both actual unique RDD producers remain HVAC/Average/empty units, required identically in ESO, Source catalog and JSON/CSV. No additional waiver."
+        },
+        "effective_state": "One bounded two-Zone opaque24h weather composition: separated closed ZULU300m3/100m2 receiver and ALPHA48m3/8m2 blocker, ten SunExposed/NoWind Outdoors walls/roofs and two Ground floors with twelve authored18C monthly values. Material partial public fractions on ZULU WALL001 establish cross-Zone geometric shading. No reciprocal/mutual requirement, baseline80 thermal causality, positive shadow-shadow area, private Native owner or arbitrary-combination/full-object/frozen-conformance claim.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "Source_image_reused": 111,
+          "new_Source_builds": 0,
+          "retained_actual_existing_test_authority": 0,
+          "new_test_executions": 0,
+          "new_test_functions": 0,
+          "publication109": {
+            "path": ".runtime/object-expansion/unit109-prep/publish01/receipt.json",
+            "sha256": "86f7bb6ca57a65449281376fca90a4efb6b800749fc0f898b481f6a5a61407b2",
+            "bytes": 5917
+          },
+          "retained_build_quality_authority": {
+            "path": ".runtime/object-expansion/unit110-prep/retained-build111-quality-authority01.json",
+            "sha256": "bd7c71f6629e5c532893216ec38d91b3a3cd7ae72f7c64eae85251717979cccc",
+            "bytes": 1682
+          },
+          "historical_Build111_repository": {
+            "head": "25541d1c13701c57470de5b9f8b19778410243fa",
+            "worktree_clean": false,
+            "porcelain_v1_nul_utf8": " M crates/ep_runtime/src/heat_balance/gap_batch_cohort/exterior/ingress/producer_calls.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/multiplier_predictor.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/warmup.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/body_host.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/owners.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_heat_balance_initialization/provider_host.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/array.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/period.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/sky.rs\u0000 M crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/state.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/surface.rs\u0000?? crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/polygon_overlap.rs\u0000?? crates/ep_runtime/src/heat_balance/radiation/ordinary/solar_timestep/shadow_driver.rs\u0000"
+          },
+          "fresh110_repository": {
+            "head": "a6d0594bed181f377bfa1ea67d025397812dd6c8",
+            "worktree_clean": true,
+            "porcelain_v1_nul_utf8": ""
+          }
+        },
+        "current_primary_observation": {
+          "Zones": 2,
+          "surfaces": 12,
+          "SunExposed_NoWind_Outdoors": 10,
+          "Ground_NoSun_NoWind": 2,
+          "authored_monthly_ground_temperature_C": [
+            18,
+            18,
+            18,
+            18,
+            18,
+            18,
+            18,
+            18,
+            18,
+            18,
+            18,
+            18
+          ],
+          "timesteps_per_hour": 4,
+          "raw_OutputVariable_requests": 115,
+          "reporting_environments": [
+            {
+              "kind_of_environment": 1,
+              "ordinal": 1,
+              "selected_by_primary_flags": false,
+              "title": "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 1,
+              "ordinal": 2,
+              "selected_by_primary_flags": false,
+              "title": "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+              "total_days": 1
+            },
+            {
+              "kind_of_environment": 3,
+              "ordinal": 3,
+              "selected_by_primary_flags": true,
+              "title": "RUN PERIOD 1",
+              "total_days": 1
+            }
+          ],
+          "actual_complete_reporting_hours": 24,
+          "actual_DD_reporting_hours": 0,
+          "weather_reporting_hours": 24,
+          "hours_cli_argument": null,
+          "actual_warmup_days": [
+            6
+          ],
+          "actual_cross_Zone_partial_shading": {
+            "passed": true,
+            "required_receiver_keys": [
+              "ZULU:WALL001"
+            ],
+            "activation_margin_from_unchanged_scalar_atol": 1e-09,
+            "observations": [
+              {
+                "key": "ZULU:WALL001",
+                "report_id": 11,
+                "actual_Native_partial_samples": 37,
+                "actual_Source_partial_samples": 37,
+                "actual_paired_partial_samples": 37,
+                "Native_min": 0.0,
+                "Native_max": 0.631169,
+                "Source_min": 0.0,
+                "Source_max": 0.631169,
+                "first_actual_paired_partial": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 3489,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.631169",
+                    "value": 0.631169,
+                    "physical_line": 3494,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 3340
+                  },
+                  "Source": {
+                    "token": "0.631169",
+                    "value": 0.631169,
+                    "physical_line": 3494,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 3340
+                  }
+                }
+              },
+              {
+                "key": "ZULU:WALL002",
+                "report_id": 12,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ZULU:WALL003",
+                "report_id": 13,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 0.0,
+                "Source_min": 0.0,
+                "Source_max": 0.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ZULU:WALL004",
+                "report_id": 14,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ZULU:ROOF001",
+                "report_id": 15,
+                "actual_Native_partial_samples": 37,
+                "actual_Source_partial_samples": 37,
+                "actual_paired_partial_samples": 37,
+                "Native_min": 0.0,
+                "Native_max": 0.9589223694525001,
+                "Source_min": 0.0,
+                "Source_max": 0.9589223694525001,
+                "first_actual_paired_partial": {
+                  "sample_index": 29,
+                  "stamp": {
+                    "environment_ordinal": 1,
+                    "fields": [
+                      "1",
+                      " 1",
+                      " 1",
+                      " 0",
+                      " 8",
+                      "15.00",
+                      "30.00",
+                      "Tuesday"
+                    ],
+                    "kind": "interval",
+                    "physical_line": 3489,
+                    "report_id": 2
+                  },
+                  "Native": {
+                    "token": "0.9589223694525001",
+                    "value": 0.9589223694525001,
+                    "physical_line": 3498,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 3344
+                  },
+                  "Source": {
+                    "token": "0.9589223694525001",
+                    "value": 0.9589223694525001,
+                    "physical_line": 3498,
+                    "stamp_index": 29,
+                    "stream_data_ordinal": 3344
+                  }
+                }
+              },
+              {
+                "key": "ALPHA:WALL001",
+                "report_id": 16,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:WALL002",
+                "report_id": 17,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:WALL003",
+                "report_id": 18,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 0.0,
+                "Source_min": 0.0,
+                "Source_max": 0.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:WALL004",
+                "report_id": 19,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              },
+              {
+                "key": "ALPHA:ROOF001",
+                "report_id": 20,
+                "actual_Native_partial_samples": 0,
+                "actual_Source_partial_samples": 0,
+                "actual_paired_partial_samples": 0,
+                "Native_min": 0.0,
+                "Native_max": 1.0,
+                "Source_min": 0.0,
+                "Source_max": 1.0,
+                "first_actual_paired_partial": null
+              }
+            ],
+            "reciprocal_shading_claim": false,
+            "shadow_shadow_positive_overlap_claim": false,
+            "baseline80_causal_claim": false
+          },
+          "actual_Source_geometry": {
+            "actual_trace": {
+              "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/geometry-consumers.json",
+              "sha256": "f1a599a4802798f5e4f517fcc6abb5ad0c312862dc096928fca04339776bc12f",
+              "bytes": 55995
+            },
+            "actual_compiled": {
+              "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/compiled-geometry.json",
+              "sha256": "034011d914a97442e4be7a6fbf0f5de05dccfe753dca47d2a2ba612e5fca2321",
+              "bytes": 38820
+            },
+            "authored_geometry_audit": {
+              "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/authored-geometry-audit.json",
+              "sha256": "f9c09baf62a9d963f2b912819a7f9d3440acf98177f6f2e9da7bc92fed510cf2",
+              "bytes": 10092
+            },
+            "all12_surface_vertices_and_owners_exact": true,
+            "two_Zones_Spaces_enclosures": true,
+            "observer_supplies_inputs": false,
+            "private_Native_allocations_observed": false
+          },
+          "Source_JSON_samples_checked": 11040,
+          "Source_CSV_all_token_bits_owner_clock_joins": true,
+          "whole_public_ancillary": {
+            "eio": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.eio",
+                "sha256": "ec443bfacec46b08d179a164b7bf94c5580d8672df19d01227bf1921940e439e",
+                "bytes": 14786
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.eio",
+                "sha256": "9440c77a5b4881fbf71967461b96f522c2fecd879e55980d3bb818f5bf884985",
+                "bytes": 14750
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "err": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.err",
+                "sha256": "135a15e4b357e5fd41547cc1bccd2c029f918328b165ad6396fff9b362eafe1f",
+                "bytes": 1032
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.err",
+                "sha256": "25525510ea654b503533d4051a9040ab02d19c0aa3d35402e44b1345ae047e6c",
+                "bytes": 1027
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "end": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.end",
+                "sha256": "6e1b648ff07056120a559a60aaacdf708cf275b9da5340268068c0f0728c49d2",
+                "bytes": 98
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.end",
+                "sha256": "4e14366ec3fb321cdc7cec58723e1832e3ef3d93f7eba36c51ce1f340ec4386f",
+                "bytes": 98
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "rdd": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.rdd",
+                "sha256": "f02eaf21219344df8b9baf3a252717ff68bd20dc4926a05ebb5820ff5ea293d8",
+                "bytes": 26892
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.rdd",
+                "sha256": "fb110c5f515cd06f7b07bf14cacabe2574cc4c23bd7815c9ff05f13be532345d",
+                "bytes": 26887
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mdd": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.mdd",
+                "sha256": "ff955c3f89dc1100b6004508ff31e232f8dd5d116132436c9c735be2dbdd53fb",
+                "bytes": 2631
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.mdd",
+                "sha256": "6d4f2c550369868923e08bd715b4abc2e93af74d91cb4f6dfb1f049bcc02c7ab",
+                "bytes": 2626
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mtd": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.mtd",
+                "sha256": "9e2561b7e5e2d14ab7219e7f6150c6d75accf01f49f1d8280b41ac7d7f135eb1",
+                "bytes": 6216
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.mtd",
+                "sha256": "9e2561b7e5e2d14ab7219e7f6150c6d75accf01f49f1d8280b41ac7d7f135eb1",
+                "bytes": 6216
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "shd": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.shd",
+                "sha256": "69825fb9916ded5b4648d8ccb9170ab1365895a239ec550fda15fab8a179912f",
+                "bytes": 3016
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.shd",
+                "sha256": "69825fb9916ded5b4648d8ccb9170ab1365895a239ec550fda15fab8a179912f",
+                "bytes": 3016
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "warmup_days": [
+              6
+            ],
+            "complete_CTF_records": [
+              [
+                " Construction CTF",
+                "R13WALL",
+                "   1",
+                "   1",
+                "   1",
+                "   0.250",
+                "         0.4365",
+                "   0.900",
+                "   0.900",
+                "   0.750",
+                "   0.750",
+                "Rough"
+              ],
+              [
+                " Material CTF Summary",
+                "R13LAYER",
+                "  0.0000",
+                "         0.000",
+                "      0.000",
+                "        0.000",
+                "       2.291"
+              ],
+              [
+                " CTF",
+                "   1",
+                "                   0",
+                "                   0",
+                "                  -0",
+                "                  -0"
+              ],
+              [
+                " CTF",
+                "   0",
+                "          0.43649728",
+                "          0.43649728",
+                "          0.43649728"
+              ],
+              [
+                " Construction CTF",
+                "FLOOR",
+                "   2",
+                "   1",
+                "   5",
+                "   0.250",
+                "          17.04",
+                "   0.900",
+                "   0.900",
+                "   0.650",
+                "   0.650",
+                "MediumRough"
+              ],
+              [
+                " Material CTF Summary",
+                "C5 - 4 IN HW CONCRETE",
+                "  0.1015",
+                "         1.730",
+                "   2242.585",
+                "      836.800",
+                "     0.05868"
+              ],
+              [
+                " CTF",
+                "   5",
+                "      -4.1142049E-08",
+                "       1.5543709E-08",
+                "      -4.1142049E-08",
+                "       1.2297289E-11"
+              ],
+              [
+                " CTF",
+                "   4",
+                "       0.00057884701",
+                "       0.00022976293",
+                "       0.00057884701",
+                "      -4.0580373E-07"
+              ],
+              [
+                " CTF",
+                "   3",
+                "         -0.33051123",
+                "         0.091914804",
+                "         -0.33051123",
+                "        0.0006592243"
+              ],
+              [
+                " CTF",
+                "   2",
+                "           12.566595",
+                "           2.1743923",
+                "           12.566595",
+                "        -0.058066613"
+              ],
+              [
+                " CTF",
+                "   1",
+                "          -62.622544",
+                "           4.7096437",
+                "          -62.622544",
+                "          0.60555731"
+              ],
+              [
+                " CTF",
+                "   0",
+                "            58.08561",
+                "          0.72354869",
+                "            58.08561"
+              ],
+              [
+                " Construction CTF",
+                "ROOF31",
+                "   3",
+                "   1",
+                "   1",
+                "   0.250",
+                "         0.1833",
+                "   0.900",
+                "   0.900",
+                "   0.750",
+                "   0.750",
+                "Rough"
+              ],
+              [
+                " Material CTF Summary",
+                "R31LAYER",
+                "  0.0000",
+                "         0.000",
+                "      0.000",
+                "        0.000",
+                "       5.456"
+              ],
+              [
+                " CTF",
+                "   1",
+                "                   0",
+                "                   0",
+                "                  -0",
+                "                  -0"
+              ],
+              [
+                " CTF",
+                "   0",
+                "          0.18328446",
+                "          0.18328446",
+                "          0.18328446"
+              ]
+            ],
+            "default_shadowing_EIO": [
+              "Shadowing/Sun Position Calculations Annual Simulations",
+              "PolygonClipping",
+              "Periodic",
+              "20",
+              "15000",
+              "SutherlandHodgman",
+              "512",
+              "SimpleSkyDiffuseModeling",
+              "No",
+              "No",
+              "No"
+            ],
+            "public_AUDIT": {
+              "Native": {
+                "artifact": {
+                  "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.audit",
+                  "sha256": "4f28990ca5abbc5a6c96b85c31160383fe2259f65c95fc2a6456b47da94acfb5",
+                  "bytes": 1569
+                },
+                "maxNumberOfFigures": 1,
+                "ClippingAlgorithm": "SutherlandHodgman"
+              },
+              "Source": {
+                "artifact": {
+                  "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.audit",
+                  "sha256": "4f28990ca5abbc5a6c96b85c31160383fe2259f65c95fc2a6456b47da94acfb5",
+                  "bytes": 1569
+                },
+                "maxNumberOfFigures": 1,
+                "ClippingAlgorithm": "SutherlandHodgman"
+              }
+            },
+            "MULTOL_invocation_observed": true,
+            "MULTOL_qualification": "Positive whole-run max prior-figure count proves a MULTOL invocation, possibly during sky diffuse. It does not identify a beam call, receiver/time, call count or positive shadow-shadow intersection;109 already had positive1.",
+            "DXF": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativeout.dxf",
+                "sha256": "4a6165ce36b928e0885a674aca50b9e9228dccad43332ee0a290c0ff8dca8743",
+                "bytes": 9692
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplusrs.dxf",
+                "sha256": "448075668d9617a61af2494756d1034323450544a3603747f938df77eb1ffb72",
+                "bytes": 8590
+              },
+              "pairs": 533,
+              "sole_identity_pair": 3
+            },
+            "full_CSV_table": {
+              "Native": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativetbl.csv",
+                "sha256": "a41803624c4cc032f0cdb7a38db987aef2ea776e92cce81004f59d61e24bac07",
+                "bytes": 84849
+              },
+              "Source": {
+                "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplustbl.csv",
+                "sha256": "8a6174674bf713467809a95c82c277cd11f20d8864035cf4ea3b14e453fa52e0",
+                "bytes": 84777
+              },
+              "rows": 1710,
+              "sole_program_identity_rows": [
+                0,
+                196
+              ],
+              "other_cells_exact": true
+            },
+            "climatic_table": {
+              "Native": {
+                "artifact": {
+                  "path": ".runtime/porting/cross-zone-opaque-shadow-110/native-01/output/nativetbl.csv",
+                  "sha256": "a41803624c4cc032f0cdb7a38db987aef2ea776e92cce81004f59d61e24bac07",
+                  "bytes": 84849
+                },
+                "header": [
+                  "",
+                  "",
+                  "Maximum Dry Bulb [C]",
+                  "Daily Temperature Range [deltaC]",
+                  "Humidity Value",
+                  "Humidity Type",
+                  "Wind Speed [m/s]",
+                  "Wind Direction"
+                ],
+                "rows": [
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+                    "-15.50",
+                    "0.00",
+                    "-15.50",
+                    "Wetbulb [C]",
+                    "3.00",
+                    "340.00"
+                  ],
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+                    "32.00",
+                    "15.20",
+                    "15.50",
+                    "Wetbulb [C]",
+                    "4.90",
+                    "0.00"
+                  ]
+                ],
+                "exact_selected_cells": 12,
+                "active_DesignDay_environments": 0
+              },
+              "Source": {
+                "artifact": {
+                  "path": ".runtime/porting/cross-zone-opaque-shadow-110/source-01/output/eplustbl.csv",
+                  "sha256": "8a6174674bf713467809a95c82c277cd11f20d8864035cf4ea3b14e453fa52e0",
+                  "bytes": 84777
+                },
+                "header": [
+                  "",
+                  "",
+                  "Maximum Dry Bulb [C]",
+                  "Daily Temperature Range [deltaC]",
+                  "Humidity Value",
+                  "Humidity Type",
+                  "Wind Speed [m/s]",
+                  "Wind Direction"
+                ],
+                "rows": [
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+                    "-15.50",
+                    "0.00",
+                    "-15.50",
+                    "Wetbulb [C]",
+                    "3.00",
+                    "340.00"
+                  ],
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+                    "32.00",
+                    "15.20",
+                    "15.50",
+                    "Wetbulb [C]",
+                    "4.90",
+                    "0.00"
+                  ]
+                ],
+                "exact_selected_cells": 12,
+                "active_DesignDay_environments": 0
+              },
+              "exact_selected_cells": 12
+            }
+          },
+          "MULTOL_invocation_only_qualification": "Positive whole-run max prior-figure count proves a MULTOL invocation, possibly during sky diffuse. It does not identify a beam call, receiver/time, call count or positive shadow-shadow intersection;109 already had positive1.",
+          "actual_custody": {
+            "Native": {
+              "path": ".runtime/object-expansion/unit110-prep/root-native-custody01.json",
+              "sha256": "69fe8ef7e66df91babffb9d49f622efbf6f13e22539f5a1765c1b4d5d3db1660",
+              "bytes": 1095
+            },
+            "Source": {
+              "path": ".runtime/object-expansion/unit110-prep/root-source-custody01.json",
+              "sha256": "11077c38f8c2d379000cf7d95e940d05803887443cd1d3c21774f16b48d147c8",
+              "bytes": 1168
+            },
+            "Source_completion": {
+              "path": ".runtime/object-expansion/unit110-prep/root-source-completion01.json",
+              "sha256": "02a4f68b085753b939afe4eb90415aa87ca636d37a3a828063ee3761fe5723af",
+              "bytes": 1485
+            }
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit110-prep/actual-independent-readback01.json",
+            "sha256": "c053e9f09bbdb214ffa51806839c5d051162ce6012720c62486131ff31f24156",
+            "bytes": 337919
+          },
+          "independent_full_actual_physical_peer": {
+            "path": ".runtime/object-expansion/unit110-prep/physical-peer01/proof01.json",
+            "sha256": "b7a97ef031bbc5b903a1cf45acb85d4dd98e1e50ad3e485b186034f0d7c3f55f",
+            "bytes": 314706
+          },
+          "Root_peer_review": {
+            "path": ".runtime/object-expansion/unit110-prep/root-physical-peer-review01.json",
+            "sha256": "8277dfeb3cb82fad95f5c1daf79f02eb0900cf75db6eb0a4e80aa65bc81c74b4",
+            "bytes": 1151
+          },
+          "source_runtime_class": "source-multizone-heat-balance-compatibility",
+          "matched_capability_ids": [],
+          "private_owners_and_complete_trajectories_observed": false
+        }
       }
     ],
     "totals": {
-      "paired_cases": 162,
-      "reported_samples": 4571502,
-      "raw_operand_unequal": 994229,
+      "paired_cases": 163,
+      "reported_samples": 4582542,
+      "raw_operand_unequal": 997326,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -52124,6 +52964,268 @@
       "Native_replays": 0,
       "Source_replays": 0,
       "scope": "One bounded B NoLimit five-DD/120-hour composition changes only four ROOF and WALL Y0 Sun/Wind exposure strings. Same-engine accepted108 companions retain all 15 weather/Day forcing streams while exposed-face and demand-or-supply outputs change. Four other Outdoors NoSun/NoWind faces, 1000 W gain, availability, thermostats, geometry and all other input bytes remain. This observes joint Sun/Wind-to-surface/HVAC composition only. Separate Sun/Wind causality, private HAT/film/local wind/flow caches, arbitrary values/combinations and frozen CON-01 promotion remain outside the evidence."
+    },
+    "current_cross_Zone_opaque_shadow_live_pair": {
+      "source_build": "source-b-positive-general-shadows-109",
+      "reused_actual_Source_build": {
+        "path": ".runtime/object-expansion/build111-row.json",
+        "sha256": "682d0c13067de3c39578052b86ccdc8bd0b6427264fb026cbdc40aa996fb84a4",
+        "bytes": 688
+      },
+      "retained_actual_quality_authority": {
+        "path": ".runtime/object-expansion/unit110-prep/retained-build111-quality-authority01.json",
+        "sha256": "bd7c71f6629e5c532893216ec38d91b3a3cd7ae72f7c64eae85251717979cccc",
+        "bytes": 1682
+      },
+      "case_rows": [
+        "A-CROSS-ZONE-OPAQUE-SHADOW-110-24H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit110-prep/actual-independent-readback01.json",
+        "sha256": "c053e9f09bbdb214ffa51806839c5d051162ce6012720c62486131ff31f24156",
+        "bytes": 337919
+      },
+      "independent_actual_full_physical_peer": {
+        "path": ".runtime/object-expansion/unit110-prep/physical-peer01/proof01.json",
+        "sha256": "b7a97ef031bbc5b903a1cf45acb85d4dd98e1e50ad3e485b186034f0d7c3f55f",
+        "bytes": 314706
+      },
+      "Root_physical_peer_review": {
+        "path": ".runtime/object-expansion/unit110-prep/root-physical-peer-review01.json",
+        "sha256": "8277dfeb3cb82fad95f5c1daf79f02eb0900cf75db6eb0a4e80aa65bc81c74b4",
+        "bytes": 1151
+      },
+      "actual_custody": {
+        "Native": {
+          "path": ".runtime/object-expansion/unit110-prep/root-native-custody01.json",
+          "sha256": "69fe8ef7e66df91babffb9d49f622efbf6f13e22539f5a1765c1b4d5d3db1660",
+          "bytes": 1095
+        },
+        "Source": {
+          "path": ".runtime/object-expansion/unit110-prep/root-source-custody01.json",
+          "sha256": "11077c38f8c2d379000cf7d95e940d05803887443cd1d3c21774f16b48d147c8",
+          "bytes": 1168
+        },
+        "Source_completion": {
+          "path": ".runtime/object-expansion/unit110-prep/root-source-completion01.json",
+          "sha256": "02a4f68b085753b939afe4eb90415aa87ca636d37a3a828063ee3761fe5723af",
+          "bytes": 1485
+        }
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit110-prep/mutual-shadow-pilot-proposal01/recipe.json",
+        "sha256": "6db02ff5cfc575bb4151384f047b0041e9f4c4689aefb922cbd5763e17e4944b",
+        "bytes": 50774
+      },
+      "publication109": {
+        "path": ".runtime/object-expansion/unit109-prep/publish01/receipt.json",
+        "sha256": "86f7bb6ca57a65449281376fca90a4efb6b800749fc0f898b481f6a5a61407b2",
+        "bytes": 5917
+      },
+      "actual_cross_Zone_partial_shading": {
+        "passed": true,
+        "required_receiver_keys": [
+          "ZULU:WALL001"
+        ],
+        "activation_margin_from_unchanged_scalar_atol": 1e-09,
+        "observations": [
+          {
+            "key": "ZULU:WALL001",
+            "report_id": 11,
+            "actual_Native_partial_samples": 37,
+            "actual_Source_partial_samples": 37,
+            "actual_paired_partial_samples": 37,
+            "Native_min": 0.0,
+            "Native_max": 0.631169,
+            "Source_min": 0.0,
+            "Source_max": 0.631169,
+            "first_actual_paired_partial": {
+              "sample_index": 29,
+              "stamp": {
+                "environment_ordinal": 1,
+                "fields": [
+                  "1",
+                  " 1",
+                  " 1",
+                  " 0",
+                  " 8",
+                  "15.00",
+                  "30.00",
+                  "Tuesday"
+                ],
+                "kind": "interval",
+                "physical_line": 3489,
+                "report_id": 2
+              },
+              "Native": {
+                "token": "0.631169",
+                "value": 0.631169,
+                "physical_line": 3494,
+                "stamp_index": 29,
+                "stream_data_ordinal": 3340
+              },
+              "Source": {
+                "token": "0.631169",
+                "value": 0.631169,
+                "physical_line": 3494,
+                "stamp_index": 29,
+                "stream_data_ordinal": 3340
+              }
+            }
+          },
+          {
+            "key": "ZULU:WALL002",
+            "report_id": 12,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 1.0,
+            "Source_min": 0.0,
+            "Source_max": 1.0,
+            "first_actual_paired_partial": null
+          },
+          {
+            "key": "ZULU:WALL003",
+            "report_id": 13,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 0.0,
+            "Source_min": 0.0,
+            "Source_max": 0.0,
+            "first_actual_paired_partial": null
+          },
+          {
+            "key": "ZULU:WALL004",
+            "report_id": 14,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 1.0,
+            "Source_min": 0.0,
+            "Source_max": 1.0,
+            "first_actual_paired_partial": null
+          },
+          {
+            "key": "ZULU:ROOF001",
+            "report_id": 15,
+            "actual_Native_partial_samples": 37,
+            "actual_Source_partial_samples": 37,
+            "actual_paired_partial_samples": 37,
+            "Native_min": 0.0,
+            "Native_max": 0.9589223694525001,
+            "Source_min": 0.0,
+            "Source_max": 0.9589223694525001,
+            "first_actual_paired_partial": {
+              "sample_index": 29,
+              "stamp": {
+                "environment_ordinal": 1,
+                "fields": [
+                  "1",
+                  " 1",
+                  " 1",
+                  " 0",
+                  " 8",
+                  "15.00",
+                  "30.00",
+                  "Tuesday"
+                ],
+                "kind": "interval",
+                "physical_line": 3489,
+                "report_id": 2
+              },
+              "Native": {
+                "token": "0.9589223694525001",
+                "value": 0.9589223694525001,
+                "physical_line": 3498,
+                "stamp_index": 29,
+                "stream_data_ordinal": 3344
+              },
+              "Source": {
+                "token": "0.9589223694525001",
+                "value": 0.9589223694525001,
+                "physical_line": 3498,
+                "stamp_index": 29,
+                "stream_data_ordinal": 3344
+              }
+            }
+          },
+          {
+            "key": "ALPHA:WALL001",
+            "report_id": 16,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 1.0,
+            "Source_min": 0.0,
+            "Source_max": 1.0,
+            "first_actual_paired_partial": null
+          },
+          {
+            "key": "ALPHA:WALL002",
+            "report_id": 17,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 1.0,
+            "Source_min": 0.0,
+            "Source_max": 1.0,
+            "first_actual_paired_partial": null
+          },
+          {
+            "key": "ALPHA:WALL003",
+            "report_id": 18,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 0.0,
+            "Source_min": 0.0,
+            "Source_max": 0.0,
+            "first_actual_paired_partial": null
+          },
+          {
+            "key": "ALPHA:WALL004",
+            "report_id": 19,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 1.0,
+            "Source_min": 0.0,
+            "Source_max": 1.0,
+            "first_actual_paired_partial": null
+          },
+          {
+            "key": "ALPHA:ROOF001",
+            "report_id": 20,
+            "actual_Native_partial_samples": 0,
+            "actual_Source_partial_samples": 0,
+            "actual_paired_partial_samples": 0,
+            "Native_min": 0.0,
+            "Native_max": 1.0,
+            "Source_min": 0.0,
+            "Source_max": 1.0,
+            "first_actual_paired_partial": null
+          }
+        ],
+        "reciprocal_shading_claim": false,
+        "shadow_shadow_positive_overlap_claim": false,
+        "baseline80_causal_claim": false
+      },
+      "new_test_executions": 0,
+      "new_test_functions": 0,
+      "new_builds": 0,
+      "actual_fresh_Native_executions": 1,
+      "actual_fresh_Source_executions": 1,
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "scope": "One bounded two-Zone opaque24h weather composition: separated closed ZULU300m3/100m2 receiver and ALPHA48m3/8m2 blocker, ten SunExposed/NoWind Outdoors walls/roofs and two Ground floors with twelve authored18C monthly values. Material partial public fractions on ZULU WALL001 establish cross-Zone geometric shading. No reciprocal/mutual requirement, baseline80 thermal causality, positive shadow-shadow area, private Native owner or arbitrary-combination/full-object/frozen-conformance claim."
     }
   },
   "additional_native_type_calibrations": [

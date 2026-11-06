@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 162 paired physical cases and 4,571,502 reported values with zero
+contains 163 paired physical cases and 4,582,542 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -157,6 +157,16 @@ wind/HAT, arbitrary values/combinations, OA/latent control, sizing and legacy
 active DDs remain outside this evidence. No capability or frozen CON-01 identity
 is promoted.
 
+A separate two-Zone opaque weather case observes cross-Zone geometric shading.
+Ten SunExposed/NoWind walls and roofs surround two closed masses; two Ground
+floors use twelve authored 18C monthly values. Each engine reports 37 partial
+sunlit-fraction samples on the declared ZULU wall and roof. All 115 series and
+11,040 values pass unchanged limits, with complete streams and Source JSON/CSV
+joins. Whole requested reports, CTF, DXF, tables and six warmup days agree
+within their recorded identity boundaries. This finite case does not establish
+reciprocal shading, baseline thermal causality, positive shadow-shadow area or
+arbitrary object combinations.
+
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
 the getter's Ceiling alias. Exact reverse Material
@@ -164,8 +174,8 @@ identity retains the Native fast path; differing counts or layer identities use
 an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
 retain Native's warning sequence. Infrared-transparent constructions retain
 their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
-and list factors and opposite coincident vertices. Twenty-five 24-hour two-Zone
-cases cover 649,584 derived values with zero tolerance or RMSE failures;
+and list factors and opposite coincident vertices. Twenty-six 24-hour two-Zone
+cases cover 660,624 derived values with zero tolerance or RMSE failures;
 the maximum absolute difference is 3.8198777474462986e-11. Actual Zone/Space and enclosure links,
 EIO, diagnostics and DXF agree within their recorded boundaries. This separate
 class inherits no one-Zone capabilities or conformance promotion. Multiple/remainder Spaces, Space heat balance, Source B authored Spaces,
