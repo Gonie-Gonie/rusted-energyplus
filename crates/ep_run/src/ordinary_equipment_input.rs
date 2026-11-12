@@ -493,7 +493,16 @@ fn resolve_raw(
                     &["SimpleCombined", "TARP", "MoWiTT", "DOE-2"],
                 ),
                 "ZoneAirHeatBalanceAlgorithm" => {
-                    selected(object, "algorithm", &["ThirdOrderBackwardDifference"])
+                    let algorithms: &[&str] = if source_calendar_ingress {
+                        &[
+                            "ThirdOrderBackwardDifference",
+                            "AnalyticalSolution",
+                            "EulerMethod",
+                        ]
+                    } else {
+                        &["ThirdOrderBackwardDifference"]
+                    };
+                    selected(object, "algorithm", algorithms)
                         && selected(object, "do_space_heat_balance_for_sizing", &["No"])
                         && selected(object, "do_space_heat_balance_for_simulation", &["No"])
                 }

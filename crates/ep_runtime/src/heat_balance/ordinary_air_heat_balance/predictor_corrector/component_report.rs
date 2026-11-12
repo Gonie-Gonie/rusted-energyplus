@@ -160,8 +160,11 @@ impl SourceZoneSpaceHeatBalanceData {
                     * (self.mat - self.ztm[0])
                     / seconds
             }
+            SelectedZoneAirSolution::Analytical => {
+                report.czd_tdt = self.temp_ind_coef - self.temp_dep_coef * self.mat;
+            }
             SelectedZoneAirSolution::Euler => {
-                return Err(Error::Unavailable("non-ThirdOrder component storage5640"));
+                report.czd_tdt = self.air_power_cap * (self.mat - self.t1);
             }
         }
         if owners.globals.display_zone_air_heat_balance_off_balance {

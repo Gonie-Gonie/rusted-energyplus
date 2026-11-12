@@ -353,15 +353,17 @@ fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut 
     }
     for (field, required) in [
         ("heat_balance_algorithm", "ConductionTransferFunction"),
-        (
-            "zone_air_heat_balance_algorithm",
-            "ThirdOrderBackwardDifference",
-        ),
         ("room_air_model_type", "Mixing"),
     ] {
         if settings[field] != required {
             violations.push(format!("{field} must be {required} in the selected scope"));
         }
+    }
+    if !matches!(
+        settings["zone_air_heat_balance_algorithm"].as_str(),
+        Some("ThirdOrderBackwardDifference" | "AnalyticalSolution" | "EulerMethod")
+    ) {
+        violations.push("zone_air_heat_balance_algorithm must be ThirdOrderBackwardDifference, AnalyticalSolution or EulerMethod in the selected Source scope".into());
     }
     for (field, minimum, exclusive) in [
         ("surface_temperature_upper_limit", 200.0, false),

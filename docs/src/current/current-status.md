@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 165 paired physical cases and 4,653,822 reported values with zero
+contains 169 paired physical cases and 4,780,216 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 109 recorded Source builds,
-102 with accepted pairs and seven without accepted pairs, including one build
+validate the consumer corrections. There are 110 recorded Source builds,
+103 with accepted pairs and seven without accepted pairs, including one build
 superseded before any Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -184,6 +184,13 @@ coefficient rules use explicit 1e-9 W/m2-K point and RMSE limits; all inherited
 rules remain exact. Positive public node flow confirms activation. Public
 averages do not instrument private Native convection-entry ACH or call history.
 Adaptive, surface-local/user/EMS/Kiva and reached window children remain bounded.
+
+All three Zone air solution algorithms now reach bounded Source A/B consumers
+with Space heat balance disabled. Four one-Zone Euler and Analytical cases
+compare 360 series and 126,394 values under unchanged scalar limits, including
+both controlled Detailed node-temperature arrays. Their complete public
+intervals and Source JSON/CSV joins pass; shortened intervals are reporting
+evidence. Private solver histories and broader combinations remain unestablished.
 
 HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
 and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including

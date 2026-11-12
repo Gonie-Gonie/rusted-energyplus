@@ -125,6 +125,7 @@ impl std::error::Error for HeatBalanceInputError {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SelectedZoneAirSolution {
     ThirdOrder,
+    Analytical,
     Euler,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

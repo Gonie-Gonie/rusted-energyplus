@@ -145,12 +145,25 @@ impl SelectedHeatBalanceInputState {
                 owners.shortcut,
             )?;
             if values.num_alphas > 0 {
-                if values.alphas[0] != "THIRDORDERBACKWARDDIFFERENCE" {
-                    return Err(HeatBalanceInputError::Unavailable(
-                        "unadmitted zone algorithm",
-                    ));
+                match values.alphas[0].as_str() {
+                    "THIRDORDERBACKWARDDIFFERENCE" => {
+                        self.zone_air_solution = SelectedZoneAirSolution::ThirdOrder;
+                        zone_label = "ThirdOrderBackwardDifference".into();
+                    }
+                    "ANALYTICALSOLUTION" => {
+                        self.zone_air_solution = SelectedZoneAirSolution::Analytical;
+                        zone_label = "AnalyticalSolution".into();
+                    }
+                    "EULERMETHOD" => {
+                        self.zone_air_solution = SelectedZoneAirSolution::Euler;
+                        zone_label = "EulerMethod".into();
+                    }
+                    _ => {
+                        return Err(HeatBalanceInputError::Unavailable(
+                            "unadmitted zone algorithm",
+                        ));
+                    }
                 }
-                self.zone_air_solution = SelectedZoneAirSolution::ThirdOrder;
             } else {
                 zone_label = values.alphas[0].clone();
             }

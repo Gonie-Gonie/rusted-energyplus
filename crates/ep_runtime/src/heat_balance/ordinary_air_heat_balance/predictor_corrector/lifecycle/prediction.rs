@@ -1,4 +1,4 @@
-//! Genuine zone-only ThirdOrder prediction, physical rollback and setpoint handoff.
+//! Genuine mixed-zone prediction, physical rollback and setpoint handoff.
 use super::*;
 fn down_interpolate(old_step: f64, new_step: f64, old: &[f64; 4], new: &mut [f64; 4]) -> f64 {
     let ratio = old_step / new_step;
@@ -130,9 +130,21 @@ impl SourceZoneSpaceHeatBalanceData {
         }
         owners.hvac.shorten_time_step_sys_room_air = false;
         if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-            return Err(Error::Unavailable(
-                "non-ThirdOrder predicted T1/W1 history3214",
-            ));
+            if shorten && owners.hvac.time_step_sys < owners.clock.time_step_zone {
+                if owners.hvac.previous_time_step < owners.clock.time_step_zone {
+                    self.t1 = self.tm2;
+                    self.w1 = self.wm2;
+                } else {
+                    self.t1 = self.tmx;
+                    self.w1 = self.wmx;
+                }
+                owners.hvac.shorten_time_step_sys_room_air = true;
+            } else {
+                self.t1 = self.zt;
+                self.w1 = self.air_hum_rat;
+            }
+            self.temp_dep_load = self.temp_dep_coef;
+            self.temp_ind_load = self.temp_ind_coef;
         }
         self.calculate_source_predicted_sensible(rafn_fraction, number, controller, owners)?;
         self.calculate_source_predicted_humidity(number, controller, owners)?;
@@ -170,12 +182,29 @@ impl SourceZoneSpaceHeatBalanceData {
         match kind {
             0 => {} // Native Uncontrolled retains its actual zero procedure locals.
             1 => {
-                if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable(
-                        "non-ThirdOrder predicted SingleHeat6870",
-                    ));
+                match owners.control.zone_air_solution {
+                    SelectedZoneAirSolution::ThirdOrder => {
+                        heating_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
+                    }
+                    SelectedZoneAirSolution::Analytical => {
+                        if self.temp_dep_load == 0.0 {
+                            heating_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                                - self.temp_ind_load;
+                        } else {
+                            let exp_700_ta =
+                                cpp_min(700.0, -self.temp_dep_load / self.air_power_cap).exp();
+                            heating_load = self.temp_dep_load
+                                * (setpoints.setpt - self.t1 * exp_700_ta)
+                                / (1.0 - exp_700_ta)
+                                - self.temp_ind_load;
+                        }
+                    }
+                    SelectedZoneAirSolution::Euler => {
+                        heating_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                            + self.temp_dep_load * setpoints.setpt
+                            - self.temp_ind_load;
+                    }
                 }
-                heating_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
                 if rafn_fraction > 0.0 {
                     heating_load /= rafn_fraction;
                 }
@@ -187,12 +216,29 @@ impl SourceZoneSpaceHeatBalanceData {
                 }
             }
             2 => {
-                if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable(
-                        "non-ThirdOrder predicted SingleCool6908",
-                    ));
+                match owners.control.zone_air_solution {
+                    SelectedZoneAirSolution::ThirdOrder => {
+                        cooling_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
+                    }
+                    SelectedZoneAirSolution::Analytical => {
+                        if self.temp_dep_load == 0.0 {
+                            cooling_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                                - self.temp_ind_load;
+                        } else {
+                            let exp_700_ta =
+                                cpp_min(700.0, -self.temp_dep_load / self.air_power_cap).exp();
+                            cooling_load = self.temp_dep_load
+                                * (setpoints.setpt - self.t1 * exp_700_ta)
+                                / (1.0 - exp_700_ta)
+                                - self.temp_ind_load;
+                        }
+                    }
+                    SelectedZoneAirSolution::Euler => {
+                        cooling_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                            + self.temp_dep_load * setpoints.setpt
+                            - self.temp_ind_load;
+                    }
                 }
-                cooling_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
                 if rafn_fraction > 0.0 {
                     // Literal Native6927 intentionally divides the heating local.
                     heating_load /= rafn_fraction;
@@ -210,13 +256,39 @@ impl SourceZoneSpaceHeatBalanceData {
                 }
             }
             3 => {
-                if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable(
-                        "non-ThirdOrder predicted SingleHeatCool6949",
-                    ));
+                match owners.control.zone_air_solution {
+                    SelectedZoneAirSolution::ThirdOrder => {
+                        heating_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
+                        cooling_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
+                    }
+                    SelectedZoneAirSolution::Analytical => {
+                        if self.temp_dep_load == 0.0 {
+                            heating_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                                - self.temp_ind_load;
+                            cooling_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                                - self.temp_ind_load;
+                        } else {
+                            let exp_700_ta =
+                                cpp_min(700.0, -self.temp_dep_load / self.air_power_cap).exp();
+                            heating_load = self.temp_dep_load
+                                * (setpoints.setpt - self.t1 * exp_700_ta)
+                                / (1.0 - exp_700_ta)
+                                - self.temp_ind_load;
+                            cooling_load = self.temp_dep_load
+                                * (setpoints.setpt - self.t1 * exp_700_ta)
+                                / (1.0 - exp_700_ta)
+                                - self.temp_ind_load;
+                        }
+                    }
+                    SelectedZoneAirSolution::Euler => {
+                        heating_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                            + self.temp_dep_load * setpoints.setpt
+                            - self.temp_ind_load;
+                        cooling_load = self.air_power_cap * (setpoints.setpt - self.t1)
+                            + self.temp_dep_load * setpoints.setpt
+                            - self.temp_ind_load;
+                    }
                 }
-                heating_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
-                cooling_load = self.temp_dep_load * setpoints.setpt - self.temp_ind_load;
                 zone_setpoint = setpoints.setpt;
                 if rafn_fraction > 0.0 {
                     heating_load /= rafn_fraction;
@@ -256,13 +328,39 @@ impl SourceZoneSpaceHeatBalanceData {
                 }
             }
             4 => {
-                if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-                    return Err(Error::Unavailable(
-                        "non-ThirdOrder predicted DualHeatCool7041",
-                    ));
+                match owners.control.zone_air_solution {
+                    SelectedZoneAirSolution::ThirdOrder => {
+                        heating_load = self.temp_dep_load * setpoints.setpt_lo - self.temp_ind_load;
+                        cooling_load = self.temp_dep_load * setpoints.setpt_hi - self.temp_ind_load;
+                    }
+                    SelectedZoneAirSolution::Analytical => {
+                        if self.temp_dep_load == 0.0 {
+                            heating_load = self.air_power_cap * (setpoints.setpt_lo - self.t1)
+                                - self.temp_ind_load;
+                            cooling_load = self.air_power_cap * (setpoints.setpt_hi - self.t1)
+                                - self.temp_ind_load;
+                        } else {
+                            let exp_700_ta =
+                                cpp_min(700.0, -self.temp_dep_load / self.air_power_cap).exp();
+                            heating_load = self.temp_dep_load
+                                * (setpoints.setpt_lo - self.t1 * exp_700_ta)
+                                / (1.0 - exp_700_ta)
+                                - self.temp_ind_load;
+                            cooling_load = self.temp_dep_load
+                                * (setpoints.setpt_hi - self.t1 * exp_700_ta)
+                                / (1.0 - exp_700_ta)
+                                - self.temp_ind_load;
+                        }
+                    }
+                    SelectedZoneAirSolution::Euler => {
+                        heating_load = self.air_power_cap * (setpoints.setpt_lo - self.t1)
+                            + self.temp_dep_load * setpoints.setpt_lo
+                            - self.temp_ind_load;
+                        cooling_load = self.air_power_cap * (setpoints.setpt_hi - self.t1)
+                            + self.temp_dep_load * setpoints.setpt_hi
+                            - self.temp_ind_load;
+                    }
                 }
-                heating_load = self.temp_dep_load * setpoints.setpt_lo - self.temp_ind_load;
-                cooling_load = self.temp_dep_load * setpoints.setpt_hi - self.temp_ind_load;
                 if rafn_fraction > 0.0 {
                     heating_load /= rafn_fraction;
                 }

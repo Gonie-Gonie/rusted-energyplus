@@ -55,7 +55,8 @@
         "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
       "Ten named Surface Outside Face Sunlit Fraction requests join all 105 inherited multizone requests. All 115 real Timestep series/11,040 values retain strict scalar policy and actual ReportID, owner and clock bindings in ESO and Source JSON/CSV; meters are genuinely absent. Other producers and full-object combinations remain bounded.",
       "Thirty named obstruction-reflection W/m2 requests retain actual Zone/Average/Timestep owners and original A policy6 limits alongside 115 literal inherited rules. All 145 series and 13,920 values pass complete ESO and Source JSON/CSV joins; all 30 new series match exactly. Meters are genuinely absent; other producers and full-object combinations remain bounded.",
-      "Six named Surface Inside Face Convection Heat Transfer Coefficient requests read the sole live SurfHConvInt cells as Zone/Average/Timestep W/m2-K. Their new explicit atol/RMSE1e-9, rtol0 rules leave113 inherited variable and2 meter rules unchanged. One Source B five-DesignDay case passes119 Timestep ESO plus2 genuine Hourly MTR series/57,360 values, with complete Source JSON/CSV owner-clock joins. No sealed policy, unit waiver or full-object promotion is introduced."
+      "Six named Surface Inside Face Convection Heat Transfer Coefficient requests read the sole live SurfHConvInt cells as Zone/Average/Timestep W/m2-K. Their new explicit atol/RMSE1e-9, rtol0 rules leave113 inherited variable and2 meter rules unchanged. One Source B five-DesignDay case passes119 Timestep ESO plus2 genuine Hourly MTR series/57,360 values, with complete Source JSON/CSV owner-clock joins. No sealed policy, unit waiver or full-object promotion is introduced.",
+      "Existing System Node Temperature Detailed requests now have same-input controlled Euler/Analytical coverage. Actual Each Call intervals retain complete per-owner partitions and Source JSON/CSV token-bit-owner-clock joins under original B Celsius limits; counts are observed and the shortening gate is aggregate across both cases. No private solver history or full-object promotion is inferred."
     ],
     "HeatBalanceAlgorithm": [
       "finite schema-number lower bounds and omitted-field defaults; explicit null/string rejected",
@@ -326,6 +327,9 @@
       "Two newSourceB finiteinputs retain originalB102policy/requestlexemes, nineacceptedDay+twoSiteSolar rules andtwo separatelydeclaredFacilityJ1/0/1meters. NoLimitreports5DD120h/54480values; combined0.02m3/s+120W hardlimits report5DD120h+Jan1weather24h/65376values. All119856values/230series passactualoriginal OR/serialSSE/count/sqrt rules. Fullorderedstreams, schedule/thermostat publicseries, ninefirstDayowners864own+3456/4320sentinel samples, wholeEIO/ERR/END/RDD/MDD/MTD/SHD anddynamic5/6warmupcounts agree. NoOutput:Constructions, drawingortabularrequest isauthored: CTFcoefficientrows/DXF/tabularCSV pairedabsence isauthenticated, zero publiccoefficientrows/climaticcells credited. GenuineCTFalgorithm andpublicsurfacephysics remaincompared. DefaultBuild110 andfour existingtestexecutions countonce; no newtestfunction.",
       "BothBinputs keepall6OutdoorsNoSunNoWind surfaces and1000Wgain/availability/thermostats exact; no solar-to-B-surface/HVAC couplingproof follows frompositiveSiteSolar. BprivateNum/Used/Which/BeginEnvrn/flowcache values andfulloperatinghistories are unobserved. AllfourBlimitmodes/arbitraryselectors/values/dates/envelopes/Space/gain/OA/latent/sizing compositions, legacy andfullobjectcompletion remainunvalidated. ExistingBcomponentclasseligibility isnotnewCON15 conformance; ad-hocclaims/release evidence remainfalse. No capabilitypromotion.",
       "Source B additionally validates a NoLimit five-DesignDay composition with only ROOF and WALL Y0 changed to SunExposed/WindExposed. All 115 series/54,480 values pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams exactly while exposed-face and demand/supply results change. This establishes joint exposure-to-surface/HVAC behavior for the declared case. The other four faces remain NoSun/NoWind. Arbitrary values/combinations, separate Sun/Wind attribution, subsurfaces, authored shades, OA/latent control, sizing and frozen CON-01 promotion remain outside this evidence. Whole EIO/SHD and five warmup counts agree; unrequested coefficient, DXF and tabular reports receive no credit."
+    ],
+    "ZoneAirHeatBalanceAlgorithm": [
+      "ThirdOrderBackwardDifference, AnalyticalSolution and EulerMethod reach the real control getter and retained opaque Source A/B consumers with Space sizing/simulation No. Four one-Zone Euler/Analytical pairs pass all360 series and126,394 values, including both controlled Detailed node-temperature arrays under unchanged inherited limits. Active Space heat balance, non-Mixing room air and reached unsupported latent/control children remain guarded; private solver histories and arbitrary/full-object combinations are unestablished."
     ]
   },
   "verification": {
@@ -49210,12 +49214,2110 @@
           ],
           "capability_or_gate_promotion": false
         }
+      },
+      {
+        "id": "A-EULER-113-24H",
+        "group": "ZoneAirHeatBalanceAlgorithm",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "source_build": "source-euler-analytical-zone-air-113",
+        "input": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal01/A-EULER-113-24H/input.idf",
+          "sha256": "d2d20f46676abe62501223a307eb5a996ceba2bcacdca6db4f4bc7a059458712",
+          "bytes": 9258
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "input_format": "IDF",
+        "native_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/command/receipt.json",
+          "sha256": "d80523949779a175784f983181301e72687db6c64e06f8fff7386cf04d2f9aa8",
+          "bytes": 9870
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/command/receipt.json",
+          "sha256": "0d550b6501dd5dc353b11c22e7de4757a3a3fd5b71d097b5dabef85d73d61456",
+          "bytes": 10539
+        },
+        "source_summary": {
+          "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/run-summary.json",
+          "sha256": "aea2285b42fe432f974dfed38a1140be485852047117a834b56bf9233c567382",
+          "bytes": 31449
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/eplus-rs.exe",
+          "sha256": "fb1225c36edf58e375304950d4f4ff7ba792ac2cf45cfec4105229f5f88bdf23",
+          "bytes": 80479164
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26",
+          "sha256": "cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/receipt.json",
+          "sha256": "d56c2c5fa6d6f0911774323e11b371ca58973493422b15b6e2a06515681e3f4a",
+          "bytes": 6412
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+          "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+          "bytes": 4029908
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/reader-bindings01.json",
+          "sha256": "9bf66255b7e17fa9dd08dbe4fa3528a9312301d7029949bf78c225b3e2980890",
+          "bytes": 9876
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal02/A-EULER-113-24H/recipe.json",
+          "sha256": "a370d39a98b7c15a9fea52226bf360a4f9e278d665c1cc21b9172f171a3e99e5",
+          "bytes": 5710
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 11,
+          "parsed_binary64_unequal": 11,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 5.684341886080802e-14,
+          "max_rmse_delta": 5.846706129059095e-15
+        },
+        "full_reported_stream_scope": {
+          "original_series": 58,
+          "original_samples": 5352,
+          "Detailed": 0,
+          "actual_total_series": 58,
+          "actual_total_samples": 5352,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true,
+          "all_actual_Detailed_arrays_compared": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "inherited_variable_and_meter_rules_literal_unchanged": true,
+          "Detailed_rule": null,
+          "new_unit_or_metadata_waiver": false,
+          "global_contract_changed": false,
+          "qualification": "Original A/B index1 canonical kgWater/kgDryAir and requested Timestep selector stay unchanged; unique actual RDD HVAC/Average/empty-unit producer is authenticated identically in Source. Existing descriptive scalar schedule units remain. No new metadata waiver."
+        },
+        "effective_state": "One physical Zone; actual EulerMethod on the bounded A route with both Space heat-balance fields No. Complete actual streams and declared policies pass. Detailed counts and public short intervals are observations only; no private Native solver history, arbitrary/full-object or frozen capability promotion.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "actual_default_Source_build": 114,
+          "shared_run_group_case_ids": [
+            "A-EULER-113-24H",
+            "A-ANALYTICAL-113-24H",
+            "B-EULER-113-120H",
+            "B-ANALYTICAL-113-120H"
+          ],
+          "shared_new_Source_build_executions": 1,
+          "shared_actual_existing_test_executions": 2,
+          "shared_actual_successful_existing_test_executions": 2,
+          "shared_retained_failed_existing_test_executions": 0,
+          "existing_test_functions_extended": 2,
+          "new_test_functions": 0,
+          "publication112": {
+            "path": ".runtime/object-expansion/unit112-prep/publish01/receipt.json",
+            "sha256": "4241aa2f978aaf40448fa4b6b3c5650fde8b9cfaf10d1e31fd40eb5fae83443e",
+            "bytes": 6388
+          },
+          "actual_build_quality_authority": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-build114-quality-authority01.json",
+            "sha256": "1c97dd545a18d1b1dce195a47c5679d849a4608c19de207673295a21c43fcef5",
+            "bytes": 2853
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit113-prep/accepted-quality.json",
+            "sha256": "c528790d6275e76dd6a46239b670010cac9ffd310ec430c9bbb96dc37c68ec09",
+            "bytes": 7713
+          },
+          "actual_build_and_engine_epoch": {
+            "head": "cd55711e02c45f671ccd553741c5c5c245b1181e",
+            "worktree_clean": false,
+            "porcelain_v1_nul_utf8": " M crates/ep_run/src/ordinary_equipment_input.rs\u0000 M crates/ep_run/src/pipeline.rs\u0000 M crates/ep_run/src/porting_scope.rs\u0000 M crates/ep_run/src/porting_scope/settings.rs\u0000 M crates/ep_run/src/porting_scope/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/component_report.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/history.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/humidity.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/temperature.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/control.rs\u0000"
+          },
+          "changed_Source_files": 14,
+          "complete_current_and_archived_Source_files": 4666,
+          "retained_prior_quality_attempts": [],
+          "shared_retained_independent_parser_structural_attempt": {
+            "receipt": {
+              "path": ".runtime/object-expansion/unit113-prep/physical-peer01/proof01.json",
+              "sha256": "91ba7da6d6229aa3d768680c3aacc967f7c309aaa93ed201f8a2c39e60942bec",
+              "bytes": 4145
+            },
+            "engine_attempt": false,
+            "accepted_sample_credit": 0,
+            "qualification": "Own verifier expected plan.ready instead of actual ready_for_one_actor and stopped before numeric read; corrected explicit checker attempt supplies the accepted peer proof. No engine/data/policy replay or failure credit."
+          }
+        },
+        "current_primary_observation": {
+          "Zones": 1,
+          "surfaces": 6,
+          "algorithm": "EulerMethod",
+          "Space_Heat_Balance_Sizing_and_Simulation": [
+            "No",
+            "No"
+          ],
+          "raw_OutputVariable_requests": 55,
+          "raw_OutputMeterFileOnly_requests": 3,
+          "actual_reporting_hours": 24,
+          "actual_warmup_days": [
+            20
+          ],
+          "runtime_classification": {
+            "actual_runtime_class": "source-multizone-heat-balance-compatibility",
+            "actual_matched_capability_ids": [],
+            "actual_runtime_selection_note": "selected explicit Source A electric gains or bounded Zones/ZoneList/whole-Zone authored Space input lane; no one-Zone capability/evidence is inherited and conformance promotion remains disabled",
+            "physical_Zone_count": 1,
+            "conformance_claim": false,
+            "qualification": "Current Source A classifier treats a nonempty DesignDay family as SourceMultiZone admission even when both DDs are inactive. These A cases have one physical Zone; no one-Zone capability/evidence or conformance promotion is inherited."
+          },
+          "actual_Detailed_samples": 0,
+          "actual_paired_short_Detailed_intervals": 0,
+          "first_actual_paired_short_interval": null,
+          "shortening_gate_is_aggregate_across_two_B_cases": true,
+          "all_actual_owner_clock_partitions_compared": true,
+          "actual_Source_geometry": {
+            "actual_trace": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/geometry-consumers.json",
+              "sha256": "3852ed7d352558093dbd19db8848856cdaf3a164840cf498d67c7016544cccb2",
+              "bytes": 32184
+            },
+            "actual_compiled": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/compiled-geometry.json",
+              "sha256": "95f20db46be74034cda40a594ee27b8d9dbe77c75a839cd7022177af7ea580d6",
+              "bytes": 21326
+            },
+            "all6_World_vertices_ZoneSpace_enclosures_exact": true,
+            "observer_supplies_inputs": false,
+            "private_Native_geometry_or_solver_history_observed": false
+          },
+          "whole_requested_ancillary": {
+            "eio": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.eio",
+                "sha256": "5d4663a8e38c6cb638965a1bb995f6de453716e14e200466b8871d6d9342bda7",
+                "bytes": 15359
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.eio",
+                "sha256": "fbc591d37f0beb3658107ee4abca30c6026269bcb623d772395a4ae501348b47",
+                "bytes": 15323
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "err": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.err",
+                "sha256": "3fd9e6ded6a095220f5b32c9d6991c0fa5214ed72715ff31f01196e3a00b3172",
+                "bytes": 897
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.err",
+                "sha256": "46ecf2b35dbb8eb2886d9cc7e1987c841137a1658a07ccd5f4ae22d0dfa9e0ed",
+                "bytes": 892
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "end": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.end",
+                "sha256": "bbe27d63bbba5a0156c23b920f4b16750415399bdc18ff667a31b22c91ac3ed8",
+                "bytes": 98
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.end",
+                "sha256": "7b7c6ef33df095cbff7663e1c24ed05a6d5458d0e1a712eb1b8dbca0fb946428",
+                "bytes": 98
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "rdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.rdd",
+                "sha256": "428c04565b6fad22adb2d814cfef81ff61e4a56fbb15924f9b5f470400d21769",
+                "bytes": 30562
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.rdd",
+                "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+                "bytes": 30557
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.mdd",
+                "sha256": "e608070dcbc1bca7d5fb5c97cfbbef7577a5a9b2adf8b5bd92019a73311c999c",
+                "bytes": 3851
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.mdd",
+                "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+                "bytes": 3846
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mtd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.mtd",
+                "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+                "bytes": 7539
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.mtd",
+                "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+                "bytes": 7539
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "shd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.shd",
+                "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+                "bytes": 1557
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.shd",
+                "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+                "bytes": 1557
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "CTF_coefficient_report": {
+              "declared_requested": true,
+              "construction_count": 3,
+              "whole_records_exact": true
+            },
+            "DXF": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativeout.dxf",
+                "sha256": "3d5a95d60be610691b02fff95160c84b90f268ece18a0f5fd6dd4d215c05e379",
+                "bytes": 6096
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplusrs.dxf",
+                "sha256": "ad463f2e8fa5e87affe71ef56d0bc6dd9c3061f61f7f20694afe48b97e32cc85",
+                "bytes": 5392
+              },
+              "pairs": 334,
+              "sole_identity_pair": 3
+            },
+            "full_CSV_table": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/nativetbl.csv",
+                "sha256": "b0ca1249c823fce4cfe47421909ba64666415e19e3dfabafeaf02183f0c4b236",
+                "bytes": 84686
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/eplustbl.csv",
+                "sha256": "551194ec75f16e742566b619ecf15389db49967e5bb3133debe92f6fd3c9a269",
+                "bytes": 84614
+              },
+              "rows": 1696,
+              "sole_program_identity_rows": [
+                0,
+                196
+              ],
+              "other_cells_exact": true
+            },
+            "climatic_table": {
+              "Native": {
+                "header": [
+                  "",
+                  "",
+                  "Maximum Dry Bulb [C]",
+                  "Daily Temperature Range [deltaC]",
+                  "Humidity Value",
+                  "Humidity Type",
+                  "Wind Speed [m/s]",
+                  "Wind Direction"
+                ],
+                "rows": [
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+                    "-15.50",
+                    "0.00",
+                    "-15.50",
+                    "Wetbulb [C]",
+                    "3.00",
+                    "340.00"
+                  ],
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+                    "32.00",
+                    "15.20",
+                    "15.50",
+                    "Wetbulb [C]",
+                    "4.90",
+                    "0.00"
+                  ]
+                ],
+                "exact_selected_cells": 12,
+                "active_DesignDay_environments": 0
+              },
+              "Source": {
+                "header": [
+                  "",
+                  "",
+                  "Maximum Dry Bulb [C]",
+                  "Daily Temperature Range [deltaC]",
+                  "Humidity Value",
+                  "Humidity Type",
+                  "Wind Speed [m/s]",
+                  "Wind Direction"
+                ],
+                "rows": [
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+                    "-15.50",
+                    "0.00",
+                    "-15.50",
+                    "Wetbulb [C]",
+                    "3.00",
+                    "340.00"
+                  ],
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+                    "32.00",
+                    "15.20",
+                    "15.50",
+                    "Wetbulb [C]",
+                    "4.90",
+                    "0.00"
+                  ]
+                ],
+                "exact_selected_cells": 12,
+                "active_DesignDay_environments": 0
+              },
+              "exact_selected_cells": 12
+            },
+            "warmup_days": [
+              20
+            ],
+            "complete_CTF_records": [
+              [
+                " Construction CTF",
+                "R13WALL",
+                "   1",
+                "   1",
+                "   1",
+                "   0.250",
+                "         0.4365",
+                "   0.900",
+                "   0.900",
+                "   0.750",
+                "   0.750",
+                "Rough"
+              ],
+              [
+                " Material CTF Summary",
+                "R13LAYER",
+                "  0.0000",
+                "         0.000",
+                "      0.000",
+                "        0.000",
+                "       2.291"
+              ],
+              [
+                " CTF",
+                "   1",
+                "                   0",
+                "                   0",
+                "                  -0",
+                "                  -0"
+              ],
+              [
+                " CTF",
+                "   0",
+                "          0.43649728",
+                "          0.43649728",
+                "          0.43649728"
+              ],
+              [
+                " Construction CTF",
+                "FLOOR",
+                "   2",
+                "   1",
+                "   5",
+                "   0.250",
+                "          17.04",
+                "   0.900",
+                "   0.900",
+                "   0.650",
+                "   0.650",
+                "MediumRough"
+              ],
+              [
+                " Material CTF Summary",
+                "C5 - 4 IN HW CONCRETE",
+                "  0.1015",
+                "         1.730",
+                "   2242.585",
+                "      836.800",
+                "     0.05868"
+              ],
+              [
+                " CTF",
+                "   5",
+                "      -4.1142049E-08",
+                "       1.5543709E-08",
+                "      -4.1142049E-08",
+                "       1.2297289E-11"
+              ],
+              [
+                " CTF",
+                "   4",
+                "       0.00057884701",
+                "       0.00022976293",
+                "       0.00057884701",
+                "      -4.0580373E-07"
+              ],
+              [
+                " CTF",
+                "   3",
+                "         -0.33051123",
+                "         0.091914804",
+                "         -0.33051123",
+                "        0.0006592243"
+              ],
+              [
+                " CTF",
+                "   2",
+                "           12.566595",
+                "           2.1743923",
+                "           12.566595",
+                "        -0.058066613"
+              ],
+              [
+                " CTF",
+                "   1",
+                "          -62.622544",
+                "           4.7096437",
+                "          -62.622544",
+                "          0.60555731"
+              ],
+              [
+                " CTF",
+                "   0",
+                "            58.08561",
+                "          0.72354869",
+                "            58.08561"
+              ],
+              [
+                " Construction CTF",
+                "ROOF31",
+                "   3",
+                "   1",
+                "   1",
+                "   0.250",
+                "         0.1833",
+                "   0.900",
+                "   0.900",
+                "   0.750",
+                "   0.750",
+                "Rough"
+              ],
+              [
+                " Material CTF Summary",
+                "R31LAYER",
+                "  0.0000",
+                "         0.000",
+                "      0.000",
+                "        0.000",
+                "       5.456"
+              ],
+              [
+                " CTF",
+                "   1",
+                "                   0",
+                "                   0",
+                "                  -0",
+                "                  -0"
+              ],
+              [
+                " CTF",
+                "   0",
+                "          0.18328446",
+                "          0.18328446",
+                "          0.18328446"
+              ]
+            ],
+            "actual_Zone_Air_Solution_Algorithm": [
+              " Zone Air Solution Algorithm",
+              " EulerMethod",
+              " No",
+              " No"
+            ]
+          },
+          "actual_Native_conversion_or_Source_staging": {
+            "artifact": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/native-01/output/input.epJSON",
+              "sha256": "360310cdd505285b159bec40d44454333285be538a6dd0bb0b02a750c3bb7eac",
+              "bytes": 27717
+            },
+            "Source_original_IDF_DOM": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/input/original.epJSON",
+              "sha256": "360310cdd505285b159bec40d44454333285be538a6dd0bb0b02a750c3bb7eac",
+              "bytes": 27717
+            },
+            "whole_DOM_exact": true,
+            "original_IDF": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-EULER-113-24H/source-01/output/input/original.idf",
+              "sha256": "d2d20f46676abe62501223a307eb5a996ceba2bcacdca6db4f4bc7a059458712",
+              "bytes": 9258
+            }
+          },
+          "actual_custody": {
+            "actual_Native_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/A-EULER-113-24H/root-native-custody01.json",
+              "sha256": "d4be8651b4f2b65e3d5e3078b6d06f01f3bf800790117968bfa8e6434900b9a6",
+              "bytes": 2861
+            },
+            "actual_Source_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/A-EULER-113-24H/root-source-custody01.json",
+              "sha256": "a5243b9fb76e8f60dcdcdf297f4d54b672e3ed6b7f69bdf2d2f072f009e23250",
+              "bytes": 2862
+            },
+            "actual_Source_completion": {
+              "path": ".runtime/object-expansion/unit113-prep/A-EULER-113-24H/root-source-completion01.json",
+              "sha256": "c376fb30070b6b501063718ed40239ae9ab6e4e01029d2547520a7b41fce9f4a",
+              "bytes": 2498
+            }
+          },
+          "Root_pre_Source_Native_activation_review": {
+            "path": ".runtime/object-expansion/unit113-prep/A-EULER-113-24H/root-native-activation-review01.json",
+            "sha256": "90f9435d567ce1bb3ead6c0e1339e189987c09e8147355dad8bfe84083cf423b",
+            "bytes": 21554
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+            "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+            "bytes": 4029908
+          },
+          "independent_full_actual_physical_peer": {
+            "path": ".runtime/object-expansion/unit113-prep/physical-peer02/proof01.json",
+            "sha256": "cb3c1cba2b031f50d6defed56c021306c326cc285f124f95eb36c0a2d4258b62",
+            "bytes": 4416211
+          },
+          "Root_peer_review": {
+            "path": ".runtime/object-expansion/unit113-prep/root-physical-peer-review01.json",
+            "sha256": "df89e4047c69f81b480e3501fafed0c944319af57c79794ac9c073955597d539",
+            "bytes": 1899
+          },
+          "not_part_of_retained27_two_Zone_cohort": true,
+          "capability_or_gate_promotion": false
+        }
+      },
+      {
+        "id": "A-ANALYTICAL-113-24H",
+        "group": "ZoneAirHeatBalanceAlgorithm",
+        "scope": "A",
+        "fixed_conformance_case": false,
+        "source_build": "source-euler-analytical-zone-air-113",
+        "input": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal01/A-ANALYTICAL-113-24H/input.idf",
+          "sha256": "d455df8a3b38d51304350c7e829a6065b43a42413af9514d18d25941194a0a86",
+          "bytes": 9265
+        },
+        "weather": {
+          "path": ".runtime/energyplus/26.1.0/WeatherData/USA_CO_Golden-NREL.724666_TMY3.epw",
+          "sha256": "c184b947cd34d41c6d6474d63d66dbb82bc0e6cae4c888edcf837348282bce7f",
+          "bytes": 1623506
+        },
+        "input_format": "IDF",
+        "native_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/command/receipt.json",
+          "sha256": "57413b838250190e8e2a5571f3726366682ba223fc5b55182c089681a24063a0",
+          "bytes": 9925
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/command/receipt.json",
+          "sha256": "042488d946157b20143cc2cdedcf99e45e55d8811725b20f21f30d0a784ddccf",
+          "bytes": 10594
+        },
+        "source_summary": {
+          "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/run-summary.json",
+          "sha256": "1d40158964e6a9b69cb278cff236b6320b825e6aed2a2080f7cbcfc980feac58",
+          "bytes": 31587
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/eplus-rs.exe",
+          "sha256": "fb1225c36edf58e375304950d4f4ff7ba792ac2cf45cfec4105229f5f88bdf23",
+          "bytes": 80479164
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26",
+          "sha256": "cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/receipt.json",
+          "sha256": "d56c2c5fa6d6f0911774323e11b371ca58973493422b15b6e2a06515681e3f4a",
+          "bytes": 6412
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+          "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+          "bytes": 4029908
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/reader-bindings01.json",
+          "sha256": "9bf66255b7e17fa9dd08dbe4fa3528a9312301d7029949bf78c225b3e2980890",
+          "bytes": 9876
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal02/A-ANALYTICAL-113-24H/recipe.json",
+          "sha256": "b01543f1db652c9f095de3274648566433759432fd91ea2c7dafb425ba8bb5c6",
+          "bytes": 5744
+        },
+        "totals": {
+          "series": 58,
+          "samples": 5352,
+          "raw_operand_unequal": 3302,
+          "parsed_binary64_unequal": 3302,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 9.822542779147625e-11,
+          "max_rmse_delta": 2.2875881720687096e-11
+        },
+        "full_reported_stream_scope": {
+          "original_series": 58,
+          "original_samples": 5352,
+          "Detailed": 0,
+          "actual_total_series": 58,
+          "actual_total_samples": 5352,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true,
+          "all_actual_Detailed_arrays_compared": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": "docs/validation/contracts/output-tolerances.json",
+            "sha256": "d3cd3e5956ce7e02dbcebe9e8c48799673b66c7b181d932f57514a949dcbf698",
+            "bytes": 45145
+          },
+          "inherited_variable_and_meter_rules_literal_unchanged": true,
+          "Detailed_rule": null,
+          "new_unit_or_metadata_waiver": false,
+          "global_contract_changed": false,
+          "qualification": "Original A/B index1 canonical kgWater/kgDryAir and requested Timestep selector stay unchanged; unique actual RDD HVAC/Average/empty-unit producer is authenticated identically in Source. Existing descriptive scalar schedule units remain. No new metadata waiver."
+        },
+        "effective_state": "One physical Zone; actual AnalyticalSolution on the bounded A route with both Space heat-balance fields No. Complete actual streams and declared policies pass. Detailed counts and public short intervals are observations only; no private Native solver history, arbitrary/full-object or frozen capability promotion.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "actual_default_Source_build": 114,
+          "shared_run_group_case_ids": [
+            "A-EULER-113-24H",
+            "A-ANALYTICAL-113-24H",
+            "B-EULER-113-120H",
+            "B-ANALYTICAL-113-120H"
+          ],
+          "shared_new_Source_build_executions": 1,
+          "shared_actual_existing_test_executions": 2,
+          "shared_actual_successful_existing_test_executions": 2,
+          "shared_retained_failed_existing_test_executions": 0,
+          "existing_test_functions_extended": 2,
+          "new_test_functions": 0,
+          "publication112": {
+            "path": ".runtime/object-expansion/unit112-prep/publish01/receipt.json",
+            "sha256": "4241aa2f978aaf40448fa4b6b3c5650fde8b9cfaf10d1e31fd40eb5fae83443e",
+            "bytes": 6388
+          },
+          "actual_build_quality_authority": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-build114-quality-authority01.json",
+            "sha256": "1c97dd545a18d1b1dce195a47c5679d849a4608c19de207673295a21c43fcef5",
+            "bytes": 2853
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit113-prep/accepted-quality.json",
+            "sha256": "c528790d6275e76dd6a46239b670010cac9ffd310ec430c9bbb96dc37c68ec09",
+            "bytes": 7713
+          },
+          "actual_build_and_engine_epoch": {
+            "head": "cd55711e02c45f671ccd553741c5c5c245b1181e",
+            "worktree_clean": false,
+            "porcelain_v1_nul_utf8": " M crates/ep_run/src/ordinary_equipment_input.rs\u0000 M crates/ep_run/src/pipeline.rs\u0000 M crates/ep_run/src/porting_scope.rs\u0000 M crates/ep_run/src/porting_scope/settings.rs\u0000 M crates/ep_run/src/porting_scope/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/component_report.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/history.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/humidity.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/temperature.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/control.rs\u0000"
+          },
+          "changed_Source_files": 14,
+          "complete_current_and_archived_Source_files": 4666,
+          "retained_prior_quality_attempts": [],
+          "shared_retained_independent_parser_structural_attempt": {
+            "receipt": {
+              "path": ".runtime/object-expansion/unit113-prep/physical-peer01/proof01.json",
+              "sha256": "91ba7da6d6229aa3d768680c3aacc967f7c309aaa93ed201f8a2c39e60942bec",
+              "bytes": 4145
+            },
+            "engine_attempt": false,
+            "accepted_sample_credit": 0,
+            "qualification": "Own verifier expected plan.ready instead of actual ready_for_one_actor and stopped before numeric read; corrected explicit checker attempt supplies the accepted peer proof. No engine/data/policy replay or failure credit."
+          }
+        },
+        "current_primary_observation": {
+          "Zones": 1,
+          "surfaces": 6,
+          "algorithm": "AnalyticalSolution",
+          "Space_Heat_Balance_Sizing_and_Simulation": [
+            "No",
+            "No"
+          ],
+          "raw_OutputVariable_requests": 55,
+          "raw_OutputMeterFileOnly_requests": 3,
+          "actual_reporting_hours": 24,
+          "actual_warmup_days": [
+            19
+          ],
+          "runtime_classification": {
+            "actual_runtime_class": "source-multizone-heat-balance-compatibility",
+            "actual_matched_capability_ids": [],
+            "actual_runtime_selection_note": "selected explicit Source A electric gains or bounded Zones/ZoneList/whole-Zone authored Space input lane; no one-Zone capability/evidence is inherited and conformance promotion remains disabled",
+            "physical_Zone_count": 1,
+            "conformance_claim": false,
+            "qualification": "Current Source A classifier treats a nonempty DesignDay family as SourceMultiZone admission even when both DDs are inactive. These A cases have one physical Zone; no one-Zone capability/evidence or conformance promotion is inherited."
+          },
+          "actual_Detailed_samples": 0,
+          "actual_paired_short_Detailed_intervals": 0,
+          "first_actual_paired_short_interval": null,
+          "shortening_gate_is_aggregate_across_two_B_cases": true,
+          "all_actual_owner_clock_partitions_compared": true,
+          "actual_Source_geometry": {
+            "actual_trace": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/geometry-consumers.json",
+              "sha256": "3852ed7d352558093dbd19db8848856cdaf3a164840cf498d67c7016544cccb2",
+              "bytes": 32184
+            },
+            "actual_compiled": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/compiled-geometry.json",
+              "sha256": "9fcc6e9f399c0379c5dca8830d453c03ff10fe8af67d2b75fc5a67f7a0589202",
+              "bytes": 21341
+            },
+            "all6_World_vertices_ZoneSpace_enclosures_exact": true,
+            "observer_supplies_inputs": false,
+            "private_Native_geometry_or_solver_history_observed": false
+          },
+          "whole_requested_ancillary": {
+            "eio": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.eio",
+                "sha256": "4a8e10736e45d00c9fe191e2874b70eb6d389884aa316cd5e4f026a8cb092fbb",
+                "bytes": 15366
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.eio",
+                "sha256": "1a474d3da236e66e28620c66efaa0ac348df768308c9877a4822dca431cee556",
+                "bytes": 15330
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "err": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.err",
+                "sha256": "b71bd36ad31ed3ba5cc74fa58cb73c4b05430c2d38d7b11252422131fe46b279",
+                "bytes": 897
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.err",
+                "sha256": "46ecf2b35dbb8eb2886d9cc7e1987c841137a1658a07ccd5f4ae22d0dfa9e0ed",
+                "bytes": 892
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "end": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.end",
+                "sha256": "6cc14d8944341701d68783b36876d99acf7c6dba6d6806b5569ab89f3a3b3063",
+                "bytes": 98
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.end",
+                "sha256": "7b7c6ef33df095cbff7663e1c24ed05a6d5458d0e1a712eb1b8dbca0fb946428",
+                "bytes": 98
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "rdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.rdd",
+                "sha256": "d66f82aa89c234c510865a7726cb90910bc6c818155137249c0c875daa6c54cb",
+                "bytes": 30562
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.rdd",
+                "sha256": "3701cd4b6911b9b7bc91fb57637823e49458ef4bfbf207d2bf788c8eac529791",
+                "bytes": 30557
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.mdd",
+                "sha256": "238971f6f05cf04017789760e51e58f5f8ad3530a02c5282286272500af95235",
+                "bytes": 3851
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.mdd",
+                "sha256": "29b47aa762fabfdd10ad5943d960792a5b5cbda5ad583041172031fd90ace990",
+                "bytes": 3846
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mtd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.mtd",
+                "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+                "bytes": 7539
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.mtd",
+                "sha256": "c2b05a418e2bead4118bd119f61478e0913be42e9af907b6f883afedace1ffe2",
+                "bytes": 7539
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "shd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.shd",
+                "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+                "bytes": 1557
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.shd",
+                "sha256": "f6e4bd14011cb6a4dafd667a850c3c71db8128539bd7a8fbb6db47711d182436",
+                "bytes": 1557
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "CTF_coefficient_report": {
+              "declared_requested": true,
+              "construction_count": 3,
+              "whole_records_exact": true
+            },
+            "DXF": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativeout.dxf",
+                "sha256": "ea1a444608876ca5fdd9a6952f2b94e19adcdfa9b2163524865c20d83ddfa81a",
+                "bytes": 6096
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplusrs.dxf",
+                "sha256": "ad463f2e8fa5e87affe71ef56d0bc6dd9c3061f61f7f20694afe48b97e32cc85",
+                "bytes": 5392
+              },
+              "pairs": 334,
+              "sole_identity_pair": 3
+            },
+            "full_CSV_table": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/nativetbl.csv",
+                "sha256": "f61e2488a3b674307e47270905bfb64577cc487edc2667f5f891bd5bf132db5e",
+                "bytes": 84693
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/eplustbl.csv",
+                "sha256": "e8e662e88d279e9b840eeab20754e6e29b1bc34113b64b9d79a9f62007de98f5",
+                "bytes": 84621
+              },
+              "rows": 1696,
+              "sole_program_identity_rows": [
+                0,
+                196
+              ],
+              "other_cells_exact": true
+            },
+            "climatic_table": {
+              "Native": {
+                "header": [
+                  "",
+                  "",
+                  "Maximum Dry Bulb [C]",
+                  "Daily Temperature Range [deltaC]",
+                  "Humidity Value",
+                  "Humidity Type",
+                  "Wind Speed [m/s]",
+                  "Wind Direction"
+                ],
+                "rows": [
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+                    "-15.50",
+                    "0.00",
+                    "-15.50",
+                    "Wetbulb [C]",
+                    "3.00",
+                    "340.00"
+                  ],
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+                    "32.00",
+                    "15.20",
+                    "15.50",
+                    "Wetbulb [C]",
+                    "4.90",
+                    "0.00"
+                  ]
+                ],
+                "exact_selected_cells": 12,
+                "active_DesignDay_environments": 0
+              },
+              "Source": {
+                "header": [
+                  "",
+                  "",
+                  "Maximum Dry Bulb [C]",
+                  "Daily Temperature Range [deltaC]",
+                  "Humidity Value",
+                  "Humidity Type",
+                  "Wind Speed [m/s]",
+                  "Wind Direction"
+                ],
+                "rows": [
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB",
+                    "-15.50",
+                    "0.00",
+                    "-15.50",
+                    "Wetbulb [C]",
+                    "3.00",
+                    "340.00"
+                  ],
+                  [
+                    "",
+                    "DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB",
+                    "32.00",
+                    "15.20",
+                    "15.50",
+                    "Wetbulb [C]",
+                    "4.90",
+                    "0.00"
+                  ]
+                ],
+                "exact_selected_cells": 12,
+                "active_DesignDay_environments": 0
+              },
+              "exact_selected_cells": 12
+            },
+            "warmup_days": [
+              19
+            ],
+            "complete_CTF_records": [
+              [
+                " Construction CTF",
+                "R13WALL",
+                "   1",
+                "   1",
+                "   1",
+                "   0.250",
+                "         0.4365",
+                "   0.900",
+                "   0.900",
+                "   0.750",
+                "   0.750",
+                "Rough"
+              ],
+              [
+                " Material CTF Summary",
+                "R13LAYER",
+                "  0.0000",
+                "         0.000",
+                "      0.000",
+                "        0.000",
+                "       2.291"
+              ],
+              [
+                " CTF",
+                "   1",
+                "                   0",
+                "                   0",
+                "                  -0",
+                "                  -0"
+              ],
+              [
+                " CTF",
+                "   0",
+                "          0.43649728",
+                "          0.43649728",
+                "          0.43649728"
+              ],
+              [
+                " Construction CTF",
+                "FLOOR",
+                "   2",
+                "   1",
+                "   5",
+                "   0.250",
+                "          17.04",
+                "   0.900",
+                "   0.900",
+                "   0.650",
+                "   0.650",
+                "MediumRough"
+              ],
+              [
+                " Material CTF Summary",
+                "C5 - 4 IN HW CONCRETE",
+                "  0.1015",
+                "         1.730",
+                "   2242.585",
+                "      836.800",
+                "     0.05868"
+              ],
+              [
+                " CTF",
+                "   5",
+                "      -4.1142049E-08",
+                "       1.5543709E-08",
+                "      -4.1142049E-08",
+                "       1.2297289E-11"
+              ],
+              [
+                " CTF",
+                "   4",
+                "       0.00057884701",
+                "       0.00022976293",
+                "       0.00057884701",
+                "      -4.0580373E-07"
+              ],
+              [
+                " CTF",
+                "   3",
+                "         -0.33051123",
+                "         0.091914804",
+                "         -0.33051123",
+                "        0.0006592243"
+              ],
+              [
+                " CTF",
+                "   2",
+                "           12.566595",
+                "           2.1743923",
+                "           12.566595",
+                "        -0.058066613"
+              ],
+              [
+                " CTF",
+                "   1",
+                "          -62.622544",
+                "           4.7096437",
+                "          -62.622544",
+                "          0.60555731"
+              ],
+              [
+                " CTF",
+                "   0",
+                "            58.08561",
+                "          0.72354869",
+                "            58.08561"
+              ],
+              [
+                " Construction CTF",
+                "ROOF31",
+                "   3",
+                "   1",
+                "   1",
+                "   0.250",
+                "         0.1833",
+                "   0.900",
+                "   0.900",
+                "   0.750",
+                "   0.750",
+                "Rough"
+              ],
+              [
+                " Material CTF Summary",
+                "R31LAYER",
+                "  0.0000",
+                "         0.000",
+                "      0.000",
+                "        0.000",
+                "       5.456"
+              ],
+              [
+                " CTF",
+                "   1",
+                "                   0",
+                "                   0",
+                "                  -0",
+                "                  -0"
+              ],
+              [
+                " CTF",
+                "   0",
+                "          0.18328446",
+                "          0.18328446",
+                "          0.18328446"
+              ]
+            ],
+            "actual_Zone_Air_Solution_Algorithm": [
+              " Zone Air Solution Algorithm",
+              " AnalyticalSolution",
+              " No",
+              " No"
+            ]
+          },
+          "actual_Native_conversion_or_Source_staging": {
+            "artifact": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/native-01/output/input.epJSON",
+              "sha256": "583c29a58f48aa56484f9d65d3b6f25dab83c97b9dd93b0803f8f1ccf3a5c581",
+              "bytes": 27724
+            },
+            "Source_original_IDF_DOM": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/input/original.epJSON",
+              "sha256": "583c29a58f48aa56484f9d65d3b6f25dab83c97b9dd93b0803f8f1ccf3a5c581",
+              "bytes": 27724
+            },
+            "whole_DOM_exact": true,
+            "original_IDF": {
+              "path": ".runtime/porting/zone-air-solvers-113/A-ANALYTICAL-113-24H/source-01/output/input/original.idf",
+              "sha256": "d455df8a3b38d51304350c7e829a6065b43a42413af9514d18d25941194a0a86",
+              "bytes": 9265
+            }
+          },
+          "actual_custody": {
+            "actual_Native_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/A-ANALYTICAL-113-24H/root-native-custody01.json",
+              "sha256": "0cd88ae3bb5c2c20930acdbe5a2f2d2df1a5cd1fdbcd8d595e3c605a59377922",
+              "bytes": 2886
+            },
+            "actual_Source_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/A-ANALYTICAL-113-24H/root-source-custody01.json",
+              "sha256": "69dda1219aee7ebe6b9e7293a4d73656e72f3ad4e88b53868197826c481db6bb",
+              "bytes": 2887
+            },
+            "actual_Source_completion": {
+              "path": ".runtime/object-expansion/unit113-prep/A-ANALYTICAL-113-24H/root-source-completion01.json",
+              "sha256": "18c8af6b8e3cb18f4b8c7c9cd6578b50cf0eefe3cbcc769b7ed647a2bcbd1dd0",
+              "bytes": 2533
+            }
+          },
+          "Root_pre_Source_Native_activation_review": {
+            "path": ".runtime/object-expansion/unit113-prep/A-ANALYTICAL-113-24H/root-native-activation-review01.json",
+            "sha256": "a4bcc184e8df8a4dbcd216786986cbeae0c202ea9c692d66cf71ad7bf52b4d7e",
+            "bytes": 21596
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+            "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+            "bytes": 4029908
+          },
+          "independent_full_actual_physical_peer": {
+            "path": ".runtime/object-expansion/unit113-prep/physical-peer02/proof01.json",
+            "sha256": "cb3c1cba2b031f50d6defed56c021306c326cc285f124f95eb36c0a2d4258b62",
+            "bytes": 4416211
+          },
+          "Root_peer_review": {
+            "path": ".runtime/object-expansion/unit113-prep/root-physical-peer-review01.json",
+            "sha256": "df89e4047c69f81b480e3501fafed0c944319af57c79794ac9c073955597d539",
+            "bytes": 1899
+          },
+          "not_part_of_retained27_two_Zone_cohort": true,
+          "capability_or_gate_promotion": false
+        }
+      },
+      {
+        "id": "B-EULER-113-120H",
+        "group": "ZoneAirHeatBalanceAlgorithm",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-euler-analytical-zone-air-113",
+        "input": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal01/B-EULER-113-120H/input.epJSON",
+          "sha256": "68114bf0c59cc238d7a6318549c00e4f85dec12eff299ef4ed697a454900db0c",
+          "bytes": 85040
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/command/receipt.json",
+          "sha256": "92077373693ef2cdbe8fad454a2af294fd0a44b95d56a0921051dc17f28c6378",
+          "bytes": 9133
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/command/receipt.json",
+          "sha256": "35b7a655cd3501e53825ceb0c97988bb940f97b6568aced7341e9c2c96dd104f",
+          "bytes": 9809
+        },
+        "source_summary": {
+          "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/run-summary.json",
+          "sha256": "6b3db8aafaa76c26bc468101d64eb1ef5a3cee58ac2b81906a5a143d41e6c25a",
+          "bytes": 68299
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/eplus-rs.exe",
+          "sha256": "fb1225c36edf58e375304950d4f4ff7ba792ac2cf45cfec4105229f5f88bdf23",
+          "bytes": 80479164
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26",
+          "sha256": "cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/receipt.json",
+          "sha256": "d56c2c5fa6d6f0911774323e11b371ca58973493422b15b6e2a06515681e3f4a",
+          "bytes": 6412
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+          "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+          "bytes": 4029908
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/reader-bindings01.json",
+          "sha256": "9bf66255b7e17fa9dd08dbe4fa3528a9312301d7029949bf78c225b3e2980890",
+          "bytes": 9876
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal02/B-EULER-113-120H/recipe.json",
+          "sha256": "13a12a3413f632b19275ded3681edc8fa9d727b70a213469fd583930584c15ce",
+          "bytes": 6066
+        },
+        "totals": {
+          "series": 122,
+          "samples": 57845,
+          "raw_operand_unequal": 20385,
+          "parsed_binary64_unequal": 20385,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 6.459595169872046e-08,
+          "max_rmse_delta": 7.279021953250793e-09
+        },
+        "full_reported_stream_scope": {
+          "original_series": 121,
+          "original_samples": 57360,
+          "Detailed": 485,
+          "actual_total_series": 122,
+          "actual_total_samples": 57845,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true,
+          "all_actual_Detailed_arrays_compared": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal01/B-derived-policy.json",
+            "sha256": "9dbc53ef695f1d36a08da25fe406688c9eaa36c9f83c83dc37ddab3ff3585ec3",
+            "bytes": 34564
+          },
+          "inherited_variable_and_meter_rules_literal_unchanged": true,
+          "Detailed_rule": {
+            "origin_global_B_index": 67,
+            "units": "C",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06,
+            "only_frequency_changed": "Timestep to Detailed"
+          },
+          "new_unit_or_metadata_waiver": false,
+          "global_contract_changed": false,
+          "qualification": "Original A/B index1 canonical kgWater/kgDryAir and requested Timestep selector stay unchanged; unique actual RDD HVAC/Average/empty-unit producer is authenticated identically in Source. Existing descriptive scalar schedule units remain. No new metadata waiver."
+        },
+        "effective_state": "One physical Zone; actual EulerMethod on the bounded B route with both Space heat-balance fields No. Complete actual streams and declared policies pass. Detailed counts and public short intervals are observations only; no private Native solver history, arbitrary/full-object or frozen capability promotion.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "actual_default_Source_build": 114,
+          "shared_run_group_case_ids": [
+            "A-EULER-113-24H",
+            "A-ANALYTICAL-113-24H",
+            "B-EULER-113-120H",
+            "B-ANALYTICAL-113-120H"
+          ],
+          "shared_new_Source_build_executions": 1,
+          "shared_actual_existing_test_executions": 2,
+          "shared_actual_successful_existing_test_executions": 2,
+          "shared_retained_failed_existing_test_executions": 0,
+          "existing_test_functions_extended": 2,
+          "new_test_functions": 0,
+          "publication112": {
+            "path": ".runtime/object-expansion/unit112-prep/publish01/receipt.json",
+            "sha256": "4241aa2f978aaf40448fa4b6b3c5650fde8b9cfaf10d1e31fd40eb5fae83443e",
+            "bytes": 6388
+          },
+          "actual_build_quality_authority": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-build114-quality-authority01.json",
+            "sha256": "1c97dd545a18d1b1dce195a47c5679d849a4608c19de207673295a21c43fcef5",
+            "bytes": 2853
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit113-prep/accepted-quality.json",
+            "sha256": "c528790d6275e76dd6a46239b670010cac9ffd310ec430c9bbb96dc37c68ec09",
+            "bytes": 7713
+          },
+          "actual_build_and_engine_epoch": {
+            "head": "cd55711e02c45f671ccd553741c5c5c245b1181e",
+            "worktree_clean": false,
+            "porcelain_v1_nul_utf8": " M crates/ep_run/src/ordinary_equipment_input.rs\u0000 M crates/ep_run/src/pipeline.rs\u0000 M crates/ep_run/src/porting_scope.rs\u0000 M crates/ep_run/src/porting_scope/settings.rs\u0000 M crates/ep_run/src/porting_scope/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/component_report.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/history.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/humidity.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/temperature.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/control.rs\u0000"
+          },
+          "changed_Source_files": 14,
+          "complete_current_and_archived_Source_files": 4666,
+          "retained_prior_quality_attempts": [],
+          "shared_retained_independent_parser_structural_attempt": {
+            "receipt": {
+              "path": ".runtime/object-expansion/unit113-prep/physical-peer01/proof01.json",
+              "sha256": "91ba7da6d6229aa3d768680c3aacc967f7c309aaa93ed201f8a2c39e60942bec",
+              "bytes": 4145
+            },
+            "engine_attempt": false,
+            "accepted_sample_credit": 0,
+            "qualification": "Own verifier expected plan.ready instead of actual ready_for_one_actor and stopped before numeric read; corrected explicit checker attempt supplies the accepted peer proof. No engine/data/policy replay or failure credit."
+          }
+        },
+        "current_primary_observation": {
+          "Zones": 1,
+          "surfaces": 6,
+          "algorithm": "EulerMethod",
+          "Space_Heat_Balance_Sizing_and_Simulation": [
+            "No",
+            "No"
+          ],
+          "raw_OutputVariable_requests": 115,
+          "raw_OutputMeterFileOnly_requests": 2,
+          "actual_reporting_hours": 120,
+          "actual_warmup_days": [
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "runtime_classification": {
+            "actual_runtime_class": "ideal-loads-direct-zone-coupled-compatibility",
+            "actual_matched_capability_ids": [
+              "ideal_loads_no_oa_sensible"
+            ],
+            "actual_runtime_selection_note": "selected runtime 'ideal-loads-direct-zone-coupled-compatibility' executes the matched capability boundary; conformance_claim remains false for arbitrary runs",
+            "physical_Zone_count": 1,
+            "conformance_claim": false,
+            "qualification": "Actual retained controlled Source B class and capability identifiers; no new capability or conformance promotion."
+          },
+          "actual_Detailed_samples": 485,
+          "actual_paired_short_Detailed_intervals": 10,
+          "first_actual_paired_short_interval": {
+            "sample_index": 24,
+            "stamp": {
+              "environment_ordinal": 1,
+              "fields": [
+                "1",
+                " 7",
+                "21",
+                " 0",
+                " 7",
+                " 0.00",
+                " 7.50",
+                "SummerDesignDay"
+              ],
+              "kind": "interval",
+              "physical_line": 3034,
+              "report_id": 2
+            },
+            "minutes": 7.5,
+            "Native": {
+              "token": "21.47821497475974",
+              "value": 21.47821497475974,
+              "physical_line": 3035,
+              "stamp_index": 24,
+              "stream_data_ordinal": 2881
+            },
+            "Source": {
+              "token": "21.478214974759737",
+              "value": 21.478214974759737,
+              "physical_line": 3035,
+              "stamp_index": 24,
+              "stream_data_ordinal": 2881
+            }
+          },
+          "shortening_gate_is_aggregate_across_two_B_cases": true,
+          "all_actual_owner_clock_partitions_compared": true,
+          "actual_Source_geometry": {
+            "actual_trace": {
+              "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/geometry-consumers.json",
+              "sha256": "941b0d235edcdf7478231a1a6c14d4731e4066d740bcab154d18376a7fbc9d1c",
+              "bytes": 28291
+            },
+            "actual_compiled": {
+              "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/compiled-geometry.json",
+              "sha256": "9f75931612a7ad135ee85347aab9e5d3d0556a111431b9654b2bc2a6d96b13e5",
+              "bytes": 19050
+            },
+            "all6_World_vertices_ZoneSpace_enclosures_exact": true,
+            "actual_Ground_floor": true,
+            "actual_global_and_effective_Zone_algorithm": "ASTMC1340",
+            "actual12_ground_months_C": [
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0
+            ],
+            "private_Native_geometry_or_ACH_observed": false
+          },
+          "whole_requested_ancillary": {
+            "eio": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/output/nativeout.eio",
+                "sha256": "dcc07bb739ae97db55b55514145abbccd1b42c1d816287eecf0631df10db72e4",
+                "bytes": 15381
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/eplusrs.eio",
+                "sha256": "de4047fb1bcc7d86c9a9d656f2b9bc8fcd2da373a2a08c35d43249531764b3c7",
+                "bytes": 15345
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "err": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/output/nativeout.err",
+                "sha256": "6e5c4a287fd0b19237a830c9c1da973e7ba08dd9abd6665c2bd89c46dbc30bb3",
+                "bytes": 1036
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/eplusrs.err",
+                "sha256": "d04630679481d7da3a3d564e2c6c98d8f846431a63fd86b5f4494d787cc0779f",
+                "bytes": 1031
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "end": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/output/nativeout.end",
+                "sha256": "6cc14d8944341701d68783b36876d99acf7c6dba6d6806b5569ab89f3a3b3063",
+                "bytes": 98
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/eplusrs.end",
+                "sha256": "e045b6e57752f4728ecec7afec225221087bead61bd2a9b438908dabf5455195",
+                "bytes": 98
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "rdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/output/nativeout.rdd",
+                "sha256": "70a98ac03107e517b5872270bfeca61fa506696dd28ef749b1cef77393728e32",
+                "bytes": 26917
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/eplusrs.rdd",
+                "sha256": "45971ee644d8d86123ca54d7c862a003d0fd76324b18af91437d465b744d01ef",
+                "bytes": 26912
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/output/nativeout.mdd",
+                "sha256": "90d54bd29eae163f50aeea612b2201a694d6e91a02c85d0b60462300e52c5368",
+                "bytes": 1129
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/eplusrs.mdd",
+                "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+                "bytes": 1124
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mtd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/output/nativeout.mtd",
+                "sha256": "3d1e0780953d541c410330b85bda5bc091c97ee5d1d4b9b9477ea624963cff45",
+                "bytes": 5999
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/eplusrs.mtd",
+                "sha256": "3d1e0780953d541c410330b85bda5bc091c97ee5d1d4b9b9477ea624963cff45",
+                "bytes": 5999
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "shd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/native-01/output/nativeout.shd",
+                "sha256": "f31d556fa1df4bf9e36ad837daa5df908589c2ee98da187a1af8a9e7a2df6bd6",
+                "bytes": 1478
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/eplusrs.shd",
+                "sha256": "f31d556fa1df4bf9e36ad837daa5df908589c2ee98da187a1af8a9e7a2df6bd6",
+                "bytes": 1478
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "CTF_coefficient_report": {
+              "declared_requested": false,
+              "Native_records": 0,
+              "Source_records": 0,
+              "paired_absence": true
+            },
+            "DXF": {
+              "Native": null,
+              "Source": null,
+              "declared_requested": false,
+              "paired_absence": true
+            },
+            "full_CSV_table": {
+              "Native": null,
+              "Source": null,
+              "declared_requested": false,
+              "paired_absence": true
+            },
+            "climatic_table": {
+              "observed": false,
+              "exact_selected_cells": 0
+            },
+            "warmup_days": [
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "complete_CTF_records": [],
+            "actual_Zone_Air_Solution_Algorithm": [
+              " Zone Air Solution Algorithm",
+              " EulerMethod",
+              " No",
+              " No"
+            ]
+          },
+          "actual_Native_conversion_or_Source_staging": {
+            "artifact": null,
+            "Source_original_epJSON": {
+              "path": ".runtime/porting/zone-air-solvers-113/B-EULER-113-120H/source-01/output/input/original.epJSON",
+              "sha256": "68114bf0c59cc238d7a6318549c00e4f85dec12eff299ef4ed697a454900db0c",
+              "bytes": 85040
+            },
+            "whole_DOM_and_bytes_exact": true
+          },
+          "actual_custody": {
+            "actual_Native_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/B-EULER-113-120H/root-native-custody01.json",
+              "sha256": "5038d40a12e5e98e9dfbc8563193776835615fc1e06318afea3bb7e933c0d469",
+              "bytes": 2677
+            },
+            "actual_Source_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/B-EULER-113-120H/root-source-custody01.json",
+              "sha256": "96b51a892f4428979234e1475974d265051b7418ea6dd82df7660779690c23f8",
+              "bytes": 2677
+            },
+            "actual_Source_completion": {
+              "path": ".runtime/object-expansion/unit113-prep/B-EULER-113-120H/root-source-completion01.json",
+              "sha256": "1b7924caae186a318b38c363c1ed94b2329fa801099ea5c21feaca4e0d41e9de",
+              "bytes": 2565
+            }
+          },
+          "Root_pre_Source_Native_activation_review": {
+            "path": ".runtime/object-expansion/unit113-prep/B-EULER-113-120H/root-native-activation-review01.json",
+            "sha256": "64c3ecdbf2c6d5ef492950ac05e9a9a51478a3f99d50dfae2c22d2497bb33802",
+            "bytes": 130272
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+            "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+            "bytes": 4029908
+          },
+          "independent_full_actual_physical_peer": {
+            "path": ".runtime/object-expansion/unit113-prep/physical-peer02/proof01.json",
+            "sha256": "cb3c1cba2b031f50d6defed56c021306c326cc285f124f95eb36c0a2d4258b62",
+            "bytes": 4416211
+          },
+          "Root_peer_review": {
+            "path": ".runtime/object-expansion/unit113-prep/root-physical-peer-review01.json",
+            "sha256": "df89e4047c69f81b480e3501fafed0c944319af57c79794ac9c073955597d539",
+            "bytes": 1899
+          },
+          "not_part_of_retained27_two_Zone_cohort": true,
+          "capability_or_gate_promotion": false
+        }
+      },
+      {
+        "id": "B-ANALYTICAL-113-120H",
+        "group": "ZoneAirHeatBalanceAlgorithm",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-euler-analytical-zone-air-113",
+        "input": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal01/B-ANALYTICAL-113-120H/input.epJSON",
+          "sha256": "1bc9910180d521e784876e9580b50b132cd31b422c2509e354201aef153f7601",
+          "bytes": 85047
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/command/receipt.json",
+          "sha256": "e40d4907c0903845c1e0e95f5db8ad995a7def1199b8512f844969312152762c",
+          "bytes": 9188
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/command/receipt.json",
+          "sha256": "d623569213e21d7219b2f0e310e24d2e250e35797e648b1839958e5dd53eea53",
+          "bytes": 9865
+        },
+        "source_summary": {
+          "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/run-summary.json",
+          "sha256": "cc3c8b1680b8f2435b14feba2c20f436c01207e1c0195e64cde245510ff4230c",
+          "bytes": 68423
+        },
+        "source_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/eplus-rs.exe",
+          "sha256": "fb1225c36edf58e375304950d4f4ff7ba792ac2cf45cfec4105229f5f88bdf23",
+          "bytes": 80479164
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26",
+          "sha256": "cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/receipt.json",
+          "sha256": "d56c2c5fa6d6f0911774323e11b371ca58973493422b15b6e2a06515681e3f4a",
+          "bytes": 6412
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+          "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+          "bytes": 4029908
+        },
+        "derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/reader-bindings01.json",
+          "sha256": "9bf66255b7e17fa9dd08dbe4fa3528a9312301d7029949bf78c225b3e2980890",
+          "bytes": 9876
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal02/B-ANALYTICAL-113-120H/recipe.json",
+          "sha256": "c15c214edf8421f89cf98793576ff0ad52828690ffdfdeeb4713cc86a5acf69c",
+          "bytes": 6100
+        },
+        "totals": {
+          "series": 122,
+          "samples": 57845,
+          "raw_operand_unequal": 17499,
+          "parsed_binary64_unequal": 17499,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 6.925984052941203e-08,
+          "max_rmse_delta": 7.566138703323508e-09
+        },
+        "full_reported_stream_scope": {
+          "original_series": 121,
+          "original_samples": 57360,
+          "Detailed": 485,
+          "actual_total_series": 122,
+          "actual_total_samples": 57845,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true,
+          "all_actual_Detailed_arrays_compared": true,
+          "frozen_conformance_identity": false
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal01/B-derived-policy.json",
+            "sha256": "9dbc53ef695f1d36a08da25fe406688c9eaa36c9f83c83dc37ddab3ff3585ec3",
+            "bytes": 34564
+          },
+          "inherited_variable_and_meter_rules_literal_unchanged": true,
+          "Detailed_rule": {
+            "origin_global_B_index": 67,
+            "units": "C",
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06,
+            "only_frequency_changed": "Timestep to Detailed"
+          },
+          "new_unit_or_metadata_waiver": false,
+          "global_contract_changed": false,
+          "qualification": "Original A/B index1 canonical kgWater/kgDryAir and requested Timestep selector stay unchanged; unique actual RDD HVAC/Average/empty-unit producer is authenticated identically in Source. Existing descriptive scalar schedule units remain. No new metadata waiver."
+        },
+        "effective_state": "One physical Zone; actual AnalyticalSolution on the bounded B route with both Space heat-balance fields No. Complete actual streams and declared policies pass. Detailed counts and public short intervals are observations only; no private Native solver history, arbitrary/full-object or frozen capability promotion.",
+        "comparison_provenance": {
+          "independent_new_input": true,
+          "fresh_Native_executions": 1,
+          "fresh_Source_executions": 1,
+          "Native_replays": 0,
+          "Source_replays": 0,
+          "actual_default_Source_build": 114,
+          "shared_run_group_case_ids": [
+            "A-EULER-113-24H",
+            "A-ANALYTICAL-113-24H",
+            "B-EULER-113-120H",
+            "B-ANALYTICAL-113-120H"
+          ],
+          "shared_new_Source_build_executions": 1,
+          "shared_actual_existing_test_executions": 2,
+          "shared_actual_successful_existing_test_executions": 2,
+          "shared_retained_failed_existing_test_executions": 0,
+          "existing_test_functions_extended": 2,
+          "new_test_functions": 0,
+          "publication112": {
+            "path": ".runtime/object-expansion/unit112-prep/publish01/receipt.json",
+            "sha256": "4241aa2f978aaf40448fa4b6b3c5650fde8b9cfaf10d1e31fd40eb5fae83443e",
+            "bytes": 6388
+          },
+          "actual_build_quality_authority": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-build114-quality-authority01.json",
+            "sha256": "1c97dd545a18d1b1dce195a47c5679d849a4608c19de207673295a21c43fcef5",
+            "bytes": 2853
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit113-prep/accepted-quality.json",
+            "sha256": "c528790d6275e76dd6a46239b670010cac9ffd310ec430c9bbb96dc37c68ec09",
+            "bytes": 7713
+          },
+          "actual_build_and_engine_epoch": {
+            "head": "cd55711e02c45f671ccd553741c5c5c245b1181e",
+            "worktree_clean": false,
+            "porcelain_v1_nul_utf8": " M crates/ep_run/src/ordinary_equipment_input.rs\u0000 M crates/ep_run/src/pipeline.rs\u0000 M crates/ep_run/src/porting_scope.rs\u0000 M crates/ep_run/src/porting_scope/settings.rs\u0000 M crates/ep_run/src/porting_scope/tests.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/component_report.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/history.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/humidity.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/lifecycle/prediction.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_air_heat_balance/predictor_corrector/temperature.rs\u0000 M crates/ep_runtime/src/heat_balance/ordinary_equipment/source_purchased_air/native_gap_cohort/air_history.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input.rs\u0000 M crates/ep_runtime/src/heat_balance/selected_heat_balance_input/control.rs\u0000"
+          },
+          "changed_Source_files": 14,
+          "complete_current_and_archived_Source_files": 4666,
+          "retained_prior_quality_attempts": [],
+          "shared_retained_independent_parser_structural_attempt": {
+            "receipt": {
+              "path": ".runtime/object-expansion/unit113-prep/physical-peer01/proof01.json",
+              "sha256": "91ba7da6d6229aa3d768680c3aacc967f7c309aaa93ed201f8a2c39e60942bec",
+              "bytes": 4145
+            },
+            "engine_attempt": false,
+            "accepted_sample_credit": 0,
+            "qualification": "Own verifier expected plan.ready instead of actual ready_for_one_actor and stopped before numeric read; corrected explicit checker attempt supplies the accepted peer proof. No engine/data/policy replay or failure credit."
+          }
+        },
+        "current_primary_observation": {
+          "Zones": 1,
+          "surfaces": 6,
+          "algorithm": "AnalyticalSolution",
+          "Space_Heat_Balance_Sizing_and_Simulation": [
+            "No",
+            "No"
+          ],
+          "raw_OutputVariable_requests": 115,
+          "raw_OutputMeterFileOnly_requests": 2,
+          "actual_reporting_hours": 120,
+          "actual_warmup_days": [
+            6,
+            6,
+            6,
+            6,
+            6
+          ],
+          "runtime_classification": {
+            "actual_runtime_class": "ideal-loads-direct-zone-coupled-compatibility",
+            "actual_matched_capability_ids": [
+              "ideal_loads_no_oa_sensible"
+            ],
+            "actual_runtime_selection_note": "selected runtime 'ideal-loads-direct-zone-coupled-compatibility' executes the matched capability boundary; conformance_claim remains false for arbitrary runs",
+            "physical_Zone_count": 1,
+            "conformance_claim": false,
+            "qualification": "Actual retained controlled Source B class and capability identifiers; no new capability or conformance promotion."
+          },
+          "actual_Detailed_samples": 485,
+          "actual_paired_short_Detailed_intervals": 10,
+          "first_actual_paired_short_interval": {
+            "sample_index": 24,
+            "stamp": {
+              "environment_ordinal": 1,
+              "fields": [
+                "1",
+                " 7",
+                "21",
+                " 0",
+                " 7",
+                " 0.00",
+                " 7.50",
+                "SummerDesignDay"
+              ],
+              "kind": "interval",
+              "physical_line": 3034,
+              "report_id": 2
+            },
+            "minutes": 7.5,
+            "Native": {
+              "token": "21.425459438048193",
+              "value": 21.425459438048193,
+              "physical_line": 3035,
+              "stamp_index": 24,
+              "stream_data_ordinal": 2881
+            },
+            "Source": {
+              "token": "21.425459438048197",
+              "value": 21.425459438048197,
+              "physical_line": 3035,
+              "stamp_index": 24,
+              "stream_data_ordinal": 2881
+            }
+          },
+          "shortening_gate_is_aggregate_across_two_B_cases": true,
+          "all_actual_owner_clock_partitions_compared": true,
+          "actual_Source_geometry": {
+            "actual_trace": {
+              "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/geometry-consumers.json",
+              "sha256": "941b0d235edcdf7478231a1a6c14d4731e4066d740bcab154d18376a7fbc9d1c",
+              "bytes": 28291
+            },
+            "actual_compiled": {
+              "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/compiled-geometry.json",
+              "sha256": "5a4da78124ce33b3a0d0a8dcb486595a3b417c95285c9f8f8d1bfc45d4e833cb",
+              "bytes": 19065
+            },
+            "all6_World_vertices_ZoneSpace_enclosures_exact": true,
+            "actual_Ground_floor": true,
+            "actual_global_and_effective_Zone_algorithm": "ASTMC1340",
+            "actual12_ground_months_C": [
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0,
+              18.0
+            ],
+            "private_Native_geometry_or_ACH_observed": false
+          },
+          "whole_requested_ancillary": {
+            "eio": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/output/nativeout.eio",
+                "sha256": "dce39d782a54e3a689213d5dcfd5b9522bb3edecb69f9fea907db26a0f4d1868",
+                "bytes": 15388
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/eplusrs.eio",
+                "sha256": "d2c143ece481b0115de89206532cc50a902daf57fb24f4840c2dd830905063a5",
+                "bytes": 15352
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "err": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/output/nativeout.err",
+                "sha256": "99f8d737afb8495272db7a6ff125ef0cf98bd1dc53cfc4827da33a81264b71dc",
+                "bytes": 1036
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/eplusrs.err",
+                "sha256": "43d1df7af6245b2bf1a0197a4d2c861caaedac16d68a1b9fdbf3361682ede1ba",
+                "bytes": 1031
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "end": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/output/nativeout.end",
+                "sha256": "6cc14d8944341701d68783b36876d99acf7c6dba6d6806b5569ab89f3a3b3063",
+                "bytes": 98
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/eplusrs.end",
+                "sha256": "d490b98de38e1aaa88ef12b3930bae3c982d5c791467a6c39ab82b1374fcd402",
+                "bytes": 98
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "rdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/output/nativeout.rdd",
+                "sha256": "e5e7b7434233be897f897da4b624ff04524d9ad9855ea6fce34beea6a1956e66",
+                "bytes": 26917
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/eplusrs.rdd",
+                "sha256": "45971ee644d8d86123ca54d7c862a003d0fd76324b18af91437d465b744d01ef",
+                "bytes": 26912
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mdd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/output/nativeout.mdd",
+                "sha256": "d944636c23b8973021897907edef681ab46172c3b02ccfbe0254ba6f01d32f38",
+                "bytes": 1129
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/eplusrs.mdd",
+                "sha256": "c5a5ab64ecc2bc61197009eb5e87096deb2cb7a8426b50d5a46e5858ba51f9d5",
+                "bytes": 1124
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "mtd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/output/nativeout.mtd",
+                "sha256": "3d1e0780953d541c410330b85bda5bc091c97ee5d1d4b9b9477ea624963cff45",
+                "bytes": 5999
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/eplusrs.mtd",
+                "sha256": "3d1e0780953d541c410330b85bda5bc091c97ee5d1d4b9b9477ea624963cff45",
+                "bytes": 5999
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "shd": {
+              "Native": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/native-01/output/nativeout.shd",
+                "sha256": "f31d556fa1df4bf9e36ad837daa5df908589c2ee98da187a1af8a9e7a2df6bd6",
+                "bytes": 1478
+              },
+              "Source": {
+                "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/eplusrs.shd",
+                "sha256": "f31d556fa1df4bf9e36ad837daa5df908589c2ee98da187a1af8a9e7a2df6bd6",
+                "bytes": 1478
+              },
+              "full_body_equal_under_only_identity_elapsed_EOL_exceptions": true
+            },
+            "CTF_coefficient_report": {
+              "declared_requested": false,
+              "Native_records": 0,
+              "Source_records": 0,
+              "paired_absence": true
+            },
+            "DXF": {
+              "Native": null,
+              "Source": null,
+              "declared_requested": false,
+              "paired_absence": true
+            },
+            "full_CSV_table": {
+              "Native": null,
+              "Source": null,
+              "declared_requested": false,
+              "paired_absence": true
+            },
+            "climatic_table": {
+              "observed": false,
+              "exact_selected_cells": 0
+            },
+            "warmup_days": [
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "complete_CTF_records": [],
+            "actual_Zone_Air_Solution_Algorithm": [
+              " Zone Air Solution Algorithm",
+              " AnalyticalSolution",
+              " No",
+              " No"
+            ]
+          },
+          "actual_Native_conversion_or_Source_staging": {
+            "artifact": null,
+            "Source_original_epJSON": {
+              "path": ".runtime/porting/zone-air-solvers-113/B-ANALYTICAL-113-120H/source-01/output/input/original.epJSON",
+              "sha256": "1bc9910180d521e784876e9580b50b132cd31b422c2509e354201aef153f7601",
+              "bytes": 85047
+            },
+            "whole_DOM_and_bytes_exact": true
+          },
+          "actual_custody": {
+            "actual_Native_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/B-ANALYTICAL-113-120H/root-native-custody01.json",
+              "sha256": "6540620585a882798bf78f794ba4bf36f37751e982fc438166ab771fdd6e8c9d",
+              "bytes": 2702
+            },
+            "actual_Source_custody": {
+              "path": ".runtime/object-expansion/unit113-prep/B-ANALYTICAL-113-120H/root-source-custody01.json",
+              "sha256": "e2bbeed64580a57e043c7d0778c6539fde642bbb500b543cc2eac25366ff99ba",
+              "bytes": 2702
+            },
+            "actual_Source_completion": {
+              "path": ".runtime/object-expansion/unit113-prep/B-ANALYTICAL-113-120H/root-source-completion01.json",
+              "sha256": "fe068746a6216803eb7bbe4351b6e0290ba9c77fd7407261ed021392ef70f292",
+              "bytes": 2595
+            }
+          },
+          "Root_pre_Source_Native_activation_review": {
+            "path": ".runtime/object-expansion/unit113-prep/B-ANALYTICAL-113-120H/root-native-activation-review01.json",
+            "sha256": "1a1624968a73422e6291a99db4d8ad34ec313f876bc07bcaeb658d63cb10ffc9",
+            "bytes": 130310
+          },
+          "Root_full_completed_file_readback": {
+            "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+            "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+            "bytes": 4029908
+          },
+          "independent_full_actual_physical_peer": {
+            "path": ".runtime/object-expansion/unit113-prep/physical-peer02/proof01.json",
+            "sha256": "cb3c1cba2b031f50d6defed56c021306c326cc285f124f95eb36c0a2d4258b62",
+            "bytes": 4416211
+          },
+          "Root_peer_review": {
+            "path": ".runtime/object-expansion/unit113-prep/root-physical-peer-review01.json",
+            "sha256": "df89e4047c69f81b480e3501fafed0c944319af57c79794ac9c073955597d539",
+            "bytes": 1899
+          },
+          "not_part_of_retained27_two_Zone_cohort": true,
+          "capability_or_gate_promotion": false
+        }
       }
     ],
     "totals": {
-      "paired_cases": 165,
-      "reported_samples": 4653822,
-      "raw_operand_unequal": 1019434,
+      "paired_cases": 169,
+      "reported_samples": 4780216,
+      "raw_operand_unequal": 1060631,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -51074,6 +53176,23 @@
           "sha256": "d4372179c14a266fd70821f5a6784844b75157c28785b10af39ae6709dea4ec5",
           "bytes": 80466804
         }
+      },
+      {
+        "id": "source-euler-analytical-zone-air-113",
+        "receipt": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/receipt.json",
+          "sha256": "d56c2c5fa6d6f0911774323e11b371ca58973493422b15b6e2a06515681e3f4a",
+          "bytes": 6412
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26",
+          "sha256": "cc18c0d8eb2b81554170cacdef5a7ac8a9e21e01e263ead9a7de35371a536c26"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/object-domain-20261020/build-114/eplus-rs.exe",
+          "sha256": "fb1225c36edf58e375304950d4f4ff7ba792ac2cf45cfec4105229f5f88bdf23",
+          "bytes": 80479164
+        }
       }
     ],
     "focused_since_workspace": {
@@ -51319,14 +53438,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 109,
-      "builds_with_accepted_paired_cases": 102,
+      "actual_recorded_builds": 110,
+      "builds_with_accepted_paired_cases": 103,
       "builds_with_only_retained_failed_Source_attempts": 3,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 6,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "109 recorded Source builds:102 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
+      "qualification": "110 recorded Source builds:103 have accepted comparisons;6 have only retained unaccepted attempts and1 was superseded before any Source execution. Historical unaccepted/unlaunched records remain unchanged and contribute no accepted samples.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 2,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 1,
@@ -54814,6 +56933,152 @@
       "Native_replays": 0,
       "Source_replays": 0,
       "scope": "One bounded one-Zone Source B five-DesignDay120h composition inherits global ASTMC1340, makes one existing Floor Ground and authors12 controlled18C ground temperatures. Actual positive public ZoneAirNode mass flow and six live inside-convection coefficient outputs pass strict complete-stream policies. Public low-flow and flow-derived>100 indicators do not instrument private Native convection-entry ACH, psychrometric caches or call history. No arbitrary/full-object or frozen capability promotion."
+    },
+    "current_ZoneAir_solution_algorithms_live_pairs": {
+      "source_build": "source-euler-analytical-zone-air-113",
+      "actual_Source_build": {
+        "path": ".runtime/object-expansion/build114-row.json",
+        "sha256": "539e8fc2273959a0543f24e99b70bcb19ca2bb6eb3cfcd64c6f56caf75d97b48",
+        "bytes": 687
+      },
+      "actual_build_quality_authority": {
+        "path": ".runtime/object-expansion/unit113-prep/actual-build114-quality-authority01.json",
+        "sha256": "1c97dd545a18d1b1dce195a47c5679d849a4608c19de207673295a21c43fcef5",
+        "bytes": 2853
+      },
+      "actual_quality": {
+        "path": ".runtime/object-expansion/unit113-prep/accepted-quality.json",
+        "sha256": "c528790d6275e76dd6a46239b670010cac9ffd310ec430c9bbb96dc37c68ec09",
+        "bytes": 7713
+      },
+      "case_rows": [
+        "A-EULER-113-24H",
+        "A-ANALYTICAL-113-24H",
+        "B-EULER-113-120H",
+        "B-ANALYTICAL-113-120H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit113-prep/actual-independent-readback01.json",
+        "sha256": "9078fb1c7a5ecade62deb6606f475614ebe2f816d6e42b42365dac1e70a0676a",
+        "bytes": 4029908
+      },
+      "independent_actual_full_physical_peer": {
+        "path": ".runtime/object-expansion/unit113-prep/physical-peer02/proof01.json",
+        "sha256": "cb3c1cba2b031f50d6defed56c021306c326cc285f124f95eb36c0a2d4258b62",
+        "bytes": 4416211
+      },
+      "Root_physical_peer_review": {
+        "path": ".runtime/object-expansion/unit113-prep/root-physical-peer-review01.json",
+        "sha256": "df89e4047c69f81b480e3501fafed0c944319af57c79794ac9c073955597d539",
+        "bytes": 1899
+      },
+      "actual_custody": {
+        "A-EULER-113-24H": {
+          "actual_Native_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/A-EULER-113-24H/root-native-custody01.json",
+            "sha256": "d4be8651b4f2b65e3d5e3078b6d06f01f3bf800790117968bfa8e6434900b9a6",
+            "bytes": 2861
+          },
+          "actual_Source_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/A-EULER-113-24H/root-source-custody01.json",
+            "sha256": "a5243b9fb76e8f60dcdcdf297f4d54b672e3ed6b7f69bdf2d2f072f009e23250",
+            "bytes": 2862
+          },
+          "actual_Source_completion": {
+            "path": ".runtime/object-expansion/unit113-prep/A-EULER-113-24H/root-source-completion01.json",
+            "sha256": "c376fb30070b6b501063718ed40239ae9ab6e4e01029d2547520a7b41fce9f4a",
+            "bytes": 2498
+          }
+        },
+        "A-ANALYTICAL-113-24H": {
+          "actual_Native_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/A-ANALYTICAL-113-24H/root-native-custody01.json",
+            "sha256": "0cd88ae3bb5c2c20930acdbe5a2f2d2df1a5cd1fdbcd8d595e3c605a59377922",
+            "bytes": 2886
+          },
+          "actual_Source_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/A-ANALYTICAL-113-24H/root-source-custody01.json",
+            "sha256": "69dda1219aee7ebe6b9e7293a4d73656e72f3ad4e88b53868197826c481db6bb",
+            "bytes": 2887
+          },
+          "actual_Source_completion": {
+            "path": ".runtime/object-expansion/unit113-prep/A-ANALYTICAL-113-24H/root-source-completion01.json",
+            "sha256": "18c8af6b8e3cb18f4b8c7c9cd6578b50cf0eefe3cbcc769b7ed647a2bcbd1dd0",
+            "bytes": 2533
+          }
+        },
+        "B-EULER-113-120H": {
+          "actual_Native_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/B-EULER-113-120H/root-native-custody01.json",
+            "sha256": "5038d40a12e5e98e9dfbc8563193776835615fc1e06318afea3bb7e933c0d469",
+            "bytes": 2677
+          },
+          "actual_Source_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/B-EULER-113-120H/root-source-custody01.json",
+            "sha256": "96b51a892f4428979234e1475974d265051b7418ea6dd82df7660779690c23f8",
+            "bytes": 2677
+          },
+          "actual_Source_completion": {
+            "path": ".runtime/object-expansion/unit113-prep/B-EULER-113-120H/root-source-completion01.json",
+            "sha256": "1b7924caae186a318b38c363c1ed94b2329fa801099ea5c21feaca4e0d41e9de",
+            "bytes": 2565
+          }
+        },
+        "B-ANALYTICAL-113-120H": {
+          "actual_Native_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/B-ANALYTICAL-113-120H/root-native-custody01.json",
+            "sha256": "6540620585a882798bf78f794ba4bf36f37751e982fc438166ab771fdd6e8c9d",
+            "bytes": 2702
+          },
+          "actual_Source_custody": {
+            "path": ".runtime/object-expansion/unit113-prep/B-ANALYTICAL-113-120H/root-source-custody01.json",
+            "sha256": "e2bbeed64580a57e043c7d0778c6539fde642bbb500b543cc2eac25366ff99ba",
+            "bytes": 2702
+          },
+          "actual_Source_completion": {
+            "path": ".runtime/object-expansion/unit113-prep/B-ANALYTICAL-113-120H/root-source-completion01.json",
+            "sha256": "fe068746a6216803eb7bbe4351b6e0290ba9c77fd7407261ed021392ef70f292",
+            "bytes": 2595
+          }
+        }
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit113-prep/zone-air-solvers-pilot-proposal02/proposal.json",
+        "sha256": "a6310ebdef28c1b63b9692533c5a87436e26d5b9df84e5cccf8632d57d05464e",
+        "bytes": 3162
+      },
+      "publication112": {
+        "path": ".runtime/object-expansion/unit112-prep/publish01/receipt.json",
+        "sha256": "4241aa2f978aaf40448fa4b6b3c5650fde8b9cfaf10d1e31fd40eb5fae83443e",
+        "bytes": 6388
+      },
+      "actual_Detailed_samples": 970,
+      "actual_same_clock_paired_short_Detailed_intervals": 20,
+      "Detailed_gate": "Aggregate at least1pairedNative0<duration<15min interval across both B cases; all complete arrays required, no fixed count or individual shortening prerequisite.",
+      "new_test_executions": 2,
+      "new_successful_test_executions": 2,
+      "retained_failed_test_executions": 0,
+      "new_test_functions": 0,
+      "new_builds": 1,
+      "actual_fresh_Native_executions": 4,
+      "actual_fresh_Source_executions": 4,
+      "Native_replays": 0,
+      "Source_replays": 0,
+      "retained_independent_parser_structural_attempt": {
+        "path": ".runtime/object-expansion/unit113-prep/physical-peer01/proof01.json",
+        "sha256": "91ba7da6d6229aa3d768680c3aacc967f7c309aaa93ed201f8a2c39e60942bec",
+        "bytes": 4145
+      },
+      "verification_helper_failure_is_not_an_engine_attempt": true,
+      "all4_cases_one_physical_Zone": true,
+      "retained_two_Zone_cohort_cases_unchanged": 27,
+      "retained_two_Zone_cohort_samples_unchanged": 674544,
+      "cohort_definition_audit": {
+        "path": ".runtime/object-expansion/unit113-prep/multizone-cohort-definition-audit01.json",
+        "sha256": "3c01724afaef86725281bc9e077783ec06adaea404aa35f3890220a3c1e37798",
+        "bytes": 5892
+      },
+      "capability_or_gate_promotion": false
     }
   },
   "additional_native_type_calibrations": [

@@ -141,6 +141,10 @@ pub(super) fn project_settings(
     );
     let air = if air.eq_ignore_ascii_case("ThirdOrderBackwardDifference") {
         "ThirdOrderBackwardDifference".into()
+    } else if air.eq_ignore_ascii_case("AnalyticalSolution") {
+        "AnalyticalSolution".into()
+    } else if air.eq_ignore_ascii_case("EulerMethod") {
+        "EulerMethod".into()
     } else {
         air
     };

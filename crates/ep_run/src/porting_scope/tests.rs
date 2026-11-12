@@ -2302,6 +2302,44 @@ fn default_controls_and_source_adjustments_are_observable() {
         "ThirdOrderBackwardDifference"
     );
     assert_eq!(actual.settings["room_air_model_type"], "Mixing");
+    // Actual Source intake/effective settings only; physical solver parity is
+    // established separately on complete same-input primary runs.
+    for scope in [PortingScope::A, PortingScope::B] {
+        for (authored, effective) in [
+            (
+                "ThirdOrderBackwardDifference",
+                "ThirdOrderBackwardDifference",
+            ),
+            ("analyticalsolution", "AnalyticalSolution"),
+            ("eulermethod", "EulerMethod"),
+        ] {
+            let mut selected = input(scope);
+            selected["ZoneAirHeatBalanceAlgorithm"] = json!({"Control":{
+                "algorithm":authored,
+                "do_space_heat_balance_for_sizing":"No",
+                "do_space_heat_balance_for_simulation":"No",
+            }});
+            let raw = parse_epjson_str(&selected.to_string()).expect("actual Source air algorithm");
+            let source = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            };
+            assert!(
+                source.is_ok(),
+                "{scope:?}/{authored}: {:?}",
+                source.as_ref().err()
+            );
+            let selected_scope = trace(&selected, scope);
+            assert!(selected_scope.admissible, "{:?}", selected_scope.violations);
+            assert_eq!(
+                selected_scope.settings["zone_air_heat_balance_algorithm"],
+                effective
+            );
+            if effective != "ThirdOrderBackwardDifference" {
+                assert!(crate::ordinary_input_processor::resolve(&raw).is_err());
+            }
+        }
+    }
     assert_eq!(actual.settings["timesteps_per_hour"], 4);
     assert_eq!(actual.production["conformance_claim"], false);
     value["Building"]["Building"]["maximum_number_of_warmup_days"] = json!(0);
@@ -2487,12 +2525,6 @@ fn scientific_algorithms_are_rejected_before_bounded_execution() {
             "algorithm",
             "ConductionFiniteDifference",
             "heat_balance_algorithm",
-        ),
-        (
-            "ZoneAirHeatBalanceAlgorithm",
-            "algorithm",
-            "EulerMethod",
-            "zone_air_heat_balance_algorithm",
         ),
         (
             "RoomAirModelType",

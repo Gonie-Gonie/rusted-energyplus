@@ -1,4 +1,4 @@
-//! Genuine zone-only ThirdOrder correctAirTemp3863-4164 on live AirHB/Node owners.
+//! Genuine mixed-zone correctAirTemp3863-4164 on live AirHB/Node owners.
 use super::*;
 impl SourceZoneSpaceHeatBalanceData {
     pub(super) fn correct_source_zone_temperature(
@@ -77,10 +77,18 @@ impl SourceZoneSpaceHeatBalanceData {
                             self.temp_dep_coef,
                         );
                 }
+                SelectedZoneAirSolution::Analytical => {
+                    if self.temp_dep_coef == 0.0 {
+                        self.zt = self.t1 + self.temp_ind_coef / self.air_power_cap;
+                    } else {
+                        self.zt = (self.t1 - self.temp_ind_coef / self.temp_dep_coef)
+                            * cpp_min(700.0, -self.temp_dep_coef / self.air_power_cap).exp()
+                            + self.temp_ind_coef / self.temp_dep_coef;
+                    }
+                }
                 SelectedZoneAirSolution::Euler => {
-                    return Err(Error::Unavailable(
-                        "non-ThirdOrder controlled Source air solve3964",
-                    ));
+                    self.zt = (self.air_power_cap * self.t1 + self.temp_ind_coef)
+                        / (self.air_power_cap + self.temp_dep_coef);
                 }
             }
             if !controller.subsystems.room_air.any_non_mixing {
@@ -159,8 +167,18 @@ impl SourceZoneSpaceHeatBalanceData {
                             self.temp_dep_coef,
                         )
                 }
+                SelectedZoneAirSolution::Analytical => {
+                    if self.temp_dep_coef == 0.0 {
+                        self.zt = self.t1 + self.temp_ind_coef / self.air_power_cap;
+                    } else {
+                        self.zt = (self.t1 - self.temp_ind_coef / self.temp_dep_coef)
+                            * cpp_min(700.0, -self.temp_dep_coef / self.air_power_cap).exp()
+                            + self.temp_ind_coef / self.temp_dep_coef;
+                    }
+                }
                 SelectedZoneAirSolution::Euler => {
-                    return Err(Error::Unavailable("non-ThirdOrder Source air solve4079"));
+                    self.zt = (self.air_power_cap * self.t1 + self.temp_ind_coef)
+                        / (self.air_power_cap + self.temp_dep_coef);
                 }
             }
             if controller.subsystems.room_air.any_non_mixing
@@ -204,8 +222,8 @@ impl SourceZoneSpaceHeatBalanceData {
             SelectedZoneAirSolution::ThirdOrder => {
                 temperature_change = cpp_max(temperature_change, (self.zt - self.ztm[0]).abs())
             }
-            SelectedZoneAirSolution::Euler => {
-                return Err(Error::Unavailable("non-ThirdOrder temperature change4150"));
+            SelectedZoneAirSolution::Analytical | SelectedZoneAirSolution::Euler => {
+                temperature_change = cpp_max(temperature_change, (self.zt - self.t1).abs())
             }
         }
         Ok(temperature_change)

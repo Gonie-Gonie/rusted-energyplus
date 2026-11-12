@@ -32,7 +32,10 @@ impl SourceZoneSpaceHeatBalanceData {
             return Err(Error::Unavailable("positive RoomAFN zone history4233"));
         }
         if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-            return Err(Error::Unavailable("non-ThirdOrder history TM2/TMX4248"));
+            self.tm2 = self.tmx;
+            self.tmx = self.ztav;
+            self.wm2 = self.wmx;
+            self.wmx = self.air_hum_rat_avg;
         }
         Ok(())
     }
@@ -53,7 +56,10 @@ impl SourceZoneSpaceHeatBalanceData {
             return Err(Error::Unavailable("positive nonmixing system history4309"));
         }
         if owners.control.zone_air_solution != SelectedZoneAirSolution::ThirdOrder {
-            return Err(Error::Unavailable("non-ThirdOrder system histories4341"));
+            self.tm2 = self.tmx;
+            self.tmx = self.mat;
+            self.wm2 = self.wmx;
+            self.wmx = self.air_hum_rat_temp;
         }
         let _ = number; // No Source RoomAir row is read on mixed/Space branch4308.
         Ok(())

@@ -160,6 +160,7 @@ fn state(factory: &Factory) -> Result<Value> {
         "address":pointer(row),"ordinal":at+1,"Name":row.name,"Multiplier":row.multiplier,"ListMultiplier":row.list_multiplier,"spaceIndexes":row.space_indexes})).collect::<Vec<_>>();
     let algorithm = match factory.control.zone_air_solution {
         hb::selected_heat_balance_input::SelectedZoneAirSolution::ThirdOrder => 0,
+        hb::selected_heat_balance_input::SelectedZoneAirSolution::Analytical => 1,
         hb::selected_heat_balance_input::SelectedZoneAirSolution::Euler => 2,
     }; // Pinned DataHeatBalance.hh100-107; these inputs genuinely select ThirdOrder0.
     Ok(

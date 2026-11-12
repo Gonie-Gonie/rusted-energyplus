@@ -1276,7 +1276,7 @@ fn run_with_optional_porting_scope_impl(
     let support_report = if scope.is_some() {
         scoped_report = compile_result.report.clone();
         // These bounded controls are admitted only after the strict scope guard
-        // confirms the same ThirdOrder/Mixing branches as the Rust runtime.
+        // confirms the same admitted Source zone-air/Mixing branches as the runtime.
         scoped_report.coverage.retain(|entry| {
             !matches!(
                 entry.object_type.as_str(),

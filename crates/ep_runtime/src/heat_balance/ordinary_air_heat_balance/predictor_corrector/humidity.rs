@@ -96,8 +96,16 @@ impl SourceZoneSpaceHeatBalanceData {
                         a,
                     )
             }
+            SelectedZoneAirSolution::Analytical => {
+                if a == 0.0 {
+                    self.air_hum_rat_temp = self.w1 + b / c;
+                } else {
+                    self.air_hum_rat_temp =
+                        (self.w1 - b / a) * cpp_min(700.0, -a / c).exp() + b / a;
+                }
+            }
             SelectedZoneAirSolution::Euler => {
-                return Err(Error::Unavailable("non-ThirdOrder humidity solve4554"));
+                self.air_hum_rat_temp = (c * self.w1 + b) / (c + a);
             }
         }
         if self.air_hum_rat_temp < 0.0 {

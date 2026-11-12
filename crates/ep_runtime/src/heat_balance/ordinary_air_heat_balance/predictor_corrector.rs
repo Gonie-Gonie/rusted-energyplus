@@ -1,4 +1,4 @@
-//! Actual retained ThirdOrder Zone/Space caller bodies; no legacy air copy.
+//! Actual retained three-algorithm Zone/Space caller bodies; no legacy air copy.
 use super::{SourceAirHeatBalance, SourceZoneSpaceHeatBalanceData, index};
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::error_backend::SourceErrorBackend;
