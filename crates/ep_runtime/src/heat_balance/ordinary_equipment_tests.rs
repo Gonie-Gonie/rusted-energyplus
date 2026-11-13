@@ -949,6 +949,162 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 )
             );
         }
+
+        if total == 1 {
+            // Isolated real-owner operand probes of the same production method;
+            // not a Native pair, caller phase execution or seeded CLI input.
+            let mut config = EquipmentConfig {
+                zone_name: "AUTHORED FLOW ZONE".into(),
+                zone_node: 1,
+                total_inlet_air_mass_flow_rate: 1.2,
+                total_exhaust_air_mass_flow_rate: 1.2,
+                total_available_air_loop_outdoor_air: 0.6,
+                ..Default::default()
+            };
+            let mut zone_air = crate::heat_balance::ordinary_air_heat_balance::SourceZoneSpaceHeatBalanceData::default();
+            let nodes = Some(vec![SourceNodeData {
+                temperature: 20.0,
+                humidity_ratio: 0.008,
+                ..Default::default()
+            }]);
+            let phase_clock = crate::weather::day::WeatherGlobalState {
+                current_time: 6.25,
+                time_step_zone: 0.25,
+                warmup_flag: false,
+                ..Default::default()
+            };
+            let phase_globals = SelectedHeatBalanceGlobals::default();
+            let environment = crate::weather::day::WeatherEnvironmentState {
+                std_rho_air: 1.2,
+                current_weather: crate::weather::day::CurrentWeatherState {
+                    out_baro_press: 101325.0,
+                    ..Default::default()
+                },
+                environment_name: "AUTHORED FLOW ENVIRONMENT".into(),
+                current_month_day: "07/21".into(),
+                ..Default::default()
+            };
+            let volume_environment = crate::weather::day::WeatherEnvironmentState {
+                std_rho_air: 10.0,
+                ..environment.clone()
+            };
+            let phase_hvac =
+                crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals::default();
+            let mut psychrometrics = crate::psychrometrics::SourcePsychrometricAccess;
+            let mut recurring =
+                crate::heat_balance::source_initialization::SourceRecurringErrorState::default();
+            let mut diagnostic_state = error_state.clone();
+            diagnostic_state.output_error_header = false;
+            diagnostic_state.tracking.total_warning_errors = 0;
+            diagnostic_state.tracking.total_warning_errors_during_warmup = 0;
+            diagnostic_state.tracking.total_warning_errors_during_sizing = 0;
+            diagnostic_state.warmup_flag = true; // Live Source operands must win.
+            diagnostic_state.doing_sizing = true;
+            let (mut error, mut console) = (Vec::new(), Vec::new());
+            let mut backend = SourceErrorBackend {
+                state: &mut diagnostic_state,
+                error_stream: Some(&mut error),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut diagnostic = crate::psychrometrics::SourcePsychrometricOwners {
+                clock: &phase_clock,
+                globals: &phase_globals,
+                environment: &environment,
+                hvac: &phase_hvac,
+                recurring: &mut recurring,
+                backend: &mut backend,
+            };
+            // Mass threshold and real incoming flow short-circuit before Node.
+            config.check_source_flow_balance(
+                0.0005,
+                &None,
+                &zone_air,
+                &mut psychrometrics,
+                &developer,
+                &mut diagnostic,
+            )?;
+            zone_air.oamfl = 0.002;
+            config.check_source_flow_balance(
+                0.002,
+                &None,
+                &zone_air,
+                &mut psychrometrics,
+                &developer,
+                &mut diagnostic,
+            )?;
+            assert!(!config.flow_error);
+            assert_eq!(diagnostic.backend.state.tracking.total_warning_errors, 0);
+            // Positive mass residual may still fail the independent volume gate.
+            zone_air.oamfl = 0.0;
+            diagnostic.environment = &volume_environment;
+            config.check_source_flow_balance(
+                0.0024,
+                &nodes,
+                &zone_air,
+                &mut psychrometrics,
+                &developer,
+                &mut diagnostic,
+            )?;
+            assert!(!config.flow_error);
+            assert_eq!(diagnostic.backend.state.tracking.total_warning_errors, 0);
+            diagnostic.environment = &environment;
+            let before_warning = config.clone();
+            config.check_source_flow_balance(
+                2.4,
+                &nodes,
+                &zone_air,
+                &mut psychrometrics,
+                &developer,
+                &mut diagnostic,
+            )?;
+            let mut expected = before_warning;
+            expected.flow_error = true;
+            assert_eq!(config, expected);
+            assert_eq!(diagnostic.backend.state.tracking.total_warning_errors, 1);
+            assert_eq!(
+                diagnostic
+                    .backend
+                    .state
+                    .tracking
+                    .total_warning_errors_during_warmup,
+                0
+            );
+            assert_eq!(
+                diagnostic
+                    .backend
+                    .state
+                    .tracking
+                    .total_warning_errors_during_sizing,
+                0
+            );
+            // Once latch suppresses repeated diagnostic and even Node access.
+            config.check_source_flow_balance(
+                2.4,
+                &None,
+                &zone_air,
+                &mut psychrometrics,
+                &developer,
+                &mut diagnostic,
+            )?;
+            assert_eq!(diagnostic.backend.state.tracking.total_warning_errors, 1);
+            assert_eq!(
+                std::str::from_utf8(&error)?,
+                concat!(
+                    "   ** Warning ** In zone AUTHORED FLOW ZONE there is unbalanced air flow. Load due to induced outdoor air is neglected.\n",
+                    "   **   ~~~   **  Environment=AUTHORED FLOW ENVIRONMENT, at Simulation time=07/21 06:00 - 06:15\n",
+                    "   **   ~~~   **   Flows [m3/s]: Inlets: 1.000000  Unbalanced exhausts: 1.000000  Returns: 2.000000\n",
+                    "   **   ~~~   **   Infiltration: 0.000000  Zone Ventilation: 0.000000  Mixing (incoming): 0.000000\n",
+                    "   **   ~~~   **   Imbalance (excess outflow): 2.000000  Total system OA flow (for all airloops serving this zone): 0.500000\n",
+                    "   **   ~~~   **   This error will only be reported once per zone.\n",
+                )
+            );
+        }
         let retained_source = source.clone();
         let retained_input = input.clone();
         source.get_zone_equipment_source(

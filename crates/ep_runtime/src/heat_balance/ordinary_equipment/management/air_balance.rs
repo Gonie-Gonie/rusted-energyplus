@@ -423,27 +423,22 @@ pub(super) fn mass_balance(
                 && !o.clock.warmup_flag
                 && !first_hvac_iteration
             {
-                let config = row(&o.equipment.zone_config, index)?;
-                if !config.flow_error {
-                    let unbalanced_exhaust =
-                        config.total_exhaust_air_mass_flow_rate - config.zone_exhaust_balanced;
-                    let unbalanced_system =
-                        unbalanced_exhaust + total_return - config.total_inlet_air_mass_flow_rate;
-                    if unbalanced_system > 0.001 {
-                        let air = &row(&o.air.zones, index)?.air;
-                        let incoming = air.oamfl + air.vamfl + air.mixing_mass_flow_zone;
-                        let unbalanced = max(0.0, unbalanced_system - incoming);
-                        if unbalanced > 0.001 {
-                            let _temperature =
-                                node(&o.equipment.nodes.physical, config.zone_node)?.temperature;
-                            let _humidity =
-                                node(&o.equipment.nodes.physical, config.zone_node)?.humidity_ratio;
-                            return Err(Error::Unavailable(
-                                "actual CalcZoneMassBalance diagnostic-aware PsyRhoAirFnPbTdbW5225",
-                            ));
-                        }
-                    }
-                }
+                let air = &row(&o.air.zones, index)?.air;
+                row_mut(&mut o.equipment.zone_config, index)?.check_source_flow_balance(
+                    total_return,
+                    &o.equipment.nodes.physical,
+                    air,
+                    o.psychrometrics,
+                    &o.project.system.developer_flag,
+                    &mut crate::psychrometrics::SourcePsychrometricOwners {
+                        clock: o.clock,
+                        globals: o.globals,
+                        environment: o.environment,
+                        hvac: o.hvac,
+                        recurring: o.recurring_errors,
+                        backend: o.backend,
+                    },
+                )?;
             }
         }
         if iteration > 0 {

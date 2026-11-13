@@ -301,6 +301,109 @@ impl Default for EquipmentConfig {
     }
 }
 
+impl EquipmentConfig {
+    /// Native ZoneEquipmentManager5214-5258, after the unchanged caller phase
+    /// guards. Every diagnostic operand borrows its genuine retained owner.
+    fn check_source_flow_balance(
+        &mut self,
+        total_zone_return: f64,
+        nodes: &Option<Vec<SourceNodeData>>,
+        air: &super::ordinary_air_heat_balance::SourceZoneSpaceHeatBalanceData,
+        psychrometrics: &mut crate::psychrometrics::SourcePsychrometricAccess,
+        developer: &bool,
+        owners: &mut crate::psychrometrics::SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<(), super::selected_heat_balance_input::HeatBalanceInputError> {
+        use super::selected_heat_balance_input::HeatBalanceInputError as Error;
+        if !self.flow_error {
+            let system_unbalanced_exhaust =
+                self.total_exhaust_air_mass_flow_rate - self.zone_exhaust_balanced;
+            let system_unbalanced_flow =
+                system_unbalanced_exhaust + total_zone_return - self.total_inlet_air_mass_flow_rate;
+            if system_unbalanced_flow > 0.001 {
+                let incoming_flow = air.oamfl + air.vamfl + air.mixing_mass_flow_zone;
+                let difference = system_unbalanced_flow - incoming_flow;
+                let unbalanced_flow = if 0.0 < difference { difference } else { 0.0 };
+                if unbalanced_flow > 0.001 {
+                    let zone_node = nodes
+                        .as_deref()
+                        .and_then(|rows| self.zone_node.checked_sub(1).and_then(|at| rows.get(at)))
+                        .ok_or(Error::Unavailable(
+                            "actual CalcZoneMassBalance ZoneNode5223",
+                        ))?;
+                    let zone_density = psychrometrics.source_air_density(
+                        owners.environment.current_weather.out_baro_press,
+                        zone_node.temperature,
+                        zone_node.humidity_ratio,
+                        "CalcZoneMassBalance",
+                        developer,
+                        owners,
+                    )?;
+                    let incoming_volume_flow = incoming_flow / zone_density;
+                    let system_unbalanced_volume_flow =
+                        system_unbalanced_flow / owners.environment.std_rho_air;
+                    let volume_difference = system_unbalanced_volume_flow - incoming_volume_flow;
+                    let unbalanced_volume_flow = if 0.0 < volume_difference {
+                        volume_difference
+                    } else {
+                        0.0
+                    };
+                    if unbalanced_volume_flow > 0.001 {
+                        owners.backend.show_source_warning_error(
+                            &format!(
+                                "In zone {} there is unbalanced air flow. Load due to induced outdoor air is neglected.",
+                                self.zone_name,
+                            ),
+                            &super::error_backend::SourceDiagnosticFlags {
+                                kickoff: &owners.globals.kickoff_simulation,
+                                developer,
+                                warmup: &owners.clock.warmup_flag,
+                                doing_sizing: &owners.globals.doing_sizing,
+                            },
+                        )?;
+                        owners.backend.show_source_continue_error_time_stamp(
+                            "",
+                            owners.clock,
+                            owners.globals,
+                            owners.environment,
+                            owners.hvac,
+                        )?;
+                        let round = |value| {
+                            super::source_round_format::round(value, 6).map_err(|error| {
+                                Error::Format(format!("CalcZoneMassBalance .6R: {error:?}"))
+                            })
+                        };
+                        owners.backend.show_continue_error(&format!(
+                            "  Flows [m3/s]: Inlets: {}  Unbalanced exhausts: {}  Returns: {}",
+                            round(
+                                self.total_inlet_air_mass_flow_rate
+                                    / owners.environment.std_rho_air
+                            )?,
+                            round(system_unbalanced_exhaust / owners.environment.std_rho_air)?,
+                            round(total_zone_return / owners.environment.std_rho_air)?,
+                        ))?;
+                        owners.backend.show_continue_error(&format!(
+                            "  Infiltration: {}  Zone Ventilation: {}  Mixing (incoming): {}",
+                            round(air.oamfl / zone_density)?,
+                            round(air.vamfl / zone_density)?,
+                            round(air.mixing_mass_flow_zone / zone_density)?,
+                        ))?;
+                        owners.backend.show_continue_error(&format!(
+                            "  Imbalance (excess outflow): {}  Total system OA flow (for all airloops serving this zone): {}",
+                            round(unbalanced_volume_flow)?,
+                            round(self.total_available_air_loop_outdoor_air / owners.environment.std_rho_air)?,
+                        ))?;
+                        owners.backend.show_continue_error(
+                            "  This error will only be reported once per zone.",
+                        )?;
+                        self.flow_error = true;
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq)]
 struct EquipmentList {
     load_distribution_scheme: i32,

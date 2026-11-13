@@ -753,12 +753,16 @@ fn validate_direct_zone_model(
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneExhaustTopology);
     }
-    if connection
-        .zone_return_air_node_1_flow_rate_fraction_schedule
-        .is_some()
-        || connection
-            .zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name
+    // Legacy binding owns its original no-return-control subset. Source uses
+    // the actual Config schedule/basis arrays and calcReturnFlows owner; its
+    // existing Proven-role preflight below still rejects unresolved prefixes.
+    if mode == DirectZoneValidationMode::LegacyBinding
+        && (connection
+            .zone_return_air_node_1_flow_rate_fraction_schedule
             .is_some()
+            || connection
+                .zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name
+                .is_some())
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneReturnFlowControl);
     }

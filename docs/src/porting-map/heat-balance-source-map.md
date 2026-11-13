@@ -1477,7 +1477,9 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-Six bounded Source B Scheduled pairs compare 397,920 values, with all nine controls in direct epJSON and genuine IDF. The latest IDF pair distinguishes two case-distinct NodeList declarations with different physical members: all nine controls follow the first original declaration even though converted key order is opposite. One retained Source A unused-list pair covers exact whitespace, original-prefix holes and explicit Deferred graph metadata across 59,520 values. Together seven pairs compare 457,440 values. Selected-hole consumers, broader member/topology and identity combinations, Source A managers and full-object conformance remain open.
+Seven bounded Source B Scheduled/NodeList compositions compare 469,680 values; one retained Source A unused-list pair adds 59,520, for eight pairs and 529,200 values. The latest real-exhaust return-control pair compares 151 series/71,760 values: a genuine two-member Sensor basis and existing fraction schedule match all 480 reported return-flow relations with positive on/off activation. Whole BND retains four physical nodes, eighteen Scheduled and two real Sensor connections. A real once-per-zone unbalanced-flow warning, timestamp/operand continuations and actual phase counters match alongside five adaptive-DD warnings. Exact IDF order/case identity and unused A Proven/Deferred evidence remain retained. Selected holes, broader parent/topology/schedule combinations, Source A managers and full-object conformance remain open.
+
+Return-flow diagnostics apply mass and incoming-flow gates before actual zone-density and standard-density volume checks; backend output and live counters precede the once-Zone latch.
 
 Reported setpoint state does not establish private histories or IdealLoads load-control effects.
 Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

@@ -291,6 +291,51 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         .expect("unused unresolved declaration must not block independent proven Source roles");
     bind_direct_zone_purchased_air_model(&unused_deferred)
         .expect("unchanged Legacy binding still follows independent proven roles");
+    // Admission only: Source retains the actual raw schedule/basis owners at
+    // runtime; typed eligibility must not invent Config arrays or return flow.
+    for (fraction, basis) in [(true, false), (false, true), (true, true)] {
+        let mut typed = unused_deferred.typed.clone();
+        typed.node_list_names.insert("RETURN BASIS", NodeListId(1));
+        typed.node_lists.push(NodeList {
+            id: NodeListId(1),
+            name: typed.node_list_names.normalized_name("RETURN BASIS"),
+            nodes: vec![NodeId(0), NodeId(1)].into(),
+        });
+        if fraction {
+            typed.zone_equipment_connections[0]
+                .zone_return_air_node_1_flow_rate_fraction_schedule = Some(ScheduleId(3));
+        }
+        if basis {
+            typed.zone_equipment_connections[0]
+                .zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name =
+                Some(typed.node_list_names.normalized_name("RETURN BASIS"));
+        }
+        let controlled = SimulationModel::from_typed(typed.clone());
+        validate_source_direct_zone_purchased_air_model(&controlled)
+            .expect("actual Source return-control roles retain proven node identities");
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&controlled)
+                .expect_err("Legacy return-control boundary remains exact"),
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: DirectZonePurchasedAirBindingFeature::NoZoneReturnFlowControl,
+            }
+        );
+        if basis {
+            typed.node_lists[1].nodes =
+                ep_model::NodeListMembers::DeferredSourceOriginalPrefix { used_len: 2 };
+            assert_eq!(
+                validate_source_direct_zone_purchased_air_model(&SimulationModel::from_typed(
+                    typed
+                )),
+                Err(DirectZonePurchasedAirBindingError::DeferredSourceNodeList {
+                    deferred: ep_model::DeferredSourceNodeList {
+                        id: NodeListId(1),
+                        used_len: 2
+                    },
+                })
+            );
+        }
+    }
     let mut required = unused_deferred.typed.clone();
     required.zone_equipment_connections[0].zone_air_inlet_node_or_nodelist_name = Some(
         required

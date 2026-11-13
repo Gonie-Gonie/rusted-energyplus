@@ -337,10 +337,10 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "All nine Scheduled controls remain bounded Source B in direct epJSON and genuine IDF across six pairs/397,920 values. Existing real-exhaust evidence retains eighteen public setpoint joins and three actual exhaust streams. The latest 139-series/66,000-value IDF pair exercises case-distinct NodeList aliases in true declaration order with whole policy and physical files preserved. It measures public setpoint/schedule and BND relations; private histories, IdealLoads load-control effects, selected holes, Source A managers, other managers and arbitrary combinations remain unvalidated."
+      "All nine Scheduled controls remain bounded Source B in epJSON and genuine IDF across seven pairs/469,680 values. Existing IDF case/order and real-exhaust evidence remains. The latest 151-series/71,760-value return-control composition retains eighteen inlet/exhaust public setpoint joins and positive actual exhaust flow while separately validating actual return basis/fraction flow and diagnostic behavior. Reported setpoint state does not establish private histories, IdealLoads setpoint load-control effects, Source A managers, selected-hole consumers, other managers or arbitrary combinations."
     ],
     "NodeList": [
-      "Bounded Source A/B retains one sole raw/IP NodeList owner and an advisory Proven/Deferred input graph. Six B pairs cover singleton aliases, genuine IDF order, trailing blanks, one real inlet/exhaust two-member list and a case-distinct IDF declaration-order discriminator. The retained A unused-list pair preserves original-prefix holes/late duplicate/tail identities, whitespace and case-distinct names without inventing physical IDs. The case-distinct B pair exercises actual first-declaration alias lookup with different member payloads; this does not close selected-hole or general consumer/member/topology combinations. Legacy normalization and strict binding remain; no full-object claim."
+      "Bounded Source A/B uses the sole raw/IP NodeList owner with advisory Proven/Deferred input metadata. Seven B pairs retain singleton/IDF-order/case-distinct/trailing-blank and real inlet/exhaust evidence, adding a positive two-member return-flow Sensor basis under an authored fraction schedule. Its four physical nodes, two genuine Sensor roles and all 480 public return-flow relations match; no private Config or fake Node0 is reconstructed. The retained unused A composition preserves whitespace and original-prefix/late-tail identities. Selected holes and broader consumer/member/topology combinations remain unresolved; Legacy normalization and strict binding remain, without full-object promotion."
     ]
   },
   "verification": {
@@ -5820,6 +5820,49 @@
         "new_test_functions": 0,
         "native_cohort_reruns": 0,
         "scope": "Raw-model change verified by four actual relevant QA commands and four existing standard-test callers. Failed prior QA/checker adds no accepted samples or physical-failure count. Full current Native/Source pair is separate from QA; no historical runtime-cohort credit or full-object promotion."
+      },
+      "return_fraction_basis_124": {
+        "final_quality": {
+          "path": ".runtime/porting/return-flow-node-basis-124/quality05/summary.json",
+          "sha256": "bb79c6c4c99b8eb7faf2ed69778b1d33156b82d1f2dab243af3670cdbb8a8712",
+          "bytes": 1997
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit124-prep/owner-execution-review02.json",
+          "sha256": "4424bc98ffe779c28fc79cf85a4ab9ba6c17e8df38a841740fa2ecb438d50f11",
+          "bytes": 2583
+        },
+        "Source_epoch_authority": {
+          "path": ".runtime/object-expansion/unit124-prep/Root-Source-epoch-authority01.json",
+          "sha256": "d99479f011721afefcc87a01fb3980deca5f81ee24756d6a2631f9197b7744bc",
+          "bytes": 9261
+        },
+        "retained_inventory": {
+          "path": ".runtime/object-expansion/unit124-prep/retained-attempt-inventory01.json",
+          "sha256": "4c3ea87424b34861e1375dab5ea655e3a715e687cdfe0cc1eba939da7b8f9e3a",
+          "bytes": 10927
+        },
+        "retained_unlaunched_build": {
+          "path": ".runtime/object-expansion/unit124-prep/build126-attempt01.json",
+          "sha256": "dd0c193f296118894fa37583ac1fa58a7823f3a3a857884add9b5b68f582b6e4",
+          "bytes": 705
+        },
+        "retained_failed_precheck": {
+          "path": ".runtime/object-expansion/unit124-prep/runtime-protocol-proposal01/native-proof01.json",
+          "sha256": "40c505f15c1d3b9891b691ff013e6938d0f112a9bbdde9f9657aab32382dbcd2",
+          "bytes": 3848
+        },
+        "scientific_warning_correction": {
+          "path": ".runtime/object-expansion/unit124-prep/scientific-positive-unbalanced-warning-supplement01.json",
+          "sha256": "9efed1d5f7bbdcd245c8c27ed76e578a87f58a88f0c02771c468aa0c3b0c7de7",
+          "bytes": 13878
+        },
+        "retained_Native_only_characterization": {
+          "path": ".runtime/object-expansion/unit123-prep/Root-native-characterization-complete01.json",
+          "sha256": "f50925d537e7b3d640aeae68b171bf6bc2f231440032a16b01cfe53fb6dd1400",
+          "bytes": 2580
+        },
+        "scope": "Six actual relevant QA commands and three existing exact owner callers; no workspace/native cohort rerun. Historical Native-only rejection and failed/aborted checks add zero paired cases/values; Source126 never launched. Full current Source127 physics is separate from QA."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -53751,12 +53794,536 @@
           "full_current_and_archive_source_files": 4672
         },
         "effective_state": "All nine Scheduled controls remain bounded Source B in direct epJSON and genuine IDF across six pairs/397,920 values. Existing real-exhaust evidence retains eighteen public setpoint joins and three actual exhaust streams. The latest 139-series/66,000-value IDF pair exercises case-distinct NodeList aliases in true declaration order with whole policy and physical files preserved. It measures public setpoint/schedule and BND relations; private histories, IdealLoads load-control effects, selected holes, Source A managers, other managers and arbitrary combinations remain unvalidated."
+      },
+      {
+        "id": "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H",
+        "group": "ZoneHVAC:EquipmentConnections",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-return-flow-warning-owner-124",
+        "input": {
+          "path": ".runtime/object-expansion/unit124-prep/return-flow-basis-input-proposal01/input.epJSON",
+          "sha256": "545512f310f06238151aa4f1d1c8ff2882091a59f44724bb4099eee649f0bf57",
+          "bytes": 98277
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/return-flow-node-basis-124/case/native-01/command/receipt.json",
+          "sha256": "91c7fcdf8b8a033f0308ebcff53f7dcefee8da0d15c8bc272c0b891fd30c0104",
+          "bytes": 40836
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": true,
+        "Native_reference_reuse_scope": "First unchanged-input Native execution under historical126 retained across unlaunched Source126 and current Source127 owner completion; no replay.",
+        "Native_reference_launch_build": {
+          "path": ".runtime/object-expansion/unit124-prep/build126-attempt01.json",
+          "sha256": "dd0c193f296118894fa37583ac1fa58a7823f3a3a857884add9b5b68f582b6e4",
+          "bytes": 705
+        },
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/return-flow-node-basis-124/case/source-01/command/receipt.json",
+          "sha256": "ebb871c5c2a2891f2ef6250bd76b308a114ab9e609f3081de9c4f9c7b0ac908e",
+          "bytes": 51236
+        },
+        "source_summary": {
+          "path": ".runtime/porting/return-flow-node-basis-124/case/source-01/output/run-summary.json",
+          "sha256": "0fa97adbd4843096d6ebc2dbcad9f1251dbd4ae4b0b4d1437cc33e1d3a7aef82",
+          "bytes": 61846
+        },
+        "source_executable": {
+          "path": ".runtime/porting/return-flow-node-basis-124/build127-01/eplus-rs.exe",
+          "sha256": "34ed668b16201c045f7f834ceb2c688ebb9895b4d7c535dc51d2e2f50ed11447",
+          "bytes": 80761231
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/dc/dc5b7b8ffdfced12e5b10e7c5c858b5d81b4731c7185d2c202e4eecf43985298",
+          "sha256": "dc5b7b8ffdfced12e5b10e7c5c858b5d81b4731c7185d2c202e4eecf43985298"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/return-flow-node-basis-124/build127-01/build/receipt.json",
+          "sha256": "df33c41534f571fa93a8de0b4898fb5672b8cdb493d5536625dfef372a470491",
+          "bytes": 4950
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit124-prep/runtime-protocol-proposal02/pair-proof01.json",
+          "sha256": "07cf9b2839cd5c59c5bd6a83e486a36875126b64be5fc9afc4ee2b08e6351590",
+          "bytes": 258465
+        },
+        "independent_physical_comparison": {
+          "path": ".runtime/object-expansion/unit124-prep/physical-peer02/proof01.json",
+          "sha256": "c911c8e51e04bafca5fd77f9a14d644019536f61e3be2d7ab3f59f2919d6e322",
+          "bytes": 215172
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit124-prep/root-completed-readback-review01.json",
+          "sha256": "dcc1b9a84a132dc945c783d39e4af1d5b0e19eb5438624d9839e505d2571cde1",
+          "bytes": 2368
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit124-prep/science-final01/recipe01.json",
+          "sha256": "ae18cd1e5f2875353c25fdb7e9dba3ff9063e7b7786068ff2e8000ea28d16c8a",
+          "bytes": 29403
+        },
+        "totals": {
+          "series": 151,
+          "samples": 71760,
+          "raw_operand_unequal": 19080,
+          "parsed_binary64_unequal": 19080,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.0244548320770264e-08,
+          "max_rmse_delta": 1.36033233314753e-09
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit120-prep/real-exhaust-input-proposal01/derived-policy.json",
+            "sha256": "331201b897c6126f4d38b1d1394600da4829cd20074750369a98fd6b4286aac2",
+            "bytes": 41601
+          },
+          "entire149_variable_and2_meter_policy_byte_exact": true,
+          "global_contract_changed": false
+        },
+        "actual_epJSON_input_projection": {
+          "artifact": {
+            "path": ".runtime/porting/return-flow-node-basis-124/case/source-01/output/compiled-geometry.json",
+            "sha256": "e5db39b50c77212001ec964e6be8a529c548da6eab04a99cd7523f2fe6ad20e6",
+            "bytes": 21289
+          },
+          "staged_original": {
+            "path": ".runtime/porting/return-flow-node-basis-124/case/source-01/output/input/original.epJSON",
+            "sha256": "545512f310f06238151aa4f1d1c8ff2882091a59f44724bb4099eee649f0bf57",
+            "bytes": 98277
+          },
+          "staged_complete_input": {
+            "path": ".runtime/porting/return-flow-node-basis-124/case/source-01/output/input/converted.epJSON",
+            "sha256": "545512f310f06238151aa4f1d1c8ff2882091a59f44724bb4099eee649f0bf57",
+            "bytes": 98277
+          },
+          "actual_Scheduled_inputs": {
+            "116 SCHEDULED INLET TEMPERATURE": {
+              "control_variable": "Temperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED HUMIDITY RATIO": {
+              "control_variable": "HumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MASS FLOW RATE": {
+              "control_variable": "MassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM HUMIDITY RATIO": {
+              "control_variable": "MaximumHumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM MASS FLOW RATE": {
+              "control_variable": "MaximumMassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM TEMPERATURE": {
+              "control_variable": "MaximumTemperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM HUMIDITY RATIO": {
+              "control_variable": "MinimumHumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM MASS FLOW RATE": {
+              "control_variable": "MinimumMassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM TEMPERATURE": {
+              "control_variable": "MinimumTemperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            }
+          },
+          "actual_NodeList_inputs": {
+            "118 SHARED INLET ALIAS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                }
+              ]
+            },
+            "120 SCHEDULED MULTI TARGETS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                },
+                {
+                  "node_name": "ZONE ONE EXHAUST"
+                }
+              ]
+            },
+            "ZONE ONE INLETS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                }
+              ]
+            },
+            "ZZ 124 RETURN FLOW BASIS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                },
+                {
+                  "node_name": "ZONE ONE AIR NODE"
+                }
+              ]
+            }
+          },
+          "actual_NodeList_source_order": [
+            "118 SHARED INLET ALIAS",
+            "120 SCHEDULED MULTI TARGETS",
+            "ZONE ONE INLETS",
+            "ZZ 124 RETURN FLOW BASIS"
+          ],
+          "raw_source_is_epjson": true,
+          "scheduled_idf_declaration_overlay": false,
+          "nodelist_idf_declaration_overlay": false,
+          "qualification": "Actual RawModel/direct-epJSON input objects/order after normal byte-copy staging; no converter, IDF metadata or private NodeList/Node/call-history observation."
+        },
+        "actual_public_return_flow": {
+          "Native": {
+            "contract": {
+              "path": ".runtime/object-expansion/unit124-prep/return-flow-basis-input-proposal01/public-return-flow-gate.json",
+              "sha256": "c3eefbc10c0fbb2e9377c89d25c624e742b48b779401de2261e097ec2452635f",
+              "bytes": 3514
+            },
+            "policy_indices": [
+              5,
+              66,
+              69,
+              72
+            ],
+            "report_ids": [
+              354,
+              357,
+              381,
+              384
+            ],
+            "samples": 480,
+            "max_same_clock_relation_delta": 0.0,
+            "positive_basis_fraction_zero_samples": 180,
+            "positive_basis_fraction_one_samples": 240,
+            "positive_actual_return_samples": 240,
+            "first_observations": {
+              "off": {
+                "sample": 12,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  " 4",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 12
+                },
+                "fraction": 0.0,
+                "inlet": 0.008451547211036841,
+                "ZoneAir": 0.008451547211036841,
+                "basis": 0.016903094422073682,
+                "expected_return": 0.0,
+                "actual_return": 0.0
+              },
+              "on": {
+                "sample": 24,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  " 7",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 24
+                },
+                "fraction": 1.0,
+                "inlet": 0.1626974891240335,
+                "ZoneAir": 0.1626974891240335,
+                "basis": 0.325394978248067,
+                "expected_return": 0.325394978248067,
+                "actual_return": 0.325394978248067
+              }
+            },
+            "comparison_policy": {
+              "key": "ZONE ONE RETURN",
+              "variable": "System Node Mass Flow Rate",
+              "units": "kg/s",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1e-09,
+              "rtol": 0.0,
+              "rmse_max": 1e-09
+            },
+            "qualification": "Complete public nonwarmup same-clock relation only; actual inlet then ZoneAir ordered sum and real schedule, no private Config/FixedReturnFlow/call/reset reconstruction."
+          },
+          "Source": {
+            "contract": {
+              "path": ".runtime/object-expansion/unit124-prep/return-flow-basis-input-proposal01/public-return-flow-gate.json",
+              "sha256": "c3eefbc10c0fbb2e9377c89d25c624e742b48b779401de2261e097ec2452635f",
+              "bytes": 3514
+            },
+            "policy_indices": [
+              5,
+              66,
+              69,
+              72
+            ],
+            "report_ids": [
+              354,
+              357,
+              381,
+              384
+            ],
+            "samples": 480,
+            "max_same_clock_relation_delta": 0.0,
+            "positive_basis_fraction_zero_samples": 180,
+            "positive_basis_fraction_one_samples": 240,
+            "positive_actual_return_samples": 240,
+            "first_observations": {
+              "off": {
+                "sample": 12,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  " 4",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 12
+                },
+                "fraction": 0.0,
+                "inlet": 0.008451547211036836,
+                "ZoneAir": 0.008451547211036836,
+                "basis": 0.01690309442207367,
+                "expected_return": 0.0,
+                "actual_return": 0.0
+              },
+              "on": {
+                "sample": 24,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  " 7",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 24
+                },
+                "fraction": 1.0,
+                "inlet": 0.16269748912403334,
+                "ZoneAir": 0.16269748912403334,
+                "basis": 0.3253949782480667,
+                "expected_return": 0.3253949782480667,
+                "actual_return": 0.3253949782480667
+              }
+            },
+            "comparison_policy": {
+              "key": "ZONE ONE RETURN",
+              "variable": "System Node Mass Flow Rate",
+              "units": "kg/s",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1e-09,
+              "rtol": 0.0,
+              "rmse_max": 1e-09
+            },
+            "qualification": "Complete public nonwarmup same-clock relation only; actual inlet then ZoneAir ordered sum and real schedule, no private Config/FixedReturnFlow/call/reset reconstruction."
+          }
+        },
+        "actual_warning_diagnostics": {
+          "Native": {
+            "ERR": {
+              "path": ".runtime/porting/return-flow-node-basis-124/case/native-01/output/nativeout.err",
+              "sha256": "934285a6ead7e1c211e5289f147df443f90d07310c086234e7de1e2ed46d1f95",
+              "bytes": 2084
+            },
+            "END": {
+              "path": ".runtime/porting/return-flow-node-basis-124/case/native-01/output/nativeout.end",
+              "sha256": "6782d28c0054518831e692ee7cb1db68c226963adb8b8644723d700ae5b04933",
+              "bytes": 98
+            },
+            "scientific_correction": {
+              "path": ".runtime/object-expansion/unit124-prep/scientific-positive-unbalanced-warning-supplement01.json",
+              "sha256": "9efed1d5f7bbdcd245c8c27ed76e578a87f58a88f0c02771c468aa0c3b0c7de7",
+              "bytes": 13878
+            },
+            "ordered_warnings": [
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "In zone ZONE ONE there is unbalanced air flow. Load due to induced outdoor air is neglected.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day."
+            ],
+            "unbalanced_flow_continuations": [
+              "   **   ~~~   **  Environment=105 001 CLEAR SKY DEFAULT, at Simulation time=07/21 06:00 - 06:15",
+              "   **   ~~~   **   Flows [m3/s]: Inlets: 0.168584  Unbalanced exhausts: 0.168584  Returns: 0.337168",
+              "   **   ~~~   **   Infiltration: 0.000000  Zone Ventilation: 0.000000  Mixing (incoming): 0.000000",
+              "   **   ~~~   **   Imbalance (excess outflow): 0.337168  Total system OA flow (for all airloops serving this zone): 0.000000",
+              "   **   ~~~   **   This error will only be reported once per zone."
+            ],
+            "counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed": {
+              "warnings": 6,
+              "severe": 0
+            },
+            "phase_counts_are_actual_observations": true,
+            "qualification": "Actual full ERR/END diagnostic counters and exact six-warning order/positive once-zone continuation block. New branch is nonwarmup/nonsizing by Native primary; no forced phase counts or Source-input constants. Whole paired ERR body remains strict under unchanged ancillary function."
+          },
+          "Source": {
+            "ERR": {
+              "path": ".runtime/porting/return-flow-node-basis-124/case/source-01/output/eplusrs.err",
+              "sha256": "151f0624c7077bd9657623fefa42ae5e8dd179f30749ffea7d716794349f433c",
+              "bytes": 2079
+            },
+            "END": {
+              "path": ".runtime/porting/return-flow-node-basis-124/case/source-01/output/eplusrs.end",
+              "sha256": "012845ba6d836780fa41a32fbab128b0c1870d1efe0de55fc4136f7e4a2f28a9",
+              "bytes": 98
+            },
+            "scientific_correction": {
+              "path": ".runtime/object-expansion/unit124-prep/scientific-positive-unbalanced-warning-supplement01.json",
+              "sha256": "9efed1d5f7bbdcd245c8c27ed76e578a87f58a88f0c02771c468aa0c3b0c7de7",
+              "bytes": 13878
+            },
+            "ordered_warnings": [
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "In zone ZONE ONE there is unbalanced air flow. Load due to induced outdoor air is neglected.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day."
+            ],
+            "unbalanced_flow_continuations": [
+              "   **   ~~~   **  Environment=105 001 CLEAR SKY DEFAULT, at Simulation time=07/21 06:00 - 06:15",
+              "   **   ~~~   **   Flows [m3/s]: Inlets: 0.168584  Unbalanced exhausts: 0.168584  Returns: 0.337168",
+              "   **   ~~~   **   Infiltration: 0.000000  Zone Ventilation: 0.000000  Mixing (incoming): 0.000000",
+              "   **   ~~~   **   Imbalance (excess outflow): 0.337168  Total system OA flow (for all airloops serving this zone): 0.000000",
+              "   **   ~~~   **   This error will only be reported once per zone."
+            ],
+            "counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed": {
+              "warnings": 6,
+              "severe": 0
+            },
+            "phase_counts_are_actual_observations": true,
+            "qualification": "Actual full ERR/END diagnostic counters and exact six-warning order/positive once-zone continuation block. New branch is nonwarmup/nonsizing by Native primary; no forced phase counts or Source-input constants. Whole paired ERR body remains strict under unchanged ancillary function."
+          }
+        },
+        "comparison_provenance": {
+          "Source_epoch_authority": {
+            "path": ".runtime/object-expansion/unit124-prep/Root-Source-epoch-authority01.json",
+            "sha256": "d99479f011721afefcc87a01fb3980deca5f81ee24756d6a2631f9197b7744bc",
+            "bytes": 9261
+          },
+          "actual_fresh_Native_executions": 1,
+          "actual_fresh_Source_executions": 1,
+          "retained_unlaunched_Source_build": {
+            "path": ".runtime/object-expansion/unit124-prep/build126-attempt01.json",
+            "sha256": "dd0c193f296118894fa37583ac1fa58a7823f3a3a857884add9b5b68f582b6e4",
+            "bytes": 705
+          },
+          "retained_failed_reader_without_sample_credit": {
+            "path": ".runtime/object-expansion/unit124-prep/runtime-protocol-proposal01/native-proof01.json",
+            "sha256": "40c505f15c1d3b9891b691ff013e6938d0f112a9bbdde9f9657aab32382dbcd2",
+            "bytes": 3848
+          },
+          "scientific_correction": {
+            "path": ".runtime/object-expansion/unit124-prep/scientific-positive-unbalanced-warning-supplement01.json",
+            "sha256": "9efed1d5f7bbdcd245c8c27ed76e578a87f58a88f0c02771c468aa0c3b0c7de7",
+            "bytes": 13878
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/return-flow-node-basis-124/quality05/summary.json",
+            "sha256": "bb79c6c4c99b8eb7faf2ed69778b1d33156b82d1f2dab243af3670cdbb8a8712",
+            "bytes": 1997
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit124-prep/owner-execution-review02.json",
+            "sha256": "4424bc98ffe779c28fc79cf85a4ab9ba6c17e8df38a841740fa2ecb438d50f11",
+            "bytes": 2583
+          },
+          "retained_inventory": {
+            "path": ".runtime/object-expansion/unit124-prep/retained-attempt-inventory01.json",
+            "sha256": "4c3ea87424b34861e1375dab5ea655e3a715e687cdfe0cc1eba939da7b8f9e3a",
+            "bytes": 10927
+          },
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit124-prep/build127-attempt01.json",
+            "sha256": "c35f9e5558d32cfe4112d43aa5134d3ee5a7281cb220cc19606f386125fa6621",
+            "bytes": 708
+          },
+          "full_current_and_archive_source_files": 4672
+        },
+        "effective_state": "Bounded Source B retains one matched distinct Zone/IdealLoads exhaust with no primary AirLoop, OA, system inlet or plenum. Source-only eligibility additionally accepts an actual return-fraction schedule and Proven basis node/list; Legacy binding remains strict. A151-series/71,760-value five-DesignDay pair verifies positive on/off return flow from the real ordered two-node Sensor basis and current schedule, complete physical files and genuine once-Zone unbalanced-flow warning/timestamp/operands. Source raw/IP Config/Node/schedule owners supply every value. Warning gates apply system mass residual, actual incoming flow, then current-pressure/ZoneNode density and standard-density volume thresholds; real warning/timestamp/.6R effects precede the existing per-Zone latch, and counters use live phase flags. Multiple-return/primary/mixing/enforcement and broader combinations, Source A and full-object/frozen conformance remain open."
       }
     ],
     "totals": {
-      "paired_cases": 178,
-      "reported_samples": 5358616,
-      "raw_operand_unequal": 1225260,
+      "paired_cases": 179,
+      "reported_samples": 5430376,
+      "raw_operand_unequal": 1244340,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -55886,6 +56453,40 @@
           "sha256": "c3c76e0f28fd3a27f02c5d1383dc79bd66c5e14083e930c54f75469e3869cc6b",
           "bytes": 80760622
         }
+      },
+      {
+        "id": "source-dd-return-flow-node-basis-124",
+        "receipt": {
+          "path": ".runtime/porting/return-flow-node-basis-124/build126-01/build/receipt.json",
+          "sha256": "ac5933621980eba315cc08e1c95f8460140819ac43b9c840e9b6e9691d19bc8f",
+          "bytes": 4503
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/4a/4aae3bb2ef0733648eea5416168bb83a2c970edf96756070f568c97edca910b5",
+          "sha256": "4aae3bb2ef0733648eea5416168bb83a2c970edf96756070f568c97edca910b5"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/return-flow-node-basis-124/build126-01/eplus-rs.exe",
+          "sha256": "7ac4517bbd373c6256cbb45001017f8ec12f60907e60e0a268dad515d9d82266",
+          "bytes": 80758443
+        }
+      },
+      {
+        "id": "source-dd-return-flow-warning-owner-124",
+        "receipt": {
+          "path": ".runtime/porting/return-flow-node-basis-124/build127-01/build/receipt.json",
+          "sha256": "df33c41534f571fa93a8de0b4898fb5672b8cdb493d5536625dfef372a470491",
+          "bytes": 4950
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/dc/dc5b7b8ffdfced12e5b10e7c5c858b5d81b4731c7185d2c202e4eecf43985298",
+          "sha256": "dc5b7b8ffdfced12e5b10e7c5c858b5d81b4731c7185d2c202e4eecf43985298"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/return-flow-node-basis-124/build127-01/eplus-rs.exe",
+          "sha256": "34ed668b16201c045f7f834ceb2c688ebb9895b4d7c535dc51d2e2f50ed11447",
+          "bytes": 80761231
+        }
       }
     ],
     "focused_since_workspace": {
@@ -56252,18 +56853,18 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 125,
-      "builds_with_accepted_paired_cases": 112,
+      "actual_recorded_builds": 127,
+      "builds_with_accepted_paired_cases": 113,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 10,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "125 recorded Source builds: 112 have accepted paired cases; 13 have none, including three without Source execution. Historical failed/unaccepted attempts and zero accepted sample credit remain unchanged. One lexical conversion and failed quality/reader checks receive no physical case/sample credit.",
+      "qualification": "127 recorded Source builds: 113 have accepted paired cases; 14 have none, including four without Source execution. Build126 executable is retained unlaunched; current127 supplies the accepted pair against the sole original Native reference. Failed/aborted QA and reader checks and Native-only characterization contribute no accepted samples.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
-      "builds_without_Source_execution": 3,
-      "builds_without_accepted_paired_cases": 13
+      "builds_without_Source_execution": 4,
+      "builds_without_accepted_paired_cases": 14
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",
@@ -60801,7 +61402,7 @@
       "scope": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion.",
       "capability_or_gate_promotion": false
     },
-    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H"], "accepted_paired_cases": 7, "accepted_samples": 457440, "retained_Scheduled_B_pairs": 6, "retained_Scheduled_B_samples": 397920, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit122-prep/runtime-protocol-proposal01/pair-proof01.json", "sha256": "b85a454d95ce0b663b5d3489be1c9f39b63646d7371e29544a9324af0f04a351", "bytes": 207314}, "latest_independent_physical_comparison": {"path": ".runtime/object-expansion/unit122-prep/physical-peer02/proof01.json", "sha256": "56544f253a7831b1245c1af659c6d64b86350b8158766f968387cd294243faa6", "bytes": 176058}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit122-prep/root-completed-readback-review01.json", "sha256": "f54baa31a9843d3970fada2d1029860a50bec41b02dc3325b7eab226cbf282d4", "bytes": 1961}, "latest_source_build": "source-dd-case-colliding-nodelists-idf-122", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit122-prep/build125-attempt01.json", "sha256": "527e89425e2f0b74d6cc17f486e4e1abf1d81a5516f38f38094aea261b951e44", "bytes": 723}, "latest_actual_quality": {"path": ".runtime/porting/case-colliding-nodelists-idf-122/quality02/summary.json", "sha256": "dfa09748874c640df922017ad21f0c5ab91705fd1cb5e25ba075e47f53cbe2bb", "bytes": 1347}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit122-prep/owner-execution-review01.json", "sha256": "f5bb5c71728b0ff05b18e9d859c878fac15aaddec801215c21a57f4fa72ff7fb", "bytes": 2382}, "latest_input_contract": {"path": ".runtime/object-expansion/unit122-prep/science-final01/recipe01.json", "sha256": "9efa400be1e7d4038c7869833da9ff2de1b513266a20a69f36179f372f784af0", "bytes": 26503}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit122-prep/retained-attempt-inventory01.json", "sha256": "2cddab80c952b944056094d8c2d6ef1d8f4bd42b41d1d0d6fdbc8c46d01cc60b", "bytes": 8642}, "scope": "Six bounded Source B Scheduled pairs compare 397,920 values, with all nine controls in direct epJSON and genuine IDF. The latest IDF pair distinguishes two case-distinct NodeList declarations with different physical members: all nine controls follow the first original declaration even though converted key order is opposite. One retained Source A unused-list pair covers exact whitespace, original-prefix holes and explicit Deferred graph metadata across 59,520 values. Together seven pairs compare 457,440 values. Selected-hole consumers, broader member/topology and identity combinations, Source A managers and full-object conformance remain open.", "capability_or_gate_promotion": false}
+    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H"], "accepted_paired_cases": 8, "accepted_samples": 529200, "retained_Scheduled_B_pairs": 7, "retained_Scheduled_B_samples": 469680, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit124-prep/runtime-protocol-proposal02/pair-proof01.json", "sha256": "07cf9b2839cd5c59c5bd6a83e486a36875126b64be5fc9afc4ee2b08e6351590", "bytes": 258465}, "latest_independent_physical_comparison": {"path": ".runtime/object-expansion/unit124-prep/physical-peer02/proof01.json", "sha256": "c911c8e51e04bafca5fd77f9a14d644019536f61e3be2d7ab3f59f2919d6e322", "bytes": 215172}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit124-prep/root-completed-readback-review01.json", "sha256": "dcc1b9a84a132dc945c783d39e4af1d5b0e19eb5438624d9839e505d2571cde1", "bytes": 2368}, "latest_source_build": "source-dd-return-flow-warning-owner-124", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit124-prep/build127-attempt01.json", "sha256": "c35f9e5558d32cfe4112d43aa5134d3ee5a7281cb220cc19606f386125fa6621", "bytes": 708}, "latest_actual_quality": {"path": ".runtime/porting/return-flow-node-basis-124/quality05/summary.json", "sha256": "bb79c6c4c99b8eb7faf2ed69778b1d33156b82d1f2dab243af3670cdbb8a8712", "bytes": 1997}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit124-prep/owner-execution-review02.json", "sha256": "4424bc98ffe779c28fc79cf85a4ab9ba6c17e8df38a841740fa2ecb438d50f11", "bytes": 2583}, "latest_input_contract": {"path": ".runtime/object-expansion/unit124-prep/science-final01/recipe01.json", "sha256": "ae18cd1e5f2875353c25fdb7e9dba3ff9063e7b7786068ff2e8000ea28d16c8a", "bytes": 29403}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit124-prep/retained-attempt-inventory01.json", "sha256": "4c3ea87424b34861e1375dab5ea655e3a715e687cdfe0cc1eba939da7b8f9e3a", "bytes": 10927}, "latest_Source_epoch_authority": {"path": ".runtime/object-expansion/unit124-prep/Root-Source-epoch-authority01.json", "sha256": "d99479f011721afefcc87a01fb3980deca5f81ee24756d6a2631f9197b7744bc", "bytes": 9261}, "scope": "Seven bounded Source B Scheduled/NodeList compositions compare 469,680 values; one retained Source A unused-list pair adds 59,520, for eight pairs and 529,200 values. The latest real-exhaust return-control pair compares 151 series/71,760 values: a genuine two-member Sensor basis and existing fraction schedule match all 480 reported return-flow relations with positive on/off activation. Whole BND retains four physical nodes, eighteen Scheduled and two real Sensor connections. A real once-per-zone unbalanced-flow warning, timestamp/operand continuations and actual phase counters match alongside five adaptive-DD warnings. Exact IDF order/case identity and unused A Proven/Deferred evidence remain retained. Selected holes, broader parent/topology/schedule combinations, Source A managers and full-object conformance remain open.", "capability_or_gate_promotion": false}
   },
   "additional_native_type_calibrations": [
     {

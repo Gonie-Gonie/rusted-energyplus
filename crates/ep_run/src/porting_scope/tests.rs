@@ -3374,6 +3374,112 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     parse_epjson_str(&invalid.to_string()).expect("changed actual NodeList input");
                 assert!(ep_compiler::compile_raw_model_for_source(&invalid_raw).has_errors());
             }
+            // Exercise actual Source compilation, scope, support classification
+            // and raw IP custody for return controls, without simulating flow or
+            // reconstructing any private Config/Node arrays from typed fields.
+            for (fraction, basis) in [(true, false), (false, true), (true, true)] {
+                let mut returns = people.clone();
+                returns["Schedule:Constant"]["Return Fraction"] = json!({"hourly_value":0.375});
+                returns["NodeList"] = json!({"Return Basis":{"nodes":[
+                    {"node_name":"Supply"},{"node_name":"Air"}
+                ]}});
+                if fraction {
+                    returns["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_return_air_node_1_flow_rate_fraction_schedule_name"] =
+                        json!("Return Fraction");
+                }
+                if basis {
+                    returns["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name"] =
+                        json!("Return Basis");
+                }
+                let raw = parse_epjson_str(&returns.to_string())
+                    .expect("actual Source return controls raw");
+                let unchanged = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("actual return controls typed model");
+                let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                    .expect("Source eligibility uses genuine existing return-control owners");
+                assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+                let mut actual_scope =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(actual_scope.admissible, "{:?}", actual_scope.violations);
+                actual_scope.environment = Some(
+                    super::environment::environment_from_weather(
+                        model,
+                        &single_day_weather_fixture(),
+                        "authored Source return-control admission weather",
+                    )
+                    .expect("actual Source return-control environment"),
+                );
+                let admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                    &raw,
+                    &actual_scope,
+                )
+                .expect("real return controls Source admission token");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert_eq!(
+                    support.runtime_class,
+                    crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+                );
+                assert!(support.matched_capability_ids.is_empty());
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("actual return controls raw IP custody");
+                let fields = ip
+                    .source_raw_object_fields("ZoneHVAC:EquipmentConnections", "Connection")
+                    .expect("actual return controls Connection fields");
+                if fraction {
+                    assert_eq!(
+                        fields["zone_return_air_node_1_flow_rate_fraction_schedule_name"],
+                        SourceRaw::String("Return Fraction".into())
+                    );
+                }
+                if basis {
+                    assert_eq!(
+                        fields["zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name"],
+                        SourceRaw::String("Return Basis".into())
+                    );
+                    let mut deferred = returns.clone();
+                    deferred["NodeList"]["Return Basis"]["nodes"] = json!([
+                        {"node_name":"Supply"},{"node_name":""},{"node_name":"Supply"}
+                    ]);
+                    let deferred_raw = parse_epjson_str(&deferred.to_string())
+                        .expect("original unresolved return basis raw");
+                    let deferred_compile = ep_compiler::compile_raw_model_for_source(&deferred_raw);
+                    assert!(
+                        !deferred_compile.has_errors(),
+                        "{:?}",
+                        deferred_compile.report.diagnostics
+                    );
+                    let deferred_model = deferred_compile
+                        .model
+                        .as_ref()
+                        .expect("retained Deferred basis declaration");
+                    assert!(
+                        !inspect_porting_scope(
+                            &deferred_raw,
+                            &deferred_compile.report,
+                            Some(deferred_model),
+                            scope
+                        )
+                        .admissible
+                    );
+                }
+                assert_eq!(raw, unchanged);
+            }
             // A genuine optional Source exhaust remains outside the unchanged
             // legacy direct binding. Source eligibility returns no physical binding.
             let mut exhaust = people.clone();
