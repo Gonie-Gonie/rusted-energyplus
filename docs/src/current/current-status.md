@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 177 paired physical cases and 5,292,616 reported values with zero
+contains 178 paired physical cases and 5,358,616 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 124 recorded Source builds,
-111 with accepted pairs and 13 without accepted pairs, including 3 builds
+validate the consumer corrections. There are 125 recorded Source builds,
+112 with accepted pairs and 13 without accepted pairs, including 3 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,15 +196,15 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-All nine Scheduled controls remain bounded B across five pairs and 331,920 values.
-One Source A unused-NodeList case adds 127 series/59,520 values: six exact declarations, seven
-Blank nodes, two actual blank warnings and matching complete streams/BND, including seven real NonConnected records. The A
-case covers unused original-prefix holes, late duplicate/tail list-name identity,
-whitespace and case-distinct declarations. Source graph membership is Proven or
-explicit Deferred input metadata; physical cells remain solely raw/IP-owned.
-Together six pairs compare 391,440 values. Selected holes, runtime first-alias
-lookup, case-colliding IDF names, general field/topology combinations and full-object
-conformance remain open. Scheduled is still bounded B; no Source A manager claim.
+Six bounded B Scheduled pairs compare 397,920 values, including all nine controls
+in direct epJSON and genuine IDF. One case-distinct IDF pair compares 139 series/66,000
+values: two aliases have different members, and all nine managers select the first
+original declaration despite opposite converted-key order. Whole BND preserves
+three physical nodes, nine Scheduled connections and actual reference counts.
+The retained A unused-list case adds 59,520 values with exact whitespace and
+original-prefix/Deferred input metadata. Together seven pairs compare 457,440
+values. Selected holes, broader identity/member/topology combinations, Source A
+managers and full-object conformance remain open.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

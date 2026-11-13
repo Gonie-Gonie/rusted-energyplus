@@ -337,10 +337,10 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "Bounded Source B connects all nine SetpointManager:Scheduled controls through real schedules and Node owners in direct epJSON and genuine IDF. Five paired cases compare 331,920 values across five DesignDays each. The latest real-exhaust two-member case compares 151 series/71,760 values: eighteen public setpoint/schedule joins, six advanced mass-flow outputs and three actual exhaust-node streams, including positive actual mass flow. Whole BND verifies four physical nodes, eighteen Scheduled connections and genuine ZoneExhaust/IdealLoads Inlet roles; complete tables, streams and actual ERR/END phase counters pass under preserved inherited rules and twelve known-unit key-only additions. Prior IDF order and trailing-blank warning evidence remains retained. Internal holes, whitespace names, general member/topology combinations, Source A, other consumers/managers and arbitrary systems remain unvalidated. Setpoint effects on IdealLoads load control, private histories, full-object and frozen conformance promotion remain unclaimed."
+      "All nine Scheduled controls remain bounded Source B in direct epJSON and genuine IDF across six pairs/397,920 values. Existing real-exhaust evidence retains eighteen public setpoint joins and three actual exhaust streams. The latest 139-series/66,000-value IDF pair exercises case-distinct NodeList aliases in true declaration order with whole policy and physical files preserved. It measures public setpoint/schedule and BND relations; private histories, IdealLoads load-control effects, selected holes, Source A managers, other managers and arbitrary combinations remain unvalidated."
     ],
     "NodeList": [
-      "Bounded Source A/B reaches the same sole raw/IP NodeList owner. Five retained B cases cover single-member aliases, actual IDF order, trailing blanks and one genuine inlet/exhaust two-member list. One A unused-list pair adds six exact declarations and seven Blank physical nodes, including original-prefix holes/late duplicate, tail list-name identity, whitespace names, case-distinct declarations and ignored raw metadata; two actual blank warnings and whole BND including seven genuine NonConnected records, streams and phase counters match across 127 series/59,520 values. Source Node/list namespaces preserve authored whitespace, and the advisory graph exposes Proven members or explicit Deferred original-prefix descriptors without fake Node IDs. Legacy normalization, graph shape and strict binding remain. Only this unused A composition is accepted; runtime first-alias lookup, case-colliding IDF names, selected-hole consumers, general field/topology combinations, other consumers and full-object/frozen conformance remain unvalidated."
+      "Bounded Source A/B retains one sole raw/IP NodeList owner and an advisory Proven/Deferred input graph. Six B pairs cover singleton aliases, genuine IDF order, trailing blanks, one real inlet/exhaust two-member list and a case-distinct IDF declaration-order discriminator. The retained A unused-list pair preserves original-prefix holes/late duplicate/tail identities, whitespace and case-distinct names without inventing physical IDs. The case-distinct B pair exercises actual first-declaration alias lookup with different member payloads; this does not close selected-hole or general consumer/member/topology combinations. Legacy normalization and strict binding remain; no full-object claim."
     ]
   },
   "verification": {
@@ -5775,6 +5775,51 @@
           "sha256": "b006aff5ded8c5ec7c04e35af4126fedb4729b8ea9e9644eba5939c25ac487c1"
         },
         "scope": "Final-source QA and executed owner assertions are separate from the accepted 59,520-value physical pair. Source123 failure and prior QA/reader failures remain retained without accepted samples; no full-object promotion."
+      },
+      "case_distinct_IDF_NodeLists_122": {
+        "final_quality": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/quality02/summary.json",
+          "sha256": "dfa09748874c640df922017ad21f0c5ab91705fd1cb5e25ba075e47f53cbe2bb",
+          "bytes": 1347
+        },
+        "prior_failed_quality": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/quality01/summary.json",
+          "sha256": "d4f8399deacebdd619fd69ab781ef40d380921b27630533db33e52bba5ba4949",
+          "bytes": 1014
+        },
+        "independent_test_scope_correction": {
+          "path": ".runtime/object-expansion/unit122-prep/independent-test-scope-correction-review01.json",
+          "sha256": "4b9c1c5a11fa356ac25611a2b9e5111c26fd5971d039a503892a714bcc7493e0",
+          "bytes": 2005
+        },
+        "retained_failed_reader": {
+          "path": ".runtime/object-expansion/unit122-prep/physical-peer01/proof01.json",
+          "sha256": "8ef4cba0797a25b4200fbe94b1ebb99d0e4759b62305bc9c997c8db05393a7c1",
+          "bytes": 1309
+        },
+        "final_independent_reader": {
+          "path": ".runtime/object-expansion/unit122-prep/physical-peer02/readback.py",
+          "sha256": "41cf963c62b0df8edc3890cdf315040c1b9b4d8378c195ec36a3fd59d516ad1a",
+          "bytes": 33532
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit122-prep/owner-execution-review01.json",
+          "sha256": "f5bb5c71728b0ff05b18e9d859c878fac15aaddec801215c21a57f4fa72ff7fb",
+          "bytes": 2382
+        },
+        "retained_inventory": {
+          "path": ".runtime/object-expansion/unit122-prep/retained-attempt-inventory01.json",
+          "sha256": "2cddab80c952b944056094d8c2d6ef1d8f4bd42b41d1d0d6fdbc8c46d01cc60b",
+          "bytes": 8642
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f6/f62b5d17d107c7f193eae1019e0cbf6bcb9e2e961c84754e422c050fd7288cb9",
+          "sha256": "f62b5d17d107c7f193eae1019e0cbf6bcb9e2e961c84754e422c050fd7288cb9"
+        },
+        "current_QA_commands": 4,
+        "new_test_functions": 0,
+        "native_cohort_reruns": 0,
+        "scope": "Raw-model change verified by four actual relevant QA commands and four existing standard-test callers. Failed prior QA/checker adds no accepted samples or physical-failure count. Full current Native/Source pair is separate from QA; no historical runtime-cohort credit or full-object promotion."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -53437,12 +53482,281 @@
           "full_current_and_archive_source_files": 4672
         },
         "effective_state": "Bounded Source A/B reaches the same sole raw/IP NodeList owner. Five retained B cases cover single-member aliases, actual IDF order, trailing blanks and one genuine inlet/exhaust two-member list. One A unused-list pair adds six exact declarations and seven Blank physical nodes, including original-prefix holes/late duplicate, tail list-name identity, whitespace names, case-distinct declarations and ignored raw metadata; two actual blank warnings and whole BND including seven genuine NonConnected records, streams and phase counters match across 127 series/59,520 values. Source Node/list namespaces preserve authored whitespace, and the advisory graph exposes Proven members or explicit Deferred original-prefix descriptors without fake Node IDs. Legacy normalization, graph shape and strict binding remain. Only this unused A composition is accepted; runtime first-alias lookup, case-colliding IDF names, selected-hole consumers, general field/topology combinations, other consumers and full-object/frozen conformance remain unvalidated."
+      },
+      {
+        "id": "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H",
+        "group": "SetpointManager:Scheduled",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-case-colliding-nodelists-idf-122",
+        "input": {
+          "path": ".runtime/object-expansion/unit122-prep/case-colliding-nodelists-idf-input-proposal01/input.idf",
+          "sha256": "00bb38e00c7d073b7c1b34e91c4549ac4be1ffe94f3603bfc3575e162ce888b8",
+          "bytes": 27537
+        },
+        "weather": null,
+        "input_format": "IDF",
+        "native_receipt": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/case/native-01/command/receipt.json",
+          "sha256": "487b89d620661458e5c0ac6fc98119e7aac4b2347092a4052053785e44b482c7",
+          "bytes": 39721
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/case/source-01/command/receipt.json",
+          "sha256": "cbc84a76226c3f62ba431fcdc6a51cb7f617d69d578d0e3f4e3076a4aaa30843",
+          "bytes": 40460
+        },
+        "source_summary": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/case/source-01/output/run-summary.json",
+          "sha256": "fb9286dec4694c082dfd36dcb8ce35d62c0c71f31ac55e692a70406cfeedb1e3",
+          "bytes": 73999
+        },
+        "source_executable": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/build125-01/eplus-rs.exe",
+          "sha256": "c3c76e0f28fd3a27f02c5d1383dc79bd66c5e14083e930c54f75469e3869cc6b",
+          "bytes": 80760622
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f6/f62b5d17d107c7f193eae1019e0cbf6bcb9e2e961c84754e422c050fd7288cb9",
+          "sha256": "f62b5d17d107c7f193eae1019e0cbf6bcb9e2e961c84754e422c050fd7288cb9"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/build125-01/build/receipt.json",
+          "sha256": "a98f824ba72aed18da016d3ca5bc8373bc4353d311beebf53dc1c88a0a8fbf8c",
+          "bytes": 4283
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit122-prep/runtime-protocol-proposal01/pair-proof01.json",
+          "sha256": "b85a454d95ce0b663b5d3489be1c9f39b63646d7371e29544a9324af0f04a351",
+          "bytes": 207314
+        },
+        "independent_physical_comparison": {
+          "path": ".runtime/object-expansion/unit122-prep/physical-peer02/proof01.json",
+          "sha256": "56544f253a7831b1245c1af659c6d64b86350b8158766f968387cd294243faa6",
+          "bytes": 176058
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit122-prep/root-completed-readback-review01.json",
+          "sha256": "f54baa31a9843d3970fada2d1029860a50bec41b02dc3325b7eab226cbf282d4",
+          "bytes": 1961
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit122-prep/science-final01/recipe01.json",
+          "sha256": "9efa400be1e7d4038c7869833da9ff2de1b513266a20a69f36179f372f784af0",
+          "bytes": 26503
+        },
+        "totals": {
+          "series": 139,
+          "samples": 66000,
+          "raw_operand_unequal": 18387,
+          "parsed_binary64_unequal": 18387,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.0244548320770264e-08,
+          "max_rmse_delta": 1.36033233314753e-09
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit117-prep/scheduled-idf-pilot-proposal01/derived-policy.json",
+            "sha256": "5024fcb3dde4343e2731cf3a54b0f720e3f985f43461708c5ad3beb92dd0fbed",
+            "bytes": 38842
+          },
+          "entire137_variable_and2_meter_policy_byte_exact": true,
+          "global_contract_changed": false
+        },
+        "full_reported_stream_scope": {
+          "actual_total_series": 139,
+          "actual_total_samples": 66000,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true
+        },
+        "actual_IDF_input_projection": {
+          "artifact": {
+            "path": ".runtime/porting/case-colliding-nodelists-idf-122/case/source-01/output/compiled-geometry.json",
+            "sha256": "bc6fc0983641e527d9fade3a7e72c4b6c29cfe211c55ca977c94cb698d2ccd8f",
+            "bytes": 26430
+          },
+          "staged_original": {
+            "path": ".runtime/porting/case-colliding-nodelists-idf-122/case/source-01/output/input/original.idf",
+            "sha256": "00bb38e00c7d073b7c1b34e91c4549ac4be1ffe94f3603bfc3575e162ce888b8",
+            "bytes": 27537
+          },
+          "converted_input": {
+            "path": ".runtime/porting/case-colliding-nodelists-idf-122/case/source-01/output/input/converted.epJSON",
+            "sha256": "18e506d49b1a4f99f325b22f9723f0b7621f71b170910521ebea0590cfe8e209",
+            "bytes": 94786
+          },
+          "actual_metadata": {
+            "116 SCHEDULED INLET TEMPERATURE": {
+              "control_variable": "Temperature",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 182.0,
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLETS"
+            },
+            "117 SCHEDULED HUMIDITY RATIO": {
+              "control_variable": "HumidityRatio",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 183.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "zone one inlets"
+            },
+            "117 SCHEDULED MASS FLOW RATE": {
+              "control_variable": "MassFlowRate",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 184.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLETS"
+            },
+            "117 SCHEDULED MAXIMUM HUMIDITY RATIO": {
+              "control_variable": "MaximumHumidityRatio",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 185.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "zone one inlets"
+            },
+            "117 SCHEDULED MAXIMUM MASS FLOW RATE": {
+              "control_variable": "MaximumMassFlowRate",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 186.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLETS"
+            },
+            "117 SCHEDULED MAXIMUM TEMPERATURE": {
+              "control_variable": "MaximumTemperature",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 187.0,
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "zone one inlets"
+            },
+            "117 SCHEDULED MINIMUM HUMIDITY RATIO": {
+              "control_variable": "MinimumHumidityRatio",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 188.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLETS"
+            },
+            "117 SCHEDULED MINIMUM MASS FLOW RATE": {
+              "control_variable": "MinimumMassFlowRate",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 189.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "zone one inlets"
+            },
+            "117 SCHEDULED MINIMUM TEMPERATURE": {
+              "control_variable": "MinimumTemperature",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 190.0,
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLETS"
+            }
+          },
+          "actual_NodeList_inputs": {
+            "ZONE ONE INLETS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE AIR NODE"
+                }
+              ]
+            },
+            "zone one inlets": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                }
+              ]
+            }
+          },
+          "actual_NodeList_source_order": [
+            "zone one inlets",
+            "ZONE ONE INLETS"
+          ],
+          "raw_source_is_epjson": false,
+          "scheduled_idf_declaration_overlay": true,
+          "nodelist_idf_declaration_overlay": true,
+          "qualification": "Actual RawModel/input-format metadata after the real IDF loader; no private NodeList, Node or call-history observation."
+        },
+        "input_derivation_science": {
+          "derivation": {
+            "path": ".runtime/object-expansion/unit122-prep/case-colliding-nodelists-idf-input-proposal01/byte-derivation.json",
+            "sha256": "3c96f14b0f4762b688f52194a63583a4cbf69b77cb7b5f1599878a11beea0d77",
+            "bytes": 3170
+          },
+          "actual_roundtrip": {
+            "path": ".runtime/porting/case-colliding-nodelists-idf-122/roundtrip01/roundtrip-authority.json",
+            "sha256": "7c3fa3dfa9fea18064f3cf8952996dbd90edd9383196c95e797dc6ef4a8f140a",
+            "bytes": 2317
+          },
+          "scientific_DOM_review": {
+            "path": ".runtime/object-expansion/unit122-prep/science-final01/scientific-DOM-review.json",
+            "sha256": "3f95249b2a46412e7afb171f14a80005fc1326e509c15fc34d03941082fe58f8",
+            "bytes": 3179
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit122-prep/independent-case-colliding-nodelists-idf-input-review01.json",
+            "sha256": "d3b65ce54d5beb8fa1a481c668dac47e5ed57f72bd2990112830939fd8f5d6b5",
+            "bytes": 4028
+          },
+          "actual_IDF_metadata": {
+            "path": ".runtime/object-expansion/unit122-prep/case-colliding-nodelists-idf-input-proposal01/actual-IDF-metadata.json",
+            "sha256": "beb63a0573d73b6a2080a7feba1555cbd57cb02c57a619e89dbe61d52fbd7212",
+            "bytes": 2649
+          },
+          "different_member_original_declaration_first_discriminator": true
+        },
+        "comparison_provenance": {
+          "actual_fresh_Native_executions": 1,
+          "actual_fresh_Source_executions": 1,
+          "actual_conversion_only_processes": 1,
+          "failed_reader_without_physical_failure_or_sample_credit": {
+            "path": ".runtime/object-expansion/unit122-prep/physical-peer01/proof01.json",
+            "sha256": "8ef4cba0797a25b4200fbe94b1ebb99d0e4759b62305bc9c997c8db05393a7c1",
+            "bytes": 1309
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/case-colliding-nodelists-idf-122/quality02/summary.json",
+            "sha256": "dfa09748874c640df922017ad21f0c5ab91705fd1cb5e25ba075e47f53cbe2bb",
+            "bytes": 1347
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit122-prep/owner-execution-review01.json",
+            "sha256": "f5bb5c71728b0ff05b18e9d859c878fac15aaddec801215c21a57f4fa72ff7fb",
+            "bytes": 2382
+          },
+          "retained_inventory": {
+            "path": ".runtime/object-expansion/unit122-prep/retained-attempt-inventory01.json",
+            "sha256": "2cddab80c952b944056094d8c2d6ef1d8f4bd42b41d1d0d6fdbc8c46d01cc60b",
+            "bytes": 8642
+          },
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit122-prep/build125-attempt01.json",
+            "sha256": "527e89425e2f0b74d6cc17f486e4e1abf1d81a5516f38f38094aea261b951e44",
+            "bytes": 723
+          },
+          "full_current_and_archive_source_files": 4672
+        },
+        "effective_state": "All nine Scheduled controls remain bounded Source B in direct epJSON and genuine IDF across six pairs/397,920 values. Existing real-exhaust evidence retains eighteen public setpoint joins and three actual exhaust streams. The latest 139-series/66,000-value IDF pair exercises case-distinct NodeList aliases in true declaration order with whole policy and physical files preserved. It measures public setpoint/schedule and BND relations; private histories, IdealLoads load-control effects, selected holes, Source A managers, other managers and arbitrary combinations remain unvalidated."
       }
     ],
     "totals": {
-      "paired_cases": 177,
-      "reported_samples": 5292616,
-      "raw_operand_unequal": 1206873,
+      "paired_cases": 178,
+      "reported_samples": 5358616,
+      "raw_operand_unequal": 1225260,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -55555,6 +55869,23 @@
           "sha256": "8962e631aa7417f3f66ffccac2e8f0d6f2ace4071d73494b980f90c47575dcfe",
           "bytes": 80758460
         }
+      },
+      {
+        "id": "source-dd-case-colliding-nodelists-idf-122",
+        "receipt": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/build125-01/build/receipt.json",
+          "sha256": "a98f824ba72aed18da016d3ca5bc8373bc4353d311beebf53dc1c88a0a8fbf8c",
+          "bytes": 4283
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f6/f62b5d17d107c7f193eae1019e0cbf6bcb9e2e961c84754e422c050fd7288cb9",
+          "sha256": "f62b5d17d107c7f193eae1019e0cbf6bcb9e2e961c84754e422c050fd7288cb9"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/case-colliding-nodelists-idf-122/build125-01/eplus-rs.exe",
+          "sha256": "c3c76e0f28fd3a27f02c5d1383dc79bd66c5e14083e930c54f75469e3869cc6b",
+          "bytes": 80760622
+        }
       }
     ],
     "focused_since_workspace": {
@@ -55921,14 +56252,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 124,
-      "builds_with_accepted_paired_cases": 111,
+      "actual_recorded_builds": 125,
+      "builds_with_accepted_paired_cases": 112,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 10,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "124 recorded Source builds: 111 have accepted paired cases; 13 have none, including three without Source execution. Source123 is retained as a failed physical process; Source124 carries the accepted pair against the unchanged first Native reference. Failed attempts/quality/readers receive no accepted sample credit.",
+      "qualification": "125 recorded Source builds: 112 have accepted paired cases; 13 have none, including three without Source execution. Historical failed/unaccepted attempts and zero accepted sample credit remain unchanged. One lexical conversion and failed quality/reader checks receive no physical case/sample credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 3,
@@ -60470,7 +60801,7 @@
       "scope": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion.",
       "capability_or_gate_promotion": false
     },
-    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H"], "accepted_paired_cases": 6, "accepted_samples": 391440, "retained_Scheduled_B_pairs": 5, "retained_Scheduled_B_samples": 331920, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit121-prep/runtime-protocol-proposal05/pair-proof01.json", "sha256": "7fe6fe67b66fde29783bc718c8264f5a7eed407b4c4ba335f7b08c656d011a9b", "bytes": 261141}, "latest_independent_physical_comparison": {"path": ".runtime/object-expansion/unit121-prep/physical-peer06/proof01.json", "sha256": "a396d0706d82da6039b99eca82bda9df34d7d51640aa71fdcbb2b9434f75cf48", "bytes": 449040}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit121-prep/root-completed-readback-review01.json", "sha256": "e643dbc5b08c0e9788bbea361681f63b07972a2aca413a4b6edb771f459d51d3", "bytes": 2092}, "latest_source_build": "source-dd-source-a-unused-nodelist-owner-repair-121", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit121-prep/build124-attempt01.json", "sha256": "5aabf86d6bdef180f94b372224b3c3698356bdbce72e463fa6f77391346615fc", "bytes": 724}, "latest_actual_quality": {"path": ".runtime/porting/source-a-unused-nodelist-121/quality05/summary.json", "sha256": "316c79f490b65ee7d765bc034f8d6914bb04d7b0e32decddf34dcfe9053805eb", "bytes": 1668}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit121-prep/owner-execution-review02.json", "sha256": "3e719c46968c95ca3cfb9e2abcee1f2fcd05ebc4ec8b8ebd8185d4edf62bfd4e", "bytes": 3281}, "latest_input_contract": {"path": ".runtime/object-expansion/unit121-prep/source-a-unused-nodelist-input-proposal01/plan01.json", "sha256": "94d47f4c372a17c9e32f75e0766d83b33da84f8555c6b56d7330f2522cc25ea1", "bytes": 16169}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit121-prep/retained-attempt-inventory01.json", "sha256": "70ad17e858aec110fb1e73fa792c2b84e2facaae362f0a5c0df98c7fc30b09ca", "bytes": 9276}, "latest_Source_epoch_authority": {"path": ".runtime/object-expansion/unit121-prep/Source-epoch-authority01.json", "sha256": "3a39c7312b3efbc76e9b19ebd79ce2a1ac663fcc1873b31d2aa41ba16a570ccb", "bytes": 5503}, "latest_retained_original_Native_authority": {"path": ".runtime/object-expansion/unit121-prep/retained-Native-authority01.json", "sha256": "947a0fe84d75483895826d3805ae500221b45aa4c39450c0110025bb731ff3f5", "bytes": 4315}, "latest_structural_supplement": {"path": ".runtime/object-expansion/unit121-prep/scientific-structural-NonConnected-supplement01.json", "sha256": "dbb58fb380d688b305ae47b17aa0f990aa952e779915f74106c2e7b352c3303e", "bytes": 10985}, "scope": "All nine Scheduled controls remain bounded Source B across five pairs and 331,920 values. One additional Source A unused-NodeList case compares 127 series/59,520 values, giving six pairs and 391,440 values. The A case preserves six exact declarations, seven physical Blank nodes and seven genuine NonConnected records, original-prefix holes, a late duplicate, a tail sharing another list name, whitespace identities and case-distinct declarations with ignored metadata. Two genuine blank warnings and actual phase counters match. The advisory Source graph records Proven membership or explicit Deferred original-prefix descriptors; the sole raw/IP owner retains original physical cells and references. This unused A composition does not exercise selected holes or runtime first-alias lookup. Case-colliding IDF names, selected-hole consumers, broader topology/field combinations and full-object conformance remain open; Scheduled remains bounded B.", "capability_or_gate_promotion": false}
+    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H"], "accepted_paired_cases": 7, "accepted_samples": 457440, "retained_Scheduled_B_pairs": 6, "retained_Scheduled_B_samples": 397920, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit122-prep/runtime-protocol-proposal01/pair-proof01.json", "sha256": "b85a454d95ce0b663b5d3489be1c9f39b63646d7371e29544a9324af0f04a351", "bytes": 207314}, "latest_independent_physical_comparison": {"path": ".runtime/object-expansion/unit122-prep/physical-peer02/proof01.json", "sha256": "56544f253a7831b1245c1af659c6d64b86350b8158766f968387cd294243faa6", "bytes": 176058}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit122-prep/root-completed-readback-review01.json", "sha256": "f54baa31a9843d3970fada2d1029860a50bec41b02dc3325b7eab226cbf282d4", "bytes": 1961}, "latest_source_build": "source-dd-case-colliding-nodelists-idf-122", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit122-prep/build125-attempt01.json", "sha256": "527e89425e2f0b74d6cc17f486e4e1abf1d81a5516f38f38094aea261b951e44", "bytes": 723}, "latest_actual_quality": {"path": ".runtime/porting/case-colliding-nodelists-idf-122/quality02/summary.json", "sha256": "dfa09748874c640df922017ad21f0c5ab91705fd1cb5e25ba075e47f53cbe2bb", "bytes": 1347}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit122-prep/owner-execution-review01.json", "sha256": "f5bb5c71728b0ff05b18e9d859c878fac15aaddec801215c21a57f4fa72ff7fb", "bytes": 2382}, "latest_input_contract": {"path": ".runtime/object-expansion/unit122-prep/science-final01/recipe01.json", "sha256": "9efa400be1e7d4038c7869833da9ff2de1b513266a20a69f36179f372f784af0", "bytes": 26503}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit122-prep/retained-attempt-inventory01.json", "sha256": "2cddab80c952b944056094d8c2d6ef1d8f4bd42b41d1d0d6fdbc8c46d01cc60b", "bytes": 8642}, "scope": "Six bounded Source B Scheduled pairs compare 397,920 values, with all nine controls in direct epJSON and genuine IDF. The latest IDF pair distinguishes two case-distinct NodeList declarations with different physical members: all nine controls follow the first original declaration even though converted key order is opposite. One retained Source A unused-list pair covers exact whitespace, original-prefix holes and explicit Deferred graph metadata across 59,520 values. Together seven pairs compare 457,440 values. Selected-hole consumers, broader member/topology and identity combinations, Source A managers and full-object conformance remain open.", "capability_or_gate_promotion": false}
   },
   "additional_native_type_calibrations": [
     {

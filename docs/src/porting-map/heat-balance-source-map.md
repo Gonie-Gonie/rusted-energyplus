@@ -1477,15 +1477,7 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-Five bounded B Scheduled/NodeList pairs retain 331,920 values, including all nine
-controls, genuine IDF order, trailing blanks and a real inlet/exhaust two-member
-list. Source-only eligibility leaves legacy binding strict. One A unused-NodeList
-pair adds 127 series/59,520 values: six declarations, seven Blank nodes, original
-prefix holes, late/tail identities, exact whitespace/case and ignored metadata.
-Two real blank warnings and actual phase counters match; whole BND has no node
-connections and all seven exact NonConnected ID/name records. The advisory graph records Proven members or explicit Deferred input
-prerequisites without copying runtime Node state. Six pairs compare 391,440 values.
-Selected holes, runtime first-alias lookup, case-colliding IDF names, broader
-field/topology combinations and other consumers remain open. Scheduled stays B;
-private histories, load-control effects and full-object conformance remain unclaimed.
+Six bounded Source B Scheduled pairs compare 397,920 values, with all nine controls in direct epJSON and genuine IDF. The latest IDF pair distinguishes two case-distinct NodeList declarations with different physical members: all nine controls follow the first original declaration even though converted key order is opposite. One retained Source A unused-list pair covers exact whitespace, original-prefix holes and explicit Deferred graph metadata across 59,520 values. Together seven pairs compare 457,440 values. Selected-hole consumers, broader member/topology and identity combinations, Source A managers and full-object conformance remain open.
+
+Reported setpoint state does not establish private histories or IdealLoads load-control effects.
 Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

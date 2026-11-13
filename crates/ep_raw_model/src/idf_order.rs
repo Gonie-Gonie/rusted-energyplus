@@ -351,6 +351,9 @@ pub fn apply_idf_declaration_order(
 
     for target in targets {
         let exact_names = target.object_type == "ComfortViewFactorAngles";
+        // Native preserves case-distinct NodeList declarations before its
+        // alpha getter uppercases names. Keep Comfort-only metadata gates separate.
+        let node_list_names = target.object_type.eq_ignore_ascii_case("NodeList");
         let idf_objects = scanned.get(target.object_type).ok_or_else(|| {
             IdfOrderError::new(format!(
                 "internal IDF order recovery error: missing scan bucket for {}",
@@ -359,7 +362,7 @@ pub fn apply_idf_declaration_order(
         })?;
         for (index, idf_object) in idf_objects.iter().enumerate() {
             if idf_objects[..index].iter().any(|earlier| {
-                if exact_names {
+                if exact_names || node_list_names {
                     earlier.name == idf_object.name
                 } else {
                     earlier.name.eq_ignore_ascii_case(&idf_object.name)
@@ -404,7 +407,7 @@ pub fn apply_idf_declaration_order(
         let actual_names = instances.keys().collect::<Vec<_>>();
         for (index, actual_name) in actual_names.iter().enumerate() {
             if actual_names[..index].iter().any(|earlier| {
-                if exact_names {
+                if exact_names || node_list_names {
                     earlier.0 == actual_name.0
                 } else {
                     earlier.0.eq_ignore_ascii_case(&actual_name.0)
@@ -432,16 +435,28 @@ pub fn apply_idf_declaration_order(
         let mut seen_actual_names = BTreeSet::new();
         let mut ordered_names = Vec::with_capacity(idf_objects.len());
         for idf_object in idf_objects {
-            let matching_names = instances
-                .keys()
-                .filter(|name| {
-                    if exact_names {
-                        name.0 == idf_object.name
-                    } else {
-                        name.0.eq_ignore_ascii_case(&idf_object.name)
-                    }
-                })
-                .collect::<Vec<_>>();
+            // NodeList case variants have separate exact converted keys.
+            // Prefer that genuine identity; retain the established unique
+            // case-insensitive fallback when a caller supplies only one spelling.
+            let exact_node_list_name = if node_list_names {
+                instances.keys().find(|name| name.0 == idf_object.name)
+            } else {
+                None
+            };
+            let matching_names = if let Some(name) = exact_node_list_name {
+                vec![name]
+            } else {
+                instances
+                    .keys()
+                    .filter(|name| {
+                        if exact_names {
+                            name.0 == idf_object.name
+                        } else {
+                            name.0.eq_ignore_ascii_case(&idf_object.name)
+                        }
+                    })
+                    .collect::<Vec<_>>()
+            };
             if matching_names.is_empty() {
                 return Err(IdfOrderError::new(format!(
                     "IDF declaration-order recovery name mismatch for {}: staged IDF name '{}' (idf_order {}) is absent from converted epJSON",
@@ -1517,6 +1532,21 @@ mod tests {
                 assert_eq!(model, original);
             }
         }
+        // NodeList's exact-key exception must not relax other families.
+        let mut model = parse_epjson_str(
+            r#"{"Schedule:Constant":{"Case":{"hourly_value":1},"case":{"hourly_value":2}}}"#,
+        )?;
+        let before = model.clone();
+        let error = required_order_error(
+            apply_idf_declaration_order(
+                &mut model,
+                "Schedule:Constant,case,,2;Schedule:Constant,Case,,1;",
+                IDF_ORDER_TARGETS,
+            ),
+            "schedule case variants retain their existing duplicate guard",
+        )?;
+        assert!(error.to_string().contains("duplicate staged IDF"));
+        assert_eq!(model, before);
         Ok(())
     }
 
@@ -2191,6 +2221,76 @@ mod unnamed_report_order_tests {
             .is_err()
         );
         assert_eq!(bad, before);
+        // Native decode preserves both exact Name keys. Their actual IDF
+        // declaration order may be the reverse of the JSON object key order.
+        let collision_json = r#"{"NodeList":{
+            "Case":{"nodes":[{"node_name":"FIRST"}]},
+            "case":{"nodes":[{"node_name":"SECOND"}]}
+        }}"#;
+        let collision_idf = "NodeList,case,SECOND;NodeList,Case,FIRST;";
+        let direct_collision = parse_epjson_str(collision_json)?;
+        let ordered = parse_epjson_str_with_idf_order(collision_json, collision_idf)?;
+        assert_eq!(ordered.objects, direct_collision.objects);
+        assert_eq!(
+            ordered
+                .ordered_instances("NodeList")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["case", "Case"]
+        );
+        assert_eq!(
+            ordered
+                .source_ordered_instances("NodeList")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["case", "Case"]
+        );
+        assert_eq!(
+            ordered
+                .source_json_instances("NodeList")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Case", "case"]
+        );
+        assert!(ordered.has_idf_declaration_order("NodeList") && !ordered.is_epjson());
+        for (idf, expected) in [
+            (
+                "NodeList,case,SECOND;NodeList,case,SECOND;",
+                "duplicate staged IDF",
+            ),
+            ("NodeList,CASE,FIRST;NodeList,case,SECOND;", "ambiguous"),
+            (
+                "NodeList,Missing,FIRST;NodeList,case,SECOND;",
+                "name mismatch",
+            ),
+            ("NodeList,case,SECOND;", "count mismatch"),
+        ] {
+            let mut actual = direct_collision.clone();
+            let before = actual.clone();
+            let error = apply_idf_declaration_order(&mut actual, idf, IDF_ORDER_TARGETS)
+                .err()
+                .ok_or_else(|| {
+                    std::io::Error::other(
+                        "invalid NodeList name associations must remain transactional",
+                    )
+                })?;
+            assert!(error.to_string().contains(expected), "{error}");
+            assert_eq!(actual, before);
+        }
+        // A later target failure must not install the earlier valid list overlay.
+        let mut later_failure = parse_epjson_str(
+            r#"{
+            "NodeList":{"Case":{"nodes":[{"node_name":"FIRST"}]},"case":{"nodes":[{"node_name":"SECOND"}]}},
+            "Schedule:Constant":{"Only":{"hourly_value":1}}
+        }"#,
+        )?;
+        let before = later_failure.clone();
+        let idf = format!("{collision_idf}Schedule:Constant,Missing,,1;");
+        assert!(apply_idf_declaration_order(&mut later_failure, &idf, IDF_ORDER_TARGETS).is_err());
+        assert_eq!(later_failure, before);
         Ok(())
     }
 }
