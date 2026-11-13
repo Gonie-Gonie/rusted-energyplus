@@ -3827,6 +3827,133 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 );
             }
 
+            // Unit129: a real cooling-fuel schedule reaches Source eligibility,
+            // scope/support and raw IP; this does not simulate any HVAC flow.
+            for value in [0.0_f64, 0.5, 2.0] {
+                let name = "129 Cooling Fuel Efficiency";
+                let mut efficiency = people.clone();
+                efficiency["Schedule:Constant"][name] = json!({"hourly_value":value});
+                efficiency["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_fuel_efficiency_schedule_name"] =
+                    json!(name);
+                let raw = parse_epjson_str(&efficiency.to_string())
+                    .expect("real cooling efficiency input");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("real cooling efficiency typed model");
+                let unit = &model.ideal_loads_air_systems[0];
+                let selected = unit
+                    .cooling_fuel_efficiency_schedule
+                    .expect("actual selected cooling schedule");
+                let schedule = model
+                    .schedules
+                    .iter()
+                    .find(|row| row.id == selected)
+                    .expect("real schedule arena member");
+                assert_eq!(schedule.hourly_value.to_bits(), value.to_bits());
+                assert!(unit.heating_fuel_efficiency_schedule.is_none());
+                assert!(unit.heating_availability_schedule.is_none());
+                assert!(unit.cooling_availability_schedule.is_none());
+                assert_ne!(unit.availability_schedule, Some(selected));
+                let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                    .expect("actual Source cooling schedule eligibility");
+                assert_eq!(
+                    ep_runtime::bind_direct_zone_purchased_air_model(&simulation).expect_err("Legacy cooling fuel fence"),
+                    ep_runtime::DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                        feature: ep_runtime::DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules,
+                    }
+                );
+                let mut actual_scope =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(actual_scope.admissible, "{:?}", actual_scope.violations);
+                actual_scope.environment = Some(
+                    super::environment::environment_from_weather(
+                        model,
+                        &single_day_weather_fixture(),
+                        "authored cooling efficiency weather",
+                    )
+                    .expect("real cooling efficiency environment"),
+                );
+                let admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                    &raw,
+                    &actual_scope,
+                )
+                .expect("same raw cooling schedule admission");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert_eq!(
+                    support.runtime_class,
+                    crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+                );
+                assert!(support.matched_capability_ids.is_empty());
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("actual cooling schedule raw IP");
+                let fields = ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("real unit alphas");
+                assert_eq!(
+                    fields["cooling_fuel_efficiency_schedule_name"],
+                    SourceRaw::String(name.into())
+                );
+                assert!(!fields.contains_key("heating_fuel_efficiency_schedule_name"));
+                let fields = ip
+                    .source_raw_object_fields("Schedule:Constant", name)
+                    .expect("actual schedule token");
+                let token = match &fields["hourly_value"] {
+                    SourceRaw::Number(token) => Some(token),
+                    _ => None,
+                }
+                .expect("real retained schedule number");
+                assert_eq!(
+                    token.parse::<f64>().expect("actual finite token").to_bits(),
+                    value.to_bits()
+                );
+                assert_eq!(raw, retained);
+                let mut heating = efficiency;
+                heating["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heating_fuel_efficiency_schedule_name"] =
+                    json!(name);
+                let heating_raw = parse_epjson_str(&heating.to_string())
+                    .expect("real still-fenced heating declaration");
+                let heating_compile = ep_compiler::compile_raw_model_for_source(&heating_raw);
+                assert!(
+                    !heating_compile.has_errors(),
+                    "{:?}",
+                    heating_compile.report.diagnostics
+                );
+                let heating_model = heating_compile
+                    .model
+                    .as_ref()
+                    .expect("actual heating typed model");
+                assert_eq!(
+                    ep_runtime::validate_source_direct_zone_purchased_air_model(&ep_model::SimulationModel::from_typed(heating_model.clone())),
+                    Err(ep_runtime::DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                        feature: ep_runtime::DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules,
+                    })
+                );
+                assert!(
+                    !inspect_porting_scope(
+                        &heating_raw,
+                        &heating_compile.report,
+                        Some(heating_model),
+                        scope
+                    )
+                    .admissible
+                );
+            }
+
             // Full actual raw compiler -> scope -> Source token -> runtime class
             // -> IP custody for ordered return counts, without simulating flow.
             for count in [0_usize, 1, 3, 5] {

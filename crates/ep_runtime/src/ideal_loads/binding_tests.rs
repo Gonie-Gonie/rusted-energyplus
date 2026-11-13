@@ -331,6 +331,65 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         );
     }
 
+    // Unit129 admits real typed cooling-fuel schedule roles only.
+    // No runtime fuel values, owner fields or division are authored by this test.
+    for value in [0.0_f64, 0.5, 2.0] {
+        let mut typed = unused_deferred.typed.clone();
+        let efficiency =
+            ScheduleId(u32::try_from(typed.schedules.len()).expect("dense schedule ID"));
+        typed.schedules.push(ScheduleConstant {
+            id: efficiency,
+            name: NormalizedName::new("129 COOLING FUEL EFFICIENCY"),
+            schedule_type_limits: None,
+            hourly_value: value,
+        });
+        typed
+            .schedule_names
+            .insert("129 COOLING FUEL EFFICIENCY", efficiency);
+        typed.ideal_loads_air_systems[0].cooling_fuel_efficiency_schedule = Some(efficiency);
+        let cooling = SimulationModel::from_typed(typed.clone());
+        assert_eq!(
+            cooling.typed.ideal_loads_air_systems[0].cooling_fuel_efficiency_schedule,
+            Some(efficiency)
+        );
+        assert_eq!(
+            cooling
+                .typed
+                .schedules
+                .iter()
+                .find(|row| row.id == efficiency)
+                .expect("actual fuel schedule arena member")
+                .hourly_value
+                .to_bits(),
+            value.to_bits()
+        );
+        validate_source_direct_zone_purchased_air_model(&cooling)
+            .expect("Source retains actual cooling fuel schedule identity");
+        let expected = DirectZonePurchasedAirBindingError::UnsupportedFeature {
+            feature: DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules,
+        };
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&cooling).expect_err("Legacy cooling fuel fence"),
+            expected
+        );
+        for cooling_selected in [false, true] {
+            let mut heating = typed.clone();
+            heating.ideal_loads_air_systems[0].cooling_fuel_efficiency_schedule =
+                cooling_selected.then_some(efficiency);
+            heating.ideal_loads_air_systems[0].heating_fuel_efficiency_schedule = Some(efficiency);
+            let heating = SimulationModel::from_typed(heating);
+            assert_eq!(
+                validate_source_direct_zone_purchased_air_model(&heating),
+                Err(expected.clone())
+            );
+            assert_eq!(
+                bind_direct_zone_purchased_air_model(&heating)
+                    .expect_err("heating fuel stays fenced in either mode"),
+                expected
+            );
+        }
+    }
+
     // Admission only: Source retains the actual raw schedule/basis owners at
     // runtime; typed eligibility must not invent Config arrays or return flow.
     for (fraction, basis) in [(true, false), (false, true), (true, true)] {

@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 182 paired physical cases and 5,650,456 reported values with zero
+contains 184 paired physical cases and 5,797,816 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 130 recorded Source builds,
-116 with accepted pairs and 14 without accepted pairs, including 4 builds
+validate the consumer corrections. There are 131 recorded Source builds,
+117 with accepted pairs and 14 without accepted pairs, including 4 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,15 +196,14 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-Ten bounded B Scheduled/NodeList compositions retain 689,760 values, with a
-59,520-value unused A case: eleven pairs/749,280 values. The latest independent
-cooling-availability composition compares 155 series/73,680 values. Actual
-overall-on/cooling-off potential samples suppress supply sensible cooling, and
-cooling-on samples show real service. A separate return-fraction schedule keeps
-positive basis in both states, positive first return and later-return zero. The
-prior 127 Native witness-shortfall remains unaccepted with no Source run or replay.
-Source-only cooling eligibility retains Legacy, heating, fuel and topology fences;
-arbitrary combinations, private histories and full-object conformance remain open.
+Twelve bounded B Scheduled/NodeList compositions retain 837,120 values, with a
+59,520-value unused A case: thirteen pairs/896,640 values. Two cooling-fuel cases
+compare 155 series/73,680 values each with unchanged caps: positive nonunit
+efficiency and the nonpositive fallback to effective efficiency one both have
+actual positive cooling/fuel service. Independent cooling availability, return
+basis/fraction, eighteen setpoint joins and complete scientific checks remain. One
+shared Source 131 QA/build serves both fresh pairs. Legacy, heating, other-fuel,
+private-state and full-object boundaries remain; no prior failure is relabeled.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

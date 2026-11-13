@@ -958,8 +958,11 @@ fn validate_direct_zone_model(
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneHvacSizingObject);
     }
+    // The real Source report reads cooling efficiency from its live schedule.
+    // Heating stays fenced for both modes; Legacy keeps its original fuel premise.
     if system.heating_fuel_efficiency_schedule.is_some()
-        || system.cooling_fuel_efficiency_schedule.is_some()
+        || (mode == DirectZoneValidationMode::LegacyBinding
+            && system.cooling_fuel_efficiency_schedule.is_some())
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules);
     }

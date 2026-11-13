@@ -337,10 +337,10 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "All nine Scheduled controls remain bounded Source B in epJSON and genuine IDF across ten pairs/689,760 values. The latest 155-series/73,680-value independent cooling-availability composition retains all eighteen public setpoint/schedule joins, actual exhaust and ordered return/basis/fraction behavior. The separate cooling schedule is not a setpoint-load-control witness. Source A unused-list evidence remains separate. Private histories, Source A managers, selected-hole consumers, other managers and arbitrary combinations remain unvalidated."
+      "All nine Scheduled controls remain bounded Source B in epJSON and genuine IDF across twelve pairs/837,120 values. The two 155-series fuel cases preserve all eighteen public setpoint/schedule joins and existing exhaust/ordered-return relations; their new efficiency checks concern real report/fuel owners, not setpoint load control. Source A unused-list evidence stays separate. Private histories, Source A managers, selected-hole consumers, other managers and arbitrary combinations remain unvalidated."
     ],
     "NodeList": [
-      "Bounded Source A/B retains the sole raw/IP NodeList owner and advisory Proven/Deferred metadata. Ten B pairs retain IDF order/case/trailing-blank and genuine inlet/exhaust/basis/ordered-return behavior; the unused A pair retains exact whitespace/original-prefix identities. The independent cooling composition preserves positive-off/on return basis and actual two-return behavior rather than waiving the earlier 127 witness shortfall. Source-only matched-exhaust return vectors and optional absence retain unchanged no-exhaust/Legacy singleton conditions. Selected holes, private alias arrays, general Unicode/name combinations and full-object conformance remain open."
+      "Bounded Source A/B retains the sole raw/IP NodeList owner and advisory Proven/Deferred metadata. Twelve B pairs preserve actual order/case/blank and inlet/exhaust/basis/return behavior; the unused A pair retains exact whitespace/original-prefix identities. Two live cooling-fuel cases keep every existing NodeList/return/connection and public identity gate. Unresolved/selected Deferred consumers, no-exhaust/Legacy singleton conditions, private alias observations, arbitrary Unicode/name combinations and full-object conformance retain their existing limits."
     ]
   },
   "verification": {
@@ -5947,6 +5947,46 @@
           "bytes": 2594
         },
         "scope": "The unchanged Source130 passed five actual relevant QA commands and two existing binding/raw-caller tests under unit127 owner review. No new test function, workspace/cohort rerun or extra build for128.127Native witness-shortfall remains unaccepted without Source run, Native error, Source failure, gate waiver or replay; distinct128 full155-series comparison alone adds accepted samples."
+      },
+      "cooling_fuel_efficiency_129": {
+        "final_quality": {
+          "path": ".runtime/porting/cooling-fuel-129/quality01/summary.json",
+          "sha256": "71732982dfdeba1f4138fba6f36e054e208e892b4daa7d3cc3a414d471b074b3",
+          "bytes": 1608
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit129-prep/owner-execution-review01.json",
+          "sha256": "490c1af329b6c684d31a37e4caef8b26ae1e827ef99807e1a5779baeec0c0e8b",
+          "bytes": 3008
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "95812493fd4feae3fe70be92e30a9616f2574a70572a56eec2d981ab5b0e32e0",
+          "bytes": 6421
+        },
+        "retained_inventory": {
+          "path": ".runtime/object-expansion/unit129-prep/retained-attempt-inventory01.json",
+          "sha256": "cbc4c439bbf3a1293bcf9f81bf0e340225dac1b6114361669739bcf6fad44dc2",
+          "bytes": 17414
+        },
+        "Root_completed_review": {
+          "path": ".runtime/object-expansion/unit129-prep/root-completed-readback-review01.json",
+          "sha256": "f8140f5f51c0e39e4576a8e94c09a1c376de51a9533b4505e5aa8dc7eb41ff01",
+          "bytes": 3601
+        },
+        "case_comparisons": {
+          "POSITIVE": {
+            "path": ".runtime/object-expansion/unit129-prep/runtime-protocol-proposal01/POSITIVE.pair-proof01.json",
+            "sha256": "453ce227b8467330ebb6ffaa4a79ff63ec1968491794df1e27258e5965400de8",
+            "bytes": 354350
+          },
+          "FALLBACK": {
+            "path": ".runtime/object-expansion/unit129-prep/runtime-protocol-proposal01/FALLBACK.pair-proof01.json",
+            "sha256": "4c2e35918e2773a09f48d3d8aee10af4b44d9dfe17ea981c40d6916979bbca3e",
+            "bytes": 354298
+          }
+        },
+        "scope": "One actual five-command QA/default Source131 build and two existing binding/raw-caller tests serve both predeclared cases. Two fresh Native and two fresh Source processes; no duplicated build/QA, new test function, workspace/cohort rerun or tolerance change. Existing histories remain literal."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -58372,12 +58412,398 @@
           "full_current_and_archive_source_files": 4672
         },
         "effective_state": "Bounded Source B permits a genuine explicit cooling-availability schedule through existing raw/IP, live SelectedSchedule and PurchasedAir calc/report owners; Legacy explicit-cooling, heating-availability and fuel-efficiency name fences remain. One independent-schedule case compares 155 series/73,680 values with original caps: actual overall-on/cooling-off potential samples suppress supply sensible cooling rate/energy, while cooling-on samples show real service. Transport, passive zone cooling and total cooling are not substituted for that coil witness. Source 130 is reused after the unaccepted Native-only127 witness shortfall; no Source 127 run or retroactive gate relaxation is credited. Selected UTF8 public-byte evidence remains finite. Broader IdealLoads/Unicode/topology combinations and full-object/frozen conformance remain open."
+      },
+      {
+        "id": "B-COOLING-FUEL-EFFICIENCY-POSITIVE-129-120H",
+        "case_kind": "POSITIVE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-cooling-fuel-129",
+        "input": {
+          "path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/POSITIVE/input.epJSON",
+          "sha256": "85b0bf04e9b7d3af5619bb9ab5a9f8b9aab9238abe2acb9bff0f10a9ae853e0a",
+          "bytes": 100396
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/cooling-fuel-129/POSITIVE/case/native-01/command/receipt.json",
+          "sha256": "8713a8ce2e03714546b692f78bdc9764ed189fe914cdaafb21b46d41fccff37e",
+          "bytes": 59095
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/cooling-fuel-129/POSITIVE/case/source-01/command/receipt.json",
+          "sha256": "c6453bc5530070c8308e7916387e60390e430e89300156f6bb98f9f91df7eab5",
+          "bytes": 59871
+        },
+        "source_summary": {
+          "path": ".runtime/porting/cooling-fuel-129/POSITIVE/case/source-01/output/run-summary.json",
+          "sha256": "4edd50e2c157bc914d9d3572a93ab6a61fa229e5994c2e31c3af7d99345e06fb",
+          "bytes": 63272
+        },
+        "source_executable": {
+          "path": ".runtime/porting/cooling-fuel-129/build131-01/eplus-rs.exe",
+          "sha256": "b5d3e0cb846764d43f227806d16e945936ebbb20cf6bd503851eb00d85e733d0",
+          "bytes": 80761607
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/10/1046e9ad7a8eb8a204941cf003c13d4d4d1061ef46ec83c9ad51cdf6f3b3e220",
+          "sha256": "1046e9ad7a8eb8a204941cf003c13d4d4d1061ef46ec83c9ad51cdf6f3b3e220"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/cooling-fuel-129/build131-01/build/receipt.json",
+          "sha256": "249f3f9e4f66c27fa5ad97ca13c100e13f1dc36a7502f32dd83a79c81232c8cd",
+          "bytes": 4483
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit129-prep/runtime-protocol-proposal01/POSITIVE.pair-proof01.json",
+          "sha256": "453ce227b8467330ebb6ffaa4a79ff63ec1968491794df1e27258e5965400de8",
+          "bytes": 354350
+        },
+        "independent_physical_comparison": {
+          "path": ".runtime/object-expansion/unit129-prep/physical-peer01/POSITIVE/proof01.json",
+          "sha256": "fd8447816df4cd73bc4e7ca58e483b60399ebc7e4ccae0f48ac2fd325fd77849",
+          "bytes": 314531
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit129-prep/root-completed-readback-review01.json",
+          "sha256": "f8140f5f51c0e39e4576a8e94c09a1c376de51a9533b4505e5aa8dc7eb41ff01",
+          "bytes": 3601
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit129-prep/science-final01/POSITIVE.recipe.json",
+          "sha256": "036f42c4e36a03bc49c9742b4de85c929cc5b1c60c524f9d61277d551d8b78a0",
+          "bytes": 35535
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "95812493fd4feae3fe70be92e30a9616f2574a70572a56eec2d981ab5b0e32e0",
+          "bytes": 6421
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 18818,
+          "parsed_binary64_unequal": 18818,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 4.604771675076336e-09,
+          "max_rmse_delta": 4.2951189411881996e-10
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/POSITIVE/unchanged-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "all155_previous_rules_and_caps_literal": true,
+          "global_contract_changed": false
+        },
+        "cooling_fuel_gate_summary": {
+          "Native": {
+            "case_kind": "POSITIVE",
+            "policy_indices": [
+              4,
+              91,
+              92,
+              98
+            ],
+            "samples": 480,
+            "full_clock_context_operand_joins": 1920,
+            "branch_counts": {
+              "raw_positive": 480,
+              "fallback_nonpositive": 0
+            },
+            "positive_service_samples": 360,
+            "distinct_actual_selected_efficiencies": [
+              18.0,
+              22.8,
+              26.0
+            ],
+            "distinct_actual_effective_efficiencies": [
+              18.0,
+              22.8,
+              26.0
+            ],
+            "max_abs_fuel_energy_relation_delta": 7.275957614183426e-12,
+            "comparison_policy": {
+              "key": "ZONE one ideal loads 각",
+              "variable": "Zone Ideal Loads Supply Air Total Cooling Fuel Energy",
+              "units": "J",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0
+            }
+          },
+          "Source": {
+            "case_kind": "POSITIVE",
+            "policy_indices": [
+              4,
+              91,
+              92,
+              98
+            ],
+            "samples": 480,
+            "full_clock_context_operand_joins": 1920,
+            "branch_counts": {
+              "raw_positive": 480,
+              "fallback_nonpositive": 0
+            },
+            "positive_service_samples": 360,
+            "distinct_actual_selected_efficiencies": [
+              18.0,
+              22.8,
+              26.0
+            ],
+            "distinct_actual_effective_efficiencies": [
+              18.0,
+              22.8,
+              26.0
+            ],
+            "max_abs_fuel_energy_relation_delta": 1.4551915228366852e-11,
+            "comparison_policy": {
+              "key": "ZONE one ideal loads 각",
+              "variable": "Zone Ideal Loads Supply Air Total Cooling Fuel Energy",
+              "units": "J",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0
+            }
+          }
+        },
+        "inherited_science": "Complete original cooling/return/setpoint/exhaust/BND/UTF8/comfort/table/ancillary/clocks/Source JSONCSV gates remain required in both immutable comparisons. Detailed operands/witnesses/projections/bodies are retained there, not duplicated in this canonical row.",
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit129-prep/build131-attempt01.json",
+            "sha256": "11201ec082ecb5d927a661ddd62ab820a7cf3f81d4f65d2eabfdf1d9d1ac8094",
+            "bytes": 675
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/cooling-fuel-129/quality01/summary.json",
+            "sha256": "71732982dfdeba1f4138fba6f36e054e208e892b4daa7d3cc3a414d471b074b3",
+            "bytes": 1608
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit129-prep/owner-execution-review01.json",
+            "sha256": "490c1af329b6c684d31a37e4caef8b26ae1e827ef99807e1a5779baeec0c0e8b",
+            "bytes": 3008
+          },
+          "retained_inventory": {
+            "path": ".runtime/object-expansion/unit129-prep/retained-attempt-inventory01.json",
+            "sha256": "cbc4c439bbf3a1293bcf9f81bf0e340225dac1b6114361669739bcf6fad44dc2",
+            "bytes": 17414
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_batch_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite positive cooling-fuel branch composition with actual positive service. Source-only cooling-fuel eligibility; no heating/other-resource/private-substep/full-object promotion."
+      },
+      {
+        "id": "B-COOLING-FUEL-EFFICIENCY-FALLBACK-129-120H",
+        "case_kind": "FALLBACK",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-cooling-fuel-129",
+        "input": {
+          "path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/FALLBACK/input.epJSON",
+          "sha256": "a17894798f5a93370e5f5fa8c6f66f3f71a691b6ef7a93ad3f2ceeb284663214",
+          "bytes": 100402
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/cooling-fuel-129/FALLBACK/case/native-01/command/receipt.json",
+          "sha256": "2cab4e8733195eb518a1c83abc8c5e5cb2bb2fff6e7761f31497eb65b089e62e",
+          "bytes": 59094
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/cooling-fuel-129/FALLBACK/case/source-01/command/receipt.json",
+          "sha256": "16e3795f53a16f0c879855eff03cf5f8d648fa3927c2409763e507347b0a18a3",
+          "bytes": 59871
+        },
+        "source_summary": {
+          "path": ".runtime/porting/cooling-fuel-129/FALLBACK/case/source-01/output/run-summary.json",
+          "sha256": "e06a23a38509a5174c0838e75fdb7a3a0b845c722be3b03c1576e1bb7dc66f02",
+          "bytes": 63271
+        },
+        "source_executable": {
+          "path": ".runtime/porting/cooling-fuel-129/build131-01/eplus-rs.exe",
+          "sha256": "b5d3e0cb846764d43f227806d16e945936ebbb20cf6bd503851eb00d85e733d0",
+          "bytes": 80761607
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/10/1046e9ad7a8eb8a204941cf003c13d4d4d1061ef46ec83c9ad51cdf6f3b3e220",
+          "sha256": "1046e9ad7a8eb8a204941cf003c13d4d4d1061ef46ec83c9ad51cdf6f3b3e220"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/cooling-fuel-129/build131-01/build/receipt.json",
+          "sha256": "249f3f9e4f66c27fa5ad97ca13c100e13f1dc36a7502f32dd83a79c81232c8cd",
+          "bytes": 4483
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit129-prep/runtime-protocol-proposal01/FALLBACK.pair-proof01.json",
+          "sha256": "4c2e35918e2773a09f48d3d8aee10af4b44d9dfe17ea981c40d6916979bbca3e",
+          "bytes": 354298
+        },
+        "independent_physical_comparison": {
+          "path": ".runtime/object-expansion/unit129-prep/physical-peer01/FALLBACK/proof01.json",
+          "sha256": "9ff89c7992d8f86415f0de20728f2cfac060d55f891e06bfc16fe2f2cf9abaec",
+          "bytes": 314479
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit129-prep/root-completed-readback-review01.json",
+          "sha256": "f8140f5f51c0e39e4576a8e94c09a1c376de51a9533b4505e5aa8dc7eb41ff01",
+          "bytes": 3601
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit129-prep/science-final01/FALLBACK.recipe.json",
+          "sha256": "9a9c5a5b482f4fd1df6c791f1ba2a7ff556ed644c9abfacd48942756f4dc2209",
+          "bytes": 35547
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "95812493fd4feae3fe70be92e30a9616f2574a70572a56eec2d981ab5b0e32e0",
+          "bytes": 6421
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 18824,
+          "parsed_binary64_unequal": 18824,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 4.604771675076336e-09,
+          "max_rmse_delta": 9.334460975422294e-10
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/FALLBACK/unchanged-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "all155_previous_rules_and_caps_literal": true,
+          "global_contract_changed": false
+        },
+        "cooling_fuel_gate_summary": {
+          "Native": {
+            "case_kind": "FALLBACK",
+            "policy_indices": [
+              5,
+              91,
+              92,
+              98
+            ],
+            "samples": 480,
+            "full_clock_context_operand_joins": 1920,
+            "branch_counts": {
+              "raw_positive": 240,
+              "fallback_nonpositive": 240
+            },
+            "positive_service_samples": 120,
+            "distinct_actual_selected_efficiencies": [
+              0.0,
+              1.0
+            ],
+            "distinct_actual_effective_efficiencies": [
+              1.0
+            ],
+            "max_abs_fuel_energy_relation_delta": 0.0,
+            "comparison_policy": {
+              "key": "ZONE one ideal loads 각",
+              "variable": "Zone Ideal Loads Supply Air Total Cooling Fuel Energy",
+              "units": "J",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0
+            }
+          },
+          "Source": {
+            "case_kind": "FALLBACK",
+            "policy_indices": [
+              5,
+              91,
+              92,
+              98
+            ],
+            "samples": 480,
+            "full_clock_context_operand_joins": 1920,
+            "branch_counts": {
+              "raw_positive": 240,
+              "fallback_nonpositive": 240
+            },
+            "positive_service_samples": 120,
+            "distinct_actual_selected_efficiencies": [
+              0.0,
+              1.0
+            ],
+            "distinct_actual_effective_efficiencies": [
+              1.0
+            ],
+            "max_abs_fuel_energy_relation_delta": 0.0,
+            "comparison_policy": {
+              "key": "ZONE one ideal loads 각",
+              "variable": "Zone Ideal Loads Supply Air Total Cooling Fuel Energy",
+              "units": "J",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1.0,
+              "rtol": 0.0,
+              "rmse_max": 1.0
+            }
+          }
+        },
+        "inherited_science": "Complete original cooling/return/setpoint/exhaust/BND/UTF8/comfort/table/ancillary/clocks/Source JSONCSV gates remain required in both immutable comparisons. Detailed operands/witnesses/projections/bodies are retained there, not duplicated in this canonical row.",
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit129-prep/build131-attempt01.json",
+            "sha256": "11201ec082ecb5d927a661ddd62ab820a7cf3f81d4f65d2eabfdf1d9d1ac8094",
+            "bytes": 675
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/cooling-fuel-129/quality01/summary.json",
+            "sha256": "71732982dfdeba1f4138fba6f36e054e208e892b4daa7d3cc3a414d471b074b3",
+            "bytes": 1608
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit129-prep/owner-execution-review01.json",
+            "sha256": "490c1af329b6c684d31a37e4caef8b26ae1e827ef99807e1a5779baeec0c0e8b",
+            "bytes": 3008
+          },
+          "retained_inventory": {
+            "path": ".runtime/object-expansion/unit129-prep/retained-attempt-inventory01.json",
+            "sha256": "cbc4c439bbf3a1293bcf9f81bf0e340225dac1b6114361669739bcf6fad44dc2",
+            "bytes": 17414
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_batch_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite fallback cooling-fuel branch composition with actual positive service. Source-only cooling-fuel eligibility; no heating/other-resource/private-substep/full-object promotion."
       }
     ],
     "totals": {
-      "paired_cases": 182,
-      "reported_samples": 5650456,
-      "raw_operand_unequal": 1302368,
+      "paired_cases": 184,
+      "reported_samples": 5797816,
+      "raw_operand_unequal": 1340010,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -60592,6 +61018,23 @@
           "sha256": "a437a2dad4093a272c69a79464c8e7f8d9858449557f98fcd7ebe6673c3c688f",
           "bytes": 80761853
         }
+      },
+      {
+        "id": "source-dd-cooling-fuel-129",
+        "receipt": {
+          "path": ".runtime/porting/cooling-fuel-129/build131-01/build/receipt.json",
+          "sha256": "249f3f9e4f66c27fa5ad97ca13c100e13f1dc36a7502f32dd83a79c81232c8cd",
+          "bytes": 4483
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/10/1046e9ad7a8eb8a204941cf003c13d4d4d1061ef46ec83c9ad51cdf6f3b3e220",
+          "sha256": "1046e9ad7a8eb8a204941cf003c13d4d4d1061ef46ec83c9ad51cdf6f3b3e220"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/cooling-fuel-129/build131-01/eplus-rs.exe",
+          "sha256": "b5d3e0cb846764d43f227806d16e945936ebbb20cf6bd503851eb00d85e733d0",
+          "bytes": 80761607
+        }
       }
     ],
     "focused_since_workspace": {
@@ -60958,14 +61401,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 130,
-      "builds_with_accepted_paired_cases": 116,
+      "actual_recorded_builds": 131,
+      "builds_with_accepted_paired_cases": 117,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 10,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "130 recorded Source builds: 116 have accepted paired cases; 14 have none, including four without Source execution. The distinct128 pair uses one fresh Native and one fresh Source on the same actual130 snapshot. Earlier127Native is unaccepted with no Source process/sample credit; Source130 is recorded once. All previous failed/unaccepted histories remain retained.",
+      "qualification": "131 recorded Source builds:117 have accepted pairs;14 have none, including four without Source execution. One shared Source131 QA/default build serves two distinct fresh cooling-fuel pairs. It is appended once. Existing unaccepted Native, failed reader, QA and build histories retain zero accepted sample credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 4,
@@ -65507,7 +65950,7 @@
       "scope": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion.",
       "capability_or_gate_promotion": false
     },
-    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H", "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H"], "accepted_paired_cases": 11, "accepted_samples": 749280, "retained_Scheduled_B_pairs": 10, "retained_Scheduled_B_samples": 689760, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit128-prep/runtime-protocol-proposal02/pair-proof01.json", "sha256": "505c4d2dd2574e79b8087d766b0e33fab60267f69765326b84cf7e929ebdb841", "bytes": 333183}, "latest_independent_physical_comparison": {"path": ".runtime/object-expansion/unit128-prep/physical-peer02/proof01.json", "sha256": "90821a715ba84407563dc8c7de42a4ae6317abe564b0bd6c4ac75c5466997da3", "bytes": 292985}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit128-prep/root-completed-readback-review01.json", "sha256": "b1bec8e3bfd1e43dc7a52328fbb32e99a47e2776243eecf52f2c1f978c4516ed", "bytes": 2888}, "latest_source_build": "source-dd-cooling-availability-127", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit127-prep/build130-attempt01.json", "sha256": "08ee6dc2d56c807f40ed0d3c1f4d5fe91453679f8666614336516e347b35de0b", "bytes": 699}, "latest_actual_quality": {"path": ".runtime/porting/cooling-availability-127/quality01/summary.json", "sha256": "1aff7b062c99f04281574e954e497b8e3c69817dbae17c186f3881bc7d85a623", "bytes": 1648}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit127-prep/owner-execution-review01.json", "sha256": "e56f4464144cf9c5b916018d978a35f1b4a5e17cd1f3d9fa15cfddc2ab6fab2e", "bytes": 3010}, "latest_input_contract": {"path": ".runtime/object-expansion/unit128-prep/science-final01/recipe01.json", "sha256": "ba8f216eab4a88e0cecbd9ef5a9b4eca93081964391b03e54215855e655e09e9", "bytes": 33752}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit128-prep/retained-attempt-inventory01.json", "sha256": "5df729f053617d498f4b5a9a71537a65a0a888075e7f4731672d90e5dc4b185c", "bytes": 12381}, "latest_retained_unaccepted127": {"path": ".runtime/object-expansion/unit127-prep/Root-unaccepted-Native-disposition01.json", "sha256": "3750831e13d6de59a7e38e88922beba47a5d209f862a14b858d46b7d6caa662c", "bytes": 2594}, "scope": "Ten bounded Source B Scheduled/NodeList compositions retain 689,760 values; the unused Source A pair adds 59,520, for eleven pairs/749,280 values. The latest independent cooling-availability case compares 155 series/73,680 values. Actual overall-on/cooling-off samples with public cooling potential suppress coil/supply sensible cooling, while cooling-on samples provide real service. A separate original return-fraction schedule retains positive basis in both states, positive first return and the later-return zero branch. All eighteen setpoint joins, complete BND27 and selected UTF8 public identities remain. The earlier 127 Native witness-shortfall case remains unaccepted, without Source execution or replay. Source-only cooling eligibility retains Legacy/heating/fuel/topology fences; broader combinations and full-object conformance remain open.", "capability_or_gate_promotion": false}
+    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H", "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H", "B-COOLING-FUEL-EFFICIENCY-POSITIVE-129-120H", "B-COOLING-FUEL-EFFICIENCY-FALLBACK-129-120H"], "accepted_paired_cases": 13, "accepted_samples": 896640, "retained_Scheduled_B_pairs": 12, "retained_Scheduled_B_samples": 837120, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"POSITIVE": {"path": ".runtime/object-expansion/unit129-prep/runtime-protocol-proposal01/POSITIVE.pair-proof01.json", "sha256": "453ce227b8467330ebb6ffaa4a79ff63ec1968491794df1e27258e5965400de8", "bytes": 354350}, "FALLBACK": {"path": ".runtime/object-expansion/unit129-prep/runtime-protocol-proposal01/FALLBACK.pair-proof01.json", "sha256": "4c2e35918e2773a09f48d3d8aee10af4b44d9dfe17ea981c40d6916979bbca3e", "bytes": 354298}}, "latest_independent_physical_comparisons": {"POSITIVE": {"path": ".runtime/object-expansion/unit129-prep/physical-peer01/POSITIVE/proof01.json", "sha256": "fd8447816df4cd73bc4e7ca58e483b60399ebc7e4ccae0f48ac2fd325fd77849", "bytes": 314531}, "FALLBACK": {"path": ".runtime/object-expansion/unit129-prep/physical-peer01/FALLBACK/proof01.json", "sha256": "9ff89c7992d8f86415f0de20728f2cfac060d55f891e06bfc16fe2f2cf9abaec", "bytes": 314479}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit129-prep/root-completed-readback-review01.json", "sha256": "f8140f5f51c0e39e4576a8e94c09a1c376de51a9533b4505e5aa8dc7eb41ff01", "bytes": 3601}, "latest_source_build": "source-dd-cooling-fuel-129", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit129-prep/build131-attempt01.json", "sha256": "11201ec082ecb5d927a661ddd62ab820a7cf3f81d4f65d2eabfdf1d9d1ac8094", "bytes": 675}, "latest_actual_quality": {"path": ".runtime/porting/cooling-fuel-129/quality01/summary.json", "sha256": "71732982dfdeba1f4138fba6f36e054e208e892b4daa7d3cc3a414d471b074b3", "bytes": 1608}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit129-prep/owner-execution-review01.json", "sha256": "490c1af329b6c684d31a37e4caef8b26ae1e827ef99807e1a5779baeec0c0e8b", "bytes": 3008}, "latest_input_contracts": {"POSITIVE": {"path": ".runtime/object-expansion/unit129-prep/science-final01/POSITIVE.recipe.json", "sha256": "036f42c4e36a03bc49c9742b4de85c929cc5b1c60c524f9d61277d551d8b78a0", "bytes": 35535}, "FALLBACK": {"path": ".runtime/object-expansion/unit129-prep/science-final01/FALLBACK.recipe.json", "sha256": "9a9c5a5b482f4fd1df6c791f1ba2a7ff556ed644c9abfacd48942756f4dc2209", "bytes": 35547}}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit129-prep/retained-attempt-inventory01.json", "sha256": "cbc4c439bbf3a1293bcf9f81bf0e340225dac1b6114361669739bcf6fad44dc2", "bytes": 17414}, "latest_batch_plan": {"path": ".runtime/object-expansion/unit129-prep/cooling-fuel-two-case-input-proposal01/batch-plan01.json", "sha256": "95812493fd4feae3fe70be92e30a9616f2574a70572a56eec2d981ab5b0e32e0", "bytes": 6421}, "scope": "Twelve bounded Source B Scheduled/NodeList compositions retain 837,120 values; the unused Source A pair adds 59,520, for thirteen pairs/896,640 values. Two cooling-fuel-efficiency cases add 155 series/73,680 values each under unchanged caps. Actual positive nonunit efficiency divides cooling fuel energy by the live selected value; the separate nonpositive case uses the genuine effective value of one, with positive cooling/fuel service observed in that branch. Independent cooling availability, positive-off/on return basis, later-return zero, eighteen setpoint joins and complete structural/scientific comparisons remain. One shared Source 131 QA/build serves both fresh pairs. Legacy/heating/other-fuel, private-state and full-object boundaries remain.", "capability_or_gate_promotion": false}
   },
   "additional_native_type_calibrations": [
     {
