@@ -365,6 +365,21 @@ pub(super) fn run() -> Result<(usize, usize, usize)> {
     let mut sizing = SelectedSizingManager::default();
     let mut branch = SourceBranchNodeConnections::default();
     let mut gains = SelectedInternalHeatGains::default();
+    // Actual cold diagnostic owner for this existing nonblank equipment
+    // bootstrap; no Native expected diagnostic payload is read or injected.
+    let mut getter_state = error_state();
+    let (mut getter_errors, mut getter_console) = (Vec::new(), Vec::new());
+    let mut getter_backend = SourceErrorBackend {
+        state: &mut getter_state,
+        error_stream: Some(&mut getter_errors),
+        console: &mut getter_console,
+        out_unit1: None,
+        out_unit2: None,
+        f_message: None,
+        message_callback: None,
+        error_callback: None,
+        sqlite: None,
+    };
     equipment.get_zone_equipment_source(
         &mut input,
         admitted,
@@ -381,6 +396,8 @@ pub(super) fn run() -> Result<(usize, usize, usize)> {
             sizing: &mut sizing,
             branch: Some(&mut branch),
             source_is_epjson: false,
+            backend: &mut getter_backend,
+            diagnostic_flags: None, // retained Native nonblank bootstrap: no warning branch
         },
     )?;
     let space_controls = SelectedHeatBalanceSpaceControls::default();

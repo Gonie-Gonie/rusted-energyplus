@@ -6,17 +6,20 @@ use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGloba
 use crate::heat_balance::selected_input_processor::{SelectedInputProcessor, SourceArgumentCounts};
 
 use super::source_equipment_getter::SourceEquipmentGetterLocals;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneData;
 use crate::heat_balance::selected_schedule_manager::SelectedScheduleManager;
 use crate::heat_balance::selected_sizing::{SelectedSizingManager, SourceTerminalUnitSizingData};
 use crate::heat_balance::startup_integrity::SourceBranchNodeConnections;
 
-pub(crate) struct SourceEquipmentInputOwners<'a> {
+pub(crate) struct SourceEquipmentInputOwners<'a, 'backend> {
     pub(crate) zones: &'a mut [SelectedZoneData],
     pub(crate) schedules: &'a mut SelectedScheduleManager,
     pub(crate) sizing: &'a mut SelectedSizingManager,
     pub(crate) branch: Option<&'a mut SourceBranchNodeConnections>,
     pub(crate) source_is_epjson: bool,
+    pub(crate) backend: &'a mut SourceErrorBackend<'backend>,
+    pub(crate) diagnostic_flags: Option<SourceDiagnosticFlags<'a>>,
 }
 
 fn definition(
@@ -134,7 +137,7 @@ impl OrdinaryEquipment {
         space_simulation: bool,
         globals: &SelectedHeatBalanceGlobals,
         gains: &mut SelectedInternalHeatGains,
-        mut owners: SourceEquipmentInputOwners<'_>,
+        mut owners: SourceEquipmentInputOwners<'_, '_>,
     ) -> Result<(), Unavailable> {
         if self.input.is_some()
             || clock.timesteps_per_hour == 0
@@ -178,7 +181,7 @@ impl OrdinaryEquipment {
         space_simulation: bool,
         globals: &SelectedHeatBalanceGlobals,
         gains: &mut SelectedInternalHeatGains,
-        owners: &mut SourceEquipmentInputOwners<'_>,
+        owners: &mut SourceEquipmentInputOwners<'_, '_>,
     ) -> Result<(), Unavailable> {
         // Original224-227: the real three counts precede all definitions.
         let controlled_zones = input.get_num_objects_found("ZoneHVAC:EquipmentConnections");
@@ -249,8 +252,12 @@ impl OrdinaryEquipment {
                 "actual GetZoneEquipmentData292 controlled-zone/count severe diagnostic".into(),
             ));
         }
-        self.nodes
-            .init_unique_check_source("ZoneHVAC:EquipmentConnections", input)?;
+        self.nodes.init_unique_check_source(
+            "ZoneHVAC:EquipmentConnections",
+            input,
+            owners.backend,
+            owners.diagnostic_flags,
+        )?;
         let mut overall_equipment_count = 0_usize;
         let mut local_terminal_unit_sizing_counter = 0_usize;
         for _controlled_zone in 0..controlled_zones {
@@ -273,6 +280,8 @@ impl OrdinaryEquipment {
             self.process_source_zone_equipment_input(
                 zone,
                 input,
+                owners.backend,
+                owners.diagnostic_flags,
                 owners.branch.as_deref_mut().ok_or_else(|| {
                     Unavailable::Input(
                         "actual existing BranchNodeConnections owner required".into(),
@@ -437,10 +446,12 @@ impl NodeOwner {
         &mut self,
         context: &str,
         input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: Option<SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Unavailable> {
         if self.get_input {
             let mut errors_found = false;
-            self.get_source_node_lists_input(input, &mut errors_found)?;
+            self.get_source_node_lists_input(input, backend, diagnostic_flags, &mut errors_found)?;
             self.get_input = false;
         }
         self.begin_unique_check_context(context)

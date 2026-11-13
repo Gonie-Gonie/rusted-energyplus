@@ -1798,6 +1798,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 branch: None,
                 // Unused: this authored admitted-input fixture has zero controlled Connections.
                 source_is_epjson: false,
+                backend: &mut context.backend,
+                diagnostic_flags: None, // zero NodeLists: no diagnostic phase read
             },
         )?;
         assert_eq!(owners.shortcut.current_module_object, old_module);

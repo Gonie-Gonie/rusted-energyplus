@@ -209,6 +209,19 @@ pub(super) fn run() -> Result<usize> {
     let mut sizing = SelectedSizingManager::default();
     let mut branch = SourceBranchNodeConnections::default();
     let mut gains = SelectedInternalHeatGains::default();
+    let mut state = error_state();
+    let mut console = Vec::new();
+    let mut backend = SourceErrorBackend {
+        state: &mut state,
+        error_stream: None,
+        console: &mut console,
+        out_unit1: None,
+        out_unit2: None,
+        f_message: None,
+        message_callback: None,
+        error_callback: None,
+        sqlite: None,
+    };
     equipment.get_zone_equipment_source(
         &mut input,
         equipment_input,
@@ -225,6 +238,8 @@ pub(super) fn run() -> Result<usize> {
             sizing: &mut sizing,
             branch: Some(&mut branch),
             source_is_epjson: false,
+            backend: &mut backend,
+            diagnostic_flags: None, // retained Native nonblank bootstrap: no warning branch
         },
     )?;
     let mut controller = SourceZoneAirPredictorCorrector::default();
@@ -242,19 +257,6 @@ pub(super) fn run() -> Result<usize> {
     let availability = crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability::default();
     let mut shortcut = SourceInputProcessorShortCut::default();
     let mut psychrometrics = SourcePsychrometricAccess::default();
-    let mut state = error_state();
-    let mut console = Vec::new();
-    let mut backend = SourceErrorBackend {
-        state: &mut state,
-        error_stream: None,
-        console: &mut console,
-        out_unit1: None,
-        out_unit2: None,
-        f_message: None,
-        message_callback: None,
-        error_callback: None,
-        sqlite: None,
-    };
     controller.subsystems.room_air.manage_source_air_model(
         1,
         &mut input,

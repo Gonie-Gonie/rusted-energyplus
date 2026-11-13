@@ -1,5 +1,6 @@
 //! Native NodeInputManager GetNodeNums/GetOnlySingleNode/CheckUnique children.
 use super::{NodeOwner, Unavailable, source_nodes::SourceNodeFluidType};
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::heat_balance::startup_integrity::{
     SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType,
@@ -15,6 +16,8 @@ impl NodeOwner {
     pub(super) fn get_source_node_nums(
         &mut self,
         input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: Option<SourceDiagnosticFlags<'_>>,
         branch: &mut SourceBranchNodeConnections,
         name: &str,
         num_nodes: &mut usize,
@@ -33,7 +36,7 @@ impl NodeOwner {
             .source_name()
             .map_err(|e| Unavailable::Input(e.to_string()))?;
         if self.get_input {
-            self.get_source_node_lists_input(input, errors_found)?;
+            self.get_source_node_lists_input(input, backend, diagnostic_flags, errors_found)?;
             self.get_input = false;
         }
         if matches!(
@@ -140,6 +143,8 @@ impl NodeOwner {
     pub(super) fn get_source_only_single_node(
         &mut self,
         input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: Option<SourceDiagnosticFlags<'_>>,
         branch: &mut SourceBranchNodeConnections,
         name: &str,
         errors_found: &mut bool,
@@ -175,6 +180,8 @@ impl NodeOwner {
         let mut num_nodes = 0;
         let result = self.get_source_node_nums(
             input,
+            backend,
+            diagnostic_flags,
             branch,
             name,
             &mut num_nodes,

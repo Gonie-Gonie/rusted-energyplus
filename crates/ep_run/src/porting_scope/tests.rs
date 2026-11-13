@@ -3100,6 +3100,110 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     .iter()
                     .any(|row| row.object_type == "SetpointManager:Scheduled")
             );
+            // Exercise the real compile/scope/support caller before runtime:
+            // explicit trailing empty strings are advisory graph omissions,
+            // while the original raw/IP cells remain the Node getter's input.
+            let mut warning = people.clone();
+            warning["NodeList"] = json!({"Supply List":{"nodes":[
+                {"node_name":"Supply"},{"node_name":""},{"node_name":""}]}});
+            warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["zone_supply_air_node_name"] =
+                json!("Supply List");
+            warning["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_air_inlet_node_or_nodelist_name"] =
+                json!("Supply List");
+            warning["SetpointManager:Scheduled"]["Supply setpoint"]["setpoint_node_or_nodelist_name"] =
+                json!("Supply List");
+            let warning_raw =
+                parse_epjson_str(&warning.to_string()).expect("actual trailing-empty Source raw");
+            let original_warning_raw = warning_raw.clone();
+            let old_compile = compile_raw_model(&warning_raw);
+            assert!(old_compile.has_errors() && old_compile.model.is_none());
+            assert!(
+                old_compile
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|d| d.code == "MissingRequiredField"
+                        && d.object_type == "NodeList"
+                        && d.field.as_deref() == Some("node_name"))
+            );
+            let warning_compile = ep_compiler::compile_raw_model_for_source(&warning_raw);
+            assert!(
+                !warning_compile.has_errors(),
+                "{:?}",
+                warning_compile.report.diagnostics
+            );
+            let warning_model = warning_compile
+                .model
+                .as_ref()
+                .expect("actual Source compiled warning model");
+            assert_eq!(warning_model.node_lists.len(), 1);
+            assert_eq!(warning_model.node_lists[0].nodes.len(), 1);
+            let simulation = ep_model::SimulationModel::from_typed(warning_model.clone());
+            assert_eq!(simulation.graph.node_list_members.len(), 1);
+            assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_ok());
+            let mut warning_scope = inspect_porting_scope(
+                &warning_raw,
+                &warning_compile.report,
+                Some(warning_model),
+                scope,
+            );
+            assert!(warning_scope.admissible, "{:?}", warning_scope.violations);
+            warning_scope.environment = Some(
+                super::environment::environment_from_weather(
+                    warning_model,
+                    &single_day_weather_fixture(),
+                    "authored trailing-empty Source admission weather",
+                )
+                .expect("actual warning-scope environment"),
+            );
+            let warning_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &warning_raw,
+                &warning_scope,
+            )
+            .expect("actual raw/compiled warning Source admission");
+            let warning_support = crate::support::assess_support_with_source_admission(
+                &warning_raw,
+                &warning_compile.report,
+                Some(warning_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&warning_admission),
+            );
+            assert!(
+                warning_support.allows_rust_runtime(),
+                "{:?}",
+                warning_support.diagnostics
+            );
+            let warning_ip = crate::ordinary_input_processor::resolve_source_b(&warning_raw)
+                .expect("actual Source IP transfer");
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as SourceRaw;
+            let original_members = match &warning_ip
+                .source_raw_object_fields("NodeList", "Supply List")
+                .expect("actual raw NodeList fields")["nodes"]
+            {
+                SourceRaw::Array(members) => Some(members),
+                _ => None,
+            }
+            .expect("actual retained member array");
+            assert_eq!(original_members.len(), 3);
+            for member in &original_members[1..] {
+                let fields = match member {
+                    SourceRaw::Object(fields) => Some(fields),
+                    _ => None,
+                }
+                .expect("actual retained member object");
+                assert_eq!(fields["node_name"], SourceRaw::String(String::new()));
+            }
+            assert_eq!(warning_raw, original_warning_raw);
+            for bad_member in [json!({"node_name":3}), json!({"node_name":"Supply"})] {
+                let mut invalid = warning.clone();
+                invalid["NodeList"]["Supply List"]["nodes"][2] = bad_member;
+                let invalid_raw =
+                    parse_epjson_str(&invalid.to_string()).expect("changed actual NodeList input");
+                assert!(ep_compiler::compile_raw_model_for_source(&invalid_raw).has_errors());
+            }
             // An admissible trace cannot grant a token to changed raw operands.
             for (field, bad_value) in [
                 ("control_variable", "Unknown"),

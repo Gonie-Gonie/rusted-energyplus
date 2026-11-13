@@ -1,5 +1,6 @@
 //! GetNodeListsInput516-648 over the existing sole IP and NodeOwner.
 use super::{NodeOwner, Unavailable, source_nodes::SourceNodeFluidType};
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputStatisticsValue as Value,
 };
@@ -18,6 +19,8 @@ impl NodeOwner {
     pub(super) fn get_source_node_lists_input(
         &mut self,
         input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: Option<SourceDiagnosticFlags<'_>>,
         _errors_found: &mut bool,
     ) -> Result<(), Unavailable> {
         let mut local_errors_found = false;
@@ -101,9 +104,36 @@ impl NodeOwner {
                     .and_then(|rows| rows.get_mut(member))
                     .ok_or(Unavailable::InconsistentOwner)? = alphas[member + 1].clone();
                 if alphas[member + 1].is_empty() {
-                    return Err(unavailable(
-                        "actual GetNodeListsInput583 blank-node warning diagnostic",
-                    ));
+                    let flags = diagnostic_flags.as_ref().ok_or_else(|| unavailable(
+                        "actual GetNodeListsInput578 blank warning needs live Source phase flags"))?;
+                    backend
+                        .show_source_warning_error(
+                            &format!(
+                                "GetNodeListsInput: NodeList=\"{}\", blank node name in list.",
+                                alphas[0]
+                            ),
+                            flags,
+                        )
+                        .map_err(|error| {
+                            Unavailable::Input(format!("actual NodeList warning backend: {error}"))
+                        })?;
+                    let row = self
+                        .node_lists
+                        .as_mut()
+                        .and_then(|rows| rows.get_mut(index))
+                        .ok_or(Unavailable::InconsistentOwner)?;
+                    row.number_of_nodes = row
+                        .number_of_nodes
+                        .checked_sub(1)
+                        .ok_or(Unavailable::InconsistentOwner)?;
+                    if row.number_of_nodes == 0 {
+                        return Err(unavailable(
+                            "actual GetNodeListsInput582 no-nodes severe diagnostic",
+                        ));
+                    }
+                    // Native changes only the used prefix count. Keep the
+                    // original empty name/zero number cell and later indices.
+                    continue;
                 }
                 let number = self.assign_source_node_number(
                     &alphas[member + 1],

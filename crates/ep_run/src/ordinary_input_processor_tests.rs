@@ -134,6 +134,38 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
         ep_raw_model::apply_idf_declaration_order(&mut missing_order, list_idf, &targets)?;
         assert!(!missing_order.is_epjson() && !missing_order.has_idf_declaration_order("NodeList"));
         assert!(crate::ordinary_equipment_input::resolve_source_b(&missing_order).is_err());
+        // Pinned NodeList schema requires a string key, but has no minLength.
+        // Explicit empty strings survive to the actual warning/count branch.
+        let mut explicit_blank = lists.clone();
+        explicit_blank["NodeList"]["Zulu List"]["nodes"]
+            .as_array_mut()
+            .ok_or("actual authored member array")?
+            .push(json!({"node_name":""}));
+        let mut blank_input = resolve_source_b(&parse(&explicit_blank)?)?;
+        assert_eq!(
+            blank_input.get_object_def_max_args("NodeList")?,
+            SourceArgumentCounts {
+                alphas: 4,
+                numerics: 0
+            }
+        );
+        let Raw::Array(members) =
+            &blank_input.source_raw_object_fields("NodeList", "Zulu List")?["nodes"]
+        else {
+            return Err("actual blank member custody".into());
+        };
+        assert_eq!(members.len(), 3);
+        let Raw::Object(last) = &members[2] else {
+            return Err("actual blank member object".into());
+        };
+        assert_eq!(last["node_name"], Raw::String(String::new()));
+        for invalid in [json!({}), json!({"node_name":null}), json!({"node_name":3})] {
+            explicit_blank["NodeList"]["Zulu List"]["nodes"][2] = invalid;
+            assert!(
+                crate::ordinary_equipment_input::resolve_source_b(&parse(&explicit_blank)?)
+                    .is_err()
+            );
+        }
         // This bridge transfers real schedule operands; no Schedule:File is opened,
         // and schedule numerical execution is covered by its own existing owners.
         let mut year = json!({"Schedule:Year":{"Y":{"schedule_weeks":[{

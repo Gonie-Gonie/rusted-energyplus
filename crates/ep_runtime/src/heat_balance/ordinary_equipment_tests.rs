@@ -559,6 +559,18 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 sizing: &mut sizing,
                 branch: None,
                 source_is_epjson: true,
+                backend: &mut SourceErrorBackend {
+                    state: &mut error_state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+                diagnostic_flags: None, // zero NodeLists: no diagnostic phase read
             },
         )?;
         assert_eq!(source.zone_ids, zone_ids);
@@ -616,6 +628,18 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 sizing: &mut sizing,
                 branch: None,
                 source_is_epjson: true,
+                backend: &mut SourceErrorBackend {
+                    state: &mut error_state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+                diagnostic_flags: None, // zero NodeLists: no diagnostic phase read
             },
         )?;
         assert_eq!(source, retained_source);
@@ -2366,6 +2390,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     sizing: &mut sizing,
                     branch: None,
                     source_is_epjson,
+                    backend: &mut backend,
+                    diagnostic_flags: None, // zero NodeLists: no diagnostic phase read
                 },
             )?;
             assert_eq!(equipment.space_ids, expected);

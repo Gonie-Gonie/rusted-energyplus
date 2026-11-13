@@ -377,6 +377,30 @@ impl Factory {
         let mut ancillary = hb::ctf_initialization_context::CtfInitializationReports::default();
         let mut manager = SourceHvacManager::default();
         let mut sizing = hb::selected_sizing::SelectedSizingManager::default();
+        // Authored integration canaries: callbacks' legacy flags deliberately
+        // disagree with the actual Source phase cells used by NodeList warnings.
+        let warning_before = state.tracking.clone();
+        let legacy_flags = (
+            state.warmup_flag,
+            state.doing_sizing,
+            state.kickoff_simulation,
+        );
+        state.warmup_flag = !weather.global.warmup_flag;
+        state.doing_sizing = !globals.doing_sizing;
+        state.kickoff_simulation = !globals.kickoff_simulation;
+        let blank_members = object(member(member(definition, "raw")?, "NodeList")?)?
+            .values()
+            .map(|row| {
+                array(member(row, "nodes")?).map(|members| {
+                    members
+                        .iter()
+                        .filter(|row| row.get("node_name").and_then(Value::as_str) == Some(""))
+                        .count()
+                })
+            })
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .sum::<usize>();
         equipment.get_zone_equipment_source(
             &mut input,
             admitted,
@@ -393,8 +417,57 @@ impl Factory {
                 sizing: &mut sizing,
                 branch: Some(&mut manager.ancillary.branch_node_connections),
                 source_is_epjson: true,
+                backend: &mut SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+                diagnostic_flags: Some(hb::error_backend::SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
             },
         )?;
+        let expected_warnings = i32::try_from(blank_members)?;
+        assert_eq!(
+            state.tracking.total_warning_errors - warning_before.total_warning_errors,
+            expected_warnings
+        );
+        assert_eq!(
+            state.tracking.total_warning_errors_during_warmup
+                - warning_before.total_warning_errors_during_warmup,
+            if weather.global.warmup_flag
+                && !globals.doing_sizing
+                && !globals.kickoff_simulation
+                && !warning_before.abort_processing
+            {
+                expected_warnings
+            } else {
+                0
+            }
+        );
+        assert_eq!(
+            state.tracking.total_warning_errors_during_sizing
+                - warning_before.total_warning_errors_during_sizing,
+            if globals.doing_sizing {
+                expected_warnings
+            } else {
+                0
+            }
+        );
+        (
+            state.warmup_flag,
+            state.doing_sizing,
+            state.kickoff_simulation,
+        ) = legacy_flags;
         let mut selected = None;
         for (z, c) in equipment
             .zone_config
@@ -836,8 +909,12 @@ pub(super) fn run() -> Result<usize> {
             }
             // Clone INPUT ONLY. No Native expected payload is read or injected.
             if target == "ZONE ONE INLETS" {
-                definition["raw"]["NodeList"]["118 SHARED INLET ALIAS"] =
-                    json!({"nodes":[{"node_name":"ZONE ONE INLET"}]});
+                // Only the original list is a target. Its trailing blank has
+                // a valid one-node used prefix; the unreferenced alias retains
+                // a middle hole and the original later index without compaction.
+                definition["raw"]["NodeList"]["118 SHARED INLET ALIAS"] = json!({"nodes":[{"node_name":"ZONE ONE INLET"},{"node_name":""},{"node_name":"ZONE ONE INLET"}]});
+                definition["raw"]["NodeList"]["ZONE ONE INLETS"]["nodes"] =
+                    json!([{"node_name":"ZONE ONE INLET"},{"node_name":""}]);
                 definition["object_order"]["NodeList"] =
                     json!(["118 SHARED INLET ALIAS", "ZONE ONE INLETS"]);
             }
@@ -881,16 +958,45 @@ pub(super) fn run() -> Result<usize> {
                     ["118 SHARED INLET ALIAS", "ZONE ONE INLETS"]
                 );
                 for row in lists {
-                    assert_eq!(row.number_of_nodes, 1);
+                    if row.name == "ZONE ONE INLETS" {
+                        assert_eq!(row.number_of_nodes, 1);
+                        assert_eq!(
+                            row.node_names.as_deref(),
+                            Some(["ZONE ONE INLET".to_owned(), String::new()].as_slice())
+                        );
+                        assert_eq!(
+                            row.node_numbers.as_deref(),
+                            Some([actual_number, 0].as_slice())
+                        );
+                    } else {
+                        assert_eq!(row.number_of_nodes, 2);
+                        assert_eq!(
+                            row.node_names.as_deref(),
+                            Some(
+                                [
+                                    "ZONE ONE INLET".to_owned(),
+                                    String::new(),
+                                    "ZONE ONE INLET".to_owned()
+                                ]
+                                .as_slice()
+                            )
+                        );
+                        assert_eq!(
+                            row.node_numbers.as_deref(),
+                            Some([actual_number, 0, actual_number].as_slice())
+                        );
+                    }
                     assert_eq!(
-                        row.node_names.as_deref(),
-                        Some(["ZONE ONE INLET".to_owned()].as_slice())
-                    );
-                    assert_eq!(
-                        row.node_numbers.as_deref(),
-                        Some([actual_number].as_slice())
+                        String::from_utf8_lossy(&f.error)
+                            .matches(&format!(
+                                "GetNodeListsInput: NodeList=\"{}\", blank node name in list.",
+                                row.name
+                            ))
+                            .count(),
+                        1
                     );
                 }
+                assert_eq!(f.error_state.tracking.total_warning_errors, 2);
             }
             f.scheduled_phase_inputs(&json!({"hour":2,"timestep":1,"day_of_year":1,"day_of_week":3,"dst":0,"begin_environment":true}))?;
             f.scheduled_selected_step(actual_number, control, if conflict { 24.0 } else { 18.0 })?;

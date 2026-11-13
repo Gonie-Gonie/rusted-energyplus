@@ -315,6 +315,13 @@ impl SourceHvacManager {
                 o.equipment
                     .get_source_scheduled_setpoint_node_nums(
                         o.input,
+                        o.backend,
+                        Some(SourceDiagnosticFlags {
+                            kickoff: &o.globals.kickoff_simulation,
+                            developer: &o.project.system.developer_flag,
+                            warmup: &o.clock.warmup_flag,
+                            doing_sizing: &o.globals.doing_sizing,
+                        }),
                         &mut self.ancillary.branch_node_connections,
                         &target,
                         &name,

@@ -2,6 +2,7 @@
 use super::source_equipment_getter::{SourceEquipmentGetterLocals, alpha, integer, sole_object};
 use super::source_nodes::SourceNodeFluidType;
 use super::*;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_input_processor::{
     SelectedInputProcessor, SourceInputStatisticsValue as V,
 };
@@ -27,6 +28,8 @@ impl OrdinaryEquipment {
         &mut self,
         index: usize,
         input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: Option<SourceDiagnosticFlags<'_>>,
         branch: &mut SourceBranchNodeConnections,
         schedules: &mut SelectedScheduleManager,
         locals: &SourceEquipmentGetterLocals,
@@ -55,6 +58,8 @@ impl OrdinaryEquipment {
         let exhaust_name = locals.alphas[3].clone();
         let zone_node = self.nodes.get_source_only_single_node(
             input,
+            backend,
+            diagnostic_flags,
             branch,
             &locals.alphas[4],
             &mut self.equipment_data_errors_found,
@@ -103,6 +108,8 @@ impl OrdinaryEquipment {
         let mut number_nodes = 0usize;
         self.nodes.get_source_node_nums(
             input,
+            backend,
+            diagnostic_flags,
             branch,
             &inlet_name,
             &mut number_nodes,
@@ -186,6 +193,8 @@ impl OrdinaryEquipment {
         node_list_error = false;
         self.nodes.get_source_node_nums(
             input,
+            backend,
+            diagnostic_flags,
             branch,
             &exhaust_name,
             &mut number_nodes,
@@ -229,6 +238,8 @@ impl OrdinaryEquipment {
         node_list_error = false;
         self.nodes.get_source_node_nums(
             input,
+            backend,
+            diagnostic_flags,
             branch,
             &return_name,
             &mut number_nodes,
@@ -322,6 +333,8 @@ impl OrdinaryEquipment {
         node_list_error = false;
         self.nodes.get_source_node_nums(
             input,
+            backend,
+            diagnostic_flags,
             branch,
             &return_basis_name,
             &mut number_nodes,

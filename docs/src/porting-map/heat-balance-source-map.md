@@ -1477,17 +1477,17 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-The bounded Source B getter connects all nine selectors to actual schedules
-and physical Node fields. Genuine staged IDF retains original global Scheduled
-ordinals/field counts and NodeList declaration order after strict reconciliation.
-The current two-list case uses nonblank one-member aliases of the same existing
-inlet, in declaration order opposite lexical order; all nine controls alternate
-between them. GetNodeListsInput adds one existing-node reference, while all nine
-GetNodeNums uses retain their reference increments and actual connections.
-Three physical pairs compare 194,160 values, including two all-nine IDF pairs
-of 139 series/66,000 values each. Whole input metadata, public schedule relations,
-three advanced mass-flow outputs, BND and requested table bodies pass.
-Blank-member lists, multi-member lists with real connections, Source A, new
-Node/HVAC topologies, other consumers/managers and arbitrary combinations remain
-open. IdealLoads load-control, private histories and full-object promotion are
-unclaimed. Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).
+Bounded Source B connects all nine controls to real schedules and physical Node
+fields. Genuine IDF retains original Scheduled ordinals/field counts and NodeList
+declaration order. Direct epJSON retains actual raw member arrays and DOJ order.
+Two aliases share the existing inlet; one direct-JSON trailing-empty case emits
+the real NodeList warning and shortens only its used prefix. The Source-only
+compiler omits exact empty strings from its advisory graph; the sole raw/runtime
+NodeOwner retains original cells, diagnostic flags and reference/connection state.
+Four pairs compare 260,160 values, with three all-nine cases of 139 series/66,000
+values each. Public schedule relations, advanced mass-flow outputs, whole BND,
+tables and complete actual ERR/END counters pass under unchanged policies.
+Internal holes, whitespace names, multi-member lists with real connections,
+Source A, new Node/HVAC topologies and other consumers/managers remain open.
+No IdealLoads load-control, private history or full-object promotion is inferred.
+Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

@@ -136,6 +136,11 @@ impl CtfInitializationContext<'_> {
                             hb_input_error(E::Unavailable("actual equipment input format custody"))
                         })?
                         .source_is_epjson,
+                    backend: &mut self.backend,
+                    diagnostic_flags: reports.selected_project_data.as_ref().and_then(|project|
+                        crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                            "", globals, &project.system.developer_flag, diagnostic_clock,
+                        ).diagnostic_flags),
                 },
             )
             .map_err(|error| equipment_error(error, &mut self.backend))?;

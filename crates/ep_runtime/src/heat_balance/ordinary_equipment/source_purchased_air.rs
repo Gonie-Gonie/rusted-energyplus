@@ -315,7 +315,12 @@ impl OrdinaryEquipment {
         let family_present = output.input.find_exact_family(getter::FAMILY).is_some();
         if family_present {
             self.nodes
-                .init_unique_check_source(getter::FAMILY, output.input)
+                .init_unique_check_source(
+                    getter::FAMILY,
+                    output.input,
+                    backend,
+                    output.environment.diagnostic_flags,
+                )
                 .map_err(|_| Error::Unavailable("actual PurchasedAir InitUniqueNodeCheck257"))?;
             // Exact installed/pinned schema is compiled into schema.rs; the
             // actual outer JSON object-map traversal is lexicographic.
@@ -386,6 +391,8 @@ impl OrdinaryEquipment {
                     .nodes
                     .get_source_only_single_node(
                         output.input,
+                        backend,
+                        output.environment.diagnostic_flags,
                         branch,
                         &supply,
                         &mut errors_found,
@@ -430,6 +437,8 @@ impl OrdinaryEquipment {
                         .nodes
                         .get_source_only_single_node(
                             output.input,
+                            backend,
+                            output.environment.diagnostic_flags,
                             branch,
                             &exhaust,
                             &mut errors_found,
@@ -470,6 +479,8 @@ impl OrdinaryEquipment {
                         .nodes
                         .get_source_only_single_node(
                             output.input,
+                            backend,
+                            output.environment.diagnostic_flags,
                             branch,
                             &inlet,
                             &mut errors_found,

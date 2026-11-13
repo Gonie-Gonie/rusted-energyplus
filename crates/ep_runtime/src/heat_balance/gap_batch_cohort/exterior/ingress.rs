@@ -676,6 +676,13 @@ impl GainFactory {
                 sizing: &mut reports.selected_sizing_manager,
                 branch: Some(&mut manager.ancillary.branch_node_connections),
                 source_is_epjson: false,
+                backend: &mut zone_backend,
+                diagnostic_flags: Some(hb::error_backend::SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
             },
         )?;
         let mut air = SourceAirHeatBalance::default();

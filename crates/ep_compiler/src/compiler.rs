@@ -463,6 +463,8 @@ pub fn compile_raw_model(raw_model: &RawModel) -> CompileResult {
 /// `Schedule:File` remains RawOnly: only its ID and names are declared here.
 /// Field validation, defaults, type lookup and external data belong to the
 /// retained Source getter; legacy compilation and value caches are unchanged.
+/// The advisory NodeList graph omits explicit empty-string members; the real
+/// Source IP/NodeOwner retains their original cells, warning counts and holes.
 #[must_use]
 pub fn compile_raw_model_for_source(raw_model: &RawModel) -> CompileResult {
     let mut compiler = Compiler::new(raw_model, None);
@@ -15050,6 +15052,15 @@ impl<'a> Compiler<'a> {
                 );
                 continue;
             };
+            // This graph only supplies Source admission/binding identities.
+            // The actual NodeList getter warns and shortens its used prefix;
+            // retain that original array exclusively in the raw/IP owner.
+            if self.source_file_declarations
+                && matches!(fields.get(&FieldName("node_name".into())),
+                    Some(RawValue::String(value)) if value.is_empty())
+            {
+                continue;
+            }
             let entry_object = RawObject {
                 fields: fields.clone(),
                 source_span: None,

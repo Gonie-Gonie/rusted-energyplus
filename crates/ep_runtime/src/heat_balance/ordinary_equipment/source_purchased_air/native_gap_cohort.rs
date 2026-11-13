@@ -733,6 +733,23 @@ impl Factory {
                 sizing: &mut sizing,
                 branch: Some(&mut manager.ancillary.branch_node_connections),
                 source_is_epjson: false,
+                backend: &mut SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut error),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                },
+                diagnostic_flags: Some(hb::error_backend::SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
             },
         )?;
         let mut selected = None;

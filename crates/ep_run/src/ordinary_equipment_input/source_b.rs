@@ -138,7 +138,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         }
         ("NodeList", "nodes") => {
             blank(value)
-                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "node_name" => blank(value) || matches!(value, RawValue::String(_)), _ => false, }) && fields.get(&FieldName("node_name".into())).is_some_and(|value| !blank(value)))))
+                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "node_name" => matches!(value, RawValue::String(_)), _ => false, }) && fields.contains_key(&FieldName("node_name".into())))))
         }
         ("Schedule:Compact", "schedule_type_limits_name") => {
             blank(value) || matches!(value, RawValue::String(_))

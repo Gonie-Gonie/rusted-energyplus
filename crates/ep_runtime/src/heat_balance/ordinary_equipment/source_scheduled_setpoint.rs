@@ -1,6 +1,7 @@
 //! SetPointManager1390-1416 calls the sole NodeInputManager owner.
 //! These narrow accesses never allocate a parallel node or alter flow/temperature.
 use super::{OrdinaryEquipment, Unavailable, source_nodes::SourceNodeFluidType};
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::heat_balance::startup_integrity::{
     SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType,
@@ -15,6 +16,8 @@ impl OrdinaryEquipment {
     pub(crate) fn get_source_scheduled_setpoint_node_nums(
         &mut self,
         input: &mut SelectedInputProcessor,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: Option<SourceDiagnosticFlags<'_>>,
         branch: &mut SourceBranchNodeConnections,
         node_or_list_name: &str,
         object_name: &str,
@@ -24,6 +27,8 @@ impl OrdinaryEquipment {
     ) -> Result<(), Unavailable> {
         self.nodes.get_source_node_nums(
             input,
+            backend,
+            diagnostic_flags,
             branch,
             node_or_list_name,
             num_nodes,
