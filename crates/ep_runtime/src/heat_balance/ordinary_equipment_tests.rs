@@ -611,10 +611,62 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 .all(|row| row.zone_name == "Uncontrolled Zone" && !row.is_controlled)
         );
         assert!(source.internal_gains.zone.is_none() && source.internal_gains.space.is_none());
-        // Unit126 input-stage identity probe: the real raw PurchasedAir getter,
-        // GetOnlySingleNode and output registration retain UTF-8 bytes while
-        // folding ASCII only. This does not execute HVAC or certify all Unicode.
-        if total == 1 {
+        // Retain the original omitted-default/UTF8 actual-getter probe and
+        // exercise all13 schema-legal fuels through the same real registration.
+        // Numeric HVAC sums belong to physical cases; no energies are seeded here.
+        use crate::heat_balance::ordinary_equipment::source_purchased_air::owners::SourcePurchasedAirFuel as F;
+        use crate::heat_balance::source_output_registration::{
+            SourceMeterEndUse as E, SourceMeterGroup as G, SourceMeterResource as M,
+            SourceOutputStoreType, SourceOutputUnits, TimeStepKind,
+        };
+        let resources = [
+            ("Electricity", F::Electricity, M::Electricity),
+            ("NaturalGas", F::NaturalGas, M::NaturalGas),
+            ("Gasoline", F::Gasoline, M::Gasoline),
+            ("Diesel", F::Diesel, M::Diesel),
+            ("Coal", F::Coal, M::Coal),
+            ("Propane", F::Propane, M::Propane),
+            ("FuelOilNo1", F::FuelOilNo1, M::FuelOilNo1),
+            ("FuelOilNo2", F::FuelOilNo2, M::FuelOilNo2),
+            ("OtherFuel1", F::OtherFuel1, M::OtherFuel1),
+            ("OtherFuel2", F::OtherFuel2, M::OtherFuel2),
+            ("DistrictCooling", F::DistrictCooling, M::DistrictCooling),
+            (
+                "DistrictHeatingWater",
+                F::DistrictHeatingWater,
+                M::DistrictHeatingWater,
+            ),
+            (
+                "DistrictHeatingSteam",
+                F::DistrictHeatingSteam,
+                M::DistrictHeatingSteam,
+            ),
+        ];
+        let resource_rows = resources.len() + 1;
+        let fuel_cases =
+            std::iter::once((
+                None,
+                F::DistrictHeatingWater,
+                F::DistrictCooling,
+                M::DistrictHeatingWater,
+                M::DistrictCooling,
+                "DistrictHeatingWater",
+                "DistrictCooling",
+            ))
+            .chain(resources.into_iter().map(|(name, fuel, resource)| {
+                (Some(name), fuel, fuel, resource, resource, name, name)
+            }))
+            .take(if total == 1 { resource_rows } else { 0 });
+        for (
+            authored_fuel,
+            heat_fuel,
+            cool_fuel,
+            heat_resource,
+            cool_resource,
+            heat_name,
+            cool_name,
+        ) in fuel_cases
+        {
             use crate::heat_balance::selected_input_processor::{
                 SourceInputStatisticsInput, SourceInputStatisticsValue as V,
             };
@@ -627,7 +679,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             let physical = "Zone one inlet 가";
             let unit_name = "ZONE one ideal loads 각";
             let variable = "Zone Ideal Loads Supply Air Sensible Heating Rate";
-            let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, V>>> =
+            let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, V>>> =
                 BTreeMap::from([
                     (
                         "NodeList".into(),
@@ -664,6 +716,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         )]),
                     ),
                 ]);
+            if let Some(name) = authored_fuel {
+                let fields = objects
+                    .get_mut("ZoneHVAC:IdealLoadsAirSystem")
+                    .and_then(|rows| rows.get_mut(unit_name))
+                    .ok_or("actual raw fuel fields")?;
+                for field in ["heating_fuel_type", "cooling_fuel_type"] {
+                    fields.insert(field.into(), V::String(name.into()));
+                }
+            }
             let retained_objects = objects.clone();
             let mut probe_definitions = definitions.clone();
             probe_definitions.push(SourceObjectDefinition {
@@ -828,6 +889,10 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 actual_unit.name.as_bytes(),
                 "ZONE ONE IDEAL LOADS 각".as_bytes()
             );
+            assert_eq!(
+                (actual_unit.heating_fuel_type, actual_unit.cooling_fuel_type),
+                (heat_fuel, cool_fuel)
+            );
             assert_eq!(actual_unit.zone_supply_air_node_num, 1);
             assert_eq!(probe.nodes.number_of_unique_node_names, 1);
             assert_eq!(
@@ -875,6 +940,125 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     .windows(expected_connection.len())
                     .any(|bytes| bytes == expected_connection.as_bytes())
             );
+            // These are actual registered Which bindings and bidirectional
+            // meter source links. No fabricated time_step_value or numeric sum.
+            let mut fuel_indices = Vec::new();
+            for field in [
+                SourcePurchasedAirOutputField::TotHeatFuelEnergy,
+                SourcePurchasedAirOutputField::TotCoolFuelEnergy,
+            ] {
+                let indices = probe_registration
+                    .out_vars
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, row)| {
+                        row.which == Some(SourceRealOutputTarget::PurchasedAir { field, index: 1 })
+                    })
+                    .map(|(index, _)| index)
+                    .collect::<Vec<_>>();
+                assert_eq!(indices.len(), 1);
+                let index = indices[0];
+                let row = &probe_registration.out_vars[index];
+                assert_eq!(row.time_step_type, TimeStepKind::System);
+                assert_eq!(row.store_type, SourceOutputStoreType::Sum);
+                assert_eq!(row.units, SourceOutputUnits::J);
+                assert_eq!((row.zone_multiplier, row.zone_list_multiplier), (1, 1));
+                assert!(!row.report); // meter attachment exists without a fuel Output:Variable request
+                assert_eq!(row.meter_numbers.len(), 4);
+                fuel_indices.push(index);
+            }
+            let heat = fuel_indices[0];
+            let cool = fuel_indices[1];
+            let shared = heat_resource == cool_resource;
+            let mut expected = vec![
+                (
+                    format!("{heat_name}:Facility"),
+                    heat_resource,
+                    E::Invalid,
+                    G::Invalid,
+                    if shared { vec![heat, cool] } else { vec![heat] },
+                ),
+                (
+                    format!("{heat_name}:HVAC"),
+                    heat_resource,
+                    E::Invalid,
+                    G::Hvac,
+                    if shared { vec![heat, cool] } else { vec![heat] },
+                ),
+                (
+                    format!("Heating:{heat_name}"),
+                    heat_resource,
+                    E::Heating,
+                    G::Invalid,
+                    vec![heat],
+                ),
+                (
+                    format!("General:Heating:{heat_name}"),
+                    heat_resource,
+                    E::Heating,
+                    G::Invalid,
+                    vec![heat],
+                ),
+                (
+                    format!("Cooling:{cool_name}"),
+                    cool_resource,
+                    E::Cooling,
+                    G::Invalid,
+                    vec![cool],
+                ),
+                (
+                    format!("General:Cooling:{cool_name}"),
+                    cool_resource,
+                    E::Cooling,
+                    G::Invalid,
+                    vec![cool],
+                ),
+            ];
+            if !shared {
+                expected.extend([
+                    (
+                        format!("{cool_name}:Facility"),
+                        cool_resource,
+                        E::Invalid,
+                        G::Invalid,
+                        vec![cool],
+                    ),
+                    (
+                        format!("{cool_name}:HVAC"),
+                        cool_resource,
+                        E::Invalid,
+                        G::Hvac,
+                        vec![cool],
+                    ),
+                ]);
+            }
+            assert_eq!(
+                probe_registration.meters.meters.len(),
+                if shared { 6 } else { 8 }
+            );
+            assert_eq!(probe_registration.meters.meter_map.len(), expected.len());
+            for (name, resource, end_use, group, sources) in expected {
+                let number = *probe_registration
+                    .meters
+                    .meter_map
+                    .get(&name.to_ascii_uppercase())
+                    .ok_or("actual named fuel meter")?;
+                let meter = &probe_registration.meters.meters[number];
+                assert_eq!(meter.name, name);
+                assert_eq!(meter.resource, resource);
+                assert_eq!(meter.end_use, end_use);
+                assert_eq!(meter.group, group);
+                assert_eq!(meter.units, SourceOutputUnits::J);
+                assert!(meter.ip_units.is_some());
+                assert_eq!(meter.source_variable_numbers, sources);
+                for source in sources {
+                    assert!(
+                        probe_registration.out_vars[source]
+                            .meter_numbers
+                            .contains(&i32::try_from(number)?)
+                    );
+                }
+            }
             assert!(probe_error.is_empty() && probe_console.is_empty() && probe_eio.is_empty());
             assert!(probe.purchased_air.get_purchased_air_input); // this getter does not own the caller's once latch
         }

@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 186 paired physical cases and 5,945,176 reported values with zero
+contains 200 paired physical cases and 6,980,296 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 132 recorded Source builds,
-118 with accepted pairs and 14 without accepted pairs, including 4 builds
+validate the consumer corrections. There are 133 recorded Source builds,
+119 with accepted pairs and 14 without accepted pairs, including 4 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,15 +196,15 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-Fourteen bounded B Scheduled/NodeList compositions retain 984,480 values, with a
-59,520-value unused A case: fifteen pairs/1,044,000 values. Source admits heating
-and cooling availability and fuel-efficiency names through the real live owners.
-Two Winter heating cases compare 155 series/73,680 values each with unchanged
-caps, actual site-weather activation, meaningful heating-off/on service and
-positive or fallback fuel service. All prior cooling, return, eighteen setpoint,
-structure, comfort and export checks remain. One shared Source 132 QA/build serves
-both fresh heating pairs. Legacy, other-resource, private-state and full-object
-boundaries remain; earlier failed histories retain zero accepted sample credit.
+Twenty-eight bounded B Scheduled/NodeList pairs retain 2,019,600 values; the
+unused A pair adds 59,520, for twenty-nine pairs/2,079,120 values. Fourteen new
+finite scenes cover thirteen canonical nonempty IdealLoads fuel labels and
+distinct NaturalGas heating/Electricity cooling, with positive Winter heat and
+Summer cooling. Hourly fuel meters retain original caps, ordered quarter sums
+and actual producer membership; complete Electricity catalogs stay paired. All
+previous physical gates remain. One Source 133 QA/default build serves the
+matrix. Explicit-empty, arbitrary-combination, other topology/OA/humidity/sizing,
+Legacy/private-state and full-object boundaries remain open.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

@@ -33,9 +33,21 @@ fn unit(
 fn fuel_resource(fuel: SourcePurchasedAirFuel) -> Result<SourceMeterResource, Error> {
     match fuel {
         SourcePurchasedAirFuel::Electricity => Ok(SourceMeterResource::Electricity),
+        SourcePurchasedAirFuel::NaturalGas => Ok(SourceMeterResource::NaturalGas),
+        SourcePurchasedAirFuel::Gasoline => Ok(SourceMeterResource::Gasoline),
+        SourcePurchasedAirFuel::Diesel => Ok(SourceMeterResource::Diesel),
+        SourcePurchasedAirFuel::Coal => Ok(SourceMeterResource::Coal),
+        SourcePurchasedAirFuel::Propane => Ok(SourceMeterResource::Propane),
+        SourcePurchasedAirFuel::FuelOilNo1 => Ok(SourceMeterResource::FuelOilNo1),
+        SourcePurchasedAirFuel::FuelOilNo2 => Ok(SourceMeterResource::FuelOilNo2),
+        SourcePurchasedAirFuel::OtherFuel1 => Ok(SourceMeterResource::OtherFuel1),
+        SourcePurchasedAirFuel::OtherFuel2 => Ok(SourceMeterResource::OtherFuel2),
         SourcePurchasedAirFuel::DistrictCooling => Ok(SourceMeterResource::DistrictCooling),
         SourcePurchasedAirFuel::DistrictHeatingWater => {
             Ok(SourceMeterResource::DistrictHeatingWater)
+        }
+        SourcePurchasedAirFuel::DistrictHeatingSteam => {
+            Ok(SourceMeterResource::DistrictHeatingSteam)
         }
         _ => Err(Error::Unavailable(
             "actual PurchasedAir other-fuel meter resource",
