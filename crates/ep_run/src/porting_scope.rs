@@ -875,8 +875,10 @@ fn validate_ideal_loads(model: &TypedModel, violations: &mut Vec<String>) {
         violations.push("scope B requires exactly one direct IdealLoads system".into());
     }
     let simulation = ep_model::SimulationModel::from_typed(model.clone());
-    if let Err(error) = ep_runtime::bind_direct_zone_purchased_air_model(&simulation) {
-        violations.push(format!("direct IdealLoads binding failed: {error:?}"));
+    if let Err(error) = ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation) {
+        violations.push(format!(
+            "ordinary Source IdealLoads eligibility failed: {error:?}"
+        ));
     }
     for system in &model.ideal_loads_air_systems {
         if system

@@ -7,6 +7,8 @@ pub(crate) struct SourceAirflowNetwork {
     pub(crate) num_airflow_network: usize,
     pub(crate) num_occupant_ventilation_controls: usize,
     pub(crate) control_type: i32,
+    /// Solver.hpp484 ctor0; get_element_input459 is the later genuine writer.
+    pub(crate) num_exhaust_fans: i32,
     pub(crate) duct_loss: bool,
     pub(crate) fan_activated: bool,
     pub(crate) distribution_simulated: bool,
@@ -21,6 +23,7 @@ impl Default for SourceAirflowNetwork {
             num_airflow_network: 0,
             num_occupant_ventilation_controls: 0,
             control_type: 0,
+            num_exhaust_fans: 0,
             duct_loss: false,
             fan_activated: false,
             distribution_simulated: false,
@@ -121,6 +124,8 @@ impl SourceAirflowNetwork {
                     eio,
                     "AirflowNetwork Model:Control,NoMultizoneOrDistribution"
                 )?;
+                // Native returns1988 before get_element_input2706: the same
+                // AFN NumOfExhFan constructor cell is not overwritten here.
                 return Ok(());
             }
         }

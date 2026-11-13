@@ -108,6 +108,15 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
                 manager,
                 owners.globals,
                 owners.zones,
+                owners.gains,
+                owners.geometry,
+                owners.backend,
+                &crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &owners.globals.kickoff_simulation,
+                    developer: &owners.project.system.developer_flag,
+                    warmup: &owners.clock.warmup_flag,
+                    doing_sizing: &owners.globals.doing_sizing,
+                },
             ),
             Child::SimulateHvac => manager.simulate_source_hvac(owners, self, eio),
             Child::ManageWaterInits => manager.ancillary.water.manage_source_water_inits(

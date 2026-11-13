@@ -7,6 +7,7 @@ use ep_runtime::{
     IdealLoadsPurchasedAirBranch, IdealLoadsUnsupportedFeature,
     bind_direct_zone_purchased_air_model, classify_no_oa_sensible_subset,
     select_purchased_air_branch, validate_ideal_loads_zone_equipment_dispatch,
+    validate_source_direct_zone_purchased_air_model,
 };
 
 use crate::{
@@ -42,6 +43,7 @@ pub(super) fn matched_capabilities(
 pub(super) fn runtime_status_for_typed_model(
     typed_model: Option<&TypedModel>,
     registry: &CapabilityRegistrySpec,
+    source_admission: Option<&super::SourceSupportAdmission>,
 ) -> (SupportStatus, RuntimeClass, Vec<String>, Vec<String>) {
     let Some(typed_model) = typed_model else {
         return (
@@ -63,6 +65,17 @@ pub(super) fn runtime_status_for_typed_model(
             );
         }
 
+        if source_ideal_loads_eligible(&simulation_model, source_admission) {
+            // Actual ordinary Source getters remain the sole physical producers.
+            // No frozen legacy capability is promoted for the exhaust topology.
+            return (
+                SupportStatus::SupportedCompatibility,
+                RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility,
+                Vec::new(),
+                Vec::new(),
+            );
+        }
+
         // Branch-level capability evidence does not prove this model's
         // arbitrary-run topology or demand provenance. Keep the fallback
         // unmatched and diagnostic-only.
@@ -80,6 +93,14 @@ pub(super) fn runtime_status_for_typed_model(
         registry,
         vec!["official_1zone_uncontrolled_declared_heat_balance".to_string()],
     )
+}
+
+fn source_ideal_loads_eligible(
+    model: &SimulationModel,
+    admission: Option<&super::SourceSupportAdmission>,
+) -> bool {
+    admission.is_some_and(|admission| admission.consumes_ideal_loads())
+        && validate_source_direct_zone_purchased_air_model(model).is_ok()
 }
 
 fn runtime_selection_from_registry(
@@ -808,7 +829,9 @@ pub(super) fn assess_typed_runtime_boundaries(
                 "IdealLoads systems require zone equipment connections and resolvable supply nodes",
             );
         }
-        if let Err(error) = bind_direct_zone_purchased_air_model(&simulation_model) {
+        if let Err(error) = bind_direct_zone_purchased_air_model(&simulation_model)
+            && !source_ideal_loads_eligible(&simulation_model, source_admission)
+        {
             diagnostics.warning(
                 "IdealLoadsFixtureDemandDiagnosticOnly",
                 "support",

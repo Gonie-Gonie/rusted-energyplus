@@ -12,6 +12,8 @@ pub(crate) struct SourceSupportAdmission {
     /// Source A DesignDay inputs, electric gains and bounded Zones/lists/whole-Zone Spaces use
     /// their own class without inheriting the frozen one-Zone capability.
     multizone_consumed: bool,
+    /// Explicit validated Source B/raw equipment custody, not legacy release evidence.
+    ideal_loads_consumed: bool,
 }
 
 impl SourceSupportAdmission {
@@ -158,6 +160,15 @@ impl SourceSupportAdmission {
         Some(Self {
             covered_objects,
             zone_convection_overrides_consumed,
+            ideal_loads_consumed: trace.scope == PortingScope::B
+                && raw
+                    .objects
+                    .get(&ObjectType("ZoneHVAC:IdealLoadsAirSystem".into()))
+                    .is_some_and(|rows| rows.len() == 1)
+                && raw
+                    .objects
+                    .get(&ObjectType("ZoneHVAC:EquipmentConnections".into()))
+                    .is_some_and(|rows| rows.len() == 1),
             multizone_consumed: trace.scope == PortingScope::A
                 && (raw
                     .objects
@@ -188,6 +199,10 @@ impl SourceSupportAdmission {
                         .get(&ObjectType("ElectricEquipment".into()))
                         .is_some_and(|rows| !rows.is_empty())),
         })
+    }
+
+    pub(super) fn consumes_ideal_loads(&self) -> bool {
+        self.ideal_loads_consumed
     }
 
     pub(super) fn consumes_multizone(&self) -> bool {

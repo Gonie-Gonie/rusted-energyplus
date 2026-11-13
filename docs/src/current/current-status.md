@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 175 paired physical cases and 5,161,336 reported values with zero
+contains 176 paired physical cases and 5,233,096 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 121 recorded Source builds,
-109 with accepted pairs and 12 without accepted pairs, including 3 builds
+validate the consumer corrections. There are 122 recorded Source builds,
+110 with accepted pairs and 12 without accepted pairs, including 3 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,15 +196,16 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-Bounded Source B connects all nine SetpointManager:Scheduled controls in direct
-epJSON and genuine staged IDF, including two lists sharing the existing inlet
-and one direct-epJSON trailing-empty-member case. Four five-DesignDay pairs
-compare 260,160 values; three all-nine cases each retain 139 series/66,000 values.
-The blank case preserves actual raw cells and connections and emits one real
-NodeList warning; full ERR/END warning order and observed phase counters match.
-Internal holes, whitespace names, multi-member lists with real connections,
-Source A, new Node/HVAC topologies, other managers and arbitrary combinations
-remain open. IdealLoads load-control and full-object conformance are unclaimed.
+Bounded Source B connects all nine SetpointManager:Scheduled controls through
+real schedules and Node owners in direct epJSON and genuine IDF. Five pairs
+compare 331,920 values. The latest matched-exhaust/two-member case retains 151
+series/71,760 values, eighteen setpoint/schedule joins, six advanced mass-flow
+outputs and three actual exhaust streams, including positive actual flow. Whole
+BND verifies four nodes, eighteen Scheduled connections and genuine ZoneExhaust/
+IdealLoads Inlet roles. Source-only eligibility keeps legacy binding strict.
+Internal holes, whitespace identities, general member/topology combinations,
+Source A and other managers remain open. Setpoint load-control effects and
+full-object conformance remain unclaimed.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

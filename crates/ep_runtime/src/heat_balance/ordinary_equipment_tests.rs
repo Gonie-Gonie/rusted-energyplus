@@ -610,6 +610,110 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 .all(|row| row.zone_name == "Uncontrolled Zone" && !row.is_controlled)
         );
         assert!(source.internal_gains.zone.is_none() && source.internal_gains.space.is_none());
+        if total == 1 {
+            // Authored unit operands, not a Native pair or a real AirLoop-ready
+            // producer. Probe the same owners without changing the input table.
+            use crate::heat_balance::ordinary_hvac_manager::SourceHvacManager;
+            use crate::heat_balance::selected_heat_balance_input::surface::SurfaceGeometryInputState;
+            use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
+            let afn = crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirSubsystems::default();
+            assert_eq!(afn.airflow_network.num_exhaust_fans, 0);
+            let mut zonal = source.clone();
+            let mut zonal_zones = selected.clone();
+            let config = &mut zonal.zone_config.as_mut().ok_or("authored Zonal config")?[0];
+            config.is_controlled = true;
+            config.inlet_nodes = 1;
+            config.exhaust_nodes = 1;
+            config.inlet_node_air_loop_numbers = Some(vec![0]);
+            let mut manager = SourceHvacManager::default();
+            let mut hvac = SelectedHvacGlobals::default();
+            let geometry = SurfaceGeometryInputState::default();
+            let warmup = true;
+            let mut error_state = error_state.clone(); // Isolate later existing warning checks.
+            let (mut error, mut console) = (Vec::new(), Vec::new());
+            let mut invoke = |equipment: &mut OrdinaryEquipment,
+                              owners: &mut SelectedZoneInputOwners,
+                              manager: &mut SourceHvacManager,
+                              gains: &crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains,
+                              hvac: &SelectedHvacGlobals| {
+                let result = equipment.set_source_heat_to_return_air_flags(
+                    hvac, manager, &globals, owners, gains, &geometry,
+                    &mut SourceErrorBackend {
+                        state: &mut error_state, error_stream: Some(&mut error),
+                        console: &mut console, out_unit1: None, out_unit2: None,
+                        f_message: None, message_callback: None, error_callback: None,
+                        sqlite: None,
+                    },
+                    &crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff: &globals.kickoff_simulation, developer: &developer,
+                        warmup: &warmup, doing_sizing: &globals.doing_sizing,
+                    },
+                );
+                (result, error_state.tracking.total_warning_errors,
+                 error_state.tracking.total_warning_errors_during_warmup)
+            };
+            invoke(&mut zonal, &mut zonal_zones, &mut manager, &gains, &hvac).0?;
+            assert!(manager.my_one_time_flag);
+            assert!(!zonal.zone_config.as_ref().ok_or("gated config")?[0].zonal_system_only);
+            hvac.air_loops_sim_once = true; // Explicit authored branch operand only.
+            invoke(&mut zonal, &mut zonal_zones, &mut manager, &gains, &hvac).0?;
+            assert!(!manager.my_one_time_flag);
+            assert!(zonal.zone_config.as_ref().ok_or("zonal config")?[0].zonal_system_only);
+            assert!(zonal_zones.zones.as_ref().ok_or("zonal Zone")?[0].no_heat_to_return_air);
+            assert!(!zonal_zones.zones.as_ref().ok_or("same Zone")?[0].refrig_case_return_air);
+            manager.my_one_time_flag = true;
+            zonal_zones.zones.as_mut().ok_or("refrigeration Zone")?[0].refrig_case_return_air =
+                true;
+            let (result, warnings, warmup_warnings) =
+                invoke(&mut zonal, &mut zonal_zones, &mut manager, &gains, &hvac);
+            result?;
+            assert_eq!((warnings, warmup_warnings), (1, 1));
+            let (result, warnings, warmup_warnings) =
+                invoke(&mut zonal, &mut zonal_zones, &mut manager, &gains, &hvac);
+            result?;
+            assert_eq!((warnings, warmup_warnings), (1, 1));
+            manager.my_one_time_flag = true;
+            let zone = &mut zonal_zones.zones.as_mut().ok_or("warning Zone")?[0];
+            zone.refrig_case_return_air = false;
+            zone.no_heat_to_return_air = false;
+            let space = &mut zonal_zones.spaces.as_mut().ok_or("same implicit Space")?[0];
+            assert_eq!((space.ht_surface_first, space.ht_surface_last), (0, -1));
+            space.ht_surface_first = 1;
+            space.ht_surface_last = 1;
+            let mut positive_lights = gains.clone();
+            positive_lights.totals[1] = 1;
+            assert!(matches!(
+                invoke(&mut zonal, &mut zonal_zones, &mut manager, &positive_lights, &hvac).0,
+                Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual SetHeatToReturnAirFlag Lights.ZonePtr2969"
+                ))
+            ));
+            assert!(manager.my_one_time_flag);
+            assert!(!zonal_zones.zones.as_ref().ok_or("unwritten Zone")?[0].no_heat_to_return_air);
+            assert!(matches!(
+                invoke(&mut zonal, &mut zonal_zones, &mut manager, &gains, &hvac).0,
+                Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                    "actual SetHeatToReturnAirFlag SurfWinAirflowDestination2984"
+                ))
+            ));
+            assert!(manager.my_one_time_flag);
+            assert!(
+                !zonal_zones.zones.as_ref().ok_or("still unwritten Zone")?[0].no_heat_to_return_air
+            );
+            assert!(!error_state.warmup_flag); // Warning counted the live Source flag.
+            let diagnostics = std::str::from_utf8(&error)?;
+            assert_eq!(
+                diagnostics
+                    .matches("return air cooling by refrigerated cases")
+                    .count(),
+                1
+            );
+            assert!(
+                diagnostics.contains(
+                    "  This zone has no return air or is served by an on/off HVAC system."
+                )
+            );
+        }
         let retained_source = source.clone();
         let retained_input = input.clone();
         source.get_zone_equipment_source(

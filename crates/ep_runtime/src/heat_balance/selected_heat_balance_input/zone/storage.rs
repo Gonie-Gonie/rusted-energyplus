@@ -77,6 +77,8 @@ pub(crate) struct SelectedZoneData {
     pub(crate) is_return_plenum: bool,
     pub(crate) leakage_parallel_piu_numbers: Vec<f64>,
     pub(crate) no_heat_to_return_air: bool,
+    /// Native ZoneData.hh651 ctorfalse; RefrigeratedCase1267 is the true writer.
+    pub(crate) refrig_case_return_air: bool,
     /// DataHeatBalance.hh661 ctorfalse; first TestSurfTemp detail writes once.
     pub(crate) temp_out_of_bounds_reported: bool,
     /// Native DataHeatBalance.hh662: same Zone, false until small-enclosure Fix.
@@ -166,6 +168,7 @@ impl Default for SelectedZoneData {
             is_return_plenum: false,
             leakage_parallel_piu_numbers: Vec::new(),
             no_heat_to_return_air: false,
+            refrig_case_return_air: false,
             temp_out_of_bounds_reported: false,
             enforced_reciprocity: false,
             adjusted_return_temperature_by_ite: 0.0,

@@ -1477,17 +1477,19 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-Bounded Source B connects all nine controls to real schedules and physical Node
-fields. Genuine IDF retains original Scheduled ordinals/field counts and NodeList
-declaration order. Direct epJSON retains actual raw member arrays and DOJ order.
-Two aliases share the existing inlet; one direct-JSON trailing-empty case emits
-the real NodeList warning and shortens only its used prefix. The Source-only
-compiler omits exact empty strings from its advisory graph; the sole raw/runtime
-NodeOwner retains original cells, diagnostic flags and reference/connection state.
-Four pairs compare 260,160 values, with three all-nine cases of 139 series/66,000
-values each. Public schedule relations, advanced mass-flow outputs, whole BND,
-tables and complete actual ERR/END counters pass under unchanged policies.
-Internal holes, whitespace names, multi-member lists with real connections,
-Source A, new Node/HVAC topologies and other consumers/managers remain open.
-No IdealLoads load-control, private history or full-object promotion is inferred.
-Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).
+Bounded Source B connects all nine controls through actual schedules and the
+sole raw/IP NodeOwner. Genuine IDF metadata, direct-JSON member/order and the
+trailing-blank warning path remain validated. The latest case adds a genuine
+two-member list targeting inlet plus a declared matched IdealLoads exhaust.
+Source-only eligibility returns no physical binding and leaves legacy guards
+strict; actual PurchasedAir selects the real exhaust for recirculation. The
+same AFN constructor scalar gates actual exhaust accumulation, and ZonalSystemOnly
+reads the real refrigeration flag, Lights count and Space surface operands.
+Five pairs compare 331,920 values. The latest 151-series/71,760-value pair retains
+eighteen schedule joins, six advanced mass-flow outputs and actual exhaust T/W/flow
+with positive flow observed. Whole BND checks four nodes, eighteen Scheduled
+connections and genuine component/ControlledExhaust roles; tables, streams and
+actual error summaries pass. Internal holes, whitespace identities, general
+member/topology combinations, Source A and other managers remain open. No private
+history, setpoint load-control or full-object promotion is inferred. Current
+evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

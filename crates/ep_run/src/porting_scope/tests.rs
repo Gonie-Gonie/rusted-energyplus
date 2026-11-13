@@ -3204,6 +3204,141 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     parse_epjson_str(&invalid.to_string()).expect("changed actual NodeList input");
                 assert!(ep_compiler::compile_raw_model_for_source(&invalid_raw).has_errors());
             }
+            // A genuine optional Source exhaust remains outside the unchanged
+            // legacy direct binding. Source eligibility returns no physical binding.
+            let mut exhaust = people.clone();
+            exhaust["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_air_exhaust_node_or_nodelist_name"] =
+                json!("Exhaust");
+            exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["zone_exhaust_air_node_name"] =
+                json!("Exhaust");
+            exhaust["NodeList"] = json!({"Manager Targets":{"nodes":[{"node_name":"Supply"},{"node_name":"Exhaust"}]}});
+            exhaust["SetpointManager:Scheduled"]["Supply setpoint"]["setpoint_node_or_nodelist_name"] =
+                json!("Manager Targets");
+            let exhaust_raw =
+                parse_epjson_str(&exhaust.to_string()).expect("real Source exhaust raw");
+            let original_exhaust_raw = exhaust_raw.clone();
+            let exhaust_compile = ep_compiler::compile_raw_model_for_source(&exhaust_raw);
+            assert!(
+                !exhaust_compile.has_errors(),
+                "{:?}",
+                exhaust_compile.report.diagnostics
+            );
+            let exhaust_model = exhaust_compile
+                .model
+                .as_ref()
+                .expect("actual Source exhaust typed model");
+            let exhaust_simulation = ep_model::SimulationModel::from_typed(exhaust_model.clone());
+            assert!(ep_runtime::bind_direct_zone_purchased_air_model(&exhaust_simulation).is_err());
+            ep_runtime::validate_source_direct_zone_purchased_air_model(&exhaust_simulation)
+                .expect("matched real Source exhaust eligibility");
+            let mut exhaust_scope = inspect_porting_scope(
+                &exhaust_raw,
+                &exhaust_compile.report,
+                Some(exhaust_model),
+                scope,
+            );
+            assert!(exhaust_scope.admissible, "{:?}", exhaust_scope.violations);
+            exhaust_scope.environment = Some(
+                super::environment::environment_from_weather(
+                    exhaust_model,
+                    &single_day_weather_fixture(),
+                    "authored real exhaust admission weather",
+                )
+                .expect("actual exhaust environment"),
+            );
+            let exhaust_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &exhaust_raw,
+                &exhaust_scope,
+            )
+            .expect("same actual Source B/raw exhaust custody");
+            let exhaust_support = crate::support::assess_support_with_source_admission(
+                &exhaust_raw,
+                &exhaust_compile.report,
+                Some(exhaust_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&exhaust_admission),
+            );
+            assert!(
+                exhaust_support.allows_rust_runtime(),
+                "{:?}",
+                exhaust_support.diagnostics
+            );
+            assert_eq!(
+                exhaust_support.runtime_class,
+                crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+            );
+            assert!(exhaust_support.matched_capability_ids.is_empty());
+            assert!(
+                !exhaust_support
+                    .diagnostics
+                    .diagnostics
+                    .iter()
+                    .any(|d| d.code == "IdealLoadsFixtureDemandDiagnosticOnly")
+            );
+            let legacy_exhaust = assess_support(
+                &exhaust_raw,
+                &exhaust_compile.report,
+                Some(exhaust_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+            );
+            assert!(!legacy_exhaust.allows_rust_runtime());
+            let exhaust_ip = crate::ordinary_input_processor::resolve_source_b(&exhaust_raw)
+                .expect("real Source exhaust IP custody");
+            assert_eq!(
+                exhaust_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("real exhaust object")["zone_exhaust_air_node_name"],
+                SourceRaw::String("Exhaust".into())
+            );
+            assert_eq!(exhaust_raw, original_exhaust_raw);
+            for (family, field, value) in [
+                (
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    "zone_exhaust_air_node_name",
+                    json!("Different"),
+                ),
+                (
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    "zone_exhaust_air_node_name",
+                    json!("Supply"),
+                ),
+                (
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    "zone_exhaust_air_node_name",
+                    json!(null),
+                ),
+                (
+                    "ZoneHVAC:IdealLoadsAirSystem",
+                    "system_inlet_air_node_name",
+                    json!("Plenum"),
+                ),
+            ] {
+                let mut invalid = exhaust.clone();
+                invalid[family][if family == "ZoneHVAC:IdealLoadsAirSystem" {
+                    "Ideal"
+                } else {
+                    "Connection"
+                }][field] = value;
+                let invalid_raw =
+                    parse_epjson_str(&invalid.to_string()).expect("changed exhaust fields");
+                let invalid_compile = ep_compiler::compile_raw_model_for_source(&invalid_raw);
+                if let Some(model) = invalid_compile.model.as_ref() {
+                    assert!(
+                        ep_runtime::validate_source_direct_zone_purchased_air_model(
+                            &ep_model::SimulationModel::from_typed(model.clone())
+                        )
+                        .is_err()
+                    );
+                } else {
+                    assert!(invalid_compile.has_errors());
+                }
+            }
             // An admissible trace cannot grant a token to changed raw operands.
             for (field, bad_value) in [
                 ("control_variable", "Unknown"),

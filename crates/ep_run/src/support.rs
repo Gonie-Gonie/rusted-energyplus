@@ -518,7 +518,7 @@ pub(crate) fn assess_support_with_source_admission(
                 Vec::new(),
             )
         } else {
-            runtime_status_for_typed_model(typed_model, &capability_registry.spec)
+            runtime_status_for_typed_model(typed_model, &capability_registry.spec, source_admission)
         };
     for capability_id in &missing_capability_ids {
         diagnostics.error(

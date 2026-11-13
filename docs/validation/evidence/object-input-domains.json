@@ -337,10 +337,10 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "Bounded Source B connects all nine SetpointManager:Scheduled controls in direct epJSON and genuine staged IDF, including two NodeLists sharing the existing inlet and one direct-epJSON trailing-empty-member case. Four five-DesignDay pairs compare 260,160 values; three all-nine cases each retain 139 series/66,000 values under unchanged policies. Genuine IDF order/field metadata, direct-JSON raw members/order, nine public schedule relations, three advanced mass-flow outputs and whole BND/table bodies pass. The trailing blank emits one real NodeList warning alongside five inherited adaptive warnings; full actual ERR/END warning order and phase counters match without an assumed phase count. Internal holes, whitespace names, multi-member lists with real connections, Source A, new Node/HVAC topologies, other consumers/managers and arbitrary combinations remain unvalidated. IdealLoads load-control effects, private Node histories, full-object and frozen conformance promotion remain unclaimed."
+      "Bounded Source B connects all nine SetpointManager:Scheduled controls through real schedules and Node owners in direct epJSON and genuine IDF. Five paired cases compare 331,920 values across five DesignDays each. The latest real-exhaust two-member case compares 151 series/71,760 values: eighteen public setpoint/schedule joins, six advanced mass-flow outputs and three actual exhaust-node streams, including positive actual mass flow. Whole BND verifies four physical nodes, eighteen Scheduled connections and genuine ZoneExhaust/IdealLoads Inlet roles; complete tables, streams and actual ERR/END phase counters pass under preserved inherited rules and twelve known-unit key-only additions. Prior IDF order and trailing-blank warning evidence remains retained. Internal holes, whitespace names, general member/topology combinations, Source A, other consumers/managers and arbitrary systems remain unvalidated. Setpoint effects on IdealLoads load control, private histories, full-object and frozen conformance promotion remain unclaimed."
     ],
     "NodeList": [
-      "Bounded Source B resolves NodeLists through actual raw InputProcessor arrays and the sole physical NodeOwner. Accepted evidence covers two one-member aliases of the existing inlet and one direct-epJSON list with that inlet followed by an exact empty string. The real getter warns, decrements only the used count and retains original raw cells; the Source-only compiler advisory graph omits exact empty strings while legacy and other validation remain unchanged. Full paired evidence verifies original IDF order where applicable, actual direct-JSON member/order observations, three physical nodes, inlet reference count 12 and nine Scheduled connections. Internal holes/shortened-prefix combinations, whitespace names, multi-member lists with real connections, Source A, new Node/HVAC topologies, other consumers and full-object/frozen conformance remain unvalidated."
+      "Bounded Source B resolves actual NodeList members through the sole raw/IP NodeOwner. Retained evidence covers one-member aliases, an exact trailing blank and one genuine two-member list targeting existing inlet plus declared exhaust. The latest pair verifies four physical nodes, inlet/exhaust reference counts 13/11, eighteen Scheduled connections and real exhaust component roles. Original IDF order and direct-JSON raw member/order observations remain distinct. The advisory Source graph still omits exact empty strings; original runtime cells are retained. Internal holes/shortened-prefix cases, whitespace identities, general multi-member/topology combinations, Source A, other consumers and full-object/frozen conformance remain unvalidated."
     ]
   },
   "verification": {
@@ -5709,6 +5709,28 @@
           "sha256": "14a50ce4bd6776edda2dcb016a98b03a406743dd44d2a26c80ae7dabc464e962"
         },
         "scope": "Final-source QA and Source-only owner executions are separate from the one accepted 66,000-value physical pair; unlaunched builds receive no sample credit."
+      },
+      "ScheduledRealExhaust_NodeList_epJSON_120": {
+        "final_quality": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/quality01/summary.json",
+          "sha256": "433c351ad02a80b72c1f46c28024294f54516878540f744e2faf5862f46bd0ad",
+          "bytes": 1703
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit120-prep/owner-execution-review01.json",
+          "sha256": "73ba7344e47f09623a3d63799e09b9728b36f50238551bfce6ce9390fbfa3f63",
+          "bytes": 2635
+        },
+        "retained_inventory": {
+          "path": ".runtime/object-expansion/unit120-prep/retained-attempt-inventory01.json",
+          "sha256": "f823a688e5a6d18ea809ad8b53e90099c244d67bdbf48370a9df182eb873603b",
+          "bytes": 5977
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/85/85bb601cb21ac42a6f314ab29654016a3b9c86855238ffc8934d4459c35a2948",
+          "sha256": "85bb601cb21ac42a6f314ab29654016a3b9c86855238ffc8934d4459c35a2948"
+        },
+        "scope": "Final-source QA and Source-only owner executions are separate from the accepted 71,760-value physical pair; no full-object promotion."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -52669,12 +52691,328 @@
           "full_current_and_archive_source_files": 4671
         },
         "effective_state": "Bounded Source B connects all nine SetpointManager:Scheduled controls in direct epJSON and genuine staged IDF, including two NodeLists sharing the existing inlet and one direct-epJSON trailing-empty-member case. Four five-DesignDay pairs compare 260,160 values; three all-nine cases each retain 139 series/66,000 values under unchanged policies. Genuine IDF order/field metadata, direct-JSON raw members/order, nine public schedule relations, three advanced mass-flow outputs and whole BND/table bodies pass. The trailing blank emits one real NodeList warning alongside five inherited adaptive warnings; full actual ERR/END warning order and phase counters match without an assumed phase count. Internal holes, whitespace names, multi-member lists with real connections, Source A, new Node/HVAC topologies, other consumers/managers and arbitrary combinations remain unvalidated. IdealLoads load-control effects, private Node histories, full-object and frozen conformance promotion remain unclaimed."
+      },
+      {
+        "id": "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H",
+        "group": "SetpointManager:Scheduled",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-scheduled-real-exhaust-nodelist-120",
+        "input": {
+          "path": ".runtime/object-expansion/unit120-prep/real-exhaust-input-proposal01/input.epJSON",
+          "sha256": "79eb56999dd65fd271429b979ab6e8471dab104d9b86882e21389636faeb9017",
+          "bytes": 97802
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/native-01/command/receipt.json",
+          "sha256": "3c2aac7c493382a07e6f3b19b18a2bf568b0f46a16b372b98d20d6a54a46815d",
+          "bytes": 34191
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/source-01/command/receipt.json",
+          "sha256": "8804b6e8a3b04765a6a5764b4738b297620fc7e9722fa2e6171e0393be496f57",
+          "bytes": 34947
+        },
+        "source_summary": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/source-01/output/run-summary.json",
+          "sha256": "ba8ea7644fd7876349556e2911a0f77e0829186837e3335bb6e8cf1a3c2cc7c9",
+          "bytes": 61928
+        },
+        "source_executable": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/build01/eplus-rs.exe",
+          "sha256": "8f40e384f418c7d9446521d2c48ee5a4238c67946d9c4138438e07f761278384",
+          "bytes": 80621502
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/85/85bb601cb21ac42a6f314ab29654016a3b9c86855238ffc8934d4459c35a2948",
+          "sha256": "85bb601cb21ac42a6f314ab29654016a3b9c86855238ffc8934d4459c35a2948"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/build01/build/receipt.json",
+          "sha256": "ef188e58c9509a7525050cf60a5226d1a03fb299252cf4a936ceef36317e0286",
+          "bytes": 5891
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit120-prep/runtime-protocol-proposal02/pair-proof01.json",
+          "sha256": "2cc296b9e96182fd40548c82b3ab98399de5075217bc4c47e43258bc94eb1921",
+          "bytes": 248630
+        },
+        "independent_physical_comparison": {
+          "path": ".runtime/object-expansion/unit120-prep/physical-peer01/proof01.json",
+          "sha256": "3abd5feab27ba1c3a3ff71d3766238a46461c2b39fd6a5a9044769029db71bd3",
+          "bytes": 200173
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit120-prep/root-completed-readback-review01.json",
+          "sha256": "3f197c9bfc28fc3b98c71e6bcd6ccedaff7a292e2cc6e43a2f996dae4a8a6dc3",
+          "bytes": 1958
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit120-prep/science-final01/recipe01.json",
+          "sha256": "4d0e9b5942f1d9b4a6aff2c2fee92af44cc4ca5e68eda37e4b3d59e35da45abd",
+          "bytes": 26022
+        },
+        "totals": {
+          "series": 151,
+          "samples": 71760,
+          "raw_operand_unequal": 18909,
+          "parsed_binary64_unequal": 18909,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.0244548320770264e-08,
+          "max_rmse_delta": 1.36033233314753e-09
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit120-prep/real-exhaust-input-proposal01/derived-policy.json",
+            "sha256": "331201b897c6126f4d38b1d1394600da4829cd20074750369a98fd6b4286aac2",
+            "bytes": 41601
+          },
+          "old137_variable_and2_meter_rules_literal_unchanged": true,
+          "new12_rules_change_known_unit_key_only": true,
+          "global_contract_changed": false
+        },
+        "full_reported_stream_scope": {
+          "actual_total_series": 151,
+          "actual_total_samples": 71760,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true
+        },
+        "actual_epJSON_input_projection": {
+          "artifact": {
+            "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/source-01/output/compiled-geometry.json",
+            "sha256": "4f5e24b4ea521c1cc54885c28043c2d61165526ddd03488622030974dd961c12",
+            "bytes": 21159
+          },
+          "staged_original": {
+            "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/source-01/output/input/original.epJSON",
+            "sha256": "79eb56999dd65fd271429b979ab6e8471dab104d9b86882e21389636faeb9017",
+            "bytes": 97802
+          },
+          "staged_complete_input": {
+            "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/source-01/output/input/converted.epJSON",
+            "sha256": "79eb56999dd65fd271429b979ab6e8471dab104d9b86882e21389636faeb9017",
+            "bytes": 97802
+          },
+          "actual_Scheduled_inputs": {
+            "116 SCHEDULED INLET TEMPERATURE": {
+              "control_variable": "Temperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED HUMIDITY RATIO": {
+              "control_variable": "HumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MASS FLOW RATE": {
+              "control_variable": "MassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM HUMIDITY RATIO": {
+              "control_variable": "MaximumHumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM MASS FLOW RATE": {
+              "control_variable": "MaximumMassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM TEMPERATURE": {
+              "control_variable": "MaximumTemperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM HUMIDITY RATIO": {
+              "control_variable": "MinimumHumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM MASS FLOW RATE": {
+              "control_variable": "MinimumMassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM TEMPERATURE": {
+              "control_variable": "MinimumTemperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            }
+          },
+          "actual_NodeList_inputs": {
+            "118 SHARED INLET ALIAS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                }
+              ]
+            },
+            "120 SCHEDULED MULTI TARGETS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                },
+                {
+                  "node_name": "ZONE ONE EXHAUST"
+                }
+              ]
+            },
+            "ZONE ONE INLETS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE INLET"
+                }
+              ]
+            }
+          },
+          "actual_NodeList_source_order": [
+            "118 SHARED INLET ALIAS",
+            "120 SCHEDULED MULTI TARGETS",
+            "ZONE ONE INLETS"
+          ],
+          "raw_source_is_epjson": true,
+          "scheduled_idf_declaration_overlay": false,
+          "nodelist_idf_declaration_overlay": false,
+          "qualification": "Actual RawModel/direct-epJSON input objects/order after normal byte-copy staging; no converter, IDF metadata or private NodeList/Node/call-history observation."
+        },
+        "input_derivation_science": {
+          "derivation": {
+            "path": ".runtime/object-expansion/unit120-prep/real-exhaust-input-proposal01/byte-derivation.json",
+            "sha256": "e06b9d2b4ef5f95c143f6c7741060ba85a9c14137b47b777a08c898fc3f1580c",
+            "bytes": 31773
+          },
+          "review": {
+            "path": ".runtime/object-expansion/unit120-prep/independent-real-exhaust-input-review01.json",
+            "sha256": "df8798aaa4761b5af00b84e06653e7127356b03a272a213acb881d91863e0908",
+            "bytes": 7777
+          },
+          "warning_phase_contract": {
+            "path": ".runtime/object-expansion/unit120-prep/science-final01/warning-phase-contract01.json",
+            "sha256": "75a768a69a60b41e46fa9e3bae7175bcb71f3cb245aa1a9584b2e6e9f468a5b5",
+            "bytes": 2194
+          },
+          "source_input_contract": {
+            "path": ".runtime/object-expansion/unit120-prep/real-exhaust-input-proposal01/source-input-contract.json",
+            "sha256": "e5de6e30cf076b9420986e248ed66bf4585bad36e698d47adfd55efbf1508ef8",
+            "bytes": 5312
+          },
+          "direct_epJSON_input_byte_exact": true,
+          "converter_processes": 0
+        },
+        "actual_warning_diagnostics": {
+          "Native": {
+            "ERR": {
+              "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/native-01/output/nativeout.err",
+              "sha256": "6833d9fceb6587fe74776c90de6903bfd571242e63602c585a2de0c81916e46a",
+              "bytes": 1481
+            },
+            "END": {
+              "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/native-01/output/nativeout.end",
+              "sha256": "c1b026235142224dc1415aa6c6fc8bde98b78206199632c321ebe0aa25a61bfa",
+              "bytes": 98
+            },
+            "ordered_warnings": [
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day."
+            ],
+            "counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed": {
+              "warnings": 5,
+              "severe": 0
+            },
+            "phase_counts_are_actual_observations": true,
+            "qualification": "Actual engine ERR/END diagnostic summary counters. No private phase flag, hardcoded warmup/sizing count or application run-summary diagnostic counter claim."
+          },
+          "Source": {
+            "ERR": {
+              "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/source-01/output/eplusrs.err",
+              "sha256": "58f2af206458064c6f897411b9ea2f3adf23f788258856843d042064f7c313b9",
+              "bytes": 1476
+            },
+            "END": {
+              "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/source-01/output/eplusrs.end",
+              "sha256": "d6dce896be2e4962fd2a1e1c50b1c689e5dc6823222cb98c7b044f313544148d",
+              "bytes": 98
+            },
+            "ordered_warnings": [
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day."
+            ],
+            "counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed": {
+              "warnings": 5,
+              "severe": 0
+            },
+            "phase_counts_are_actual_observations": true,
+            "qualification": "Actual engine ERR/END diagnostic summary counters. No private phase flag, hardcoded warmup/sizing count or application run-summary diagnostic counter claim."
+          }
+        },
+        "comparison_provenance": {
+          "actual_fresh_Native_executions": 1,
+          "actual_fresh_Source_executions": 1,
+          "actual_quality": {
+            "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/quality01/summary.json",
+            "sha256": "433c351ad02a80b72c1f46c28024294f54516878540f744e2faf5862f46bd0ad",
+            "bytes": 1703
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit120-prep/owner-execution-review01.json",
+            "sha256": "73ba7344e47f09623a3d63799e09b9728b36f50238551bfce6ce9390fbfa3f63",
+            "bytes": 2635
+          },
+          "retained_inventory": {
+            "path": ".runtime/object-expansion/unit120-prep/retained-attempt-inventory01.json",
+            "sha256": "f823a688e5a6d18ea809ad8b53e90099c244d67bdbf48370a9df182eb873603b",
+            "bytes": 5977
+          },
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit120-prep/build122-attempt01.json",
+            "sha256": "edea64c7064325aa0b64da3bb721ba9b6e3f09b9437adb58406a4ad3943d840a",
+            "bytes": 724
+          },
+          "full_current_and_archive_source_files": 4671
+        },
+        "effective_state": "Bounded Source B connects all nine SetpointManager:Scheduled controls through real schedules and Node owners in direct epJSON and genuine IDF. Five paired cases compare 331,920 values across five DesignDays each. The latest real-exhaust two-member case compares 151 series/71,760 values: eighteen public setpoint/schedule joins, six advanced mass-flow outputs and three actual exhaust-node streams, including positive actual mass flow. Whole BND verifies four physical nodes, eighteen Scheduled connections and genuine ZoneExhaust/IdealLoads Inlet roles; complete tables, streams and actual ERR/END phase counters pass under preserved inherited rules and twelve known-unit key-only additions. Prior IDF order and trailing-blank warning evidence remains retained. Internal holes, whitespace names, general member/topology combinations, Source A, other consumers/managers and arbitrary systems remain unvalidated. Setpoint effects on IdealLoads load control, private histories, full-object and frozen conformance promotion remain unclaimed."
       }
     ],
     "totals": {
-      "paired_cases": 175,
-      "reported_samples": 5161336,
-      "raw_operand_unequal": 1170953,
+      "paired_cases": 176,
+      "reported_samples": 5233096,
+      "raw_operand_unequal": 1189862,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -54736,6 +55074,23 @@
           "sha256": "65fac3c391889807288ddf3cde748244083549bf4a1e68ef8bf44f6579610acc",
           "bytes": 80602667
         }
+      },
+      {
+        "id": "source-dd-scheduled-real-exhaust-nodelist-120",
+        "receipt": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/build01/build/receipt.json",
+          "sha256": "ef188e58c9509a7525050cf60a5226d1a03fb299252cf4a936ceef36317e0286",
+          "bytes": 5891
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/85/85bb601cb21ac42a6f314ab29654016a3b9c86855238ffc8934d4459c35a2948",
+          "sha256": "85bb601cb21ac42a6f314ab29654016a3b9c86855238ffc8934d4459c35a2948"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/build01/eplus-rs.exe",
+          "sha256": "8f40e384f418c7d9446521d2c48ee5a4238c67946d9c4138438e07f761278384",
+          "bytes": 80621502
+        }
       }
     ],
     "focused_since_workspace": {
@@ -55060,14 +55415,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 121,
-      "builds_with_accepted_paired_cases": 109,
+      "actual_recorded_builds": 122,
+      "builds_with_accepted_paired_cases": 110,
       "builds_with_only_retained_failed_Source_attempts": 5,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 9,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "121 recorded Source builds: 109 have accepted paired cases; 12 have none, including three without Source execution. Failed/unaccepted meanings and physical sample accounting are unchanged; converter and unlaunched records receive no sample credit.",
+      "qualification": "122 recorded Source builds: 110 have accepted paired cases; 12 have none, including three without Source execution. Failed/unaccepted meanings and physical sample accounting are unchanged; converter and unlaunched records receive no sample credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 3,
@@ -59614,52 +59969,53 @@
         "B-SCHEDULED-TEMPERATURE-DD-116-120H",
         "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H",
         "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H",
-        "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H"
+        "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H",
+        "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H"
       ],
-      "accepted_paired_cases": 4,
-      "accepted_samples": 260160,
+      "accepted_paired_cases": 5,
+      "accepted_samples": 331920,
       "latest_complete_comparison": {
-        "path": ".runtime/object-expansion/unit119-prep/runtime-protocol-proposal02/pair-proof01.json",
-        "sha256": "b257136b7089ffb250932c3052fb573dd638d4069bc316a57e4e83ad65ec7fd5",
-        "bytes": 205884
+        "path": ".runtime/object-expansion/unit120-prep/runtime-protocol-proposal02/pair-proof01.json",
+        "sha256": "2cc296b9e96182fd40548c82b3ab98399de5075217bc4c47e43258bc94eb1921",
+        "bytes": 248630
       },
       "latest_independent_physical_comparison": {
-        "path": ".runtime/object-expansion/unit119-prep/physical-peer01/proof01.json",
-        "sha256": "4ef2699e2f5429d8ce94d1e0c7da2a36504cd2bab6a9bd9ba9fdbc90b2bcfad8",
-        "bytes": 146028
+        "path": ".runtime/object-expansion/unit120-prep/physical-peer01/proof01.json",
+        "sha256": "3abd5feab27ba1c3a3ff71d3766238a46461c2b39fd6a5a9044769029db71bd3",
+        "bytes": 200173
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/object-expansion/unit119-prep/root-completed-readback-review01.json",
-        "sha256": "26668f13e0b0d0960cea2cbd9790c7919a4942980ac7cba4dff716ec3690e1f1",
-        "bytes": 1760
+        "path": ".runtime/object-expansion/unit120-prep/root-completed-readback-review01.json",
+        "sha256": "3f197c9bfc28fc3b98c71e6bcd6ccedaff7a292e2cc6e43a2f996dae4a8a6dc3",
+        "bytes": 1958
       },
-      "latest_source_build": "source-dd-scheduled-blank-nodelist-119-attempt03",
+      "latest_source_build": "source-dd-scheduled-real-exhaust-nodelist-120",
       "latest_actual_Source_build": {
-        "path": ".runtime/object-expansion/unit119-prep/build121-attempt03.json",
-        "sha256": "4e91618eadac336c1504cc46752019b778865cb8a535ac70945fce64295d12c6",
-        "bytes": 713
+        "path": ".runtime/object-expansion/unit120-prep/build122-attempt01.json",
+        "sha256": "edea64c7064325aa0b64da3bb721ba9b6e3f09b9437adb58406a4ad3943d840a",
+        "bytes": 724
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/scheduled-blank-nodelist-119/quality03/summary.json",
-        "sha256": "43f774c5f28365a2df2379a148bd9cc88abfc9d809a4d0376abc06253d0530ea",
-        "bytes": 1668
+        "path": ".runtime/porting/scheduled-real-exhaust-nodelist-120/quality01/summary.json",
+        "sha256": "433c351ad02a80b72c1f46c28024294f54516878540f744e2faf5862f46bd0ad",
+        "bytes": 1703
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/object-expansion/unit119-prep/owner-execution-review03.json",
-        "sha256": "c7bd9185b963ddf9da508475867599686b18e46c279ead26c5ae597b079bd648",
-        "bytes": 2498
+        "path": ".runtime/object-expansion/unit120-prep/owner-execution-review01.json",
+        "sha256": "73ba7344e47f09623a3d63799e09b9728b36f50238551bfce6ce9390fbfa3f63",
+        "bytes": 2635
       },
       "latest_input_contract": {
-        "path": ".runtime/object-expansion/unit119-prep/science-final01/recipe02.json",
-        "sha256": "a3a73891b38ef26f73712e991e16133883925e6901cd6745fb1aa3eaf3246581",
-        "bytes": 20564
+        "path": ".runtime/object-expansion/unit120-prep/science-final01/recipe01.json",
+        "sha256": "4d0e9b5942f1d9b4a6aff2c2fee92af44cc4ca5e68eda37e4b3d59e35da45abd",
+        "bytes": 26022
       },
       "latest_retained_inventory": {
-        "path": ".runtime/object-expansion/unit119-prep/retained-attempt-inventory01.json",
-        "sha256": "fd8a47c314234068331bf12f102afdcb60fcb742c98a6a1ed43b63f86309c6cf",
-        "bytes": 6519
+        "path": ".runtime/object-expansion/unit120-prep/retained-attempt-inventory01.json",
+        "sha256": "f823a688e5a6d18ea809ad8b53e90099c244d67bdbf48370a9df182eb873603b",
+        "bytes": 5977
       },
-      "scope": "Bounded Source B connects all nine SetpointManager:Scheduled controls in direct epJSON and genuine staged IDF, including two NodeLists sharing the existing inlet and one direct-epJSON trailing-empty-member case. Four five-DesignDay pairs compare 260,160 values; three all-nine cases each retain 139 series/66,000 values under unchanged policies. Genuine IDF order/field metadata, direct-JSON raw members/order, nine public schedule relations, three advanced mass-flow outputs and whole BND/table bodies pass. The trailing blank emits one real NodeList warning alongside five inherited adaptive warnings; full actual ERR/END warning order and phase counters match without an assumed phase count. Internal holes, whitespace names, multi-member lists with real connections, Source A, new Node/HVAC topologies, other consumers/managers and arbitrary combinations remain unvalidated. IdealLoads load-control effects, private Node histories, full-object and frozen conformance promotion remain unclaimed.",
+      "scope": "Bounded Source B connects all nine SetpointManager:Scheduled controls through real schedules and Node owners in direct epJSON and genuine IDF. Five paired cases compare 331,920 values across five DesignDays each. The latest real-exhaust two-member case compares 151 series/71,760 values: eighteen public setpoint/schedule joins, six advanced mass-flow outputs and three actual exhaust-node streams, including positive actual mass flow. Whole BND verifies four physical nodes, eighteen Scheduled connections and genuine ZoneExhaust/IdealLoads Inlet roles; complete tables, streams and actual ERR/END phase counters pass under preserved inherited rules and twelve known-unit key-only additions. Prior IDF order and trailing-blank warning evidence remains retained. Internal holes, whitespace names, general member/topology combinations, Source A, other consumers/managers and arbitrary systems remain unvalidated. Setpoint effects on IdealLoads load control, private histories, full-object and frozen conformance promotion remain unclaimed.",
       "capability_or_gate_promotion": false
     }
   },

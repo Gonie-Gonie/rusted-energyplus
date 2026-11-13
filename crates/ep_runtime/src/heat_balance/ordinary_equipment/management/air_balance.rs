@@ -286,14 +286,17 @@ pub(super) fn mass_balance(
                 ));
             }
             let exhaust_count = row(&o.equipment.zone_config, index)?.exhaust_nodes;
-            // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
-            #[allow(clippy::never_loop)]
-            for _exhaust in 0..exhaust_count {
-                // The current AFN owner has no retained NumOfExhFan scalar.
-                // Zero actual Config.NumExhaustNodes naturally executes no read.
-                return Err(Error::Unavailable(
-                    "actual CalcZoneMassBalance AFN AirflowNetworkNumOfExhFan5049",
-                ));
+            for exhaust in 0..exhaust_count {
+                // Native5049 tests the same AFN cell before reading any Node.
+                if o.controller.subsystems.airflow_network.num_exhaust_fans == 0 {
+                    let exhaust_node = *row(
+                        &row(&o.equipment.zone_config, index)?.exhaust_node_numbers,
+                        exhaust,
+                    )?;
+                    let flow = node(&o.equipment.nodes.physical, exhaust_node)?.mass_flow_rate;
+                    row_mut(&mut o.equipment.zone_config, index)?
+                        .total_exhaust_air_mass_flow_rate += flow;
+                }
             }
             total_exhaust = row(&o.equipment.zone_config, index)?.total_exhaust_air_mass_flow_rate;
             if *row(&o.fan.zone_mass_balance_flag, index)? {

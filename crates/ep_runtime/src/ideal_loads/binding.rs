@@ -448,6 +448,8 @@ pub enum DirectZonePurchasedAirBindingRelation {
     ZoneAirNode,
     /// One resolved Zone return node used by blank-exhaust PurchasedAir.
     ZoneReturnNode,
+    /// One actual matched exhaust node for the explicit ordinary Source lane.
+    SourceZoneExhaustNode,
 }
 
 /// Static topology feature required by the bounded direct-Zone binding.
@@ -485,6 +487,12 @@ pub enum DirectZonePurchasedAirBindingFeature {
     NoZoneReturnFlowControl,
     /// The IdealLoads object has no exhaust node.
     NoIdealLoadsExhaustNode,
+    /// Both ordinary Source exhaust declarations resolve to the same sole node.
+    MatchedSourceExhaustIdentity,
+    /// The Source exhaust is distinct from supply, Zone air and return nodes.
+    DistinctSourceExhaustNode,
+    /// Ordinary Source exhaust operation has no primary air-loop declarations.
+    NoSourcePrimaryAirLoops,
     /// The IdealLoads object has no system inlet or plenum node.
     NoIdealLoadsSystemInletNode,
     /// A DesignSpecification:ZoneHVAC:Sizing object is not selected.
@@ -607,12 +615,58 @@ pub struct DirectZonePurchasedAirModelBinding<'model> {
 pub fn bind_direct_zone_purchased_air_model(
     model: &SimulationModel,
 ) -> Result<DirectZonePurchasedAirModelBinding<'_>, DirectZonePurchasedAirBindingError> {
+    match validate_direct_zone_model(model, DirectZoneValidationMode::LegacyBinding)? {
+        DirectZoneValidation::LegacyBinding(binding) => Ok(binding),
+        DirectZoneValidation::SourceEligibility => {
+            unreachable!("private validation mode is fixed by the caller")
+        }
+    }
+}
+
+/// Validates typed topology for the explicit ordinary Source input lane.
+///
+/// This returns no physical binding, recirculation node, initialization plan or
+/// numerical owner. The real Source raw/IP equipment getters still produce and
+/// validate every physical Node at runtime. Ordinary legacy binding stays strict.
+///
+/// # Errors
+/// Retains every common direct-Zone guard, permitting an optional sole matched
+/// exhaust only when it is distinct and no system inlet/plenum is selected.
+pub fn validate_source_direct_zone_purchased_air_model(
+    model: &SimulationModel,
+) -> Result<(), DirectZonePurchasedAirBindingError> {
+    match validate_direct_zone_model(model, DirectZoneValidationMode::SourceEligibility)? {
+        DirectZoneValidation::SourceEligibility => Ok(()),
+        DirectZoneValidation::LegacyBinding(_) => {
+            unreachable!("private validation mode is fixed by the caller")
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum DirectZoneValidationMode {
+    LegacyBinding,
+    SourceEligibility,
+}
+// Keep the existing Legacy binding stack-owned; Source eligibility carries no binding.
+#[allow(clippy::large_enum_variant)]
+enum DirectZoneValidation<'model> {
+    LegacyBinding(DirectZonePurchasedAirModelBinding<'model>),
+    SourceEligibility,
+}
+fn validate_direct_zone_model(
+    model: &SimulationModel,
+    mode: DirectZoneValidationMode,
+) -> Result<DirectZoneValidation<'_>, DirectZonePurchasedAirBindingError> {
     let typed = &model.typed;
     let graph = &model.graph;
     if ep_model::ModelGraph::from_typed(typed) != *graph {
         return unsupported(DirectZonePurchasedAirBindingFeature::CoherentTypedModelGraph);
     }
 
+    if mode == DirectZoneValidationMode::SourceEligibility && !typed.air_loops.is_empty() {
+        return unsupported(DirectZonePurchasedAirBindingFeature::NoSourcePrimaryAirLoops);
+    }
     let zone = require_one(&typed.zones, DirectZonePurchasedAirBindingRelation::Zone)?;
     if zone.zone_type != 1 {
         return unsupported(DirectZonePurchasedAirBindingFeature::StandardZoneType);
@@ -689,7 +743,9 @@ pub fn bind_direct_zone_purchased_air_model(
     if connection.zone != zone.id || connection.equipment_list != ideal_loads_edge.equipment_list {
         return identity_mismatch(DirectZonePurchasedAirBindingRelation::ZoneEquipmentConnection);
     }
-    if connection.zone_air_exhaust_node_or_nodelist_name.is_some() {
+    if mode == DirectZoneValidationMode::LegacyBinding
+        && connection.zone_air_exhaust_node_or_nodelist_name.is_some()
+    {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneExhaustTopology);
     }
     if connection
@@ -794,8 +850,43 @@ pub fn bind_direct_zone_purchased_air_model(
         return unsupported(DirectZonePurchasedAirBindingFeature::DistinctZoneReturnNode);
     }
 
-    if system.zone_exhaust_air_node_name.is_some() {
+    if mode == DirectZoneValidationMode::LegacyBinding
+        && system.zone_exhaust_air_node_name.is_some()
+    {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoIdealLoadsExhaustNode);
+    }
+    if mode == DirectZoneValidationMode::SourceEligibility {
+        match (
+            connection.zone_air_exhaust_node_or_nodelist_name.as_ref(),
+            system.zone_exhaust_air_node_name.as_ref(),
+        ) {
+            (None, None) => {}
+            (Some(config_name), Some(system_name)) => {
+                let exhausts = resolve_node_or_nodelist(typed, config_name);
+                let exhaust = require_one(
+                    &exhausts,
+                    DirectZonePurchasedAirBindingRelation::SourceZoneExhaustNode,
+                )?;
+                if typed.node_names.resolve(&system_name.0) != Some(*exhaust) {
+                    return unsupported(
+                        DirectZonePurchasedAirBindingFeature::MatchedSourceExhaustIdentity,
+                    );
+                }
+                if *exhaust == supply_edge.node
+                    || *exhaust == zone_air_edge.node
+                    || *exhaust == *return_node
+                {
+                    return unsupported(
+                        DirectZonePurchasedAirBindingFeature::DistinctSourceExhaustNode,
+                    );
+                }
+            }
+            _ => {
+                return unsupported(
+                    DirectZonePurchasedAirBindingFeature::MatchedSourceExhaustIdentity,
+                );
+            }
+        }
     }
     if system.system_inlet_air_node_name.is_some() {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoIdealLoadsSystemInletNode);
@@ -851,28 +942,35 @@ pub fn bind_direct_zone_purchased_air_model(
     let init_topology_plan = PurchasedAirInitTopologyPlan::from_model(typed, system.id, zone.id)
         .map_err(|error| DirectZonePurchasedAirBindingError::InitTopologyPlan { error })?;
 
-    Ok(DirectZonePurchasedAirModelBinding {
-        zone: zone.id,
-        thermostat: thermostat.id,
-        dual_setpoint: setpoint.id,
-        control_type_schedule: thermostat.control_type_schedule,
-        heating_setpoint_schedule: setpoint.heating_setpoint_schedule,
-        cooling_setpoint_schedule: setpoint.cooling_setpoint_schedule,
-        overall_availability_schedule: system.availability_schedule,
-        equipment_list: equipment_list.id,
-        ideal_loads_air_system: system.id,
-        supply_node: supply_edge.node,
-        zone_air_node: zone_air_edge.node,
-        return_node: *return_node,
-        zone_multiplier: zone.multiplier,
-        zone_list_multiplier: zone.list_multiplier,
-        nominal_system_timestep_seconds,
-        branch,
-        limit_context,
-        system,
-        init_manager_plan,
-        init_topology_plan,
-    })
+    // Source eligibility consumes validation facts only. Do not construct the
+    // legacy blank-exhaust return/recirculation binding for a Source model.
+    if mode == DirectZoneValidationMode::SourceEligibility {
+        return Ok(DirectZoneValidation::SourceEligibility);
+    }
+    Ok(DirectZoneValidation::LegacyBinding(
+        DirectZonePurchasedAirModelBinding {
+            zone: zone.id,
+            thermostat: thermostat.id,
+            dual_setpoint: setpoint.id,
+            control_type_schedule: thermostat.control_type_schedule,
+            heating_setpoint_schedule: setpoint.heating_setpoint_schedule,
+            cooling_setpoint_schedule: setpoint.cooling_setpoint_schedule,
+            overall_availability_schedule: system.availability_schedule,
+            equipment_list: equipment_list.id,
+            ideal_loads_air_system: system.id,
+            supply_node: supply_edge.node,
+            zone_air_node: zone_air_edge.node,
+            return_node: *return_node,
+            zone_multiplier: zone.multiplier,
+            zone_list_multiplier: zone.list_multiplier,
+            nominal_system_timestep_seconds,
+            branch,
+            limit_context,
+            system,
+            init_manager_plan,
+            init_topology_plan,
+        },
+    ))
 }
 
 /// Schedule role resolved for one model-bound coupling call.

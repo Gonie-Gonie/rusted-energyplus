@@ -718,6 +718,7 @@ fn missing_registry_capability_blocks_runtime_selection() -> Result<(), Box<dyn 
         super::runtime_boundaries::runtime_status_for_typed_model(
             result.model.as_ref(),
             &crate::support_registry::CapabilityRegistrySpec::default(),
+            None,
         );
 
     assert_eq!(status, SupportStatus::Unsupported);

@@ -1,7 +1,10 @@
 //! Actual HVACManager::SetHeatToReturnAirFlag2884-3015 selected empty-air-loop route.
 use super::OrdinaryEquipment;
+use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
+use crate::heat_balance::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use crate::heat_balance::ordinary_hvac_manager::SourceHvacManager;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+use crate::heat_balance::selected_heat_balance_input::surface::SurfaceGeometryInputState;
 use crate::heat_balance::selected_heat_balance_input::{
     HeatBalanceInputError as Error, zone::SelectedZoneInputOwners,
 };
@@ -15,12 +18,17 @@ fn index(number: i32) -> Result<usize, Error> {
         ))
 }
 impl OrdinaryEquipment {
+    #[allow(clippy::too_many_arguments)] // Reborrow the genuine reached module owners.
     pub(crate) fn set_source_heat_to_return_air_flags(
         &mut self,
         hvac: &SelectedHvacGlobals,
         manager: &mut SourceHvacManager,
         globals: &SelectedHeatBalanceGlobals,
         zones: &mut SelectedZoneInputOwners,
+        gains: &SelectedInternalHeatGains,
+        geometry: &SurfaceGeometryInputState,
+        backend: &mut SourceErrorBackend<'_>,
+        diagnostic_flags: &SourceDiagnosticFlags<'_>,
     ) -> Result<(), Error> {
         if !hvac.air_loops_sim_once {
             return Ok(());
@@ -78,16 +86,70 @@ impl OrdinaryEquipment {
                     }
                 }
                 if config.zonal_system_only || cycling_fan {
-                    let _zone = zones
+                    let zone = zones
                         .zones
                         .as_ref()
                         .and_then(|v| v.get(index(number).ok()?))
                         .ok_or(Error::Unavailable(
                             "actual same return-gain warning Zone2961",
                         ))?;
-                    return Err(Error::Unavailable(
-                        "actual positive controlled-zone RefrigCaseRA/Lights/airflow-window warning operands2962",
-                    ));
+                    if zone.refrig_case_return_air {
+                        backend.show_source_warning_error(
+                            &format!(
+                                "For zone={} return air cooling by refrigerated cases will be applied to the zone air.",
+                                zone.name
+                            ),
+                            diagnostic_flags,
+                        )?;
+                        backend.show_continue_error(
+                            "  This zone has no return air or is served by an on/off HVAC system.",
+                        )?;
+                    }
+                    // The retained TotLights cell is the actual loop bound.
+                    // Positive Lights rows are not yet produced by the Source
+                    // getter; misc input rows and Zone aggregates are not Lights.
+                    #[allow(clippy::never_loop)]
+                    for _light in 1..=gains.totals[1] {
+                        return Err(Error::Unavailable(
+                            "actual SetHeatToReturnAirFlag Lights.ZonePtr2969",
+                        ));
+                    }
+                    for &space_number in &zone.space_indexes {
+                        let space = zones
+                            .spaces
+                            .as_ref()
+                            .and_then(|rows| rows.get(index(space_number).ok()?))
+                            .ok_or(Error::Unavailable(
+                                "actual SetHeatToReturnAirFlag same Space2982",
+                            ))?;
+                        for surface_number in space.ht_surface_first..=space.ht_surface_last {
+                            let destination = geometry
+                                .window_arrays
+                                .as_ref()
+                                .and_then(|arrays| {
+                                    arrays
+                                        .surf_win_airflow_destination
+                                        .get(index(surface_number).ok()?)
+                                })
+                                .ok_or(Error::Unavailable(
+                                    "actual SetHeatToReturnAirFlag SurfWinAirflowDestination2984",
+                                ))?;
+                            // DataSurfaces.hh438-444: Invalid=-1, Indoor=0,
+                            // Outdoor=1, Return=2. The actual allocation is -1.
+                            if *destination == 2 {
+                                backend.show_source_warning_error(
+                                    &format!(
+                                        "For zone={} return air heat gain from air flow windows will be applied to the zone air.",
+                                        zone.name
+                                    ),
+                                    diagnostic_flags,
+                                )?;
+                                backend.show_continue_error(
+                                    "  This zone has no return air or is served by an on/off HVAC system.",
+                                )?;
+                            }
+                        }
+                    }
                 }
             }
             manager.my_one_time_flag = false;
