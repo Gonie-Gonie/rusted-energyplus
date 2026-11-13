@@ -1,4 +1,4 @@
-//! Native Scheduled Temperature GetInput/Init/Verify/Sim/Update on real Node owners.
+//! Native Scheduled all-control GetInput/Init/Verify/Sim/Update on real Node owners.
 use super::super::{Error, SourceHvacManager, SourceHvacOwners};
 use super::state::SourceScheduledSetPoint;
 use crate::heat_balance::error_backend::SourceDiagnosticFlags;
@@ -41,6 +41,43 @@ const TYPES: [&str; 32] = [
 ];
 
 const SCHEDULED: &str = "SetpointManager:Scheduled";
+
+// Native SetPointManager140-159 and HVAC::CtrlVarType retain these exact ordinals.
+const CONTROL_NAMES: [&str; 9] = [
+    "Temperature",
+    "MaximumTemperature",
+    "MinimumTemperature",
+    "HumidityRatio",
+    "MaximumHumidityRatio",
+    "MinimumHumidityRatio",
+    "MassFlowRate",
+    "MaximumMassFlowRate",
+    "MinimumMassFlowRate",
+];
+const CONTROL_NAMES_UPPER: [&str; 9] = [
+    "TEMPERATURE",
+    "MAXIMUMTEMPERATURE",
+    "MINIMUMTEMPERATURE",
+    "HUMIDITYRATIO",
+    "MAXIMUMHUMIDITYRATIO",
+    "MINIMUMHUMIDITYRATIO",
+    "MASSFLOWRATE",
+    "MAXIMUMMASSFLOWRATE",
+    "MINIMUMMASSFLOWRATE",
+];
+fn control_name(control: i32, uppercase: bool) -> Result<&'static str, Error> {
+    let index = usize::try_from(control)
+        .map_err(|_| Error::Unavailable("actual Scheduled control-variable ordinal"))?;
+    let names = if uppercase {
+        &CONTROL_NAMES_UPPER
+    } else {
+        &CONTROL_NAMES
+    };
+    names
+        .get(index)
+        .copied()
+        .ok_or(Error::Unavailable("actual Scheduled control-variable name"))
+}
 fn equipment_error(
     error: crate::heat_balance::ordinary_equipment::OrdinaryEquipmentUnavailable,
 ) -> Error {
@@ -87,7 +124,7 @@ impl SourceHvacManager {
                                     Error::Unavailable("actual Scheduled schedule pointer2272"),
                                 )?)?;
                         o.equipment
-                            .set_source_scheduled_temperature_setpoint(node, value)
+                            .set_source_scheduled_setpoint(node, row.control_variable, value)
                             .map_err(equipment_error)?;
                     }
                 }
@@ -113,7 +150,7 @@ impl SourceHvacManager {
                 for row in rows.iter() {
                     for &node in &row.control_nodes {
                         o.equipment
-                            .set_source_scheduled_temperature_setpoint(node, row.setpoint)
+                            .set_source_scheduled_setpoint(node, row.control_variable, row.setpoint)
                             .map_err(equipment_error)?;
                     }
                 }
@@ -243,12 +280,16 @@ impl SourceHvacManager {
                         .map_err(|_| Error::Unavailable("Scheduled spmMap signed ordinal537"))?,
                 );
                 let control = alpha(&fields, "control_variable")?;
-                if control != "TEMPERATURE" {
-                    return Err(Error::Unavailable(
-                        "Scheduled positive control other than Temperature",
-                    ));
-                }
-                rows[index].control_variable = 0; // Native HVAC::CtrlVarType::Temp
+
+                rows[index].control_variable = i32::try_from(
+                    CONTROL_NAMES_UPPER
+                        .iter()
+                        .position(|name| *name == control)
+                        .ok_or(Error::Unavailable("invalid Scheduled control-variable key"))?,
+                )
+                .map_err(|_| {
+                    Error::Unavailable("actual Scheduled control-variable signed ordinal")
+                })?;
                 let schedule_name = alpha(&fields, "schedule_name")?;
                 rows[index].schedule = o.schedules.get_source_schedule(&schedule_name)?;
                 if rows[index].schedule.is_none() {
@@ -340,8 +381,10 @@ impl SourceHvacManager {
                         "...duplicate node specified = {}",
                         o.equipment.source_node_id(node)?
                     ))?;
-                    o.backend
-                        .show_continue_error("...control type variable    = TEMPERATURE")?;
+                    o.backend.show_continue_error(&format!(
+                        "...control type variable    = {}",
+                        control_name(row.control_variable, true)?
+                    ))?;
                 }
             }
             for other in rows.iter().skip(i + 1) {
@@ -373,8 +416,10 @@ impl SourceHvacManager {
                             "...conflicting node name = {}",
                             o.equipment.source_node_id(node)?
                         ))?;
-                        o.backend
-                            .show_continue_error("...control type variable = Temperature")?;
+                        o.backend.show_continue_error(&format!(
+                            "...control type variable = {}",
+                            control_name(row.control_variable, false)?
+                        ))?;
                         // Native1660 does NOT set ErrorsFound: conflicts warn, last writer wins.
                     }
                 }

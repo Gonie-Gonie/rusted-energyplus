@@ -40,11 +40,12 @@ impl OrdinaryEquipment {
         )
     }
 
-    /// Native Scheduled Temp init2266-2280 and UpdateSetPointManagers both
-    /// write only Node.TempSetPoint. No limit, sentinel or schedule substitution.
-    pub(crate) fn set_source_scheduled_temperature_setpoint(
+    /// Native Scheduled init2266-2306 and Update4183-4219 write precisely
+    /// the selected existing Node cell. No clamp, unit inference or substitute.
+    pub(crate) fn set_source_scheduled_setpoint(
         &mut self,
         number: usize,
+        control_variable: i32,
         value: f64,
     ) -> Result<(), Unavailable> {
         let row = self
@@ -53,7 +54,20 @@ impl OrdinaryEquipment {
             .as_mut()
             .and_then(|rows| number.checked_sub(1).and_then(|at| rows.get_mut(at)))
             .ok_or(Unavailable::InconsistentOwner)?;
-        row.temperature_setpoint = value;
+
+        let destination = match control_variable {
+            0 => &mut row.temperature_setpoint,
+            1 => &mut row.temperature_setpoint_high,
+            2 => &mut row.temperature_setpoint_low,
+            3 => &mut row.humidity_ratio_setpoint,
+            4 => &mut row.humidity_ratio_max,
+            5 => &mut row.humidity_ratio_min,
+            6 => &mut row.mass_flow_rate_setpoint,
+            7 => &mut row.mass_flow_rate_max,
+            8 => &mut row.mass_flow_rate_min,
+            _ => return Err(Unavailable::InconsistentOwner),
+        };
+        *destination = value;
         Ok(())
     }
 }

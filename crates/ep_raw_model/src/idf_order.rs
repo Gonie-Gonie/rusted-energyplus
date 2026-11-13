@@ -247,6 +247,11 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "ZoneHVAC:IdealLoadsAirSystem",
         name_field_index: 0,
     },
+    // SetPointManager reads its original global IDF ordinal from the raw DOM.
+    IdfOrderTarget {
+        object_type: "SetpointManager:Scheduled",
+        name_field_index: 0,
+    },
     // ScheduleManager uses getObjectItem's preserved IDF order within these
     // families. Cross-family registration order remains the compiler's owner.
     IdfOrderTarget {
@@ -337,6 +342,7 @@ pub fn apply_idf_declaration_order(
     let scanned = scan_target_objects(idf, targets)?;
     let mut overlay = BTreeMap::new();
     let mut report_field_counts = Vec::new();
+    let mut report_idf_orders = Vec::new();
 
     for target in targets {
         let exact_names = target.object_type == "ComfortViewFactorAngles";
@@ -484,6 +490,7 @@ pub fn apply_idf_declaration_order(
                         | "SizingPeriod:DesignDay"
                         | "ZoneControl:Thermostat"
                         | "ZoneHVAC:IdealLoadsAirSystem"
+                        | "SetpointManager:Scheduled"
                         | "Schedule:Day:Hourly"
                         | "Schedule:Day:Interval"
                         | "Schedule:Day:List"
@@ -526,6 +533,11 @@ pub fn apply_idf_declaration_order(
                             idf_object.max_fields.max(10)
                         }
                         "Schedule:File" => idf_object.max_fields.saturating_sub(1),
+                        // This nonextensible schema has no min_fields. Native
+                        // END retains the final value without advancing F.
+                        "SetpointManager:Scheduled" if !idf_object.semicolon_terminated => {
+                            idf_object.max_fields.saturating_sub(1)
+                        }
                         // Pinned IdealLoads IDD/schema min_fields is 27; only semicolon records reach this padding.
                         "ZoneHVAC:IdealLoadsAirSystem" => idf_object.max_fields.max(27),
                         "Site:GroundTemperature:BuildingSurface"
@@ -545,8 +557,16 @@ pub fn apply_idf_declaration_order(
                         "Schedule:Day:Interval" => Some(idf_object.max_fields.saturating_sub(3)),
                         "Schedule:Day:List" => Some(idf_object.max_fields.saturating_sub(4)),
                         "Schedule:Week:Compact" => Some(idf_object.max_fields.saturating_sub(1)),
+                        "SetpointManager:Scheduled" => Some(0),
                         _ => None,
                     },
+                ));
+            }
+            if target.object_type == "SetpointManager:Scheduled" {
+                report_idf_orders.push((
+                    actual_type.clone(),
+                    actual_name.clone(),
+                    idf_object.idf_order,
                 ));
             }
             ordered_names.push(actual_name);
@@ -572,6 +592,17 @@ pub fn apply_idf_declaration_order(
                 RawValue::Number(count.to_string()),
             );
         }
+    }
+    for (object_type, name, idf_order) in report_idf_orders {
+        let object = model
+            .objects
+            .get_mut(&object_type)
+            .and_then(|objects| objects.get_mut(&name))
+            .ok_or_else(|| IdfOrderError::new("reconciled Scheduled input disappeared"))?;
+        object.fields.insert(
+            FieldName("idf_order".into()),
+            RawValue::Number(idf_order.to_string()),
+        );
     }
     model.idf_declaration_order = overlay;
     model.source_input_format = SourceInputFormat::Idf;
@@ -2012,6 +2043,93 @@ mod unnamed_report_order_tests {
             assert_eq!(
                 rows[0].1.fields[&FieldName("activity_level_schedule_name".into())],
                 RawValue::String("activity".into())
+            );
+        }
+        // SetPointManager's direct-JSON getter sorts original global IDF
+        // numbers. Unrelated declarations count; comments/empty records do not.
+        // Native conversion removes these metadata fields, so the actual
+        // staged IDF supplies them after strict one-to-one reconciliation.
+        let scheduled_json = r#"{"SetpointManager:Scheduled":{
+            "Alpha Manager":{"control_variable":"Temperature","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"},
+            "Zulu Manager":{"control_variable":"Temperature","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"}
+        }}"#;
+        let scheduled_idf = "NodeList,Unrelated First,Zone;\n\
+            ; ! Empty records do not consume a Native object ordinal.\n\
+            SETPOINTMANAGER:SCHEDULED, ZULU MANAGER ,Temperature,On,Supply;\n\
+            NodeList,Unrelated Middle,Other;\n\
+            SetpointManager:Scheduled,alpha manager,Temperature,On,Supply;";
+        let direct = parse_epjson_str(scheduled_json)?;
+        let staged = parse_epjson_str_with_idf_order(scheduled_json, scheduled_idf)?;
+        assert!(direct.is_epjson());
+        assert!(!staged.is_epjson());
+        assert!(!direct.has_idf_declaration_order("SetpointManager:Scheduled"));
+        let rows = staged.ordered_instances("SetpointManager:Scheduled")?;
+        assert_eq!(
+            rows.iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Zulu Manager", "Alpha Manager"]
+        );
+        for ((_, object), ordinal) in rows.into_iter().zip([2, 4]) {
+            for (field, value) in [
+                ("idf_order", ordinal),
+                ("idf_max_fields", 4),
+                ("idf_max_extensible_fields", 0),
+            ] {
+                assert_eq!(
+                    object.fields.get(&FieldName(field.into())),
+                    Some(&RawValue::Number(value.to_string()))
+                );
+            }
+        }
+        let mut without_metadata = staged.objects.clone();
+        for objects in without_metadata.values_mut() {
+            for object in objects.values_mut() {
+                for field in ["idf_order", "idf_max_fields", "idf_max_extensible_fields"] {
+                    object.fields.remove(&FieldName(field.into()));
+                }
+            }
+        }
+        assert_eq!(without_metadata, direct.objects);
+        assert_eq!(
+            direct
+                .ordered_instances("SetpointManager:Scheduled")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Alpha Manager", "Zulu Manager"]
+        );
+        for replacement in ["ZULU MANAGER", "Missing Manager", ""] {
+            let mut bad = direct.clone();
+            let before = bad.clone();
+            let idf = scheduled_idf.replace("alpha manager", replacement);
+            assert!(apply_idf_declaration_order(&mut bad, &idf, IDF_ORDER_TARGETS).is_err());
+            assert_eq!(bad, before);
+        }
+        // Scheduled has no schema min_fields. Native END leaves its final
+        // parsed Node value present without advancing F; a trailing comma
+        // advances F before END, while a semicolon ends the regular record.
+        let single = r#"{"SetpointManager:Scheduled":{"SP":{"control_variable":"Temperature","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"}}}"#;
+        for (ending, count) in [("", 3), (",", 4), (";", 4)] {
+            let idf = format!("SetpointManager:Scheduled,SP,Temperature,On,Supply{ending}");
+            let actual = parse_epjson_str_with_idf_order(single, &idf)?;
+            let rows = actual.ordered_instances("SetpointManager:Scheduled")?;
+            for (field, value) in [
+                ("idf_order", 1),
+                ("idf_max_fields", count),
+                ("idf_max_extensible_fields", 0),
+            ] {
+                assert_eq!(
+                    rows[0].1.fields.get(&FieldName(field.into())),
+                    Some(&RawValue::Number(value.to_string()))
+                );
+            }
+            assert_eq!(
+                rows[0]
+                    .1
+                    .fields
+                    .get(&FieldName("setpoint_node_or_nodelist_name".into())),
+                Some(&RawValue::String("Supply".into()))
             );
         }
         Ok(())

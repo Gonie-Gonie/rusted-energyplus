@@ -1477,13 +1477,16 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-The bounded Source B direct-epJSON route connects Temperature control to the
-live schedule and the existing physical Node owner. GetInput, Init, Verify,
-Sim and Update retain Native order, actual equipment/air-loop readiness and
-environment flags. Environment resets and the one-time sensed-node sentinel
-reset remain in their original owners. System node output reads that same
-setpoint field; IdealLoads does not consume it for load control.
+The bounded Source B getter connects all nine Native control selectors to
+actual schedules and physical Node fields. GetInput, Init, Verify, Sim and
+Update preserve equipment/air-loop readiness and environment/reset order.
+Direct epJSON retains its Native map order; staged IDF supplies the original
+global declaration numbers and exact field counts after strict reconciliation.
+Three advanced mass-flow bindings and the other six setpoint outputs read
+their real fields. IdealLoads calculates loads from its own owners.
 
-IDF input, other selectors/managers and broader systems remain outside this
-validated increment. The retained comparison and execution evidence is in
-[object input domains](../../validation/evidence/object-input-domains.json).
+Two physical cases cover 128,160 values, including the all-nine IDF witness
+with matching public schedule relations, input metadata, BND and complete
+reported streams. Source A, multiple NodeLists, new Node/HVAC topologies, other managers
+and arbitrary combinations remain open. The retained comparisons, actual QA
+and execution records are in [object input domains](../../validation/evidence/object-input-domains.json).

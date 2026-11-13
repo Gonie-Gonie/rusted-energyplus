@@ -685,8 +685,33 @@ impl Factory {
         assert!(self.hvac_manager.simulation.air_loop.inputs_filled);
         Ok(())
     }
-    fn scheduled_value(&self, number: usize, expected: f64) -> Result {
-        use hb::source_output_registration::{SourceNodeOutputField, SourceRealOutputTarget};
+    fn scheduled_setpoint_fields(&self, number: Option<usize>) -> Result<[u64; 9]> {
+        let row = match number {
+            Some(number) => self
+                .equipment
+                .nodes
+                .physical
+                .as_ref()
+                .and_then(|rows| number.checked_sub(1).and_then(|at| rows.get(at)))
+                .ok_or_else(|| invalid("actual Scheduled Node canaries"))?,
+            None => &self.equipment.nodes.default_node_values,
+        };
+        Ok([
+            row.temperature_setpoint.to_bits(),
+            row.temperature_setpoint_high.to_bits(),
+            row.temperature_setpoint_low.to_bits(),
+            row.humidity_ratio_setpoint.to_bits(),
+            row.humidity_ratio_max.to_bits(),
+            row.humidity_ratio_min.to_bits(),
+            row.mass_flow_rate_setpoint.to_bits(),
+            row.mass_flow_rate_max.to_bits(),
+            row.mass_flow_rate_min.to_bits(),
+        ])
+    }
+    fn scheduled_value(&self, number: usize, control: usize, expected: f64) -> Result {
+        use hb::source_output_registration::{
+            SourceNodeOutputField as Field, SourceRealOutputTarget,
+        };
         let row = self
             .equipment
             .nodes
@@ -694,12 +719,53 @@ impl Factory {
             .as_ref()
             .and_then(|v| v.get(number - 1))
             .ok_or_else(|| invalid("actual Scheduled Node"))?;
-        assert_eq!(row.temperature_setpoint.to_bits(), expected.to_bits());
+
+        let fields = [
+            &row.temperature_setpoint,
+            &row.temperature_setpoint_high,
+            &row.temperature_setpoint_low,
+            &row.humidity_ratio_setpoint,
+            &row.humidity_ratio_max,
+            &row.humidity_ratio_min,
+            &row.mass_flow_rate_setpoint,
+            &row.mass_flow_rate_max,
+            &row.mass_flow_rate_min,
+        ];
+        let targets = [
+            Field::TemperatureSetpoint,
+            Field::TemperatureSetpointHigh,
+            Field::TemperatureSetpointLow,
+            Field::HumidityRatioSetpoint,
+            Field::HumidityRatioMax,
+            Field::HumidityRatioMin,
+            Field::MassFlowRateSetpoint,
+            Field::MassFlowRateMax,
+            Field::MassFlowRateMin,
+        ];
+        let selected = *fields
+            .get(control)
+            .ok_or_else(|| invalid("actual Scheduled selector"))?;
+        assert_eq!(selected.to_bits(), expected.to_bits());
         let value = self.equipment.real_output(SourceRealOutputTarget::Node {
-            field: SourceNodeOutputField::TemperatureSetpoint,
+            field: *targets
+                .get(control)
+                .ok_or_else(|| invalid("actual Scheduled output field"))?,
             index: i32::try_from(number)?,
         })?;
-        assert!(std::ptr::eq(value, &row.temperature_setpoint));
+        assert!(std::ptr::eq(value, selected));
+
+        Ok(())
+    }
+    fn scheduled_selected_step(&mut self, number: usize, control: usize, expected: f64) -> Result {
+        let before = self.scheduled_setpoint_fields(Some(number))?;
+        self.scheduled_step(false)?;
+        self.scheduled_value(number, control, expected)?;
+        let after = self.scheduled_setpoint_fields(Some(number))?;
+        for (field, (actual, prior)) in after.iter().zip(before.iter()).enumerate() {
+            if field != control {
+                assert_eq!(actual, prior, "unselected Node field {field}");
+            }
+        }
         Ok(())
     }
 }
@@ -736,162 +802,210 @@ pub(super) fn run() -> Result<usize> {
         ("actual-one-member-NodeList", "ZONE ONE INLETS", false),
         ("conflict-live-warmup-last-writer", "ZONE ONE INLET", true),
     ] {
-        let mut definition = template.clone();
-        strip_idf(&mut definition);
-        for family in [
-            "Output:Variable",
-            "Output:VariableDictionary",
-            "Output:Table:SummaryReports",
-        ] {
-            definition["raw"]
-                .as_object_mut()
-                .ok_or_else(|| invalid("raw input"))?
-                .remove(family);
-            definition["object_order"]
-                .as_object_mut()
-                .ok_or_else(|| invalid("unit operand order"))?
-                .remove(family);
-        }
-        // Clone INPUT ONLY. No Native expected payload is read or injected.
-        definition["raw"]["Schedule:Compact"]["Scheduled Unit Swing"] = json!({"schedule_type_limits_name":"Temperature","data":[{"field":"Through: 12/31"},{"field":"For: AllDays"},{"field":"Until: 03:00"},{"field":18.0},{"field":"Until: 24:00"},{"field":27.0}]});
-        definition["object_order"]["Schedule:Compact"]
-            .as_array_mut()
-            .ok_or_else(|| invalid("compact input order"))?
-            .push(json!("Scheduled Unit Swing"));
-        definition["raw"]["SetpointManager:Scheduled"] = json!({"SP A":{"control_variable":"Temperature","schedule_name":"Scheduled Unit Swing","setpoint_node_or_nodelist_name":target}});
-        definition["object_order"]["SetpointManager:Scheduled"] = json!(["SP A"]);
-        if conflict {
-            definition["raw"]["SetpointManager:Scheduled"]["SP B"] = json!({"control_variable":"Temperature","schedule_name":"Cooling Setpoint","setpoint_node_or_nodelist_name":target});
-            definition["object_order"]["SetpointManager:Scheduled"]
+        let mut variants = 0;
+        let mut total_manager_calls = 0;
+        for (control, control_name) in [
+            "Temperature",
+            "MaximumTemperature",
+            "MinimumTemperature",
+            "HumidityRatio",
+            "MaximumHumidityRatio",
+            "MinimumHumidityRatio",
+            "MassFlowRate",
+            "MaximumMassFlowRate",
+            "MinimumMassFlowRate",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let mut definition = template.clone();
+            strip_idf(&mut definition);
+            for family in [
+                "Output:Variable",
+                "Output:VariableDictionary",
+                "Output:Table:SummaryReports",
+            ] {
+                definition["raw"]
+                    .as_object_mut()
+                    .ok_or_else(|| invalid("raw input"))?
+                    .remove(family);
+                definition["object_order"]
+                    .as_object_mut()
+                    .ok_or_else(|| invalid("unit operand order"))?
+                    .remove(family);
+            }
+            // Clone INPUT ONLY. No Native expected payload is read or injected.
+            definition["raw"]["Schedule:Compact"]["Scheduled Unit Swing"] = json!({"schedule_type_limits_name":"Temperature","data":[{"field":"Through: 12/31"},{"field":"For: AllDays"},{"field":"Until: 03:00"},{"field":18.0},{"field":"Until: 24:00"},{"field":27.0}]});
+            definition["object_order"]["Schedule:Compact"]
                 .as_array_mut()
-                .ok_or_else(|| invalid("manager input order"))?
-                .push(json!("SP B"));
-        }
-        let mut manager_calls = 0;
-        let mut f = Factory::new_authored_epjson_operands(&definitions, &definition, false)?;
-        let names_before = f.equipment.nodes.node_ids.clone();
-        f.scheduled_phase_inputs(&json!({"hour":2,"timestep":1,"day_of_year":1,"day_of_week":3,"dst":0,"begin_environment":true}))?;
-        f.scheduled_step(false)?;
-        manager_calls += 1;
-        let sp = &f.hvac_manager.simulation.setpoints;
-        assert!(!sp.get_input_flag);
-        assert!(sp.init_one_time_flag);
-        assert!(sp.init_one_time_flag2);
-        assert!(!sp.manager_on);
-        let rows = sp
-            .managers
-            .as_ref()
-            .ok_or_else(|| invalid("real Scheduled rows"))?;
-        assert_eq!(rows.len(), if conflict { 2 } else { 1 });
-        assert_eq!(rows[0].control_nodes.len(), 1);
-        let number = rows[0].control_nodes[0];
-        assert_eq!(f.equipment.source_node_id(number)?, "ZONE ONE INLET");
-        assert_eq!(rows[0].setpoint.to_bits(), 0.0f64.to_bits());
-        assert_eq!(f.equipment.nodes.node_ids, names_before);
-        f.scheduled_value(number, if conflict { 24.0 } else { 18.0 })?;
-        f.scheduled_step(false)?;
-        manager_calls += 1; // actual repeat while readiness is still false
-        assert!(f.hvac_manager.simulation.setpoints.init_one_time_flag2);
-        f.scheduled_step(true)?; // real AirLoop call -> actual caller readiness writer -> intentional stop
-        let row = &f
-            .equipment
-            .nodes
-            .physical
-            .as_ref()
-            .ok_or_else(|| invalid("physical nodes"))?[number - 1];
-        let unaffected = (
-            row.temperature.to_bits(),
-            row.humidity_ratio.to_bits(),
-            row.mass_flow_rate.to_bits(),
-        );
-        f.weather.global.warmup_flag = true;
-        f.globals.kickoff_simulation = false;
-        f.globals.doing_sizing = false;
-        f.error_state.warmup_flag = false;
-        f.error_state.doing_sizing = true;
-        f.error_state.kickoff_simulation = true;
-        let warnings = f.error_state.tracking.total_warning_errors;
-        let warmup = f.error_state.tracking.total_warning_errors_during_warmup;
-        let sizing = f.error_state.tracking.total_warning_errors_during_sizing;
-        f.scheduled_step(false)?;
-        manager_calls += 1;
-        assert!(!f.hvac_manager.simulation.setpoints.init_one_time_flag);
-        assert!(!f.hvac_manager.simulation.setpoints.init_one_time_flag2);
-        assert_eq!(
-            f.error_state.tracking.total_warning_errors - warnings,
-            i32::from(conflict)
-        );
-        assert_eq!(
-            f.error_state.tracking.total_warning_errors_during_warmup - warmup,
-            i32::from(conflict)
-        );
-        assert_eq!(
-            f.error_state.tracking.total_warning_errors_during_sizing - sizing,
-            0
-        );
-        if conflict {
-            assert!(
-                String::from_utf8_lossy(&f.error)
-                    .contains("conflicting node name = ZONE ONE INLET")
-            );
-        }
-        f.scheduled_phase_inputs(&json!({"hour":4,"begin_environment":false}))?;
-        f.scheduled_step(false)?;
-        manager_calls += 1;
-        assert!(f.hvac_manager.simulation.setpoints.manager_on);
-        assert!(f.hvac_manager.simulation.setpoints.environment_flag);
-        assert_eq!(
-            f.hvac_manager
-                .simulation
-                .setpoints
+                .ok_or_else(|| invalid("compact input order"))?
+                .push(json!("Scheduled Unit Swing"));
+            definition["raw"]["SetpointManager:Scheduled"] = json!({"SP A":{"control_variable":control_name,"schedule_name":"Scheduled Unit Swing","setpoint_node_or_nodelist_name":target}});
+            definition["object_order"]["SetpointManager:Scheduled"] = json!(["SP A"]);
+            if conflict {
+                definition["raw"]["SetpointManager:Scheduled"]["SP B"] = json!({"control_variable":control_name,"schedule_name":"Cooling Setpoint","setpoint_node_or_nodelist_name":target});
+                definition["object_order"]["SetpointManager:Scheduled"]
+                    .as_array_mut()
+                    .ok_or_else(|| invalid("manager input order"))?
+                    .push(json!("SP B"));
+            }
+            let mut manager_calls = 0;
+            let mut f = Factory::new_authored_epjson_operands(&definitions, &definition, false)?;
+            let names_before = f.equipment.nodes.node_ids.clone();
+
+            let actual_number = f
+                .equipment
+                .nodes
+                .node_ids
+                .as_ref()
+                .and_then(|rows| rows.iter().position(|name| name == "ZONE ONE INLET"))
+                .ok_or_else(|| invalid("actual preexisting inlet identity"))?;
+            f.scheduled_phase_inputs(&json!({"hour":2,"timestep":1,"day_of_year":1,"day_of_week":3,"dst":0,"begin_environment":true}))?;
+            f.scheduled_selected_step(actual_number, control, if conflict { 24.0 } else { 18.0 })?;
+            manager_calls += 1;
+            let sp = &f.hvac_manager.simulation.setpoints;
+            assert!(!sp.get_input_flag);
+            assert!(sp.init_one_time_flag);
+            assert!(sp.init_one_time_flag2);
+            assert!(!sp.manager_on);
+            let rows = sp
                 .managers
                 .as_ref()
-                .ok_or_else(|| invalid("managers"))?[0]
-                .setpoint
-                .to_bits(),
-            27.0f64.to_bits()
-        );
-        f.scheduled_value(number, if conflict { 24.0 } else { 27.0 })?;
-        let row = &f
-            .equipment
-            .nodes
-            .physical
-            .as_ref()
-            .ok_or_else(|| invalid("physical nodes"))?[number - 1];
-        assert_eq!(
-            (
+                .ok_or_else(|| invalid("real Scheduled rows"))?;
+            assert_eq!(rows.len(), if conflict { 2 } else { 1 });
+            assert_eq!(rows[0].control_nodes.len(), 1);
+            let number = rows[0].control_nodes[0];
+            assert_eq!(number, actual_number);
+            assert_eq!(rows[0].control_variable, i32::try_from(control)?);
+            assert_eq!(f.equipment.source_node_id(number)?, "ZONE ONE INLET");
+            assert_eq!(rows[0].setpoint.to_bits(), 0.0f64.to_bits());
+            assert_eq!(f.equipment.nodes.node_ids, names_before);
+            f.scheduled_value(number, control, if conflict { 24.0 } else { 18.0 })?;
+            f.scheduled_selected_step(number, control, if conflict { 24.0 } else { 18.0 })?;
+            manager_calls += 1; // actual repeat while readiness is still false
+            assert!(f.hvac_manager.simulation.setpoints.init_one_time_flag2);
+            f.scheduled_step(true)?; // real AirLoop call -> actual caller readiness writer -> intentional stop
+            let row = &f
+                .equipment
+                .nodes
+                .physical
+                .as_ref()
+                .ok_or_else(|| invalid("physical nodes"))?[number - 1];
+            let unaffected = (
                 row.temperature.to_bits(),
                 row.humidity_ratio.to_bits(),
-                row.mass_flow_rate.to_bits()
-            ),
-            unaffected
-        );
-        f.equipment.reset_source_hvac_node_setpoints()?;
-        f.scheduled_value(number, -999.0)?;
-        f.scheduled_step(false)?;
-        manager_calls += 1;
-        f.scheduled_value(number, if conflict { 24.0 } else { 27.0 })?;
-        f.equipment.reset_source_node_data()?;
-        f.scheduled_value(number, -999.0)?;
-        f.scheduled_phase_inputs(&json!({"hour":2,"begin_environment":true}))?;
-        f.scheduled_step(false)?;
-        manager_calls += 1;
-        assert!(!f.hvac_manager.simulation.setpoints.manager_on);
-        assert!(!f.hvac_manager.simulation.setpoints.environment_flag);
-        f.scheduled_value(number, if conflict { 24.0 } else { 18.0 })?;
-        f.scheduled_phase_inputs(&json!({"begin_environment":false}))?;
-        f.scheduled_step(false)?;
-        manager_calls += 1;
-        assert!(f.hvac_manager.simulation.setpoints.environment_flag);
-        f.scheduled_phase_inputs(&json!({"hour":4,"begin_environment":true}))?;
-        f.scheduled_step(false)?;
-        manager_calls += 1;
-        f.scheduled_value(number, if conflict { 24.0 } else { 27.0 })?;
-        assert_eq!(f.equipment.nodes.node_ids, names_before);
-        assert_eq!(manager_calls, 8);
+                row.mass_flow_rate.to_bits(),
+            );
+            f.weather.global.warmup_flag = true;
+            f.globals.kickoff_simulation = false;
+            f.globals.doing_sizing = false;
+            f.error_state.warmup_flag = false;
+            f.error_state.doing_sizing = true;
+            f.error_state.kickoff_simulation = true;
+            let warnings = f.error_state.tracking.total_warning_errors;
+            let warmup = f.error_state.tracking.total_warning_errors_during_warmup;
+            let sizing = f.error_state.tracking.total_warning_errors_during_sizing;
+            f.scheduled_selected_step(number, control, if conflict { 24.0 } else { 18.0 })?;
+            manager_calls += 1;
+            assert!(!f.hvac_manager.simulation.setpoints.init_one_time_flag);
+            assert!(!f.hvac_manager.simulation.setpoints.init_one_time_flag2);
+            assert_eq!(
+                f.error_state.tracking.total_warning_errors - warnings,
+                i32::from(conflict)
+            );
+            assert_eq!(
+                f.error_state.tracking.total_warning_errors_during_warmup - warmup,
+                i32::from(conflict)
+            );
+            assert_eq!(
+                f.error_state.tracking.total_warning_errors_during_sizing - sizing,
+                0
+            );
+            if conflict {
+                assert!(
+                    String::from_utf8_lossy(&f.error)
+                        .contains("conflicting node name = ZONE ONE INLET")
+                );
+            }
+            f.scheduled_phase_inputs(&json!({"hour":4,"begin_environment":false}))?;
+            f.scheduled_selected_step(number, control, if conflict { 24.0 } else { 27.0 })?;
+            manager_calls += 1;
+            assert!(f.hvac_manager.simulation.setpoints.manager_on);
+            assert!(f.hvac_manager.simulation.setpoints.environment_flag);
+            assert_eq!(
+                f.hvac_manager
+                    .simulation
+                    .setpoints
+                    .managers
+                    .as_ref()
+                    .ok_or_else(|| invalid("managers"))?[0]
+                    .setpoint
+                    .to_bits(),
+                27.0f64.to_bits()
+            );
+            f.scheduled_value(number, control, if conflict { 24.0 } else { 27.0 })?;
+            let row = &f
+                .equipment
+                .nodes
+                .physical
+                .as_ref()
+                .ok_or_else(|| invalid("physical nodes"))?[number - 1];
+            assert_eq!(
+                (
+                    row.temperature.to_bits(),
+                    row.humidity_ratio.to_bits(),
+                    row.mass_flow_rate.to_bits()
+                ),
+                unaffected
+            );
+
+            let before_reset = f.scheduled_setpoint_fields(Some(number))?;
+            f.equipment.reset_source_hvac_node_setpoints()?;
+
+            let reset_fields = f.scheduled_setpoint_fields(Some(number))?;
+            for (field, (actual, prior)) in reset_fields.iter().zip(before_reset.iter()).enumerate()
+            {
+                let expected = if matches!(field, 0 | 3..=6) {
+                    (-999.0f64).to_bits()
+                } else {
+                    *prior
+                };
+                assert_eq!(
+                    *actual, expected,
+                    "Native first-global-reset subset {field}"
+                );
+            }
+            f.scheduled_selected_step(number, control, if conflict { 24.0 } else { 27.0 })?;
+            manager_calls += 1;
+            let defaults = f.scheduled_setpoint_fields(None)?;
+            f.equipment.reset_source_node_data()?;
+
+            assert_eq!(f.scheduled_setpoint_fields(Some(number))?, defaults);
+            f.scheduled_phase_inputs(&json!({"hour":2,"begin_environment":true}))?;
+            f.scheduled_selected_step(number, control, if conflict { 24.0 } else { 18.0 })?;
+            manager_calls += 1;
+            assert!(!f.hvac_manager.simulation.setpoints.manager_on);
+            assert!(!f.hvac_manager.simulation.setpoints.environment_flag);
+            f.scheduled_value(number, control, if conflict { 24.0 } else { 18.0 })?;
+            f.scheduled_phase_inputs(&json!({"begin_environment":false}))?;
+            f.scheduled_selected_step(number, control, if conflict { 24.0 } else { 18.0 })?;
+            manager_calls += 1;
+            assert!(f.hvac_manager.simulation.setpoints.environment_flag);
+            f.scheduled_phase_inputs(&json!({"hour":4,"begin_environment":true}))?;
+            f.scheduled_selected_step(number, control, if conflict { 24.0 } else { 27.0 })?;
+            manager_calls += 1;
+            f.scheduled_value(number, control, if conflict { 24.0 } else { 27.0 })?;
+            assert_eq!(f.equipment.nodes.node_ids, names_before);
+            assert_eq!(manager_calls, 8);
+
+            total_manager_calls += manager_calls;
+            variants += 1;
+        }
+        assert_eq!(variants, 9);
+        assert_eq!(total_manager_calls, 72);
         cases += 1;
         println!(
-            "Source Scheduled owner case: {label}; actual Manage calls={manager_calls}; actual readiness finite-prefix calls=1; full-HVAC success not claimed"
+            "Source Scheduled all-selector owner case: {label}; selectors={variants}; actual Manage calls={total_manager_calls}; actual readiness finite-prefix calls={variants}; full-HVAC success not claimed"
         );
     }
     assert_eq!(cases, 3);

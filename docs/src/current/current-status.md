@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 172 paired physical cases and 4,963,336 reported values with zero
+contains 173 paired physical cases and 5,029,336 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 117 recorded Source builds,
-106 with accepted pairs and 11 without accepted pairs, including 2 builds
+validate the consumer corrections. There are 118 recorded Source builds,
+107 with accepted pairs and 11 without accepted pairs, including 2 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,14 +196,14 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-Bounded Source B accepts SetpointManager:Scheduled with Temperature control in
-direct epJSON. One five-DesignDay case compares 131 series and 62,160 values
-under unchanged inherited policies, including the actual scheduled inlet
-setpoint and matching node/SetPoint connection reports. IdealLoads does not use
-that inlet setpoint for load control. Supported schedules and node references
-remain bounded by their connected consumers. Staged IDF, other controls and
-managers, Source A, arbitrary system combinations and full-object conformance
-remain outside this validated route.
+Bounded Source B accepts all nine SetpointManager:Scheduled controls in direct
+epJSON and through genuine IDF declaration metadata. Two five-DesignDay pairs
+compare 128,160 values: Temperature in epJSON and all nine controls in IDF.
+The IDF case retains all 139 series and 66,000 values, including three advanced
+mass-flow outputs, actual scheduled values and whole node/connection reports.
+IdealLoads does not consume these setpoints for load control. Source A, multiple
+NodeLists, new Node/HVAC topologies, other managers, arbitrary systems
+and full-object conformance remain outside this validated route.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

@@ -34,8 +34,22 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
     }
     match (family, name) {
         // The Native object has four alpha fields (Name is the map key), no
-        // numeric/extensible fields. This Source-B child implements only Temp.
-        ("SetpointManager:Scheduled", "control_variable") => text_is(value, &["Temperature"]),
+
+        // numeric/extensible fields. All nine Native selectors reach real Node fields.
+        ("SetpointManager:Scheduled", "control_variable") => text_is(
+            value,
+            &[
+                "Temperature",
+                "MaximumTemperature",
+                "MinimumTemperature",
+                "HumidityRatio",
+                "MaximumHumidityRatio",
+                "MinimumHumidityRatio",
+                "MassFlowRate",
+                "MaximumMassFlowRate",
+                "MinimumMassFlowRate",
+            ],
+        ),
         ("SetpointManager:Scheduled", "schedule_name" | "setpoint_node_or_nodelist_name") => {
             matches!(value, RawValue::String(text) if !text.is_empty())
         }
@@ -505,10 +519,13 @@ pub(super) fn validate_scheduled_setpoint_references(raw: &RawModel) -> Result<(
     else {
         return Ok(());
     };
-    // No genuine Scheduled IDF_ORDER_TARGETS writer has been promoted yet.
-    // Do not infer declaration order from the converted JSON map or typed IDs.
-    if !objects.is_empty() && !raw.is_epjson() {
-        return Err("Scheduled Temperature currently requires direct Source epJSON; staged IDF metadata recovery is not implemented".into());
+    // Original IDF reaches the same getter only through the actual staged
+    // declaration-order producer, never a lexical-order or typed-ID guess.
+    if !objects.is_empty()
+        && !raw.is_epjson()
+        && !raw.has_idf_declaration_order("SetpointManager:Scheduled")
+    {
+        return Err("Scheduled IDF requires its actual recovered declaration order".into());
     }
     for object in objects.values() {
         let Some(RawValue::String(schedule)) =

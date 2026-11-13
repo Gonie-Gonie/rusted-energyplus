@@ -42,6 +42,39 @@ fn compile_projection_retains_actual_input_zero_bits_and_copies_stored_vertices(
         observed["inputs"]["source_assisted_lexical_conversion"],
         true
     );
+    // The observer copies the actual RawModel format, independently of the
+    // deliberately true caller-extension flag above.
+    assert_eq!(observed["parsed_input"]["raw_source_is_epjson"], true);
+    assert_eq!(
+        observed["parsed_input"]["scheduled_idf_declaration_overlay"],
+        false
+    );
+    let scheduled = r#"{"Zone":{"Z":{}},"SetpointManager:Scheduled":{
+        "Alpha Manager":{"control_variable":"MassFlowRate","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"},
+        "Zulu Manager":{"control_variable":"Temperature","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"}
+    }}"#;
+    let direct = parse_epjson_str(scheduled).expect("direct Scheduled raw input");
+    let direct_observed = super::parsed_input(&direct).expect("direct raw observation");
+    assert_eq!(direct_observed["raw_source_is_epjson"], true);
+    assert_eq!(direct_observed["scheduled_idf_declaration_overlay"], false);
+    let staged = ep_raw_model::parse_epjson_str_with_idf_order(scheduled,
+        "Zone,Z;SetpointManager:Scheduled,Zulu Manager,Temperature,On,Supply;SetpointManager:Scheduled,Alpha Manager,MassFlowRate,On,Supply;")
+        .expect("genuine Scheduled declaration writer");
+    let staged_observed = super::parsed_input(&staged).expect("actual staged raw observation");
+    assert_eq!(staged_observed["raw_source_is_epjson"], false);
+    assert_eq!(staged_observed["scheduled_idf_declaration_overlay"], true);
+    for (name, ordinal) in [("Zulu Manager", 2), ("Alpha Manager", 3)] {
+        let actual = &staged_observed["objects"]["SetpointManager:Scheduled"][name];
+        assert_eq!(actual["idf_order"], f64::from(ordinal));
+        assert_eq!(actual["idf_max_fields"], 4.0);
+        assert_eq!(actual["idf_max_extensible_fields"], 0.0);
+        assert_eq!(actual["schedule_name"], "On");
+        assert_eq!(actual["setpoint_node_or_nodelist_name"], "Supply");
+        assert_eq!(
+            actual["control_variable"],
+            direct_observed["objects"]["SetpointManager:Scheduled"][name]["control_variable"]
+        );
+    }
     assert_eq!(observed["settings"]["building_raw_north_axis_deg"], 765.0);
     assert_eq!(
         observed["settings"]["building_effective_north_axis_deg"],

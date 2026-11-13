@@ -154,6 +154,7 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
         }
         assert_eq!(scheduled_custody_cases, 6);
         for control in [
+            "Temperature",
             "MaximumTemperature",
             "MinimumTemperature",
             "HumidityRatio",
@@ -162,14 +163,22 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
             "MassFlowRate",
             "MaximumMassFlowRate",
             "MinimumMassFlowRate",
-            "Unknown",
-            "",
         ] {
+            let mut value = base.clone();
+            // Actual raw projection retains authored case; runtime getter owns uppercase.
+            value[family]["SP"]["control_variable"] = json!(control.to_ascii_lowercase());
+            let input = resolve_source_b(&parse(&value)?)?;
+            assert_eq!(
+                input.source_raw_object_fields(family, "SP")?["control_variable"],
+                Raw::String(control.to_ascii_lowercase())
+            );
+        }
+        for control in ["Unknown", ""] {
             let mut value = base.clone();
             value[family]["SP"]["control_variable"] = json!(control);
             assert!(
                 resolve_source_b(&parse(&value)?).is_err(),
-                "unported selector {control}"
+                "invalid selector {control}"
             );
         }
         for field in [
@@ -202,9 +211,43 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
             "Zone,Z;\nSetpointManager:Scheduled,SP,Temperature,Constant-1.0,Supply;",
         )?;
         assert!(!staged.is_epjson());
-        assert!(!staged.has_idf_declaration_order(family));
-        let error = resolve_source_b(&staged).expect_err("Scheduled staged IDF must remain fenced");
-        assert!(error.contains("requires direct Source epJSON"));
+        assert!(staged.has_idf_declaration_order(family));
+        let input = resolve_source_b(&staged)?;
+        for (field, count) in [
+            ("idf_order", 2),
+            ("idf_max_fields", 4),
+            ("idf_max_extensible_fields", 0),
+        ] {
+            assert_eq!(
+                input.source_raw_object_fields(family, "SP")?[field],
+                Raw::Number(count.to_string())
+            );
+        }
+        assert!(input.is_object_unused(family, "SP"));
+        assert!(resolve_source_a(&staged).is_err());
+        assert!(resolve(&staged).is_err());
+        // DOM family order and recovered physical IDF order remain distinct.
+        let reordered = ep_raw_model::parse_epjson_str_with_idf_order(
+            &order.to_string(),
+            "Zone,Z;\nSetpointManager:Scheduled,SP10,Temperature,Constant-1.0,Supply;\nSetpointManager:Scheduled,SP2,Temperature,Constant-1.0,Supply;",
+        )?;
+        let input = resolve_source_b(&reordered)?;
+        let Some(SourceInputFamily::Objects(rows)) = input.family(family) else {
+            return Err("Scheduled IDF family shapes".into());
+        };
+        assert_eq!(
+            rows.iter()
+                .map(|row| row.object_name.as_str())
+                .collect::<Vec<_>>(),
+            ["SP2", "SP10"]
+        );
+        assert_eq!(input.source_raw_object_names(family)?, ["SP10", "SP2"]);
+        for (name, ordinal) in [("SP10", 2), ("SP2", 3)] {
+            assert_eq!(
+                input.source_raw_object_fields(family, name)?["idf_order"],
+                Raw::Number(ordinal.to_string())
+            );
+        }
     }
     let base = r#""Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}}"#;
     let diagnostics = r#", "Output:Diagnostics":{"d":{"diagnostics":[{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"}]}},"Schedule:Constant":{}"#;

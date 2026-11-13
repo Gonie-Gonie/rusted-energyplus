@@ -16,6 +16,7 @@ const SELECTED_OBJECTS: &[&str] = &[
     "GlobalGeometryRules",
     "BuildingSurface:Detailed",
     "Material:InfraredTransparent",
+    "SetpointManager:Scheduled",
     "GeometryTransform",
     "Compliance:Building",
 ];
@@ -96,6 +97,8 @@ fn parsed_input(raw: &RawModel) -> Result<Value, String> {
     }
     Ok(json!({
         "objects":objects, "numeric_bits":numeric_bits,
+        "raw_source_is_epjson":raw.is_epjson(),
+        "scheduled_idf_declaration_overlay":raw.has_idf_declaration_order("SetpointManager:Scheduled"),
         "method":"copy selected actual RawModel objects after ordinary lexical conversion; f64 bits use the compiler numeric parse",
         "numeric_path_semantics":"slash-delimited object/field names and array indices; not escaped JSON pointers",
     }))

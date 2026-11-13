@@ -337,7 +337,7 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "Bounded Source B now admits direct epJSON SetpointManager:Scheduled with Temperature control, supported schedules and actual node/node-list resolution. One B five-DesignDay pilot compares 131 series and 62,160 values under unchanged inherited policies. The existing inlet setpoint output is positive, nonconstant and follows the actual public schedule at the same report clocks. Full BND node identities are unchanged and the genuine SetPoint connection is added; paired BND bodies agree separately from the seven inherited ancillary reports. Direct epJSON-only, bounded Source B Scheduled Temperature with supported actual schedules and real Node ownership. IDF lacks the required metadata writer and remains fenced; other controls/managers, Source A, arbitrary systems and IdealLoads load-control effects are not promoted. This is setpoint state and public-output evidence, not global capability/algorithm or full-object conformance. The owner-execution review binds an actual named passing ep_run test and authenticated harness=false process-main markers to the final source snapshot: 3 bounded Source-only owner cases, 24 actual Manage calls and 3 actual AirLoop readiness finite prefixes. Intentional next-Zone-child stops are not full HVAC success. These counts are separate from physical samples and do not establish complete Scheduled support; fully completed Scheduled objects remain 0. Other reset/order/diagnostic branches are not implied."
+      "Bounded Source B connects all nine SetpointManager:Scheduled controls in direct epJSON and through the genuine staged-IDF metadata writer, using supported actual schedules and physical Node owners. Two five-DesignDay pairs compare 128,160 values: Temperature in epJSON and all nine controls in IDF. The IDF pair compares all 139 series/66,000 values under unchanged inherited policies; three advanced mass-flow outputs, all nine public schedule relations, actual global IDF metadata and whole BND/table bodies pass. Source A, multiple NodeLists, new Node/HVAC topologies, other managers and arbitrary combinations remain unvalidated. This establishes bounded setpoint state/reporting; IdealLoads load-control effects, private Node histories, full-object and frozen conformance promotion are not established."
     ]
   },
   "verification": {
@@ -5640,6 +5640,28 @@
           "bytes": 1393
         },
         "scope": "The owner-execution review binds an actual named passing ep_run test and authenticated harness=false process-main markers to the final source snapshot: 3 bounded Source-only owner cases, 24 actual Manage calls and 3 actual AirLoop readiness finite prefixes. Intentional next-Zone-child stops are not full HVAC success. These counts are separate from physical samples and do not establish complete Scheduled support; fully completed Scheduled objects remain 0. Other reset/order/diagnostic branches are not implied. Final format/check/strict Clippy/workspace/Native-air cohort is separate from prior attempts and historical workspace70. No QA count contributes physical samples."
+      },
+      "ScheduledNineControls_IDF_117": {
+        "final_quality": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/quality01/summary.json",
+          "sha256": "d6c760af50013adc810872b160dac4360d2d5930c6c6d1be4d8e5129f0587bef",
+          "bytes": 1683
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit117-prep/owner-execution-review01.json",
+          "sha256": "634454140409e5438d3f54dc6b0a0946a69dc5753c8fb596eb70adb5d3201b91",
+          "bytes": 2507
+        },
+        "retained_inventory": {
+          "path": ".runtime/object-expansion/unit117-prep/retained-attempt-inventory01.json",
+          "sha256": "a3c8a24a6dd49ee7b8dcb647b6a586c680dad2ef8ac2f1b00e35a4d6e76825d1",
+          "bytes": 6758
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/a5/a5e2e66ab22aacc1ffdd47cbbb2a73351ee5028cb119fea6a4b094f709c092dd",
+          "sha256": "a5e2e66ab22aacc1ffdd47cbbb2a73351ee5028cb119fea6a4b094f709c092dd"
+        },
+        "scope": "Actual final-source QA and Source-only owner executions are separate from the one 66,000-value physical comparison; intentional finite-prefix stops are not full HVAC success."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -51801,12 +51823,247 @@
           "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true
         },
         "effective_state": "Direct epJSON-only, bounded Source B Scheduled Temperature with supported actual schedules and real Node ownership. IDF lacks the required metadata writer and remains fenced; other controls/managers, Source A, arbitrary systems and IdealLoads load-control effects are not promoted. This is setpoint state and public-output evidence, not global capability/algorithm or full-object conformance. The owner-execution review binds an actual named passing ep_run test and authenticated harness=false process-main markers to the final source snapshot: 3 bounded Source-only owner cases, 24 actual Manage calls and 3 actual AirLoop readiness finite prefixes. Intentional next-Zone-child stops are not full HVAC success. These counts are separate from physical samples and do not establish complete Scheduled support; fully completed Scheduled objects remain 0. Other reset/order/diagnostic branches are not implied."
+      },
+      {
+        "id": "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H",
+        "group": "SetpointManager:Scheduled",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-scheduled-nine-controls-idf-117",
+        "input": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/conversion01/output/precursor.idf",
+          "sha256": "d9f44d986b5b713045fd6c797989b854304490f99676537f98265397e0585535",
+          "bytes": 27473
+        },
+        "weather": null,
+        "input_format": "IDF",
+        "native_receipt": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/native-01/command/receipt.json",
+          "sha256": "d1c06f662e95d9aaf3a689b4edd62c14ba1d9817d7cf9eacb412659b245671f4",
+          "bytes": 33519
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/command/receipt.json",
+          "sha256": "022cb819cb8160a18fe5fe9def4f29cea3e28998cae117b9ccfab6e5f719cde8",
+          "bytes": 34253
+        },
+        "source_summary": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/run-summary.json",
+          "sha256": "8529d679a251042d15f006a760396888017f323e923794b8131a32991e054672",
+          "bytes": 73829
+        },
+        "source_executable": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/build01/eplus-rs.exe",
+          "sha256": "96c426c6b81e2cfd731f025895841e8eeb19f6afcd4557da6c86b8e4965efbc9",
+          "bytes": 80583697
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/a5/a5e2e66ab22aacc1ffdd47cbbb2a73351ee5028cb119fea6a4b094f709c092dd",
+          "sha256": "a5e2e66ab22aacc1ffdd47cbbb2a73351ee5028cb119fea6a4b094f709c092dd"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/build01/build/receipt.json",
+          "sha256": "0569cfa028581aac0de4d55dd1f5e7ccd7ef2239ea9a69fe3984ddac6e5b9e00",
+          "bytes": 5307
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit117-prep/runtime-protocol-proposal03/pair-proof01.json",
+          "sha256": "ae1ab7654b19b4b4653b234ed36b011b5690e56d9f8884eb8c2f4292b3ee7a2a",
+          "bytes": 202457
+        },
+        "independent_physical_comparison": {
+          "path": ".runtime/object-expansion/unit117-prep/physical-peer01/proof01.json",
+          "sha256": "619e287aa1e06409378ac6be6fb198aebdb92a43a68571db862d6dc5879db46c",
+          "bytes": 144311
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit117-prep/root-completed-readback-review01.json",
+          "sha256": "6a9383e043a805a802e7ec526f715e93554cb36e33d495153457310a12570b6d",
+          "bytes": 1607
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit117-prep/scheduled-idf-science-final01/recipe02.json",
+          "sha256": "e2176d1a3cd968759d81ffd5b51bea968011ab337a5943ce226a43f740583175",
+          "bytes": 25946
+        },
+        "totals": {
+          "series": 139,
+          "samples": 66000,
+          "raw_operand_unequal": 18387,
+          "parsed_binary64_unequal": 18387,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.0244548320770264e-08,
+          "max_rmse_delta": 1.36033233314753e-09
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit117-prep/scheduled-idf-pilot-proposal01/derived-policy.json",
+            "sha256": "5024fcb3dde4343e2731cf3a54b0f720e3f985f43461708c5ad3beb92dd0fbed",
+            "bytes": 38842
+          },
+          "inherited129_variable_and2_meter_rule_literals_unchanged": true,
+          "new8_rules_clone_known_unit_rules": true,
+          "global_contract_changed": false
+        },
+        "full_reported_stream_scope": {
+          "actual_total_series": 139,
+          "actual_total_samples": 66000,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true
+        },
+        "actual_IDF_input_projection": {
+          "artifact": {
+            "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/compiled-geometry.json",
+            "sha256": "39e09898139a0fccb7a3f957bd89928202e626de4f5aab40ba0712d0b7f6bbf1",
+            "bytes": 26115
+          },
+          "staged_original": {
+            "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/input/original.idf",
+            "sha256": "d9f44d986b5b713045fd6c797989b854304490f99676537f98265397e0585535",
+            "bytes": 27473
+          },
+          "converted_input": {
+            "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/input/converted.epJSON",
+            "sha256": "21a0a23de21672e4c653c257d3b3fea2d3812b5ef60b5b2528df2078addf877e",
+            "bytes": 94604
+          },
+          "actual_metadata": {
+            "116 SCHEDULED INLET TEMPERATURE": {
+              "control_variable": "Temperature",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 181.0,
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED HUMIDITY RATIO": {
+              "control_variable": "HumidityRatio",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 182.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED MASS FLOW RATE": {
+              "control_variable": "MassFlowRate",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 183.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED MAXIMUM HUMIDITY RATIO": {
+              "control_variable": "MaximumHumidityRatio",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 184.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED MAXIMUM MASS FLOW RATE": {
+              "control_variable": "MaximumMassFlowRate",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 185.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED MAXIMUM TEMPERATURE": {
+              "control_variable": "MaximumTemperature",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 186.0,
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED MINIMUM HUMIDITY RATIO": {
+              "control_variable": "MinimumHumidityRatio",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 187.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED MINIMUM MASS FLOW RATE": {
+              "control_variable": "MinimumMassFlowRate",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 188.0,
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            },
+            "117 SCHEDULED MINIMUM TEMPERATURE": {
+              "control_variable": "MinimumTemperature",
+              "idf_max_extensible_fields": 0.0,
+              "idf_max_fields": 4.0,
+              "idf_order": 189.0,
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+            }
+          },
+          "raw_source_is_epjson": false,
+          "scheduled_idf_declaration_overlay": true,
+          "qualification": "Actual RawModel/input-format metadata after the real IDF loader; no private Node or call-history observation."
+        },
+        "format_conversion_science": {
+          "conversion": {
+            "path": ".runtime/porting/scheduled-nine-controls-idf-117/conversion01/conversion-authority.json",
+            "sha256": "66636c8b7af9fcc0589557134d242cf65bd5713a0d52463b4c5d8c56ec580302",
+            "bytes": 1783
+          },
+          "roundtrip": {
+            "path": ".runtime/porting/scheduled-nine-controls-idf-117/roundtrip01/roundtrip-authority.json",
+            "sha256": "8e51eb81b985cef6fbfbbad1368cd4ebd9d4766104c876505a605e0454a60a62",
+            "bytes": 1755
+          },
+          "review": {
+            "path": ".runtime/object-expansion/unit117-prep/scheduled-idf-science-final01/scientific-DOM-review.json",
+            "sha256": "900879ee917c3cc644ef5fccd3da0d8c32c60e3423a6f9ab429e99e18da0b2b9",
+            "bytes": 35941
+          },
+          "raw_precursor_DOM_equality_claimed": false,
+          "conversion_only_processes": 2,
+          "simulation_credit": 0
+        },
+        "comparison_provenance": {
+          "actual_fresh_Native_executions": 1,
+          "actual_fresh_Source_executions": 1,
+          "actual_quality": {
+            "path": ".runtime/porting/scheduled-nine-controls-idf-117/quality01/summary.json",
+            "sha256": "d6c760af50013adc810872b160dac4360d2d5930c6c6d1be4d8e5129f0587bef",
+            "bytes": 1683
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit117-prep/owner-execution-review01.json",
+            "sha256": "634454140409e5438d3f54dc6b0a0946a69dc5753c8fb596eb70adb5d3201b91",
+            "bytes": 2507
+          },
+          "retained_inventory": {
+            "path": ".runtime/object-expansion/unit117-prep/retained-attempt-inventory01.json",
+            "sha256": "a3c8a24a6dd49ee7b8dcb647b6a586c680dad2ef8ac2f1b00e35a4d6e76825d1",
+            "bytes": 6758
+          },
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit117-prep/build118-attempt01.json",
+            "sha256": "e8bf200d93182c0424b710a51d0674744e04d8dbe0969011aec515a38113f34d",
+            "bytes": 712
+          },
+          "full_current_and_archive_source_files": 4671
+        },
+        "effective_state": "Bounded Source B connects all nine SetpointManager:Scheduled controls in direct epJSON and through the genuine staged-IDF metadata writer, using supported actual schedules and physical Node owners. Two five-DesignDay pairs compare 128,160 values: Temperature in epJSON and all nine controls in IDF. The IDF pair compares all 139 series/66,000 values under unchanged inherited policies; three advanced mass-flow outputs, all nine public schedule relations, actual global IDF metadata and whole BND/table bodies pass. Source A, multiple NodeLists, new Node/HVAC topologies, other managers and arbitrary combinations remain unvalidated. This establishes bounded setpoint state/reporting; IdealLoads load-control effects, private Node histories, full-object and frozen conformance promotion are not established."
       }
     ],
     "totals": {
-      "paired_cases": 172,
-      "reported_samples": 4963336,
-      "raw_operand_unequal": 1115792,
+      "paired_cases": 173,
+      "reported_samples": 5029336,
+      "raw_operand_unequal": 1134179,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -53800,6 +54057,23 @@
           "sha256": "8ab0e4c585bb97977711dc26ba7be89ee4815e2e4068db23dd8becf0b39d6536",
           "bytes": 80564719
         }
+      },
+      {
+        "id": "source-dd-scheduled-nine-controls-idf-117",
+        "receipt": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/build01/build/receipt.json",
+          "sha256": "0569cfa028581aac0de4d55dd1f5e7ccd7ef2239ea9a69fe3984ddac6e5b9e00",
+          "bytes": 5307
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/a5/a5e2e66ab22aacc1ffdd47cbbb2a73351ee5028cb119fea6a4b094f709c092dd",
+          "sha256": "a5e2e66ab22aacc1ffdd47cbbb2a73351ee5028cb119fea6a4b094f709c092dd"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/build01/eplus-rs.exe",
+          "sha256": "96c426c6b81e2cfd731f025895841e8eeb19f6afcd4557da6c86b8e4965efbc9",
+          "bytes": 80583697
+        }
       }
     ],
     "focused_since_workspace": {
@@ -54124,14 +54398,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 117,
-      "builds_with_accepted_paired_cases": 106,
+      "actual_recorded_builds": 118,
+      "builds_with_accepted_paired_cases": 107,
       "builds_with_only_retained_failed_Source_attempts": 5,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 9,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "117 recorded Source builds: 106 with accepted pairs. Unit116 adds 1 actual builds and exactly one accepted 62,160-value case. Failed, incomplete and exit-zero rejected attempts contribute zero samples; incomplete launch processes are not reclassified as unlaunched. Historical accounting meanings remain unchanged.",
+      "qualification": "118 recorded Source builds: 107 have accepted paired cases; 11 have none. Retained failed/unaccepted and unlaunched inventory meanings are unchanged. Conversion-only and pre-dispatch launcher records create no physical sample or build credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 2,
@@ -59489,6 +59763,662 @@
       "new_builds": 1,
       "new_builds_without_Source_execution": [],
       "scope": "Direct epJSON-only, bounded Source B Scheduled Temperature with supported actual schedules and real Node ownership. IDF lacks the required metadata writer and remains fenced; other controls/managers, Source A, arbitrary systems and IdealLoads load-control effects are not promoted. This is setpoint state and public-output evidence, not global capability/algorithm or full-object conformance.",
+      "capability_or_gate_promotion": false
+    },
+    "current_Scheduled_all_controls_IDF_live_pair": {
+      "source_build": "source-dd-scheduled-nine-controls-idf-117",
+      "actual_Source_build": {
+        "path": ".runtime/object-expansion/unit117-prep/build118-attempt01.json",
+        "sha256": "e8bf200d93182c0424b710a51d0674744e04d8dbe0969011aec515a38113f34d",
+        "bytes": 712
+      },
+      "case_rows": [
+        "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit117-prep/runtime-protocol-proposal03/pair-proof01.json",
+        "sha256": "ae1ab7654b19b4b4653b234ed36b011b5690e56d9f8884eb8c2f4292b3ee7a2a",
+        "bytes": 202457
+      },
+      "independent_actual_physical_comparison": {
+        "path": ".runtime/object-expansion/unit117-prep/physical-peer01/proof01.json",
+        "sha256": "619e287aa1e06409378ac6be6fb198aebdb92a43a68571db862d6dc5879db46c",
+        "bytes": 144311
+      },
+      "Root_completed_review": {
+        "path": ".runtime/object-expansion/unit117-prep/root-completed-readback-review01.json",
+        "sha256": "6a9383e043a805a802e7ec526f715e93554cb36e33d495153457310a12570b6d",
+        "bytes": 1607
+      },
+      "actual_quality": {
+        "path": ".runtime/porting/scheduled-nine-controls-idf-117/quality01/summary.json",
+        "sha256": "d6c760af50013adc810872b160dac4360d2d5930c6c6d1be4d8e5129f0587bef",
+        "bytes": 1683
+      },
+      "owner_execution_review": {
+        "path": ".runtime/object-expansion/unit117-prep/owner-execution-review01.json",
+        "sha256": "634454140409e5438d3f54dc6b0a0946a69dc5753c8fb596eb70adb5d3201b91",
+        "bytes": 2507
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit117-prep/scheduled-idf-science-final01/recipe02.json",
+        "sha256": "e2176d1a3cd968759d81ffd5b51bea968011ab337a5943ce226a43f740583175",
+        "bytes": 25946
+      },
+      "actual_IDF_metadata": {
+        "path": ".runtime/object-expansion/unit117-prep/scheduled-idf-science-final01/actual-IDF-metadata.json",
+        "sha256": "8b9b3afc5002e5b2f201d53e5e33fe4dbbdb112f9b171c167b30a2c5b481e8c7",
+        "bytes": 1973
+      },
+      "actual_Source_IDF_input_projection": {
+        "artifact": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/compiled-geometry.json",
+          "sha256": "39e09898139a0fccb7a3f957bd89928202e626de4f5aab40ba0712d0b7f6bbf1",
+          "bytes": 26115
+        },
+        "staged_original": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/input/original.idf",
+          "sha256": "d9f44d986b5b713045fd6c797989b854304490f99676537f98265397e0585535",
+          "bytes": 27473
+        },
+        "converted_input": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/input/converted.epJSON",
+          "sha256": "21a0a23de21672e4c653c257d3b3fea2d3812b5ef60b5b2528df2078addf877e",
+          "bytes": 94604
+        },
+        "actual_metadata": {
+          "116 SCHEDULED INLET TEMPERATURE": {
+            "control_variable": "Temperature",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 181.0,
+            "schedule_name": "Cooling Setpoint",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED HUMIDITY RATIO": {
+            "control_variable": "HumidityRatio",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 182.0,
+            "schedule_name": "Internal Gain Schedule",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED MASS FLOW RATE": {
+            "control_variable": "MassFlowRate",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 183.0,
+            "schedule_name": "Internal Gain Schedule",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED MAXIMUM HUMIDITY RATIO": {
+            "control_variable": "MaximumHumidityRatio",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 184.0,
+            "schedule_name": "Internal Gain Schedule",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED MAXIMUM MASS FLOW RATE": {
+            "control_variable": "MaximumMassFlowRate",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 185.0,
+            "schedule_name": "Internal Gain Schedule",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED MAXIMUM TEMPERATURE": {
+            "control_variable": "MaximumTemperature",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 186.0,
+            "schedule_name": "Cooling Setpoint",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED MINIMUM HUMIDITY RATIO": {
+            "control_variable": "MinimumHumidityRatio",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 187.0,
+            "schedule_name": "Internal Gain Schedule",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED MINIMUM MASS FLOW RATE": {
+            "control_variable": "MinimumMassFlowRate",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 188.0,
+            "schedule_name": "Internal Gain Schedule",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          },
+          "117 SCHEDULED MINIMUM TEMPERATURE": {
+            "control_variable": "MinimumTemperature",
+            "idf_max_extensible_fields": 0.0,
+            "idf_max_fields": 4.0,
+            "idf_order": 189.0,
+            "schedule_name": "Cooling Setpoint",
+            "setpoint_node_or_nodelist_name": "ZONE ONE INLET"
+          }
+        },
+        "raw_source_is_epjson": false,
+        "scheduled_idf_declaration_overlay": true,
+        "qualification": "Actual RawModel/input-format metadata after the real IDF loader; no private Node or call-history observation."
+      },
+      "actual_scheduled_controls": [
+        {
+          "control": {
+            "manager": "116 SCHEDULED INLET TEMPERATURE",
+            "control_variable": "Temperature",
+            "schedule": "Cooling Setpoint",
+            "node": "ZONE ONE INLET",
+            "Native_field": "TempSetPoint",
+            "variable": "System Node Setpoint Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": false,
+            "rule_origin_zero_based_index": 64,
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "report_id": 359,
+          "schedule_report_id": 352,
+          "samples": 480,
+          "distinct_actual_values": [
+            17.999999999999993,
+            17.999999999999996,
+            18.0,
+            18.000000000000004,
+            22.799999999999997,
+            22.8,
+            26.0
+          ],
+          "max_same_clock_schedule_delta": 7.105427357601002e-15
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED MAXIMUM TEMPERATURE",
+            "control_variable": "MaximumTemperature",
+            "schedule": "Cooling Setpoint",
+            "node": "ZONE ONE INLET",
+            "Native_field": "TempSetPointHi",
+            "variable": "System Node Setpoint High Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": false,
+            "rule_origin_zero_based_index": 64,
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "report_id": 360,
+          "schedule_report_id": 352,
+          "samples": 480,
+          "distinct_actual_values": [
+            17.999999999999993,
+            17.999999999999996,
+            18.0,
+            18.000000000000004,
+            22.799999999999997,
+            22.8,
+            26.0
+          ],
+          "max_same_clock_schedule_delta": 7.105427357601002e-15
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED MINIMUM TEMPERATURE",
+            "control_variable": "MinimumTemperature",
+            "schedule": "Cooling Setpoint",
+            "node": "ZONE ONE INLET",
+            "Native_field": "TempSetPointLo",
+            "variable": "System Node Setpoint Low Temperature",
+            "units": "C",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": false,
+            "rule_origin_zero_based_index": 64,
+            "atol": 1e-06,
+            "rtol": 0.0,
+            "rmse_max": 1e-06
+          },
+          "report_id": 361,
+          "schedule_report_id": 352,
+          "samples": 480,
+          "distinct_actual_values": [
+            17.999999999999993,
+            17.999999999999996,
+            18.0,
+            18.000000000000004,
+            22.799999999999997,
+            22.8,
+            26.0
+          ],
+          "max_same_clock_schedule_delta": 7.105427357601002e-15
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED HUMIDITY RATIO",
+            "control_variable": "HumidityRatio",
+            "schedule": "Internal Gain Schedule",
+            "node": "ZONE ONE INLET",
+            "Native_field": "HumRatSetPoint",
+            "variable": "System Node Setpoint Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": false,
+            "rule_origin_zero_based_index": 65,
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          },
+          "report_id": 362,
+          "schedule_report_id": 354,
+          "samples": 480,
+          "distinct_actual_values": [
+            0.0,
+            1.0
+          ],
+          "max_same_clock_schedule_delta": 0.0
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED MAXIMUM HUMIDITY RATIO",
+            "control_variable": "MaximumHumidityRatio",
+            "schedule": "Internal Gain Schedule",
+            "node": "ZONE ONE INLET",
+            "Native_field": "HumRatMax",
+            "variable": "System Node Setpoint Maximum Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": false,
+            "rule_origin_zero_based_index": 65,
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          },
+          "report_id": 364,
+          "schedule_report_id": 354,
+          "samples": 480,
+          "distinct_actual_values": [
+            0.0,
+            1.0
+          ],
+          "max_same_clock_schedule_delta": 0.0
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED MINIMUM HUMIDITY RATIO",
+            "control_variable": "MinimumHumidityRatio",
+            "schedule": "Internal Gain Schedule",
+            "node": "ZONE ONE INLET",
+            "Native_field": "HumRatMin",
+            "variable": "System Node Setpoint Minimum Humidity Ratio",
+            "units": "kgWater/kgDryAir",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": false,
+            "rule_origin_zero_based_index": 65,
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          },
+          "report_id": 363,
+          "schedule_report_id": 354,
+          "samples": 480,
+          "distinct_actual_values": [
+            0.0,
+            1.0
+          ],
+          "max_same_clock_schedule_delta": 0.0
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED MASS FLOW RATE",
+            "control_variable": "MassFlowRate",
+            "schedule": "Internal Gain Schedule",
+            "node": "ZONE ONE INLET",
+            "Native_field": "MassFlowRateSetPoint",
+            "variable": "System Node Setpoint Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": true,
+            "rule_origin_zero_based_index": 66,
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          },
+          "report_id": 367,
+          "schedule_report_id": 354,
+          "samples": 480,
+          "distinct_actual_values": [
+            0.0,
+            1.0
+          ],
+          "max_same_clock_schedule_delta": 0.0
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED MAXIMUM MASS FLOW RATE",
+            "control_variable": "MaximumMassFlowRate",
+            "schedule": "Internal Gain Schedule",
+            "node": "ZONE ONE INLET",
+            "Native_field": "MassFlowRateMax",
+            "variable": "System Node Maximum Limit Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": true,
+            "rule_origin_zero_based_index": 66,
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          },
+          "report_id": 366,
+          "schedule_report_id": 354,
+          "samples": 480,
+          "distinct_actual_values": [
+            0.0,
+            1.0
+          ],
+          "max_same_clock_schedule_delta": 0.0
+        },
+        {
+          "control": {
+            "manager": "117 SCHEDULED MINIMUM MASS FLOW RATE",
+            "control_variable": "MinimumMassFlowRate",
+            "schedule": "Internal Gain Schedule",
+            "node": "ZONE ONE INLET",
+            "Native_field": "MassFlowRateMin",
+            "variable": "System Node Minimum Limit Mass Flow Rate",
+            "units": "kg/s",
+            "frequency": "Timestep",
+            "time_step_type": "System",
+            "store_type": "Average",
+            "advanced_report_required": true,
+            "rule_origin_zero_based_index": 66,
+            "atol": 1e-09,
+            "rtol": 0.0,
+            "rmse_max": 1e-09
+          },
+          "report_id": 365,
+          "schedule_report_id": 354,
+          "samples": 480,
+          "distinct_actual_values": [
+            0.0,
+            1.0
+          ],
+          "max_same_clock_schedule_delta": 0.0
+        }
+      ],
+      "actual_BND": {
+        "artifact": {
+          "path": ".runtime/porting/scheduled-nine-controls-idf-117/native-01/output/nativeout.bnd",
+          "sha256": "7b76cec050b43a928edeb8bab55c5b07bfef6ddc0c483c38d44c2471ba6a0449",
+          "bytes": 9632
+        },
+        "actual_nodes": [
+          [
+            "Node",
+            "1",
+            "ZONE ONE INLET",
+            "Air",
+            "11"
+          ],
+          [
+            "Node",
+            "2",
+            "ZONE ONE AIR NODE",
+            "Air",
+            "0"
+          ],
+          [
+            "Node",
+            "3",
+            "ZONE ONE RETURN",
+            "Air",
+            "0"
+          ]
+        ],
+        "all_nine_connections": [
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "116 SCHEDULED INLET TEMPERATURE",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED MAXIMUM TEMPERATURE",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED MINIMUM TEMPERATURE",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED HUMIDITY RATIO",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED MAXIMUM HUMIDITY RATIO",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED MINIMUM HUMIDITY RATIO",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED MASS FLOW RATE",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED MAXIMUM MASS FLOW RATE",
+            "Setpoint",
+            "1"
+          ],
+          [
+            "Non-Parent Node Connection",
+            "ZONE ONE INLET",
+            "SETPOINTMANAGER:SCHEDULED",
+            "117 SCHEDULED MINIMUM MASS FLOW RATE",
+            "Setpoint",
+            "1"
+          ]
+        ],
+        "body": [
+          "! This file shows details about the branches, nodes, and other",
+          "! elements of the flow connections.",
+          "! This file is intended for use in \"debugging\" potential problems",
+          "! that may also be detected by the program, but may be more easily",
+          "! identified by \"eye\".",
+          "! This file is also intended to support software which draws a",
+          "! schematic diagram of the HVAC system.",
+          "! ===============================================================",
+          "! #Nodes,<Number of Unique Nodes>",
+          " #Nodes,3",
+          "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>",
+          " Node,1,ZONE ONE INLET,Air,11",
+          " Node,2,ZONE ONE AIR NODE,Air,0",
+          " Node,3,ZONE ONE RETURN,Air,0",
+          "! ===============================================================",
+          "! Suspicious nodes have 0 references.  It is normal for some nodes, however.",
+          "! Listing nodes with 0 references (culled from previous list):",
+          "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>",
+          " Suspicious Node,2,ZONE ONE AIR NODE,Air,0",
+          " Suspicious Node,3,ZONE ONE RETURN,Air,0",
+          "! ===============================================================",
+          "! <#Branch Lists>,<Number of Branch Lists>",
+          " #Branch Lists,0",
+          "! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>",
+          "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>",
+          "! ===============================================================",
+          "! <#Supply Air Paths>,<Number of Supply Air Paths>",
+          " #Supply Air Paths,0",
+          "! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>",
+          "! <#Components on Supply Air Path>,<Number of Components>",
+          "! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>",
+          "! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>",
+          "! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>",
+          "! ===============================================================",
+          "! <#Return Air Paths>,<Number of Return Air Paths>",
+          " #Return Air Paths,0",
+          "! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>",
+          "! <#Components on Return Air Path>,<Number of Components>",
+          "! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>",
+          "! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>",
+          "! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>",
+          "! ===============================================================",
+          "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>",
+          " #Outdoor Air Nodes,0",
+          "! ===============================================================",
+          "! <#Component Sets>,<Number of Component Sets>",
+          " #Component Sets,0",
+          "! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>",
+          "! ===============================================================",
+          "! <# Plant Loops>,<Number of Plant Loops>",
+          " #Plant Loops,0",
+          "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>",
+          "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>",
+          "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>",
+          "! ===============================================================",
+          "! <# Condenser Loops>,<Number of Condenser Loops>",
+          " #Condenser Loops,0",
+          "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>",
+          "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>",
+          "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>",
+          "! ===============================================================",
+          "! <# Controlled Zones>,<Number of Controlled Zones>",
+          " #Controlled Zones,1",
+          "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>,<# Return Nodes>",
+          "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>",
+          "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>",
+          " Controlled Zone,ZONE ONE,ZONE ONE EQUIPMENT,,ZONE ONE AIR NODE,1,0,1",
+          "   Controlled Zone Inlet,1,ZONE ONE,ZONE ONE INLET,Undefined,N/A",
+          "   Controlled Zone Return,1,ZONE ONE,ZONE ONE RETURN",
+          "! ===============================================================",
+          "! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>",
+          " #Zone Equipment Lists,1",
+          "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>",
+          "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating Priority>,<Cooling Priority>",
+          " Zone Equipment List,1,ZONE ONE EQUIPMENT,ZONE ONE,1",
+          "   Zone Equipment Component,1,ZONEHVAC:IDEALLOADSAIRSYSTEM,ZONE ONE IDEAL LOADS,ZONE ONE,1,1",
+          "! ===============================================================",
+          "! <#AirLoopHVACs>,<Number of AirLoopHVACs>",
+          " #AirLoopHVACs,0",
+          "! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>",
+          "! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return Node Name>,<AirLoop Return Node #>,<Air Loop Return Node Name>",
+          "! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply Node Name>,<AirLoop Supply Node #>,<Air Loop Supply Node Name>",
+          "! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet Node Name>,<AirLoopHVAC Name>",
+          "! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet Node Name>,<AirLoopHVAC Name>",
+          "! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed Air Outlet Node Name>,<AirLoopHVAC Name>",
+          "! <AirLoopHVAC Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! ===============================================================",
+          "! <#Parent Node Connections>,<Number of Parent Node Connections>",
+          " #Parent Node Connections,0",
+          "! <Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
+          "! ===============================================================",
+          "! <#Non-Parent Node Connections>,<Number of Non-Parent Node Connections>",
+          " #Non-Parent Node Connections,13",
+          "! <Non-Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
+          " Non-Parent Node Connection,ZONE ONE AIR NODE,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneNode,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneInlet,1",
+          " Non-Parent Node Connection,ZONE ONE RETURN,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneReturn,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,116 SCHEDULED INLET TEMPERATURE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED HUMIDITY RATIO,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED MASS FLOW RATE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED MAXIMUM HUMIDITY RATIO,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED MAXIMUM MASS FLOW RATE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED MAXIMUM TEMPERATURE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED MINIMUM HUMIDITY RATIO,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED MINIMUM MASS FLOW RATE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,117 SCHEDULED MINIMUM TEMPERATURE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,ZONEHVAC:IDEALLOADSAIRSYSTEM,ZONE ONE IDEAL LOADS,Outlet,1"
+        ],
+        "node_identity_unchanged": true,
+        "target_reference_increment": 8
+      },
+      "actual_Source_exports": {
+        "eso": {
+          "json_joins": 65760,
+          "csv": {
+            "artifact": {
+              "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/results/source-eso.csv",
+              "sha256": "1bb2bd6da0877c5581e853354eb95c9c02e0a90f3b1890739970c7ba20d40544",
+              "bytes": 21612397
+            },
+            "operand_bits_line_owner_clock_joins": 65760
+          }
+        },
+        "mtr": {
+          "json_joins": 240,
+          "csv": {
+            "artifact": {
+              "path": ".runtime/porting/scheduled-nine-controls-idf-117/source-01/output/results/source-mtr.csv",
+              "sha256": "ee80203d81a8e1fe021d3be34d6fdfb9eebb1bbcf97ec22d1b69f7801b069d3b",
+              "bytes": 67335
+            },
+            "operand_bits_line_owner_clock_joins": 240
+          }
+        }
+      },
+      "retained_inventory": {
+        "path": ".runtime/object-expansion/unit117-prep/retained-attempt-inventory01.json",
+        "sha256": "a3c8a24a6dd49ee7b8dcb647b6a586c680dad2ef8ac2f1b00e35a4d6e76825d1",
+        "bytes": 6758
+      },
+      "accepted_paired_cases": 1,
+      "accepted_samples": 66000,
+      "new_builds": 1,
       "capability_or_gate_promotion": false
     }
   },
