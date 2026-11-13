@@ -3284,7 +3284,7 @@ fn write_graph_and_plan(
 ) -> Result<GraphAndPlanExportSummary, String> {
     let plan = &precomputed.execution_plan;
     let graph = &model.graph;
-    let graph_summary = json!({
+    let mut graph_summary = json!({
         "schema_version": 1,
         "zone_surface_edges": graph.zone_surfaces.len(),
         "construction_material_edges": graph.construction_materials.len(),
@@ -3300,6 +3300,19 @@ fn write_graph_and_plan(
         "plant_connector_list_member_edges": graph.plant_connector_list_members.len(),
         "plant_branch_component_edges": graph.plant_branch_components.len(),
     });
+    if !graph.deferred_source_node_lists.is_empty() {
+        graph_summary["deferred_source_node_lists"] = json!(
+            graph
+                .deferred_source_node_lists
+                .iter()
+                .map(|deferred| json!({
+                    "node_list_id": deferred.id.0,
+                    "original_prefix_length": deferred.used_len,
+                    "status": "unresolved-source-original-prefix",
+                }))
+                .collect::<Vec<_>>()
+        );
+    }
     write_json(
         &output_dir.join("model").join("graph-summary.json"),
         &graph_summary,

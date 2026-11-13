@@ -149,6 +149,7 @@ pub fn simulate_ideal_loads_node_state_projection(
             .zone_air_inlet_node_or_nodelist_name
             .as_ref()
             .map(|name| resolve_node_or_nodelist(&model.typed, name))
+            .transpose()?
             .unwrap_or_default();
         let supply_node_count = supply_nodes.len().max(1) as f64;
         for node_id in supply_nodes {
@@ -171,10 +172,19 @@ pub fn simulate_ideal_loads_node_state_projection(
             }
         }
 
-        if let Some(zone_air_node_id) = model
-            .typed
-            .node_names
-            .resolve(&connection.zone_air_node_name.0)
+        let zone_air_node = if model.typed.node_names.is_source_exact_namespace() {
+            let nodes = resolve_node_or_nodelist(&model.typed, &connection.zone_air_node_name)?;
+            match nodes.as_slice() {
+                [node] => Some(*node),
+                _ => None,
+            }
+        } else {
+            model
+                .typed
+                .node_names
+                .resolve(&connection.zone_air_node_name.0)
+        };
+        if let Some(zone_air_node_id) = zone_air_node
             && let Some(node_name) = node_name_for_id(&model.typed, zone_air_node_id)
         {
             apply_node_state_update(
@@ -198,6 +208,7 @@ pub fn simulate_ideal_loads_node_state_projection(
             .zone_return_air_node_or_nodelist_name
             .as_ref()
             .map(|name| resolve_node_or_nodelist(&model.typed, name))
+            .transpose()?
             .unwrap_or_default();
         for node_id in return_nodes {
             if let Some(node_name) = node_name_for_id(&model.typed, node_id) {
@@ -390,21 +401,14 @@ fn add_constant_output_series(
     *handle_index += 1;
 }
 
-fn resolve_node_or_nodelist(model: &TypedModel, name: &NormalizedName) -> Vec<NodeId> {
-    if let Some(node_id) = model.node_names.resolve(&name.0) {
-        return vec![node_id];
-    }
-
-    if let Some(node_list_id) = model.node_list_names.resolve(&name.0)
-        && let Some(node_list) = model
-            .node_lists
-            .iter()
-            .find(|node_list| node_list.id == node_list_id)
-    {
-        return node_list.nodes.clone();
-    }
-
-    Vec::new()
+fn resolve_node_or_nodelist(
+    model: &TypedModel,
+    name: &NormalizedName,
+) -> Result<Vec<NodeId>, RuntimeError> {
+    model
+        .resolve_advisory_node_reference(&name.0)
+        .require_proven_nodes()
+        .map_err(|deferred| RuntimeError::DeferredSourceNodeList { deferred })
 }
 
 fn node_name_for_id(model: &TypedModel, node_id: NodeId) -> Option<String> {

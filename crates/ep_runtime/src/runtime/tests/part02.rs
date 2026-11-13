@@ -438,7 +438,7 @@
         typed.node_lists.push(NodeList {
             id: NodeListId(0),
             name: NormalizedName::new("Zone One Inlets"),
-            nodes: vec![NodeId(0)],
+            nodes: vec![NodeId(0)].into(),
         });
         typed
             .node_list_names

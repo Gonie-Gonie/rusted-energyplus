@@ -58,6 +58,12 @@ impl<T: Copy> NameMap<T> {
         }
     }
 
+    /// Whether this namespace preserves every authored whitespace byte.
+    #[must_use]
+    pub fn is_source_exact_namespace(&self) -> bool {
+        self.normalization == NameNormalization::SourceScheduleAsciiUpper
+    }
+
     /// Uses this map's identity policy for an arena name or reference.
     #[must_use]
     pub fn normalized_name(&self, name: &str) -> NormalizedName {

@@ -557,6 +557,12 @@ fn print_plan_summary(model: &SimulationModel, plan: &ExecutionPlan) {
     );
     println!("  nodes: {}", model.typed.nodes.len());
     println!("  node_lists: {}", model.typed.node_lists.len());
+    if !model.graph.deferred_source_node_lists.is_empty() {
+        println!(
+            "  deferred_source_node_lists: {}",
+            model.graph.deferred_source_node_lists.len()
+        );
+    }
     println!("  air_loops: {}", model.typed.air_loops.len());
     println!("  fans: {}", model.typed.fans.len());
     println!("  coils: {}", model.typed.coils.len());

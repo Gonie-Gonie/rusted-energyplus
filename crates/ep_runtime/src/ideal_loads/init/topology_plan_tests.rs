@@ -306,6 +306,17 @@ fn model_plan_preserves_node_list_order_and_resolved_oa_state() {
             reported_first_return_node: None,
         })
     );
+    model.node_lists[0].nodes =
+        ep_model::NodeListMembers::DeferredSourceOriginalPrefix { used_len: 2 };
+    assert_eq!(
+        PurchasedAirInitTopologyPlan::from_model(&model, SYSTEM, ZoneId(0)),
+        Err(PurchasedAirInitTopologyPlanError::DeferredSourceNodeList {
+            deferred: ep_model::DeferredSourceNodeList {
+                id: ep_model::NodeListId(0),
+                used_len: 2
+            },
+        })
+    );
 }
 
 fn plan(
@@ -346,6 +357,6 @@ fn add_node_list(model: &mut TypedModel, id: u32, name: &str, nodes: Vec<NodeId>
     model.node_lists.push(ep_model::NodeList {
         id,
         name: NormalizedName::new(name),
-        nodes,
+        nodes: nodes.into(),
     });
 }

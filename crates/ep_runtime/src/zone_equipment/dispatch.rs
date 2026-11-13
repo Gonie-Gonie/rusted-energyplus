@@ -1,9 +1,6 @@
 //! Zone equipment dispatch validation for IdealLoads compatibility.
 
-use ep_model::{
-    IdealLoadsAirSystemId, NodeId, NormalizedName, SimulationModel, TypedModel,
-    ZoneEquipmentListId, ZoneId,
-};
+use ep_model::{IdealLoadsAirSystemId, NodeId, SimulationModel, ZoneEquipmentListId, ZoneId};
 
 /// Source-order entry point reserved for zone equipment orchestration.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -44,6 +41,11 @@ pub const IDEAL_LOADS_ZONE_EQUIPMENT_DISPATCH_PATH: &str = "ZoneEquipmentManager
 /// Blocking issue in the IdealLoads zone-equipment dispatch prerequisites.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum IdealLoadsZoneEquipmentDispatchIssue {
+    /// Required Source original-prefix membership is unresolved; Native validity is not inferred.
+    DeferredSourceNodeList {
+        /// Actual deferred declaration and retained original-prefix length.
+        deferred: ep_model::DeferredSourceNodeList,
+    },
     /// The IdealLoads system is not present in any typed `ZoneHVAC:EquipmentList` edge.
     MissingZoneEquipmentListEntry,
     /// The selected graph edge does not have a matching `ZoneHVAC:EquipmentConnections` object.
@@ -65,6 +67,7 @@ impl IdealLoadsZoneEquipmentDispatchIssue {
     #[must_use]
     pub const fn code(self) -> &'static str {
         match self {
+            Self::DeferredSourceNodeList { .. } => "unresolved_source_nodelist_original_prefix",
             Self::MissingZoneEquipmentListEntry => "missing_zone_equipment_list_entry",
             Self::MissingZoneEquipmentConnection => "missing_zone_equipment_connection",
             Self::MissingZoneInletNodeList => "missing_zone_inlet_node_list",
@@ -207,7 +210,25 @@ pub fn validate_ideal_loads_zone_equipment_dispatch(
         .filter(|edge| edge.ideal_loads_air_system == ideal_loads_air_system)
         .map(|edge| edge.node)
         .collect::<Vec<_>>();
-    if supply_nodes.is_empty() {
+    let deferred_supply = model
+        .typed
+        .ideal_loads_air_systems
+        .iter()
+        .find(|system| system.id == ideal_loads_air_system)
+        .and_then(|system| {
+            model
+                .typed
+                .resolve_advisory_node_reference(&system.zone_supply_air_node_name.0)
+                .require_proven_nodes()
+                .err()
+        });
+    if let Some(deferred) = deferred_supply {
+        push_issue(
+            &mut issues,
+            IdealLoadsZoneEquipmentDispatchIssue::DeferredSourceNodeList { deferred },
+        );
+    }
+    if supply_nodes.is_empty() && deferred_supply.is_none() {
         push_issue(
             &mut issues,
             IdealLoadsZoneEquipmentDispatchIssue::MissingIdealLoadsSupplyNode,
@@ -251,7 +272,23 @@ pub fn validate_ideal_loads_zone_equipment_dispatch(
                     connection.zone == edge.zone && connection.equipment_list == edge.equipment_list
                 }) {
                 if let Some(name) = connection.zone_air_inlet_node_or_nodelist_name.as_ref() {
-                    resolve_node_or_nodelist(&model.typed, name)
+                    match model
+                        .typed
+                        .resolve_advisory_node_reference(&name.0)
+                        .require_proven_nodes()
+                    {
+                        Ok(nodes) => nodes,
+                        Err(deferred) => {
+                            push_issue(
+                                &mut issues,
+                                IdealLoadsZoneEquipmentDispatchIssue::DeferredSourceNodeList {
+                                    deferred,
+                                },
+                            );
+                            // No known typed IDs; the distinct unresolved issue carries the actual count.
+                            Vec::new()
+                        }
+                    }
                 } else {
                     push_issue(
                         &mut issues,
@@ -301,18 +338,6 @@ pub fn validate_ideal_loads_zone_equipment_dispatch(
         issues,
         warnings,
     }
-}
-
-fn resolve_node_or_nodelist(model: &TypedModel, name: &NormalizedName) -> Vec<NodeId> {
-    if let Some(node) = model.node_names.resolve(&name.0) {
-        return vec![node];
-    }
-    if let Some(node_list) = model.node_list_names.resolve(&name.0)
-        && let Some(list) = model.node_lists.iter().find(|list| list.id == node_list)
-    {
-        return list.nodes.clone();
-    }
-    Vec::new()
 }
 
 fn push_issue(

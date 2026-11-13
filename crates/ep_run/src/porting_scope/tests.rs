@@ -3076,6 +3076,83 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 .iter()
                 .any(|row| row.object_type == "People")
         );
+        if scope == PortingScope::A {
+            let mut unused = people.clone();
+            unused["NodeList"] = json!({
+                "  A unused  ":{"nodes":[{"node_name":"  real unused node  ","ignored":"metadata"}],"ignored":"metadata"},
+                "Z deferred":{"nodes":[{"node_name":"Tail A"},{"node_name":""},{"node_name":"Tail A"}]}
+            });
+            let raw =
+                parse_epjson_str(&unused.to_string()).expect("actual Source A unused NodeLists");
+            let retained = raw.clone();
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+            let model = compiled
+                .model
+                .as_ref()
+                .expect("actual unused Source A model");
+            assert_eq!(model.node_lists.len(), 2);
+            assert!(model.node_lists.iter().any(|list| matches!(
+                list.nodes,
+                ep_model::NodeListMembers::DeferredSourceOriginalPrefix { .. }
+            )));
+            let mut actual = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+            assert!(actual.admissible, "{:?}", actual.violations);
+            actual.environment = Some(
+                super::environment::environment_from_weather(
+                    model,
+                    &single_day_weather_fixture(),
+                    "authored unused NodeList Source A weather",
+                )
+                .expect("real A environment"),
+            );
+            let admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &actual)
+                    .expect("actual Source A unused-list custody");
+            let support = crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission),
+            );
+            assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+            let ip =
+                crate::ordinary_input_processor::resolve_source_a(&raw).expect("actual A raw IP");
+            assert_eq!(
+                ip.source_raw_object_names("NodeList")
+                    .expect("actual A list order"),
+                ["  A unused  ", "Z deferred"]
+            );
+            assert_eq!(raw, retained);
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+            for (family, objects) in [
+                (
+                    "SetpointManager:Scheduled",
+                    json!({"manager":{"control_variable":"Temperature","schedule_name":"Heat","setpoint_node_or_nodelist_name":"unused"}}),
+                ),
+                (
+                    "ZoneHVAC:EquipmentConnections",
+                    json!({"connection":{"zone_name":"Zone","zone_conditioning_equipment_list_name":"list","zone_air_node_name":"air"}}),
+                ),
+            ] {
+                let mut invalid = unused.clone();
+                invalid[family] = objects;
+                assert!(
+                    !trace(&invalid, scope).admissible,
+                    "Source A keeps {family} outside this lane"
+                );
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_a(
+                        &parse_epjson_str(&invalid.to_string()).expect("changed Source A family")
+                    )
+                    .is_err()
+                );
+            }
+        }
         if scope == PortingScope::B {
             assert_eq!(model.setpoint_managers.len(), 1);
             assert!(
@@ -3137,7 +3214,14 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 .as_ref()
                 .expect("actual Source compiled warning model");
             assert_eq!(warning_model.node_lists.len(), 1);
-            assert_eq!(warning_model.node_lists[0].nodes.len(), 1);
+            assert_eq!(
+                warning_model.node_lists[0]
+                    .nodes
+                    .proven_nodes()
+                    .expect("trailing blank leaves a proven prefix")
+                    .len(),
+                1
+            );
             let simulation = ep_model::SimulationModel::from_typed(warning_model.clone());
             assert_eq!(simulation.graph.node_list_members.len(), 1);
             assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_ok());
@@ -3197,9 +3281,95 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(fields["node_name"], SourceRaw::String(String::new()));
             }
             assert_eq!(warning_raw, original_warning_raw);
+            // Original-prefix holes remain explicit advisory prerequisites. An unused
+            // declaration must not reject independent Source roles or compact a late duplicate.
+            for members in [
+                json!([{"node_name":"Supply"},{"node_name":""},{"node_name":"Supply"}]),
+                json!([{"node_name":""},{"node_name":"Supply"}]),
+                json!([{"node_name":"Supply"},{"node_name":""},{"node_name":"Other List"}]),
+            ] {
+                let mut unused = people.clone();
+                unused["NodeList"] = json!({
+                    "Unused original prefix":{"nodes":members},
+                    "Other List":{"nodes":[{"node_name":"Supply"}]}
+                });
+                let raw =
+                    parse_epjson_str(&unused.to_string()).expect("actual unused-hole Source raw");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("unused deferred Source model");
+                let id = model
+                    .node_list_names
+                    .resolve("Unused original prefix")
+                    .expect("real list");
+                let list = model
+                    .node_lists
+                    .iter()
+                    .find(|list| list.id == id)
+                    .expect("real declaration");
+                assert!(matches!(
+                    list.nodes,
+                    ep_model::NodeListMembers::DeferredSourceOriginalPrefix { .. }
+                ));
+                let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                assert_eq!(simulation.graph.deferred_source_node_lists.len(), 1);
+                ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                    .expect("unused deferred input does not obstruct proven Source roles");
+                let observed = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(observed.admissible, "{:?}", observed.violations);
+                crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("original raw arrays retain Source IP custody");
+                assert_eq!(raw, retained);
+            }
+            for (name, valid) in [
+                ("", false),
+                (" \t\r\u{c}", false),
+                ("X\nY", false),
+                ("\u{b}", true),
+                ("\u{a0}", true),
+                (" Supply List ", true),
+            ] {
+                let mut exact = people.clone();
+                exact["NodeList"] = json!({name:{"nodes":[{"node_name":"Supply"}]}});
+                let raw =
+                    parse_epjson_str(&exact.to_string()).expect("exact authored NodeList name");
+                assert_eq!(
+                    crate::ordinary_equipment_input::resolve_source_b(&raw).is_ok(),
+                    valid,
+                    "official NodeList object key {name:?}"
+                );
+                if valid {
+                    let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                    let model = compiled.model.as_ref().expect("exact-key Source model");
+                    let id = model
+                        .node_list_names
+                        .resolve(name)
+                        .expect("exact Source identity");
+                    assert_eq!(
+                        model
+                            .node_lists
+                            .iter()
+                            .find(|list| list.id == id)
+                            .expect("real list")
+                            .name
+                            .0,
+                        name.to_ascii_uppercase()
+                    );
+                    if name.starts_with(' ') {
+                        assert!(model.node_list_names.resolve(name.trim()).is_none());
+                    }
+                }
+            }
             for bad_member in [json!({"node_name":3}), json!({"node_name":"Supply"})] {
                 let mut invalid = warning.clone();
-                invalid["NodeList"]["Supply List"]["nodes"][2] = bad_member;
+                // The duplicate must lie inside the original shortened prefix.
+                // A late duplicate after an internal hole remains Deferred.
+                invalid["NodeList"]["Supply List"]["nodes"][1] = bad_member;
                 let invalid_raw =
                     parse_epjson_str(&invalid.to_string()).expect("changed actual NodeList input");
                 assert!(ep_compiler::compile_raw_model_for_source(&invalid_raw).has_errors());

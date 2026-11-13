@@ -144,6 +144,10 @@ pub fn inspect_porting_scope(
             || raw
                 .objects
                 .get(&ep_raw_model::ObjectType("ElectricEquipment".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            || raw
+                .objects
+                .get(&ep_raw_model::ObjectType("NodeList".into()))
                 .is_some_and(|rows| !rows.is_empty()))
         && let Err(error) = crate::ordinary_equipment_input::resolve_source_a(raw)
     {
@@ -269,6 +273,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
             | "Material:AirGap"
             | "Material:InfraredTransparent"
             | "Construction"
+            | "NodeList"
             | "Zone"
             | "BuildingSurface:Detailed"
             | "OtherEquipment"
@@ -300,7 +305,6 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                     | "ZoneHVAC:EquipmentConnections"
                     | "ZoneHVAC:EquipmentList"
                     | "ZoneHVAC:IdealLoadsAirSystem"
-                    | "NodeList"
             ))
 }
 

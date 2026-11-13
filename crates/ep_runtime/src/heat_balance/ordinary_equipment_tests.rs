@@ -382,7 +382,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             ..Default::default()
         };
         // The same selected legacy_idd counts used by the production IP.
-        let definitions = [
+        let definitions: Vec<SourceObjectDefinition> = [
             ("Zone", 4, 9, 0, 0, None),
             ("Output:Variable", 4, 0, 0, 0, None),
             ("NodeList", 1, 0, 1, 0, Some("nodes")),
@@ -423,7 +423,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     .collect(),
             ),
         )]);
-        let mut input = SelectedInputProcessor::from_admitted_input(definitions, families)?;
+        let mut input =
+            SelectedInputProcessor::from_admitted_input(definitions.clone(), families.clone())?;
         let mut shortcut = SourceInputProcessorShortCut::default();
         shortcut.allocate_from_input(&input)?;
         let mut globals = SelectedHeatBalanceGlobals::default();
@@ -610,6 +611,240 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 .all(|row| row.zone_name == "Uncontrolled Zone" && !row.is_controlled)
         );
         assert!(source.internal_gains.zone.is_none() && source.internal_gains.space.is_none());
+        // Source InitUniqueNodeCheck must retain genuine unused NodeLists even
+        // with zero controlled Zones. Use the real raw IP/getter, not a manually
+        // populated node owner or only the private postcondition predicate.
+        {
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputStatisticsInput, SourceInputStatisticsValue as V,
+            };
+            let authored_lists = [
+                ("UNUSED PREFIX", vec!["NODE A", "", "NODE A"]),
+                ("UNUSED SPACES", vec![" NODE A ", "NODE B"]),
+            ];
+            let mut node_fields = BTreeMap::new();
+            let mut node_shapes = Vec::new();
+            for (name, members) in &authored_lists {
+                node_shapes.push(SourceObjectShape {
+                    object_name: (*name).into(),
+                    field_sizes: BTreeMap::from([("nodes".into(), members.len())]),
+                });
+                node_fields.insert(
+                    (*name).into(),
+                    BTreeMap::from([(
+                        "nodes".into(),
+                        V::Array(
+                            members
+                                .iter()
+                                .map(|member| {
+                                    V::Object(BTreeMap::from([(
+                                        "node_name".into(),
+                                        V::String((*member).into()),
+                                    )]))
+                                })
+                                .collect(),
+                        ),
+                    )]),
+                );
+            }
+            let mut positive_families = families.clone();
+            positive_families.insert("NodeList".into(), SourceInputFamily::Objects(node_shapes));
+            let mut positive_ip = SelectedInputProcessor::from_admitted_input(
+                definitions.clone(),
+                positive_families,
+            )?;
+            positive_ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                objects: BTreeMap::from([
+                    (
+                        "Zone".into(),
+                        raw.objects["Zone"]
+                            .iter()
+                            .map(|row| (row.object_name.clone(), BTreeMap::new()))
+                            .collect(),
+                    ),
+                    ("NodeList".into(), node_fields),
+                ]),
+                object_order: BTreeMap::from([
+                    (
+                        "Zone".into(),
+                        raw.objects["Zone"]
+                            .iter()
+                            .map(|row| row.object_name.clone())
+                            .collect(),
+                    ),
+                    (
+                        "NodeList".into(),
+                        authored_lists
+                            .iter()
+                            .map(|(name, _)| (*name).into())
+                            .collect(),
+                    ),
+                ]),
+            })?;
+            let positive_clock = OrdinaryEquipmentInput::from_source_a_family_inventory(
+                [("NodeList", authored_lists.len())],
+                timesteps,
+            )?;
+            let mut positive = OrdinaryEquipment::new_for_source_ordered(
+                &model,
+                positive_clock,
+                &zone_ids,
+                &space_ids,
+            )?;
+            let mut positive_zones = selected.clone();
+            let mut positive_gains = crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains::default();
+            let mut positive_schedules =
+                crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+            let mut positive_sizing =
+                crate::heat_balance::selected_sizing::SelectedSizingManager::default();
+            let mut positive_state = error_state.clone();
+            let (mut positive_error, mut positive_console) = (Vec::new(), Vec::new());
+            positive.get_zone_equipment_source(
+                &mut positive_ip,
+                positive_clock,
+                false,
+                false,
+                &globals,
+                &mut positive_gains,
+                SourceEquipmentInputOwners {
+                    zones: positive_zones
+                        .zones
+                        .as_deref_mut()
+                        .ok_or("actual Source positive-list Zones")?,
+                    schedules: &mut positive_schedules,
+                    sizing: &mut positive_sizing,
+                    branch: None,
+                    source_is_epjson: true,
+                    backend: &mut SourceErrorBackend {
+                        state: &mut positive_state,
+                        error_stream: Some(&mut positive_error),
+                        console: &mut positive_console,
+                        out_unit1: None,
+                        out_unit2: None,
+                        f_message: None,
+                        message_callback: None,
+                        error_callback: None,
+                        sqlite: None,
+                    },
+                    diagnostic_flags: Some(
+                        crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                            kickoff: &globals.kickoff_simulation,
+                            developer: &developer,
+                            warmup: &clock.warmup_flag,
+                            doing_sizing: &globals.doing_sizing,
+                        },
+                    ),
+                },
+            )?;
+            assert!(!positive.get_equipment_input && positive.equipment_inputs_filled);
+            assert_eq!(positive.zone_config, source.zone_config);
+            assert_eq!(positive.equipment_lists, source.equipment_lists);
+            assert_eq!(
+                positive.priority_simulation_order.as_deref(),
+                Some([].as_slice())
+            );
+            assert_eq!(positive.nodes.number_of_nodes, 3);
+            assert_eq!(positive.nodes.number_of_unique_node_names, 3);
+            assert_eq!(positive.nodes.number_of_node_lists, 2);
+            assert_eq!(
+                positive
+                    .nodes
+                    .node_ids
+                    .as_deref()
+                    .ok_or("actual NodeID allocation")?,
+                ["Undefined", "NODE A", " NODE A ", "NODE B"]
+            );
+            assert_eq!(
+                positive.nodes.node_references.as_deref(),
+                Some([1, 0, 0].as_slice())
+            );
+            assert_eq!(
+                positive
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .ok_or("actual Node allocation")?
+                    .len(),
+                3
+            );
+            assert_eq!(
+                positive
+                    .nodes
+                    .marked_nodes
+                    .as_ref()
+                    .ok_or("actual MarkedNode allocation")?
+                    .len(),
+                3
+            );
+            assert_eq!(
+                positive
+                    .nodes
+                    .node_setpoint_checks
+                    .as_ref()
+                    .ok_or("actual NodeSetpointCheck allocation")?
+                    .len(),
+                3
+            );
+            let actual_lists = positive
+                .nodes
+                .node_lists
+                .as_deref()
+                .ok_or("actual NodeLists allocation")?;
+            assert_eq!(actual_lists[0].number_of_nodes, 2);
+            assert_eq!(
+                actual_lists[0]
+                    .node_names
+                    .as_deref()
+                    .ok_or("actual original names")?,
+                ["NODE A", "", "NODE A"]
+            );
+            assert_eq!(
+                actual_lists[0].node_numbers.as_deref(),
+                Some([1, 0, 1].as_slice())
+            );
+            assert_eq!(
+                actual_lists[1].node_numbers.as_deref(),
+                Some([2, 3].as_slice())
+            );
+            assert!(!positive_ip.is_object_unused("NodeList", "UNUSED PREFIX"));
+            assert!(!positive_ip.is_object_unused("NodeList", "UNUSED SPACES"));
+            assert_eq!(positive_state.tracking.total_warning_errors, 1);
+            assert!(std::str::from_utf8(&positive_error)?.contains(
+                "GetNodeListsInput: NodeList=\"UNUSED PREFIX\", blank node name in list."
+            ));
+            positive_gains.validate_source_initial_gain_allocations(total, total)?;
+            let mut inconsistent = positive.clone();
+            inconsistent
+                .nodes
+                .node_references
+                .as_mut()
+                .ok_or("actual positive references")?
+                .pop();
+            assert!(matches!(
+                inconsistent.validate_initialized_storage(
+                    &zone_ids,
+                    &space_ids,
+                    Some(&positive_gains)
+                ),
+                Err(Unavailable::InconsistentOwner)
+            ));
+            let mut inconsistent_zero = source.clone();
+            inconsistent_zero.nodes.node_ids = Some(Vec::new());
+            assert!(matches!(
+                inconsistent_zero.validate_initialized_storage(&zone_ids, &space_ids, Some(&gains)),
+                Err(Unavailable::InconsistentOwner)
+            ));
+            if total == 1 {
+                let mut legacy = OrdinaryEquipment::new(source_clock, &zone_ids, &space_ids)?;
+                legacy.get_zone_equipment(timesteps)?;
+                legacy.validate_initialized(&zone_ids, &space_ids)?;
+                legacy.nodes = positive.nodes.clone();
+                assert!(matches!(
+                    legacy.validate_initialized(&zone_ids, &space_ids),
+                    Err(Unavailable::InconsistentOwner)
+                ));
+            }
+        }
         if total == 1 {
             // Authored unit operands, not a Native pair or a real AirLoop-ready
             // producer. Probe the same owners without changing the input table.

@@ -19,6 +19,11 @@ pub enum PurchasedAirInitTopologyRelation {
 /// Invalid typed topology rejected before the one-time runtime transition.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PurchasedAirInitTopologyPlanError {
+    /// Advisory Source original-prefix membership is unresolved; Native validity is not inferred.
+    DeferredSourceNodeList {
+        /// Referenced declaration and its actual original-prefix length.
+        deferred: ep_model::DeferredSourceNodeList,
+    },
     /// The selected IdealLoads system is absent from the typed arena.
     SystemMissing {
         /// Missing typed system.
@@ -201,16 +206,16 @@ impl PurchasedAirInitTopologyPlan {
             resolve_optional_nodes(
                 model,
                 connection.zone_air_inlet_node_or_nodelist_name.as_ref(),
-            ),
+            )?,
             configured_exhaust_node,
             resolve_optional_nodes(
                 model,
                 connection.zone_air_exhaust_node_or_nodelist_name.as_ref(),
-            ),
+            )?,
             resolve_optional_nodes(
                 model,
                 connection.zone_return_air_node_or_nodelist_name.as_ref(),
-            ),
+            )?,
             system_object
                 .design_specification_outdoor_air_object_name
                 .as_ref()
@@ -410,7 +415,7 @@ fn resolve_exactly_one(
     relation: PurchasedAirInitTopologyRelation,
     controlled_zone: ZoneId,
 ) -> Result<NodeId, PurchasedAirInitTopologyPlanError> {
-    let nodes = resolve_nodes(model, name);
+    let nodes = resolve_nodes(model, name)?;
     if nodes.len() != 1 {
         return Err(PurchasedAirInitTopologyPlanError::Cardinality {
             relation,
@@ -422,19 +427,21 @@ fn resolve_exactly_one(
     Ok(nodes[0])
 }
 
-fn resolve_optional_nodes(model: &TypedModel, name: Option<&NormalizedName>) -> Vec<NodeId> {
-    name.map_or_else(Vec::new, |name| resolve_nodes(model, name))
+fn resolve_optional_nodes(
+    model: &TypedModel,
+    name: Option<&NormalizedName>,
+) -> Result<Vec<NodeId>, PurchasedAirInitTopologyPlanError> {
+    name.map_or_else(|| Ok(Vec::new()), |name| resolve_nodes(model, name))
 }
 
-fn resolve_nodes(model: &TypedModel, name: &NormalizedName) -> Vec<NodeId> {
-    if let Some(node) = model.node_names.resolve(&name.0) {
-        return vec![node];
-    }
+fn resolve_nodes(
+    model: &TypedModel,
+    name: &NormalizedName,
+) -> Result<Vec<NodeId>, PurchasedAirInitTopologyPlanError> {
     model
-        .node_list_names
-        .resolve(&name.0)
-        .and_then(|node_list| model.node_lists.iter().find(|list| list.id == node_list))
-        .map_or_else(Vec::new, |list| list.nodes.clone())
+        .resolve_advisory_node_reference(&name.0)
+        .require_proven_nodes()
+        .map_err(|deferred| PurchasedAirInitTopologyPlanError::DeferredSourceNodeList { deferred })
 }
 
 fn push_diagnostic(

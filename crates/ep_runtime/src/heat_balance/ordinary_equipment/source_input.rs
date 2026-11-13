@@ -62,7 +62,14 @@ impl OrdinaryEquipment {
             || zone_ids.len() != model.zones.len()
             || space_ids.len() != model.spaces.len()
             || model.timestep.number_of_timesteps_per_hour as usize != clock.timesteps_per_hour
-            || (zone_ids.len() > 1 && clock.supplied.iter().flatten().any(|&count| count != 0))
+            || (zone_ids.len() > 1
+                && clock
+                    .supplied
+                    .iter()
+                    .zip(OrdinaryEquipmentInput::FAMILIES)
+                    .any(|(count, family)| {
+                        family != "NodeList" && count.is_some_and(|count| count != 0)
+                    }))
         {
             return Err(Unavailable::GeometryOrTimestep);
         }

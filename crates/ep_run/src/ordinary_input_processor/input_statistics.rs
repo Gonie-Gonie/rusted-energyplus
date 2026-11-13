@@ -121,6 +121,7 @@ pub(super) fn resolve_source_a(raw: &RawModel) -> Result<SourceInputStatisticsIn
     }
     for family in [
         "SizingPeriod:DesignDay",
+        "NodeList",
         "ElectricEquipment",
         "People",
         "ZoneList",

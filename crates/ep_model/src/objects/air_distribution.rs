@@ -12,6 +12,58 @@ pub struct Node {
     pub name: NormalizedName,
 }
 
+/// Advisory membership whose typed node identities are fully known or explicitly deferred.
+/// Source runtime NodeInputManager remains the sole owner of original node cells and refs.
+#[derive(Clone, Eq, PartialEq)]
+pub enum NodeListMembers {
+    /// Every retained original-prefix cell names a real typed node.
+    Proven(Vec<NodeId>),
+    /// At least one original-prefix cell is blank; no placeholder node ID is created.
+    DeferredSourceOriginalPrefix {
+        /// Native retained count after subtracting exact-empty original cells.
+        used_len: usize,
+    },
+}
+
+impl NodeListMembers {
+    /// Returns known membership without assigning a fabricated cardinality to deferred input.
+    #[must_use]
+    pub fn proven_nodes(&self) -> Option<&[NodeId]> {
+        match self {
+            Self::Proven(nodes) => Some(nodes),
+            Self::DeferredSourceOriginalPrefix { .. } => None,
+        }
+    }
+}
+
+impl From<Vec<NodeId>> for NodeListMembers {
+    fn from(nodes: Vec<NodeId>) -> Self {
+        Self::Proven(nodes)
+    }
+}
+
+impl std::fmt::Debug for NodeListMembers {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            // Preserve the established Legacy NodeList Debug/graph representation.
+            Self::Proven(nodes) => std::fmt::Debug::fmt(nodes, formatter),
+            Self::DeferredSourceOriginalPrefix { used_len } => formatter
+                .debug_struct("DeferredSourceOriginalPrefix")
+                .field("used_len", used_len)
+                .finish(),
+        }
+    }
+}
+
+/// Unresolved advisory Source membership, not a claim of Native-invalid input.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct DeferredSourceNodeList {
+    /// Referenced typed input declaration.
+    pub id: NodeListId,
+    /// Native original-prefix length, never a fabricated typed-node cardinality.
+    pub used_len: usize,
+}
+
 /// Typed `NodeList` input.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct NodeList {
@@ -19,8 +71,8 @@ pub struct NodeList {
     pub id: NodeListId,
     /// NodeList name.
     pub name: NormalizedName,
-    /// Member nodes in declared order.
-    pub nodes: Vec<NodeId>,
+    /// Proven original-prefix nodes or explicit unresolved Source membership.
+    pub nodes: NodeListMembers,
 }
 
 /// Zone equipment load distribution scheme.

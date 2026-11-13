@@ -105,11 +105,30 @@ impl OrdinaryEquipmentInput {
         "SpaceHVAC:ZoneEquipmentMixer",
         "SpaceHVAC:ZoneReturnMixer",
     ];
+    /// Source A carries actual NodeList counts to the common raw getter while
+    /// retaining every other empty-equipment and present-empty Space guard.
+    ///
+    /// # Errors
+    /// Rejects an invalid clock, duplicate family, or other active family.
+    pub fn from_source_a_family_inventory<'a>(
+        inventory: impl IntoIterator<Item = (&'a str, usize)>,
+        timesteps_per_hour: usize,
+    ) -> Result<Self, OrdinaryEquipmentUnavailable> {
+        Self::from_empty_or_node_list_inventory(inventory, timesteps_per_hour, true)
+    }
     /// Preserve absent versus explicit-empty supplied maps, rejecting active
     /// queried families and the warning-bearing present-empty Space branches.
     pub fn from_family_inventory<'a>(
         inventory: impl IntoIterator<Item = (&'a str, usize)>,
         timesteps_per_hour: usize,
+    ) -> Result<Self, OrdinaryEquipmentUnavailable> {
+        Self::from_empty_or_node_list_inventory(inventory, timesteps_per_hour, false)
+    }
+
+    fn from_empty_or_node_list_inventory<'a>(
+        inventory: impl IntoIterator<Item = (&'a str, usize)>,
+        timesteps_per_hour: usize,
+        source_node_lists: bool,
     ) -> Result<Self, OrdinaryEquipmentUnavailable> {
         if timesteps_per_hour == 0 || timesteps_per_hour > 60 || 60 % timesteps_per_hour != 0 {
             return Err(Unavailable::GeometryOrTimestep);
@@ -117,7 +136,9 @@ impl OrdinaryEquipmentInput {
         let mut supplied = [None; 9];
         for (family, count) in inventory {
             if let Some(index) = Self::FAMILIES.iter().position(|&name| name == family) {
-                if supplied[index].is_some() || count != 0 || index >= 6 {
+                if supplied[index].is_some()
+                    || ((count != 0 || index >= 6) && !(source_node_lists && family == "NodeList"))
+                {
                     return Err(Unavailable::Input(family.into()));
                 }
                 supplied[index] = Some(count);
@@ -1212,16 +1233,17 @@ impl OrdinaryEquipment {
                         .iter()
                         .any(|row| !row.name.is_empty() || row.number_of_equipment_types != 0)
             })
-            || self.nodes.physical.is_some()
-            || self.nodes.number_of_nodes != 0
-            || self.nodes.number_of_unique_node_names != 0
-            || self.nodes.number_of_node_lists != 0
+            || (source_gains.is_none()
+                && (self.nodes.physical.is_some()
+                    || self.nodes.number_of_nodes != 0
+                    || self.nodes.number_of_unique_node_names != 0
+                    || self.nodes.number_of_node_lists != 0
+                    || self
+                        .nodes
+                        .node_lists
+                        .as_ref()
+                        .is_none_or(|rows| !rows.is_empty())))
             || self.nodes.get_input
-            || self
-                .nodes
-                .node_lists
-                .as_ref()
-                .is_none_or(|rows| !rows.is_empty())
             || self.nodes.unique_names.is_some()
             || !self.nodes.context_name.is_empty()
             || self.nodes.number_of_check_nodes != 0
@@ -1230,6 +1252,46 @@ impl OrdinaryEquipment {
             return Err(Unavailable::InconsistentOwner);
         }
         if let Some(gains) = source_gains {
+            // InitUniqueNodeCheck reads NodeLists even when no Zone is controlled.
+            // Check the actual sole owner's extents, never a no-node assumption.
+            let nodes = &self.nodes;
+            let count = nodes.number_of_nodes;
+            if nodes.number_of_unique_node_names != count
+                || nodes
+                    .node_lists
+                    .as_ref()
+                    .is_none_or(|rows| rows.len() != nodes.number_of_node_lists)
+                || if count == 0 {
+                    nodes.physical.is_some()
+                        || nodes.node_ids.is_some()
+                        || nodes.node_references.is_some()
+                        || nodes.marked_nodes.is_some()
+                        || nodes.node_setpoint_checks.is_some()
+                } else {
+                    nodes
+                        .physical
+                        .as_ref()
+                        .is_none_or(|rows| rows.len() != count)
+                        || nodes
+                            .node_ids
+                            .as_ref()
+                            .is_none_or(|rows| count.checked_add(1) != Some(rows.len()))
+                        || nodes
+                            .node_references
+                            .as_ref()
+                            .is_none_or(|rows| rows.len() != count)
+                        || nodes
+                            .marked_nodes
+                            .as_ref()
+                            .is_none_or(|rows| rows.len() != count)
+                        || nodes
+                            .node_setpoint_checks
+                            .as_ref()
+                            .is_none_or(|rows| rows.len() != count)
+                }
+            {
+                return Err(Unavailable::InconsistentOwner);
+            }
             // Actual Source route never allocates a second legacy gain collection.
             if self.internal_gains.zone.is_some()
                 || self.internal_gains.space.is_some()

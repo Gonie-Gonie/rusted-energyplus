@@ -37,6 +37,7 @@ mod multizone;
 mod people;
 pub(crate) use people::has_instantiated_adaptive_comfort;
 mod source_b;
+mod source_node_lists;
 mod space_lists;
 mod spaces;
 mod zone_groups;
@@ -102,6 +103,7 @@ fn resolve_raw(
         let source_space_family = source_space_ingress && family.0 == "Space";
         let source_space_list_family = source_space_list_ingress && family.0 == "SpaceList";
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
+        let source_node_list_family = source_calendar_ingress && family.0 == "NodeList";
         let source_design_day_family =
             source_calendar_ingress && family.0 == "SizingPeriod:DesignDay";
         let source_irt_family =
@@ -169,6 +171,7 @@ fn resolve_raw(
         ) && !(source_zone_list_ingress && family.0 == "ZoneList")
             && !(source_zone_group_ingress && family.0 == "ZoneGroup")
             && !source_b_family
+            && !source_node_list_family
             && !source_irt_family
             && !source_calendar_family
             && !source_compact_family
@@ -236,6 +239,7 @@ fn resolve_raw(
                             | "SpaceList"
                             | "ScheduleTypeLimits"
                             | "SetpointManager:Scheduled"
+                            | "NodeList"
                             | "Schedule:Constant"
                             | "Schedule:Compact"
                             | "Schedule:File"
@@ -278,6 +282,8 @@ fn resolve_raw(
                 if !admitted_field(&family.0, &field.0, value, source_calendar_ingress)
                     && !((source_b_family || source_compact_family)
                         && source_b::admitted_field(&family.0, &field.0, value))
+                    && !(source_node_list_family
+                        && source_node_lists::admitted_field(&field.0, value, raw.is_epjson()))
                     && !(source_people_family && people::admitted_field(&field.0, value))
                     && !(source_angle_family && people::admitted_angle_field(&field.0, value))
                 {
@@ -463,9 +469,12 @@ fn resolve_raw(
                 for &required in source_b::required_fields(&family.0) {
                     let missing = if source_calendar_ingress
                         && (family.0 == "Schedule:Week:Daily"
-                            || (family.0 == "ZoneControl:Thermostat"
-                                && required == "control_type_schedule_name"))
-                    {
+                            || matches!(
+                                (family.0.as_str(), required),
+                                ("ZoneControl:Thermostat", "control_type_schedule_name")
+                                    | ("ZoneHVAC:IdealLoadsAirSystem", "zone_supply_air_node_name")
+                                    | ("ZoneHVAC:EquipmentConnections", "zone_air_node_name")
+                            )) {
                         !matches!(field(object, required), Some(RawValue::String(value)) if !value.is_empty())
                     } else {
                         field(object, required).is_none_or(blank)
@@ -722,6 +731,7 @@ fn resolve_raw(
     }
     if source_calendar_ingress {
         infrared::validate_defined_uses(raw, source_multizone_ingress)?;
+        source_node_lists::validate_declaration_order(raw)?;
     }
     if source_b_ingress {
         source_b::validate_scheduled_setpoint_references(raw)?;
@@ -857,6 +867,8 @@ fn resolve_raw(
         .map(|(family, objects)| (family.0.as_str(), objects.len()));
     if source_b_ingress {
         OrdinaryEquipmentInput::from_source_family_inventory(inventory, timestep)
+    } else if source_calendar_ingress {
+        OrdinaryEquipmentInput::from_source_a_family_inventory(inventory, timestep)
     } else {
         OrdinaryEquipmentInput::from_family_inventory(inventory, timestep)
     }
@@ -1862,6 +1874,122 @@ mod tests {
         ] {
             let raw = parse_epjson_str(&format!("{{{base}{addition}}}"))?;
             assert_eq!(resolve(&raw).is_ok(), accepted, "{name}");
+        }
+        // Common NodeList admission reaches only explicit Source A/B; original
+        // alpha strings and schema-ignored metadata do not become Node state.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
+            for (index, family) in OrdinaryEquipmentInput::FAMILIES.into_iter().enumerate() {
+                for count in [0, 1] {
+                    let inventory = [(family, count)];
+                    let allowed = family == "NodeList" || (count == 0 && index < 6);
+                    assert_eq!(
+                        OrdinaryEquipmentInput::from_source_a_family_inventory(inventory, 4)
+                            .is_ok(),
+                        allowed,
+                        "Source A {family} count={count}"
+                    );
+                    assert!(
+                        OrdinaryEquipmentInput::from_source_a_family_inventory(
+                            [inventory[0], inventory[0]],
+                            4,
+                        )
+                        .is_err()
+                    );
+                }
+            }
+            assert!(
+                OrdinaryEquipmentInput::from_source_a_family_inventory([("NodeList", 2)], 7)
+                    .is_err()
+            );
+            for name in ["  padded list  ", "\u{b}", "\u{a0}"] {
+                let mut value: serde_json::Value = serde_json::from_str(&format!("{{{base}}}"))?;
+                value["NodeList"] = serde_json::json!({name:{
+                    "nodes":[{"node_name":"  padded node  ","ignored_item":"kept"},{"node_name":""},{"node_name":"  "}],
+                    "ignored_instance":{"actual":"metadata"},
+                    "idf_order":{"ignored":"direct JSON"},"idf_max_fields":false,
+                    "idf_max_extensible_fields":"not a field count"
+                }});
+                let raw = parse_epjson_str(&value.to_string())?;
+                let retained = raw.clone();
+                assert!(resolve(&raw).is_err());
+                resolve_source_a(&raw)?;
+                resolve_source_b(&raw)?;
+                for source_b in [false, true] {
+                    let mut ip = if source_b {
+                        crate::ordinary_input_processor::resolve_source_b(&raw)?
+                    } else {
+                        crate::ordinary_input_processor::resolve_source_a(&raw)?
+                    };
+                    assert_eq!(ip.get_object_def_max_args("NodeList")?.alphas, 4);
+                    assert_eq!(ip.source_raw_object_names("NodeList")?, [name]);
+                    let fields = ip.source_raw_object_fields("NodeList", name)?;
+                    assert_eq!(fields["idf_max_fields"], V::Bool(false));
+                    let V::Array(items) = &fields["nodes"] else {
+                        return Err("retained NodeList array".into());
+                    };
+                    assert_eq!(items.len(), 3);
+                    for (item, expected) in items.iter().zip(["  padded node  ", "", "  "]) {
+                        let V::Object(fields) = item else {
+                            return Err("retained NodeList item".into());
+                        };
+                        assert_eq!(fields["node_name"], V::String(expected.into()));
+                    }
+                    let V::Object(first) = &items[0] else {
+                        return Err("retained first member".into());
+                    };
+                    assert_eq!(first["ignored_item"], V::String("kept".into()));
+                }
+                assert_eq!(raw, retained);
+                value["Zone"]["second actual zone"] = serde_json::json!({});
+                resolve_source_a(&parse_epjson_str(&value.to_string())?)?;
+            }
+            for name in ["", " \t\r\u{c}", "A\nB"] {
+                let value = serde_json::json!({"NodeList":{name:{"nodes":[{"node_name":"A"}]}}});
+                let raw = parse_epjson_str(&value.to_string())?;
+                assert!(resolve_source_a(&raw).is_err());
+                assert!(resolve_source_b(&raw).is_err());
+            }
+            for nodes in [
+                serde_json::json!(null),
+                serde_json::json!(""),
+                serde_json::json!(" "),
+                serde_json::json!([{}]),
+                serde_json::json!([{"node_name":null}]),
+                serde_json::json!([{"node_name":3}]),
+                serde_json::json!(["A"]),
+            ] {
+                let value = serde_json::json!({"NodeList":{"Actual List":{"nodes":nodes}}});
+                let raw = parse_epjson_str(&value.to_string())?;
+                assert!(resolve_source_a(&raw).is_err());
+                assert!(resolve_source_b(&raw).is_err());
+            }
+            let lists_json = r#"{"Zone":{"actual zone":{}},"NodeList":{"Alpha":{"nodes":[{"node_name":"A"}]},"Zulu":{"nodes":[{"node_name":"Z"}]}}}"#;
+            let lists_idf = "Zone,actual zone;NodeList,Zulu,Z;NodeList,Alpha,A;";
+            let staged = ep_raw_model::parse_epjson_str_with_idf_order(lists_json, lists_idf)?;
+            resolve_source_a(&staged)?;
+            resolve_source_b(&staged)?;
+            let staged_ip = crate::ordinary_input_processor::resolve_source_a(&staged)?;
+            assert_eq!(
+                staged_ip.source_raw_object_names("NodeList")?,
+                ["Zulu", "Alpha"]
+            );
+            let mut missing = parse_epjson_str(lists_json)?;
+            ep_raw_model::apply_idf_declaration_order(&mut missing, lists_idf, &[])?;
+            assert!(!missing.is_epjson() && !missing.has_idf_declaration_order("NodeList"));
+            assert!(resolve_source_a(&missing).is_err());
+            assert!(resolve_source_b(&missing).is_err());
+            // These two required Node alphas use exact nonempty Source identity,
+            // while the shared Legacy blank predicate remains unchanged.
+            for value in [
+                serde_json::json!({"Zone":{"actual zone":{}},"ZoneHVAC:IdealLoadsAirSystem":{"unit":{"zone_supply_air_node_name":"  "}}}),
+                serde_json::json!({"Zone":{"actual zone":{}},"ZoneHVAC:EquipmentConnections":{"connection":{"zone_name":"actual zone","zone_conditioning_equipment_list_name":"actual list","zone_air_node_name":"  "}}}),
+            ] {
+                let raw = parse_epjson_str(&value.to_string())?;
+                resolve_source_b(&raw)?;
+                assert!(resolve_source_a(&raw).is_err());
+                assert!(resolve(&raw).is_err());
+            }
         }
         // Source diagnostics keep exact raw names/keys and genuine missing
         // keys. The project projection does not invoke GetProjectData or mark

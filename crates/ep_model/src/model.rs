@@ -4,9 +4,9 @@ use crate::{
     AirLoopHvac, AvailabilityManagerComponent, BoilerHotWater, BranchId, BranchListId, Building,
     ChillerElectricEir, CoilComponent, ComponentId, ConnectorId, ConnectorListId, Construction,
     ConstructionId, ConstructionThermochromicChild, ConstructionThermochromicSeries,
-    ConstructionWindowDataFileRequest, DayScheduleId, DesignSpecificationOutdoorAir,
-    DesignSpecificationOutdoorAirId, ElectricEquipment, ElectricEquipmentId,
-    ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
+    ConstructionWindowDataFileRequest, DayScheduleId, DeferredSourceNodeList,
+    DesignSpecificationOutdoorAir, DesignSpecificationOutdoorAirId, ElectricEquipment,
+    ElectricEquipmentId, ExternalInterfaceFmuExportSchedule, ExternalInterfaceFmuImportSchedule,
     ExternalInterfaceSchedule, FanComponent, FenestrationSolarAbsorbedRequest, GlazingSpectralData,
     GlazingSpectralDataId, GlobalGeometryRules, IdealLoadsAirSystem, IdealLoadsAirSystemId,
     InternalGainId, LoopId, Material, MaterialHeatAndMoistureTransferDiffusion,
@@ -16,16 +16,16 @@ use crate::{
     MaterialMoisturePenetrationDepthSettings, MaterialPhaseChange, MaterialPhaseChangeHysteresis,
     MaterialVariableAbsorptance, MaterialVariableAbsorptanceId,
     MaterialVariableThermalConductivity, NameMap, Node, NodeId, NodeList, NodeListId,
-    NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList, PlantConnector,
-    PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed, RunPeriod,
-    RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay, RunPeriodSpecialDayId,
-    ScheduleCompact, ScheduleConstant, ScheduleDayHourly, ScheduleDayInterval, ScheduleDayList,
-    ScheduleFile, ScheduleFileShading, ScheduleId, ScheduleTypeLimitId, ScheduleTypeLimits,
-    ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear, SetpointManagerComponent, SiteLocation,
-    SourceFileScheduleDeclaration, Space, SpaceId, SpaceList, SpaceListId, SpaceOrigin,
-    SpaceTypeId, Surface, SurfaceConvectionAlgorithms, SurfaceId,
-    SurfaceIncidentSolarMultiplierRequest, SurfaceSolarIncident, SurfaceVaporCoefficients,
-    ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
+    NodeListMembers, NormalizedName, OtherEquipment, People, PlantBranch, PlantBranchList,
+    PlantConnector, PlantConnectorKind, PlantConnectorList, PlantLoop, PumpConstantSpeed,
+    RunPeriod, RunPeriodDaylightSavingTime, RunPeriodId, RunPeriodSpecialDay,
+    RunPeriodSpecialDayId, ScheduleCompact, ScheduleConstant, ScheduleDayHourly,
+    ScheduleDayInterval, ScheduleDayList, ScheduleFile, ScheduleFileShading, ScheduleId,
+    ScheduleTypeLimitId, ScheduleTypeLimits, ScheduleWeekCompact, ScheduleWeekDaily, ScheduleYear,
+    SetpointManagerComponent, SiteLocation, SourceFileScheduleDeclaration, Space, SpaceId,
+    SpaceList, SpaceListId, SpaceOrigin, SpaceTypeId, Surface, SurfaceConvectionAlgorithms,
+    SurfaceId, SurfaceIncidentSolarMultiplierRequest, SurfaceSolarIncident,
+    SurfaceVaporCoefficients, ThermostatDualSetpoint, ThermostatSetpointId, TimestepConfig,
     VariableAbsorptanceSurfaceBinding, Version, WeekScheduleId, WindowFrameAndDivider,
     WindowFrameAndDividerId, WindowGlazingThermochromicGroupMaterial,
     WindowGlazingThermochromicState, Zone, ZoneEquipmentConnection, ZoneEquipmentList,
@@ -578,6 +578,75 @@ impl TypedModel {
     }
 }
 
+/// Advisory node reference resolved using the selected input namespace.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AdvisoryNodeReference<'model> {
+    /// Neither a typed node nor a typed list exists.
+    Missing,
+    /// A direct typed node.
+    Single(NodeId),
+    /// A list whose complete original-prefix typed membership is known.
+    ProvenList {
+        /// Typed list declaration.
+        id: NodeListId,
+        /// Proven ordered membership.
+        nodes: &'model [NodeId],
+    },
+    /// Original-prefix membership cannot be represented by real typed node IDs.
+    DeferredList {
+        /// Typed list declaration.
+        id: NodeListId,
+        /// Native original-prefix length, not a typed-node cardinality.
+        used_len: usize,
+    },
+}
+
+impl AdvisoryNodeReference<'_> {
+    /// Returns only proven nodes; a deferred list remains a distinct unresolved prerequisite.
+    pub fn require_proven_nodes(self) -> Result<Vec<NodeId>, DeferredSourceNodeList> {
+        match self {
+            Self::Missing => Ok(Vec::new()),
+            Self::Single(node) => Ok(vec![node]),
+            Self::ProvenList { nodes, .. } => Ok(nodes.to_vec()),
+            Self::DeferredList { id, used_len } => Err(DeferredSourceNodeList { id, used_len }),
+        }
+    }
+}
+
+impl TypedModel {
+    /// Source NodeInputManager resolves lists before nodes; Legacy keeps its prior node-first rule.
+    #[must_use]
+    pub fn resolve_advisory_node_reference(&self, name: &str) -> AdvisoryNodeReference<'_> {
+        let resolve_list = || {
+            self.node_list_names.resolve(name).and_then(|id| {
+                self.node_lists
+                    .iter()
+                    .find(|list| list.id == id)
+                    .map(|list| match &list.nodes {
+                        NodeListMembers::Proven(nodes) => {
+                            AdvisoryNodeReference::ProvenList { id, nodes }
+                        }
+                        NodeListMembers::DeferredSourceOriginalPrefix { used_len } => {
+                            AdvisoryNodeReference::DeferredList {
+                                id,
+                                used_len: *used_len,
+                            }
+                        }
+                    })
+            })
+        };
+        if self.node_list_names.is_source_exact_namespace()
+            && let Some(reference) = resolve_list()
+        {
+            return reference;
+        }
+        if let Some(node) = self.node_names.resolve(name) {
+            return AdvisoryNodeReference::Single(node);
+        }
+        resolve_list().unwrap_or(AdvisoryNodeReference::Missing)
+    }
+}
+
 /// Runtime-ready immutable model plus graph relations.
 #[derive(Clone, Debug, PartialEq)]
 pub struct SimulationModel {
@@ -597,7 +666,7 @@ impl SimulationModel {
 }
 
 /// Static model graph used for validation and execution planning.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Default, Eq, PartialEq)]
 pub struct ModelGraph {
     /// Zone to surface edges.
     pub zone_surfaces: Vec<ZoneSurfaceEdge>,
@@ -611,6 +680,8 @@ pub struct ModelGraph {
     pub zone_ideal_loads: Vec<ZoneIdealLoadsEdge>,
     /// NodeList membership edges.
     pub node_list_members: Vec<NodeListMemberEdge>,
+    /// Deferred Source original-prefix declarations; no membership edges or placeholder IDs exist.
+    pub deferred_source_node_lists: Vec<DeferredSourceNodeList>,
     /// IdealLoads supply-node edges.
     pub ideal_loads_supply_nodes: Vec<IdealLoadsSupplyNodeEdge>,
     /// IdealLoads outdoor-air design specification edges.
@@ -633,6 +704,42 @@ pub struct ModelGraph {
     pub component_registry: ComponentRegistry,
     /// Node graph with component ownership and node diagnostics.
     pub node_graph: NodeGraph,
+}
+
+impl std::fmt::Debug for ModelGraph {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut graph = formatter.debug_struct("ModelGraph");
+        graph.field("zone_surfaces", &self.zone_surfaces);
+        graph.field("construction_materials", &self.construction_materials);
+        graph.field("zone_thermostats", &self.zone_thermostats);
+        graph.field("thermostat_setpoints", &self.thermostat_setpoints);
+        graph.field("zone_ideal_loads", &self.zone_ideal_loads);
+        graph.field("node_list_members", &self.node_list_members);
+        if !self.deferred_source_node_lists.is_empty() {
+            graph.field(
+                "deferred_source_node_lists",
+                &self.deferred_source_node_lists,
+            );
+        }
+        graph.field("ideal_loads_supply_nodes", &self.ideal_loads_supply_nodes);
+        graph.field(
+            "ideal_loads_outdoor_air_specs",
+            &self.ideal_loads_outdoor_air_specs,
+        );
+        graph.field("zone_air_nodes", &self.zone_air_nodes);
+        graph.field("plant_loop_branch_lists", &self.plant_loop_branch_lists);
+        graph.field("plant_branch_list_members", &self.plant_branch_list_members);
+        graph.field(
+            "plant_connector_list_members",
+            &self.plant_connector_list_members,
+        );
+        graph.field("plant_branch_components", &self.plant_branch_components);
+        graph.field("plant_loop_graph", &self.plant_loop_graph);
+        graph.field("air_loop_graph", &self.air_loop_graph);
+        graph.field("component_registry", &self.component_registry);
+        graph.field("node_graph", &self.node_graph);
+        graph.finish()
+    }
 }
 
 impl ModelGraph {
@@ -688,28 +795,49 @@ impl ModelGraph {
             node_list_members: model
                 .node_lists
                 .iter()
-                .flat_map(|node_list| {
-                    node_list
-                        .nodes
+                .filter_map(|list| match &list.nodes {
+                    NodeListMembers::Proven(nodes) => Some((list.id, nodes)),
+                    NodeListMembers::DeferredSourceOriginalPrefix { .. } => None,
+                })
+                .flat_map(|(node_list, nodes)| {
+                    nodes
                         .iter()
                         .enumerate()
                         .map(move |(index, node)| NodeListMemberEdge {
-                            node_list: node_list.id,
+                            node_list,
                             node: *node,
                             index: index as u32,
                         })
                 })
                 .collect(),
+            deferred_source_node_lists: model
+                .node_lists
+                .iter()
+                .filter_map(|list| match list.nodes {
+                    NodeListMembers::DeferredSourceOriginalPrefix { used_len } => {
+                        Some(DeferredSourceNodeList {
+                            id: list.id,
+                            used_len,
+                        })
+                    }
+                    NodeListMembers::Proven(_) => None,
+                })
+                .collect(),
             ideal_loads_supply_nodes: model
                 .ideal_loads_air_systems
                 .iter()
-                .flat_map(|system| {
-                    resolve_node_or_list(model, &system.zone_supply_air_node_name)
-                        .into_iter()
-                        .map(move |node| IdealLoadsSupplyNodeEdge {
-                            ideal_loads_air_system: system.id,
-                            node,
-                        })
+                .filter_map(|system| {
+                    // Deferred declarations stay explicit above; graph edges only carry real IDs.
+                    match resolve_node_or_list(model, &system.zone_supply_air_node_name) {
+                        Ok(nodes) => Some((system.id, nodes)),
+                        Err(_) => None,
+                    }
+                })
+                .flat_map(|(ideal_loads_air_system, nodes)| {
+                    nodes.into_iter().map(move |node| IdealLoadsSupplyNodeEdge {
+                        ideal_loads_air_system,
+                        node,
+                    })
                 })
                 .collect(),
             ideal_loads_outdoor_air_specs: model
@@ -734,13 +862,12 @@ impl ModelGraph {
                 .zone_equipment_connections
                 .iter()
                 .filter_map(|connection| {
-                    model
-                        .node_names
-                        .resolve(&connection.zone_air_node_name.0)
-                        .map(|node| ZoneAirNodeEdge {
+                    resolved_zone_air_node(model, &connection.zone_air_node_name).map(|node| {
+                        ZoneAirNodeEdge {
                             zone: connection.zone,
                             node,
-                        })
+                        }
+                    })
                 })
                 .collect(),
             plant_loop_branch_lists: plant_loop_branch_lists(model),
@@ -1567,26 +1694,38 @@ fn referenced_node_ids(
 ) -> Vec<NodeId> {
     let mut nodes = Vec::new();
     for list in &model.node_lists {
-        for node in &list.nodes {
-            push_unique_node(&mut nodes, *node);
+        match &list.nodes {
+            NodeListMembers::Proven(members) => {
+                for node in members {
+                    push_unique_node(&mut nodes, *node);
+                }
+            }
+            // Deferred memberships are recorded on ModelGraph, not replaced with fake NodeIds.
+            NodeListMembers::DeferredSourceOriginalPrefix { .. } => {}
         }
     }
     for system in &model.ideal_loads_air_systems {
-        for node in resolve_node_or_list(model, &system.zone_supply_air_node_name) {
-            push_unique_node(&mut nodes, node);
-        }
-    }
-    for connection in &model.zone_equipment_connections {
-        if let Some(node) = model.node_names.resolve(&connection.zone_air_node_name.0) {
-            push_unique_node(&mut nodes, node);
-        }
-        if let Some(name) = &connection.zone_air_inlet_node_or_nodelist_name {
-            for node in resolve_node_or_list(model, name) {
+        if let Ok(members) = resolve_node_or_list(model, &system.zone_supply_air_node_name) {
+            for node in members {
                 push_unique_node(&mut nodes, node);
             }
         }
-        if let Some(name) = &connection.zone_return_air_node_or_nodelist_name {
-            for node in resolve_node_or_list(model, name) {
+    }
+    for connection in &model.zone_equipment_connections {
+        if let Some(node) = resolved_zone_air_node(model, &connection.zone_air_node_name) {
+            push_unique_node(&mut nodes, node);
+        }
+        if let Some(name) = &connection.zone_air_inlet_node_or_nodelist_name
+            && let Ok(members) = resolve_node_or_list(model, name)
+        {
+            for node in members {
+                push_unique_node(&mut nodes, node);
+            }
+        }
+        if let Some(name) = &connection.zone_return_air_node_or_nodelist_name
+            && let Ok(members) = resolve_node_or_list(model, name)
+        {
+            for node in members {
                 push_unique_node(&mut nodes, node);
             }
         }
@@ -1609,8 +1748,10 @@ fn referenced_node_ids(
             .iter()
             .chain(air_loop.supply_side_outlet_node_names.iter())
         {
-            for node in resolve_node_or_list(model, name) {
-                push_unique_node(&mut nodes, node);
+            if let Ok(members) = resolve_node_or_list(model, name) {
+                for node in members {
+                    push_unique_node(&mut nodes, node);
+                }
             }
         }
     }
@@ -1718,16 +1859,26 @@ fn sorted_zone_ideal_loads(model: &TypedModel) -> Vec<ZoneIdealLoadsEdge> {
     edges
 }
 
-fn resolve_node_or_list(model: &TypedModel, name: &NormalizedName) -> Vec<NodeId> {
-    if let Some(node) = model.node_names.resolve(&name.0) {
-        return vec![node];
+fn resolve_node_or_list(
+    model: &TypedModel,
+    name: &NormalizedName,
+) -> Result<Vec<NodeId>, DeferredSourceNodeList> {
+    model
+        .resolve_advisory_node_reference(&name.0)
+        .require_proven_nodes()
+}
+
+fn resolved_zone_air_node(model: &TypedModel, name: &NormalizedName) -> Option<NodeId> {
+    if !model.node_names.is_source_exact_namespace() {
+        return model.node_names.resolve(&name.0);
     }
-    if let Some(node_list) = model.node_list_names.resolve(&name.0)
-        && let Some(list) = model.node_lists.iter().find(|list| list.id == node_list)
-    {
-        return list.nodes.clone();
+    match model.resolve_advisory_node_reference(&name.0) {
+        AdvisoryNodeReference::Single(node) => Some(node),
+        AdvisoryNodeReference::ProvenList { nodes: [node], .. } => Some(*node),
+        AdvisoryNodeReference::Missing
+        | AdvisoryNodeReference::ProvenList { .. }
+        | AdvisoryNodeReference::DeferredList { .. } => None,
     }
-    Vec::new()
 }
 
 /// NodeList membership relation.

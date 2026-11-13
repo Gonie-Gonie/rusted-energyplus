@@ -83,6 +83,53 @@ fn get_zone_local_environment_materializes_optional_nodes_and_zone_links()
     assert_eq!(model.zone_local_environments[2].outdoor_air_node, None);
     assert_eq!(model.zones[0].linked_outdoor_air_node, Some(NodeId(0)));
     assert_eq!(model.zones[1].linked_outdoor_air_node, Some(NodeId(1)));
+    // Existing test, real Source compiler caller: exact optional alpha and
+    // selected Proven versus unused/selected Deferred advisory prerequisites.
+    let raw = parse_epjson_str(
+        r#"{
+        "Zone":{"Only Zone":{}},
+        "NodeList":{
+            "Alias ":{"nodes":[{"node_name":" Member "}]},
+            "Unused Hole":{"nodes":[{"node_name":"A"},{"node_name":""},{"node_name":"A"}]}
+        },
+        "ZoneProperty:LocalEnvironment":{
+            "Alpha Alias":{"zone_name":"Only Zone","outdoor_air_node_name":"Alias "},
+            "Beta Whitespace":{"zone_name":"Only Zone","outdoor_air_node_name":" "}
+        }
+    }"#,
+    )?;
+    let source = super::super::compile_raw_model_for_source(&raw);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    let source = source.model.ok_or("Source local-environment projection")?;
+    let member = source
+        .node_names
+        .resolve(" Member ")
+        .ok_or("exact member")?;
+    let whitespace = source
+        .node_names
+        .resolve(" ")
+        .ok_or("nonempty whitespace node")?;
+    assert_eq!(source.nodes[member.0 as usize].name.0, " MEMBER ");
+    assert!(source.node_names.resolve("Member").is_none());
+    assert_eq!(
+        source.zone_local_environments[0].outdoor_air_node,
+        Some(member)
+    );
+    assert_eq!(
+        source.zone_local_environments[1].outdoor_air_node,
+        Some(whitespace)
+    );
+    assert_eq!(source.zones[0].linked_outdoor_air_node, Some(whitespace));
+    let selected = parse_epjson_str(
+        r#"{
+        "Zone":{"Only Zone":{}},
+        "NodeList":{"Hole":{"nodes":[{"node_name":"A"},{"node_name":""},{"node_name":"A"}]}},
+        "ZoneProperty:LocalEnvironment":{"Selected":{"zone_name":"Only Zone","outdoor_air_node_name":"Hole"}}
+    }"#,
+    )?;
+    let selected = super::super::compile_raw_model_for_source(&selected);
+    assert!(selected.model.is_none() && has_error(&selected, "SourceNodeProjectionUnavailable"));
+
     Ok(())
 }
 

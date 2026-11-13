@@ -256,6 +256,52 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
     assert_eq!([binding.supply_node.0, binding.return_node.0], [0, 2]);
     assert_eq!(binding.zone_air_node, NodeId(1));
     assert_eq!(binding.nominal_system_timestep_seconds, 600.0);
+    assert!(!format!("{:?}", model.graph).contains("deferred_source_node_lists"));
+    assert_eq!(
+        format!("{:?}", ep_model::NodeListMembers::Proven(vec![NodeId(0)])),
+        format!("{:?}", vec![NodeId(0)])
+    );
+
+    let (unused_deferred, _) = fixture(|typed| {
+        typed.node_names = ep_model::NameMap::source_exact_namespace();
+        for node in &typed.nodes {
+            typed.node_names.insert(&node.name.0, node.id);
+        }
+        typed.node_list_names = ep_model::NameMap::source_exact_namespace();
+        typed
+            .node_list_names
+            .insert("UNUSED ORIGINAL PREFIX", NodeListId(0));
+        typed.node_lists.push(NodeList {
+            id: NodeListId(0),
+            name: typed
+                .node_list_names
+                .normalized_name("UNUSED ORIGINAL PREFIX"),
+            nodes: ep_model::NodeListMembers::DeferredSourceOriginalPrefix { used_len: 2 },
+        });
+    });
+    let deferred = ep_model::DeferredSourceNodeList {
+        id: NodeListId(0),
+        used_len: 2,
+    };
+    assert_eq!(
+        unused_deferred.graph.deferred_source_node_lists,
+        vec![deferred]
+    );
+    validate_source_direct_zone_purchased_air_model(&unused_deferred)
+        .expect("unused unresolved declaration must not block independent proven Source roles");
+    bind_direct_zone_purchased_air_model(&unused_deferred)
+        .expect("unchanged Legacy binding still follows independent proven roles");
+    let mut required = unused_deferred.typed.clone();
+    required.zone_equipment_connections[0].zone_air_inlet_node_or_nodelist_name = Some(
+        required
+            .node_list_names
+            .normalized_name("UNUSED ORIGINAL PREFIX"),
+    );
+    let required = SimulationModel::from_typed(required);
+    assert_eq!(
+        validate_source_direct_zone_purchased_air_model(&required),
+        Err(DirectZonePurchasedAirBindingError::DeferredSourceNodeList { deferred })
+    );
 }
 
 #[test]
@@ -492,7 +538,7 @@ fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
         typed.node_lists.push(NodeList {
             id: NodeListId(0),
             name: NormalizedName::new("INLETS"),
-            nodes: vec![NodeId(0), NodeId(3)],
+            nodes: vec![NodeId(0), NodeId(3)].into(),
         });
         typed.node_list_names.insert("INLETS", NodeListId(0));
         typed.ideal_loads_air_systems[0].zone_supply_air_node_name = NormalizedName::new("INLETS");
@@ -529,7 +575,7 @@ fn binding_rejects_multi_inlet_return_and_mode_availability_topology() {
         typed.node_lists.push(NodeList {
             id: NodeListId(0),
             name: NormalizedName::new("RETURNS"),
-            nodes: vec![NodeId(2), NodeId(3)],
+            nodes: vec![NodeId(2), NodeId(3)].into(),
         });
         typed.node_list_names.insert("RETURNS", NodeListId(0));
         typed.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name =

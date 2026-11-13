@@ -4830,26 +4830,17 @@ fn manifest_allows_constant_shr_conformance(
 }
 
 fn resolve_first_node_or_list_name(model: &SimulationModel, name: &str) -> Option<String> {
-    if let Some(node_id) = model.typed.node_names.resolve(name) {
-        return model
-            .typed
-            .nodes
-            .iter()
-            .find(|node| node.id == node_id)
-            .map(|node| node.name.0.clone());
-    }
-    let node_list_id = model.typed.node_list_names.resolve(name)?;
-    let node_list = model
-        .typed
-        .node_lists
-        .iter()
-        .find(|node_list| node_list.id == node_list_id)?;
-    let node_id = node_list.nodes.first()?;
+    let node_id = match model.typed.resolve_advisory_node_reference(name) {
+        ep_model::AdvisoryNodeReference::Single(node) => node,
+        ep_model::AdvisoryNodeReference::ProvenList { nodes, .. } => *nodes.first()?,
+        ep_model::AdvisoryNodeReference::Missing
+        | ep_model::AdvisoryNodeReference::DeferredList { .. } => return None,
+    };
     model
         .typed
         .nodes
         .iter()
-        .find(|node| node.id == *node_id)
+        .find(|node| node.id == node_id)
         .map(|node| node.name.0.clone())
 }
 

@@ -5,8 +5,7 @@ use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
 pub(super) fn is_family(family: &str) -> bool {
     matches!(
         family,
-        "NodeList"
-            | "SetpointManager:Scheduled"
+        "SetpointManager:Scheduled"
             | "Output:Schedules"
             | "Schedule:Compact"
             | "Schedule:File"
@@ -135,10 +134,6 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
                     fields.get(&FieldName((*name).into())).and_then(number).is_some_and(|n| n.fract() == 0.0 && n >= 1.0 && n <= if name.ends_with("month") {12.0} else {31.0})
                 })
             }))
-        }
-        ("NodeList", "nodes") => {
-            blank(value)
-                || matches!(value, RawValue::Array(items) if items.iter().all(|item| matches!(item, RawValue::Object(fields) if fields.iter().all(|(name, value)| match name.0.as_str() { "node_name" => matches!(value, RawValue::String(_)), _ => false, }) && fields.contains_key(&FieldName("node_name".into())))))
         }
         ("Schedule:Compact", "schedule_type_limits_name") => {
             blank(value) || matches!(value, RawValue::String(_))
@@ -461,7 +456,6 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         "Schedule:Day:Interval" | "Schedule:Week:Compact" => &["data"],
         "Schedule:Day:List" => &["minutes_per_item", "extensions"],
         "Schedule:Year" => &["schedule_weeks"],
-        "NodeList" => &[],
         "Schedule:Compact" => &[],
         "Schedule:File" => &["file_name", "column_number", "rows_to_skip_at_top"],
         "ThermostatSetpoint:DualSetpoint" => &[],
@@ -513,19 +507,6 @@ const REGULAR_DAY_FIELDS: [&str; 12] = [
 /// Admission validates actual raw schedule identity, not a typed empty graph.
 /// Resolution/current values and node connections remain the production getters.
 pub(super) fn validate_scheduled_setpoint_references(raw: &RawModel) -> Result<(), String> {
-    // A caller can explicitly apply only a custom subset of IDF overlays.
-    // Multiple lists need their actual legacy getter order on that path too.
-    if !raw.is_epjson()
-        && raw
-            .objects
-            .get(&ObjectType("NodeList".into()))
-            .is_some_and(|rows| rows.len() > 1)
-        && !raw.has_idf_declaration_order("NodeList")
-    {
-        return Err(
-            "Multiple NodeLists in IDF require their actual recovered declaration order".into(),
-        );
-    }
     let Some(objects) = raw
         .objects
         .get(&ObjectType("SetpointManager:Scheduled".into()))

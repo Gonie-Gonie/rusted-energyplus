@@ -34,6 +34,11 @@ pub enum RuntimeError {
         /// Missing or unrepresentable real owner; never a fabricated Native fatal.
         reason: String,
     },
+    /// An advisory Source NodeList required by this projection has unresolved original cells.
+    DeferredSourceNodeList {
+        /// Actual input declaration and retained prefix length; no Native-invalid claim.
+        deferred: ep_model::DeferredSourceNodeList,
+    },
     /// No air-side nodes were available for a node-state projection.
     NoNodeStateProjectionNodes,
     /// No plant loops were available for a plant-state projection.
@@ -151,6 +156,11 @@ impl Display for RuntimeError {
             Self::NoZones => write!(
                 formatter,
                 "first-zone simulation requires at least one Zone"
+            ),
+            Self::DeferredSourceNodeList { deferred } => write!(
+                formatter,
+                "advisory Source NodeList {:?} original prefix (length {}) requires unresolved input support",
+                deferred.id, deferred.used_len
             ),
             Self::NoNodeStateProjectionNodes => write!(
                 formatter,

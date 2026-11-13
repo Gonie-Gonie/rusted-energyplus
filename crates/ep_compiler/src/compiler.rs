@@ -56,10 +56,11 @@ use ep_model::{
     MaterialPhaseChangeId, MaterialSurfaceRoughness, MaterialVariableAbsorptance,
     MaterialVariableAbsorptanceId, MaterialVariableThermalConductivity,
     MaterialVariableThermalConductivityId, MaterialVariableThermalConductivityPoint, NameMap,
-    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NormalizedName, NumericType,
-    OpaqueSurfaceProperties, OtherEquipment, OtherEquipmentDesignLevelCalculationMethod,
-    OutdoorAirEconomizerType, OutsideBoundaryCondition, OutsideSurfaceConvectionAlgorithm, People,
-    PeopleNumberCalculationMethod, PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
+    NoMassMaterial, Node, NodeId, NodeList, NodeListId, NodeListMembers, NormalizedName,
+    NumericType, OpaqueSurfaceProperties, OtherEquipment,
+    OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType, OutsideBoundaryCondition,
+    OutsideSurfaceConvectionAlgorithm, People, PeopleNumberCalculationMethod,
+    PhaseChangeHysteresisCurve, PhaseChangeHysteresisThermalState,
     PhaseChangeTemperatureEnthalpyPoint, PlantBranch, PlantBranchComponent, PlantBranchList,
     PlantConnector, PlantConnectorKind, PlantConnectorList, PlantConnectorListEntry, PlantLoop,
     Point3, PumpConstantSpeed, RegularMaterial, RoofVegetationMaterial,
@@ -463,8 +464,9 @@ pub fn compile_raw_model(raw_model: &RawModel) -> CompileResult {
 /// `Schedule:File` remains RawOnly: only its ID and names are declared here.
 /// Field validation, defaults, type lookup and external data belong to the
 /// retained Source getter; legacy compilation and value caches are unchanged.
-/// The advisory NodeList graph omits explicit empty-string members; the real
-/// Source IP/NodeOwner retains their original cells, warning counts and holes.
+/// Source NodeList membership is the original shortened prefix: Proven real
+/// typed identities or an explicit Deferred prefix, never compacted members.
+/// The real Source IP/NodeOwner owns all original cells, warnings and references.
 #[must_use]
 pub fn compile_raw_model_for_source(raw_model: &RawModel) -> CompileResult {
     let mut compiler = Compiler::new(raw_model, None);
@@ -702,6 +704,8 @@ impl<'a> Compiler<'a> {
             model.authored_space_names = NameMap::source_exact_namespace();
             model.space_type_names = NameMap::source_exact_namespace();
             model.space_list_names = NameMap::source_exact_namespace();
+            model.node_names = NameMap::source_exact_namespace();
+            model.node_list_names = NameMap::source_exact_namespace();
         }
 
         self.parse_building(&mut model);
@@ -12501,6 +12505,10 @@ impl<'a> Compiler<'a> {
     }
 
     fn parse_node_lists(&mut self, model: &mut TypedModel) {
+        if self.source_file_declarations {
+            self.parse_source_node_lists(model);
+            return;
+        }
         for (name, object) in self.objects("NodeList") {
             if model.node_names.resolve(&name).is_some() {
                 self.error(
@@ -12527,8 +12535,160 @@ impl<'a> Compiler<'a> {
             model.node_lists.push(NodeList {
                 id,
                 name: NormalizedName::new(&name),
+                nodes: nodes.into(),
+            });
+        }
+    }
+
+    // Immutable Source advisory identities only. The real raw/IP NodeOwner
+    // retains original mutable cells, references, warning phases and fluids.
+    fn parse_source_node_lists(&mut self, model: &mut TypedModel) {
+        let objects = self.objects("NodeList");
+        let declared_names = objects
+            .iter()
+            .map(|(name, _)| model.node_list_names.normalized_name(name))
+            .collect::<Vec<_>>();
+        for (ordinal, (name, object)) in objects.into_iter().enumerate() {
+            let Some(nodes) =
+                self.source_node_list_members(model, &name, &object, ordinal, &declared_names)
+            else {
+                continue;
+            };
+            let Some(id_value) = self.checked_id("NodeList", &name, model.node_lists.len()) else {
+                continue;
+            };
+            let id = NodeListId(id_value);
+            // Native preserves every exact JSON declaration, uppercases each
+            // Name, and GetNodeNums finds the first case-matching declaration.
+            // No duplicate-list-name check occurs in GetNodeListsInput.
+            model.node_list_names.insert_instance(&name, id);
+            model.node_lists.push(NodeList {
+                id,
+                name: model.node_list_names.normalized_name(&name),
                 nodes,
             });
+        }
+    }
+
+    fn source_node_list_members(
+        &mut self,
+        model: &mut TypedModel,
+        object_name: &str,
+        object: &RawObject,
+        ordinal: usize,
+        declared_names: &[NormalizedName],
+    ) -> Option<NodeListMembers> {
+        let Some(value) = field_value(object, "nodes") else {
+            self.error(
+                "MissingRequiredField",
+                "NodeList",
+                Some(object_name),
+                Some("nodes"),
+                format!("NodeList/{object_name} requires field nodes"),
+            );
+            return None;
+        };
+        let RawValue::Array(values) = value else {
+            self.invalid_field_type("NodeList", object_name, "nodes", "array");
+            return None;
+        };
+        let diagnostics_before = self.diagnostics.len();
+        // Parser-local string borrows, not a second physical Node array. An
+        // explicit empty string is legal here; malformed/missing cells are not.
+        let mut names = Vec::with_capacity(values.len());
+        for (index, value) in values.iter().enumerate() {
+            let RawValue::Object(fields) = value else {
+                self.error(
+                    "InvalidFieldType",
+                    "NodeList",
+                    Some(object_name),
+                    Some("nodes"),
+                    format!("NodeList/{object_name} node entry {index} must be an object"),
+                );
+                continue;
+            };
+            match fields.get(&FieldName("node_name".into())) {
+                Some(RawValue::String(value)) => names.push(value.as_str()),
+                Some(_) => self.invalid_field_type("NodeList", object_name, "node_name", "string"),
+                None => self.error(
+                    "MissingRequiredField",
+                    "NodeList",
+                    Some(object_name),
+                    Some("node_name"),
+                    format!("NodeList/{object_name}[{index}] requires field node_name"),
+                ),
+            }
+        }
+        if self.diagnostics.len() != diagnostics_before {
+            return None;
+        }
+        let used_len = names.len() - names.iter().filter(|name| name.is_empty()).count();
+        if used_len == 0 {
+            self.error(
+                "MissingNodeListMember",
+                "NodeList",
+                Some(object_name),
+                Some("nodes"),
+                format!("NodeList/{object_name} has no valid node members"),
+            );
+            return None;
+        }
+        let own_name = model.node_list_names.normalized_name(object_name);
+        // Native588-595: register/self-check every nonempty ORIGINAL cell,
+        // including tails outside used_len. This is AssignNodeNumber, not the
+        // list-first GetOnlySingleNode consumer, so a tail may share a list name.
+        for name in &names {
+            if name.is_empty() {
+                continue;
+            }
+            self.register_node_identity(model, name)?;
+            if model.node_names.normalized_name(name) == own_name {
+                self.error(
+                    "DuplicateNodeOrNodeListName",
+                    "NodeList",
+                    Some(object_name),
+                    Some("node_name"),
+                    format!(
+                        "NodeList/{object_name} member '{name}' duplicates its own NodeList name"
+                    ),
+                );
+            }
+        }
+        // Native600-638 examines ORIGINAL slots[0:m], never a compacted list.
+        // Empty keys compare equal here, just as two original zero Node cells.
+        let prefix = &names[..used_len];
+        let mut seen = std::collections::BTreeSet::new();
+        for name in prefix {
+            let normalized = model.node_names.normalized_name(name);
+            if !seen.insert(normalized.clone()) {
+                self.error(
+                    "DuplicateNodeListMember",
+                    "NodeList",
+                    Some(object_name),
+                    Some("node_name"),
+                    format!(
+                        "NodeList/{object_name} duplicates original-prefix node '{}'",
+                        normalized.0
+                    ),
+                );
+            }
+            if declared_names
+                .iter()
+                .enumerate()
+                .any(|(other, list)| other != ordinal && *list == normalized)
+            {
+                self.error("DuplicateNodeOrNodeListName", "NodeList", Some(object_name), Some("node_name"),
+                    format!("NodeList/{object_name} original-prefix member '{name}' duplicates another NodeList name"));
+            }
+        }
+        if prefix.iter().any(|name| name.is_empty()) {
+            Some(NodeListMembers::DeferredSourceOriginalPrefix { used_len })
+        } else {
+            let nodes = prefix
+                .iter()
+                .map(|name| model.node_names.resolve(name))
+                .collect::<Option<Vec<_>>>()?;
+            Some(NodeListMembers::Proven(nodes))
         }
     }
 
@@ -12617,7 +12777,7 @@ impl<'a> Compiler<'a> {
 
     fn parse_ideal_loads_air_systems(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("ZoneHVAC:IdealLoadsAirSystem") {
-            let Some(zone_supply_air_node_name) = self.required_string(
+            let Some(zone_supply_air_node_name) = self.required_node_name(
                 "ZoneHVAC:IdealLoadsAirSystem",
                 &name,
                 &object,
@@ -12627,7 +12787,7 @@ impl<'a> Compiler<'a> {
             };
             self.register_node_or_nodelist_name(model, &zone_supply_air_node_name);
             let zone_exhaust_air_node_name = self
-                .optional_string(
+                .optional_node_name(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
@@ -12635,10 +12795,10 @@ impl<'a> Compiler<'a> {
                 )
                 .map(|value| {
                     self.register_node(model, &value);
-                    NormalizedName::new(&value)
+                    model.node_names.normalized_name(&value)
                 });
             let system_inlet_air_node_name = self
-                .optional_string(
+                .optional_node_name(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
@@ -12646,10 +12806,10 @@ impl<'a> Compiler<'a> {
                 )
                 .map(|value| {
                     self.register_node(model, &value);
-                    NormalizedName::new(&value)
+                    model.node_names.normalized_name(&value)
                 });
             let outdoor_air_inlet_node_name = self
-                .optional_string(
+                .optional_node_name(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,
                     &object,
@@ -12657,7 +12817,7 @@ impl<'a> Compiler<'a> {
                 )
                 .map(|value| {
                     self.register_node(model, &value);
-                    NormalizedName::new(&value)
+                    model.node_names.normalized_name(&value)
                 });
             let Some(id_value) = self.checked_id(
                 "ZoneHVAC:IdealLoadsAirSystem",
@@ -12686,7 +12846,9 @@ impl<'a> Compiler<'a> {
                     &object,
                     "availability_schedule_name",
                 ),
-                zone_supply_air_node_name: NormalizedName::new(&zone_supply_air_node_name),
+                zone_supply_air_node_name: model
+                    .node_names
+                    .normalized_name(&zone_supply_air_node_name),
                 zone_exhaust_air_node_name,
                 system_inlet_air_node_name,
                 maximum_heating_supply_air_temperature_c: self.number_range_default(
@@ -12961,7 +13123,7 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let Some(zone_air_node_name) = self.required_string(
+            let Some(zone_air_node_name) = self.required_node_name(
                 "ZoneHVAC:EquipmentConnections",
                 &name,
                 &object,
@@ -12971,7 +13133,7 @@ impl<'a> Compiler<'a> {
             };
             self.register_node(model, &zone_air_node_name);
             let zone_air_inlet_node_or_nodelist_name = self
-                .optional_string(
+                .optional_node_name(
                     "ZoneHVAC:EquipmentConnections",
                     &name,
                     &object,
@@ -12979,10 +13141,10 @@ impl<'a> Compiler<'a> {
                 )
                 .map(|value| {
                     self.register_node_or_nodelist_name(model, &value);
-                    NormalizedName::new(&value)
+                    model.node_names.normalized_name(&value)
                 });
             let zone_air_exhaust_node_or_nodelist_name = self
-                .optional_string(
+                .optional_node_name(
                     "ZoneHVAC:EquipmentConnections",
                     &name,
                     &object,
@@ -12990,10 +13152,10 @@ impl<'a> Compiler<'a> {
                 )
                 .map(|value| {
                     self.register_node_or_nodelist_name(model, &value);
-                    NormalizedName::new(&value)
+                    model.node_names.normalized_name(&value)
                 });
             let zone_return_air_node_or_nodelist_name = self
-                .optional_string(
+                .optional_node_name(
                     "ZoneHVAC:EquipmentConnections",
                     &name,
                     &object,
@@ -13001,10 +13163,10 @@ impl<'a> Compiler<'a> {
                 )
                 .map(|value| {
                     self.register_node_or_nodelist_name(model, &value);
-                    NormalizedName::new(&value)
+                    model.node_names.normalized_name(&value)
                 });
             let zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name = self
-                .optional_string(
+                .optional_node_name(
                     "ZoneHVAC:EquipmentConnections",
                     &name,
                     &object,
@@ -13012,7 +13174,7 @@ impl<'a> Compiler<'a> {
                 )
                 .map(|value| {
                     self.register_node_or_nodelist_name(model, &value);
-                    NormalizedName::new(&value)
+                    model.node_names.normalized_name(&value)
                 });
             let Some(id_value) = self.checked_id(
                 "ZoneHVAC:EquipmentConnections",
@@ -13046,7 +13208,7 @@ impl<'a> Compiler<'a> {
                     equipment_list,
                     zone_air_inlet_node_or_nodelist_name,
                     zone_air_exhaust_node_or_nodelist_name,
-                    zone_air_node_name: NormalizedName::new(&zone_air_node_name),
+                    zone_air_node_name: model.node_names.normalized_name(&zone_air_node_name),
                     zone_return_air_node_or_nodelist_name,
                     zone_return_air_node_1_flow_rate_fraction_schedule: self
                         .optional_schedule_reference(
@@ -13070,12 +13232,12 @@ impl<'a> Compiler<'a> {
         ] {
             for (name, object) in self.objects(object_type) {
                 let Some(inlet_node_name) =
-                    self.required_string(object_type, &name, &object, "air_inlet_node_name")
+                    self.required_node_name(object_type, &name, &object, "air_inlet_node_name")
                 else {
                     continue;
                 };
                 let Some(outlet_node_name) =
-                    self.required_string(object_type, &name, &object, "air_outlet_node_name")
+                    self.required_node_name(object_type, &name, &object, "air_outlet_node_name")
                 else {
                     continue;
                 };
@@ -13137,10 +13299,10 @@ impl<'a> Compiler<'a> {
         ] {
             for (name, object) in self.objects(object_type) {
                 let inlet_node = self
-                    .optional_string(object_type, &name, &object, "air_inlet_node_name")
+                    .optional_node_name(object_type, &name, &object, "air_inlet_node_name")
                     .and_then(|node_name| self.register_node(model, &node_name));
                 let outlet_node = self
-                    .optional_string(object_type, &name, &object, "air_outlet_node_name")
+                    .optional_node_name(object_type, &name, &object, "air_outlet_node_name")
                     .and_then(|node_name| self.register_node(model, &node_name));
                 let Some(id_value) = self.checked_id(object_type, &name, model.coils.len()) else {
                     continue;
@@ -13176,7 +13338,7 @@ impl<'a> Compiler<'a> {
         ] {
             for (name, object) in self.objects(object_type) {
                 let setpoint_node = self
-                    .optional_string(
+                    .optional_node_name(
                         object_type,
                         &name,
                         &object,
@@ -13184,7 +13346,24 @@ impl<'a> Compiler<'a> {
                     )
                     .and_then(|node_or_list| {
                         self.register_node_or_nodelist_name(model, &node_or_list);
-                        model.node_names.resolve(&node_or_list)
+                        if self.source_file_declarations {
+                            // This optional single-node summary cannot pretend
+                            // a multi/deferred list is one node. The genuine raw
+                            // Scheduled owner still consumes its full target.
+                            match model.resolve_advisory_node_reference(&node_or_list) {
+                                ep_model::AdvisoryNodeReference::Single(node) => Some(node),
+                                ep_model::AdvisoryNodeReference::ProvenList { nodes, .. }
+                                    if nodes.len() == 1 =>
+                                {
+                                    Some(nodes[0])
+                                }
+                                ep_model::AdvisoryNodeReference::Missing
+                                | ep_model::AdvisoryNodeReference::ProvenList { .. }
+                                | ep_model::AdvisoryNodeReference::DeferredList { .. } => None,
+                            }
+                        } else {
+                            model.node_names.resolve(&node_or_list)
+                        }
                     });
                 let Some(id_value) =
                     self.checked_id(object_type, &name, model.setpoint_managers.len())
@@ -13242,12 +13421,12 @@ impl<'a> Compiler<'a> {
     fn parse_pumps_constant_speed(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Pump:ConstantSpeed") {
             let Some(inlet_node_name) =
-                self.required_string("Pump:ConstantSpeed", &name, &object, "inlet_node_name")
+                self.required_node_name("Pump:ConstantSpeed", &name, &object, "inlet_node_name")
             else {
                 continue;
             };
             let Some(outlet_node_name) =
-                self.required_string("Pump:ConstantSpeed", &name, &object, "outlet_node_name")
+                self.required_node_name("Pump:ConstantSpeed", &name, &object, "outlet_node_name")
             else {
                 continue;
             };
@@ -13296,7 +13475,7 @@ impl<'a> Compiler<'a> {
 
     fn parse_boilers_hot_water(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Boiler:HotWater") {
-            let Some(inlet_node_name) = self.required_string(
+            let Some(inlet_node_name) = self.required_node_name(
                 "Boiler:HotWater",
                 &name,
                 &object,
@@ -13304,7 +13483,7 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let Some(outlet_node_name) = self.required_string(
+            let Some(outlet_node_name) = self.required_node_name(
                 "Boiler:HotWater",
                 &name,
                 &object,
@@ -13355,7 +13534,7 @@ impl<'a> Compiler<'a> {
 
     fn parse_chillers_electric_eir(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("Chiller:Electric:EIR") {
-            let Some(chilled_water_inlet_node_name) = self.required_string(
+            let Some(chilled_water_inlet_node_name) = self.required_node_name(
                 "Chiller:Electric:EIR",
                 &name,
                 &object,
@@ -13363,7 +13542,7 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let Some(chilled_water_outlet_node_name) = self.required_string(
+            let Some(chilled_water_outlet_node_name) = self.required_node_name(
                 "Chiller:Electric:EIR",
                 &name,
                 &object,
@@ -13382,7 +13561,7 @@ impl<'a> Compiler<'a> {
                 continue;
             };
             let condenser_inlet_node = self
-                .optional_string(
+                .optional_node_name(
                     "Chiller:Electric:EIR",
                     &name,
                     &object,
@@ -13390,7 +13569,7 @@ impl<'a> Compiler<'a> {
                 )
                 .and_then(|value| self.register_node(model, &value));
             let condenser_outlet_node = self
-                .optional_string(
+                .optional_node_name(
                     "Chiller:Electric:EIR",
                     &name,
                     &object,
@@ -13564,10 +13743,10 @@ impl<'a> Compiler<'a> {
                     )
                 });
             let supply_side_inlet_node = self
-                .optional_string("AirLoopHVAC", &name, &object, "supply_side_inlet_node_name")
+                .optional_node_name("AirLoopHVAC", &name, &object, "supply_side_inlet_node_name")
                 .and_then(|node_name| self.register_node(model, &node_name));
             let demand_side_outlet_node = self
-                .optional_string(
+                .optional_node_name(
                     "AirLoopHVAC",
                     &name,
                     &object,
@@ -13624,23 +13803,26 @@ impl<'a> Compiler<'a> {
     fn parse_plant_loops(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("PlantLoop") {
             let Some(plant_side_inlet_node_name) =
-                self.required_string("PlantLoop", &name, &object, "plant_side_inlet_node_name")
+                self.required_node_name("PlantLoop", &name, &object, "plant_side_inlet_node_name")
             else {
                 continue;
             };
             let Some(plant_side_outlet_node_name) =
-                self.required_string("PlantLoop", &name, &object, "plant_side_outlet_node_name")
+                self.required_node_name("PlantLoop", &name, &object, "plant_side_outlet_node_name")
             else {
                 continue;
             };
             let Some(demand_side_inlet_node_name) =
-                self.required_string("PlantLoop", &name, &object, "demand_side_inlet_node_name")
+                self.required_node_name("PlantLoop", &name, &object, "demand_side_inlet_node_name")
             else {
                 continue;
             };
-            let Some(demand_side_outlet_node_name) =
-                self.required_string("PlantLoop", &name, &object, "demand_side_outlet_node_name")
-            else {
+            let Some(demand_side_outlet_node_name) = self.required_node_name(
+                "PlantLoop",
+                &name,
+                &object,
+                "demand_side_outlet_node_name",
+            ) else {
                 continue;
             };
             let Some(plant_side_inlet_node) =
@@ -14618,7 +14800,7 @@ impl<'a> Compiler<'a> {
             ) {
                 continue;
             }
-            let Some(inlet_node_name) = self.required_string(
+            let Some(inlet_node_name) = self.required_node_name(
                 "Branch",
                 &entry_name,
                 &entry_object,
@@ -14626,7 +14808,7 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let Some(outlet_node_name) = self.required_string(
+            let Some(outlet_node_name) = self.required_node_name(
                 "Branch",
                 &entry_name,
                 &entry_object,
@@ -15052,15 +15234,6 @@ impl<'a> Compiler<'a> {
                 );
                 continue;
             };
-            // This graph only supplies Source admission/binding identities.
-            // The actual NodeList getter warns and shortens its used prefix;
-            // retain that original array exclusively in the raw/IP owner.
-            if self.source_file_declarations
-                && matches!(fields.get(&FieldName("node_name".into())),
-                    Some(RawValue::String(value)) if value.is_empty())
-            {
-                continue;
-            }
             let entry_object = RawObject {
                 fields: fields.clone(),
                 source_span: None,
@@ -15136,12 +15309,12 @@ impl<'a> Compiler<'a> {
             };
             let entry_name = format!("{object_name}[{index}]");
             let Some(node_or_list_name) =
-                self.required_string(object_type, &entry_name, &entry_object, name_field)
+                self.required_node_name(object_type, &entry_name, &entry_object, name_field)
             else {
                 continue;
             };
             self.register_node_or_nodelist_name(model, &node_or_list_name);
-            names.push(NormalizedName::new(&node_or_list_name));
+            names.push(model.node_names.normalized_name(&node_or_list_name));
         }
         names
     }
@@ -15239,6 +15412,35 @@ impl<'a> Compiler<'a> {
     }
 
     fn register_node(&mut self, model: &mut TypedModel, node_name: &str) -> Option<NodeId> {
+        if self.source_file_declarations {
+            match model.resolve_advisory_node_reference(node_name) {
+                ep_model::AdvisoryNodeReference::Single(node) => return Some(node),
+                ep_model::AdvisoryNodeReference::ProvenList { nodes, .. } => {
+                    if nodes.len() == 1 {
+                        return Some(nodes[0]);
+                    }
+                    self.error(
+                        "InvalidSingleNodeReference",
+                        "Node",
+                        Some(node_name),
+                        None,
+                        format!(
+                            "Node '{node_name}' requires one node, but its NodeList has {} members",
+                            nodes.len()
+                        ),
+                    );
+                    return None;
+                }
+                ep_model::AdvisoryNodeReference::DeferredList { used_len, .. } => {
+                    self.error("SourceNodeProjectionUnavailable", "Node", Some(node_name), None,
+                        format!("Node '{node_name}' has an unresolved Source original prefix of length {used_len}; actual Native consumer legality is not decided by this advisory projection"));
+                    return None;
+                }
+                ep_model::AdvisoryNodeReference::Missing => {
+                    return self.register_node_identity(model, node_name);
+                }
+            }
+        }
         if let Some(node) = model.node_names.resolve(node_name) {
             return Some(node);
         }
@@ -15253,6 +15455,19 @@ impl<'a> Compiler<'a> {
             return None;
         }
 
+        self.register_node_identity(model, node_name)
+    }
+
+    // Direct identity insertion for actual literal member registration. This
+    // does not resolve a NodeList alias or own runtime nodes/fluids/references.
+    fn register_node_identity(
+        &mut self,
+        model: &mut TypedModel,
+        node_name: &str,
+    ) -> Option<NodeId> {
+        if let Some(node) = model.node_names.resolve(node_name) {
+            return Some(node);
+        }
         let id_value = self.checked_id("Node", node_name, model.nodes.len())?;
         let id = NodeId(id_value);
         if model.node_names.insert(node_name, id).is_some() {
@@ -15261,7 +15476,7 @@ impl<'a> Compiler<'a> {
         }
         model.nodes.push(Node {
             id,
-            name: NormalizedName::new(node_name),
+            name: model.node_names.normalized_name(node_name),
         });
         Some(id)
     }
@@ -15359,6 +15574,41 @@ impl<'a> Compiler<'a> {
             return Some(Some(value.clone()));
         }
         self.optional_reference_name_checked(object_type, object_name, object, field)
+    }
+
+    // Node alphas are uppercased without trimming by the actual Source
+    // getter. Exact empty is absent/required-error according to this field;
+    // nonempty whitespace is a distinct name. Shared string policy is intact.
+    fn required_node_name(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<String> {
+        if self.source_file_declarations
+            && let Some(RawValue::String(value)) = field_value(object, field)
+            && !value.is_empty()
+        {
+            return Some(value.clone());
+        }
+        self.required_string(object_type, object_name, object, field)
+    }
+
+    fn optional_node_name(
+        &mut self,
+        object_type: &str,
+        object_name: &str,
+        object: &RawObject,
+        field: &str,
+    ) -> Option<String> {
+        if self.source_file_declarations
+            && let Some(RawValue::String(value)) = field_value(object, field)
+            && !value.is_empty()
+        {
+            return Some(value.clone());
+        }
+        self.optional_string(object_type, object_name, object, field)
     }
 
     fn required_string(
@@ -18224,13 +18474,13 @@ mod tests {
 
     use super::{
         ALL_SCHEDULE_DAY_TYPES, CompileStage, DiagnosticSeverity, ObjectCoverageStatus,
-        compile_raw_model,
+        compile_raw_model, compile_raw_model_for_source,
     };
     use ep_model::{
         AutosizeOrNumber, CalendarDateRule, DayOfWeek, DehumidificationControlType,
         DesignSpecificationOutdoorAirMethod, FirstHourInterpolationStartingValues,
         HumidificationControlType, IdealLoadsLimit, InsideSurfaceConvectionAlgorithm,
-        LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph,
+        LoadDistributionScheme, MaterialSurfaceRoughness, ModelGraph, NodeListMembers,
         OtherEquipmentDesignLevelCalculationMethod, OutdoorAirEconomizerType,
         OutsideSurfaceConvectionAlgorithm, PeopleNumberCalculationMethod, PlantConnectorKind,
         ScheduleDayType, ScheduleInterpolation, SpecialDayType,
@@ -20022,7 +20272,14 @@ mod tests {
         assert_eq!(model.zone_equipment_connections.len(), 1);
         assert_eq!(model.nodes.len(), 3);
         assert_eq!(model.node_lists.len(), 1);
-        assert_eq!(model.node_lists[0].nodes.len(), 1);
+        assert_eq!(
+            model.node_lists[0]
+                .nodes
+                .proven_nodes()
+                .expect("legacy proven members")
+                .len(),
+            1
+        );
         assert_eq!(model.zone_thermostats[0].zone.0, 0);
         assert_eq!(model.zone_thermostats[0].controls[0].dual_setpoint.0, 0);
         assert_eq!(
@@ -20436,6 +20693,168 @@ mod tests {
                 && diagnostic.object_type == "NodeList"
                 && diagnostic.object_name.as_deref() == Some("Shared Name")
         }));
+
+        // Authored compiler-only cases; no Native/runtime execution credit.
+        let source_raw = parse_epjson_str(
+            r#"{
+            "NodeList": {
+                "A HOLE": {"nodes":[{"node_name":"A"},{"node_name":""},{"node_name":"A"}]},
+                "B TAIL": {"nodes":[{"node_name":"B"},{"node_name":""},{"node_name":"OTHER"}]},
+                "Case": {"nodes":[{"node_name":"FIRST CASE MEMBER"}]},
+                "OTHER": {"nodes":[{"node_name":"REAL OTHER"}]},
+                " Padded ": {"nodes":[{"node_name":"PADDED MEMBER"}]},
+                "SPACES": {"nodes":[{"node_name":" "},{"node_name":"  "}]},
+                "TRAILING": {"nodes":[{"node_name":"END"},{"node_name":""}]},
+                "case": {"nodes":[{"node_name":"SECOND CASE MEMBER"}]}
+            },
+            "SetpointManager:Scheduled": {
+                "PROVEN LIST SUMMARY": {"setpoint_node_or_nodelist_name":"OTHER"},
+                "DEFERRED LIST SUMMARY": {"setpoint_node_or_nodelist_name":"A HOLE"}
+            }
+        }"#,
+        )?;
+        let retained_raw = source_raw.clone();
+        let source = compile_raw_model_for_source(&source_raw);
+        assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+        assert_eq!(source_raw, retained_raw);
+        let source = source.model.ok_or("Source advisory NodeLists")?;
+        assert!(
+            source.node_names.is_source_exact_namespace()
+                && source.node_list_names.is_source_exact_namespace()
+        );
+        for name in ["A HOLE", "B TAIL"] {
+            let id = source
+                .node_list_names
+                .resolve(name)
+                .ok_or("deferred declaration")?;
+            assert!(matches!(
+                &source.node_lists[id.0 as usize].nodes,
+                NodeListMembers::DeferredSourceOriginalPrefix { used_len: 2 }
+            ));
+        }
+        assert!(source.node_names.resolve("OTHER").is_some()); // Real all-cell tail registration.
+        let other = source
+            .node_names
+            .resolve("REAL OTHER")
+            .ok_or("actual OTHER member")?;
+        assert!(matches!(source.resolve_advisory_node_reference("OTHER"),
+            ep_model::AdvisoryNodeReference::ProvenList { nodes, .. } if nodes == [other].as_slice()));
+        assert_eq!(
+            source
+                .setpoint_managers
+                .iter()
+                .find(|row| row.name.0 == "PROVEN LIST SUMMARY")
+                .ok_or("Proven summary")?
+                .setpoint_node,
+            Some(other)
+        );
+        assert_eq!(
+            source
+                .setpoint_managers
+                .iter()
+                .find(|row| row.name.0 == "DEFERRED LIST SUMMARY")
+                .ok_or("Deferred summary")?
+                .setpoint_node,
+            None
+        );
+        let spaces = &source.node_lists[source
+            .node_list_names
+            .resolve("SPACES")
+            .ok_or("space list")?
+            .0 as usize];
+        let members = spaces
+            .nodes
+            .proven_nodes()
+            .ok_or("space members are real nonempty names")?;
+        assert_eq!(members.len(), 2);
+        assert_ne!(members[0], members[1]);
+        assert_eq!(source.nodes[members[0].0 as usize].name.0, " ");
+        assert_eq!(source.nodes[members[1].0 as usize].name.0, "  ");
+        assert!(source.node_names.resolve("").is_none());
+        let padded = source
+            .node_list_names
+            .resolve(" Padded ")
+            .ok_or("exact list key")?;
+        assert_eq!(source.node_lists[padded.0 as usize].name.0, " PADDED ");
+        assert!(source.node_list_names.resolve("Padded").is_none());
+        let same_names = source
+            .node_lists
+            .iter()
+            .filter(|row| row.name.0 == "CASE")
+            .collect::<Vec<_>>();
+        assert_eq!(same_names.len(), 2); // Every real declaration is retained.
+        assert_eq!(source.node_list_names.len(), source.node_lists.len());
+        assert_eq!(
+            source.node_list_names.resolve("case"),
+            Some(same_names[0].id)
+        );
+        let first = source
+            .node_names
+            .resolve("FIRST CASE MEMBER")
+            .ok_or("first actual case member")?;
+        let second = source
+            .node_names
+            .resolve("SECOND CASE MEMBER")
+            .ok_or("second actual case member")?;
+        assert_eq!(same_names[0].nodes.proven_nodes(), Some([first].as_slice()));
+        assert_eq!(
+            same_names[1].nodes.proven_nodes(),
+            Some([second].as_slice())
+        );
+        let trailing = &source.node_lists[source
+            .node_list_names
+            .resolve("TRAILING")
+            .ok_or("trailing list")?
+            .0 as usize];
+        assert_eq!(
+            trailing
+                .nodes
+                .proven_nodes()
+                .ok_or("original first-one prefix")?
+                .len(),
+            1
+        );
+        assert!(compile_raw_model(&source_raw).has_errors()); // Legacy trims/rejects as before.
+        for (list, expected) in [
+            (
+                r#"{"SELF":{"nodes":[{"node_name":"A"},{"node_name":""},{"node_name":"self"}]}}"#,
+                "DuplicateNodeOrNodeListName",
+            ),
+            (
+                r#"{"DUP":{"nodes":[{"node_name":"A"},{"node_name":"a"}]}}"#,
+                "DuplicateNodeListMember",
+            ),
+            (
+                r#"{"ZERO DUP":{"nodes":[{"node_name":""},{"node_name":""},{"node_name":"A"},{"node_name":"B"},{"node_name":"C"}]}}"#,
+                "DuplicateNodeListMember",
+            ),
+            (
+                r#"{"CROSS":{"nodes":[{"node_name":"OTHER"}]},"OTHER":{"nodes":[{"node_name":"B"}]}}"#,
+                "DuplicateNodeOrNodeListName",
+            ),
+            (
+                r#"{"EMPTY":{"nodes":[{"node_name":""}]}}"#,
+                "MissingNodeListMember",
+            ),
+            (
+                r#"{"MALFORMED":{"nodes":[{"node_name":3}]}}"#,
+                "InvalidFieldType",
+            ),
+            (r#"{"MISSING":{"nodes":[{}]}}"#, "MissingRequiredField"),
+        ] {
+            let raw = parse_epjson_str(&format!("{{\"NodeList\":{list}}}"))?;
+            let result = compile_raw_model_for_source(&raw);
+            assert!(
+                result.model.is_none()
+                    && result
+                        .report
+                        .diagnostics
+                        .iter()
+                        .any(|row| row.code == expected),
+                "{expected}: {:?}",
+                result.report.diagnostics
+            );
+        }
 
         Ok(())
     }

@@ -1477,19 +1477,15 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-Bounded Source B connects all nine controls through actual schedules and the
-sole raw/IP NodeOwner. Genuine IDF metadata, direct-JSON member/order and the
-trailing-blank warning path remain validated. The latest case adds a genuine
-two-member list targeting inlet plus a declared matched IdealLoads exhaust.
-Source-only eligibility returns no physical binding and leaves legacy guards
-strict; actual PurchasedAir selects the real exhaust for recirculation. The
-same AFN constructor scalar gates actual exhaust accumulation, and ZonalSystemOnly
-reads the real refrigeration flag, Lights count and Space surface operands.
-Five pairs compare 331,920 values. The latest 151-series/71,760-value pair retains
-eighteen schedule joins, six advanced mass-flow outputs and actual exhaust T/W/flow
-with positive flow observed. Whole BND checks four nodes, eighteen Scheduled
-connections and genuine component/ControlledExhaust roles; tables, streams and
-actual error summaries pass. Internal holes, whitespace identities, general
-member/topology combinations, Source A and other managers remain open. No private
-history, setpoint load-control or full-object promotion is inferred. Current
-evidence is in [object input domains](../../validation/evidence/object-input-domains.json).
+Five bounded B Scheduled/NodeList pairs retain 331,920 values, including all nine
+controls, genuine IDF order, trailing blanks and a real inlet/exhaust two-member
+list. Source-only eligibility leaves legacy binding strict. One A unused-NodeList
+pair adds 127 series/59,520 values: six declarations, seven Blank nodes, original
+prefix holes, late/tail identities, exact whitespace/case and ignored metadata.
+Two real blank warnings and actual phase counters match; whole BND has no node
+connections and all seven exact NonConnected ID/name records. The advisory graph records Proven members or explicit Deferred input
+prerequisites without copying runtime Node state. Six pairs compare 391,440 values.
+Selected holes, runtime first-alias lookup, case-colliding IDF names, broader
+field/topology combinations and other consumers remain open. Scheduled stays B;
+private histories, load-control effects and full-object conformance remain unclaimed.
+Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

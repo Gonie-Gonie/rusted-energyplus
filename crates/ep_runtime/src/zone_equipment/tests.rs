@@ -27,6 +27,34 @@ fn zone_equipment_dispatch_validation_accepts_single_equipment_path() {
     assert_eq!(validation.zone_inlet_nodes, vec![NodeId(0)]);
     assert!(validation.issue_codes().is_empty());
     assert!(validation.warning_codes().is_empty());
+    let mut typed = model.typed.clone();
+    typed.node_lists[0].nodes =
+        ep_model::NodeListMembers::DeferredSourceOriginalPrefix { used_len: 2 };
+    let unused = SimulationModel::from_typed(typed.clone());
+    assert!(
+        validate_ideal_loads_zone_equipment_dispatch(&unused, IdealLoadsAirSystemId(0))
+            .is_conformance_candidate()
+    );
+    typed.zone_equipment_connections[0].zone_air_inlet_node_or_nodelist_name =
+        Some(NormalizedName::new("Zone Inlet List"));
+    let required = SimulationModel::from_typed(typed);
+    let validation =
+        validate_ideal_loads_zone_equipment_dispatch(&required, IdealLoadsAirSystemId(0));
+    assert_eq!(
+        validation.issues,
+        vec![
+            IdealLoadsZoneEquipmentDispatchIssue::DeferredSourceNodeList {
+                deferred: ep_model::DeferredSourceNodeList {
+                    id: NodeListId(0),
+                    used_len: 2
+                },
+            }
+        ]
+    );
+    assert_eq!(
+        validation.issue_codes(),
+        vec!["unresolved_source_nodelist_original_prefix"]
+    );
 }
 
 #[test]
@@ -198,7 +226,7 @@ fn single_ideal_loads_typed_model(system_supply: &str, connection_inlet: &str) -
     typed.node_lists.push(NodeList {
         id: NodeListId(0),
         name: NormalizedName::new("Zone Inlet List"),
-        nodes: vec![NodeId(0)],
+        nodes: vec![NodeId(0)].into(),
     });
     typed
         .node_list_names

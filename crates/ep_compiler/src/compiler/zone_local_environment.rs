@@ -102,10 +102,32 @@ impl Compiler<'_> {
         object: &ep_raw_model::RawObject,
     ) -> Option<NodeCandidate> {
         let Some(node_name) =
-            self.optional_string(OBJECT_TYPE, object_name, object, "outdoor_air_node_name")
+            self.optional_node_name(OBJECT_TYPE, object_name, object, "outdoor_air_node_name")
         else {
             return Some(NodeCandidate::Blank);
         };
+
+        if self.source_file_declarations {
+            return match model.resolve_advisory_node_reference(&node_name) {
+                ep_model::AdvisoryNodeReference::Missing => Some(NodeCandidate::New(node_name)),
+                ep_model::AdvisoryNodeReference::Single(node) => {
+                    Some(NodeCandidate::Existing(node))
+                }
+                ep_model::AdvisoryNodeReference::ProvenList { nodes, .. } if nodes.len() == 1 => {
+                    Some(NodeCandidate::Existing(nodes[0]))
+                }
+                ep_model::AdvisoryNodeReference::ProvenList { nodes, .. } => {
+                    self.error("InvalidSingleNodeReference", OBJECT_TYPE, Some(object_name), Some("outdoor_air_node_name"),
+                        format!("ZoneProperty:LocalEnvironment/{object_name} requires one node, but NodeList '{node_name}' has {} members", nodes.len()));
+                    None
+                }
+                ep_model::AdvisoryNodeReference::DeferredList { used_len, .. } => {
+                    self.error("SourceNodeProjectionUnavailable", OBJECT_TYPE, Some(object_name), Some("outdoor_air_node_name"),
+                        format!("ZoneProperty:LocalEnvironment/{object_name} has an unresolved Source original prefix of length {used_len}; actual Native consumer legality is not decided by this advisory projection"));
+                    None
+                }
+            };
+        }
 
         if let Some(node_list) = model.node_list_names.resolve(&node_name) {
             let Ok(node_list_index) = usize::try_from(node_list.0) else {
@@ -124,7 +146,12 @@ impl Compiler<'_> {
                 );
                 return None;
             };
-            if node_list_record.nodes.len() != 1 {
+            let Some(nodes) = node_list_record.nodes.proven_nodes() else {
+                self.error("SourceNodeProjectionUnavailable", OBJECT_TYPE, Some(object_name), Some("outdoor_air_node_name"),
+                    "Deferred Source membership cannot supply a proven single-node local-environment projection".to_string());
+                return None;
+            };
+            if nodes.len() != 1 {
                 self.error(
                     "InvalidSingleNodeReference",
                     OBJECT_TYPE,
@@ -133,12 +160,12 @@ impl Compiler<'_> {
                     format!(
                         "ZoneProperty:LocalEnvironment/{object_name} requires one node, but NodeList '{}' has {} members",
                         node_list_record.name.0,
-                        node_list_record.nodes.len()
+                        nodes.len()
                     ),
                 );
                 return None;
             }
-            return Some(NodeCandidate::Existing(node_list_record.nodes[0]));
+            return Some(NodeCandidate::Existing(nodes[0]));
         }
 
         if let Some(node) = model.node_names.resolve(&node_name) {

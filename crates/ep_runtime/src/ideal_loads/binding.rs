@@ -515,6 +515,11 @@ pub enum DirectZonePurchasedAirBindingFeature {
 /// Fail-closed error while binding one typed model to the CP300 coupling.
 #[derive(Clone, Debug, PartialEq)]
 pub enum DirectZonePurchasedAirBindingError {
+    /// Required Source advisory membership is unresolved, not classified as Native-invalid input.
+    DeferredSourceNodeList {
+        /// Referenced declaration and its actual original-prefix length.
+        deferred: ep_model::DeferredSourceNodeList,
+    },
     /// A required relation did not have exactly one member.
     Cardinality {
         /// Relation being checked.
@@ -790,6 +795,28 @@ fn validate_direct_zone_model(
         return unsupported(DirectZonePurchasedAirBindingFeature::NoSequentialFractionSchedules);
     }
 
+    if mode == DirectZoneValidationMode::SourceEligibility {
+        // Check unresolved input prerequisites before graph edge/cardinality validation.
+        // Unused deferred lists remain visible on the graph and do not block Proven roles.
+        for name in [
+            Some(&system.zone_supply_air_node_name),
+            system.zone_exhaust_air_node_name.as_ref(),
+            system.system_inlet_air_node_name.as_ref(),
+            Some(&connection.zone_air_node_name),
+            connection.zone_air_inlet_node_or_nodelist_name.as_ref(),
+            connection.zone_air_exhaust_node_or_nodelist_name.as_ref(),
+            connection.zone_return_air_node_or_nodelist_name.as_ref(),
+            connection
+                .zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name
+                .as_ref(),
+        ]
+        .into_iter()
+        .flatten()
+        {
+            resolve_node_or_nodelist(typed, name)?;
+        }
+    }
+
     let dispatch_validation = validate_ideal_loads_zone_equipment_dispatch(model, system.id);
     if !dispatch_validation.is_conformance_candidate() {
         return Err(
@@ -814,7 +841,7 @@ fn validate_direct_zone_model(
             expected: 1,
             actual: 0,
         })?;
-    let inlet_nodes = resolve_node_or_nodelist(typed, inlet_name);
+    let inlet_nodes = resolve_node_or_nodelist(typed, inlet_name)?;
     let inlet_node = require_one(
         &inlet_nodes,
         DirectZonePurchasedAirBindingRelation::ZoneInletNode,
@@ -841,7 +868,7 @@ fn validate_direct_zone_model(
             expected: 1,
             actual: 0,
         })?;
-    let return_nodes = resolve_node_or_nodelist(typed, return_name);
+    let return_nodes = resolve_node_or_nodelist(typed, return_name)?;
     let return_node = require_one(
         &return_nodes,
         DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
@@ -862,12 +889,13 @@ fn validate_direct_zone_model(
         ) {
             (None, None) => {}
             (Some(config_name), Some(system_name)) => {
-                let exhausts = resolve_node_or_nodelist(typed, config_name);
+                let exhausts = resolve_node_or_nodelist(typed, config_name)?;
                 let exhaust = require_one(
                     &exhausts,
                     DirectZonePurchasedAirBindingRelation::SourceZoneExhaustNode,
                 )?;
-                if typed.node_names.resolve(&system_name.0) != Some(*exhaust) {
+                let system_exhausts = resolve_node_or_nodelist(typed, system_name)?;
+                if system_exhausts.as_slice() != [*exhaust] {
                     return unsupported(
                         DirectZonePurchasedAirBindingFeature::MatchedSourceExhaustIdentity,
                     );
@@ -2786,16 +2814,14 @@ fn schedule_value(
     Ok(value)
 }
 
-fn resolve_node_or_nodelist(model: &ep_model::TypedModel, name: &NormalizedName) -> Vec<NodeId> {
-    if let Some(node) = model.node_names.resolve(&name.0) {
-        return vec![node];
-    }
-    if let Some(node_list) = model.node_list_names.resolve(&name.0)
-        && let Some(list) = model.node_lists.iter().find(|list| list.id == node_list)
-    {
-        return list.nodes.clone();
-    }
-    Vec::new()
+fn resolve_node_or_nodelist(
+    model: &ep_model::TypedModel,
+    name: &NormalizedName,
+) -> Result<Vec<NodeId>, DirectZonePurchasedAirBindingError> {
+    model
+        .resolve_advisory_node_reference(&name.0)
+        .require_proven_nodes()
+        .map_err(|deferred| DirectZonePurchasedAirBindingError::DeferredSourceNodeList { deferred })
 }
 
 fn require_one<T>(
