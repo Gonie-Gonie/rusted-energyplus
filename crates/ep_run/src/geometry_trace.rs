@@ -17,6 +17,7 @@ const SELECTED_OBJECTS: &[&str] = &[
     "BuildingSurface:Detailed",
     "Material:InfraredTransparent",
     "SetpointManager:Scheduled",
+    "NodeList",
     "GeometryTransform",
     "Compliance:Building",
 ];
@@ -95,10 +96,28 @@ fn parsed_input(raw: &RawModel) -> Result<Value, String> {
             objects.insert((*kind).to_string(), Value::Object(rows));
         }
     }
+    // This is the actual RawModel source-order provider, not a reconstructed
+    // Node owner or lexical fallback. Legacy debug observers can report an
+    // unavailable provider as data without changing the execution path.
+    let (nodelist_source_order, nodelist_source_order_unavailable) =
+        match raw.source_ordered_instances("NodeList") {
+            Ok(rows) => (
+                Some(
+                    rows.into_iter()
+                        .map(|(name, _)| name.0.clone())
+                        .collect::<Vec<_>>(),
+                ),
+                None,
+            ),
+            Err(error) => (None, Some(error)),
+        };
     Ok(json!({
         "objects":objects, "numeric_bits":numeric_bits,
         "raw_source_is_epjson":raw.is_epjson(),
         "scheduled_idf_declaration_overlay":raw.has_idf_declaration_order("SetpointManager:Scheduled"),
+        "nodelist_idf_declaration_overlay":raw.has_idf_declaration_order("NodeList"),
+        "nodelist_source_order":nodelist_source_order,
+        "nodelist_source_order_unavailable":nodelist_source_order_unavailable,
         "method":"copy selected actual RawModel objects after ordinary lexical conversion; f64 bits use the compiler numeric parse",
         "numeric_path_semantics":"slash-delimited object/field names and array indices; not escaped JSON pointers",
     }))

@@ -87,6 +87,53 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
             matches!(&fields["unknown_object"],Raw::Object(values) if values.contains_key("nested"))
         );
         assert!(input.is_object_unused(family, "SP2") && input.is_object_unused(family, "SP10"));
+        // Actual NodeList IDF overlay -> same IP order/member custody. These
+        // are authored input operands, not a Node allocation or connection.
+        let lists = json!({"Zone":{"Z":{}},"NodeList":{
+            "Alpha List":{"nodes":[{"node_name":"First"}]},
+            "Zulu List":{"nodes":[{"node_name":"Second"},{"node_name":"First"}]}
+        },"SetpointManager:Scheduled":{"SP":{
+            "control_variable":"Temperature","schedule_name":"Constant-1.0",
+            "setpoint_node_or_nodelist_name":"Zulu List"}}});
+        let list_idf = "Zone,Z;NodeList,Zulu List,Second,First;NodeList,Alpha List,First;SetpointManager:Scheduled,SP,Temperature,Constant-1.0,Zulu List;";
+        let staged = ep_raw_model::parse_epjson_str_with_idf_order(&lists.to_string(), list_idf)?;
+        let mut input = resolve_source_b(&staged)?;
+        assert_eq!(
+            input.get_object_def_max_args("NodeList")?,
+            SourceArgumentCounts {
+                alphas: 3,
+                numerics: 0
+            }
+        );
+        assert_eq!(
+            input.source_raw_object_names("NodeList")?,
+            ["Zulu List", "Alpha List"]
+        );
+        let Raw::Array(members) =
+            &input.source_raw_object_fields("NodeList", "Zulu List")?["nodes"]
+        else {
+            return Err("actual NodeList member custody".into());
+        };
+        assert_eq!(members.len(), 2);
+        for (member, expected) in members.iter().zip(["Second", "First"]) {
+            let Raw::Object(fields) = member else {
+                return Err("actual NodeList member shape".into());
+            };
+            assert_eq!(fields["node_name"], Raw::String(expected.into()));
+        }
+        assert!(
+            input.is_object_unused("NodeList", "Zulu List")
+                && input.is_object_unused("NodeList", "Alpha List")
+        );
+        let mut missing_order = parse(&lists)?;
+        let targets = ep_raw_model::IDF_ORDER_TARGETS
+            .iter()
+            .copied()
+            .filter(|target| target.object_type != "NodeList")
+            .collect::<Vec<_>>();
+        ep_raw_model::apply_idf_declaration_order(&mut missing_order, list_idf, &targets)?;
+        assert!(!missing_order.is_epjson() && !missing_order.has_idf_declaration_order("NodeList"));
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&missing_order).is_err());
         // This bridge transfers real schedule operands; no Schedule:File is opened,
         // and schedule numerical execution is covered by its own existing owners.
         let mut year = json!({"Schedule:Year":{"Y":{"schedule_weeks":[{

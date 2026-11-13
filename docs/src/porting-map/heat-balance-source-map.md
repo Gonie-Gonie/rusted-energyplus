@@ -1477,16 +1477,17 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-The bounded Source B getter connects all nine Native control selectors to
-actual schedules and physical Node fields. GetInput, Init, Verify, Sim and
-Update preserve equipment/air-loop readiness and environment/reset order.
-Direct epJSON retains its Native map order; staged IDF supplies the original
-global declaration numbers and exact field counts after strict reconciliation.
-Three advanced mass-flow bindings and the other six setpoint outputs read
-their real fields. IdealLoads calculates loads from its own owners.
-
-Two physical cases cover 128,160 values, including the all-nine IDF witness
-with matching public schedule relations, input metadata, BND and complete
-reported streams. Source A, multiple NodeLists, new Node/HVAC topologies, other managers
-and arbitrary combinations remain open. The retained comparisons, actual QA
-and execution records are in [object input domains](../../validation/evidence/object-input-domains.json).
+The bounded Source B getter connects all nine selectors to actual schedules
+and physical Node fields. Genuine staged IDF retains original global Scheduled
+ordinals/field counts and NodeList declaration order after strict reconciliation.
+The current two-list case uses nonblank one-member aliases of the same existing
+inlet, in declaration order opposite lexical order; all nine controls alternate
+between them. GetNodeListsInput adds one existing-node reference, while all nine
+GetNodeNums uses retain their reference increments and actual connections.
+Three physical pairs compare 194,160 values, including two all-nine IDF pairs
+of 139 series/66,000 values each. Whole input metadata, public schedule relations,
+three advanced mass-flow outputs, BND and requested table bodies pass.
+Blank-member lists, multi-member lists with real connections, Source A, new
+Node/HVAC topologies, other consumers/managers and arbitrary combinations remain
+open. IdealLoads load-control, private histories and full-object promotion are
+unclaimed. Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

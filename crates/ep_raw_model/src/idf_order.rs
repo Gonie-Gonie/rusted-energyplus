@@ -252,6 +252,11 @@ pub const IDF_ORDER_TARGETS: &[IdfOrderTarget] = &[
         object_type: "SetpointManager:Scheduled",
         name_field_index: 0,
     },
+    // NodeInputManager's legacy getter visits every list in actual input order.
+    IdfOrderTarget {
+        object_type: "NodeList",
+        name_field_index: 0,
+    },
     // ScheduleManager uses getObjectItem's preserved IDF order within these
     // families. Cross-family registration order remains the compiler's owner.
     IdfOrderTarget {
@@ -2052,6 +2057,9 @@ mod unnamed_report_order_tests {
         let scheduled_json = r#"{"SetpointManager:Scheduled":{
             "Alpha Manager":{"control_variable":"Temperature","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"},
             "Zulu Manager":{"control_variable":"Temperature","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"}
+        },"NodeList":{
+            "Unrelated First":{"nodes":[{"node_name":"Zone"}]},
+            "Unrelated Middle":{"nodes":[{"node_name":"Other"}]}
         }}"#;
         let scheduled_idf = "NodeList,Unrelated First,Zone;\n\
             ; ! Empty records do not consume a Native object ordinal.\n\
@@ -2132,6 +2140,57 @@ mod unnamed_report_order_tests {
                 Some(&RawValue::String("Supply".into()))
             );
         }
+        // NodeList uses legacy GetObjectItem order, rather than the global
+        // idf_order scalar consumed by Scheduled's direct-JSON getter. Keep
+        // its actual member arrays intact; no reconstructed field counts.
+        let lists_json = r#"{"NodeList":{
+            "Alpha List":{"nodes":[{"node_name":"First"}]},
+            "Zulu List":{"nodes":[{"node_name":"Second"},{"node_name":"First"}]}
+        }}"#;
+        let lists_idf = "NodeList,ZULU LIST,Second,First;\n\
+            ; ! Comments and empty records do not change list order.\n\
+            NodeList,alpha list,First;";
+        let direct = parse_epjson_str(lists_json)?;
+        let staged = parse_epjson_str_with_idf_order(lists_json, lists_idf)?;
+        assert!(direct.is_epjson());
+        assert!(!direct.has_idf_declaration_order("NodeList"));
+        assert!(!staged.is_epjson());
+        assert!(staged.has_idf_declaration_order("NodeList"));
+        assert_eq!(staged.objects, direct.objects);
+        assert_eq!(
+            staged
+                .ordered_instances("NodeList")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Zulu List", "Alpha List"]
+        );
+        assert_eq!(
+            direct
+                .ordered_instances("NodeList")?
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>(),
+            ["Alpha List", "Zulu List"]
+        );
+        for replacement in ["ZULU LIST", "Missing List", ""] {
+            let mut bad = direct.clone();
+            let before = bad.clone();
+            let idf = lists_idf.replace("alpha list", replacement);
+            assert!(apply_idf_declaration_order(&mut bad, &idf, IDF_ORDER_TARGETS).is_err());
+            assert_eq!(bad, before);
+        }
+        let mut bad = direct.clone();
+        let before = bad.clone();
+        assert!(
+            apply_idf_declaration_order(
+                &mut bad,
+                "NodeList,Zulu List,Second,First;",
+                IDF_ORDER_TARGETS
+            )
+            .is_err()
+        );
+        assert_eq!(bad, before);
         Ok(())
     }
 }

@@ -49,7 +49,10 @@ fn compile_projection_retains_actual_input_zero_bits_and_copies_stored_vertices(
         observed["parsed_input"]["scheduled_idf_declaration_overlay"],
         false
     );
-    let scheduled = r#"{"Zone":{"Z":{}},"SetpointManager:Scheduled":{
+    let scheduled = r#"{"Zone":{"Z":{}},"NodeList":{
+        "Alpha List":{"nodes":[{"node_name":"Supply"}]},
+        "Zulu List":{"nodes":[{"node_name":"Supply"}]}
+    },"SetpointManager:Scheduled":{
         "Alpha Manager":{"control_variable":"MassFlowRate","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"},
         "Zulu Manager":{"control_variable":"Temperature","schedule_name":"On","setpoint_node_or_nodelist_name":"Supply"}
     }}"#;
@@ -57,13 +60,29 @@ fn compile_projection_retains_actual_input_zero_bits_and_copies_stored_vertices(
     let direct_observed = super::parsed_input(&direct).expect("direct raw observation");
     assert_eq!(direct_observed["raw_source_is_epjson"], true);
     assert_eq!(direct_observed["scheduled_idf_declaration_overlay"], false);
+    assert_eq!(direct_observed["nodelist_idf_declaration_overlay"], false);
+    assert_eq!(
+        direct_observed["nodelist_source_order"],
+        json!(["Alpha List", "Zulu List"])
+    );
+    assert!(direct_observed["nodelist_source_order_unavailable"].is_null());
     let staged = ep_raw_model::parse_epjson_str_with_idf_order(scheduled,
-        "Zone,Z;SetpointManager:Scheduled,Zulu Manager,Temperature,On,Supply;SetpointManager:Scheduled,Alpha Manager,MassFlowRate,On,Supply;")
+        "Zone,Z;NodeList,Zulu List,Supply;NodeList,Alpha List,Supply;SetpointManager:Scheduled,Zulu Manager,Temperature,On,Supply;SetpointManager:Scheduled,Alpha Manager,MassFlowRate,On,Supply;")
         .expect("genuine Scheduled declaration writer");
     let staged_observed = super::parsed_input(&staged).expect("actual staged raw observation");
     assert_eq!(staged_observed["raw_source_is_epjson"], false);
     assert_eq!(staged_observed["scheduled_idf_declaration_overlay"], true);
-    for (name, ordinal) in [("Zulu Manager", 2), ("Alpha Manager", 3)] {
+    assert_eq!(staged_observed["nodelist_idf_declaration_overlay"], true);
+    assert_eq!(
+        staged_observed["nodelist_source_order"],
+        json!(["Zulu List", "Alpha List"])
+    );
+    assert!(staged_observed["nodelist_source_order_unavailable"].is_null());
+    assert_eq!(
+        staged_observed["objects"]["NodeList"],
+        direct_observed["objects"]["NodeList"]
+    );
+    for (name, ordinal) in [("Zulu Manager", 4), ("Alpha Manager", 5)] {
         let actual = &staged_observed["objects"]["SetpointManager:Scheduled"][name];
         assert_eq!(actual["idf_order"], f64::from(ordinal));
         assert_eq!(actual["idf_max_fields"], 4.0);

@@ -36,16 +36,9 @@ impl NodeOwner {
             row.name.clear();
             row.number_of_nodes = 0;
         }
-        // NodeList is not an IDF declaration-overlay target. A retained JSON
-        // map order cannot establish its original multi-object IDF ordinal.
-        if self.number_of_node_lists > 1 {
-            return Err(unavailable(
-                "actual multi-NodeList getter ordinal needs retained Native input order",
-            ));
-        }
         for index in 0..self.number_of_node_lists {
-            // A single actual list has the same sole ordinal in either input
-            // format. The zero-count SourceA path never needs this raw owner.
+            // The sole retained IP order comes from the actual direct-JSON
+            // producer or the strictly reconciled original-IDF NodeList overlay.
             let order = input
                 .source_raw_object_names("NodeList")
                 .map_err(|_| unavailable("actual NodeList getter retained object order"))?;

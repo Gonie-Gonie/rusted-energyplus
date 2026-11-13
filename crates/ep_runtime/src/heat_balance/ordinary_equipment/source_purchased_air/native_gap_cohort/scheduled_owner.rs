@@ -835,6 +835,12 @@ pub(super) fn run() -> Result<usize> {
                     .remove(family);
             }
             // Clone INPUT ONLY. No Native expected payload is read or injected.
+            if target == "ZONE ONE INLETS" {
+                definition["raw"]["NodeList"]["118 SHARED INLET ALIAS"] =
+                    json!({"nodes":[{"node_name":"ZONE ONE INLET"}]});
+                definition["object_order"]["NodeList"] =
+                    json!(["118 SHARED INLET ALIAS", "ZONE ONE INLETS"]);
+            }
             definition["raw"]["Schedule:Compact"]["Scheduled Unit Swing"] = json!({"schedule_type_limits_name":"Temperature","data":[{"field":"Through: 12/31"},{"field":"For: AllDays"},{"field":"Until: 03:00"},{"field":18.0},{"field":"Until: 24:00"},{"field":27.0}]});
             definition["object_order"]["Schedule:Compact"]
                 .as_array_mut()
@@ -860,6 +866,32 @@ pub(super) fn run() -> Result<usize> {
                 .as_ref()
                 .and_then(|rows| rows.iter().position(|name| name == "ZONE ONE INLET"))
                 .ok_or_else(|| invalid("actual preexisting inlet identity"))?;
+            if target == "ZONE ONE INLETS" {
+                let lists = f
+                    .equipment
+                    .nodes
+                    .node_lists
+                    .as_ref()
+                    .ok_or_else(|| invalid("actual multiple NodeLists"))?;
+                assert_eq!(
+                    lists
+                        .iter()
+                        .map(|row| row.name.as_str())
+                        .collect::<Vec<_>>(),
+                    ["118 SHARED INLET ALIAS", "ZONE ONE INLETS"]
+                );
+                for row in lists {
+                    assert_eq!(row.number_of_nodes, 1);
+                    assert_eq!(
+                        row.node_names.as_deref(),
+                        Some(["ZONE ONE INLET".to_owned()].as_slice())
+                    );
+                    assert_eq!(
+                        row.node_numbers.as_deref(),
+                        Some([actual_number].as_slice())
+                    );
+                }
+            }
             f.scheduled_phase_inputs(&json!({"hour":2,"timestep":1,"day_of_year":1,"day_of_week":3,"dst":0,"begin_environment":true}))?;
             f.scheduled_selected_step(actual_number, control, if conflict { 24.0 } else { 18.0 })?;
             manager_calls += 1;

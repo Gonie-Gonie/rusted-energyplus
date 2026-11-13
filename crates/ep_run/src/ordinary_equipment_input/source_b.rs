@@ -513,6 +513,19 @@ const REGULAR_DAY_FIELDS: [&str; 12] = [
 /// Admission validates actual raw schedule identity, not a typed empty graph.
 /// Resolution/current values and node connections remain the production getters.
 pub(super) fn validate_scheduled_setpoint_references(raw: &RawModel) -> Result<(), String> {
+    // A caller can explicitly apply only a custom subset of IDF overlays.
+    // Multiple lists need their actual legacy getter order on that path too.
+    if !raw.is_epjson()
+        && raw
+            .objects
+            .get(&ObjectType("NodeList".into()))
+            .is_some_and(|rows| rows.len() > 1)
+        && !raw.has_idf_declaration_order("NodeList")
+    {
+        return Err(
+            "Multiple NodeLists in IDF require their actual recovered declaration order".into(),
+        );
+    }
     let Some(objects) = raw
         .objects
         .get(&ObjectType("SetpointManager:Scheduled".into()))
