@@ -291,6 +291,46 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         .expect("unused unresolved declaration must not block independent proven Source roles");
     bind_direct_zone_purchased_air_model(&unused_deferred)
         .expect("unchanged Legacy binding still follows independent proven roles");
+    // Unit127 validates admission and real typed schedule identity only.
+    // Live cooling values and suppression remain the existing Source owner.
+    for value in [0.0_f64, 1.0] {
+        let mut typed = unused_deferred.typed.clone();
+        let cooling = ScheduleId(u32::try_from(typed.schedules.len()).expect("dense schedule ID"));
+        typed.schedules.push(ScheduleConstant {
+            id: cooling,
+            name: NormalizedName::new("127 COOLING AVAILABILITY"),
+            schedule_type_limits: None,
+            hourly_value: value,
+        });
+        typed
+            .schedule_names
+            .insert("127 COOLING AVAILABILITY", cooling);
+        typed.ideal_loads_air_systems[0].cooling_availability_schedule = Some(cooling);
+        let model = SimulationModel::from_typed(typed.clone());
+        validate_source_direct_zone_purchased_air_model(&model)
+            .expect("Source retains actual independent cooling schedule");
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&model).expect_err("Legacy cooling premise held"),
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule,
+            }
+        );
+        typed.ideal_loads_air_systems[0].heating_availability_schedule = Some(cooling);
+        let with_heating = SimulationModel::from_typed(typed);
+        let expected = DirectZonePurchasedAirBindingError::UnsupportedFeature {
+            feature: DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule,
+        };
+        assert_eq!(
+            validate_source_direct_zone_purchased_air_model(&with_heating),
+            Err(expected.clone())
+        );
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&with_heating)
+                .expect_err("heating stays fenced first"),
+            expected
+        );
+    }
+
     // Admission only: Source retains the actual raw schedule/basis owners at
     // runtime; typed eligibility must not invent Config arrays or return flow.
     for (fraction, basis) in [(true, false), (false, true), (true, true)] {

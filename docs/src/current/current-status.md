@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 181 paired physical cases and 5,576,776 reported values with zero
+contains 182 paired physical cases and 5,650,456 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 129 recorded Source builds,
-115 with accepted pairs and 14 without accepted pairs, including 4 builds
+validate the consumer corrections. There are 130 recorded Source builds,
+116 with accepted pairs and 14 without accepted pairs, including 4 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,15 +196,15 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-Nine bounded B Scheduled/NodeList compositions retain 616,080 values, with a
-59,520-value unused A case: ten pairs and 675,600 values. The latest name-only
-pair compares 154 series/73,200 values and preserves the accepted two-return
-physics. Actual public physical-node and IdealLoads producer records retain the
-selected UTF-8 bytes while ASCII case is normalized. Source removes two
-PurchasedAir ASCII guards and retains ASCII-only conversion. The original Native
-Build128 context and current Source129 custody remain distinct. Other Unicode
-identities, private alias histories, selected holes, broader parents, Source A
-managers and full-object conformance remain open.
+Ten bounded B Scheduled/NodeList compositions retain 689,760 values, with a
+59,520-value unused A case: eleven pairs/749,280 values. The latest independent
+cooling-availability composition compares 155 series/73,680 values. Actual
+overall-on/cooling-off potential samples suppress supply sensible cooling, and
+cooling-on samples show real service. A separate return-fraction schedule keeps
+positive basis in both states, positive first return and later-return zero. The
+prior 127 Native witness-shortfall remains unaccepted with no Source run or replay.
+Source-only cooling eligibility retains Legacy, heating, fuel and topology fences;
+arbitrary combinations, private histories and full-object conformance remain open.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

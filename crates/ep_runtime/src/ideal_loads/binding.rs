@@ -966,7 +966,11 @@ fn validate_direct_zone_model(
     if system.heating_availability_schedule.is_some() {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule);
     }
-    if system.cooling_availability_schedule.is_some() {
+    // The genuine Source getter/calc consumes the live cooling schedule.
+    // Legacy keeps its fixed always-on premise; the heating fence above stays.
+    if mode == DirectZoneValidationMode::LegacyBinding
+        && system.cooling_availability_schedule.is_some()
+    {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule);
     }
 

@@ -337,10 +337,10 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "All nine Scheduled controls remain bounded Source B in epJSON and genuine IDF across nine pairs/616,080 values. The latest name-only 154-series/73,200-value derivative preserves all eighteen inlet/exhaust public setpoint joins, actual exhaust and ordered return/basis/fraction behavior while checking selected UTF-8 physical-node and parent-unit bytes. Existing Source A unused-list evidence remains separate. Public reports do not establish private histories, IdealLoads setpoint load-control effects, Source A managers, selected holes, other managers or arbitrary combinations."
+      "All nine Scheduled controls remain bounded Source B in epJSON and genuine IDF across ten pairs/689,760 values. The latest 155-series/73,680-value independent cooling-availability composition retains all eighteen public setpoint/schedule joins, actual exhaust and ordered return/basis/fraction behavior. The separate cooling schedule is not a setpoint-load-control witness. Source A unused-list evidence remains separate. Private histories, Source A managers, selected-hole consumers, other managers and arbitrary combinations remain unvalidated."
     ],
     "NodeList": [
-      "Bounded Source A/B retains the sole raw/IP NodeList owner and advisory Proven/Deferred metadata. Nine B pairs retain IDF order/case/trailing-blank and genuine inlet/exhaust/basis/ordered-return behavior; the unused A pair retains exact whitespace/original-prefix identities. One selected alias resolves a UTF-8 physical inlet with ASCII-only normalization and actual public byte witnesses; no private alias storage is inferred. Source-only matched-exhaust return vectors and genuine absent return input remain bounded by unchanged no-exhaust/Legacy singleton conditions. Selected holes, general Unicode/name combinations and full-object conformance remain open."
+      "Bounded Source A/B retains the sole raw/IP NodeList owner and advisory Proven/Deferred metadata. Ten B pairs retain IDF order/case/trailing-blank and genuine inlet/exhaust/basis/ordered-return behavior; the unused A pair retains exact whitespace/original-prefix identities. The independent cooling composition preserves positive-off/on return basis and actual two-return behavior rather than waiving the earlier 127 witness shortfall. Source-only matched-exhaust return vectors and optional absence retain unchanged no-exhaust/Legacy singleton conditions. Selected holes, private alias arrays, general Unicode/name combinations and full-object conformance remain open."
     ]
   },
   "verification": {
@@ -5924,6 +5924,29 @@
           "bytes": 9761
         },
         "scope": "Five final actual relevant QA commands and two existing exact owner/caller tests; no workspace/native-cohort rerun or new test function. Native128 context and Source129 current custody remain distinct. Conditional Source proposal01 was never executed;02 corrects its genuine fixture once-order. Earlier actual QA attempts, including Clippy fixture-type inference failure before owner tests, are retained separately and contribute no samples."
+      },
+      "independent_cooling_availability_128": {
+        "final_quality": {
+          "path": ".runtime/porting/cooling-availability-127/quality01/summary.json",
+          "sha256": "1aff7b062c99f04281574e954e497b8e3c69817dbae17c186f3881bc7d85a623",
+          "bytes": 1648
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit127-prep/owner-execution-review01.json",
+          "sha256": "e56f4464144cf9c5b916018d978a35f1b4a5e17cd1f3d9fa15cfddc2ab6fab2e",
+          "bytes": 3010
+        },
+        "retained_inventory": {
+          "path": ".runtime/object-expansion/unit128-prep/retained-attempt-inventory01.json",
+          "sha256": "5df729f053617d498f4b5a9a71537a65a0a888075e7f4731672d90e5dc4b185c",
+          "bytes": 12381
+        },
+        "retained_unaccepted127": {
+          "path": ".runtime/object-expansion/unit127-prep/Root-unaccepted-Native-disposition01.json",
+          "sha256": "3750831e13d6de59a7e38e88922beba47a5d209f862a14b858d46b7d6caa662c",
+          "bytes": 2594
+        },
+        "scope": "The unchanged Source130 passed five actual relevant QA commands and two existing binding/raw-caller tests under unit127 owner review. No new test function, workspace/cohort rerun or extra build for128.127Native witness-shortfall remains unaccepted without Source run, Native error, Source failure, gate waiver or replay; distinct128 full155-series comparison alone adds accepted samples."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -55657,12 +55680,2704 @@
           "full_current_and_archive_source_files": 4672
         },
         "effective_state": "Bounded Source B retains the genuine raw/IP PurchasedAir owner and matched optional Zone/IdealLoads exhaust with no system inlet/plenum, OA or primary AirLoop. Actual selected UTF-8 physical-node and genuine IdealLoads producer-name byte witnesses justify removing two unconditional ASCII rejection guards while retaining to_ascii_uppercase and all existing type/default/enum/schedule/other-parent/Legacy checks. A name-only derivative preserves the 154-series/73,200-value two-return physics under unchanged tolerances. The evidence does not certify all Unicode/name combinations, private alias arrays, broader exhaust/topology combinations, positive AFN/Lights/refrigeration, Source A or full-object/frozen conformance."
+      },
+      {
+        "id": "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-cooling-availability-127",
+        "input": {
+          "path": ".runtime/object-expansion/unit128-prep/orthogonal-cooling-input-proposal02/input.epJSON",
+          "sha256": "82da0edf15dfa471dfe00841345c7552fcaa2292da9b4e3b5ea0970eee42eed8",
+          "bytes": 100322
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/orthogonal-cooling-128/case/native-01/command/receipt.json",
+          "sha256": "7a13737f1aae75c6d1ad2f5f17eb3f908b8e1046dcd011035cb8f7365b3d2247",
+          "bytes": 58824
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/orthogonal-cooling-128/case/source-01/command/receipt.json",
+          "sha256": "5d908d5b4c8f0544b20ecd2bc364bced12c3a580c2f349934086f4e315a75521",
+          "bytes": 59581
+        },
+        "source_summary": {
+          "path": ".runtime/porting/orthogonal-cooling-128/case/source-01/output/run-summary.json",
+          "sha256": "731319bfbdddc69a01034fe452994466be8a6b2d498827341329cc56b0d3f82a",
+          "bytes": 63161
+        },
+        "source_executable": {
+          "path": ".runtime/porting/cooling-availability-127/build130-01/eplus-rs.exe",
+          "sha256": "a437a2dad4093a272c69a79464c8e7f8d9858449557f98fcd7ebe6673c3c688f",
+          "bytes": 80761853
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3e/3ede16405bcd761ff12c3f144626437587a58f913fa220685bb159d34d1fd0a2",
+          "sha256": "3ede16405bcd761ff12c3f144626437587a58f913fa220685bb159d34d1fd0a2"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/cooling-availability-127/build130-01/build/receipt.json",
+          "sha256": "904827554caa9c123b95dc13fbd7177ebeac73ddbc18df1748fb4a39c6d33697",
+          "bytes": 4500
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit128-prep/runtime-protocol-proposal02/pair-proof01.json",
+          "sha256": "505c4d2dd2574e79b8087d766b0e33fab60267f69765326b84cf7e929ebdb841",
+          "bytes": 333183
+        },
+        "independent_physical_comparison": {
+          "path": ".runtime/object-expansion/unit128-prep/physical-peer02/proof01.json",
+          "sha256": "90821a715ba84407563dc8c7de42a4ae6317abe564b0bd6c4ac75c5466997da3",
+          "bytes": 292985
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit128-prep/root-completed-readback-review01.json",
+          "sha256": "b1bec8e3bfd1e43dc7a52328fbb32e99a47e2776243eecf52f2c1f978c4516ed",
+          "bytes": 2888
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit128-prep/science-final01/recipe01.json",
+          "sha256": "ba8f216eab4a88e0cecbd9ef5a9b4eca93081964391b03e54215855e655e09e9",
+          "bytes": 33752
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 18824,
+          "parsed_binary64_unequal": 18824,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 4.604771675076336e-09,
+          "max_rmse_delta": 9.334460975422294e-10
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit128-prep/orthogonal-cooling-input-proposal02/derived-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "old152ESO_and2MTR_rules_literal": true,
+          "one_new_ScheduleValue_rule_index152_clones_original5_key_only": true,
+          "global_contract_changed": false
+        },
+        "actual_epJSON_input_projection": {
+          "artifact": {
+            "path": ".runtime/porting/orthogonal-cooling-128/case/source-01/output/compiled-geometry.json",
+            "sha256": "ba3fa32ef1c5cd2e7720f5eaa1358a10b215cfe91a2b9c37f8943b752df33780",
+            "bytes": 21447
+          },
+          "staged_original": {
+            "path": ".runtime/porting/orthogonal-cooling-128/case/source-01/output/input/original.epJSON",
+            "sha256": "82da0edf15dfa471dfe00841345c7552fcaa2292da9b4e3b5ea0970eee42eed8",
+            "bytes": 100322
+          },
+          "staged_complete_input": {
+            "path": ".runtime/porting/orthogonal-cooling-128/case/source-01/output/input/converted.epJSON",
+            "sha256": "82da0edf15dfa471dfe00841345c7552fcaa2292da9b4e3b5ea0970eee42eed8",
+            "bytes": 100322
+          },
+          "actual_Scheduled_inputs": {
+            "116 SCHEDULED INLET TEMPERATURE": {
+              "control_variable": "Temperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED HUMIDITY RATIO": {
+              "control_variable": "HumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MASS FLOW RATE": {
+              "control_variable": "MassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM HUMIDITY RATIO": {
+              "control_variable": "MaximumHumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM MASS FLOW RATE": {
+              "control_variable": "MaximumMassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MAXIMUM TEMPERATURE": {
+              "control_variable": "MaximumTemperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM HUMIDITY RATIO": {
+              "control_variable": "MinimumHumidityRatio",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM MASS FLOW RATE": {
+              "control_variable": "MinimumMassFlowRate",
+              "schedule_name": "Internal Gain Schedule",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            },
+            "117 SCHEDULED MINIMUM TEMPERATURE": {
+              "control_variable": "MinimumTemperature",
+              "schedule_name": "Cooling Setpoint",
+              "setpoint_node_or_nodelist_name": "120 SCHEDULED MULTI TARGETS"
+            }
+          },
+          "actual_NodeList_inputs": {
+            "118 SHARED INLET ALIAS": {
+              "nodes": [
+                {
+                  "node_name": "Zone one inlet 가"
+                }
+              ]
+            },
+            "120 SCHEDULED MULTI TARGETS": {
+              "nodes": [
+                {
+                  "node_name": "Zone one inlet 가"
+                },
+                {
+                  "node_name": "ZONE ONE EXHAUST"
+                }
+              ]
+            },
+            "ZONE one inlets 가": {
+              "nodes": [
+                {
+                  "node_name": "Zone one inlet 가"
+                }
+              ]
+            },
+            "ZZ 124 RETURN FLOW BASIS": {
+              "nodes": [
+                {
+                  "node_name": "Zone one inlet 가"
+                },
+                {
+                  "node_name": "ZONE ONE AIR NODE"
+                }
+              ]
+            },
+            "ZZ 125 MULTIPLE RETURNS": {
+              "nodes": [
+                {
+                  "node_name": "ZONE ONE FIRST RETURN 125"
+                },
+                {
+                  "node_name": "ZONE ONE RETURN"
+                }
+              ]
+            }
+          },
+          "actual_NodeList_source_order": [
+            "118 SHARED INLET ALIAS",
+            "120 SCHEDULED MULTI TARGETS",
+            "ZONE one inlets 가",
+            "ZZ 124 RETURN FLOW BASIS",
+            "ZZ 125 MULTIPLE RETURNS"
+          ],
+          "actual_return_list": {
+            "nodes": [
+              {
+                "node_name": "ZONE ONE FIRST RETURN 125"
+              },
+              {
+                "node_name": "ZONE ONE RETURN"
+              }
+            ]
+          },
+          "actual_parent_EquipmentConnections": {
+            "ZoneHVAC:EquipmentConnections 1": {
+              "zone_air_inlet_node_or_nodelist_name": "ZONE one inlets 가",
+              "zone_air_node_name": "ZONE ONE AIR NODE",
+              "zone_conditioning_equipment_list_name": "ZONE ONE EQUIPMENT",
+              "zone_name": "ZONE ONE",
+              "zone_return_air_node_or_nodelist_name": "ZZ 125 MULTIPLE RETURNS",
+              "zone_air_exhaust_node_or_nodelist_name": "ZONE ONE EXHAUST",
+              "zone_return_air_node_1_flow_rate_fraction_schedule_name": "Internal Gain Schedule",
+              "zone_return_air_node_1_flow_rate_basis_node_or_nodelist_name": "ZZ 124 RETURN FLOW BASIS"
+            }
+          },
+          "actual_IdealLoads_objects": {
+            "ZONE one ideal loads 각": {
+              "availability_schedule_name": "CON-01 System Availability",
+              "cooling_availability_schedule_name": "128 Independent Cooling Availability",
+              "cooling_fuel_type": "DistrictCooling",
+              "cooling_limit": "NoLimit",
+              "cooling_sensible_heat_ratio": 0.7,
+              "dehumidification_control_type": "None",
+              "demand_controlled_ventilation_type": "None",
+              "heat_recovery_type": "None",
+              "heating_fuel_type": "DistrictHeatingWater",
+              "heating_limit": "NoLimit",
+              "humidification_control_type": "None",
+              "latent_heat_recovery_effectiveness": 0.65,
+              "maximum_heating_supply_air_humidity_ratio": 0.0156,
+              "maximum_heating_supply_air_temperature": 50,
+              "minimum_cooling_supply_air_humidity_ratio": 0.0077,
+              "minimum_cooling_supply_air_temperature": 13,
+              "outdoor_air_economizer_type": "NoEconomizer",
+              "sensible_heat_recovery_effectiveness": 0.7,
+              "zone_supply_air_node_name": "ZONE one inlets 가",
+              "zone_exhaust_air_node_name": "ZONE ONE EXHAUST"
+            }
+          },
+          "raw_inlet_node": "Zone one inlet 가",
+          "public_inlet_node": "ZONE ONE INLET 가",
+          "raw_IdealLoads_name": "ZONE one ideal loads 각",
+          "public_IdealLoads_name": "ZONE ONE IDEAL LOADS 각",
+          "actual_cooling_availability_input": {
+            "raw_object_name": "ZONE one ideal loads 각",
+            "field": "cooling_availability_schedule_name",
+            "value": "128 Independent Cooling Availability"
+          },
+          "actual_independent_cooling_schedule": {
+            "family": "Schedule:Compact",
+            "name": "128 Independent Cooling Availability",
+            "fields": {
+              "data": [
+                {
+                  "field": "Through: 12/31"
+                },
+                {
+                  "field": "For: AllDays"
+                },
+                {
+                  "field": "Until: 06:00"
+                },
+                {
+                  "field": 0.0
+                },
+                {
+                  "field": "Until: 24:00"
+                },
+                {
+                  "field": 1.0
+                }
+              ],
+              "schedule_type_limits_name": "Fraction"
+            }
+          },
+          "actual_independent_schedule_output_request": {
+            "name": "Output:Variable 148",
+            "fields": {
+              "key_value": "128 Independent Cooling Availability",
+              "reporting_frequency": "Timestep",
+              "variable_name": "Schedule Value"
+            }
+          },
+          "raw_source_is_epjson": true,
+          "scheduled_idf_declaration_overlay": false,
+          "nodelist_idf_declaration_overlay": false,
+          "qualification": "Actual RawModel/direct-epJSON input objects/order after normal byte-copy staging; no converter, IDF metadata or private NodeList/Node/call-history observation."
+        },
+        "actual_public_return_flow": {
+          "Native": {
+            "contract": {
+              "path": ".runtime/object-expansion/unit126-prep/paired-science-proposal01/public-return-flow-gate.json",
+              "sha256": "94536d85b4deabdcd238e7955ae8618efdb34aeab17f927ec9a67cfe75ba469a",
+              "bytes": 4446
+            },
+            "policy_indices": [
+              5,
+              66,
+              69,
+              151,
+              72
+            ],
+            "report_ids": [
+              355,
+              358,
+              382,
+              385,
+              388
+            ],
+            "samples": 480,
+            "max_same_clock_relation_delta": 0.0,
+            "positive_basis_fraction_zero_samples": 120,
+            "positive_basis_fraction_one_samples": 240,
+            "positive_actual_return_samples": 240,
+            "second_return_zero_samples": 480,
+            "max_abs_old_second_return": 0.0,
+            "first_observations": {
+              "on": {
+                "sample": 24,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  " 7",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 24
+                },
+                "fraction": 1.0,
+                "inlet": 0.12482070126854479,
+                "ZoneAir": 0.12482070126854479,
+                "basis": 0.24964140253708958,
+                "expected_return": 0.24964140253708958,
+                "actual_return": 0.24964140253708958,
+                "actual_second_return": 0.0
+              },
+              "off": {
+                "sample": 72,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  "19",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 72
+                },
+                "fraction": 0.0,
+                "inlet": 0.046128086077255666,
+                "ZoneAir": 0.046128086077255666,
+                "basis": 0.09225617215451133,
+                "expected_return": 0.0,
+                "actual_return": 0.0,
+                "actual_second_return": 0.0
+              }
+            },
+            "comparison_policy": {
+              "key": "ZONE ONE RETURN",
+              "variable": "System Node Mass Flow Rate",
+              "units": "kg/s",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1e-09,
+              "rtol": 0.0,
+              "rmse_max": 1e-09
+            },
+            "new_first_policy": {
+              "key": "ZONE ONE FIRST RETURN 125",
+              "variable": "System Node Mass Flow Rate",
+              "units": "kg/s",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1e-09,
+              "rtol": 0.0,
+              "rmse_max": 1e-09
+            },
+            "qualification": "Actual public same-clock ordered-basis/fraction/new-first flow relation and complete old-second zero branch. New first must have actual positive flow; zero second is not positive evidence. No private state or forced T/W observations."
+          },
+          "Source": {
+            "contract": {
+              "path": ".runtime/object-expansion/unit126-prep/paired-science-proposal01/public-return-flow-gate.json",
+              "sha256": "94536d85b4deabdcd238e7955ae8618efdb34aeab17f927ec9a67cfe75ba469a",
+              "bytes": 4446
+            },
+            "policy_indices": [
+              5,
+              66,
+              69,
+              151,
+              72
+            ],
+            "report_ids": [
+              355,
+              358,
+              382,
+              385,
+              388
+            ],
+            "samples": 480,
+            "max_same_clock_relation_delta": 0.0,
+            "positive_basis_fraction_zero_samples": 120,
+            "positive_basis_fraction_one_samples": 240,
+            "positive_actual_return_samples": 240,
+            "second_return_zero_samples": 480,
+            "max_abs_old_second_return": 0.0,
+            "first_observations": {
+              "on": {
+                "sample": 24,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  " 7",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 24
+                },
+                "fraction": 1.0,
+                "inlet": 0.12482070126854466,
+                "ZoneAir": 0.12482070126854466,
+                "basis": 0.24964140253708933,
+                "expected_return": 0.24964140253708933,
+                "actual_return": 0.24964140253708933,
+                "actual_second_return": 0.0
+              },
+              "off": {
+                "sample": 72,
+                "clock": [
+                  "2",
+                  "1",
+                  " 7",
+                  "21",
+                  " 0",
+                  "19",
+                  " 0.00",
+                  "15.00",
+                  "SummerDesignDay"
+                ],
+                "context": {
+                  "environment_ordinal": 1,
+                  "environment_title": "105 001 CLEAR SKY DEFAULT",
+                  "local_clock_index": 72
+                },
+                "fraction": 0.0,
+                "inlet": 0.04612808607725578,
+                "ZoneAir": 0.04612808607725578,
+                "basis": 0.09225617215451155,
+                "expected_return": 0.0,
+                "actual_return": 0.0,
+                "actual_second_return": 0.0
+              }
+            },
+            "comparison_policy": {
+              "key": "ZONE ONE RETURN",
+              "variable": "System Node Mass Flow Rate",
+              "units": "kg/s",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1e-09,
+              "rtol": 0.0,
+              "rmse_max": 1e-09
+            },
+            "new_first_policy": {
+              "key": "ZONE ONE FIRST RETURN 125",
+              "variable": "System Node Mass Flow Rate",
+              "units": "kg/s",
+              "frequency": "Timestep",
+              "sampling_stage": "system",
+              "atol": 1e-09,
+              "rtol": 0.0,
+              "rmse_max": 1e-09
+            },
+            "qualification": "Actual public same-clock ordered-basis/fraction/new-first flow relation and complete old-second zero branch. New first must have actual positive flow; zero second is not positive evidence. No private state or forced T/W observations."
+          }
+        },
+        "actual_public_cooling_availability": {
+          "Native": {
+            "contract": {
+              "path": ".runtime/object-expansion/unit128-prep/orthogonal-cooling-input-proposal02/cooling-public-gates.json",
+              "sha256": "9811d1ce388d5df3fb66345ec205698875062685f78c14cdaaa9574517261d85",
+              "bytes": 7424
+            },
+            "reports": [
+              {
+                "role": "cooling_availability",
+                "policy_index": 152,
+                "report_id": 351,
+                "key": "128 INDEPENDENT COOLING AVAILABILITY",
+                "name": "Schedule Value",
+                "units": "",
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "",
+                  "raw": "Zone,Average,Schedule Value []"
+                },
+                "policy": {
+                  "key": "128 Independent Cooling Availability",
+                  "variable": "Schedule Value",
+                  "units": "scalar (declared schedule type retained)",
+                  "frequency": "Timestep",
+                  "sampling_stage": "zone",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              },
+              {
+                "role": "overall_availability",
+                "policy_index": 6,
+                "report_id": 352,
+                "key": "CON-01 SYSTEM AVAILABILITY",
+                "name": "Schedule Value",
+                "units": "",
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "",
+                  "raw": "Zone,Average,Schedule Value []"
+                },
+                "policy": {
+                  "key": "CON-01 System Availability",
+                  "variable": "Schedule Value",
+                  "units": "scalar (declared schedule type retained)",
+                  "frequency": "Timestep",
+                  "sampling_stage": "zone",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              },
+              {
+                "role": "public_cooling_potential",
+                "policy_index": 63,
+                "report_id": 214,
+                "key": "ZONE ONE",
+                "name": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+                "units": "W",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "W",
+                  "raw": "HVAC,Average,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate [W]"
+                },
+                "policy": {
+                  "key": "ZONE ONE",
+                  "variable": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+                  "units": "W",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 0.001,
+                  "rtol": 0.0,
+                  "rmse_max": 0.001
+                },
+                "samples": 480
+              },
+              {
+                "role": "supply_sensible_cooling_rate",
+                "policy_index": 93,
+                "report_id": 330,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+                "units": "W",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "W",
+                  "raw": "HVAC,Average,Zone Ideal Loads Supply Air Sensible Cooling Rate [W]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+                  "units": "W",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 0.001,
+                  "rtol": 0.0,
+                  "rmse_max": 0.001
+                },
+                "samples": 480
+              },
+              {
+                "role": "supply_sensible_cooling_energy",
+                "policy_index": 94,
+                "report_id": 220,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+                "units": "J",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Sum",
+                  "units": "J",
+                  "raw": "HVAC,Sum,Zone Ideal Loads Supply Air Sensible Cooling Energy [J]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+                  "units": "J",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1.0,
+                  "rtol": 0.0,
+                  "rmse_max": 1.0
+                },
+                "samples": 480
+              },
+              {
+                "role": "zone_sensible_cooling_rate_observed",
+                "policy_index": 81,
+                "report_id": 336,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Zone Sensible Cooling Rate",
+                "units": "W",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "W",
+                  "raw": "HVAC,Average,Zone Ideal Loads Zone Sensible Cooling Rate [W]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Zone Sensible Cooling Rate",
+                  "units": "W",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 0.001,
+                  "rtol": 0.0,
+                  "rmse_max": 0.001
+                },
+                "samples": 480
+              },
+              {
+                "role": "zone_sensible_cooling_energy_observed",
+                "policy_index": 82,
+                "report_id": 324,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Zone Sensible Cooling Energy",
+                "units": "J",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Sum",
+                  "units": "J",
+                  "raw": "HVAC,Sum,Zone Ideal Loads Zone Sensible Cooling Energy [J]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Zone Sensible Cooling Energy",
+                  "units": "J",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1.0,
+                  "rtol": 0.0,
+                  "rmse_max": 1.0
+                },
+                "samples": 480
+              },
+              {
+                "role": "inlet_mass_flow_observed",
+                "policy_index": 66,
+                "report_id": 358,
+                "key": "ZONE ONE INLET 가",
+                "name": "System Node Mass Flow Rate",
+                "units": "kg/s",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "kg/s",
+                  "raw": "HVAC,Average,System Node Mass Flow Rate [kg/s]"
+                },
+                "policy": {
+                  "key": "Zone one inlet 가",
+                  "variable": "System Node Mass Flow Rate",
+                  "units": "kg/s",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              },
+              {
+                "role": "unit_supply_mass_flow_observed",
+                "policy_index": 99,
+                "report_id": 340,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Supply Air Mass Flow Rate",
+                "units": "kg/s",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "kg/s",
+                  "raw": "HVAC,Average,Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+                  "units": "kg/s",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              }
+            ],
+            "policy_indices": [
+              152,
+              6,
+              63,
+              93,
+              94,
+              81,
+              82,
+              66,
+              99
+            ],
+            "samples": 480,
+            "full_clock_context_operand_joins": 4320,
+            "off_potential_samples": 60,
+            "on_potential_samples": 360,
+            "positive_on_service_samples": 360,
+            "max_abs_off_supply_sensible_cooling_rate": 0.0,
+            "max_abs_off_supply_sensible_cooling_energy": 0.0,
+            "first_observations": {
+              "off": {
+                "sample": 12,
+                "full_clock_context": [
+                  1,
+                  [
+                    "105 001 CLEAR SKY DEFAULT",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  2,
+                  "interval",
+                  [
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    " 4",
+                    " 0.00",
+                    "15.00",
+                    "SummerDesignDay"
+                  ]
+                ],
+                "actual_public_reports": [
+                  {
+                    "role": "cooling_availability",
+                    "policy_index": 152,
+                    "report_id": 351,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2126,
+                    "stream_data_ordinal": 1951,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "overall_availability",
+                    "policy_index": 6,
+                    "report_id": 352,
+                    "reported_decimal": "1.0",
+                    "parsed_binary64_bits": "3ff0000000000000",
+                    "value": 1.0,
+                    "physical_line": 2127,
+                    "stream_data_ordinal": 1952,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "public_cooling_potential",
+                    "policy_index": 63,
+                    "report_id": 214,
+                    "reported_decimal": "-48.988824287358796",
+                    "parsed_binary64_bits": "c0487e91cb53d928",
+                    "value": -48.988824287358796,
+                    "physical_line": 2085,
+                    "stream_data_ordinal": 1910,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_rate",
+                    "policy_index": 93,
+                    "report_id": 330,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2105,
+                    "stream_data_ordinal": 1930,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_energy",
+                    "policy_index": 94,
+                    "report_id": 220,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2091,
+                    "stream_data_ordinal": 1916,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_rate_observed",
+                    "policy_index": 81,
+                    "report_id": 336,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2111,
+                    "stream_data_ordinal": 1936,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_energy_observed",
+                    "policy_index": 82,
+                    "report_id": 324,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2099,
+                    "stream_data_ordinal": 1924,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "inlet_mass_flow_observed",
+                    "policy_index": 66,
+                    "report_id": 358,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2133,
+                    "stream_data_ordinal": 1958,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "unit_supply_mass_flow_observed",
+                    "policy_index": 99,
+                    "report_id": 340,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2115,
+                    "stream_data_ordinal": 1940,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  }
+                ]
+              },
+              "on_positive_service": {
+                "sample": 24,
+                "full_clock_context": [
+                  1,
+                  [
+                    "105 001 CLEAR SKY DEFAULT",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  2,
+                  "interval",
+                  [
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    " 7",
+                    " 0.00",
+                    "15.00",
+                    "SummerDesignDay"
+                  ]
+                ],
+                "actual_public_reports": [
+                  {
+                    "role": "cooling_availability",
+                    "policy_index": 152,
+                    "report_id": 351,
+                    "reported_decimal": "1.0",
+                    "parsed_binary64_bits": "3ff0000000000000",
+                    "value": 1.0,
+                    "physical_line": 3974,
+                    "stream_data_ordinal": 3787,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "overall_availability",
+                    "policy_index": 6,
+                    "report_id": 352,
+                    "reported_decimal": "1.0",
+                    "parsed_binary64_bits": "3ff0000000000000",
+                    "value": 1.0,
+                    "physical_line": 3975,
+                    "stream_data_ordinal": 3788,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "public_cooling_potential",
+                    "policy_index": 63,
+                    "report_id": 214,
+                    "reported_decimal": "-840.5040364910099",
+                    "parsed_binary64_bits": "c08a44084448a706",
+                    "value": -840.5040364910099,
+                    "physical_line": 3933,
+                    "stream_data_ordinal": 3746,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_rate",
+                    "policy_index": 93,
+                    "report_id": 330,
+                    "reported_decimal": "840.5040364910101",
+                    "parsed_binary64_bits": "408a44084448a708",
+                    "value": 840.5040364910101,
+                    "physical_line": 3953,
+                    "stream_data_ordinal": 3766,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_energy",
+                    "policy_index": 94,
+                    "report_id": 220,
+                    "reported_decimal": "756453.6328419091",
+                    "parsed_binary64_bits": "412715cb4403dace",
+                    "value": 756453.6328419091,
+                    "physical_line": 3939,
+                    "stream_data_ordinal": 3752,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_rate_observed",
+                    "policy_index": 81,
+                    "report_id": 336,
+                    "reported_decimal": "840.50403649101",
+                    "parsed_binary64_bits": "408a44084448a707",
+                    "value": 840.50403649101,
+                    "physical_line": 3959,
+                    "stream_data_ordinal": 3772,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_energy_observed",
+                    "policy_index": 82,
+                    "report_id": 324,
+                    "reported_decimal": "756453.632841909",
+                    "parsed_binary64_bits": "412715cb4403dacd",
+                    "value": 756453.632841909,
+                    "physical_line": 3947,
+                    "stream_data_ordinal": 3760,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "inlet_mass_flow_observed",
+                    "policy_index": 66,
+                    "report_id": 358,
+                    "reported_decimal": "0.12482070126854479",
+                    "parsed_binary64_bits": "3fbff43fddcfeb65",
+                    "value": 0.12482070126854479,
+                    "physical_line": 3981,
+                    "stream_data_ordinal": 3794,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "unit_supply_mass_flow_observed",
+                    "policy_index": 99,
+                    "report_id": 340,
+                    "reported_decimal": "0.12482070126854479",
+                    "parsed_binary64_bits": "3fbff43fddcfeb65",
+                    "value": 0.12482070126854479,
+                    "physical_line": 3963,
+                    "stream_data_ordinal": 3776,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  }
+                ]
+              }
+            },
+            "no_transport_or_zone_total_zero_assertions": true,
+            "counts_are_observations_not_targets": true,
+            "public_potential_is_not_private_substep_demand": true,
+            "qualification": "Actual complete public clock/context joins. Only supply sensible93/94 are suppressed under overall-on/cooling-off/public demand; flows66/99 and passive zone81/82 are retained observations. No old profile/count, heating, private CoolOn or timestep-energy reconstruction claim."
+          },
+          "Source": {
+            "contract": {
+              "path": ".runtime/object-expansion/unit128-prep/orthogonal-cooling-input-proposal02/cooling-public-gates.json",
+              "sha256": "9811d1ce388d5df3fb66345ec205698875062685f78c14cdaaa9574517261d85",
+              "bytes": 7424
+            },
+            "reports": [
+              {
+                "role": "cooling_availability",
+                "policy_index": 152,
+                "report_id": 351,
+                "key": "128 INDEPENDENT COOLING AVAILABILITY",
+                "name": "Schedule Value",
+                "units": "",
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "",
+                  "raw": "Zone,Average,Schedule Value []"
+                },
+                "policy": {
+                  "key": "128 Independent Cooling Availability",
+                  "variable": "Schedule Value",
+                  "units": "scalar (declared schedule type retained)",
+                  "frequency": "Timestep",
+                  "sampling_stage": "zone",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              },
+              {
+                "role": "overall_availability",
+                "policy_index": 6,
+                "report_id": 352,
+                "key": "CON-01 SYSTEM AVAILABILITY",
+                "name": "Schedule Value",
+                "units": "",
+                "producer": {
+                  "stage": "Zone",
+                  "store": "Average",
+                  "units": "",
+                  "raw": "Zone,Average,Schedule Value []"
+                },
+                "policy": {
+                  "key": "CON-01 System Availability",
+                  "variable": "Schedule Value",
+                  "units": "scalar (declared schedule type retained)",
+                  "frequency": "Timestep",
+                  "sampling_stage": "zone",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              },
+              {
+                "role": "public_cooling_potential",
+                "policy_index": 63,
+                "report_id": 214,
+                "key": "ZONE ONE",
+                "name": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+                "units": "W",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "W",
+                  "raw": "HVAC,Average,Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate [W]"
+                },
+                "policy": {
+                  "key": "ZONE ONE",
+                  "variable": "Zone System Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate",
+                  "units": "W",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 0.001,
+                  "rtol": 0.0,
+                  "rmse_max": 0.001
+                },
+                "samples": 480
+              },
+              {
+                "role": "supply_sensible_cooling_rate",
+                "policy_index": 93,
+                "report_id": 330,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+                "units": "W",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "W",
+                  "raw": "HVAC,Average,Zone Ideal Loads Supply Air Sensible Cooling Rate [W]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Supply Air Sensible Cooling Rate",
+                  "units": "W",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 0.001,
+                  "rtol": 0.0,
+                  "rmse_max": 0.001
+                },
+                "samples": 480
+              },
+              {
+                "role": "supply_sensible_cooling_energy",
+                "policy_index": 94,
+                "report_id": 220,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+                "units": "J",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Sum",
+                  "units": "J",
+                  "raw": "HVAC,Sum,Zone Ideal Loads Supply Air Sensible Cooling Energy [J]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Supply Air Sensible Cooling Energy",
+                  "units": "J",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1.0,
+                  "rtol": 0.0,
+                  "rmse_max": 1.0
+                },
+                "samples": 480
+              },
+              {
+                "role": "zone_sensible_cooling_rate_observed",
+                "policy_index": 81,
+                "report_id": 336,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Zone Sensible Cooling Rate",
+                "units": "W",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "W",
+                  "raw": "HVAC,Average,Zone Ideal Loads Zone Sensible Cooling Rate [W]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Zone Sensible Cooling Rate",
+                  "units": "W",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 0.001,
+                  "rtol": 0.0,
+                  "rmse_max": 0.001
+                },
+                "samples": 480
+              },
+              {
+                "role": "zone_sensible_cooling_energy_observed",
+                "policy_index": 82,
+                "report_id": 324,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Zone Sensible Cooling Energy",
+                "units": "J",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Sum",
+                  "units": "J",
+                  "raw": "HVAC,Sum,Zone Ideal Loads Zone Sensible Cooling Energy [J]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Zone Sensible Cooling Energy",
+                  "units": "J",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1.0,
+                  "rtol": 0.0,
+                  "rmse_max": 1.0
+                },
+                "samples": 480
+              },
+              {
+                "role": "inlet_mass_flow_observed",
+                "policy_index": 66,
+                "report_id": 358,
+                "key": "ZONE ONE INLET 가",
+                "name": "System Node Mass Flow Rate",
+                "units": "kg/s",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "kg/s",
+                  "raw": "HVAC,Average,System Node Mass Flow Rate [kg/s]"
+                },
+                "policy": {
+                  "key": "Zone one inlet 가",
+                  "variable": "System Node Mass Flow Rate",
+                  "units": "kg/s",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              },
+              {
+                "role": "unit_supply_mass_flow_observed",
+                "policy_index": 99,
+                "report_id": 340,
+                "key": "ZONE ONE IDEAL LOADS 각",
+                "name": "Zone Ideal Loads Supply Air Mass Flow Rate",
+                "units": "kg/s",
+                "producer": {
+                  "stage": "HVAC",
+                  "store": "Average",
+                  "units": "kg/s",
+                  "raw": "HVAC,Average,Zone Ideal Loads Supply Air Mass Flow Rate [kg/s]"
+                },
+                "policy": {
+                  "key": "ZONE one ideal loads 각",
+                  "variable": "Zone Ideal Loads Supply Air Mass Flow Rate",
+                  "units": "kg/s",
+                  "frequency": "Timestep",
+                  "sampling_stage": "system",
+                  "atol": 1e-09,
+                  "rtol": 0.0,
+                  "rmse_max": 1e-09
+                },
+                "samples": 480
+              }
+            ],
+            "policy_indices": [
+              152,
+              6,
+              63,
+              93,
+              94,
+              81,
+              82,
+              66,
+              99
+            ],
+            "samples": 480,
+            "full_clock_context_operand_joins": 4320,
+            "off_potential_samples": 60,
+            "on_potential_samples": 360,
+            "positive_on_service_samples": 360,
+            "max_abs_off_supply_sensible_cooling_rate": 0.0,
+            "max_abs_off_supply_sensible_cooling_energy": 0.0,
+            "first_observations": {
+              "off": {
+                "sample": 12,
+                "full_clock_context": [
+                  1,
+                  [
+                    "105 001 CLEAR SKY DEFAULT",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  2,
+                  "interval",
+                  [
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    " 4",
+                    " 0.00",
+                    "15.00",
+                    "SummerDesignDay"
+                  ]
+                ],
+                "actual_public_reports": [
+                  {
+                    "role": "cooling_availability",
+                    "policy_index": 152,
+                    "report_id": 351,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2126,
+                    "stream_data_ordinal": 1951,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "overall_availability",
+                    "policy_index": 6,
+                    "report_id": 352,
+                    "reported_decimal": "1.0",
+                    "parsed_binary64_bits": "3ff0000000000000",
+                    "value": 1.0,
+                    "physical_line": 2127,
+                    "stream_data_ordinal": 1952,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "public_cooling_potential",
+                    "policy_index": 63,
+                    "report_id": 214,
+                    "reported_decimal": "-48.98882428735908",
+                    "parsed_binary64_bits": "c0487e91cb53d950",
+                    "value": -48.98882428735908,
+                    "physical_line": 2085,
+                    "stream_data_ordinal": 1910,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_rate",
+                    "policy_index": 93,
+                    "report_id": 330,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2105,
+                    "stream_data_ordinal": 1930,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_energy",
+                    "policy_index": 94,
+                    "report_id": 220,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2091,
+                    "stream_data_ordinal": 1916,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_rate_observed",
+                    "policy_index": 81,
+                    "report_id": 336,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2111,
+                    "stream_data_ordinal": 1936,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_energy_observed",
+                    "policy_index": 82,
+                    "report_id": 324,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2099,
+                    "stream_data_ordinal": 1924,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "inlet_mass_flow_observed",
+                    "policy_index": 66,
+                    "report_id": 358,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2133,
+                    "stream_data_ordinal": 1958,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "unit_supply_mass_flow_observed",
+                    "policy_index": 99,
+                    "report_id": 340,
+                    "reported_decimal": "0.0",
+                    "parsed_binary64_bits": "0000000000000000",
+                    "value": 0.0,
+                    "physical_line": 2115,
+                    "stream_data_ordinal": 1940,
+                    "stamp_index": 12,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 4",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 2011,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  }
+                ]
+              },
+              "on_positive_service": {
+                "sample": 24,
+                "full_clock_context": [
+                  1,
+                  [
+                    "105 001 CLEAR SKY DEFAULT",
+                    "  39.74",
+                    "-105.18",
+                    "  -7.00",
+                    "1829.00"
+                  ],
+                  2,
+                  "interval",
+                  [
+                    "1",
+                    " 7",
+                    "21",
+                    " 0",
+                    " 7",
+                    " 0.00",
+                    "15.00",
+                    "SummerDesignDay"
+                  ]
+                ],
+                "actual_public_reports": [
+                  {
+                    "role": "cooling_availability",
+                    "policy_index": 152,
+                    "report_id": 351,
+                    "reported_decimal": "1.0",
+                    "parsed_binary64_bits": "3ff0000000000000",
+                    "value": 1.0,
+                    "physical_line": 3974,
+                    "stream_data_ordinal": 3787,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "overall_availability",
+                    "policy_index": 6,
+                    "report_id": 352,
+                    "reported_decimal": "1.0",
+                    "parsed_binary64_bits": "3ff0000000000000",
+                    "value": 1.0,
+                    "physical_line": 3975,
+                    "stream_data_ordinal": 3788,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "public_cooling_potential",
+                    "policy_index": 63,
+                    "report_id": 214,
+                    "reported_decimal": "-840.50403649101",
+                    "parsed_binary64_bits": "c08a44084448a707",
+                    "value": -840.50403649101,
+                    "physical_line": 3933,
+                    "stream_data_ordinal": 3746,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_rate",
+                    "policy_index": 93,
+                    "report_id": 330,
+                    "reported_decimal": "840.5040364910111",
+                    "parsed_binary64_bits": "408a44084448a711",
+                    "value": 840.5040364910111,
+                    "physical_line": 3953,
+                    "stream_data_ordinal": 3766,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "supply_sensible_cooling_energy",
+                    "policy_index": 94,
+                    "report_id": 220,
+                    "reported_decimal": "756453.63284191",
+                    "parsed_binary64_bits": "412715cb4403dad6",
+                    "value": 756453.63284191,
+                    "physical_line": 3939,
+                    "stream_data_ordinal": 3752,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_rate_observed",
+                    "policy_index": 81,
+                    "report_id": 336,
+                    "reported_decimal": "840.5040364910099",
+                    "parsed_binary64_bits": "408a44084448a706",
+                    "value": 840.5040364910099,
+                    "physical_line": 3959,
+                    "stream_data_ordinal": 3772,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "zone_sensible_cooling_energy_observed",
+                    "policy_index": 82,
+                    "report_id": 324,
+                    "reported_decimal": "756453.6328419088",
+                    "parsed_binary64_bits": "412715cb4403dacc",
+                    "value": 756453.6328419088,
+                    "physical_line": 3947,
+                    "stream_data_ordinal": 3760,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "inlet_mass_flow_observed",
+                    "policy_index": 66,
+                    "report_id": 358,
+                    "reported_decimal": "0.12482070126854466",
+                    "parsed_binary64_bits": "3fbff43fddcfeb5c",
+                    "value": 0.12482070126854466,
+                    "physical_line": 3981,
+                    "stream_data_ordinal": 3794,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  },
+                  {
+                    "role": "unit_supply_mass_flow_observed",
+                    "policy_index": 99,
+                    "report_id": 340,
+                    "reported_decimal": "0.12482070126854466",
+                    "parsed_binary64_bits": "3fbff43fddcfeb5c",
+                    "value": 0.12482070126854466,
+                    "physical_line": 3963,
+                    "stream_data_ordinal": 3776,
+                    "stamp_index": 24,
+                    "timestamp": {
+                      "environment_ordinal": 1,
+                      "fields": [
+                        "1",
+                        " 7",
+                        "21",
+                        " 0",
+                        " 7",
+                        " 0.00",
+                        "15.00",
+                        "SummerDesignDay"
+                      ],
+                      "kind": "interval",
+                      "physical_line": 3859,
+                      "report_id": 2
+                    },
+                    "environment": {
+                      "ordinal": 1,
+                      "fields": [
+                        "105 001 CLEAR SKY DEFAULT",
+                        "  39.74",
+                        "-105.18",
+                        "  -7.00",
+                        "1829.00"
+                      ],
+                      "physical_line": 162
+                    }
+                  }
+                ]
+              }
+            },
+            "no_transport_or_zone_total_zero_assertions": true,
+            "counts_are_observations_not_targets": true,
+            "public_potential_is_not_private_substep_demand": true,
+            "qualification": "Actual complete public clock/context joins. Only supply sensible93/94 are suppressed under overall-on/cooling-off/public demand; flows66/99 and passive zone81/82 are retained observations. No old profile/count, heating, private CoolOn or timestep-energy reconstruction claim."
+          }
+        },
+        "actual_warning_diagnostics": {
+          "Native": {
+            "ERR": {
+              "path": ".runtime/porting/orthogonal-cooling-128/case/native-01/output/nativeout.err",
+              "sha256": "da8105f8dfffcf16260443fd932b2e381093192b2c8b649bc6413ac1afd156cc",
+              "bytes": 2084
+            },
+            "END": {
+              "path": ".runtime/porting/orthogonal-cooling-128/case/native-01/output/nativeout.end",
+              "sha256": "7730d3e42c2eeee888f2b49f14107a152e49f97c65fa5c4cfe6ee690c8fa00ed",
+              "bytes": 98
+            },
+            "warning_contract": {
+              "path": ".runtime/object-expansion/unit128-prep/science-final01/warning-phase-contract.json",
+              "sha256": "afa92ae5e216dff8f9b91aefc5a2592d181b18110b376141503ee09a4347357a",
+              "bytes": 2976
+            },
+            "ordered_warnings": [
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "In zone ZONE ONE there is unbalanced air flow. Load due to induced outdoor air is neglected.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day."
+            ],
+            "unbalanced_flow_continuations": [
+              "   **   ~~~   **  Environment=105 001 CLEAR SKY DEFAULT, at Simulation time=07/21 06:00 - 06:15",
+              "   **   ~~~   **   Flows [m3/s]: Inlets: 0.129337  Unbalanced exhausts: 0.129337  Returns: 0.258674",
+              "   **   ~~~   **   Infiltration: 0.000000  Zone Ventilation: 0.000000  Mixing (incoming): 0.000000",
+              "   **   ~~~   **   Imbalance (excess outflow): 0.258674  Total system OA flow (for all airloops serving this zone): 0.000000",
+              "   **   ~~~   **   This error will only be reported once per zone."
+            ],
+            "actual_continuation_numbers": [
+              [
+                0.129337,
+                0.129337,
+                0.258674
+              ],
+              [
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.258674,
+                0.0
+              ]
+            ],
+            "counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed": {
+              "warnings": 6,
+              "severe": 0
+            },
+            "phase_counts_are_actual_observations": true,
+            "unbalanced_warning_count": 1,
+            "qualification": "Five exact adaptive warnings plus optional genuine once-zone unbalanced warning with its complete five immediate continuations and actual operands/counters. No old order-position/phase/count/flow fixture. Whole paired ERR/END remains exact under original version/elapsed boundary."
+          },
+          "Source": {
+            "ERR": {
+              "path": ".runtime/porting/orthogonal-cooling-128/case/source-01/output/eplusrs.err",
+              "sha256": "adb9c831014bae99bef5c0de601384c272bc6a02be08b43af6f5690a1299799b",
+              "bytes": 2079
+            },
+            "END": {
+              "path": ".runtime/porting/orthogonal-cooling-128/case/source-01/output/eplusrs.end",
+              "sha256": "006ac5635071859d8ddb677f3684cfab46c670262a915e9db26658342e7282a2",
+              "bytes": 98
+            },
+            "warning_contract": {
+              "path": ".runtime/object-expansion/unit128-prep/science-final01/warning-phase-contract.json",
+              "sha256": "afa92ae5e216dff8f9b91aefc5a2592d181b18110b376141503ee09a4347357a",
+              "bytes": 2976
+            },
+            "ordered_warnings": [
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "In zone ZONE ONE there is unbalanced air flow. Load due to induced outdoor air is neglected.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+              "GetNextEnvironment: Adaptive Comfort being reported during design day."
+            ],
+            "unbalanced_flow_continuations": [
+              "   **   ~~~   **  Environment=105 001 CLEAR SKY DEFAULT, at Simulation time=07/21 06:00 - 06:15",
+              "   **   ~~~   **   Flows [m3/s]: Inlets: 0.129337  Unbalanced exhausts: 0.129337  Returns: 0.258674",
+              "   **   ~~~   **   Infiltration: 0.000000  Zone Ventilation: 0.000000  Mixing (incoming): 0.000000",
+              "   **   ~~~   **   Imbalance (excess outflow): 0.258674  Total system OA flow (for all airloops serving this zone): 0.000000",
+              "   **   ~~~   **   This error will only be reported once per zone."
+            ],
+            "actual_continuation_numbers": [
+              [
+                0.129337,
+                0.129337,
+                0.258674
+              ],
+              [
+                0.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.258674,
+                0.0
+              ]
+            ],
+            "counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed": {
+              "warnings": 6,
+              "severe": 0
+            },
+            "phase_counts_are_actual_observations": true,
+            "unbalanced_warning_count": 1,
+            "qualification": "Five exact adaptive warnings plus optional genuine once-zone unbalanced warning with its complete five immediate continuations and actual operands/counters. No old order-position/phase/count/flow fixture. Whole paired ERR/END remains exact under original version/elapsed boundary."
+          }
+        },
+        "comparison_provenance": {
+          "retained_unaccepted127": {
+            "path": ".runtime/object-expansion/unit127-prep/Root-unaccepted-Native-disposition01.json",
+            "sha256": "3750831e13d6de59a7e38e88922beba47a5d209f862a14b858d46b7d6caa662c",
+            "bytes": 2594
+          },
+          "failed_independent_metadata_predecessor": {
+            "path": ".runtime/object-expansion/unit128-prep/physical-peer01/proof01.json",
+            "sha256": "68659962fae353ca7f443f7313523694089529dbc02e251b73ecd79872112760",
+            "bytes": 1670
+          },
+          "original127_precheck": {
+            "path": ".runtime/object-expansion/unit127-prep/runtime-protocol-proposal01/native-precheck01.json",
+            "sha256": "f3687acf4a4c901f756017e1656cca8a3f78ec32260623061ca34821caead5b6",
+            "bytes": 3573
+          },
+          "original127_Native_launch": {
+            "path": ".runtime/porting/cooling-availability-127/case/native-01/launch.json",
+            "sha256": "43d619dcfdd4a2f3673a6358b78a5d8b563bf55501738d08fb7c114aa1596802",
+            "bytes": 22701
+          },
+          "Root127_diagnostic": {
+            "path": ".runtime/object-expansion/unit127-prep/Root-Native-diagnostic01.json",
+            "sha256": "a165544d4fa3c6f71c4486e13e575c063d3c6433d10f51afb487603f47cdb71b",
+            "bytes": 91318
+          },
+          "independent127_diagnostic": {
+            "path": ".runtime/object-expansion/unit127-prep/independent-native-missing-return-witness-diagnosis01.json",
+            "sha256": "5cf07286afab911e4a817ee7e56f8e1abc9e91ac1af932eeb1ad0a7022f13051",
+            "bytes": 55066
+          },
+          "actual_fresh_Native_executions": 1,
+          "actual_fresh_Source_executions": 1,
+          "Source127_executions": 0,
+          "accepted127_cases": 0,
+          "actual_quality": {
+            "path": ".runtime/porting/cooling-availability-127/quality01/summary.json",
+            "sha256": "1aff7b062c99f04281574e954e497b8e3c69817dbae17c186f3881bc7d85a623",
+            "bytes": 1648
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit127-prep/owner-execution-review01.json",
+            "sha256": "e56f4464144cf9c5b916018d978a35f1b4a5e17cd1f3d9fa15cfddc2ab6fab2e",
+            "bytes": 3010
+          },
+          "retained_inventory": {
+            "path": ".runtime/object-expansion/unit128-prep/retained-attempt-inventory01.json",
+            "sha256": "5df729f053617d498f4b5a9a71537a65a0a888075e7f4731672d90e5dc4b185c",
+            "bytes": 12381
+          },
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit127-prep/build130-attempt01.json",
+            "sha256": "08ee6dc2d56c807f40ed0d3c1f4d5fe91453679f8666614336516e347b35de0b",
+            "bytes": 699
+          },
+          "full_current_and_archive_source_files": 4672
+        },
+        "effective_state": "Bounded Source B permits a genuine explicit cooling-availability schedule through existing raw/IP, live SelectedSchedule and PurchasedAir calc/report owners; Legacy explicit-cooling, heating-availability and fuel-efficiency name fences remain. One independent-schedule case compares 155 series/73,680 values with original caps: actual overall-on/cooling-off potential samples suppress supply sensible cooling rate/energy, while cooling-on samples show real service. Transport, passive zone cooling and total cooling are not substituted for that coil witness. Source 130 is reused after the unaccepted Native-only127 witness shortfall; no Source 127 run or retroactive gate relaxation is credited. Selected UTF8 public-byte evidence remains finite. Broader IdealLoads/Unicode/topology combinations and full-object/frozen conformance remain open."
       }
     ],
     "totals": {
-      "paired_cases": 181,
-      "reported_samples": 5576776,
-      "raw_operand_unequal": 1283544,
+      "paired_cases": 182,
+      "reported_samples": 5650456,
+      "raw_operand_unequal": 1302368,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -57860,6 +60575,23 @@
           "sha256": "8503596a6110e9d01ab2eb527dfbb95865ebb4ca1dd966c9dd26e19ebd4e3800",
           "bytes": 80763152
         }
+      },
+      {
+        "id": "source-dd-cooling-availability-127",
+        "receipt": {
+          "path": ".runtime/porting/cooling-availability-127/build130-01/build/receipt.json",
+          "sha256": "904827554caa9c123b95dc13fbd7177ebeac73ddbc18df1748fb4a39c6d33697",
+          "bytes": 4500
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3e/3ede16405bcd761ff12c3f144626437587a58f913fa220685bb159d34d1fd0a2",
+          "sha256": "3ede16405bcd761ff12c3f144626437587a58f913fa220685bb159d34d1fd0a2"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/cooling-availability-127/build130-01/eplus-rs.exe",
+          "sha256": "a437a2dad4093a272c69a79464c8e7f8d9858449557f98fcd7ebe6673c3c688f",
+          "bytes": 80761853
+        }
       }
     ],
     "focused_since_workspace": {
@@ -58226,14 +60958,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 129,
-      "builds_with_accepted_paired_cases": 115,
+      "actual_recorded_builds": 130,
+      "builds_with_accepted_paired_cases": 116,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 10,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "129 recorded Source builds: 115 have accepted paired cases; 14 have none, including four without Source execution. The new pair uses the sole original Native characterization with its retained Build128 context and one fresh Source129 execution. Native-only characterization and unexecuted preparation predecessors add no samples; existing failed/unaccepted histories remain retained.",
+      "qualification": "130 recorded Source builds: 116 have accepted paired cases; 14 have none, including four without Source execution. The distinct128 pair uses one fresh Native and one fresh Source on the same actual130 snapshot. Earlier127Native is unaccepted with no Source process/sample credit; Source130 is recorded once. All previous failed/unaccepted histories remain retained.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 4,
@@ -62775,7 +65507,7 @@
       "scope": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion.",
       "capability_or_gate_promotion": false
     },
-    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H"], "accepted_paired_cases": 10, "accepted_samples": 675600, "retained_Scheduled_B_pairs": 9, "retained_Scheduled_B_samples": 616080, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit126-prep/paired-runtime-proposal02/pair-proof01.json", "sha256": "fae9dda0db763d2a96c8929a4a81ffa773c6beb9e4500f93956d3fb525da8516", "bytes": 268458}, "latest_independent_physical_comparison": {"path": ".runtime/object-expansion/unit126-prep/physical-peer01/proof01.json", "sha256": "f97b58c278158249233056e6d38d68ee56894ccadd991713740bc01fa775119c", "bytes": 228376}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit126-prep/root-completed-readback-review01.json", "sha256": "42b5bc6cf16d6ddf523cf96b659d7102761c8ed087e7eca80b0fb7d27f103e92", "bytes": 2807}, "latest_source_build": "source-dd-UTF8-identity-126", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit126-prep/build129-attempt01.json", "sha256": "1b0e475775ac76757b44b76de98e312893446004dec1df2950cee52739068350", "bytes": 678}, "latest_actual_quality": {"path": ".runtime/porting/UTF8-identity-126/quality03/summary.json", "sha256": "efac144d297dffbe9914555750129bd4f7c2f13ae0cdaa91ae26c4ccb897b262", "bytes": 1609}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit126-prep/owner-execution-review01.json", "sha256": "cc2feb44850de0ebd5d84756dab362f57cbc55953b2bff88b5809949e5ad6b5a", "bytes": 2014}, "latest_input_contract": {"path": ".runtime/object-expansion/unit126-prep/paired-science-final01/recipe01.json", "sha256": "fa9fbe4c60badff5f4613e2e900d0dbca0db3f3f3cdc7d33c18035d0223f8b83", "bytes": 51334}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit126-prep/retained-attempt-inventory02.json", "sha256": "f376f2823ac5d67765b6415da5171301473205d8653535b3984015abb5a62898", "bytes": 9761}, "latest_Source_epoch_authority": {"path": ".runtime/object-expansion/unit126-prep/Root-Source-epoch-authority01.json", "sha256": "10a628038e535f0d8805565f18f3b36dd5b33c0e020f2555c2c001e669f1d9ee", "bytes": 8244}, "latest_Native_byte_characterization": {"path": ".runtime/object-expansion/unit126-prep/native-characterization-proposal01/byte-proof01.json", "sha256": "f4de4bf044ba5d1abebdaa5fe97a934111a5b1c420353bac638430070a3e86d1", "bytes": 82885}, "scope": "Nine bounded Source B Scheduled/NodeList compositions retain 616,080 values; the unused Source A pair adds 59,520, for ten pairs and 675,600 values. The latest name-only derivative compares 154 series/73,200 values and preserves the accepted two-return physics. Actual public NodeID and IdealLoads producer records preserve the selected UTF-8 bytes while lower-case ASCII becomes upper-case. Source removes two PurchasedAir ASCII rejection guards and retains ASCII-only conversion; the sole original Native characterization is kept under its Build128 context, separately from the fresh Source129 build. This finite result does not certify every Unicode identity, private alias histories, selected holes, other consumers/topologies, Source A managers or full-object conformance.", "capability_or_gate_promotion": false}
+    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H", "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H"], "accepted_paired_cases": 11, "accepted_samples": 749280, "retained_Scheduled_B_pairs": 10, "retained_Scheduled_B_samples": 689760, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit128-prep/runtime-protocol-proposal02/pair-proof01.json", "sha256": "505c4d2dd2574e79b8087d766b0e33fab60267f69765326b84cf7e929ebdb841", "bytes": 333183}, "latest_independent_physical_comparison": {"path": ".runtime/object-expansion/unit128-prep/physical-peer02/proof01.json", "sha256": "90821a715ba84407563dc8c7de42a4ae6317abe564b0bd6c4ac75c5466997da3", "bytes": 292985}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit128-prep/root-completed-readback-review01.json", "sha256": "b1bec8e3bfd1e43dc7a52328fbb32e99a47e2776243eecf52f2c1f978c4516ed", "bytes": 2888}, "latest_source_build": "source-dd-cooling-availability-127", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit127-prep/build130-attempt01.json", "sha256": "08ee6dc2d56c807f40ed0d3c1f4d5fe91453679f8666614336516e347b35de0b", "bytes": 699}, "latest_actual_quality": {"path": ".runtime/porting/cooling-availability-127/quality01/summary.json", "sha256": "1aff7b062c99f04281574e954e497b8e3c69817dbae17c186f3881bc7d85a623", "bytes": 1648}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit127-prep/owner-execution-review01.json", "sha256": "e56f4464144cf9c5b916018d978a35f1b4a5e17cd1f3d9fa15cfddc2ab6fab2e", "bytes": 3010}, "latest_input_contract": {"path": ".runtime/object-expansion/unit128-prep/science-final01/recipe01.json", "sha256": "ba8f216eab4a88e0cecbd9ef5a9b4eca93081964391b03e54215855e655e09e9", "bytes": 33752}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit128-prep/retained-attempt-inventory01.json", "sha256": "5df729f053617d498f4b5a9a71537a65a0a888075e7f4731672d90e5dc4b185c", "bytes": 12381}, "latest_retained_unaccepted127": {"path": ".runtime/object-expansion/unit127-prep/Root-unaccepted-Native-disposition01.json", "sha256": "3750831e13d6de59a7e38e88922beba47a5d209f862a14b858d46b7d6caa662c", "bytes": 2594}, "scope": "Ten bounded Source B Scheduled/NodeList compositions retain 689,760 values; the unused Source A pair adds 59,520, for eleven pairs/749,280 values. The latest independent cooling-availability case compares 155 series/73,680 values. Actual overall-on/cooling-off samples with public cooling potential suppress coil/supply sensible cooling, while cooling-on samples provide real service. A separate original return-fraction schedule retains positive basis in both states, positive first return and the later-return zero branch. All eighteen setpoint joins, complete BND27 and selected UTF8 public identities remain. The earlier 127 Native witness-shortfall case remains unaccepted, without Source execution or replay. Source-only cooling eligibility retains Legacy/heating/fuel/topology fences; broader combinations and full-object conformance remain open.", "capability_or_gate_promotion": false}
   },
   "additional_native_type_calibrations": [
     {
