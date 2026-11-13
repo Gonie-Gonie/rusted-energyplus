@@ -3574,6 +3574,134 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             );
             assert_eq!(exhaust_raw, original_exhaust_raw);
 
+            // Unit126: actual compile -> scope -> support -> retained raw IP
+            // custody for selected mixed-ASCII/UTF-8 identities. The runtime
+            // owner probe remains separate; this is not a simulation result.
+            {
+                let alias = "ZONE one inlets 가";
+                let physical = "Zone one inlet 가";
+                let unit_name = "ZONE one ideal loads 각";
+                let mut utf8 = exhaust.clone();
+                utf8["NodeList"][alias] = json!({"nodes":[{"node_name":physical}]});
+                utf8["NodeList"]["Manager Targets"]["nodes"][0]["node_name"] = json!(physical);
+                utf8["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_air_inlet_node_or_nodelist_name"] =
+                    json!(alias);
+                let mut actual_unit = utf8["ZoneHVAC:IdealLoadsAirSystem"]
+                    .as_object_mut()
+                    .expect("real unit object map")
+                    .remove("Ideal")
+                    .expect("real selected unit");
+                actual_unit["zone_supply_air_node_name"] = json!(alias);
+                utf8["ZoneHVAC:IdealLoadsAirSystem"][unit_name] = actual_unit;
+                utf8["ZoneHVAC:EquipmentList"]["Equipment"]["equipment"][0]["zone_equipment_name"] =
+                    json!(unit_name);
+                utf8["Output:Variable"] = json!({
+                    "UTF8 unit":{"key_value":unit_name,"variable_name":"Zone Ideal Loads Supply Air Sensible Heating Rate","reporting_frequency":"Timestep"},
+                    "UTF8 node":{"key_value":physical,"variable_name":"System Node Mass Flow Rate","reporting_frequency":"Timestep"}
+                });
+                let raw = parse_epjson_str(&utf8.to_string()).expect("real UTF-8 Source input");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled.model.as_ref().expect("real UTF-8 typed model");
+                let resolved = model
+                    .resolve_advisory_node_reference(alias)
+                    .require_proven_nodes()
+                    .expect("real selected singleton alias");
+                assert_eq!(resolved.len(), 1);
+                let actual_node = model
+                    .nodes
+                    .iter()
+                    .find(|node| node.id == resolved[0])
+                    .expect("real physical node arena member");
+                assert_eq!(
+                    actual_node.name.0.as_bytes(),
+                    "ZONE ONE INLET 가".as_bytes()
+                );
+                assert_eq!(
+                    model.ideal_loads_air_systems[0].name.0.as_bytes(),
+                    "ZONE ONE IDEAL LOADS 각".as_bytes()
+                );
+                let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                    .expect("actual Source role eligibility");
+                let mut actual_scope =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(actual_scope.admissible, "{:?}", actual_scope.violations);
+                actual_scope.environment = Some(
+                    super::environment::environment_from_weather(
+                        model,
+                        &single_day_weather_fixture(),
+                        "authored UTF-8 identity weather",
+                    )
+                    .expect("real UTF-8 scope environment"),
+                );
+                let admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                    &raw,
+                    &actual_scope,
+                )
+                .expect("actual UTF-8 raw/IP Source token");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert_eq!(
+                    support.runtime_class,
+                    crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+                );
+                assert!(support.matched_capability_ids.is_empty());
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("real UTF-8 raw IP custody");
+                let actual_parent = ip
+                    .source_raw_object_fields("ZoneHVAC:EquipmentConnections", "Connection")
+                    .expect("real parent alpha");
+                assert_eq!(
+                    actual_parent["zone_air_inlet_node_or_nodelist_name"],
+                    SourceRaw::String(alias.into())
+                );
+                let actual_unit = ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", unit_name)
+                    .expect("exact original unit key");
+                assert_eq!(
+                    actual_unit["zone_supply_air_node_name"],
+                    SourceRaw::String(alias.into())
+                );
+                assert_eq!(
+                    ip.source_raw_object_names("ZoneHVAC:IdealLoadsAirSystem")
+                        .expect("actual unit names"),
+                    &[unit_name.to_owned()]
+                );
+                let actual_list = ip
+                    .source_raw_object_fields("NodeList", alias)
+                    .expect("exact original alias key");
+                let members = match &actual_list["nodes"] {
+                    SourceRaw::Array(members) => Some(members),
+                    _ => None,
+                }
+                .expect("actual members");
+                let member = match &members[0] {
+                    SourceRaw::Object(member) => Some(member),
+                    _ => None,
+                }
+                .expect("actual first member");
+                assert_eq!(member["node_name"], SourceRaw::String(physical.into()));
+                for (request, key) in [("UTF8 unit", unit_name), ("UTF8 node", physical)] {
+                    assert_eq!(
+                        ip.source_raw_object_fields("Output:Variable", request)
+                            .expect("actual retaincase output key")["key_value"],
+                        SourceRaw::String(key.into())
+                    );
+                }
+                assert_eq!(raw, retained);
+            }
+
             // Full actual raw compiler -> scope -> Source token -> runtime class
             // -> IP custody for ordered return counts, without simulating flow.
             for count in [0_usize, 1, 3, 5] {

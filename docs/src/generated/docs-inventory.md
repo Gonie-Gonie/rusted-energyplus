@@ -82,7 +82,7 @@ none
 | docs/src/conformance/support-coverage-report.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
 | docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
 | docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-10-20 |
-| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-11-13 |
+| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-11-14 |
 | docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-10-20 |
 | docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-10-20 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
@@ -107,7 +107,7 @@ none
 | docs/src/porting-map/algorithm-port-ticket.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-06-25 |
 | docs/src/porting-map/conduction-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-10 |
 | docs/src/porting-map/geometry-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-07-15 |
-| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-10-20 |
+| docs/src/porting-map/heat-balance-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-11-14 |
 | docs/src/porting-map/ideal-loads-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-10-07 |
 | docs/src/porting-map/material-source-map.md | source-map | not in SUMMARY | n/a | present | active | compiler | 2026-07-16 |
 | docs/src/porting-map/node-state-source-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-06-07 |

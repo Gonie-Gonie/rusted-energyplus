@@ -611,6 +611,273 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 .all(|row| row.zone_name == "Uncontrolled Zone" && !row.is_controlled)
         );
         assert!(source.internal_gains.zone.is_none() && source.internal_gains.space.is_none());
+        // Unit126 input-stage identity probe: the real raw PurchasedAir getter,
+        // GetOnlySingleNode and output registration retain UTF-8 bytes while
+        // folding ASCII only. This does not execute HVAC or certify all Unicode.
+        if total == 1 {
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputStatisticsInput, SourceInputStatisticsValue as V,
+            };
+            use crate::heat_balance::source_output_registration::{
+                SourceOutputDictionaryStreams, SourcePurchasedAirOutputField,
+                SourcePurchasedAirReportingOutputContext, SourceRealOutputTarget,
+                SourceReportVariableEnvironment,
+            };
+            let alias = "ZONE one inlets 가";
+            let physical = "Zone one inlet 가";
+            let unit_name = "ZONE one ideal loads 각";
+            let variable = "Zone Ideal Loads Supply Air Sensible Heating Rate";
+            let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, V>>> =
+                BTreeMap::from([
+                    (
+                        "NodeList".into(),
+                        BTreeMap::from([(
+                            alias.into(),
+                            BTreeMap::from([(
+                                "nodes".into(),
+                                V::Array(vec![V::Object(BTreeMap::from([(
+                                    "node_name".into(),
+                                    V::String(physical.into()),
+                                )]))]),
+                            )]),
+                        )]),
+                    ),
+                    (
+                        "ZoneHVAC:IdealLoadsAirSystem".into(),
+                        BTreeMap::from([(
+                            unit_name.into(),
+                            BTreeMap::from([(
+                                "zone_supply_air_node_name".into(),
+                                V::String(alias.into()),
+                            )]),
+                        )]),
+                    ),
+                    (
+                        "Output:Variable".into(),
+                        BTreeMap::from([(
+                            "UTF8 REQUEST".into(),
+                            BTreeMap::from([
+                                ("key_value".into(), V::String(unit_name.into())),
+                                ("variable_name".into(), V::String(variable.into())),
+                                ("reporting_frequency".into(), V::String("Timestep".into())),
+                            ]),
+                        )]),
+                    ),
+                ]);
+            let retained_objects = objects.clone();
+            let mut probe_definitions = definitions.clone();
+            probe_definitions.push(SourceObjectDefinition {
+                object_type: "ZoneHVAC:IdealLoadsAirSystem".into(),
+                alpha_fields: 21,
+                numeric_fields: 11,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            });
+            let probe_families = objects
+                .iter()
+                .map(|(family, rows)| {
+                    (
+                        family.clone(),
+                        SourceInputFamily::Objects(
+                            rows.iter()
+                                .map(|(name, fields)| SourceObjectShape {
+                                    object_name: name.clone(),
+                                    field_sizes: fields
+                                        .iter()
+                                        .map(|(field, value)| {
+                                            let size = match value {
+                                                V::Null => 0,
+                                                V::Array(values) => values.len(),
+                                                V::Object(values) => values.len(),
+                                                _ => 1,
+                                            };
+                                            (field.clone(), size)
+                                        })
+                                        .collect(),
+                                })
+                                .collect(),
+                        ),
+                    )
+                })
+                .collect();
+            let object_order = objects
+                .iter()
+                .map(|(family, rows)| (family.clone(), rows.keys().cloned().collect()))
+                .collect();
+            let mut probe_ip =
+                SelectedInputProcessor::from_admitted_input(probe_definitions, probe_families)?;
+            probe_ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })?;
+            let mut probe_shortcut = SourceInputProcessorShortCut::default();
+            probe_shortcut.allocate_from_input(&probe_ip)?;
+            let probe_clock = OrdinaryEquipmentInput::from_source_a_family_inventory(
+                [("NodeList", 1)],
+                timesteps,
+            )?;
+            let mut probe = OrdinaryEquipment::new_for_source_ordered(
+                &model,
+                probe_clock,
+                &zone_ids,
+                &space_ids,
+            )?;
+            let mut probe_zones = selected.clone();
+            let mut probe_gains = crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains::default();
+            let mut probe_sizing =
+                crate::heat_balance::selected_sizing::SelectedSizingManager::default();
+            let mut probe_schedules =
+                crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+            probe_schedules.init_constant_state(timesteps)?;
+            let mut probe_branch =
+                crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
+            let mut probe_registration = SourceOutputRegistration::default();
+            let mut probe_prescan = SourceOutputPreScan::default();
+            let probe_reports = ep_model::ReportInputs {
+                output_variables: vec![ep_model::SourceOutputVariableInput {
+                    object_name: "UTF8 REQUEST".into(),
+                    key: unit_name.into(),
+                    variable_name: variable.into(),
+                    reporting_frequency: "TIMESTEP".into(),
+                    schedule_name: String::new(),
+                    alpha_blank: [false, false, false, true],
+                    default_applied: [false; 4],
+                    num_alphas: 3,
+                    is_epjson: true,
+                }],
+                ..Default::default()
+            };
+            let mut probe_state = error_state.clone();
+            let (mut probe_error, mut probe_console, mut probe_eio, mut probe_eso) =
+                (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+            let mut probe_results = Vec::new();
+            {
+                let mut backend = SourceErrorBackend {
+                    state: &mut probe_state,
+                    error_stream: Some(&mut probe_error),
+                    console: &mut probe_console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                probe.get_zone_equipment_source(
+                    &mut probe_ip,
+                    probe_clock,
+                    false,
+                    false,
+                    &globals,
+                    &mut probe_gains,
+                    SourceEquipmentInputOwners {
+                        zones: probe_zones
+                            .zones
+                            .as_deref_mut()
+                            .ok_or("real Source probe Zones")?,
+                        schedules: &mut probe_schedules,
+                        sizing: &mut probe_sizing,
+                        branch: None,
+                        source_is_epjson: true,
+                        backend: &mut backend,
+                        diagnostic_flags: Some(
+                            crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &developer,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            },
+                        ),
+                    },
+                )?;
+                probe_prescan.add_record(unit_name, variable, &mut backend)?;
+                let mut dictionary = SourceOutputDictionaryStreams {
+                    eso: Some(&mut probe_eso),
+                    sqlite_present: false,
+                    results_framework_output_variables: &mut probe_results,
+                };
+                probe.get_source_purchased_air(
+                    &mut probe_shortcut,
+                    true,
+                    &mut probe_schedules,
+                    globals.num_of_zones,
+                    &mut probe_branch,
+                    false,
+                    &mut backend,
+                    &mut SourcePurchasedAirReportingOutputContext {
+                        registration: &mut probe_registration,
+                        input: &mut probe_ip,
+                        prescan: &probe_prescan,
+                        reports: &probe_reports,
+                        environment: SourceReportVariableEnvironment::from_owners(
+                            "",
+                            &globals,
+                            &developer,
+                            Some(&clock),
+                        ),
+                        minutes_in_time_step: clock.minutes_in_time_step,
+                        host: &mut files,
+                        dictionary_host: &mut dictionary,
+                        eio: &mut probe_eio,
+                    },
+                )?;
+            }
+            let actual_unit = &probe.purchased_air.units.as_ref().ok_or("real units")?[0];
+            assert_eq!(
+                actual_unit.name.as_bytes(),
+                "ZONE ONE IDEAL LOADS 각".as_bytes()
+            );
+            assert_eq!(actual_unit.zone_supply_air_node_num, 1);
+            assert_eq!(probe.nodes.number_of_unique_node_names, 1);
+            assert_eq!(
+                probe.nodes.node_ids.as_ref().ok_or("real NodeID")?[1].as_bytes(),
+                "ZONE ONE INLET 가".as_bytes()
+            );
+            assert_eq!(probe.nodes.node_references.as_deref(), Some([1].as_slice()));
+            let actual_list = &probe.nodes.node_lists.as_ref().ok_or("real NodeLists")?[0];
+            assert_eq!(actual_list.name.as_bytes(), "ZONE ONE INLETS 가".as_bytes());
+            assert_eq!(actual_list.node_numbers.as_deref(), Some([1].as_slice()));
+            assert!(!probe_ip.is_object_unused("NodeList", alias));
+            assert!(!probe_ip.is_object_unused("ZoneHVAC:IdealLoadsAirSystem", unit_name));
+            assert!(!probe_ip.is_object_unused("Output:Variable", "UTF8 REQUEST"));
+            for (family, rows) in &retained_objects {
+                for (name, fields) in rows {
+                    assert_eq!(probe_ip.source_raw_object_fields(family, name)?, fields);
+                }
+            }
+            let registered = probe_registration
+                .out_vars
+                .iter()
+                .find(|row| row.report && row.name == variable)
+                .ok_or("real requested unit output")?;
+            assert_eq!(
+                registered.key.as_bytes(),
+                "ZONE ONE IDEAL LOADS 각".as_bytes()
+            );
+            assert_eq!(
+                registered.which,
+                Some(SourceRealOutputTarget::PurchasedAir {
+                    field: SourcePurchasedAirOutputField::SenHeatRate,
+                    index: 1
+                })
+            );
+            assert!(
+                probe_eso
+                    .windows("ZONE ONE IDEAL LOADS 각".len())
+                    .any(|bytes| bytes == "ZONE ONE IDEAL LOADS 각".as_bytes())
+            );
+            let mut connection_report = Vec::new();
+            probe_branch.report_source_node_connections(&probe, &mut connection_report)?;
+            let expected_connection = " Non-Parent Node Connection,ZONE ONE INLET 가,ZONEHVAC:IDEALLOADSAIRSYSTEM,ZONE ONE IDEAL LOADS 각,Outlet,1\n";
+            assert!(
+                connection_report
+                    .windows(expected_connection.len())
+                    .any(|bytes| bytes == expected_connection.as_bytes())
+            );
+            assert!(probe_error.is_empty() && probe_console.is_empty() && probe_eio.is_empty());
+            assert!(probe.purchased_air.get_purchased_air_input); // this getter does not own the caller's once latch
+        }
         // Source InitUniqueNodeCheck must retain genuine unused NodeLists even
         // with zero controlled Zones. Use the real raw IP/getter, not a manually
         // populated node owner or only the private postcondition predicate.

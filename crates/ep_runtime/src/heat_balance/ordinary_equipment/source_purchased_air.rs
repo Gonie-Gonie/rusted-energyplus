@@ -269,7 +269,10 @@ impl OrdinaryEquipment {
         Ok(())
     }
     #[allow(clippy::too_many_arguments)]
-    fn get_source_purchased_air<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
+    pub(super) fn get_source_purchased_air<
+        H: SourceOutputFileHost,
+        D: SourceOutputDictionaryHost,
+    >(
         &mut self,
         shortcut: &mut SourceInputProcessorShortCut,
         source_is_epjson: bool,
@@ -367,11 +370,6 @@ impl OrdinaryEquipment {
                 // Array1D copy assignment redimensions to the actual shared
                 // cNumericFieldNames extent; Native283 copies the WHOLE array.
                 *names = Some(shortcut.numeric_field_names.clone());
-                if !object.is_ascii() {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir object-name makeUPPER domain284",
-                    ));
-                }
                 self.purchased_unit_mut(number)?.name = object.to_ascii_uppercase();
                 let name = self.purchased_unit(number)?.name.clone();
                 let value = getter::alpha(output.input, object, "availability_schedule_name")?;

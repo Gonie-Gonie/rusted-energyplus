@@ -2,7 +2,7 @@
 status: active
 claim_level: planning-guard
 owner: runtime
-last_reviewed: 2026-10-20
+last_reviewed: 2026-11-14
 ---
 
 # Heat Balance Source Map
@@ -1477,7 +1477,7 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-Eight bounded Source B Scheduled/NodeList compositions retain 542,880 values; the unused Source A pair adds 59,520, for nine pairs and 602,400 values. The latest two-return composition compares 154 series/73,200 values: all 480 new-first return flows follow the actual ordered Sensor basis/current fraction with positive on/off activation, while the old second return follows the real zero branch. Full BND has five physical nodes, eighteen Scheduled, two Sensor and two ordered return connections, with no zero-reference section. Source-only eligibility retains full ordered Proven return vectors or a genuinely absent return alpha behind a matched exhaust; no-exhaust and Legacy singleton conditions remain strict. Selected holes, other consumers/topologies, Source A managers and full-object conformance remain open.
+Nine bounded Source B Scheduled/NodeList compositions retain 616,080 values; the unused Source A pair adds 59,520, for ten pairs and 675,600 values. The latest name-only derivative compares 154 series/73,200 values and preserves the accepted two-return physics. Actual public NodeID and IdealLoads producer records preserve the selected UTF-8 bytes while lower-case ASCII becomes upper-case. Source removes two PurchasedAir ASCII rejection guards and retains ASCII-only conversion; the sole original Native characterization is kept under its Build128 context, separately from the fresh Source129 build. This finite result does not certify every Unicode identity, private alias histories, selected holes, other consumers/topologies, Source A managers or full-object conformance.
 
 Reported setpoint state does not establish private histories or IdealLoads load-control effects.
 Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

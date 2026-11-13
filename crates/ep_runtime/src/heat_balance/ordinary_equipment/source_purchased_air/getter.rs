@@ -6,13 +6,8 @@ use crate::heat_balance::selected_input_processor::{
 };
 pub(super) const FAMILY: &str = "ZoneHVAC:IdealLoadsAirSystem";
 
-fn uppercase(value: &str) -> Result<String, Error> {
-    if !value.is_ascii() {
-        return Err(Error::Unavailable(
-            "actual PurchasedAir non-ASCII makeUPPER domain",
-        ));
-    }
-    Ok(value.to_ascii_uppercase())
+fn uppercase(value: &str) -> String {
+    value.to_ascii_uppercase()
 }
 fn number(value: &str) -> Result<f64, Error> {
     if value.bytes().any(|byte| matches!(byte, b'.' | b'e' | b'E')) {
@@ -46,9 +41,9 @@ pub(super) fn alpha(
         .source_raw_object_fields(FAMILY, object)
         .map_err(|_| Error::Unavailable("actual PurchasedAir retained raw object fields"))?;
     match fields.get(field) {
-        None => uppercase(default),
-        Some(V::String(value)) if value.is_empty() => uppercase(default),
-        Some(V::String(value)) => uppercase(value),
+        None => Ok(uppercase(default)),
+        Some(V::String(value)) if value.is_empty() => Ok(uppercase(default)),
+        Some(V::String(value)) => Ok(uppercase(value)),
         _ => Err(Error::Unavailable(
             "actual PurchasedAir getAlphaFieldValue string type",
         )),
@@ -151,7 +146,7 @@ pub(super) fn get(
     let mut num_numbers = 0i32;
     for (i, row) in FIELDS.iter().enumerate() {
         if row.json == "name" {
-            shortcut.alpha_args[a] = uppercase(object)?;
+            shortcut.alpha_args[a] = uppercase(object);
             shortcut.alpha_field_blanks[a] = object.is_empty();
             shortcut.alpha_field_names[a] = if source_is_epjson {
                 row.json
