@@ -2,6 +2,11 @@
 use super::bound_real::SourceOutputVariableType;
 use super::*;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum SourceComfortIntegerOutputField {
+    PeopleAdaptiveAsh5590,
+    PeopleAdaptiveAsh5580,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceIntegerOutputTarget {
     #[cfg(all(test, feature = "native-controlled-air-cohort"))]
     CohortInteger {
@@ -14,6 +19,10 @@ pub(crate) enum SourceIntegerOutputTarget {
         field: super::SourceWeatherIntegerOutputField,
     },
     ZoneThermostatControlType {
+        index: i32,
+    },
+    Comfort {
+        field: SourceComfortIntegerOutputField,
         index: i32,
     },
     SurfaceInsideIterationCount,

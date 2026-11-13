@@ -6064,6 +6064,84 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         }
                     }
                 }
+                // Native IHG681-820 still consumes optional auxiliaries for an
+                // adaptive-only model; only the required-field diagnostics are
+                // conditional on ModelWithAdditionalInputs. Exercise the actual
+                // getter from its unchanged pre-input checkpoint.
+                if expected_count == 1.5 {
+                    for (field, value, severe) in [
+                        ("", "", false),
+                        ("work_efficiency_schedule_name", "Unused People Auxiliary", false),
+                        ("air_velocity_schedule_name", "Unused People Auxiliary", false),
+                        ("clothing_insulation_schedule_name", "Unused People Auxiliary", false),
+                        ("ankle_level_air_velocity_schedule_name", "Unused People Auxiliary", false),
+                        ("clothing_insulation_schedule_name", "missing adaptive auxiliary", false),
+                        ("work_efficiency_schedule_name", "missing adaptive auxiliary", true),
+                        ("air_velocity_schedule_name", "missing adaptive auxiliary", true),
+                        ("ankle_level_air_velocity_schedule_name", "missing adaptive auxiliary", true),
+                        ("work_efficiency_schedule_name", "Fanger Method Two", true),
+                    ] {
+                        let mut candidate = people_getter_base.clone();
+                        let first = &mut candidate.heat_balance_input.as_mut()
+                            .ok_or("adaptive raw input")?.objects.get_mut("People")
+                            .ok_or("adaptive raw People")?[0];
+                        for (name, text) in [
+                            ("thermal_comfort_model_1_type", "AdaptiveASH55"),
+                            ("mean_radiant_temperature_calculation_type", "EnclosureAveraged"),
+                            ("clothing_insulation_calculation_method", "ClothingInsulationSchedule"),
+                        ] {
+                            first.fields.insert(name.into(), ProjectInputValue::String(text.into()));
+                        }
+                        if !field.is_empty() {
+                            first.fields.insert(field.into(), ProjectInputValue::String(value.into()));
+                        }
+                        let (mut state, mut errors, mut console, mut eio, mut eso) =
+                            (ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
+                        let reached = CtfInitializationContext {
+                            reports: &mut candidate,
+                            eio: &mut eio,
+                            backend: SourceErrorBackend {
+                                state: &mut state, error_stream: Some(&mut errors), console: &mut console,
+                                out_unit1: None, out_unit2: None, f_message: None,
+                                message_callback: None, error_callback: None, sqlite: None,
+                            },
+                        }.manage_selected_internal_heat_gains_input_with_dictionary(
+                            &people_model, 15, &mut gain_host, Some(&people_clock),
+                            Some(SourceGainDictionaryFile { eso: Some(&mut eso) }),
+                        );
+                        assert_eq!(reached.is_err(), severe, "adaptive {field}={value}: {reached:?}");
+                        assert_eq!(candidate.selected_internal_heat_gains.errors_found, severe);
+                        assert_eq!(state.tracking.total_severe_errors > 0, severe);
+                        let diagnostics = std::str::from_utf8(&errors)?;
+                        if severe {
+                            assert!(diagnostics.contains("GetInternalHeatGains: People = PEOPLE 0"));
+                            assert!(diagnostics.contains(if value == "Fanger Method Two" {
+                                "schedule contains values that are < 0 and/or > 1"
+                            } else {
+                                "item not found."
+                            }), "{diagnostics}");
+                            continue;
+                        }
+                        assert!(errors.is_empty(), "adaptive {field}={value}: {diagnostics}");
+                        assert!(candidate.heat_balance_input_state.adaptive_comfort_requested_ash55);
+                        let person = &candidate.selected_internal_heat_gains.allocations.people.rows[0];
+                        assert!(person.adaptive_ash55 && !person.fanger && !person.ankle_draft_ash55);
+                        assert_eq!((person.mrt_calc_type, person.clothing_type), (0, 0));
+                        for (name, present) in [
+                            ("work_efficiency_schedule_name", person.work_eff_sched.is_some()),
+                            ("air_velocity_schedule_name", person.air_velocity_sched.is_some()),
+                            ("clothing_insulation_schedule_name", person.clothing_sched.is_some()),
+                            ("ankle_level_air_velocity_schedule_name", person.ankle_air_velocity_sched.is_some()),
+                        ] {
+                            assert_eq!(present, field == name && value == "Unused People Auxiliary", "{field}: {name}");
+                        }
+                        let optional = candidate.selected_schedule_manager.as_ref()
+                            .ok_or("adaptive actual schedules")?.schedules.iter()
+                            .find(|row| row.name == "UNUSED PEOPLE AUXILIARY")
+                            .ok_or("adaptive optional schedule")?;
+                        assert_eq!(optional.is_used, value == "Unused People Auxiliary");
+                    }
+                }
                 let people_gains = &people_reports.selected_internal_heat_gains;
                 assert_eq!(people_gains.totals[0], 2);
                 assert!(people_gains.allocations.people.allocated);

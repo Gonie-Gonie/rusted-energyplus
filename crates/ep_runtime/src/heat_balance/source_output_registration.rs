@@ -171,8 +171,8 @@ mod requested_input;
 // Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
 #[allow(unused_imports)]
 pub(crate) use bound_integer::{
-    SourceIntegerOutputBinding, SourceIntegerOutputOwners, SourceIntegerOutputTarget,
-    SourceRequestedIntegerValue,
+    SourceComfortIntegerOutputField, SourceIntegerOutputBinding, SourceIntegerOutputOwners,
+    SourceIntegerOutputTarget, SourceRequestedIntegerValue,
 };
 // Retain the narrow owner reexport used by gated scientific bridges or the explicit Native owner API.
 #[allow(unused_imports)]

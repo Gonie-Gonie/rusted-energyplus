@@ -4,9 +4,11 @@ use crate::heat_balance::radiation::ordinary::{
     OrdinaryRadiationError, OrdinaryRadiationUnavailable,
 };
 use crate::heat_balance::source_output_registration::{
-    SourceComfortOutputField as Field, SourceOutputStoreType, SourceOutputUnits,
-    SourceRealOutputBinding, SourceRealOutputDeclaration, SourceRealOutputOwners,
-    SourceRealOutputTarget, SourceRealRegistrationOptions, SourceReportVariableInput, TimeStepKind,
+    SourceComfortIntegerOutputField as IntegerField, SourceComfortOutputField as Field,
+    SourceIntegerOutputBinding, SourceIntegerOutputDeclaration, SourceIntegerOutputOwners,
+    SourceIntegerOutputTarget, SourceOutputStoreType, SourceOutputUnits, SourceRealOutputBinding,
+    SourceRealOutputDeclaration, SourceRealOutputOwners, SourceRealOutputTarget,
+    SourceRealRegistrationOptions, SourceReportVariableInput, TimeStepKind,
 };
 impl SourceThermalComfort {
     pub(crate) fn real_output(&self, field: Field, number: i32) -> Result<&f64, Error> {
@@ -34,6 +36,10 @@ impl SourceThermalComfort {
                 .ok_or(Error::Unavailable("actual allocated comfort People target"))
         };
         match field {
+            PeopleAdaptiveAsh55RunningMeanOutdoorTemperature => {
+                Ok(&people()?.ashrae55_running_mean_outdoor_temp)
+            }
+            PeopleAdaptiveAsh55ComfortTemperature => Ok(&people()?.t_comf_ash55),
             PeopleFangerPmv => Ok(&people()?.fanger_pmv),
             PeopleAnkleDraftPpd => Ok(&people()?.ankle_draft_ppdash55),
             PeopleFangerPpd => Ok(&people()?.fanger_ppd),
@@ -64,6 +70,48 @@ impl SourceThermalComfort {
             )),
         }
     }
+    pub(super) fn register_integer<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
+        &self,
+        o: &mut SourceThermalComfortOwners<'_, '_, H, D>,
+        field: IntegerField,
+        number: i32,
+        name: &str,
+        key: &str,
+    ) -> Result<(), Error> {
+        let binding = SourceIntegerOutputBinding::new(
+            SourceIntegerOutputTarget::Comfort {
+                field,
+                index: number,
+            },
+            self,
+        )
+        .map_err(Error::Output)?;
+        let mut input = SourceReportVariableInput::new(
+            o.report_inputs,
+            o.input,
+            crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(
+                o.minimum_report_frequency, o.globals, o.developer, Some(o.clock),
+            ),
+            o.backend,
+        );
+        o.registration
+            .setup_bound_zone_integer(
+                &mut input,
+                o.prescan,
+                SourceIntegerOutputDeclaration {
+                    name,
+                    key,
+                    units: SourceOutputUnits::Dimensionless,
+                    store_type: SourceOutputStoreType::Average,
+                },
+                o.clock.minutes_in_time_step,
+                o.host,
+                o.eio,
+                binding,
+                o.dictionary_host,
+            )
+            .map_err(Error::Output)
+    }
     pub(super) fn register<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
         &self,
         o: &mut SourceThermalComfortOwners<'_, '_, H, D>,
@@ -83,7 +131,9 @@ impl SourceThermalComfort {
             ),
             Field::PeopleClothingSurfaceTemperature
             | Field::PeopleMeanRadiantTemperature
-            | Field::PeopleOperativeTemperature => {
+            | Field::PeopleOperativeTemperature
+            | Field::PeopleAdaptiveAsh55RunningMeanOutdoorTemperature
+            | Field::PeopleAdaptiveAsh55ComfortTemperature => {
                 (SourceOutputUnits::C, SourceOutputStoreType::Average)
             }
             Field::PeopleClothingValue => (SourceOutputUnits::Clo, SourceOutputStoreType::Average),
@@ -127,5 +177,29 @@ impl SourceRealOutputOwners for SourceThermalComfort {
                 .map_err(|e| OrdinaryRadiationError::Input(Box::new(e))),
             _ => Err(OrdinaryRadiationUnavailable::StorageDomain.into()),
         }
+    }
+}
+
+impl SourceIntegerOutputOwners for SourceThermalComfort {
+    fn integer_output(
+        &self,
+        target: SourceIntegerOutputTarget,
+    ) -> Result<&i32, OrdinaryRadiationError> {
+        let SourceIntegerOutputTarget::Comfort {
+            field,
+            index: number,
+        } = target
+        else {
+            return Err(OrdinaryRadiationUnavailable::StorageDomain.into());
+        };
+        let row = self
+            .thermal_comfort_data
+            .as_ref()
+            .and_then(|rows| rows.get(index(number).ok()?))
+            .ok_or(OrdinaryRadiationUnavailable::StorageDomain)?;
+        Ok(match field {
+            IntegerField::PeopleAdaptiveAsh5590 => &row.thermal_comfort_adaptive_ash5590,
+            IntegerField::PeopleAdaptiveAsh5580 => &row.thermal_comfort_adaptive_ash5580,
+        })
     }
 }

@@ -347,6 +347,38 @@ fn warning_all_search_matches_and_warmup_sizing_abort_guards_are_literal()
             String::from_utf8(error)?,
             "Program Version,authored version,authored IDD\n   ** Warning ** Deprecated; Node Connection Error; deprecated\n"
         );
+
+        // Live Source diagnostics borrow the real phase cells, not the stale
+        // legacy callback flags. Keep those opposite for every phase/guard row.
+        state.warmup_flag = !warmup;
+        state.doing_sizing = !sizing;
+        state.kickoff_simulation = !kickoff;
+        let mut live_error = Vec::new();
+        {
+            let mut actual = backend(&mut state, &mut live_error, &mut console);
+            actual.show_source_warning_error(
+                "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+                &SourceDiagnosticFlags {
+                    kickoff: &kickoff,
+                    developer: &false,
+                    warmup: &warmup,
+                    doing_sizing: &sizing,
+                },
+            )?;
+        }
+        assert_eq!(state.tracking.total_warning_errors, 5);
+        assert_eq!(
+            state.tracking.total_warning_errors_during_warmup,
+            2 + 2 * warmup_added
+        );
+        assert_eq!(
+            state.tracking.total_warning_errors_during_sizing,
+            1 + 2 * sizing_added
+        );
+        assert_eq!(state.warmup_flag, !warmup);
+        assert_eq!(state.doing_sizing, !sizing);
+        assert_eq!(state.kickoff_simulation, !kickoff);
+        assert_eq!(live_error, b"   ** Warning ** GetNextEnvironment: Adaptive Comfort being reported during design day.\n");
     }
     Ok(())
 }

@@ -125,11 +125,35 @@ impl WeatherSession {
             {
                 if clock.kind_of_sim == 1 {
                     if clock.do_des_day_sim {
-                        owners.backend.show_warning_error("GetNextEnvironment: Adaptive Comfort being reported during design day.")?;
-                        return Err(Error::Unavailable(
-                            "actual adaptive DesignDay MaxDryBulb reference796",
-                        )
-                        .into());
+                        owners.backend.show_source_warning_error(
+                            "GetNextEnvironment: Adaptive Comfort being reported during design day.",
+                            &crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &owners.globals.kickoff_simulation,
+                                developer: &owners.system.developer_flag,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &owners.globals.doing_sizing,
+                            },
+                        )?;
+                        let design_day = weather
+                            .source_design_day_input
+                            .design_day_input
+                            .as_ref()
+                            .and_then(|rows| rows.get(ordinal(weather.envrn).ok()?))
+                            .ok_or(Error::Unavailable("actual adaptive DesDayInput Envrn796"))?;
+                        let gross_approx_average_dry_bulb = (design_day.maximum_dry_bulb
+                            + (design_day.maximum_dry_bulb - design_day.daily_dry_bulb_range))
+                            / 2.0;
+                        if owners.control.adaptive_comfort_requested_ash55 {
+                            owners.comfort.initialize_source_adaptive_ash55_design_day(
+                                gross_approx_average_dry_bulb,
+                            );
+                        }
+                        if owners.control.adaptive_comfort_requested_cen15251 {
+                            return Err(Error::Unavailable(
+                                "actual AdaptiveCEN15251 DesignDay initialization804",
+                            )
+                            .into());
+                        }
                     }
                 } else if clock.do_weath_sim || clock.do_des_day_sim {
                     if owners.control.adaptive_comfort_requested_ash55 {

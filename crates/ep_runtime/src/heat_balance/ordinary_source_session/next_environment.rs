@@ -240,6 +240,7 @@ impl SourceInitializationFiles {
                             ))
                         })?,
                     control: &reports.heat_balance_input_state,
+                    comfort: &mut session.comfort,
                     input_weather_file_path: &input.input_weather_file_path,
                     input: reports.selected_input_processor.as_mut().ok_or_else(|| {
                         hb_input_error(Error::Unavailable(

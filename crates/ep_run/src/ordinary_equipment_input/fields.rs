@@ -738,7 +738,7 @@ pub(super) fn admitted_field(
             blank(value) || text_is(value, &["", "No", "Yes"])
         }
         ("Output:Table:SummaryReports", "reports") => {
-            matches!(value, RawValue::Array(rows) if rows.iter().all(|entry| matches!(entry, RawValue::Object(row) if row.keys().all(|key| ["report_name"].contains(&key.0.as_str())) && row.get(&FieldName("report_name".into())).is_some_and(|value| text_is(value, &["AllSummary"])))))
+            matches!(value, RawValue::Array(rows) if rows.iter().all(|entry| matches!(entry, RawValue::Object(row) if row.keys().all(|key| ["report_name"].contains(&key.0.as_str())) && row.get(&FieldName("report_name".into())).is_some_and(|value| text_is(value, &["AllSummary"]) || (source_ingress && text_is(value, &["AdaptiveComfortSummary"]))))))
         }
         ("Exterior:Lights", "schedule_name") => {
             blank(value) || matches!(value, RawValue::String(_))

@@ -348,9 +348,12 @@ impl SourceOutputPreScan {
         )?;
         for object in &raw.summaries {
             for report in &object.report_names {
-                // The real addVariablesForMonthlyReport has no ALLSUMMARY branch.
-                // All other selected-positive summary names are excluded upstream.
-                if !report.eq_ignore_ascii_case("ALLSUMMARY") {
+                // Neither admitted summary has a monthly-variable branch in
+                // Native addVariablesForMonthlyReport. Their real report bodies
+                // are selected later; monthly expansion remains a separate child.
+                if !report.eq_ignore_ascii_case("ALLSUMMARY")
+                    && !report.eq_ignore_ascii_case("ADAPTIVECOMFORTSUMMARY")
+                {
                     return Err(SourcePreScanError::Unavailable(
                         "positive monthly summary expansion",
                     ));

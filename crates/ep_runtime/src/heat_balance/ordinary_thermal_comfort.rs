@@ -27,6 +27,7 @@ use crate::psychrometrics::{SourcePsychrometricAccess, SourcePsychrometricOwners
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 use ep_model::ReportInputs;
 use std::io::Write;
+mod adaptive_ash55;
 mod ankle;
 mod fanger;
 mod initialization;
@@ -176,9 +177,7 @@ impl SourceThermalComfort {
             self.calc_source_simple_ash55(o)?;
             self.calc_source_if_setpoint_met(o)?;
             if o.control.adaptive_comfort_requested_ash55 {
-                return Err(Error::Unavailable(
-                    "actual CalcThermalComfortAdaptiveASH55 positive model",
-                ));
+                self.calc_source_adaptive_ash55(o)?;
             }
             if o.control.adaptive_comfort_requested_cen15251 {
                 return Err(Error::Unavailable(

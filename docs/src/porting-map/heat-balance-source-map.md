@@ -1455,3 +1455,14 @@ unsupported_active_branches:
 not_claimed_branches:
 - complete `GetBuildingData` or `GetZoneData` parity, broad Rust compiler pass-order parity, source control-character restoration, source/native canonical enum-case behavior, whitespace-preserving or case-colliding names, shared Zone/Space/ZoneList/SpaceList namespace uniqueness, invalid-input recovery, exact diagnostics/order/multiplicity, downstream geometry correction and warnings, output registration, runtime convection, reporting, numerical parity, and conformance
 <!-- routine-state-contract:v1 end process_zone_data -->
+
+
+## Bounded DD-only AdaptiveASH55 owner connection (Unit114)
+
+WeatherManager GetNextEnvironment supplies the actual retained DesignDay mean to the same SourceThermalComfort owner. ManageThermalComfort runs the ordinary AdaptiveASH55 body after SimpleASH55 and setpoint reporting, outside warmup and sizing. Native ThermalComfort.cc 2717-2961 owns the DD initialization, running-mean applicability, actual People occupancy, strict comfort comparisons and SysTimeElapsed accumulation. Four registered outputs borrow the same real/integer comfort cells; OutputReportTabular.cc 12356-12441 reads the retained People hour accumulators, preserving the Native People(i)/peopleInd(i) distinction.
+
+Bounded Source A/B admits AdaptiveASH55 only for DesignDay-only execution. One B five-DesignDay case compares 125 series and 59,280 reported values under the fixed policies, including four adaptive outputs and the complete adaptive summary. Genuine integer status cells, actual occupancy, retained DD mean and SysTimeElapsed hour accumulators feed the existing reporting owners. One fixed five-DesignDay, DD-only AdaptiveASH55 case. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other adaptive models and arbitrary combinations remain unvalidated. Exact 10/33.5 C applicability and +/-2.5/+/-3.5 C comfort boundaries have no separate executed numerical test; public status observations are not private state or call-history evidence. No full-object, capability or frozen conformance promotion.
+
+The retained Source04 exit-zero comparison was rejected for the ERR warmup warning classification, not credited as an accepted pair. The repair reads the actual clock.warmup_flag through SourceDiagnosticFlags at the actual GetNextEnvironment warning call, without copying a backend mirror, forcing a flag or post-processing counts. The final accepted ERR pair records 5 total warnings and 1 warmup warnings on both engines. The existing warning phase-guard test is extended with six live-phase rows against opposite legacy flags; this regression is separate from physical sample coverage.
+
+The existing routine classification and historical state-contract blocks are not promoted by this finite extension.

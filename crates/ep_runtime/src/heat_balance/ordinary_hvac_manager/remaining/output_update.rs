@@ -96,6 +96,7 @@ impl SourceOrdinaryHvacRemaining {
             air: &air,
             surface: &surface,
             hvac: &air_loop,
+            comfort: &*o.comfort,
         };
         fields.with_owners(|real| {
             output.registration.update_source_data_and_report(

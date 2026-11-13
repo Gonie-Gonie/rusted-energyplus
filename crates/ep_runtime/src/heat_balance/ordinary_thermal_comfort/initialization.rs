@@ -5,7 +5,9 @@ use super::state::{
 };
 use super::*;
 use crate::heat_balance::selected_input_processor::SourceInputStatisticsValue as V;
-use crate::heat_balance::source_output_registration::SourceComfortOutputField as Field;
+use crate::heat_balance::source_output_registration::{
+    SourceComfortIntegerOutputField as IntegerField, SourceComfortOutputField as Field,
+};
 impl SourceThermalComfort {
     pub(super) fn initialize<H: SourceOutputFileHost, D: SourceOutputDictionaryHost>(
         &mut self,
@@ -96,9 +98,34 @@ impl SourceThermalComfort {
                 )?;
             }
             if adaptive_ash55 {
-                return Err(Error::Unavailable(
-                    "actual positive adaptiveASH55 registration284",
-                ));
+                self.register_integer(
+                    o,
+                    IntegerField::PeopleAdaptiveAsh5590,
+                    number,
+                    "Zone Thermal Comfort ASHRAE 55 Adaptive Model 90% Acceptability Status",
+                    &name,
+                )?;
+                self.register_integer(
+                    o,
+                    IntegerField::PeopleAdaptiveAsh5580,
+                    number,
+                    "Zone Thermal Comfort ASHRAE 55 Adaptive Model 80% Acceptability Status",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleAdaptiveAsh55RunningMeanOutdoorTemperature,
+                    number,
+                    "Zone Thermal Comfort ASHRAE 55 Adaptive Model Running Average Outdoor Air Temperature",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleAdaptiveAsh55ComfortTemperature,
+                    number,
+                    "Zone Thermal Comfort ASHRAE 55 Adaptive Model Temperature",
+                    &name,
+                )?;
             }
             if adaptive_cen15251 {
                 return Err(Error::Unavailable(

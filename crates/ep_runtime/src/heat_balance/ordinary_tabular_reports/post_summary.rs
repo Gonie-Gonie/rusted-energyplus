@@ -1,5 +1,6 @@
 //! Actual WriteComponentSizing14199, SurfaceShadowing14472,
 //! CompCostTable10822 and AdaptiveComfortTable12356 on the same owners.
+use super::beps_report::source_report_real;
 use super::{Error, SourceTabularBody, SourceTabularReports, SourceTabularWriterOwners};
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::ordinary_output_control::SourceResultsFrameworkOptions;
@@ -21,7 +22,7 @@ pub(crate) struct SourceSurfaceShadowingReportOwners<'a, 'backend> {
     pub(crate) writer: SourceTabularWriterOwners<'a, 'backend>,
 }
 
-/// Same actual no-optional-model adaptive summary files, flags and sink capabilities.
+/// Same actual People adaptive-hour accumulators, files, flags and sink capabilities.
 pub(crate) struct SourceAdaptiveComfortReportOwners<'a, 'backend> {
     pub(crate) gains: &'a SelectedInternalHeatGains,
     pub(crate) sqlite: &'a SourceSqliteState,
@@ -365,7 +366,6 @@ impl SourceTabularReports {
             b"CEN15251 Category III Acceptability Limits [Hours]".to_vec(),
         ];
         body.fill(b"");
-        #[allow(clippy::never_loop)]
         for number in 1..=self.num_people_adaptive {
             row_head[ordinal(number)?] = o
                 .gains
@@ -378,10 +378,56 @@ impl SourceTabularReports {
                 .name
                 .as_bytes()
                 .to_vec();
-            // Optional adaptive model producers remain explicitly unavailable.
-            return Err(Error::Unavailable(
-                "actual positive adaptive comfort model table body12409",
-            ));
+            // Preserve Native's People(number) name/flag selection and the
+            // distinct peopleInd(number) accumulator reference, even if only
+            // a later People row selected an adaptive model.
+            let flags = o
+                .gains
+                .allocations
+                .people
+                .get(ordinal(number)?)
+                .ok_or(Error::Unavailable("actual adaptive table flag People12409"))?;
+            let source_number = people_indices
+                .get(ordinal(number)?)
+                .and_then(|number| *number)
+                .ok_or(Error::Unavailable("actual adaptive table peopleInd12410"))?;
+            let source = o
+                .gains
+                .allocations
+                .people
+                .get(ordinal(source_number)?)
+                .ok_or(Error::Unavailable(
+                    "actual adaptive table accumulator People12410",
+                ))?;
+            if flags.adaptive_ash55 {
+                body.set(
+                    1,
+                    extent(number)?,
+                    source_report_real(true, source.time_not_met_ash5590, 2)?,
+                )?;
+                body.set(
+                    2,
+                    extent(number)?,
+                    source_report_real(true, source.time_not_met_ash5580, 2)?,
+                )?;
+            }
+            if flags.adaptive_cen15251 {
+                body.set(
+                    3,
+                    extent(number)?,
+                    source_report_real(true, source.time_not_met_cen15251_cat_i, 2)?,
+                )?;
+                body.set(
+                    4,
+                    extent(number)?,
+                    source_report_real(true, source.time_not_met_cen15251_cat_ii, 2)?,
+                )?;
+                body.set(
+                    5,
+                    extent(number)?,
+                    source_report_real(true, source.time_not_met_cen15251_cat_iii, 2)?,
+                )?;
+            }
         }
         self.write_source_table(
             &body,

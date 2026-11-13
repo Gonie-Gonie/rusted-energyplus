@@ -39,6 +39,7 @@ pub(crate) struct SourceWeatherInitializationOwners<'a, 'backend> {
     pub(crate) reverse_design_days: &'a bool,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
+    pub(crate) comfort: &'a mut crate::heat_balance::ordinary_thermal_comfort::SourceThermalComfort,
     /// Same SourceInitializationInput path populated from actual RunConfig.
     pub(crate) input_weather_file_path: &'a std::path::Path,
     pub(crate) input: &'a mut SelectedInputProcessor,

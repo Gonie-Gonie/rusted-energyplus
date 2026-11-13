@@ -290,14 +290,30 @@ impl SelectedInternalHeatGains {
                         } else if model == "ANKLEDRAFTASH55" {
                             row.ankle_draft_ash55 = true;
                             owners.control.any_thermal_comfort_ankle_draft_model = true;
+                        } else if model == "ADAPTIVEASH55" {
+                            row.adaptive_ash55 = true;
+                            owners.control.adaptive_comfort_requested_ash55 = true;
                         } else if !model.is_empty() {
                             return Err(unavailable("positive unsupported People comfort model"));
                         }
                     }
-                    if row.fanger || row.ankle_draft_ash55 {
-                        self.read_fanger_comfort(
+                    let additional_inputs = row.fanger || row.ankle_draft_ash55;
+                    let uses_mrt = additional_inputs || row.adaptive_ash55;
+                    if uses_mrt {
+                        self.read_people_mrt(
                             count,
                             position == 0,
+                            additional_inputs,
+                            &values.alphas,
+                            local,
+                            owners,
+                        )?;
+                    }
+                    if uses_mrt {
+                        self.read_people_comfort_auxiliaries(
+                            count,
+                            position == 0,
+                            additional_inputs,
                             &values.alphas,
                             local,
                             owners,
@@ -411,19 +427,17 @@ impl SelectedInternalHeatGains {
         }
         Ok(())
     }
-    /// Actual IHG617-810 additional-input branch for supported Fanger clothing.
+    /// Native617-680 MRT inputs for every selected thermal comfort model.
     /// Defaults and blank flags come from the genuine schema/IP getter.
-    fn read_fanger_comfort(
+    fn read_people_mrt(
         &mut self,
         person: usize,
         first_space: bool,
+        additional_inputs: bool,
         alphas: &[String; 21],
         local: &SourceInputProcessorShortCut,
         owners: &mut SourceGainInputOwners<'_, '_>,
     ) -> Result<(), E> {
-        let clock = owners
-            .clock
-            .ok_or_else(|| unavailable("actual Fanger input clock"))?;
         let row = self
             .allocations
             .people
@@ -453,7 +467,7 @@ impl SelectedInternalHeatGains {
                     .unwrap_or(0);
                 let surface_number = row.surface_ptr;
                 let space_number = row.space_index;
-                if surface_number == 0 {
+                if surface_number == 0 && additional_inputs {
                     if first_space {
                         diagnostic(
                             owners,
@@ -478,7 +492,7 @@ impl SelectedInternalHeatGains {
                         .and_then(|spaces| spaces.get(index(space_number).ok()?))
                         .ok_or_else(|| unavailable("actual People MRT Space enclosure"))?
                         .radiant_enclosure_num;
-                    if surface_enclosure != people_enclosure {
+                    if surface_enclosure != people_enclosure && additional_inputs {
                         diagnostic(
                             owners,
                             &format!(
@@ -507,6 +521,22 @@ impl SelectedInternalHeatGains {
             2 => row.angle_factor_list_name = alphas[7].clone(),
             _ => return Err(unavailable("positive Fanger unsupported MRT inputs")),
         }
+        Ok(())
+    }
+    /// Native681-820: all selected models consume optional auxiliaries.
+    /// ModelWithAdditionalInputs gates only the corresponding required diagnostics.
+    fn read_people_comfort_auxiliaries(
+        &mut self,
+        person: usize,
+        first_space: bool,
+        additional_inputs: bool,
+        alphas: &[String; 21],
+        local: &SourceInputProcessorShortCut,
+        owners: &mut SourceGainInputOwners<'_, '_>,
+    ) -> Result<(), E> {
+        let clock = owners
+            .clock
+            .ok_or_else(|| unavailable("actual Fanger input clock"))?;
         let row = self
             .allocations
             .people
@@ -519,7 +549,8 @@ impl SelectedInternalHeatGains {
         let work = row.work_eff_sched;
         if first_space {
             let message = if local.alpha_field_blanks[8] {
-                Some(format!("{} cannot be empty.", local.alpha_field_names[8]))
+                additional_inputs
+                    .then(|| format!("{} cannot be empty.", local.alpha_field_names[8]))
             } else if work.is_none() {
                 Some(format!(
                     "{} = {}, item not found.",
@@ -563,15 +594,21 @@ impl SelectedInternalHeatGains {
                     let clothing = row.clothing_sched;
                     if first_space {
                         let message = if local.alpha_field_blanks[11] {
-                            Some(format!(
-                                "{} cannot be empty when {} = {}.",
-                                local.alpha_field_names[11], local.alpha_field_names[9], alphas[9]
-                            ))
+                            additional_inputs.then(|| {
+                                format!(
+                                    "{} cannot be empty when {} = {}.",
+                                    local.alpha_field_names[11],
+                                    local.alpha_field_names[9],
+                                    alphas[9]
+                                )
+                            })
                         } else if clothing.is_none() {
-                            Some(format!(
-                                "{} = {}, item not found.",
-                                local.alpha_field_names[11], alphas[11]
-                            ))
+                            additional_inputs.then(|| {
+                                format!(
+                                    "{} = {}, item not found.",
+                                    local.alpha_field_names[11], alphas[11]
+                                )
+                            })
                         } else if !owners.schedules.source_check_min_with_clock(
                             clothing
                                 .ok_or_else(|| unavailable("actual Fanger clothing schedule"))?,
@@ -587,7 +624,7 @@ impl SelectedInternalHeatGains {
                         };
                         if let Some(message) = message {
                             self.people_comfort_diagnostic(alphas, &message, None, true, owners)?;
-                        } else {
+                        } else if !local.alpha_field_blanks[11] && clothing.is_some() {
                             let max_ok = owners.schedules.source_max_with_clock(
                                 clothing
                                     .ok_or_else(|| unavailable("actual Fanger clothing maximum"))?,
@@ -656,7 +693,8 @@ impl SelectedInternalHeatGains {
         let velocity = row.air_velocity_sched;
         if first_space {
             let message = if local.alpha_field_blanks[12] {
-                Some(format!("{} cannot be empty.", local.alpha_field_names[12]))
+                additional_inputs
+                    .then(|| format!("{} cannot be empty.", local.alpha_field_names[12]))
             } else if velocity.is_none() {
                 Some(format!(
                     "{} = {}, item not found.",

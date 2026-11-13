@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-11-06
+last_reviewed: 2026-11-13
 ---
 
 # Current Status
@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 169 paired physical cases and 4,780,216 reported values with zero
+contains 170 paired physical cases and 4,839,496 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,9 +125,9 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 110 recorded Source builds,
-103 with accepted pairs and seven without accepted pairs, including one build
-superseded before any Source execution. B/legacy Electric,
+validate the consumer corrections. There are 115 recorded Source builds,
+104 with accepted pairs and 11 without accepted pairs, including 2 builds
+without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
 
@@ -184,6 +184,8 @@ coefficient rules use explicit 1e-9 W/m2-K point and RMSE limits; all inherited
 rules remain exact. Positive public node flow confirms activation. Public
 averages do not instrument private Native convection-entry ACH or call history.
 Adaptive, surface-local/user/EMS/Kiva and reached window children remain bounded.
+
+Bounded Source A/B admits AdaptiveASH55 only for DesignDay-only execution. One B five-DesignDay case compares 125 series and 59,280 reported values under the fixed policies, including four adaptive outputs and the complete adaptive summary. Genuine integer status cells, actual occupancy, retained DD mean and SysTimeElapsed hour accumulators feed the existing reporting owners. One fixed five-DesignDay, DD-only AdaptiveASH55 case. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other adaptive models and arbitrary combinations remain unvalidated. Exact 10/33.5 C applicability and +/-2.5/+/-3.5 C comfort boundaries have no separate executed numerical test; public status observations are not private state or call-history evidence. No full-object, capability or frozen conformance promotion.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

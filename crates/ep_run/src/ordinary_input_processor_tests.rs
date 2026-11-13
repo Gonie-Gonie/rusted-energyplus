@@ -194,6 +194,49 @@ pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::E
         &mut outputs.context().backend,
     )?;
 
+    // AdaptiveComfortSummary is a real summary body, not a monthly variable
+    // expansion. Exercise the actual raw/IP projection and retained pre-scan.
+    for (report, admitted) in [
+        ("AllSummary", true),
+        ("AdaptiveComfortSummary", true),
+        ("adaptivecomfortsummary", true),
+        ("AllMonthly", false),
+        ("AllSummaryAndMonthly", false),
+        ("ZoneCoolingSummaryMonthly", false),
+    ] {
+        let raw = parse_epjson_str(&format!(
+            r#"{{{base},"Output:Variable":{{"v":{{"variable_name":"Existing Variable","key_value":"*"}}}},"Output:Table:SummaryReports":{{"s":{{"reports":[{{"report_name":"{report}"}}]}}}}}}"#
+        ))?;
+        let projection = resolve_reporting_prescan_source(&raw)?;
+        for source_b in [false, true] {
+            let admitted_input = if source_b {
+                resolve_source_b(&raw)
+            } else {
+                resolve_source_a(&raw)
+            };
+            assert_eq!(admitted_input.is_ok(), admitted, "{report}");
+            // Monthly requests are rejected by the upstream admission. Project
+            // their real raw fields separately to exercise the lower owner's
+            // retained unavailable boundary without widening production admission.
+            let input = if admitted {
+                admitted_input?
+            } else {
+                project(&raw, input_statistics::resolve_source_a(&raw)?, true)?
+            };
+            let mut prescan =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            let result = prescan.pre_scan_reporting_variables(
+                &input,
+                &projection,
+                &mut outputs.context().backend,
+            );
+            assert_eq!(result.is_ok(), admitted, "{report}: {result:?}");
+            assert_eq!(prescan.num_considered_output_variables, 1);
+            assert_eq!(prescan.output_variables_for_simulation.len(), 1);
+            assert!(prescan.find_item("any key", "Existing Variable"));
+        }
+    }
+
     // Direct-JSON pre-scan keeps original spelling separately from getter alphas.
     let raw = parse_epjson_str(&format!(
         r#"{{{base},"Output:Variable":{{

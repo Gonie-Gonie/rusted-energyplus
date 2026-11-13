@@ -11,6 +11,7 @@ pub(crate) struct SourceAllIntegerOutputOwners<'a> {
     pub(crate) air: &'a dyn SourceIntegerOutputOwners,
     pub(crate) surface: &'a dyn SourceIntegerOutputOwners,
     pub(crate) hvac: &'a dyn SourceIntegerOutputOwners,
+    pub(crate) comfort: &'a dyn SourceIntegerOutputOwners,
 }
 impl SourceIntegerOutputOwners for SourceAllIntegerOutputOwners<'_> {
     fn integer_output(
@@ -29,6 +30,7 @@ impl SourceIntegerOutputOwners for SourceAllIntegerOutputOwners<'_> {
             SourceIntegerOutputTarget::ZoneThermostatControlType { .. } => {
                 self.air.integer_output(target)
             }
+            SourceIntegerOutputTarget::Comfort { .. } => self.comfort.integer_output(target),
             SourceIntegerOutputTarget::SurfaceInsideIterationCount => {
                 self.surface.integer_output(target)
             }

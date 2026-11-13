@@ -35,6 +35,7 @@ mod fields;
 mod infrared;
 mod multizone;
 mod people;
+pub(crate) use people::has_instantiated_adaptive_ash55;
 mod source_b;
 mod space_lists;
 mod spaces;

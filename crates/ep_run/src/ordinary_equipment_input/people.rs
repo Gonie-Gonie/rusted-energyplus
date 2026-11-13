@@ -202,9 +202,12 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
                 || super::source_b::has_source_detailed_reference(raw, schedule));
     }
     // Known field types/enums were validated first. No-model auxiliaries stay
-    // unconsumed; either supported model consumes the real auxiliary inputs.
+    // unconsumed. Every selected model consumes MRT; only the additional-input
+    // models require auxiliary schedules, while adaptive still consumes optional
+    // nonblank auxiliaries through the same genuine getter.
     let mut fanger = false;
     let mut ankle = false;
+    let mut adaptive_ash55 = false;
     for name in [
         "thermal_comfort_model_1_type",
         "thermal_comfort_model_2_type",
@@ -219,18 +222,26 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
                 fanger = true;
             } else if text_is(value, &["AnkleDraftASH55"]) {
                 ankle = true;
+            } else if text_is(value, &["AdaptiveASH55"]) {
+                adaptive_ash55 = true;
             } else if !matches!(value, RawValue::String(s) if s.is_empty()) {
                 return false;
             }
         }
     }
     let additional_inputs = fanger || ankle;
-    if additional_inputs
-        && (!selected(
+    let uses_mrt = additional_inputs || adaptive_ash55;
+    if uses_mrt
+        && !selected(
             object,
             "mean_radiant_temperature_calculation_type",
             &["EnclosureAveraged", "SurfaceWeighted", "AngleFactor"],
-        ) || !selected(
+        )
+    {
+        return false;
+    }
+    if additional_inputs
+        && !selected(
             object,
             "clothing_insulation_calculation_method",
             &[
@@ -238,11 +249,11 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
                 "DynamicClothingModelASHRAE55",
                 "CalculationMethodSchedule",
             ],
-        ))
+        )
     {
         return false;
     }
-    if additional_inputs
+    if uses_mrt
         && field(object, "mean_radiant_temperature_calculation_type")
             .is_some_and(|value| text_is(value, &["SurfaceWeighted"]))
         && !text(object, "surface_name_angle_factor_list_name").is_some_and(|name| {
@@ -253,7 +264,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
     {
         return false;
     }
-    if additional_inputs
+    if uses_mrt
         && field(object, "mean_radiant_temperature_calculation_type")
             .is_some_and(|value| text_is(value, &["AngleFactor"]))
     {
@@ -295,28 +306,39 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
         "number_of_people_schedule_name",
         "activity_level_schedule_name",
     ];
-    if additional_inputs {
-        required_schedules.extend([
+    if uses_mrt {
+        for name in [
             "work_efficiency_schedule_name",
             "air_velocity_schedule_name",
-        ]);
+        ] {
+            if additional_inputs
+                || matches!(field(object, name), Some(RawValue::String(value)) if !value.is_empty())
+            {
+                required_schedules.push(name);
+            }
+        }
         if selected(
             object,
             "clothing_insulation_calculation_method",
             &["ClothingInsulationSchedule"],
         ) {
-            required_schedules.push("clothing_insulation_schedule_name");
+            if additional_inputs {
+                required_schedules.push("clothing_insulation_schedule_name");
+            }
+            // Native still resolves an optional adaptive-only A12 and checks a
+            // nonnull schedule's min/max. A null pointer is allowed here when
+            // ModelWithAdditionalInputs is false; the real getter owns it.
         } else if field(object, "clothing_insulation_calculation_method")
             .is_some_and(|value| text_is(value, &["CalculationMethodSchedule"]))
         {
             required_schedules.push("clothing_insulation_calculation_method_schedule_name");
-            // A12 is consumed only if the real method schedule hasVal(1).
-            // Raw admission cannot substitute current values or min/max here.
+            // Native hasVal(1) owns whether A12 is consumed. No preflight
+            // schedule value, current/min/max or guessed pointer substitutes.
         }
-        // Dynamic clothing consumes neither the method nor clothing schedule.
-        // Native validates any nonempty A21 even when AnkleDraft is false.
+        // Dynamic clothing consumes neither A11 nor A12. Every selected model
+        // resolves nonempty A21; only AnkleDraft requires a blank A21.
         if ankle
-            || matches!(field(object, "ankle_level_air_velocity_schedule_name"), Some(RawValue::String(s)) if !s.is_empty())
+            || matches!(field(object, "ankle_level_air_velocity_schedule_name"), Some(RawValue::String(value)) if !value.is_empty())
         {
             required_schedules.push("ankle_level_air_velocity_schedule_name");
         }
@@ -351,4 +373,30 @@ pub(super) fn admitted_angle_field(name: &str, value: &RawValue) -> bool {
         // top-level IDF names above never reach this fallback.
         _ => true,
     }
+}
+
+/// Reuse Native target precedence and the existing exact empty-SpaceList
+/// expansion predicate. Occupancy0 still instantiates a real People owner.
+/// Calendar flags/defaults are interpreted only by the existing scope settings.
+pub(crate) fn has_instantiated_adaptive_ash55(raw: &RawModel) -> bool {
+    raw.objects
+        .get(&ObjectType("People".into()))
+        .is_some_and(|rows| {
+            rows.values().any(|object| {
+                !super::space_lists::empty_gain_target(raw, object)
+                    && [
+                        "thermal_comfort_model_1_type",
+                        "thermal_comfort_model_2_type",
+                        "thermal_comfort_model_3_type",
+                        "thermal_comfort_model_4_type",
+                        "thermal_comfort_model_5_type",
+                        "thermal_comfort_model_6_type",
+                        "thermal_comfort_model_7_type",
+                    ]
+                    .iter()
+                    .any(|name| {
+                        field(object, name).is_some_and(|value| text_is(value, &["AdaptiveASH55"]))
+                    })
+            })
+        })
 }

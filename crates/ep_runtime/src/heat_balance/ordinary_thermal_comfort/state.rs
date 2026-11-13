@@ -85,36 +85,47 @@ pub(crate) struct SourceComfortPredefinedSummary {
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceThermalComfort {
     // Native ThermalComfortsData shared Fanger scratch, explicit ctor0.
-    pub(crate) air_temp: f64,                // Native AirTemp
-    pub(crate) rad_temp: f64,                // Native RadTemp
-    pub(crate) rel_hum: f64,                 // Native RelHum
-    pub(crate) act_level: f64,               // Native ActLevel
-    pub(crate) act_met: f64,                 // Native ActMet ctor0
-    pub(crate) work_eff: f64,                // Native WorkEff
-    pub(crate) clo_unit: f64,                // Native CloUnit
-    pub(crate) air_vel: f64,                 // Native AirVel
-    pub(crate) vap_press: f64,               // Native VapPress
-    pub(crate) int_heat_prod: f64,           // Native IntHeatProd
-    pub(crate) clo_body_rat: f64,            // Native CloBodyRat
-    pub(crate) abs_rad_temp: f64,            // Native AbsRadTemp
-    pub(crate) abs_air_temp: f64,            // Native AbsAirTemp
-    pub(crate) clo_insul: f64,               // Native CloInsul
-    pub(crate) abs_clo_surf_temp: f64,       // Native AbsCloSurfTemp
-    pub(crate) hc_for: f64,                  // Native HcFor
-    pub(crate) hc_nat: f64,                  // Native HcNat
-    pub(crate) hc: f64,                      // Native Hc
-    pub(crate) clo_surf_temp: f64,           // Native CloSurfTemp
-    pub(crate) rad_heat_loss: f64,           // Native RadHeatLoss
-    pub(crate) conv_heat_loss: f64,          // Native ConvHeatLoss
-    pub(crate) dry_heat_loss: f64,           // Native DryHeatLoss
+    pub(crate) air_temp: f64,            // Native AirTemp
+    pub(crate) rad_temp: f64,            // Native RadTemp
+    pub(crate) op_temp: f64,             // Native OpTemp ctor0
+    pub(crate) running_average_ash: f64, // Native runningAverageASH ctor0
+    pub(crate) avg_dry_bulb_ash: f64,    // Native avgDryBulbASH ctor0
+    pub(crate) monthly_temp: [f64; 12],  // Native Array1D(12,0)
+    pub(crate) use_stat_data: bool,      // Native useStatData ctorfalse
+    pub(crate) use_epw_data: bool,       // Native useEpwData ctorfalse
+    #[allow(
+        dead_code,
+        reason = "Native constructor allocates30 zero cells; the positive EPW history child remains held."
+    )]
+    pub(crate) daily_ave_out_temp: [f64; 30], // Native ThermalComfortsData ctor393
+    pub(crate) rel_hum: f64,             // Native RelHum
+    pub(crate) act_level: f64,           // Native ActLevel
+    pub(crate) act_met: f64,             // Native ActMet ctor0
+    pub(crate) work_eff: f64,            // Native WorkEff
+    pub(crate) clo_unit: f64,            // Native CloUnit
+    pub(crate) air_vel: f64,             // Native AirVel
+    pub(crate) vap_press: f64,           // Native VapPress
+    pub(crate) int_heat_prod: f64,       // Native IntHeatProd
+    pub(crate) clo_body_rat: f64,        // Native CloBodyRat
+    pub(crate) abs_rad_temp: f64,        // Native AbsRadTemp
+    pub(crate) abs_air_temp: f64,        // Native AbsAirTemp
+    pub(crate) clo_insul: f64,           // Native CloInsul
+    pub(crate) abs_clo_surf_temp: f64,   // Native AbsCloSurfTemp
+    pub(crate) hc_for: f64,              // Native HcFor
+    pub(crate) hc_nat: f64,              // Native HcNat
+    pub(crate) hc: f64,                  // Native Hc
+    pub(crate) clo_surf_temp: f64,       // Native CloSurfTemp
+    pub(crate) rad_heat_loss: f64,       // Native RadHeatLoss
+    pub(crate) conv_heat_loss: f64,      // Native ConvHeatLoss
+    pub(crate) dry_heat_loss: f64,       // Native DryHeatLoss
     pub(crate) evap_heat_loss_reg_comf: f64, // Native EvapHeatLossRegComf
-    pub(crate) evap_heat_loss_diff: f64,     // Native EvapHeatLossDiff
-    pub(crate) evap_heat_loss: f64,          // Native EvapHeatLoss
-    pub(crate) lat_resp_heat_loss: f64,      // Native LatRespHeatLoss
-    pub(crate) dry_resp_heat_loss: f64,      // Native DryRespHeatLoss
-    pub(crate) resp_heat_loss: f64,          // Native RespHeatLoss
-    pub(crate) therm_sens_trans_coef: f64,   // Native ThermSensTransCoef
-    pub(crate) iter_num: i32,                // Native IterNum
+    pub(crate) evap_heat_loss_diff: f64, // Native EvapHeatLossDiff
+    pub(crate) evap_heat_loss: f64,      // Native EvapHeatLoss
+    pub(crate) lat_resp_heat_loss: f64,  // Native LatRespHeatLoss
+    pub(crate) dry_resp_heat_loss: f64,  // Native DryRespHeatLoss
+    pub(crate) resp_heat_loss: f64,      // Native RespHeatLoss
+    pub(crate) therm_sens_trans_coef: f64, // Native ThermSensTransCoef
+    pub(crate) iter_num: i32,            // Native IterNum
     /// Native module-wide AnkleDraft warning indices, each ctor0.
     pub(crate) ankle_draft_air_vel_warning_ind: i32,
     pub(crate) ankle_draft_clo_unit_warning_ind: i32,
@@ -153,6 +164,13 @@ impl Default for SourceThermalComfort {
         Self {
             air_temp: 0.0,
             rad_temp: 0.0,
+            op_temp: 0.0,
+            running_average_ash: 0.0,
+            avg_dry_bulb_ash: 0.0,
+            monthly_temp: [0.0; 12],
+            use_stat_data: false,
+            use_epw_data: false,
+            daily_ave_out_temp: [0.0; 30],
             rel_hum: 0.0,
             act_level: 0.0,
             act_met: 0.0,
