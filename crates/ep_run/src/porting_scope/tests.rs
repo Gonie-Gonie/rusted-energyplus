@@ -3573,6 +3573,240 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 SourceRaw::String("Exhaust".into())
             );
             assert_eq!(exhaust_raw, original_exhaust_raw);
+
+            // Full actual raw compiler -> scope -> Source token -> runtime class
+            // -> IP custody for ordered return counts, without simulating flow.
+            for count in [0_usize, 1, 3, 5] {
+                let mut returns = exhaust.clone();
+                let names = (0..count)
+                    .map(|number| {
+                        if number == 0 {
+                            "Return".to_owned()
+                        } else {
+                            format!("Return {}", number + 1)
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                if count == 0 {
+                    returns["ZoneHVAC:EquipmentConnections"]["Connection"]
+                        .as_object_mut()
+                        .expect("real Connection object")
+                        .remove("zone_return_air_node_or_nodelist_name");
+                } else {
+                    returns["NodeList"]["Return Vector"] = json!({"nodes":names.iter().map(|name|json!({"node_name":name})).collect::<Vec<_>>()});
+                    returns["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_return_air_node_or_nodelist_name"] =
+                        json!("Return Vector");
+                }
+                let raw =
+                    parse_epjson_str(&returns.to_string()).expect("real ordered return vector raw");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("actual Source return vector typed model");
+                let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                    .expect("matched exhaust Source vector eligibility");
+                assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+                if let Some(name) = model.zone_equipment_connections[0]
+                    .zone_return_air_node_or_nodelist_name
+                    .as_ref()
+                {
+                    let nodes = model
+                        .resolve_advisory_node_reference(&name.0)
+                        .require_proven_nodes()
+                        .expect("authentic ordered Proven return identities");
+                    let actual_names = nodes
+                        .iter()
+                        .map(|id| {
+                            model
+                                .nodes
+                                .iter()
+                                .find(|node| node.id == *id)
+                                .expect("real arena Node")
+                                .name
+                                .0
+                                .clone()
+                        })
+                        .collect::<Vec<_>>();
+                    assert_eq!(
+                        actual_names,
+                        names
+                            .iter()
+                            .map(|name| name.to_ascii_uppercase())
+                            .collect::<Vec<_>>()
+                    );
+                } else {
+                    assert_eq!(count, 0);
+                }
+                let mut actual_scope =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(actual_scope.admissible, "{:?}", actual_scope.violations);
+                actual_scope.environment = Some(
+                    super::environment::environment_from_weather(
+                        model,
+                        &single_day_weather_fixture(),
+                        "authored Source return-vector admission weather",
+                    )
+                    .expect("actual return vector environment"),
+                );
+                let admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                    &raw,
+                    &actual_scope,
+                )
+                .expect("actual raw return vector token");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert_eq!(
+                    support.runtime_class,
+                    crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+                );
+                assert!(support.matched_capability_ids.is_empty());
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("actual vector IP custody");
+                let fields = ip
+                    .source_raw_object_fields("ZoneHVAC:EquipmentConnections", "Connection")
+                    .expect("original Connection alpha fields");
+                if count == 0 {
+                    assert!(!fields.contains_key("zone_return_air_node_or_nodelist_name"));
+                } else {
+                    assert_eq!(
+                        fields["zone_return_air_node_or_nodelist_name"],
+                        SourceRaw::String("Return Vector".into())
+                    );
+                    let fields = ip
+                        .source_raw_object_fields("NodeList", "Return Vector")
+                        .expect("original raw return members");
+                    let members = match &fields["nodes"] {
+                        SourceRaw::Array(members) => Some(members),
+                        _ => None,
+                    }
+                    .expect("original nodes array");
+                    assert_eq!(members.len(), count);
+                    for (member, name) in members.iter().zip(&names) {
+                        let fields = match member {
+                            SourceRaw::Object(fields) => Some(fields),
+                            _ => None,
+                        }
+                        .expect("original member object");
+                        assert_eq!(fields["node_name"], SourceRaw::String(name.clone()));
+                    }
+                }
+                assert_eq!(raw, retained);
+                let mut no_exhaust = returns.clone();
+                no_exhaust["ZoneHVAC:EquipmentConnections"]["Connection"]
+                    .as_object_mut()
+                    .expect("Connection")
+                    .remove("zone_air_exhaust_node_or_nodelist_name");
+                no_exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]
+                    .as_object_mut()
+                    .expect("Ideal")
+                    .remove("zone_exhaust_air_node_name");
+                no_exhaust["SetpointManager:Scheduled"]["Supply setpoint"]["setpoint_node_or_nodelist_name"] =
+                    json!("Supply");
+                no_exhaust["NodeList"]
+                    .as_object_mut()
+                    .expect("NodeList family")
+                    .remove("Manager Targets");
+                let no_exhaust_raw =
+                    parse_epjson_str(&no_exhaust.to_string()).expect("real no-exhaust raw vector");
+                let no_exhaust_compile = ep_compiler::compile_raw_model_for_source(&no_exhaust_raw);
+                assert!(
+                    !no_exhaust_compile.has_errors(),
+                    "{:?}",
+                    no_exhaust_compile.report.diagnostics
+                );
+                let no_exhaust_model = no_exhaust_compile
+                    .model
+                    .as_ref()
+                    .expect("real no-exhaust typed model");
+                let no_exhaust_simulation =
+                    ep_model::SimulationModel::from_typed(no_exhaust_model.clone());
+                assert_eq!(
+                    ep_runtime::validate_source_direct_zone_purchased_air_model(
+                        &no_exhaust_simulation
+                    )
+                    .is_ok(),
+                    count == 1
+                );
+                assert_eq!(
+                    ep_runtime::bind_direct_zone_purchased_air_model(&no_exhaust_simulation)
+                        .is_ok(),
+                    count == 1
+                );
+                assert_eq!(
+                    inspect_porting_scope(
+                        &no_exhaust_raw,
+                        &no_exhaust_compile.report,
+                        Some(no_exhaust_model),
+                        scope
+                    )
+                    .admissible,
+                    count == 1
+                );
+                if count == 3 {
+                    for position in 0..count {
+                        for collision in ["Supply", "Air", "Exhaust"] {
+                            let mut invalid = returns.clone();
+                            invalid["NodeList"]["Return Vector"]["nodes"][position]["node_name"] =
+                                json!(collision);
+                            let raw = parse_epjson_str(&invalid.to_string())
+                                .expect("real colliding late return member");
+                            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                            assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                            let model = compiled.model.as_ref().expect("compiled colliding roles");
+                            assert!(
+                                ep_runtime::validate_source_direct_zone_purchased_air_model(
+                                    &ep_model::SimulationModel::from_typed(model.clone())
+                                )
+                                .is_err()
+                            );
+                            assert!(
+                                !inspect_porting_scope(&raw, &compiled.report, Some(model), scope)
+                                    .admissible
+                            );
+                        }
+                    }
+                    let mut deferred = returns.clone();
+                    deferred["NodeList"]["Return Vector"]["nodes"] = json!([
+                        {"node_name":"Return"},{"node_name":""},{"node_name":"Return"}
+                    ]);
+                    let raw = parse_epjson_str(&deferred.to_string())
+                        .expect("actual unresolved selected return prefix");
+                    let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                    let model = compiled
+                        .model
+                        .as_ref()
+                        .expect("retained Deferred return list");
+                    assert!(matches!(
+                        model.resolve_advisory_node_reference("Return Vector"),
+                        ep_model::AdvisoryNodeReference::DeferredList { .. }
+                    ));
+                    assert!(
+                        ep_runtime::validate_source_direct_zone_purchased_air_model(
+                            &ep_model::SimulationModel::from_typed(model.clone())
+                        )
+                        .is_err()
+                    );
+                    assert!(
+                        !inspect_porting_scope(&raw, &compiled.report, Some(model), scope)
+                            .admissible
+                    );
+                }
+            }
+
             for (family, field, value) in [
                 (
                     "ZoneHVAC:IdealLoadsAirSystem",

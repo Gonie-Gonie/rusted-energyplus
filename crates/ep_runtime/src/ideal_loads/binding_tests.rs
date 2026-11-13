@@ -336,6 +336,162 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             );
         }
     }
+
+    // Admission over real typed roles only, not physical Config/Node arrays.
+    // Counts above two ensure the Source relation is a vector, not a pair cap.
+    for count in [0_usize, 1, 3, 5] {
+        let mut typed = unused_deferred.typed.clone();
+        let exhaust = NodeId(u32::try_from(typed.nodes.len()).expect("dense exhaust ID"));
+        typed.nodes.push(Node {
+            id: exhaust,
+            name: typed.node_names.normalized_name("EXHAUST"),
+        });
+        typed.node_names.insert("EXHAUST", exhaust);
+        let mut returns = vec![NodeId(2)];
+        for number in 2..=5 {
+            let name = format!("RETURN {number}");
+            let id = NodeId(u32::try_from(typed.nodes.len()).expect("dense real typed role ID"));
+            typed.nodes.push(Node {
+                id,
+                name: typed.node_names.normalized_name(&name),
+            });
+            typed.node_names.insert(&name, id);
+            returns.push(id);
+        }
+        typed.zone_equipment_connections[0].zone_air_exhaust_node_or_nodelist_name =
+            Some(typed.node_names.normalized_name("EXHAUST"));
+        typed.ideal_loads_air_systems[0].zone_exhaust_air_node_name =
+            Some(typed.node_names.normalized_name("EXHAUST"));
+        let list_id =
+            NodeListId(u32::try_from(typed.node_lists.len()).expect("dense return list ID"));
+        typed.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name = if count == 0 {
+            None
+        } else {
+            typed.node_list_names.insert("RETURN VECTOR", list_id);
+            typed.node_lists.push(NodeList {
+                id: list_id,
+                name: typed.node_list_names.normalized_name("RETURN VECTOR"),
+                nodes: returns[..count].to_vec().into(),
+            });
+            Some(typed.node_list_names.normalized_name("RETURN VECTOR"))
+        };
+        let model = SimulationModel::from_typed(typed.clone());
+        validate_source_direct_zone_purchased_air_model(&model)
+            .expect("matched genuine exhaust selects recirculation before return cardinality");
+        if let Some(name) = typed.zone_equipment_connections[0]
+            .zone_return_air_node_or_nodelist_name
+            .as_ref()
+        {
+            assert_eq!(
+                typed
+                    .resolve_advisory_node_reference(&name.0)
+                    .require_proven_nodes()
+                    .expect("actual ordered Proven returns"),
+                returns[..count]
+            );
+        }
+        assert_eq!(
+            bind_direct_zone_purchased_air_model(&model)
+                .expect_err("Legacy exhaust check still precedes return cardinality"),
+            DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: DirectZonePurchasedAirBindingFeature::NoZoneExhaustTopology,
+            }
+        );
+        let mut without_exhaust = typed.clone();
+        without_exhaust.zone_equipment_connections[0].zone_air_exhaust_node_or_nodelist_name = None;
+        without_exhaust.ideal_loads_air_systems[0].zone_exhaust_air_node_name = None;
+        let without_exhaust = SimulationModel::from_typed(without_exhaust);
+        if count == 1 {
+            validate_source_direct_zone_purchased_air_model(&without_exhaust)
+                .expect("original no-exhaust singleton");
+            bind_direct_zone_purchased_air_model(&without_exhaust)
+                .expect("Legacy singleton unchanged");
+        } else {
+            let expected = DirectZonePurchasedAirBindingError::Cardinality {
+                relation: DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+                expected: 1,
+                actual: count,
+            };
+            assert_eq!(
+                validate_source_direct_zone_purchased_air_model(&without_exhaust),
+                Err(expected.clone())
+            );
+            assert_eq!(
+                bind_direct_zone_purchased_air_model(&without_exhaust)
+                    .expect_err("Legacy return cardinality unchanged"),
+                expected
+            );
+        }
+        if count == 5 {
+            // Every member, including late members, must be disjoint from every
+            // genuine supply/ZoneAir/exhaust role; never inspect only the first.
+            for position in 0..count {
+                for (collision, feature) in [
+                    (
+                        NodeId(0),
+                        DirectZonePurchasedAirBindingFeature::DistinctZoneReturnNode,
+                    ),
+                    (
+                        NodeId(1),
+                        DirectZonePurchasedAirBindingFeature::DistinctZoneReturnNode,
+                    ),
+                    (
+                        exhaust,
+                        DirectZonePurchasedAirBindingFeature::DistinctSourceExhaustNode,
+                    ),
+                ] {
+                    let mut invalid = typed.clone();
+                    let mut members = returns[..count].to_vec();
+                    members[position] = collision;
+                    invalid
+                        .node_lists
+                        .last_mut()
+                        .expect("real return vector")
+                        .nodes = members.into();
+                    assert_eq!(
+                        validate_source_direct_zone_purchased_air_model(
+                            &SimulationModel::from_typed(invalid)
+                        ),
+                        Err(DirectZonePurchasedAirBindingError::UnsupportedFeature { feature })
+                    );
+                }
+            }
+        }
+        if count == 3 {
+            let mut deferred = typed.clone();
+            deferred
+                .node_lists
+                .last_mut()
+                .expect("selected actual return vector")
+                .nodes = ep_model::NodeListMembers::DeferredSourceOriginalPrefix { used_len: 2 };
+            assert_eq!(
+                validate_source_direct_zone_purchased_air_model(&SimulationModel::from_typed(
+                    deferred
+                )),
+                Err(DirectZonePurchasedAirBindingError::DeferredSourceNodeList {
+                    deferred: ep_model::DeferredSourceNodeList {
+                        id: list_id,
+                        used_len: 2
+                    },
+                })
+            );
+        }
+        // A present alias with no real declaration is not the optional None case.
+        let mut missing = typed;
+        missing.zone_equipment_connections[0].zone_return_air_node_or_nodelist_name = Some(
+            missing
+                .node_list_names
+                .normalized_name("MISSING RETURN ALIAS"),
+        );
+        assert_eq!(
+            validate_source_direct_zone_purchased_air_model(&SimulationModel::from_typed(missing)),
+            Err(DirectZonePurchasedAirBindingError::Cardinality {
+                relation: DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+                expected: 1,
+                actual: 0,
+            })
+        );
+    }
     let mut required = unused_deferred.typed.clone();
     required.zone_equipment_connections[0].zone_air_inlet_node_or_nodelist_name = Some(
         required

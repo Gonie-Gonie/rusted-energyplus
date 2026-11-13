@@ -1477,9 +1477,7 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-Seven bounded Source B Scheduled/NodeList compositions compare 469,680 values; one retained Source A unused-list pair adds 59,520, for eight pairs and 529,200 values. The latest real-exhaust return-control pair compares 151 series/71,760 values: a genuine two-member Sensor basis and existing fraction schedule match all 480 reported return-flow relations with positive on/off activation. Whole BND retains four physical nodes, eighteen Scheduled and two real Sensor connections. A real once-per-zone unbalanced-flow warning, timestamp/operand continuations and actual phase counters match alongside five adaptive-DD warnings. Exact IDF order/case identity and unused A Proven/Deferred evidence remain retained. Selected holes, broader parent/topology/schedule combinations, Source A managers and full-object conformance remain open.
-
-Return-flow diagnostics apply mass and incoming-flow gates before actual zone-density and standard-density volume checks; backend output and live counters precede the once-Zone latch.
+Eight bounded Source B Scheduled/NodeList compositions retain 542,880 values; the unused Source A pair adds 59,520, for nine pairs and 602,400 values. The latest two-return composition compares 154 series/73,200 values: all 480 new-first return flows follow the actual ordered Sensor basis/current fraction with positive on/off activation, while the old second return follows the real zero branch. Full BND has five physical nodes, eighteen Scheduled, two Sensor and two ordered return connections, with no zero-reference section. Source-only eligibility retains full ordered Proven return vectors or a genuinely absent return alpha behind a matched exhaust; no-exhaust and Legacy singleton conditions remain strict. Selected holes, other consumers/topologies, Source A managers and full-object conformance remain open.
 
 Reported setpoint state does not establish private histories or IdealLoads load-control effects.
 Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

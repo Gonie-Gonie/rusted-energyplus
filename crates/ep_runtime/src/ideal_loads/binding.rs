@@ -864,20 +864,49 @@ fn validate_direct_zone_model(
     if zone_air_edge.node == supply_edge.node {
         return unsupported(DirectZonePurchasedAirBindingFeature::DistinctZoneAirNode);
     }
-    let return_name = connection
-        .zone_return_air_node_or_nodelist_name
-        .as_ref()
-        .ok_or(DirectZonePurchasedAirBindingError::Cardinality {
-            relation: DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
-            expected: 1,
-            actual: 0,
-        })?;
-    let return_nodes = resolve_node_or_nodelist(typed, return_name)?;
-    let return_node = require_one(
-        &return_nodes,
-        DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
-    )?;
-    if *return_node == supply_edge.node || *return_node == zone_air_edge.node {
+    // Only a Source exhaust candidate may carry the full ordered return vector.
+    // The existing Source branch below must still prove both exhaust identities.
+    let source_exhaust_candidate = mode == DirectZoneValidationMode::SourceEligibility
+        && connection.zone_air_exhaust_node_or_nodelist_name.is_some()
+        && system.zone_exhaust_air_node_name.is_some();
+    let return_nodes = if source_exhaust_candidate {
+        match connection.zone_return_air_node_or_nodelist_name.as_ref() {
+            Some(name) => {
+                let nodes = resolve_node_or_nodelist(typed, name)?;
+                if nodes.is_empty() {
+                    // Missing/unresolved aliases are not an absent return alpha.
+                    require_one(
+                        &nodes,
+                        DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+                    )?;
+                }
+                nodes
+            }
+            // Native GetNodeNums(empty) produces a true count-zero allocation;
+            // its scratch zero never becomes a physical or typed Node identity.
+            None => Vec::new(),
+        }
+    } else {
+        // Keep the Legacy and no-exhaust singleton checks at their old position.
+        let return_name = connection
+            .zone_return_air_node_or_nodelist_name
+            .as_ref()
+            .ok_or(DirectZonePurchasedAirBindingError::Cardinality {
+                relation: DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+                expected: 1,
+                actual: 0,
+            })?;
+        let nodes = resolve_node_or_nodelist(typed, return_name)?;
+        require_one(
+            &nodes,
+            DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+        )?;
+        nodes
+    };
+    if return_nodes
+        .iter()
+        .any(|node| *node == supply_edge.node || *node == zone_air_edge.node)
+    {
         return unsupported(DirectZonePurchasedAirBindingFeature::DistinctZoneReturnNode);
     }
 
@@ -906,7 +935,7 @@ fn validate_direct_zone_model(
                 }
                 if *exhaust == supply_edge.node
                     || *exhaust == zone_air_edge.node
-                    || *exhaust == *return_node
+                    || return_nodes.contains(exhaust)
                 {
                     return unsupported(
                         DirectZonePurchasedAirBindingFeature::DistinctSourceExhaustNode,
@@ -992,7 +1021,12 @@ fn validate_direct_zone_model(
             ideal_loads_air_system: system.id,
             supply_node: supply_edge.node,
             zone_air_node: zone_air_edge.node,
-            return_node: *return_node,
+            // Source returned above; Legacy already proved this same singleton
+            // before all later feature checks. This read creates no Source binding.
+            return_node: *require_one(
+                &return_nodes,
+                DirectZonePurchasedAirBindingRelation::ZoneReturnNode,
+            )?,
             zone_multiplier: zone.multiplier,
             zone_list_multiplier: zone.list_multiplier,
             nominal_system_timestep_seconds,

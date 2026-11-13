@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 179 paired physical cases and 5,430,376 reported values with zero
+contains 180 paired physical cases and 5,503,576 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 127 recorded Source builds,
-113 with accepted pairs and 14 without accepted pairs, including 4 builds
+validate the consumer corrections. There are 128 recorded Source builds,
+114 with accepted pairs and 14 without accepted pairs, including 4 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,14 +196,15 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-Seven bounded B Scheduled/NodeList compositions retain 469,680 values, with a
-59,520-value unused A case: eight pairs and 529,200 values. The latest real-exhaust
-return-control pair compares 151 series/71,760 values. Its real two-member Sensor
-basis/current fraction schedule matches all 480 public return-flow relations with
-positive on/off activation; complete BND and actual six-warning ERR/END including
-the once-per-zone unbalanced-flow message/timestamp/operands match. Physical values
-remain solely raw/IP-owned; Legacy remains strict. Selected holes, broader parent
-combinations, Source A managers and full-object conformance remain open.
+Eight bounded B Scheduled/NodeList compositions retain 542,880 values, with a
+59,520-value unused A case: nine pairs and 602,400 values. The latest two-return
+pair compares 154 series/73,200 values: all 480 first-return basis/fraction
+relations include positive basis in both off/on branches, while the second return follows its real
+zero branch. Complete BND27, both ordered controlled-return rows, eighteen
+Scheduled/two Sensor connections and real six-warning diagnostics match. Source
+eligibility retains ordered Proven returns or actual absent return input behind a
+matched exhaust; no-exhaust and Legacy singleton conditions remain strict. Selected
+holes, broader parents, Source A managers and full-object conformance remain open.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases
