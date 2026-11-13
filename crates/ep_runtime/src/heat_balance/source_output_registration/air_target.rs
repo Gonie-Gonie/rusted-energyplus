@@ -73,6 +73,8 @@ pub(crate) enum SourceComfortOutputField {
     PeopleClothingValue,
     PeopleAdaptiveAsh55RunningMeanOutdoorTemperature,
     PeopleAdaptiveAsh55ComfortTemperature,
+    PeopleAdaptiveCen15251RunningMeanOutdoorTemperature,
+    PeopleAdaptiveCen15251ComfortTemperature,
     ZoneSimpleSummer,
     ZoneSimpleWinter,
     ZoneSimpleEither,

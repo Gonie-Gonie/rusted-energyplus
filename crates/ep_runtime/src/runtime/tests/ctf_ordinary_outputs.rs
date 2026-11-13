@@ -608,6 +608,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         }
         // A non-default layer bound proves AllocateSurfaceWindows uses its operand.
         raw.initialize_coordinate_owners(&owners)?;
+        // Preserve authored pre-final operands for a separate actual-writer CEN fixture.
+        let cen_surface_input_checkpoint = raw.clone();
+        assert!(cen_surface_input_checkpoint.surface_tmp.is_some());
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None, None)?;
         raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
         // Authored child diagnostic inputs, not a completed Native material or
@@ -4064,6 +4067,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             // nominal-output checks. This fresh raw getter uses the same typed
             // Zone identity instead of inheriting that authored display name.
             let zone_name = model.typed.zones[0].name.0.clone();
+            let mut cen_owner_calls = 0;
             for (count_token, expected_count) in
                 [("1.5", 1.5_f64), ("0", 0.0), ("18446744073709551615", -1.0)]
             {
@@ -6069,77 +6073,198 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 // conditional on ModelWithAdditionalInputs. Exercise the actual
                 // getter from its unchanged pre-input checkpoint.
                 if expected_count == 1.5 {
-                    for (field, value, severe) in [
-                        ("", "", false),
-                        ("work_efficiency_schedule_name", "Unused People Auxiliary", false),
-                        ("air_velocity_schedule_name", "Unused People Auxiliary", false),
-                        ("clothing_insulation_schedule_name", "Unused People Auxiliary", false),
-                        ("ankle_level_air_velocity_schedule_name", "Unused People Auxiliary", false),
-                        ("clothing_insulation_schedule_name", "missing adaptive auxiliary", false),
-                        ("work_efficiency_schedule_name", "missing adaptive auxiliary", true),
-                        ("air_velocity_schedule_name", "missing adaptive auxiliary", true),
-                        ("ankle_level_air_velocity_schedule_name", "missing adaptive auxiliary", true),
-                        ("work_efficiency_schedule_name", "Fanger Method Two", true),
+                    for (model, also_ash) in [
+                        ("AdaptiveASH55", false),
+                        ("AdaptiveCEN15251", false),
+                        ("AdaptiveCEN15251", true),
                     ] {
-                        let mut candidate = people_getter_base.clone();
-                        let first = &mut candidate.heat_balance_input.as_mut()
-                            .ok_or("adaptive raw input")?.objects.get_mut("People")
-                            .ok_or("adaptive raw People")?[0];
-                        for (name, text) in [
-                            ("thermal_comfort_model_1_type", "AdaptiveASH55"),
-                            ("mean_radiant_temperature_calculation_type", "EnclosureAveraged"),
-                            ("clothing_insulation_calculation_method", "ClothingInsulationSchedule"),
+                        for (field, value, severe) in [
+                            ("", "", false),
+                            (
+                                "work_efficiency_schedule_name",
+                                "Unused People Auxiliary",
+                                false,
+                            ),
+                            (
+                                "air_velocity_schedule_name",
+                                "Unused People Auxiliary",
+                                false,
+                            ),
+                            (
+                                "clothing_insulation_schedule_name",
+                                "Unused People Auxiliary",
+                                false,
+                            ),
+                            (
+                                "ankle_level_air_velocity_schedule_name",
+                                "Unused People Auxiliary",
+                                false,
+                            ),
+                            (
+                                "clothing_insulation_schedule_name",
+                                "missing adaptive auxiliary",
+                                false,
+                            ),
+                            (
+                                "work_efficiency_schedule_name",
+                                "missing adaptive auxiliary",
+                                true,
+                            ),
+                            (
+                                "air_velocity_schedule_name",
+                                "missing adaptive auxiliary",
+                                true,
+                            ),
+                            (
+                                "ankle_level_air_velocity_schedule_name",
+                                "missing adaptive auxiliary",
+                                true,
+                            ),
+                            ("work_efficiency_schedule_name", "Fanger Method Two", true),
                         ] {
-                            first.fields.insert(name.into(), ProjectInputValue::String(text.into()));
+                            let mut candidate = people_getter_base.clone();
+                            let first = &mut candidate
+                                .heat_balance_input
+                                .as_mut()
+                                .ok_or("adaptive raw input")?
+                                .objects
+                                .get_mut("People")
+                                .ok_or("adaptive raw People")?[0];
+                            for (name, text) in [
+                                ("thermal_comfort_model_1_type", model),
+                                (
+                                    "mean_radiant_temperature_calculation_type",
+                                    "EnclosureAveraged",
+                                ),
+                                (
+                                    "clothing_insulation_calculation_method",
+                                    "ClothingInsulationSchedule",
+                                ),
+                            ] {
+                                first
+                                    .fields
+                                    .insert(name.into(), ProjectInputValue::String(text.into()));
+                            }
+                            if also_ash {
+                                first.fields.insert(
+                                    "thermal_comfort_model_2_type".into(),
+                                    ProjectInputValue::String("AdaptiveASH55".into()),
+                                );
+                            }
+                            if !field.is_empty() {
+                                first
+                                    .fields
+                                    .insert(field.into(), ProjectInputValue::String(value.into()));
+                            }
+                            let (mut state, mut errors, mut console, mut eio, mut eso) = (
+                                ctf_ordinary_output_test_state(),
+                                Vec::new(),
+                                Vec::new(),
+                                Vec::new(),
+                                Vec::new(),
+                            );
+                            let reached = CtfInitializationContext {
+                                reports: &mut candidate,
+                                eio: &mut eio,
+                                backend: SourceErrorBackend {
+                                    state: &mut state,
+                                    error_stream: Some(&mut errors),
+                                    console: &mut console,
+                                    out_unit1: None,
+                                    out_unit2: None,
+                                    f_message: None,
+                                    message_callback: None,
+                                    error_callback: None,
+                                    sqlite: None,
+                                },
+                            }
+                            .manage_selected_internal_heat_gains_input_with_dictionary(
+                                &people_model,
+                                15,
+                                &mut gain_host,
+                                Some(&people_clock),
+                                Some(SourceGainDictionaryFile {
+                                    eso: Some(&mut eso),
+                                }),
+                            );
+                            assert_eq!(
+                                reached.is_err(),
+                                severe,
+                                "adaptive {field}={value}: {reached:?}"
+                            );
+                            assert_eq!(candidate.selected_internal_heat_gains.errors_found, severe);
+                            assert_eq!(state.tracking.total_severe_errors > 0, severe);
+                            let diagnostics = std::str::from_utf8(&errors)?;
+                            if severe {
+                                assert!(
+                                    diagnostics.contains("GetInternalHeatGains: People = PEOPLE 0")
+                                );
+                                assert!(
+                                    diagnostics.contains(if value == "Fanger Method Two" {
+                                        "schedule contains values that are < 0 and/or > 1"
+                                    } else {
+                                        "item not found."
+                                    }),
+                                    "{diagnostics}"
+                                );
+                                continue;
+                            }
+                            assert!(errors.is_empty(), "adaptive {field}={value}: {diagnostics}");
+                            assert_eq!(
+                                candidate
+                                    .heat_balance_input_state
+                                    .adaptive_comfort_requested_ash55,
+                                model == "AdaptiveASH55" || also_ash
+                            );
+                            assert_eq!(
+                                candidate
+                                    .heat_balance_input_state
+                                    .adaptive_comfort_requested_cen15251,
+                                model == "AdaptiveCEN15251"
+                            );
+                            let person = &candidate
+                                .selected_internal_heat_gains
+                                .allocations
+                                .people
+                                .rows[0];
+                            assert_eq!(person.adaptive_ash55, model == "AdaptiveASH55" || also_ash);
+                            assert_eq!(person.adaptive_cen15251, model == "AdaptiveCEN15251");
+                            assert!(!person.fanger && !person.ankle_draft_ash55);
+                            assert_eq!((person.mrt_calc_type, person.clothing_type), (0, 0));
+                            for (name, present) in [
+                                (
+                                    "work_efficiency_schedule_name",
+                                    person.work_eff_sched.is_some(),
+                                ),
+                                (
+                                    "air_velocity_schedule_name",
+                                    person.air_velocity_sched.is_some(),
+                                ),
+                                (
+                                    "clothing_insulation_schedule_name",
+                                    person.clothing_sched.is_some(),
+                                ),
+                                (
+                                    "ankle_level_air_velocity_schedule_name",
+                                    person.ankle_air_velocity_sched.is_some(),
+                                ),
+                            ] {
+                                assert_eq!(
+                                    present,
+                                    field == name && value == "Unused People Auxiliary",
+                                    "{field}: {name}"
+                                );
+                            }
+                            let optional = candidate
+                                .selected_schedule_manager
+                                .as_ref()
+                                .ok_or("adaptive actual schedules")?
+                                .schedules
+                                .iter()
+                                .find(|row| row.name == "UNUSED PEOPLE AUXILIARY")
+                                .ok_or("adaptive optional schedule")?;
+                            assert_eq!(optional.is_used, value == "Unused People Auxiliary");
                         }
-                        if !field.is_empty() {
-                            first.fields.insert(field.into(), ProjectInputValue::String(value.into()));
-                        }
-                        let (mut state, mut errors, mut console, mut eio, mut eso) =
-                            (ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
-                        let reached = CtfInitializationContext {
-                            reports: &mut candidate,
-                            eio: &mut eio,
-                            backend: SourceErrorBackend {
-                                state: &mut state, error_stream: Some(&mut errors), console: &mut console,
-                                out_unit1: None, out_unit2: None, f_message: None,
-                                message_callback: None, error_callback: None, sqlite: None,
-                            },
-                        }.manage_selected_internal_heat_gains_input_with_dictionary(
-                            &people_model, 15, &mut gain_host, Some(&people_clock),
-                            Some(SourceGainDictionaryFile { eso: Some(&mut eso) }),
-                        );
-                        assert_eq!(reached.is_err(), severe, "adaptive {field}={value}: {reached:?}");
-                        assert_eq!(candidate.selected_internal_heat_gains.errors_found, severe);
-                        assert_eq!(state.tracking.total_severe_errors > 0, severe);
-                        let diagnostics = std::str::from_utf8(&errors)?;
-                        if severe {
-                            assert!(diagnostics.contains("GetInternalHeatGains: People = PEOPLE 0"));
-                            assert!(diagnostics.contains(if value == "Fanger Method Two" {
-                                "schedule contains values that are < 0 and/or > 1"
-                            } else {
-                                "item not found."
-                            }), "{diagnostics}");
-                            continue;
-                        }
-                        assert!(errors.is_empty(), "adaptive {field}={value}: {diagnostics}");
-                        assert!(candidate.heat_balance_input_state.adaptive_comfort_requested_ash55);
-                        let person = &candidate.selected_internal_heat_gains.allocations.people.rows[0];
-                        assert!(person.adaptive_ash55 && !person.fanger && !person.ankle_draft_ash55);
-                        assert_eq!((person.mrt_calc_type, person.clothing_type), (0, 0));
-                        for (name, present) in [
-                            ("work_efficiency_schedule_name", person.work_eff_sched.is_some()),
-                            ("air_velocity_schedule_name", person.air_velocity_sched.is_some()),
-                            ("clothing_insulation_schedule_name", person.clothing_sched.is_some()),
-                            ("ankle_level_air_velocity_schedule_name", person.ankle_air_velocity_sched.is_some()),
-                        ] {
-                            assert_eq!(present, field == name && value == "Unused People Auxiliary", "{field}: {name}");
-                        }
-                        let optional = candidate.selected_schedule_manager.as_ref()
-                            .ok_or("adaptive actual schedules")?.schedules.iter()
-                            .find(|row| row.name == "UNUSED PEOPLE AUXILIARY")
-                            .ok_or("adaptive optional schedule")?;
-                        assert_eq!(optional.is_used, value == "Unused People Auxiliary");
                     }
                 }
                 let people_gains = &people_reports.selected_internal_heat_gains;
@@ -6677,6 +6802,98 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         }
                     }
                 }
+                // Separate CEN body fixture. Preserve the existing ctor-Space0
+                // negative comfort tests below, and replay genuine geometry writers.
+                if expected_count == 1.5 {
+                    use crate::heat_balance::ordinary_thermal_comfort::{
+                        SourceComfortPredefinedSummary, SourceThermalComfort, SourceThermalComfortOwners,
+                    };
+                    use crate::heat_balance::source_output_registration::SourceOutputDictionaryStreams;
+                    for occupied in [true, false] {
+                        let mut comfort_reports = people_getter_base.clone();
+                        let first = &mut comfort_reports.heat_balance_input.as_mut()
+                            .ok_or("CEN raw input")?.objects.get_mut("People").ok_or("CEN People")?[0];
+                        for (field, value) in [
+                            ("thermal_comfort_model_1_type", "AdaptiveCEN15251"),
+                            ("mean_radiant_temperature_calculation_type", "EnclosureAveraged"),
+                            ("number_of_people_schedule_name", if occupied { "Constant-1.0" } else { "Constant-0.0" }),
+                        ] { first.fields.insert(field.into(), ProjectInputValue::String(value.into())); }
+                        let (mut comfort_state, mut comfort_errors, mut comfort_console,
+                             mut comfort_eio, mut comfort_eso) =
+                            (ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
+                        let mut comfort_clock = people_clock.clone();
+                        comfort_clock.minutes_in_time_step = 15;
+                        comfort_clock.kind_of_sim = 1;
+                        comfort_clock.day_of_sim = 1;
+                        comfort_clock.hour_of_day = 1;
+                        comfort_clock.time_step = 1;
+                        comfort_clock.num_of_day_in_envrn = 1;
+                        let comfort_environment = crate::weather::day::WeatherEnvironmentState::default();
+                        let mut comfort_air = crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance::default();
+                        comfort_air.allocate_source_arrays(comfort_reports.selected_heat_balance_globals.as_ref().ok_or("CEN actual globals")?)?;
+                        let mut comfort_fan = crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays::default();
+                        // New radiation owner from unchanged authored geometry input.
+                        // Do not reuse earlier intentionally partial/failed solar initialization.
+                        comfort_reports.ordinary_solar_radiation = Some(
+                            crate::heat_balance::radiation::ordinary::OrdinarySolarRadiation::for_surface_input(radiation_input));
+                        let (_comfort_surface, comfort_history) = {
+                            let mut context = CtfInitializationContext {
+                                reports: &mut comfort_reports, eio: &mut comfort_eio,
+                                backend: SourceErrorBackend { state: &mut comfort_state,
+                                    error_stream: Some(&mut comfort_errors), console: &mut comfort_console,
+                                    out_unit1: None, out_unit2: None, f_message: None,
+                                    message_callback: None, error_callback: None, sqlite: None },
+                            };
+                            context.manage_selected_internal_heat_gains_input_with_dictionary(
+                                &people_model, 15, &mut gain_host, Some(&comfort_clock),
+                                Some(SourceGainDictionaryFile { eso: Some(&mut comfort_eso) }))?;
+                            replay_cen_final_mapping(&mut context, &people_model,
+                                &cen_surface_input_checkpoint, &comfort_environment)?;
+                            prepare_cen_mrt_owner(&mut context, &people_model, &comfort_environment,
+                                &mut comfort_air, &mut comfort_fan, &mut gain_host,
+                                cache.public_initialization().ok_or("CEN CTF aggregate")?
+                                    .aggregate_after_returned_calls.simple_ctf_only)?
+                        };
+                        let comfort_globals = comfort_reports.selected_heat_balance_globals.as_ref().ok_or("CEN globals")?;
+                        let comfort_hvac = crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals::default();
+                        let comfort_controller = crate::heat_balance::ordinary_air_heat_balance::predictor_corrector::SourceZoneAirPredictorCorrector::default();
+                        let mut comfort_psychrometrics = crate::psychrometrics::SourcePsychrometricAccess;
+                        let mut comfort = SourceThermalComfort::default();
+                        let mut comfort_summary = SourceComfortPredefinedSummary::default();
+                        let mut comfort_backend = SourceErrorBackend { state: &mut comfort_state,
+                            error_stream: Some(&mut comfort_errors), console: &mut comfort_console,
+                            out_unit1: None, out_unit2: None, f_message: None,
+                            message_callback: None, error_callback: None, sqlite: None };
+                        let mut dictionary = SourceOutputDictionaryStreams {
+                            eso: Some(&mut comfort_eso), sqlite_present: comfort_reports.source_sqlite.present(),
+                            results_framework_output_variables: &mut comfort_reports.source_results_output_variables,
+                        };
+                        let mut owners = SourceThermalComfortOwners {
+                            gains: &mut comfort_reports.selected_internal_heat_gains,
+                            schedules: comfort_reports.selected_schedule_manager.as_ref().ok_or("CEN schedules")?,
+                            zones: comfort_reports.selected_zone_input.as_ref().ok_or("CEN Zones")?,
+                            control: &comfort_reports.heat_balance_input_state, globals: comfort_globals,
+                            clock: &comfort_clock, environment: &comfort_environment, hvac: &comfort_hvac, air: &comfort_air,
+                            developer: &comfort_reports.selected_project_data.as_ref().ok_or("CEN project")?.system.developer_flag,
+                            controller: &comfort_controller, fan: &mut comfort_fan,
+                            radiation: comfort_reports.ordinary_solar_radiation.as_ref().ok_or("CEN radiation")?,
+                            geometry: &mut comfort_reports.surface_geometry_input, history: &comfort_history,
+                            psychrometrics: &mut comfort_psychrometrics,
+                            recurring_errors: &mut comfort_reports.source_recurring_errors,
+                            input: comfort_reports.selected_input_processor.as_mut().ok_or("CEN IP")?,
+                            source_is_epjson: &comfort_reports.heat_balance_input.as_ref().ok_or("CEN input format")?.source_is_epjson,
+                            shortcut: &mut comfort_reports.input_processor_shortcut,
+                            registration: &mut comfort_reports.output_registration,
+                            prescan: &comfort_reports.output_prescan, report_inputs: &people_model.report_inputs,
+                            minimum_report_frequency: "", host: &mut gain_host, dictionary_host: &mut dictionary,
+                            eio: &mut comfort_eio, backend: &mut comfort_backend,
+                            registry: &mut comfort_reports.registry, table: &mut comfort_reports.table,
+                            predefined_summary: &mut comfort_summary,
+                        };
+                        comfort.manage_source_thermal_comfort(true, &mut owners)?;
+                        cen_owner_calls += comfort.verify_cen_owner_boundaries(&mut owners, occupied)?;
+                    }
+                }
                 // People comfort/report child anchor: these are the same genuine
                 // getter-populated People/schedules/Air/clock owners.
                 // Connected comfort/report children use the genuine People getter checkpoint.
@@ -6922,6 +7139,46 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             ),
                             (0.0, 0, 0, 0)
                         );
+                        // Actual DD initializer resets only its two CEN means.
+                        // Flags and the independent ASH owner survive each environment.
+                        for retained_flag in [false, true] {
+                            let mut initialized = SourceThermalComfort::default();
+                            assert_eq!(
+                                (
+                                    initialized.avg_dry_bulb_cen,
+                                    initialized.running_average_cen,
+                                    initialized.use_epw_data_cen,
+                                    initialized.first_day_set
+                                ),
+                                (0.0, 0.0, false, false)
+                            );
+                            initialized.running_average_ash = 19.0;
+                            initialized.avg_dry_bulb_ash = 7.0;
+                            initialized.first_day_set = retained_flag;
+                            initialized.use_epw_data_cen = retained_flag;
+                            for mean in [10.0, 15.0, 30.0] {
+                                initialized.avg_dry_bulb_cen = 123.0;
+                                initialized.initialize_source_adaptive_cen15251_design_day(mean);
+                                assert_eq!(
+                                    (
+                                        initialized.avg_dry_bulb_cen,
+                                        initialized.running_average_cen
+                                    ),
+                                    (0.0, mean)
+                                );
+                                assert_eq!(
+                                    (initialized.first_day_set, initialized.use_epw_data_cen),
+                                    (retained_flag, retained_flag)
+                                );
+                                assert_eq!(
+                                    (
+                                        initialized.running_average_ash,
+                                        initialized.avg_dry_bulb_ash
+                                    ),
+                                    (19.0, 7.0)
+                                );
+                            }
+                        }
                         let mut comfort_summary = SourceComfortPredefinedSummary::default();
                         {
                             let mut comfort_backend = SourceErrorBackend {
@@ -7651,6 +7908,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     }
                 }
             }
+            assert_eq!(cen_owner_calls, 94, "both actual CEN occupancy fixtures must execute");
         }
         // Same actual getter, selected local Numeric2, retained geometry and
         // live diagnostic owners. No Native observations or typed gain values
@@ -9728,4 +9986,123 @@ fn ordinary_eio_failure_remains_discoverable_through_runtime_source_chain()
     assert!(!reports.progress.report_headers_written && !reports.progress.final_fatal_invoked);
     assert!(!reports.progress.postlude_returned && error.is_empty());
     Ok(())
+}
+
+// Replay authored pre-final surface operands into the fresh GetZoneData owners.
+// The actual People getter has already consumed CEN and occupancy input.
+// Existing negative fixtures retain their geometry-incomplete owners unchanged.
+fn replay_cen_final_mapping(
+    context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>,
+    model: &ep_model::TypedModel,
+    input_checkpoint: &crate::heat_balance::selected_heat_balance_input::surface::SurfaceGeometryInputState,
+    environment: &crate::weather::day::WeatherEnvironmentState,
+) -> Result<(), Box<dyn std::error::Error>> {
+    use crate::heat_balance::selected_heat_balance_input::surface::SurfaceGetterOwners;
+    let mut raw = input_checkpoint.clone();
+    assert!(raw.surface_tmp.is_some(), "pre-final input only; final metadata is not reconstructed");
+    let r = &mut *context.reports;
+    let zones = r.selected_zone_input.as_mut().ok_or("CEN GetZoneData owners")?;
+    assert!(zones.spaces.as_ref().ok_or("CEN GetZoneData Spaces")?.iter()
+        .all(|s| s.surfaces.is_empty() && s.ht_surface_first == 0));
+    let mut owners = SurfaceGetterOwners {
+        model, input: r.selected_input_processor.as_mut().ok_or("CEN IP")?,
+        shortcut: &mut r.input_processor_shortcut, zones,
+        control: &mut r.heat_balance_input_state,
+        globals: r.selected_heat_balance_globals.as_ref().ok_or("CEN GetZoneData globals")?,
+        environment,
+    };
+    let mut errors = false;
+    // Same genuine Source final-copy writer as baseline611; its createSpaceSurfaceLists
+    // and subsequent range loop produce associations on THESE actual GetZone owners.
+    raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None, None)?;
+    assert!(!errors);
+    raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
+    raw.bind_typed_surfaces(&owners)?;
+    // Actual GetSurfaceData return-suffix writer initializes representative
+    // surface numbers and active constructions needed by radiant initialization.
+    raw.finish_selected_surface_input(&mut owners, &mut context.backend, &mut errors)?;
+    assert!(!errors && raw.selected_get_surface_data_returned);
+    assert!(raw.final_surfaces.as_ref().ok_or("CEN representative surfaces")?
+        .iter().enumerate().all(|(i, s)| s.representative_calc_surface_num == i32::try_from(i + 1).unwrap()));
+    assert!(raw.surface_tmp.is_none());
+    for space in owners.zones.spaces.as_ref().ok_or("CEN final mapped Space")? {
+        assert!(!space.surfaces.is_empty());
+        assert!(space.ht_surface_first > 0 && space.ht_surface_last >= space.ht_surface_first);
+        // Enclosure IDs remain for actual setup_radiant_enclosures to produce.
+        assert_eq!(space.radiant_enclosure_num, 0);
+    }
+    r.surface_geometry_input = raw;
+    Ok(())
+}
+
+// Build MRT owners through actual enclosure, solar and radiant initialization.
+// The caller supplies final mapped geometry and getter-populated People.
+fn prepare_cen_mrt_owner(
+    context: &mut crate::heat_balance::ctf_initialization_context::CtfInitializationContext<'_>, model: &ep_model::TypedModel,
+    environment: &crate::weather::day::WeatherEnvironmentState,
+    air: &mut crate::heat_balance::ordinary_air_heat_balance::SourceAirHeatBalance,
+    fan: &mut crate::heat_balance::ordinary_air_heat_balance::environment::SourceZoneFanHeatBalanceArrays,
+    host: &mut dyn crate::heat_balance::source_output_registration::SourceOutputFileHost,
+    simple_ctf_only: bool,
+) -> Result<(crate::heat_balance::ordinary_surface_initialization::OrdinarySurfaceInitialization,
+             crate::heat_balance::ctf_thermal_history::CtfThermalHistoryState), Box<dyn std::error::Error>> {
+    use crate::heat_balance::radiation::ordinary::{EnclosureOutputOwners, RadiantExchangeSource, RadiantInitializationOutput};
+    {
+        let r = &mut *context.reports;
+        let globals = r.selected_heat_balance_globals.as_ref().ok_or("CEN globals")?;
+        let zones = r.selected_zone_input.as_mut().ok_or("CEN Zones")?;
+        // A constructor-only Space is NOT silently repaired with invented indices.
+        assert!(zones.spaces.as_ref().ok_or("CEN Spaces")?.iter().all(|s| !s.surfaces.is_empty() && s.ht_surface_first > 0));
+        let mut getter = crate::heat_balance::selected_heat_balance_input::surface::SurfaceGetterOwners {
+            model, input: r.selected_input_processor.as_mut().ok_or("CEN IP")?,
+            shortcut: &mut r.input_processor_shortcut, zones,
+            control: &mut r.heat_balance_input_state, globals, environment,
+        };
+        let mut output = EnclosureOutputOwners {
+            output: &mut r.output_registration, prescan: &r.output_prescan,
+            minimum_report_frequency: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new("", None),
+            backend: &mut context.backend, minutes_in_time_step: 15, host, eio: context.eio,
+        };
+        let radiation = r.ordinary_solar_radiation.as_mut().ok_or("CEN radiation")?;
+        radiation.setup_radiant_enclosures(&r.surface_geometry_input, &mut getter, &mut output)?;
+        radiation.setup_solar_enclosures(&r.surface_geometry_input, &mut getter, &mut output)?;
+    }
+    // Genuine writer of Surface.rad_encl_index/solar indices, no manual =1.
+    context.initialize_selected_solar_view_factors(model)?;
+    let r = &mut *context.reports;
+    let globals = r.selected_heat_balance_globals.as_ref().ok_or("CEN globals")?;
+    let zones = r.selected_zone_input.as_ref().ok_or("CEN Zones")?;
+    let radiation = r.ordinary_solar_radiation.as_mut().ok_or("CEN radiation")?;
+    let source = RadiantExchangeSource {
+        geometry: &r.surface_geometry_input, zones, constructions: &r.heat_balance_input_state,
+        carroll_method: r.selected_project_data.as_ref().ok_or("CEN project")?.carroll_method,
+        any_inside_shelf: globals.any_inside_shelf,
+    };
+    let mut output = RadiantInitializationOutput {
+        input: r.selected_input_processor.as_mut().ok_or("CEN IP")?, shortcut: &mut r.input_processor_shortcut,
+        scan: &mut r.scan, report_inputs: &model.report_inputs, backend: &mut context.backend,
+        eio: context.eio, debug: None, advanced_report_variables: globals.display_advanced_report_variables,
+    };
+    // Genuine writer of radiant.source_surface_ptr and emissivity arrays.
+    radiation.initialize_source_radiant(&source, &mut output)?;
+    let ids = r.surface_geometry_input.final_surfaces.as_ref().ok_or("CEN Surfaces")?.iter()
+        .map(|s| s.typed_id.ok_or("CEN typed Surface ID")).collect::<Result<Vec<_>, _>>()?;
+    let mut history = crate::heat_balance::ctf_thermal_history::CtfThermalHistoryState::new_source_unallocated(ids);
+    let mut surface = crate::heat_balance::ordinary_surface_initialization::OrdinarySurfaceInitialization::default();
+    surface.arrays.allocate(history.surface_ids.len(), r.heat_balance_input_state.any_internal_heat_source_in_input,
+        simple_ctf_only, globals.any_energy_management_system_in_model, &mut history)?;
+    // Explicit surface-temperature UNIT OPERAND; never directly set MRT/output.
+    surface.arrays.surf_temp_in.as_mut().ok_or("CEN allocated inside temperature")?.fill(0.0);
+    fan.allocate_source_fan_zone_arrays(globals)?;
+    surface.calculate_source_zone_mrt(None, &r.surface_geometry_input, zones, &r.heat_balance_input_state,
+        air, radiation, globals, &mut context.backend)?;
+    for enclosure in radiation.radiant_enclosures() {
+        assert!(enclosure.sum_ae > 0.01, "must use actual weighted MRT, never MAT fallback");
+        assert_eq!(enclosure.mean_radiant_temperature.to_bits(), 0.0_f64.to_bits());
+        assert!(!enclosure.source_surface_ptr.as_ref().ok_or("CEN radiant surface pointers")?.is_empty());
+    }
+    for space in zones.spaces.as_ref().ok_or("CEN mapped Spaces")? {
+        assert!(space.radiant_enclosure_num > 0);
+    }
+    Ok((surface, history))
 }

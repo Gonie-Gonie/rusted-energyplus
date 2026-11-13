@@ -149,10 +149,11 @@ impl WeatherSession {
                             );
                         }
                         if owners.control.adaptive_comfort_requested_cen15251 {
-                            return Err(Error::Unavailable(
-                                "actual AdaptiveCEN15251 DesignDay initialization804",
-                            )
-                            .into());
+                            owners
+                                .comfort
+                                .initialize_source_adaptive_cen15251_design_day(
+                                    gross_approx_average_dry_bulb,
+                                );
                         }
                     }
                 } else if clock.do_weath_sim || clock.do_des_day_sim {

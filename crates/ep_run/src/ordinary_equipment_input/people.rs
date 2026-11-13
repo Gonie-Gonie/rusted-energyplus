@@ -207,7 +207,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
     // nonblank auxiliaries through the same genuine getter.
     let mut fanger = false;
     let mut ankle = false;
-    let mut adaptive_ash55 = false;
+    let mut adaptive = false;
     for name in [
         "thermal_comfort_model_1_type",
         "thermal_comfort_model_2_type",
@@ -222,15 +222,15 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
                 fanger = true;
             } else if text_is(value, &["AnkleDraftASH55"]) {
                 ankle = true;
-            } else if text_is(value, &["AdaptiveASH55"]) {
-                adaptive_ash55 = true;
+            } else if text_is(value, &["AdaptiveASH55", "AdaptiveCEN15251"]) {
+                adaptive = true;
             } else if !matches!(value, RawValue::String(s) if s.is_empty()) {
                 return false;
             }
         }
     }
     let additional_inputs = fanger || ankle;
-    let uses_mrt = additional_inputs || adaptive_ash55;
+    let uses_mrt = additional_inputs || adaptive;
     if uses_mrt
         && !selected(
             object,
@@ -336,7 +336,7 @@ pub(super) fn admitted_object(raw: &RawModel, object: &RawObject, source_zone_li
             // schedule value, current/min/max or guessed pointer substitutes.
         }
         // Dynamic clothing consumes neither A11 nor A12. Every selected model
-        // resolves nonempty A21; only AnkleDraft requires a blank A21.
+        // resolves nonempty A21; only AnkleDraft requires A21 to be nonblank.
         if ankle
             || matches!(field(object, "ankle_level_air_velocity_schedule_name"), Some(RawValue::String(value)) if !value.is_empty())
         {
@@ -378,7 +378,7 @@ pub(super) fn admitted_angle_field(name: &str, value: &RawValue) -> bool {
 /// Reuse Native target precedence and the existing exact empty-SpaceList
 /// expansion predicate. Occupancy0 still instantiates a real People owner.
 /// Calendar flags/defaults are interpreted only by the existing scope settings.
-pub(crate) fn has_instantiated_adaptive_ash55(raw: &RawModel) -> bool {
+pub(crate) fn has_instantiated_adaptive_comfort(raw: &RawModel) -> bool {
     raw.objects
         .get(&ObjectType("People".into()))
         .is_some_and(|rows| {
@@ -395,7 +395,9 @@ pub(crate) fn has_instantiated_adaptive_ash55(raw: &RawModel) -> bool {
                     ]
                     .iter()
                     .any(|name| {
-                        field(object, name).is_some_and(|value| text_is(value, &["AdaptiveASH55"]))
+                        field(object, name).is_some_and(|value| {
+                            text_is(value, &["AdaptiveASH55", "AdaptiveCEN15251"])
+                        })
                     })
             })
         })

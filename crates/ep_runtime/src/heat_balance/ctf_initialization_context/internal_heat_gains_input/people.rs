@@ -293,12 +293,15 @@ impl SelectedInternalHeatGains {
                         } else if model == "ADAPTIVEASH55" {
                             row.adaptive_ash55 = true;
                             owners.control.adaptive_comfort_requested_ash55 = true;
+                        } else if model == "ADAPTIVECEN15251" {
+                            row.adaptive_cen15251 = true;
+                            owners.control.adaptive_comfort_requested_cen15251 = true;
                         } else if !model.is_empty() {
                             return Err(unavailable("positive unsupported People comfort model"));
                         }
                     }
                     let additional_inputs = row.fanger || row.ankle_draft_ash55;
-                    let uses_mrt = additional_inputs || row.adaptive_ash55;
+                    let uses_mrt = additional_inputs || row.adaptive_ash55 || row.adaptive_cen15251;
                     if uses_mrt {
                         self.read_people_mrt(
                             count,

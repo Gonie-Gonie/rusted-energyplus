@@ -2593,81 +2593,97 @@ fn new_features_and_active_design_days_are_not_silently_ignored() {
         assert!(!trace(&sizing, PortingScope::B).admissible, "{field}");
     }
 
-    // AdaptiveASH55 uses actual DD initialization only. A zero design count
+    // Adaptive comfort uses actual DD initialization only. A zero design count
     // still creates its owner, whereas an empty SpaceList creates none.
     for scope in [PortingScope::A, PortingScope::B] {
-        for count in [0.0, 1.5] {
-            let mut adaptive = input(scope);
-            adaptive["SizingPeriod:DesignDay"] = value["SizingPeriod:DesignDay"].clone();
-            adaptive["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] =
-                json!("Yes");
-            adaptive["Schedule:Constant"]["Activity"] = json!({"hourly_value":120});
-            adaptive["People"] = json!({"Adaptive":{
-                "zone_or_zonelist_or_space_or_spacelist_name":"Zone",
-                "number_of_people_schedule_name":"On",
-                "activity_level_schedule_name":"Activity",
-                "number_of_people":count,
-                "sensible_heat_fraction":0.6,
-                "thermal_comfort_model_7_type":"AdaptiveASH55"
-            }});
-            let actual = trace(&adaptive, scope);
-            assert!(!actual.admissible);
-            assert!(
-                actual
-                    .violations
-                    .iter()
-                    .any(|message| message.contains("AdaptiveASH55 requires DesignDay-only"))
-            );
-            adaptive["SimulationControl"]["Control"]["run_simulation_for_weather_file_run_periods"] =
-                json!("No");
-            let run_period = adaptive
-                .as_object_mut()
-                .expect("adaptive object")
-                .remove("RunPeriod")
-                .expect("weather RunPeriod");
-            let actual = trace(&adaptive, scope);
-            assert!(actual.admissible, "{:?}", actual.violations);
-            let raw = parse_epjson_str(&adaptive.to_string()).expect("adaptive DD input");
-            match scope {
-                PortingScope::A => crate::ordinary_equipment_input::resolve_source_a(&raw),
-                PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(&raw),
-            }
-            .expect("adaptive DD Source admission");
-            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
-            for report in ["AdaptiveComfortSummary", "adaptivecomfortsummary"] {
-                let mut reporting = adaptive.clone();
-                reporting["Output:Table:SummaryReports"] =
-                    json!({"Reports":{"reports":[{"report_name":report}]}});
-                let actual = trace(&reporting, scope);
-                assert!(actual.admissible, "{:?}", actual.violations);
-                let resolve_report = |value: &Value| {
-                    let raw = parse_epjson_str(&value.to_string()).expect("summary request");
-                    match scope {
-                        PortingScope::A => crate::ordinary_equipment_input::resolve_source_a(&raw),
-                        PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(&raw),
-                    }
-                };
-                resolve_report(&reporting).expect("connected adaptive summary request");
-                reporting["Output:Table:SummaryReports"]["Reports"]["reports"][0]["report_name"] =
-                    json!("UnsupportedSummary");
-                assert!(resolve_report(&reporting).is_err());
-            }
-            adaptive["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] =
-                json!("No");
-            assert!(!trace(&adaptive, scope).admissible);
-            if scope == PortingScope::A {
-                adaptive["SimulationControl"]["Control"]["run_simulation_for_weather_file_run_periods"] =
+        for (model, also_ash) in [
+            ("AdaptiveASH55", false),
+            ("AdaptiveCEN15251", false),
+            ("AdaptiveCEN15251", true),
+        ] {
+            for count in [0.0, 1.5] {
+                let mut adaptive = input(scope);
+                adaptive["SizingPeriod:DesignDay"] = value["SizingPeriod:DesignDay"].clone();
+                adaptive["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] =
                     json!("Yes");
-                adaptive["RunPeriod"] = run_period;
-                adaptive["SpaceList"] = json!({"Empty":{"spaces":[]}});
-                adaptive["People"]["Adaptive"]["zone_or_zonelist_or_space_or_spacelist_name"] =
-                    json!("Empty");
-                let raw = parse_epjson_str(&adaptive.to_string()).expect("empty adaptive target");
-                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
-                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
-                let actual =
-                    inspect_porting_scope(&raw, &compiled.report, compiled.model.as_ref(), scope);
+                adaptive["Schedule:Constant"]["Activity"] = json!({"hourly_value":120});
+                adaptive["People"] = json!({"Adaptive":{
+                    "zone_or_zonelist_or_space_or_spacelist_name":"Zone",
+                    "number_of_people_schedule_name":"On",
+                    "activity_level_schedule_name":"Activity",
+                    "number_of_people":count,
+                    "sensible_heat_fraction":0.6,
+                    "thermal_comfort_model_7_type":model
+                }});
+                if also_ash {
+                    adaptive["People"]["Adaptive"]["thermal_comfort_model_1_type"] =
+                        json!("AdaptiveASH55");
+                }
+                let actual = trace(&adaptive, scope);
+                assert!(!actual.admissible);
+                assert!(actual.violations.iter().any(|message| {
+                    message.contains("adaptive comfort requires DesignDay-only")
+                }));
+                adaptive["SimulationControl"]["Control"]["run_simulation_for_weather_file_run_periods"] =
+                    json!("No");
+                let run_period = adaptive
+                    .as_object_mut()
+                    .expect("adaptive object")
+                    .remove("RunPeriod")
+                    .expect("weather RunPeriod");
+                let actual = trace(&adaptive, scope);
                 assert!(actual.admissible, "{:?}", actual.violations);
+                let raw = parse_epjson_str(&adaptive.to_string()).expect("adaptive DD input");
+                match scope {
+                    PortingScope::A => crate::ordinary_equipment_input::resolve_source_a(&raw),
+                    PortingScope::B => crate::ordinary_equipment_input::resolve_source_b(&raw),
+                }
+                .expect("adaptive DD Source admission");
+                assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+                for report in ["AdaptiveComfortSummary", "adaptivecomfortsummary"] {
+                    let mut reporting = adaptive.clone();
+                    reporting["Output:Table:SummaryReports"] =
+                        json!({"Reports":{"reports":[{"report_name":report}]}});
+                    let actual = trace(&reporting, scope);
+                    assert!(actual.admissible, "{:?}", actual.violations);
+                    let resolve_report = |value: &Value| {
+                        let raw = parse_epjson_str(&value.to_string()).expect("summary request");
+                        match scope {
+                            PortingScope::A => {
+                                crate::ordinary_equipment_input::resolve_source_a(&raw)
+                            }
+                            PortingScope::B => {
+                                crate::ordinary_equipment_input::resolve_source_b(&raw)
+                            }
+                        }
+                    };
+                    resolve_report(&reporting).expect("connected adaptive summary request");
+                    reporting["Output:Table:SummaryReports"]["Reports"]["reports"][0]["report_name"] =
+                        json!("UnsupportedSummary");
+                    assert!(resolve_report(&reporting).is_err());
+                }
+                adaptive["SimulationControl"]["Control"]["run_simulation_for_sizing_periods"] =
+                    json!("No");
+                assert!(!trace(&adaptive, scope).admissible);
+                if scope == PortingScope::A {
+                    adaptive["SimulationControl"]["Control"]["run_simulation_for_weather_file_run_periods"] =
+                        json!("Yes");
+                    adaptive["RunPeriod"] = run_period;
+                    adaptive["SpaceList"] = json!({"Empty":{"spaces":[]}});
+                    adaptive["People"]["Adaptive"]["zone_or_zonelist_or_space_or_spacelist_name"] =
+                        json!("Empty");
+                    let raw =
+                        parse_epjson_str(&adaptive.to_string()).expect("empty adaptive target");
+                    let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                    let actual = inspect_porting_scope(
+                        &raw,
+                        &compiled.report,
+                        compiled.model.as_ref(),
+                        scope,
+                    );
+                    assert!(actual.admissible, "{:?}", actual.violations);
+                }
             }
         }
     }

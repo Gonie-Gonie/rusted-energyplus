@@ -5,6 +5,9 @@ use super::*;
 pub(crate) enum SourceComfortIntegerOutputField {
     PeopleAdaptiveAsh5590,
     PeopleAdaptiveAsh5580,
+    PeopleAdaptiveCen15251CatI,
+    PeopleAdaptiveCen15251CatII,
+    PeopleAdaptiveCen15251CatIII,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceIntegerOutputTarget {

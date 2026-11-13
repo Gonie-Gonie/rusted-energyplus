@@ -128,9 +128,41 @@ impl SourceThermalComfort {
                 )?;
             }
             if adaptive_cen15251 {
-                return Err(Error::Unavailable(
-                    "actual positive adaptiveCEN registration317",
-                ));
+                self.register_integer(
+                    o,
+                    IntegerField::PeopleAdaptiveCen15251CatI,
+                    number,
+                    "Zone Thermal Comfort CEN 15251 Adaptive Model Category I Status",
+                    &name,
+                )?;
+                self.register_integer(
+                    o,
+                    IntegerField::PeopleAdaptiveCen15251CatII,
+                    number,
+                    "Zone Thermal Comfort CEN 15251 Adaptive Model Category II Status",
+                    &name,
+                )?;
+                self.register_integer(
+                    o,
+                    IntegerField::PeopleAdaptiveCen15251CatIII,
+                    number,
+                    "Zone Thermal Comfort CEN 15251 Adaptive Model Category III Status",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleAdaptiveCen15251RunningMeanOutdoorTemperature,
+                    number,
+                    "Zone Thermal Comfort CEN 15251 Adaptive Model Running Average Outdoor Air Temperature",
+                    &name,
+                )?;
+                self.register(
+                    o,
+                    Field::PeopleAdaptiveCen15251ComfortTemperature,
+                    number,
+                    "Zone Thermal Comfort CEN 15251 Adaptive Model Temperature",
+                    &name,
+                )?;
             }
             if cooling_effect_ash55 {
                 return Err(Error::Unavailable(

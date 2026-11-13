@@ -354,11 +354,11 @@ fn validate_project_controls(raw: &RawModel, settings: &Value, violations: &mut 
     // Syntactic People recognition is broader than this completed DD-only
     // adaptive child. Reuse the validated/default project calendar selection;
     // empty SpaceList targets do not instantiate a People/global model flag.
-    if crate::ordinary_equipment_input::has_instantiated_adaptive_ash55(raw)
+    if crate::ordinary_equipment_input::has_instantiated_adaptive_comfort(raw)
         && !source_design_day_only_selection(design_days, settings)
     {
         violations.push(
-            "People AdaptiveASH55 requires DesignDay-only execution with weather simulation disabled; adaptive STAT/EPW history remains unavailable".into(),
+            "People adaptive comfort requires DesignDay-only execution with weather simulation disabled; adaptive STAT/EPW history remains unavailable".into(),
         );
     }
     for (field, required) in [

@@ -40,6 +40,10 @@ impl SourceThermalComfort {
                 Ok(&people()?.ashrae55_running_mean_outdoor_temp)
             }
             PeopleAdaptiveAsh55ComfortTemperature => Ok(&people()?.t_comf_ash55),
+            PeopleAdaptiveCen15251RunningMeanOutdoorTemperature => {
+                Ok(&people()?.cen15251_running_mean_outdoor_temp)
+            }
+            PeopleAdaptiveCen15251ComfortTemperature => Ok(&people()?.t_comf_cen15251),
             PeopleFangerPmv => Ok(&people()?.fanger_pmv),
             PeopleAnkleDraftPpd => Ok(&people()?.ankle_draft_ppdash55),
             PeopleFangerPpd => Ok(&people()?.fanger_ppd),
@@ -133,7 +137,9 @@ impl SourceThermalComfort {
             | Field::PeopleMeanRadiantTemperature
             | Field::PeopleOperativeTemperature
             | Field::PeopleAdaptiveAsh55RunningMeanOutdoorTemperature
-            | Field::PeopleAdaptiveAsh55ComfortTemperature => {
+            | Field::PeopleAdaptiveAsh55ComfortTemperature
+            | Field::PeopleAdaptiveCen15251RunningMeanOutdoorTemperature
+            | Field::PeopleAdaptiveCen15251ComfortTemperature => {
                 (SourceOutputUnits::C, SourceOutputStoreType::Average)
             }
             Field::PeopleClothingValue => (SourceOutputUnits::Clo, SourceOutputStoreType::Average),
@@ -200,6 +206,15 @@ impl SourceIntegerOutputOwners for SourceThermalComfort {
         Ok(match field {
             IntegerField::PeopleAdaptiveAsh5590 => &row.thermal_comfort_adaptive_ash5590,
             IntegerField::PeopleAdaptiveAsh5580 => &row.thermal_comfort_adaptive_ash5580,
+            IntegerField::PeopleAdaptiveCen15251CatI => {
+                &row.thermal_comfort_adaptive_cen15251_cat_i
+            }
+            IntegerField::PeopleAdaptiveCen15251CatII => {
+                &row.thermal_comfort_adaptive_cen15251_cat_ii
+            }
+            IntegerField::PeopleAdaptiveCen15251CatIII => {
+                &row.thermal_comfort_adaptive_cen15251_cat_iii
+            }
         })
     }
 }

@@ -28,7 +28,10 @@ use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 use ep_model::ReportInputs;
 use std::io::Write;
 mod adaptive_ash55;
+mod adaptive_cen15251;
 mod ankle;
+#[cfg(test)]
+mod cen_owner_tests;
 mod fanger;
 mod initialization;
 mod output;
@@ -180,9 +183,7 @@ impl SourceThermalComfort {
                 self.calc_source_adaptive_ash55(o)?;
             }
             if o.control.adaptive_comfort_requested_cen15251 {
-                return Err(Error::Unavailable(
-                    "actual CalcThermalComfortAdaptiveCEN15251 positive model",
-                ));
+                self.calc_source_adaptive_cen15251(o)?;
             }
         }
         Ok(())

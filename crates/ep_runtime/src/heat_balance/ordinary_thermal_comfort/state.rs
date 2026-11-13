@@ -90,6 +90,14 @@ pub(crate) struct SourceThermalComfort {
     pub(crate) op_temp: f64,             // Native OpTemp ctor0
     pub(crate) running_average_ash: f64, // Native runningAverageASH ctor0
     pub(crate) avg_dry_bulb_ash: f64,    // Native avgDryBulbASH ctor0
+    pub(crate) avg_dry_bulb_cen: f64,    // Native avgDryBulbCEN ctor0
+    pub(crate) running_average_cen: f64, // Native runningAverageCEN ctor0
+    #[allow(
+        dead_code,
+        reason = "Native retained flag; positive EPW initialization remains unavailable."
+    )]
+    pub(crate) use_epw_data_cen: bool, // Native useEpwDataCEN ctorfalse
+    pub(crate) first_day_set: bool,      // Native firstDaySet ctorfalse
     pub(crate) monthly_temp: [f64; 12],  // Native Array1D(12,0)
     pub(crate) use_stat_data: bool,      // Native useStatData ctorfalse
     pub(crate) use_epw_data: bool,       // Native useEpwData ctorfalse
@@ -167,6 +175,10 @@ impl Default for SourceThermalComfort {
             op_temp: 0.0,
             running_average_ash: 0.0,
             avg_dry_bulb_ash: 0.0,
+            avg_dry_bulb_cen: 0.0,
+            running_average_cen: 0.0,
+            use_epw_data_cen: false,
+            first_day_set: false,
             monthly_temp: [0.0; 12],
             use_stat_data: false,
             use_epw_data: false,

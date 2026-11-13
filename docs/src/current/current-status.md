@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 170 paired physical cases and 4,839,496 reported values with zero
+contains 171 paired physical cases and 4,901,176 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 115 recorded Source builds,
-104 with accepted pairs and 11 without accepted pairs, including 2 builds
+validate the consumer corrections. There are 116 recorded Source builds,
+105 with accepted pairs and 11 without accepted pairs, including 2 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -317,3 +317,8 @@ Routine/domain readiness is owned by the algorithm ledger and project contract;
 input support is owned by the capability registry. A finite unit pass, parser
 support or successful demo does not promote those registries. The
 [project contract](project-contract.md) defines the promotion requirements.
+
+
+## Bounded CEN15251 extension (Unit115)
+
+Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55. One unchanged B five-DesignDay pilot compares 130 series and 61,680 reported values under preserved policies. Three genuine CEN integer statuses and two temperature outputs use the live comfort owner; all five summary columns read retained People SysTimeElapsed accumulators. One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion. No blanket exact-boundary execution claim is made here. Any owner-test review is retained separately from the final same-source full QA and physical sample evidence; unobserved CEN triples/regions remain explicit.
