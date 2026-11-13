@@ -958,15 +958,18 @@ fn validate_direct_zone_model(
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoZoneHvacSizingObject);
     }
-    // The real Source report reads cooling efficiency from its live schedule.
-    // Heating stays fenced for both modes; Legacy keeps its original fuel premise.
-    if system.heating_fuel_efficiency_schedule.is_some()
-        || (mode == DirectZoneValidationMode::LegacyBinding
-            && system.cooling_fuel_efficiency_schedule.is_some())
+    // Source reports consume both real live fuel schedules.
+    // Legacy keeps its original fuel-schedule premise.
+    if mode == DirectZoneValidationMode::LegacyBinding
+        && (system.heating_fuel_efficiency_schedule.is_some()
+            || system.cooling_fuel_efficiency_schedule.is_some())
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules);
     }
-    if system.heating_availability_schedule.is_some() {
+    // The genuine Source init/calc reads live heating availability.
+    if mode == DirectZoneValidationMode::LegacyBinding
+        && system.heating_availability_schedule.is_some()
+    {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule);
     }
     // The genuine Source getter/calc consumes the live cooling schedule.

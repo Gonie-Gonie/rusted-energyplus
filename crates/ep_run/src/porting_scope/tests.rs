@@ -3810,21 +3810,74 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     .model
                     .as_ref()
                     .expect("actual heating typed model");
+                ep_runtime::validate_source_direct_zone_purchased_air_model(
+                    &ep_model::SimulationModel::from_typed(heating_model.clone()),
+                )
+                .expect("Source admits actual heating schedule declaration");
+                let heating_schedule = heating_model.ideal_loads_air_systems[0]
+                    .heating_availability_schedule
+                    .expect("actual typed heating schedule ID");
                 assert_eq!(
-                    ep_runtime::validate_source_direct_zone_purchased_air_model(&ep_model::SimulationModel::from_typed(heating_model.clone())),
-                    Err(ep_runtime::DirectZonePurchasedAirBindingError::UnsupportedFeature {
-                        feature: ep_runtime::DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule,
-                    })
+                    heating_model
+                        .schedules
+                        .iter()
+                        .find(|row| row.id == heating_schedule)
+                        .expect("actual heating schedule arena")
+                        .hourly_value
+                        .to_bits(),
+                    value.to_bits()
+                );
+                let mut heating_scope = inspect_porting_scope(
+                    &heating_raw,
+                    &heating_compile.report,
+                    Some(heating_model),
+                    scope,
+                );
+                assert!(heating_scope.admissible, "{:?}", heating_scope.violations);
+                heating_scope.environment = Some(
+                    super::environment::environment_from_weather(
+                        heating_model,
+                        &single_day_weather_fixture(),
+                        "authored heating role weather",
+                    )
+                    .expect("actual heating scope environment"),
+                );
+                let heating_admission =
+                    crate::support::SourceSupportAdmission::from_validated_scope(
+                        &heating_raw,
+                        &heating_scope,
+                    )
+                    .expect("real heating Source token");
+                let heating_support = crate::support::assess_support_with_source_admission(
+                    &heating_raw,
+                    &heating_compile.report,
+                    Some(heating_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&heating_admission),
                 );
                 assert!(
-                    !inspect_porting_scope(
-                        &heating_raw,
-                        &heating_compile.report,
-                        Some(heating_model),
-                        scope
-                    )
-                    .admissible
+                    heating_support.allows_rust_runtime(),
+                    "{:?}",
+                    heating_support.diagnostics
                 );
+                assert_eq!(
+                    heating_support.runtime_class,
+                    crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+                );
+                assert!(heating_support.matched_capability_ids.is_empty());
+                let heating_ip = crate::ordinary_input_processor::resolve_source_b(&heating_raw)
+                    .expect("real heating raw IP");
+                let heating_fields = heating_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained heating unit alphas");
+                assert_eq!(
+                    heating_fields["heating_availability_schedule_name"],
+                    SourceRaw::String(name.into())
+                );
+                assert_eq!(ep_runtime::bind_direct_zone_purchased_air_model(&ep_model::SimulationModel::from_typed(heating_model.clone())).expect_err("Legacy heating role remains fenced"), ep_runtime::DirectZonePurchasedAirBindingError::UnsupportedFeature { feature: ep_runtime::DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule });
             }
 
             // Unit129: a real cooling-fuel schedule reaches Source eligibility,
@@ -3937,21 +3990,74 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     .model
                     .as_ref()
                     .expect("actual heating typed model");
+                ep_runtime::validate_source_direct_zone_purchased_air_model(
+                    &ep_model::SimulationModel::from_typed(heating_model.clone()),
+                )
+                .expect("Source admits actual heating schedule declaration");
+                let heating_schedule = heating_model.ideal_loads_air_systems[0]
+                    .heating_fuel_efficiency_schedule
+                    .expect("actual typed heating schedule ID");
                 assert_eq!(
-                    ep_runtime::validate_source_direct_zone_purchased_air_model(&ep_model::SimulationModel::from_typed(heating_model.clone())),
-                    Err(ep_runtime::DirectZonePurchasedAirBindingError::UnsupportedFeature {
-                        feature: ep_runtime::DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules,
-                    })
+                    heating_model
+                        .schedules
+                        .iter()
+                        .find(|row| row.id == heating_schedule)
+                        .expect("actual heating schedule arena")
+                        .hourly_value
+                        .to_bits(),
+                    value.to_bits()
+                );
+                let mut heating_scope = inspect_porting_scope(
+                    &heating_raw,
+                    &heating_compile.report,
+                    Some(heating_model),
+                    scope,
+                );
+                assert!(heating_scope.admissible, "{:?}", heating_scope.violations);
+                heating_scope.environment = Some(
+                    super::environment::environment_from_weather(
+                        heating_model,
+                        &single_day_weather_fixture(),
+                        "authored heating role weather",
+                    )
+                    .expect("actual heating scope environment"),
+                );
+                let heating_admission =
+                    crate::support::SourceSupportAdmission::from_validated_scope(
+                        &heating_raw,
+                        &heating_scope,
+                    )
+                    .expect("real heating Source token");
+                let heating_support = crate::support::assess_support_with_source_admission(
+                    &heating_raw,
+                    &heating_compile.report,
+                    Some(heating_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&heating_admission),
                 );
                 assert!(
-                    !inspect_porting_scope(
-                        &heating_raw,
-                        &heating_compile.report,
-                        Some(heating_model),
-                        scope
-                    )
-                    .admissible
+                    heating_support.allows_rust_runtime(),
+                    "{:?}",
+                    heating_support.diagnostics
                 );
+                assert_eq!(
+                    heating_support.runtime_class,
+                    crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+                );
+                assert!(heating_support.matched_capability_ids.is_empty());
+                let heating_ip = crate::ordinary_input_processor::resolve_source_b(&heating_raw)
+                    .expect("real heating raw IP");
+                let heating_fields = heating_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained heating unit alphas");
+                assert_eq!(
+                    heating_fields["heating_fuel_efficiency_schedule_name"],
+                    SourceRaw::String(name.into())
+                );
+                assert_eq!(ep_runtime::bind_direct_zone_purchased_air_model(&ep_model::SimulationModel::from_typed(heating_model.clone())).expect_err("Legacy heating role remains fenced"), ep_runtime::DirectZonePurchasedAirBindingError::UnsupportedFeature { feature: ep_runtime::DirectZonePurchasedAirBindingFeature::NoFuelEfficiencySchedules });
             }
 
             // Full actual raw compiler -> scope -> Source token -> runtime class

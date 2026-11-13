@@ -320,9 +320,11 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         let expected = DirectZonePurchasedAirBindingError::UnsupportedFeature {
             feature: DirectZonePurchasedAirBindingFeature::NoHeatingAvailabilitySchedule,
         };
+        validate_source_direct_zone_purchased_air_model(&with_heating)
+            .expect("Source now admits actual heating schedule role");
         assert_eq!(
-            validate_source_direct_zone_purchased_air_model(&with_heating),
-            Err(expected.clone())
+            with_heating.typed.ideal_loads_air_systems[0].heating_availability_schedule,
+            Some(cooling)
         );
         assert_eq!(
             bind_direct_zone_purchased_air_model(&with_heating)
@@ -378,9 +380,11 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 cooling_selected.then_some(efficiency);
             heating.ideal_loads_air_systems[0].heating_fuel_efficiency_schedule = Some(efficiency);
             let heating = SimulationModel::from_typed(heating);
+            validate_source_direct_zone_purchased_air_model(&heating)
+                .expect("Source now admits actual heating schedule role");
             assert_eq!(
-                validate_source_direct_zone_purchased_air_model(&heating),
-                Err(expected.clone())
+                heating.typed.ideal_loads_air_systems[0].heating_fuel_efficiency_schedule,
+                Some(efficiency)
             );
             assert_eq!(
                 bind_direct_zone_purchased_air_model(&heating)
