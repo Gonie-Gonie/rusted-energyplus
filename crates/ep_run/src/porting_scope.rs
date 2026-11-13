@@ -896,10 +896,14 @@ fn validate_ideal_loads(model: &TypedModel, violations: &mut Vec<String>) {
             violations
                 .push("OA, DCV, economizer and heat recovery are outside no-OA scope B".into());
         }
-        if system.dehumidification_control_type != DehumidificationControlType::None
-            || system.humidification_control_type != HumidificationControlType::None
+        if (system.dehumidification_control_type != DehumidificationControlType::None
+            || system.humidification_control_type != HumidificationControlType::None)
+            && !ep_runtime::has_source_cooling_constant_supply_humidity_shape(system)
         {
-            violations.push("humidity-control branches are outside sensible-only scope B".into());
+            violations.push(
+                "humidity controls require the bounded Source cooling constant-supply branch"
+                    .into(),
+            );
         }
         if system.system_inlet_air_node_name.is_some()
             || system

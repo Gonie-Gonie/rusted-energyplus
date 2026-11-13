@@ -3702,6 +3702,147 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(raw, retained);
             }
 
+            // Exercise the same real compiler/scope/token/IP caller for constant cooling.
+            for limit in ["NoLimit", "LimitFlowRate"] {
+                let humidity_ratio = 0.006_123_456_789_f64;
+                let mut humidity = people.clone();
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                    json!("ConstantSupplyHumidityRatio");
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(limit);
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_cooling_air_flow_rate"] =
+                    json!(0.2);
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["minimum_cooling_supply_air_humidity_ratio"] =
+                    json!(humidity_ratio);
+                let raw =
+                    parse_epjson_str(&humidity.to_string()).expect("constant cooling raw input");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("real constant cooling typed model");
+                let unit = &model.ideal_loads_air_systems[0];
+                assert_eq!(
+                    unit.dehumidification_control_type,
+                    DehumidificationControlType::ConstantSupplyHumidityRatio
+                );
+                assert_eq!(
+                    unit.humidification_control_type,
+                    HumidificationControlType::None
+                );
+                assert_eq!(
+                    unit.minimum_cooling_supply_air_humidity_ratio.to_bits(),
+                    humidity_ratio.to_bits()
+                );
+                let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                    .expect("Source constant cooling eligibility");
+                assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+                let mut actual_scope =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(actual_scope.admissible, "{:?}", actual_scope.violations);
+                actual_scope.environment = Some(
+                    super::environment::environment_from_weather(
+                        model,
+                        &single_day_weather_fixture(),
+                        "constant cooling admission weather",
+                    )
+                    .expect("real constant cooling environment"),
+                );
+                let admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                    &raw,
+                    &actual_scope,
+                )
+                .expect("same raw constant cooling Source token");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert_eq!(
+                    support.runtime_class,
+                    crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
+                );
+                assert!(support.matched_capability_ids.is_empty());
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("real constant cooling raw IP");
+                let fields = ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained constant cooling alpha/numeric fields");
+                assert_eq!(
+                    fields["dehumidification_control_type"],
+                    SourceRaw::String("ConstantSupplyHumidityRatio".into())
+                );
+                assert_eq!(
+                    fields["humidification_control_type"],
+                    SourceRaw::String("None".into())
+                );
+                assert_eq!(fields["cooling_limit"], SourceRaw::String(limit.into()));
+                let token = match &fields["minimum_cooling_supply_air_humidity_ratio"] {
+                    SourceRaw::Number(token) => Some(token),
+                    _ => None,
+                }
+                .expect("real retained humidity-ratio numeric token");
+                assert_eq!(
+                    token
+                        .parse::<f64>()
+                        .expect("actual humidity scalar")
+                        .to_bits(),
+                    humidity_ratio.to_bits()
+                );
+                assert_eq!(raw, retained);
+            }
+            for (limit, dehumidification, humidification) in [
+                ("LimitCapacity", "ConstantSupplyHumidityRatio", "None"),
+                (
+                    "LimitFlowRateAndCapacity",
+                    "ConstantSupplyHumidityRatio",
+                    "None",
+                ),
+                ("NoLimit", "Humidistat", "None"),
+                ("NoLimit", "ConstantSensibleHeatRatio", "None"),
+                (
+                    "NoLimit",
+                    "ConstantSupplyHumidityRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                ("NoLimit", "ConstantSupplyHumidityRatio", "Humidistat"),
+            ] {
+                let mut blocked = people.clone();
+                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(limit);
+                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_cooling_air_flow_rate"] =
+                    json!(0.2);
+                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_total_cooling_capacity"] =
+                    json!(900.0);
+                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                    json!(dehumidification);
+                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
+                    json!(humidification);
+                let raw = parse_epjson_str(&blocked.to_string()).expect("blocked humidity raw");
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("blocked humidity typed model");
+                assert!(
+                    ep_runtime::validate_source_direct_zone_purchased_air_model(
+                        &ep_model::SimulationModel::from_typed(model.clone())
+                    )
+                    .is_err()
+                );
+                assert!(
+                    !inspect_porting_scope(&raw, &compiled.report, Some(model), scope).admissible
+                );
+            }
+
             // Unit127: a real cooling schedule reaches Source eligibility,
             // scope/support and raw IP; this does not simulate any HVAC flow.
             for value in [0.0_f64, 1.0] {

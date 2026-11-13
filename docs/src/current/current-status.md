@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 200 paired physical cases and 6,980,296 reported values with zero
+contains 201 paired physical cases and 7,053,976 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 133 recorded Source builds,
-119 with accepted pairs and 14 without accepted pairs, including 4 builds
+validate the consumer corrections. There are 134 recorded Source builds,
+120 with accepted pairs and 14 without accepted pairs, including 4 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,15 +196,16 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-Twenty-eight bounded B Scheduled/NodeList pairs retain 2,019,600 values; the
-unused A pair adds 59,520, for twenty-nine pairs/2,079,120 values. Fourteen new
-finite scenes cover thirteen canonical nonempty IdealLoads fuel labels and
-distinct NaturalGas heating/Electricity cooling, with positive Winter heat and
-Summer cooling. Hourly fuel meters retain original caps, ordered quarter sums
-and actual producer membership; complete Electricity catalogs stay paired. All
-previous physical gates remain. One Source 133 QA/default build serves the
-matrix. Explicit-empty, arbitrary-combination, other topology/OA/humidity/sizing,
-Legacy/private-state and full-object boundaries remain open.
+Twenty-nine bounded B Scheduled/NodeList pairs retain 2,093,280 values. The
+unused A pair adds 59,520, giving thirty pairs and 2,152,800 values. A cooling
+constant supply-humidity scene retains all 155 original policies and inherited
+physical gates. Its same-clock Summer witness at the authored 0.0077 supply
+humidity ratio, distinct from Zone humidity, includes a genuine latent response;
+it does not establish a global target law or private operating mode. Named fuel
+resources and live availability/efficiency fields remain bounded. Two separate
+Native-only explicit-empty fuel successes observe Electricity with no Source
+paired credit; pinned SDK compatibility is pending. Other topology, OA, humidity,
+sizing, Legacy, private-state and full-object boundaries remain open.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

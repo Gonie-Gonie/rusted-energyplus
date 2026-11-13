@@ -337,10 +337,10 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "All nine Scheduled controls retain bounded Source B evidence across twenty-eight pairs/2,019,600 values. Fourteen fuel-resource scenes preserve all eighteen public schedule/setpoint joins and existing load/flow/structure gates. This adds no other manager, Source A manager, private-history or full-object claim."
+      "All nine Scheduled controls retain bounded Source B evidence across twenty-nine pairs and 2,093,280 values. The cooling constant-humidity scene preserves all eighteen public schedule/setpoint joins and inherited flow and structure gates. This adds no other manager, Source A manager, private-history or full-object claim."
     ],
     "NodeList": [
-      "The bounded raw/IP NodeList owner and advisory Proven/Deferred metadata retain twenty-eight Source B pairs plus the unused Source A pair. The fourteen named-resource scenes preserve all existing order/case/blank, inlet/exhaust/basis/return and public identity gates. Selected Deferred consumers, Legacy/no-exhaust bounds, arbitrary names/combinations and full-object conformance remain open."
+      "The bounded raw/IP NodeList owner and advisory Proven/Deferred metadata retain twenty-nine Source B pairs plus the unused Source A pair. The cooling constant-humidity scene preserves existing order, case, blank-member, inlet, exhaust, basis, ordered-return and public identity gates. Selected Deferred consumers, Legacy/no-exhaust bounds, arbitrary names and combinations, and full-object conformance remain open."
     ]
   },
   "verification": {
@@ -6173,6 +6173,66 @@
           }
         },
         "scope": "One four-command QA/default133 build and one existing owner test serve all14 fixed cases. One first Native is retained under exact Root custody authority after a zero-credit metadata-reader failure; the other13Native and all14Source are fresh. Every pair requires the accepted complete Native precheck and both full metric readers. No engine replay, new test function, workspace/cohort rerun, cap or formal-domain promotion. Detailed bodies/history stay in immutable evidence."
+      },
+      "cooling_constant_supply_humidity_132": {
+        "final_quality": {
+          "path": ".runtime/porting/cooling-humidity-132/quality03/summary.json",
+          "sha256": "c8b6357c0d33ae0aeed6edf94733f824af03dd41aaf5ca0e770bd8a66d07404e",
+          "bytes": 1628
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit132-prep/owner-execution-review01.json",
+          "sha256": "a8703e3613e8684fe014bd848164c2a4cd132ef9e3f575db9f39477b213969cb",
+          "bytes": 2879
+        },
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit132-prep/Root-runtime-bindings01.json",
+          "sha256": "fab1776e1bc9b8f2a7c9f8b69287be3ac5bfd8092f97c845fa803ed54b1d72a6",
+          "bytes": 3310
+        },
+        "Source_integration_correction": {
+          "path": ".runtime/object-expansion/unit132-prep/Root-source-integration-correction01.json",
+          "sha256": "6c5d9029aaf598f2fcce81778436fd14b20620b56ca2b22979aa16a28b4b9855",
+          "bytes": 4704
+        },
+        "independent_Source_integration_review": {
+          "path": ".runtime/object-expansion/unit132-prep/independent-Source-humidity-runtime-classifier-correction-review01.json",
+          "sha256": "97b3f362156bfc99ac36a6417f5f77077f607f843c19dbb795ebe6afbd346054",
+          "bytes": 2176
+        },
+        "previous_failed_check_receipts": [
+          {
+            "path": ".runtime/porting/cooling-humidity-132/quality01/format-check/receipt.json",
+            "sha256": "349ff46dc347acf280e44780ff32d30abd2734f47cefaf27beb356d8aaa172b6",
+            "bytes": 3107
+          },
+          {
+            "path": ".runtime/porting/cooling-humidity-132/quality02/source-caller-tests/receipt.json",
+            "sha256": "3f0248d7401981c43310d9db9a5b8d423b8de24c6c327fd5a193b785a6345474",
+            "bytes": 3230
+          }
+        ],
+        "Root_completed_review": {
+          "path": ".runtime/object-expansion/unit132-prep/Root-completed-readback-review01.json",
+          "sha256": "cf89aee02c0ecdc9053a4296f9d9e2529eb83c365e405a05e18cec8c05b94e8d",
+          "bytes": 56086
+        },
+        "retained_evidence": {
+          "path": ".runtime/object-expansion/unit132-prep/Root-retained-evidence01.json",
+          "sha256": "4638096e36d54b8b76d42bad7aac49114da23adcb23f00801ab9eb42d9c287fb",
+          "bytes": 7181
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit132-prep/paired-runtime-proposal02/pair-proof01.json",
+          "sha256": "cec3a1bca13fa7c0a981d54ef77f028244fd640eb995d68c2651e288aa3707f0",
+          "bytes": 468205
+        },
+        "explicit_empty_fuel_Native_disposition": {
+          "path": ".runtime/object-expansion/unit132-prep/Root-explicit-empty-fuel-disposition01.json",
+          "sha256": "f729eab8670165bda909761d8331a139b28abca94fae351b25dd02e2ba6aa64c",
+          "bytes": 4287
+        },
+        "scope": "Final five-command QA executes two existing tests and strict Clippy; one default134 build and one fresh Native/Source pair. Two earlier QA checks are retained. Two separate explicit-empty fuel Native successes observe Electricity with no Source pair credit; pinned-SDK Source compatibility is next work. No new test function, full workspace or cohort rerun, numeric limit change or formal-domain promotion."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -61526,12 +61586,152 @@
         },
         "inherited_science": "Full original cold/heatingPOS/cooling/return/SPM/exhaust/BND/UTF8/comfort/table/clocks/ancillary/JSONCSV checks remain in both immutable comparisons. Raw families, producer/member records and witnesses are retained there and omitted from this lean row.",
         "effective_state": "One finite named-resource composition; no explicit-empty/general IdealLoads or arbitrary-combination promotion."
+      },
+      {
+        "id": "B-COOLING-CONSTANT-SUPPLY-HUMIDITY-132-120H",
+        "case_kind": "COOLING_CONSTANT_SUPPLY_HUMIDITY",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-cooling-humidity-132",
+        "input": {
+          "path": ".runtime/object-expansion/unit132-prep/cooling-constant-humidity-input-proposal01/input.epJSON",
+          "sha256": "acb90c56a2a6e224fec4343ab2dbd08b43123d984ae9a4bae0a34c6aa0798c78",
+          "bytes": 100511
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/cooling-humidity-132/native01/command/receipt.json",
+          "sha256": "493c737280a12bde2ef0c408ef31aeff04cf7a9bf4b7baddd2f81ba10332a5ff",
+          "bytes": 55353
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/cooling-humidity-132/source01/command/receipt.json",
+          "sha256": "8e668bac6e1f8ec24b5741abd26ba2633e54b622ad11ffc107df56c05be03364",
+          "bytes": 56103
+        },
+        "source_summary": {
+          "path": ".runtime/porting/cooling-humidity-132/source01/output/run-summary.json",
+          "sha256": "73025f5768dded60eed12909a1e67a08fd4a2fe49a692650618776090f8fa602",
+          "bytes": 62920
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e7/e71e962faf681a840e38a3c9501f39b49f535ee8f04f81ffcc17d9dde9fb0aa7",
+          "sha256": "e71e962faf681a840e38a3c9501f39b49f535ee8f04f81ffcc17d9dde9fb0aa7"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/cooling-humidity-132/build134-01/eplus-rs.exe",
+          "sha256": "aa34ec864e310852f8738fad68b8b595e89330bca476f764f969e48bfac9ddd6",
+          "bytes": 80764586
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/cooling-humidity-132/build134-01/build/receipt.json",
+          "sha256": "bdac72bed1a3902f9e3d8110c2612a1d15f906a8ee375173d64beaade4a8d03d",
+          "bytes": 4690
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit132-prep/paired-runtime-proposal02/pair-proof01.json",
+          "sha256": "cec3a1bca13fa7c0a981d54ef77f028244fd640eb995d68c2651e288aa3707f0",
+          "bytes": 468205
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit132-prep/Root-completed-readback-review01.json",
+          "sha256": "cf89aee02c0ecdc9053a4296f9d9e2529eb83c365e405a05e18cec8c05b94e8d",
+          "bytes": 56086
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit132-prep/paired-science-final01/recipe01.json",
+          "sha256": "9bb91e338fe247e986457c306af07b0476d5adf1abe32e656f6bd1924c748c53",
+          "bytes": 35390
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 13397,
+          "parsed_binary64_unequal": 13397,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1158484742045403e-07,
+          "max_rmse_delta": 1.5760844716871123e-08
+        },
+        "public_cooling_humidity_summary": {
+          "Native": {
+            "samples": 480,
+            "same_clock_operand_joins": 4320,
+            "candidate_samples": 288,
+            "witness_samples": 211,
+            "actual_latent_report_pair_counts": {
+              "heating": 0,
+              "cooling": 203,
+              "both": 8
+            },
+            "authored_target": 0.0077,
+            "global_target_law_claimed": false,
+            "private_operating_mode_claimed": false
+          },
+          "Source": {
+            "samples": 480,
+            "same_clock_operand_joins": 4320,
+            "candidate_samples": 288,
+            "witness_samples": 211,
+            "actual_latent_report_pair_counts": {
+              "heating": 0,
+              "cooling": 203,
+              "both": 8
+            },
+            "authored_target": 0.0077,
+            "global_target_law_claimed": false,
+            "private_operating_mode_claimed": false
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit130-prep/heating-availability-fuel-two-case-input-proposal01/POSITIVE/unchanged-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "all153_ESO_and2_MTR_rules_and_caps_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit132-prep/build134-attempt01.json",
+            "sha256": "92f2eda2ddc2f8f7fbc76f696b7cb52d0c27cfeca54b1f7b65177eab7a666afa",
+            "bytes": 687
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/cooling-humidity-132/quality03/summary.json",
+            "sha256": "c8b6357c0d33ae0aeed6edf94733f824af03dd41aaf5ca0e770bd8a66d07404e",
+            "bytes": 1628
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit132-prep/owner-execution-review01.json",
+            "sha256": "a8703e3613e8684fe014bd848164c2a4cd132ef9e3f575db9f39477b213969cb",
+            "bytes": 2879
+          },
+          "retained_evidence": {
+            "path": ".runtime/object-expansion/unit132-prep/Root-retained-evidence01.json",
+            "sha256": "4638096e36d54b8b76d42bad7aac49114da23adcb23f00801ab9eb42d9c287fb",
+            "bytes": 7181
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "independent_physical_reader_required": false
+        },
+        "inherited_science": "All 155 original dictionaries, numeric policies and ordered clocks remain in the immutable comparison, together with Winter heating/weather/fuel, cooling availability, returns, eighteen setpoint joins, exhaust, BND/UTF8, comfort/table, ancillary and JSON/CSV checks. Raw family bodies and first witnesses are retained there rather than duplicated here.",
+        "effective_state": "One no-OA, NoLimit cooling ConstantSupplyHumidityRatio composition with humidification None and an existential Summer public witness. No global target equality law, private operating-mode or full-object promotion."
       }
     ],
     "totals": {
-      "paired_cases": 200,
-      "reported_samples": 6980296,
-      "raw_operand_unequal": 1669526,
+      "paired_cases": 201,
+      "reported_samples": 7053976,
+      "raw_operand_unequal": 1682923,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -63797,6 +63997,23 @@
           "sha256": "65b147780262376e90c823c95aed96468ce95a1333a8a609b9b833dda8fd95fa",
           "bytes": 80764590
         }
+      },
+      {
+        "id": "source-dd-cooling-humidity-132",
+        "receipt": {
+          "path": ".runtime/porting/cooling-humidity-132/build134-01/build/receipt.json",
+          "sha256": "bdac72bed1a3902f9e3d8110c2612a1d15f906a8ee375173d64beaade4a8d03d",
+          "bytes": 4690
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e7/e71e962faf681a840e38a3c9501f39b49f535ee8f04f81ffcc17d9dde9fb0aa7",
+          "sha256": "e71e962faf681a840e38a3c9501f39b49f535ee8f04f81ffcc17d9dde9fb0aa7"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/cooling-humidity-132/build134-01/eplus-rs.exe",
+          "sha256": "aa34ec864e310852f8738fad68b8b595e89330bca476f764f969e48bfac9ddd6",
+          "bytes": 80764586
+        }
       }
     ],
     "focused_since_workspace": {
@@ -64163,14 +64380,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 133,
-      "builds_with_accepted_paired_cases": 119,
+      "actual_recorded_builds": 134,
+      "builds_with_accepted_paired_cases": 120,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 10,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "133 recorded Source builds:119 have accepted pairs;14 have none, including four without Source execution. One Source133 four-command QA/default build and one existing owner test serve fourteen fresh fuel-resource pairs. The build is appended once; all previous unaccepted/failed histories retain zero accepted sample credit.",
+      "qualification": "134 recorded Source builds:120 have accepted pairs;14 have none, including four without Source execution. One Source134 final five-command QA/default build serves the cooling constant-humidity pair. Earlier failed format-check/caller checks and two Native-only empty-fuel characterizations retain zero accepted pair/value credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 4,
@@ -68712,24 +68929,7 @@
       "scope": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion.",
       "capability_or_gate_promotion": false
     },
-    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H", "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H", "B-COOLING-FUEL-EFFICIENCY-POSITIVE-129-120H", "B-COOLING-FUEL-EFFICIENCY-FALLBACK-129-120H",
-      "B-HEATING-AVAILABILITY-FUEL-POSITIVE-130-120H",
-      "B-HEATING-AVAILABILITY-FUEL-FALLBACK-130-120H",
-      "B-FUEL-RESOURCES-SHARED_ELECTRICITY-131-120H",
-      "B-FUEL-RESOURCES-SHARED_NATURALGAS-131-120H",
-      "B-FUEL-RESOURCES-SHARED_GASOLINE-131-120H",
-      "B-FUEL-RESOURCES-SHARED_DIESEL-131-120H",
-      "B-FUEL-RESOURCES-SHARED_COAL-131-120H",
-      "B-FUEL-RESOURCES-SHARED_PROPANE-131-120H",
-      "B-FUEL-RESOURCES-SHARED_FUELOILNO1-131-120H",
-      "B-FUEL-RESOURCES-SHARED_FUELOILNO2-131-120H",
-      "B-FUEL-RESOURCES-SHARED_OTHERFUEL1-131-120H",
-      "B-FUEL-RESOURCES-SHARED_OTHERFUEL2-131-120H",
-      "B-FUEL-RESOURCES-SHARED_DISTRICTCOOLING-131-120H",
-      "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGWATER-131-120H",
-      "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGSTEAM-131-120H",
-      "B-FUEL-RESOURCES-DISTINCT_NATURALGAS_ELECTRICITY-131-120H"
-    ], "accepted_paired_cases": 29, "accepted_samples": 2079120, "retained_Scheduled_B_pairs": 28, "retained_Scheduled_B_samples": 2019600, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"SHARED_ELECTRICITY": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_ELECTRICITY.pair-proof01.json", "sha256": "7a107c79412a7a42bceff9b2ca7758d9d6f8d5cd5988c54635463125442b7ca8", "bytes": 552813}, "SHARED_NATURALGAS": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_NATURALGAS.pair-proof01.json", "sha256": "67b35b25c1188539dfbf804a4b6ac44c80211b8712651657ec7a1b2c57be4542", "bytes": 552671}, "SHARED_GASOLINE": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_GASOLINE.pair-proof01.json", "sha256": "ee2728c3aeb978ec538cbf5d470900d786285a081657b92a355efabb64ad2548", "bytes": 552392}, "SHARED_DIESEL": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_DIESEL.pair-proof01.json", "sha256": "491466e30d42b57495a3fdd1d4a06d184791302b532caa2a674e96cd481ef005", "bytes": 552114}, "SHARED_COAL": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_COAL.pair-proof01.json", "sha256": "9eafba5b4d8510503b06623f3e39f571cab294a5c837f197204d465d2b990f72", "bytes": 551836}, "SHARED_PROPANE": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_PROPANE.pair-proof01.json", "sha256": "88f6fc961feb9a05d404ebfb7d5032f14f5072c79b8ab860cd4f880cb93219c8", "bytes": 552253}, "SHARED_FUELOILNO1": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_FUELOILNO1.pair-proof01.json", "sha256": "0ec2c7f9932ffd39a25f5b8ef4c6f223a9c5da8990e7db091016b3a6080ed0d5", "bytes": 552671}, "SHARED_FUELOILNO2": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_FUELOILNO2.pair-proof01.json", "sha256": "0f1d967c95e57834644f935574d253b06193fe57d7b7af9a3a3012a8a197186e", "bytes": 552671}, "SHARED_OTHERFUEL1": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_OTHERFUEL1.pair-proof01.json", "sha256": "da6a4e62f05295b6806a151d93481a014a6ec3f076b27d0b3e4002accb1746f3", "bytes": 552671}, "SHARED_OTHERFUEL2": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_OTHERFUEL2.pair-proof01.json", "sha256": "23ed52311f07d410db5d6c6f5d2a181629c65a03b9f688bf93d230f38545097f", "bytes": 552671}, "SHARED_DISTRICTCOOLING": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_DISTRICTCOOLING.pair-proof01.json", "sha256": "cd0d543db229ae2e532bf2bcd3eb63916c126657280505e21e60e2521da7475f", "bytes": 553367}, "SHARED_DISTRICTHEATINGWATER": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_DISTRICTHEATINGWATER.pair-proof01.json", "sha256": "1e5913ec159493b89136f5ba55829e6d3b6ea889444ec91eb467ebdd7c35fe28", "bytes": 554062}, "SHARED_DISTRICTHEATINGSTEAM": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/SHARED_DISTRICTHEATINGSTEAM.pair-proof01.json", "sha256": "39d38d2b22eadc430f406a858fed395f0c08a462409bc611341d04a9a3d3fca1", "bytes": 554062}, "DISTINCT_NATURALGAS_ELECTRICITY": {"path": ".runtime/object-expansion/unit131-prep/runtime-protocol-proposal05/DISTINCT_NATURALGAS_ELECTRICITY.pair-proof01.json", "sha256": "108471e0afd88b1f2fb24070d6ea069904d925510a684dc10ee9c41b92ddf043", "bytes": 568509}}, "latest_independent_physical_comparisons": {"SHARED_ELECTRICITY": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_ELECTRICITY/proof01.json", "sha256": "e26dc4be56ad2205e76ab62a4650f409a2d88c6ca526fbd0bc7b39d877ad3a38", "bytes": 521906}, "SHARED_NATURALGAS": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_NATURALGAS/proof01.json", "sha256": "fa269cc65fcf478e384551471e8a6d6ca3bab9ceb796e203cfdc0d37e036c087", "bytes": 518312}, "SHARED_GASOLINE": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_GASOLINE/proof01.json", "sha256": "c632e2c0bcb19f9a14aa8c2e09b9c8f9109a69970af4cfdf90eec24c1051c931", "bytes": 518049}, "SHARED_DIESEL": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_DIESEL/proof01.json", "sha256": "453c1c4bbb39b841e7e14f594bdcfb66d5793e1fad2faf2b68106b7d5d62646c", "bytes": 517787}, "SHARED_COAL": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_COAL/proof01.json", "sha256": "8217a3630d93f59364f75ee1c5fd7048dbaa57e61f755ffbdbfc7f02d7a78f76", "bytes": 517525}, "SHARED_PROPANE": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_PROPANE/proof01.json", "sha256": "a3f8b3ecacf937fe669269ea783479d7ee6b78a0e7628d572d013bad7db086e5", "bytes": 517918}, "SHARED_FUELOILNO1": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_FUELOILNO1/proof01.json", "sha256": "b4c530cdbb794834e13e4d8197a2bd89035425eeb7e09b30505d7aac21e0a9d6", "bytes": 518312}, "SHARED_FUELOILNO2": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_FUELOILNO2/proof01.json", "sha256": "890ee4b19825c2898d3f780efe1edb9e164a70a2caf9bf9f167f4bc2e9ac72ac", "bytes": 518312}, "SHARED_OTHERFUEL1": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_OTHERFUEL1/proof01.json", "sha256": "8a34add70deaa7cd8ad01aafd864c49ce3b2a35895d527298dc560cb6db5864e", "bytes": 518312}, "SHARED_OTHERFUEL2": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_OTHERFUEL2/proof01.json", "sha256": "e147020419d2df8099330b835734934f36e23f513d57c365222958e200289d7b", "bytes": 518312}, "SHARED_DISTRICTCOOLING": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_DISTRICTCOOLING/proof01.json", "sha256": "806d14ba981f4c31e9768af7a304886bcb5f55d964a4418f0653a2216bfd2510", "bytes": 518968}, "SHARED_DISTRICTHEATINGWATER": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_DISTRICTHEATINGWATER/proof01.json", "sha256": "b67dc59d12b71dde84cff1be039a5eaf16ca917738e31960019517084869be1b", "bytes": 519623}, "SHARED_DISTRICTHEATINGSTEAM": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/SHARED_DISTRICTHEATINGSTEAM/proof01.json", "sha256": "96446de861d5148b4c6942fd9dd9bc54c62d526c970de6b61de57c872b1174d0", "bytes": 519623}, "DISTINCT_NATURALGAS_ELECTRICITY": {"path": ".runtime/object-expansion/unit131-prep/physical-peer05/DISTINCT_NATURALGAS_ELECTRICITY/proof01.json", "sha256": "45808f27c6cfa5cab69588145a7eeff34667403f4d7e5dd1c14cd4108335b67d", "bytes": 537594}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit131-prep/root-completed-readback-review01.json", "sha256": "83cd6c8f83c77b3a9e7efbbcbbc978a8726bdabdcaebada861d9291471f36ed9", "bytes": 14846}, "latest_source_build": "source-dd-fuel-resources-131", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit131-prep/build133-attempt01.json", "sha256": "feb211578f61d28780bcf25b3cf56d5c4d27c71759c9dc90f06e267149d49d63", "bytes": 681}, "latest_actual_quality": {"path": ".runtime/porting/fuel-resources-131/quality01/summary.json", "sha256": "3e6c9ae03deb8e974e4996a350dcd6fdd10fd09e28643519c8d3902409daa2ba", "bytes": 1295}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit131-prep/owner-execution-review01.json", "sha256": "c513639ffa3a3b1d187068bbaa5cde4b1032116b80d457296588c2e487c6a5fd", "bytes": 3168}, "latest_input_contracts": {"SHARED_ELECTRICITY": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_ELECTRICITY.recipe.json", "sha256": "67cccba0cf84a3b2183187bd2f5aa2a25aa7da87ec6dd1bd2821b767c91ce03d", "bytes": 38840}, "SHARED_NATURALGAS": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_NATURALGAS.recipe.json", "sha256": "7456ecec8aa30a15ea6d6305bc45f387400d0144c9c41ace9b967c0e348c1b25", "bytes": 38820}, "SHARED_GASOLINE": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_GASOLINE.recipe.json", "sha256": "2ee606eb85dc8857b4171a72e8f0fb9c1f05928e7705ddb290d90b4d9c049ac0", "bytes": 38780}, "SHARED_DIESEL": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_DIESEL.recipe.json", "sha256": "b94d6c75443487c04e29793bb248ec5a18085c1ac677268b60bd75408238979a", "bytes": 38740}, "SHARED_COAL": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_COAL.recipe.json", "sha256": "bf1858568d97a730e6741a23cf214f08956a9ceee9f8e93887e0c8804559cb6c", "bytes": 38700}, "SHARED_PROPANE": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_PROPANE.recipe.json", "sha256": "dc86da50ff5137173dfe7ec06881cf016c61498fd2c2b6db9f20af5b738205e9", "bytes": 38760}, "SHARED_FUELOILNO1": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_FUELOILNO1.recipe.json", "sha256": "e6eb6143c5749f9d0be78b6613ecf599a3949a952e7f1858b13a7f208506c4e9", "bytes": 38820}, "SHARED_FUELOILNO2": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_FUELOILNO2.recipe.json", "sha256": "80f36f54411be6803205c760e330b12d69cc0a43f9735452d6b5d8e23d50bc69", "bytes": 38820}, "SHARED_OTHERFUEL1": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_OTHERFUEL1.recipe.json", "sha256": "9ecb90e4bf4506928f3cc730be55749f291949095f69fa621413d74106538bf8", "bytes": 38820}, "SHARED_OTHERFUEL2": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_OTHERFUEL2.recipe.json", "sha256": "6bf95816629d6b4cabc9a8085d29f9206f096274279e4248ed33f86de72b795f", "bytes": 38820}, "SHARED_DISTRICTCOOLING": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_DISTRICTCOOLING.recipe.json", "sha256": "52a173f974dbbe96cfa4aca7502debd6528ee19ee3ba10a86c6833a51981d78b", "bytes": 38920}, "SHARED_DISTRICTHEATINGWATER": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_DISTRICTHEATINGWATER.recipe.json", "sha256": "aa1e0cc643cb0292b91ed32a5ecff98dbdc8f4d294547b87fd20cec104267c21", "bytes": 39021}, "SHARED_DISTRICTHEATINGSTEAM": {"path": ".runtime/object-expansion/unit131-prep/science-final01/SHARED_DISTRICTHEATINGSTEAM.recipe.json", "sha256": "6f726addedb01e0bd851a319f56e15f888dd7e06039a4a7f78af8b874ae66f5e", "bytes": 39021}, "DISTINCT_NATURALGAS_ELECTRICITY": {"path": ".runtime/object-expansion/unit131-prep/science-final01/DISTINCT_NATURALGAS_ELECTRICITY.recipe.json", "sha256": "dce1e62de6589865c54facb8f8c03aebbd1c9aff886866944b1b8830bc8b3e3e", "bytes": 39072}}, "latest_retained_inventory": {"path": ".runtime/object-expansion/unit131-prep/retained-attempt-inventory01.json", "sha256": "893725a7e10707325f30b7c8aed3f52e09d348efef303f9c7a77773d06cc6286", "bytes": 220281}, "latest_batch_plan": {"path": ".runtime/object-expansion/unit131-prep/fuel-resource-matrix-input-proposal02/batch-plan02.json", "sha256": "51ee9ca37320e5f2a7249818744b5004e54282766faf30829b65a7ae60bf07a7", "bytes": 22378}, "scope": "Twenty-eight bounded Source B Scheduled/NodeList pairs retain 2,019,600 values; the unused Source A pair adds 59,520, for twenty-nine pairs/2,079,120 values. Fourteen new finite cases exercise all thirteen canonical nonempty IdealLoads fuel-resource labels, plus distinct NaturalGas heating/Electricity cooling, with genuine Winter heating and Summer cooling. Requested hourly Facility/HVAC/end-use meters are checked against chronological quarter sums and exact bidirectional producer membership; full catalogs retain legitimate Electricity facility additions. Existing heating/cooling availability and efficiency, return, eighteen setpoint, exhaust, BND/UTF8, comfort and export gates remain. One Source 133 QA/default build serves the matrix. Explicit-empty fuel behavior, other topology/OA/humidity/sizing, private-state and full-object conformance remain open.", "capability_or_gate_promotion": false}
+    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H", "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H", "B-COOLING-FUEL-EFFICIENCY-POSITIVE-129-120H", "B-COOLING-FUEL-EFFICIENCY-FALLBACK-129-120H", "B-HEATING-AVAILABILITY-FUEL-POSITIVE-130-120H", "B-HEATING-AVAILABILITY-FUEL-FALLBACK-130-120H", "B-FUEL-RESOURCES-SHARED_ELECTRICITY-131-120H", "B-FUEL-RESOURCES-SHARED_NATURALGAS-131-120H", "B-FUEL-RESOURCES-SHARED_GASOLINE-131-120H", "B-FUEL-RESOURCES-SHARED_DIESEL-131-120H", "B-FUEL-RESOURCES-SHARED_COAL-131-120H", "B-FUEL-RESOURCES-SHARED_PROPANE-131-120H", "B-FUEL-RESOURCES-SHARED_FUELOILNO1-131-120H", "B-FUEL-RESOURCES-SHARED_FUELOILNO2-131-120H", "B-FUEL-RESOURCES-SHARED_OTHERFUEL1-131-120H", "B-FUEL-RESOURCES-SHARED_OTHERFUEL2-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTCOOLING-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGWATER-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGSTEAM-131-120H", "B-FUEL-RESOURCES-DISTINCT_NATURALGAS_ELECTRICITY-131-120H", "B-COOLING-CONSTANT-SUPPLY-HUMIDITY-132-120H"], "accepted_paired_cases": 30, "accepted_samples": 2152800, "retained_Scheduled_B_pairs": 29, "retained_Scheduled_B_samples": 2093280, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparison": {"path": ".runtime/object-expansion/unit132-prep/paired-runtime-proposal02/pair-proof01.json", "sha256": "cec3a1bca13fa7c0a981d54ef77f028244fd640eb995d68c2651e288aa3707f0", "bytes": 468205}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit132-prep/Root-completed-readback-review01.json", "sha256": "cf89aee02c0ecdc9053a4296f9d9e2529eb83c365e405a05e18cec8c05b94e8d", "bytes": 56086}, "latest_source_build": "source-dd-cooling-humidity-132", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit132-prep/build134-attempt01.json", "sha256": "92f2eda2ddc2f8f7fbc76f696b7cb52d0c27cfeca54b1f7b65177eab7a666afa", "bytes": 687}, "latest_actual_quality": {"path": ".runtime/porting/cooling-humidity-132/quality03/summary.json", "sha256": "c8b6357c0d33ae0aeed6edf94733f824af03dd41aaf5ca0e770bd8a66d07404e", "bytes": 1628}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit132-prep/owner-execution-review01.json", "sha256": "a8703e3613e8684fe014bd848164c2a4cd132ef9e3f575db9f39477b213969cb", "bytes": 2879}, "latest_input_contract": {"path": ".runtime/object-expansion/unit132-prep/paired-science-final01/recipe01.json", "sha256": "9bb91e338fe247e986457c306af07b0476d5adf1abe32e656f6bd1924c748c53", "bytes": 35390}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit132-prep/Root-retained-evidence01.json", "sha256": "4638096e36d54b8b76d42bad7aac49114da23adcb23f00801ab9eb42d9c287fb", "bytes": 7181}, "explicit_empty_fuel_Native_disposition": {"path": ".runtime/object-expansion/unit132-prep/Root-explicit-empty-fuel-disposition01.json", "sha256": "f729eab8670165bda909761d8331a139b28abca94fae351b25dd02e2ba6aa64c", "bytes": 4287}, "scope": "Twenty-nine bounded Source B Scheduled/NodeList pairs retain 2,093,280 values. The unused Source A pair adds 59,520, giving thirty pairs and 2,152,800 values. One no-OA, NoLimit cooling ConstantSupplyHumidityRatio scene with humidification None retains all 155 original policies and inherited physical gates. A same-clock Summer witness shows the authored 0.0077 supply humidity ratio, a distinct Zone humidity ratio and a genuine latent response; it does not establish a global target law or private operating mode. The thirteen named fuel-resource labels remain bounded. Two separate Native-only explicit-empty fuel successes observe Electricity with no Source paired credit; pinned SDK compatibility is pending. Other humidity, topology, OA, sizing, Legacy, private-state and full-object boundaries remain open.", "capability_or_gate_promotion": false}
   },
   "additional_native_type_calibrations": [
     {

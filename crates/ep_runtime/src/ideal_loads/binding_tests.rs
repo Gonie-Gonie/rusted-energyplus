@@ -291,6 +291,124 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         .expect("unused unresolved declaration must not block independent proven Source roles");
     bind_direct_zone_purchased_air_model(&unused_deferred)
         .expect("unchanged Legacy binding still follows independent proven roles");
+    // Admission only: the real Source owner retains the humidity operation.
+    // Heating limits keep their original numeric checks in every cooling shape.
+    for heating in [
+        IdealLoadsLimit::NoLimit,
+        IdealLoadsLimit::LimitFlowRate,
+        IdealLoadsLimit::LimitCapacity,
+        IdealLoadsLimit::LimitFlowRateAndCapacity,
+    ] {
+        for cooling in [IdealLoadsLimit::NoLimit, IdealLoadsLimit::LimitFlowRate] {
+            let (constant, _) = fixture(|typed| {
+                let system = &mut typed.ideal_loads_air_systems[0];
+                system.dehumidification_control_type =
+                    DehumidificationControlType::ConstantSupplyHumidityRatio;
+                system.heating_limit = heating;
+                system.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.25));
+                system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
+                system.cooling_limit = cooling;
+                system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.20));
+            });
+            let retained = format!("{:?}", constant.typed);
+            assert!(has_source_cooling_constant_supply_humidity_shape(
+                &constant.typed.ideal_loads_air_systems[0]
+            ));
+            assert!(
+                !classify_no_oa_sensible_subset(&constant.typed.ideal_loads_air_systems[0])
+                    .is_supported()
+            );
+            validate_source_direct_zone_purchased_air_model(&constant)
+                .expect("Source validates constant cooling without a Legacy binding");
+            let expected = match (heating, cooling) {
+                (IdealLoadsLimit::NoLimit, IdealLoadsLimit::NoLimit) => {
+                    DirectZonePurchasedAirBindingError::UnsupportedBranch {
+                        branch: IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling,
+                    }
+                }
+                _ => DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                    feature:
+                        DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
+                },
+            };
+            assert_eq!(
+                bind_direct_zone_purchased_air_model(&constant)
+                    .expect_err("Legacy retains its original first humidity/branch error"),
+                expected
+            );
+            assert_eq!(format!("{:?}", constant.typed), retained);
+        }
+    }
+    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 11] = [
+        |system| system.cooling_limit = IdealLoadsLimit::LimitCapacity,
+        |system| system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity,
+        |system| system.dehumidification_control_type = DehumidificationControlType::Humidistat,
+        |system| {
+            system.dehumidification_control_type =
+                DehumidificationControlType::ConstantSensibleHeatRatio;
+        },
+        |system| system.humidification_control_type = HumidificationControlType::Humidistat,
+        |system| {
+            system.humidification_control_type =
+                HumidificationControlType::ConstantSupplyHumidityRatio;
+        },
+        |system| system.outdoor_air_inlet_node_name = Some(NormalizedName::new("SUPPLY")),
+        |system| {
+            system.design_specification_outdoor_air_object_name =
+                Some(NormalizedName::new("OUTSIDE AIR"));
+        },
+        |system| {
+            system.demand_controlled_ventilation_type =
+                DemandControlledVentilationType::OccupancySchedule;
+        },
+        |system| system.outdoor_air_economizer_type = OutdoorAirEconomizerType::DifferentialDryBulb,
+        |system| system.heat_recovery_type = HeatRecoveryType::Sensible,
+    ];
+    for mutate in blocked {
+        let (blocked, _) = fixture(|typed| {
+            let system = &mut typed.ideal_loads_air_systems[0];
+            system.dehumidification_control_type =
+                DehumidificationControlType::ConstantSupplyHumidityRatio;
+            system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.2));
+            system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
+            mutate(system);
+        });
+        assert!(!has_source_cooling_constant_supply_humidity_shape(
+            &blocked.typed.ideal_loads_air_systems[0]
+        ));
+        assert!(validate_source_direct_zone_purchased_air_model(&blocked).is_err());
+        assert!(bind_direct_zone_purchased_air_model(&blocked).is_err());
+    }
+    for unresolved in [
+        None,
+        Some(AutosizeOrNumber::Autosize),
+        Some(AutosizeOrNumber::Value(-1.0)),
+        Some(AutosizeOrNumber::Value(f64::NAN)),
+        Some(AutosizeOrNumber::Value(f64::INFINITY)),
+    ] {
+        for heating_capacity in [false, true] {
+            let (unresolved, _) = fixture(|typed| {
+                let system = &mut typed.ideal_loads_air_systems[0];
+                system.dehumidification_control_type =
+                    DehumidificationControlType::ConstantSupplyHumidityRatio;
+                system.cooling_limit = IdealLoadsLimit::LimitFlowRate;
+                system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.2));
+                if heating_capacity {
+                    system.heating_limit = IdealLoadsLimit::LimitCapacity;
+                    system.maximum_sensible_heating_capacity_w = unresolved;
+                } else {
+                    system.maximum_cooling_air_flow_rate_m3_per_s = unresolved;
+                }
+            });
+            assert_eq!(
+                validate_source_direct_zone_purchased_air_model(&unresolved),
+                Err(DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                    feature: DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
+                })
+            );
+        }
+    }
+
     // Unit127 validates admission and real typed schedule identity only.
     // Live cooling values and suppression remain the existing Source owner.
     for value in [0.0_f64, 1.0] {
