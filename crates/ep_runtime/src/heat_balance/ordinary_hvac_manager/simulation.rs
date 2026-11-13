@@ -488,3 +488,13 @@ impl SourceHvacManager {
         Ok(())
     }
 }
+
+#[cfg(all(test, feature = "native-controlled-air-cohort"))]
+impl SourceHvacManager {
+    pub(crate) fn manage_source_scheduled_owner_test(
+        &mut self,
+        owners: &mut SourceHvacOwners<'_, '_>,
+    ) -> Result<(), Error> {
+        self.manage_source_setpoints(owners)
+    }
+}

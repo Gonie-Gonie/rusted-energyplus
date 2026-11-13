@@ -335,6 +335,9 @@
     "Output:Table:SummaryReports": [
       "Explicit Source A/B AdaptiveComfortSummary admission reaches the Native-compatible non-monthly pre-scan no-op, actual summary selection and genuine end-run People hour table. The Unit114 fixed DD-only pair compares the full requested CSV body and all five cells. Other summary selectors and full report-family completion are not promoted.",
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
+    ],
+    "SetpointManager:Scheduled": [
+      "Bounded Source B now admits direct epJSON SetpointManager:Scheduled with Temperature control, supported schedules and actual node/node-list resolution. One B five-DesignDay pilot compares 131 series and 62,160 values under unchanged inherited policies. The existing inlet setpoint output is positive, nonconstant and follows the actual public schedule at the same report clocks. Full BND node identities are unchanged and the genuine SetPoint connection is added; paired BND bodies agree separately from the seven inherited ancillary reports. Direct epJSON-only, bounded Source B Scheduled Temperature with supported actual schedules and real Node ownership. IDF lacks the required metadata writer and remains fenced; other controls/managers, Source A, arbitrary systems and IdealLoads load-control effects are not promoted. This is setpoint state and public-output evidence, not global capability/algorithm or full-object conformance. The owner-execution review binds an actual named passing ep_run test and authenticated harness=false process-main markers to the final source snapshot: 3 bounded Source-only owner cases, 24 actual Manage calls and 3 actual AirLoop readiness finite prefixes. Intentional next-Zone-child stops are not full HVAC success. These counts are separate from physical samples and do not establish complete Scheduled support; fully completed Scheduled objects remain 0. Other reset/order/diagnostic branches are not implied."
     ]
   },
   "verification": {
@@ -5619,6 +5622,24 @@
           "bytes": 1593
         },
         "scope": "No blanket exact-boundary execution claim is made here. Any owner-test review is retained separately from the final same-source full QA and physical sample evidence; unobserved CEN triples/regions remain explicit. Final format/check/strict Clippy/workspace/Native-air cohort is separate from prior attempts and historical workspace70. No QA count contributes physical samples."
+      },
+      "ScheduledTemperature_116": {
+        "final_quality": {
+          "path": ".runtime/porting/scheduled-temperature-116/quality03/summary.json",
+          "sha256": "39f9bb27acec21a316604aa9e726cd69cafc6034a37e766e1c0ed3bd00216e64",
+          "bytes": 1653
+        },
+        "retained_attempt_inventory": {
+          "path": ".runtime/object-expansion/unit116-prep/retained-attempt-inventory01.json",
+          "sha256": "eff164543cc318cb624f12ed6e89a486fdb32b8622b48e0035e7e6e64fae2b01",
+          "bytes": 7661
+        },
+        "owner_test_review": {
+          "path": ".runtime/object-expansion/unit116-prep/owner-execution-review03.json",
+          "sha256": "a13e74f90ab7718916b62dbafd34383f8e2c56fab9fa8c4ca8dc32a9cd276800",
+          "bytes": 1393
+        },
+        "scope": "The owner-execution review binds an actual named passing ep_run test and authenticated harness=false process-main markers to the final source snapshot: 3 bounded Source-only owner cases, 24 actual Manage calls and 3 actual AirLoop readiness finite prefixes. Intentional next-Zone-child stops are not full HVAC success. These counts are separate from physical samples and do not establish complete Scheduled support; fully completed Scheduled objects remain 0. Other reset/order/diagnostic branches are not implied. Final format/check/strict Clippy/workspace/Native-air cohort is separate from prior attempts and historical workspace70. No QA count contributes physical samples."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -51695,12 +51716,97 @@
           "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true
         },
         "effective_state": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion. No blanket exact-boundary execution claim is made here. Any owner-test review is retained separately from the final same-source full QA and physical sample evidence; unobserved CEN triples/regions remain explicit."
+      },
+      {
+        "id": "B-SCHEDULED-TEMPERATURE-DD-116-120H",
+        "group": "SetpointManager:Scheduled",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-scheduled-temperature-116",
+        "input": {
+          "path": ".runtime/object-expansion/unit116-prep/scheduled-pilot-proposal01/input.epJSON",
+          "sha256": "aa7ab5c685c5ce298df5bdf958540e909219b239ba80d5206cefd871ff1b1df3",
+          "bytes": 90426
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/scheduled-temperature-116/native-01/command/receipt.json",
+          "sha256": "bdc0ce99fa294a25e8f68087268b85b6264af8c647b371f15af2190588552faa",
+          "bytes": 27650
+        },
+        "native_receipt_schema": "recorded-porting-command.v1",
+        "Native_reference_reused": false,
+        "Native_replays": 0,
+        "source_receipt": {
+          "path": ".runtime/porting/scheduled-temperature-116/source-01/command/receipt.json",
+          "sha256": "25214b3e06c113a294115a601ad41a98930e6fc455b687c479d7e899e884d2d4",
+          "bytes": 31804
+        },
+        "source_summary": {
+          "path": ".runtime/porting/scheduled-temperature-116/source-01/output/run-summary.json",
+          "sha256": "3cb07743d5aadbf8cbe20e1234fa575bade4f117fbb8a069861cfb2c4fe8ffc0",
+          "bytes": 71092
+        },
+        "source_executable": {
+          "path": ".runtime/porting/scheduled-temperature-116/build01/eplus-rs.exe",
+          "sha256": "8ab0e4c585bb97977711dc26ba7be89ee4815e2e4068db23dd8becf0b39d6536",
+          "bytes": 80564719
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3f/3fc2f22f917b10895ae2392f330c198a536d90f52c1433956b5f277bb5d6ec72",
+          "sha256": "3fc2f22f917b10895ae2392f330c198a536d90f52c1433956b5f277bb5d6ec72"
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/scheduled-temperature-116/build01/build/receipt.json",
+          "sha256": "8252d728a01edc791cfa8bbd9b6db5b20b695185007d1a2435163de7ebd3d2a4",
+          "bytes": 6889
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit116-prep/resume116_v2/pair-proof01.json",
+          "sha256": "43706e2d92761e506a037ed076442958f9d1e1ba6ada012ef39033d60725276a",
+          "bytes": 171051
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit116-prep/scheduled-pilot-proposal01/recipe.json",
+          "sha256": "49a7550339e71fd857eced0e74a3fff9f7a8f20c3b7fd36ddeb22802a3070030",
+          "bytes": 8792
+        },
+        "totals": {
+          "series": 131,
+          "samples": 62160,
+          "raw_operand_unequal": 18387,
+          "parsed_binary64_unequal": 18387,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.0244548320770264e-08,
+          "max_rmse_delta": 1.36033233314753e-09
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit116-prep/scheduled-pilot-proposal01/derived-policy.json",
+            "sha256": "7b054bc8c29b02b4a642cd92c12456ce5b47a7d1181138a8877ea26ff4a79198",
+            "bytes": 37074
+          },
+          "inherited_variable_and_meter_rules_literal_unchanged": true,
+          "global_contract_changed": false
+        },
+        "full_reported_stream_scope": {
+          "actual_total_series": 131,
+          "actual_total_samples": 62160,
+          "complete_ESO_and_genuine_MTR": true,
+          "all_Source_JSON_and_CSV_token_bits_owner_clock_joins": true
+        },
+        "effective_state": "Direct epJSON-only, bounded Source B Scheduled Temperature with supported actual schedules and real Node ownership. IDF lacks the required metadata writer and remains fenced; other controls/managers, Source A, arbitrary systems and IdealLoads load-control effects are not promoted. This is setpoint state and public-output evidence, not global capability/algorithm or full-object conformance. The owner-execution review binds an actual named passing ep_run test and authenticated harness=false process-main markers to the final source snapshot: 3 bounded Source-only owner cases, 24 actual Manage calls and 3 actual AirLoop readiness finite prefixes. Intentional next-Zone-child stops are not full HVAC success. These counts are separate from physical samples and do not establish complete Scheduled support; fully completed Scheduled objects remain 0. Other reset/order/diagnostic branches are not implied."
       }
     ],
     "totals": {
-      "paired_cases": 171,
-      "reported_samples": 4901176,
-      "raw_operand_unequal": 1097405,
+      "paired_cases": 172,
+      "reported_samples": 4963336,
+      "raw_operand_unequal": 1115792,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -53677,6 +53783,23 @@
           "sha256": "d2aaff900a3b04acecead79437b0ea379ad4d6f964b119bf74c3124f6a784efa",
           "bytes": 80517363
         }
+      },
+      {
+        "id": "source-dd-scheduled-temperature-116",
+        "receipt": {
+          "path": ".runtime/porting/scheduled-temperature-116/build01/build/receipt.json",
+          "sha256": "8252d728a01edc791cfa8bbd9b6db5b20b695185007d1a2435163de7ebd3d2a4",
+          "bytes": 6889
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3f/3fc2f22f917b10895ae2392f330c198a536d90f52c1433956b5f277bb5d6ec72",
+          "sha256": "3fc2f22f917b10895ae2392f330c198a536d90f52c1433956b5f277bb5d6ec72"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/scheduled-temperature-116/build01/eplus-rs.exe",
+          "sha256": "8ab0e4c585bb97977711dc26ba7be89ee4815e2e4068db23dd8becf0b39d6536",
+          "bytes": 80564719
+        }
       }
     ],
     "focused_since_workspace": {
@@ -54001,14 +54124,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 116,
-      "builds_with_accepted_paired_cases": 105,
+      "actual_recorded_builds": 117,
+      "builds_with_accepted_paired_cases": 106,
       "builds_with_only_retained_failed_Source_attempts": 5,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 9,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "116 recorded Source builds: 105 with accepted pairs. Unit115 adds 1 actual builds and exactly one accepted 61,680-value case. Failed, incomplete and exit-zero rejected attempts contribute zero samples; incomplete launch processes are not reclassified as unlaunched. Historical accounting meanings remain unchanged.",
+      "qualification": "117 recorded Source builds: 106 with accepted pairs. Unit116 adds 1 actual builds and exactly one accepted 62,160-value case. Failed, incomplete and exit-zero rejected attempts contribute zero samples; incomplete launch processes are not reclassified as unlaunched. Historical accounting meanings remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 2,
@@ -58548,6 +58671,824 @@
       "new_builds": 1,
       "new_builds_without_Source_execution": [],
       "scope": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion.",
+      "capability_or_gate_promotion": false
+    },
+    "current_ScheduledTemperature_live_pair": {
+      "source_build": "source-dd-scheduled-temperature-116",
+      "actual_Source_build": {
+        "path": ".runtime/object-expansion/unit116-prep/build117-attempt01.json",
+        "sha256": "d486099e6655e5e52e0410e617539a69354f2aed35c65e8a27e50e7822d42b41",
+        "bytes": 694
+      },
+      "actual_quality": {
+        "path": ".runtime/porting/scheduled-temperature-116/quality03/summary.json",
+        "sha256": "39f9bb27acec21a316604aa9e726cd69cafc6034a37e766e1c0ed3bd00216e64",
+        "bytes": 1653
+      },
+      "case_rows": [
+        "B-SCHEDULED-TEMPERATURE-DD-116-120H"
+      ],
+      "Root_full_completed_readback": {
+        "path": ".runtime/object-expansion/unit116-prep/resume116_v2/pair-proof01.json",
+        "sha256": "43706e2d92761e506a037ed076442958f9d1e1ba6ada012ef39033d60725276a",
+        "bytes": 171051
+      },
+      "input_contract": {
+        "path": ".runtime/object-expansion/unit116-prep/scheduled-pilot-proposal01/recipe.json",
+        "sha256": "49a7550339e71fd857eced0e74a3fff9f7a8f20c3b7fd36ddeb22802a3070030",
+        "bytes": 8792
+      },
+      "actual_ASH_status": {
+        "status_report_ids": [
+          342,
+          343
+        ],
+        "occupancy_report_id": 354,
+        "pair_counts": {
+          "(-1, -1)": 240,
+          "(0, 0)": 90,
+          "(0, 1)": 10,
+          "(1, 1)": 140
+        },
+        "first_observations": {
+          "(-1, -1)": {
+            "sample": 0,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              " 1",
+              " 0.00",
+              "15.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 0
+            },
+            "occupancy": 0.0,
+            "values": [
+              -1,
+              -1
+            ]
+          },
+          "(0, 0)": {
+            "sample": 24,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              " 7",
+              " 0.00",
+              "15.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 24
+            },
+            "occupancy": 1.0,
+            "values": [
+              0,
+              0
+            ]
+          },
+          "(0, 1)": {
+            "sample": 42,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              "11",
+              "30.00",
+              "45.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 42
+            },
+            "occupancy": 1.0,
+            "values": [
+              0,
+              1
+            ]
+          },
+          "(1, 1)": {
+            "sample": 44,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              "12",
+              " 0.00",
+              "15.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 44
+            },
+            "occupancy": 1.0,
+            "values": [
+              1,
+              1
+            ]
+          }
+        },
+        "counts_are_observations_not_targets": true
+      },
+      "actual_CEN_status": {
+        "status_report_ids": [
+          346,
+          347,
+          348
+        ],
+        "triple_counts": {
+          "(-1, -1, -1)": 240,
+          "(0, 0, 0)": 84,
+          "(0, 0, 1)": 9,
+          "(0, 1, 1)": 29,
+          "(1, 1, 1)": 118
+        },
+        "first_observations": {
+          "(-1, -1, -1)": {
+            "sample": 0,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              " 1",
+              " 0.00",
+              "15.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 0
+            },
+            "occupancy": 0.0,
+            "running_mean": 20.8,
+            "comfort": 25.664,
+            "values": [
+              -1,
+              -1,
+              -1
+            ]
+          },
+          "(0, 0, 0)": {
+            "sample": 24,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              " 7",
+              " 0.00",
+              "15.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 24
+            },
+            "occupancy": 1.0,
+            "running_mean": 20.8,
+            "comfort": 25.664,
+            "values": [
+              0,
+              0,
+              0
+            ]
+          },
+          "(0, 0, 1)": {
+            "sample": 41,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              "11",
+              "15.00",
+              "30.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 41
+            },
+            "occupancy": 1.0,
+            "running_mean": 20.8,
+            "comfort": 25.664,
+            "values": [
+              0,
+              0,
+              1
+            ]
+          },
+          "(0, 1, 1)": {
+            "sample": 43,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              "11",
+              "45.00",
+              "60.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 43
+            },
+            "occupancy": 1.0,
+            "running_mean": 20.8,
+            "comfort": 25.664,
+            "values": [
+              0,
+              1,
+              1
+            ]
+          },
+          "(1, 1, 1)": {
+            "sample": 45,
+            "clock": [
+              "2",
+              "1",
+              " 7",
+              "21",
+              " 0",
+              "12",
+              "15.00",
+              "30.00",
+              "SummerDesignDay"
+            ],
+            "context": {
+              "environment_ordinal": 1,
+              "environment_title": "105 001 CLEAR SKY DEFAULT",
+              "local_clock_index": 45
+            },
+            "occupancy": 1.0,
+            "running_mean": 20.8,
+            "comfort": 25.664,
+            "values": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        "unobserved_triples": [],
+        "applicable_occupied_samples": 240,
+        "unoccupied_samples": 240,
+        "out_of_range_samples": 0,
+        "mean_10_to_15_samples": 0,
+        "counts_are_observations_not_targets": true,
+        "coverage_limitation": "No requirement or claim that all triples, low region, out-of-range or threshold boundaries were stimulated. Public sample checks do not expose private substep states."
+      },
+      "actual_summary": {
+        "artifact": {
+          "path": ".runtime/porting/scheduled-temperature-116/native-01/output/nativetbl.csv",
+          "sha256": "1b7c9accbff17e3d4f66db48ae682e97fc55ca142f53d5151724083b7a9a56f8",
+          "bytes": 768
+        },
+        "rows": [
+          [
+            "Program Version:",
+            "EnergyPlus",
+            " Version 26.1.0-6f2e40d102",
+            " YMD=2026.11.13 13:37"
+          ],
+          [
+            "Tabular Output Report in Format: ",
+            "Comma"
+          ],
+          [],
+          [
+            "Building:",
+            "Rusted EnergyPlus IdealLoads Flow And Capacity Limit Diagnostic"
+          ],
+          [
+            "Environment:",
+            "105 005 SCHEDULE PROFILE RH ** "
+          ],
+          [],
+          [
+            "----------------------------------------------------------------------------------------------------"
+          ],
+          [
+            "REPORT:",
+            "Adaptive Comfort Summary"
+          ],
+          [
+            "FOR:",
+            "Entire Facility"
+          ],
+          [
+            "Time Not Meeting the Adaptive Comfort Models during Occupied Hours"
+          ],
+          [],
+          [
+            "",
+            "",
+            "ASHRAE55 90% Acceptability Limits [Hours]",
+            "ASHRAE55 80% Acceptability Limits  [Hours]",
+            "CEN15251 Category I Acceptability Limits [Hours]",
+            "CEN15251 Category II Acceptability Limits [Hours]",
+            "CEN15251 Category III Acceptability Limits [Hours]"
+          ],
+          [
+            "",
+            "114 ADAPTIVE OCCUPANT",
+            "25.00",
+            "22.50",
+            "30.50",
+            "23.25",
+            "21.00"
+          ],
+          []
+        ],
+        "body": [
+          [
+            "",
+            "114 ADAPTIVE OCCUPANT",
+            "25.00",
+            "22.50",
+            "30.50",
+            "23.25",
+            "21.00"
+          ]
+        ],
+        "positive_all_five_hours": [
+          25.0,
+          22.5,
+          30.5,
+          23.25,
+          21.0
+        ],
+        "lines_except_version": [
+          "Tabular Output Report in Format: ,Comma",
+          "",
+          "Building:,Rusted EnergyPlus IdealLoads Flow And Capacity Limit Diagnostic",
+          "Environment:,105 005 SCHEDULE PROFILE RH ** ",
+          "",
+          "----------------------------------------------------------------------------------------------------",
+          "REPORT:,Adaptive Comfort Summary",
+          "FOR:,Entire Facility",
+          "Time Not Meeting the Adaptive Comfort Models during Occupied Hours",
+          "",
+          ",,ASHRAE55 90% Acceptability Limits [Hours],ASHRAE55 80% Acceptability Limits  [Hours],CEN15251 Category I Acceptability Limits [Hours],CEN15251 Category II Acceptability Limits [Hours],CEN15251 Category III Acceptability Limits [Hours]",
+          ",114 ADAPTIVE OCCUPANT,25.00,22.50,30.50,23.25,21.00",
+          "",
+          ""
+        ],
+        "version_line": "Program Version:,EnergyPlus, Version 26.1.0-6f2e40d102, YMD=2026.11.13 13:37"
+      },
+      "actual_Source_exports": {
+        "eso": {
+          "json_joins": 61920,
+          "csv": {
+            "artifact": {
+              "path": ".runtime/porting/scheduled-temperature-116/source-01/output/results/source-eso.csv",
+              "sha256": "ca6e93ed0661821aa7d7542ff4c5c20e5e96661f79a6abc416035522a0954d7c",
+              "bytes": 20411093
+            },
+            "operand_bits_line_owner_clock_joins": 61920
+          }
+        },
+        "mtr": {
+          "json_joins": 240,
+          "csv": {
+            "artifact": {
+              "path": ".runtime/porting/scheduled-temperature-116/source-01/output/results/source-mtr.csv",
+              "sha256": "ee80203d81a8e1fe021d3be34d6fdfb9eebb1bbcf97ec22d1b69f7801b069d3b",
+              "bytes": 67335
+            },
+            "operand_bits_line_owner_clock_joins": 240
+          }
+        }
+      },
+      "actual_scheduled_setpoint": {
+        "report_id": 359,
+        "schedule_report_id": 352,
+        "same_stream_clock_samples": 480,
+        "distinct_actual_values": [
+          17.999999999999993,
+          17.999999999999996,
+          18.0,
+          18.000000000000004,
+          22.799999999999997,
+          22.8,
+          26.0
+        ],
+        "max_same_clock_schedule_delta": 7.105427357601002e-15,
+        "qualification": "System-average report vs actual public Schedule Value at each unchanged zone report clock; not private call-state or load-control evidence."
+      },
+      "actual_BND_node_and_connection": {
+        "artifact": {
+          "path": ".runtime/porting/scheduled-temperature-116/native-01/output/nativeout.bnd",
+          "sha256": "7916c7854491747d5ba00dc2a0031e3532a053db4a94955f2b3ca0d58c31e1de",
+          "bytes": 8708
+        },
+        "actual_nodes": [
+          [
+            "Node",
+            "1",
+            "ZONE ONE INLET",
+            "Air",
+            "3"
+          ],
+          [
+            "Node",
+            "2",
+            "ZONE ONE AIR NODE",
+            "Air",
+            "0"
+          ],
+          [
+            "Node",
+            "3",
+            "ZONE ONE RETURN",
+            "Air",
+            "0"
+          ]
+        ],
+        "added_connection": [
+          "Non-Parent Node Connection",
+          "ZONE ONE INLET",
+          "SETPOINTMANAGER:SCHEDULED",
+          "116 SCHEDULED INLET TEMPERATURE",
+          "Setpoint",
+          "1"
+        ],
+        "body": [
+          "! This file shows details about the branches, nodes, and other",
+          "! elements of the flow connections.",
+          "! This file is intended for use in \"debugging\" potential problems",
+          "! that may also be detected by the program, but may be more easily",
+          "! identified by \"eye\".",
+          "! This file is also intended to support software which draws a",
+          "! schematic diagram of the HVAC system.",
+          "! ===============================================================",
+          "! #Nodes,<Number of Unique Nodes>",
+          " #Nodes,3",
+          "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>",
+          " Node,1,ZONE ONE INLET,Air,3",
+          " Node,2,ZONE ONE AIR NODE,Air,0",
+          " Node,3,ZONE ONE RETURN,Air,0",
+          "! ===============================================================",
+          "! Suspicious nodes have 0 references.  It is normal for some nodes, however.",
+          "! Listing nodes with 0 references (culled from previous list):",
+          "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>",
+          " Suspicious Node,2,ZONE ONE AIR NODE,Air,0",
+          " Suspicious Node,3,ZONE ONE RETURN,Air,0",
+          "! ===============================================================",
+          "! <#Branch Lists>,<Number of Branch Lists>",
+          " #Branch Lists,0",
+          "! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>",
+          "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>",
+          "! ===============================================================",
+          "! <#Supply Air Paths>,<Number of Supply Air Paths>",
+          " #Supply Air Paths,0",
+          "! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>",
+          "! <#Components on Supply Air Path>,<Number of Components>",
+          "! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>",
+          "! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>",
+          "! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>",
+          "! ===============================================================",
+          "! <#Return Air Paths>,<Number of Return Air Paths>",
+          " #Return Air Paths,0",
+          "! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>",
+          "! <#Components on Return Air Path>,<Number of Components>",
+          "! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>",
+          "! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>",
+          "! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>",
+          "! ===============================================================",
+          "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>",
+          " #Outdoor Air Nodes,0",
+          "! ===============================================================",
+          "! <#Component Sets>,<Number of Component Sets>",
+          " #Component Sets,0",
+          "! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>",
+          "! ===============================================================",
+          "! <# Plant Loops>,<Number of Plant Loops>",
+          " #Plant Loops,0",
+          "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>",
+          "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>",
+          "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>",
+          "! ===============================================================",
+          "! <# Condenser Loops>,<Number of Condenser Loops>",
+          " #Condenser Loops,0",
+          "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>",
+          "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>",
+          "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>",
+          "! ===============================================================",
+          "! <# Controlled Zones>,<Number of Controlled Zones>",
+          " #Controlled Zones,1",
+          "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>,<# Return Nodes>",
+          "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>",
+          "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>",
+          " Controlled Zone,ZONE ONE,ZONE ONE EQUIPMENT,,ZONE ONE AIR NODE,1,0,1",
+          "   Controlled Zone Inlet,1,ZONE ONE,ZONE ONE INLET,Undefined,N/A",
+          "   Controlled Zone Return,1,ZONE ONE,ZONE ONE RETURN",
+          "! ===============================================================",
+          "! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>",
+          " #Zone Equipment Lists,1",
+          "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>",
+          "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating Priority>,<Cooling Priority>",
+          " Zone Equipment List,1,ZONE ONE EQUIPMENT,ZONE ONE,1",
+          "   Zone Equipment Component,1,ZONEHVAC:IDEALLOADSAIRSYSTEM,ZONE ONE IDEAL LOADS,ZONE ONE,1,1",
+          "! ===============================================================",
+          "! <#AirLoopHVACs>,<Number of AirLoopHVACs>",
+          " #AirLoopHVACs,0",
+          "! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>",
+          "! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return Node Name>,<AirLoop Return Node #>,<Air Loop Return Node Name>",
+          "! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply Node Name>,<AirLoop Supply Node #>,<Air Loop Supply Node Name>",
+          "! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet Node Name>,<AirLoopHVAC Name>",
+          "! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet Node Name>,<AirLoopHVAC Name>",
+          "! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed Air Outlet Node Name>,<AirLoopHVAC Name>",
+          "! <AirLoopHVAC Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! ===============================================================",
+          "! <#Parent Node Connections>,<Number of Parent Node Connections>",
+          " #Parent Node Connections,0",
+          "! <Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
+          "! ===============================================================",
+          "! <#Non-Parent Node Connections>,<Number of Non-Parent Node Connections>",
+          " #Non-Parent Node Connections,5",
+          "! <Non-Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
+          " Non-Parent Node Connection,ZONE ONE AIR NODE,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneNode,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneInlet,1",
+          " Non-Parent Node Connection,ZONE ONE RETURN,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneReturn,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,116 SCHEDULED INLET TEMPERATURE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,ZONEHVAC:IDEALLOADSAIRSYSTEM,ZONE ONE IDEAL LOADS,Outlet,1"
+        ],
+        "node_identity_unchanged": true,
+        "baseline": {
+          "path": ".runtime/object-expansion/unit115-prep/resume115/pair-proof01.json",
+          "sha256": "116ca8339ea70632f969e407658278b13221297031fc5a863ad7110091c76510",
+          "bytes": 146781
+        }
+      },
+      "paired_BND": {
+        "artifact": {
+          "path": ".runtime/porting/scheduled-temperature-116/source-01/output/eplusrs.bnd",
+          "sha256": "fa161fa17c1cf4d008760f6f7e13d5bb8d1dbc98f803ec8a290c82d2c712ca18",
+          "bytes": 8672
+        },
+        "actual_nodes": [
+          [
+            "Node",
+            "1",
+            "ZONE ONE INLET",
+            "Air",
+            "3"
+          ],
+          [
+            "Node",
+            "2",
+            "ZONE ONE AIR NODE",
+            "Air",
+            "0"
+          ],
+          [
+            "Node",
+            "3",
+            "ZONE ONE RETURN",
+            "Air",
+            "0"
+          ]
+        ],
+        "added_connection": [
+          "Non-Parent Node Connection",
+          "ZONE ONE INLET",
+          "SETPOINTMANAGER:SCHEDULED",
+          "116 SCHEDULED INLET TEMPERATURE",
+          "Setpoint",
+          "1"
+        ],
+        "body": [
+          "! This file shows details about the branches, nodes, and other",
+          "! elements of the flow connections.",
+          "! This file is intended for use in \"debugging\" potential problems",
+          "! that may also be detected by the program, but may be more easily",
+          "! identified by \"eye\".",
+          "! This file is also intended to support software which draws a",
+          "! schematic diagram of the HVAC system.",
+          "! ===============================================================",
+          "! #Nodes,<Number of Unique Nodes>",
+          " #Nodes,3",
+          "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>",
+          " Node,1,ZONE ONE INLET,Air,3",
+          " Node,2,ZONE ONE AIR NODE,Air,0",
+          " Node,3,ZONE ONE RETURN,Air,0",
+          "! ===============================================================",
+          "! Suspicious nodes have 0 references.  It is normal for some nodes, however.",
+          "! Listing nodes with 0 references (culled from previous list):",
+          "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>",
+          " Suspicious Node,2,ZONE ONE AIR NODE,Air,0",
+          " Suspicious Node,3,ZONE ONE RETURN,Air,0",
+          "! ===============================================================",
+          "! <#Branch Lists>,<Number of Branch Lists>",
+          " #Branch Lists,0",
+          "! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>",
+          "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>",
+          "! ===============================================================",
+          "! <#Supply Air Paths>,<Number of Supply Air Paths>",
+          " #Supply Air Paths,0",
+          "! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>",
+          "! <#Components on Supply Air Path>,<Number of Components>",
+          "! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>",
+          "! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>",
+          "! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>",
+          "! ===============================================================",
+          "! <#Return Air Paths>,<Number of Return Air Paths>",
+          " #Return Air Paths,0",
+          "! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>",
+          "! <#Components on Return Air Path>,<Number of Components>",
+          "! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>",
+          "! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>",
+          "! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>",
+          "! ===============================================================",
+          "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>",
+          " #Outdoor Air Nodes,0",
+          "! ===============================================================",
+          "! <#Component Sets>,<Number of Component Sets>",
+          " #Component Sets,0",
+          "! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>",
+          "! ===============================================================",
+          "! <# Plant Loops>,<Number of Plant Loops>",
+          " #Plant Loops,0",
+          "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>",
+          "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>",
+          "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>",
+          "! ===============================================================",
+          "! <# Condenser Loops>,<Number of Condenser Loops>",
+          " #Condenser Loops,0",
+          "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>",
+          "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>",
+          "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>",
+          "! ===============================================================",
+          "! <# Controlled Zones>,<Number of Controlled Zones>",
+          " #Controlled Zones,1",
+          "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>,<# Return Nodes>",
+          "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>",
+          "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>",
+          " Controlled Zone,ZONE ONE,ZONE ONE EQUIPMENT,,ZONE ONE AIR NODE,1,0,1",
+          "   Controlled Zone Inlet,1,ZONE ONE,ZONE ONE INLET,Undefined,N/A",
+          "   Controlled Zone Return,1,ZONE ONE,ZONE ONE RETURN",
+          "! ===============================================================",
+          "! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>",
+          " #Zone Equipment Lists,1",
+          "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>",
+          "! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating Priority>,<Cooling Priority>",
+          " Zone Equipment List,1,ZONE ONE EQUIPMENT,ZONE ONE,1",
+          "   Zone Equipment Component,1,ZONEHVAC:IDEALLOADSAIRSYSTEM,ZONE ONE IDEAL LOADS,ZONE ONE,1,1",
+          "! ===============================================================",
+          "! <#AirLoopHVACs>,<Number of AirLoopHVACs>",
+          " #AirLoopHVACs,0",
+          "! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>",
+          "! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Return Node #>,<Zn Eqp Return Node Name>,<AirLoop Return Node #>,<Air Loop Return Node Name>",
+          "! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,<Zn Eqp Supply Node #>,<Zn Eqp Supply Node Name>,<AirLoop Supply Node #>,<Air Loop Supply Node Name>",
+          "! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,<Cooled Zone Inlet Node #>,<Cooled Zone Inlet Node Name>,<AirLoopHVAC Name>",
+          "! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,<Heated Zone Inlet Node #>,<Heated Zone Inlet Node Name>,<AirLoopHVAC Name>",
+          "! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,<OA Outlet Node #>,<OA Mixed Air Outlet Node Name>,<AirLoopHVAC Name>",
+          "! <AirLoopHVAC Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>",
+          "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>",
+          "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>",
+          "! ===============================================================",
+          "! <#Parent Node Connections>,<Number of Parent Node Connections>",
+          " #Parent Node Connections,0",
+          "! <Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
+          "! ===============================================================",
+          "! <#Non-Parent Node Connections>,<Number of Non-Parent Node Connections>",
+          " #Non-Parent Node Connections,5",
+          "! <Non-Parent Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>",
+          " Non-Parent Node Connection,ZONE ONE AIR NODE,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneNode,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneInlet,1",
+          " Non-Parent Node Connection,ZONE ONE RETURN,ZONEHVAC:EQUIPMENTCONNECTIONS,ZONE ONE,ZoneReturn,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,SETPOINTMANAGER:SCHEDULED,116 SCHEDULED INLET TEMPERATURE,Setpoint,1",
+          " Non-Parent Node Connection,ZONE ONE INLET,ZONEHVAC:IDEALLOADSAIRSYSTEM,ZONE ONE IDEAL LOADS,Outlet,1"
+        ],
+        "node_identity_unchanged": true,
+        "baseline": {
+          "path": ".runtime/object-expansion/unit115-prep/resume115/pair-proof01.json",
+          "sha256": "116ca8339ea70632f969e407658278b13221297031fc5a863ad7110091c76510",
+          "bytes": 146781
+        }
+      },
+      "retained_attempts": [
+        {
+          "unit": 116,
+          "scope": "B",
+          "source_build": "source-dd-scheduled-temperature-116",
+          "build_row": {
+            "path": ".runtime/object-expansion/unit116-prep/build117-attempt01.json",
+            "sha256": "d486099e6655e5e52e0410e617539a69354f2aed35c65e8a27e50e7822d42b41",
+            "bytes": 694
+          },
+          "plan": {
+            "path": ".runtime/porting/scheduled-temperature-116/native-01/plan.json",
+            "sha256": "3c7e29ae41046b15b2a8051240cd03fdf4faed015cb204b4e48fad04874368a1",
+            "bytes": 11339
+          },
+          "accepted_pair": true,
+          "admitted_cases": 0,
+          "admitted_samples": 0,
+          "launch": {
+            "path": ".runtime/porting/scheduled-temperature-116/native-01/launch.json",
+            "sha256": "268435f2081ada2978594190d5bc6114e1682b9ccf1e26b9334b62fa6f98c3a7",
+            "bytes": 14796
+          },
+          "actual_receipt": {
+            "path": ".runtime/porting/scheduled-temperature-116/native-01/command/receipt.json",
+            "sha256": "bdc0ce99fa294a25e8f68087268b85b6264af8c647b371f15af2190588552faa",
+            "bytes": 27650
+          },
+          "engine_exit_code": 0,
+          "launch_error": null,
+          "recorder_completed": true,
+          "actual_engine_process_started": true
+        },
+        {
+          "unit": 116,
+          "scope": "B",
+          "source_build": "source-dd-scheduled-temperature-116",
+          "build_row": {
+            "path": ".runtime/object-expansion/unit116-prep/build117-attempt01.json",
+            "sha256": "d486099e6655e5e52e0410e617539a69354f2aed35c65e8a27e50e7822d42b41",
+            "bytes": 694
+          },
+          "plan": {
+            "path": ".runtime/porting/scheduled-temperature-116/source-01/plan.json",
+            "sha256": "18a2691366125ebfb102abb3189d39f1af4821b9d283c47ee7260c13b73404d3",
+            "bytes": 13314
+          },
+          "accepted_pair": true,
+          "admitted_cases": 0,
+          "admitted_samples": 0,
+          "launch": {
+            "path": ".runtime/porting/scheduled-temperature-116/source-01/launch.json",
+            "sha256": "bcc527694d7368d9554f40857e3e1defd55e94550c9857803bbc6fa5e15a6395",
+            "bytes": 22727
+          },
+          "actual_receipt": {
+            "path": ".runtime/porting/scheduled-temperature-116/source-01/command/receipt.json",
+            "sha256": "25214b3e06c113a294115a601ad41a98930e6fc455b687c479d7e899e884d2d4",
+            "bytes": 31804
+          },
+          "engine_exit_code": 0,
+          "launch_error": null,
+          "recorder_completed": true,
+          "actual_engine_process_started": true,
+          "application_summary": {
+            "path": ".runtime/porting/scheduled-temperature-116/source-01/output/run-summary.json",
+            "sha256": "3cb07743d5aadbf8cbe20e1234fa575bade4f117fbb8a069861cfb2c4fe8ffc0",
+            "bytes": 71092
+          },
+          "application_summary_exit_code": 0
+        }
+      ],
+      "accepted_paired_cases": 1,
+      "accepted_samples": 62160,
+      "new_builds": 1,
+      "new_builds_without_Source_execution": [],
+      "scope": "Direct epJSON-only, bounded Source B Scheduled Temperature with supported actual schedules and real Node ownership. IDF lacks the required metadata writer and remains fenced; other controls/managers, Source A, arbitrary systems and IdealLoads load-control effects are not promoted. This is setpoint state and public-output evidence, not global capability/algorithm or full-object conformance.",
       "capability_or_gate_promotion": false
     }
   },

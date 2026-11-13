@@ -11,6 +11,201 @@ use ep_runtime::heat_balance::selected_input_processor::{
 use ep_runtime::heat_balance::source_output_prescan::SourcePreScanError;
 
 pub(crate) fn verify_shared_input_boundary() -> Result<(), Box<dyn std::error::Error>> {
+    // Scheduled admission/IP custody, not a runtime calculation or IDF promotion.
+    {
+        use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as Raw;
+        use serde_json::json;
+        let family = "SetpointManager:Scheduled";
+        let scheduled = json!({"control_variable":"tEmPeRaTuRe",
+            "schedule_name":"Constant-1.0","setpoint_node_or_nodelist_name":"Supply"});
+        let base = json!({"Zone":{"Z":{}},"SetpointManager:Scheduled":{"SP":scheduled}});
+        let parse = |value: &serde_json::Value| parse_epjson_str(&value.to_string());
+        let raw = parse(&base)?;
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_ok());
+        assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+        assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+        assert!(resolve_source_a(&raw).is_err());
+        assert!(resolve(&raw).is_err());
+        let mut input = resolve_source_b(&raw)?;
+        assert_eq!(
+            input.get_object_def_max_args(family)?,
+            SourceArgumentCounts {
+                alphas: 4,
+                numerics: 0
+            }
+        );
+        assert!(
+            input.is_object_unused(family, "SP"),
+            "admission/transfer is not a getter call"
+        );
+        assert_eq!(
+            input.source_raw_object_fields(family, "SP")?["control_variable"],
+            Raw::String("tEmPeRaTuRe".into())
+        );
+        assert_eq!(
+            input.source_raw_object_fields(family, "SP")?["setpoint_node_or_nodelist_name"],
+            Raw::String("Supply".into())
+        );
+        // Actual pinned Windows-doj DOM producer differs from Rust string sorting.
+        let mut order = base.clone();
+        order[family] = json!({"SP10":scheduled,"SP2":scheduled});
+        order[family]["SP2"]["unknown_null"] = json!(null);
+        order[family]["SP2"]["unknown_bool"] = json!(true);
+        order[family]["SP2"]["unknown_number"] = json!(-1.25);
+        order[family]["SP2"]["unknown_string"] = json!(" retain Case ");
+        order[family]["SP2"]["unknown_array"] = json!([null, true, 3, "x"]);
+        order[family]["SP2"]["unknown_object"] = json!({"nested":[1,false]});
+        let raw = parse(&order)?;
+        let input = resolve_source_b(&raw)?;
+        let Some(SourceInputFamily::Objects(rows)) = input.family(family) else {
+            return Err("Scheduled actual family shapes".into());
+        };
+        assert_eq!(
+            rows.iter()
+                .map(|r| r.object_name.as_str())
+                .collect::<Vec<_>>(),
+            ["SP2", "SP10"]
+        );
+        assert_eq!(
+            input
+                .source_raw_object_names(family)?
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<_>>(),
+            ["SP2", "SP10"]
+        );
+        let fields = input.source_raw_object_fields(family, "SP2")?;
+        assert_eq!(fields["unknown_null"], Raw::Null);
+        assert_eq!(fields["unknown_bool"], Raw::Bool(true));
+        assert_eq!(fields["unknown_number"], Raw::Number("-1.25".into()));
+        assert_eq!(
+            fields["unknown_string"],
+            Raw::String(" retain Case ".into())
+        );
+        assert!(matches!(&fields["unknown_array"],Raw::Array(values) if values.len()==4));
+        assert!(
+            matches!(&fields["unknown_object"],Raw::Object(values) if values.contains_key("nested"))
+        );
+        assert!(input.is_object_unused(family, "SP2") && input.is_object_unused(family, "SP10"));
+        // This bridge transfers real schedule operands; no Schedule:File is opened,
+        // and schedule numerical execution is covered by its own existing owners.
+        let mut year = json!({"Schedule:Year":{"Y":{"schedule_weeks":[{
+            "schedule_week_name":"W","start_month":1,"start_day":1,"end_month":12,"end_day":31}]}},
+            "Schedule:Day:Hourly":{"D":{}},"Schedule:Week:Daily":{"W":{}}});
+        for hour in 1..=24 {
+            year["Schedule:Day:Hourly"]["D"][format!("hour_{hour}")] = json!(-5.0);
+        }
+        for day in [
+            "sunday",
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "holiday",
+            "summerdesignday",
+            "winterdesignday",
+            "customday1",
+            "customday2",
+        ] {
+            year["Schedule:Week:Daily"]["W"][format!("{day}_schedule_day_name")] = json!("D");
+        }
+        let schedules = [
+            ("Constant-0.0", json!({})),
+            ("Constant-1.0", json!({})),
+            (
+                "Negative",
+                json!({"Schedule:Constant":{"Negative":{"hourly_value":-5.0}}}),
+            ),
+            (
+                "C",
+                json!({"Schedule:Compact":{"C":{"data":[{"field":"Through: 12/31"},{"field":"For: AllDays"},{"field":"Until: 24:00"},{"field":-5.0}]}}}),
+            ),
+            ("Y", year),
+            (
+                "F",
+                json!({"Schedule:File":{"F":{"file_name":"not-opened-by-custody-test.csv","column_number":1,"rows_to_skip_at_top":0,"number_of_hours_of_data":8760,"column_separator":"Comma","interpolate_to_timestep":"No","minutes_per_item":60,"adjust_schedule_for_daylight_savings":"No"}}}),
+            ),
+        ];
+        let mut scheduled_custody_cases = 0;
+        for (name, addition) in schedules {
+            let mut value = base.clone();
+            value[family]["SP"]["schedule_name"] = json!(name);
+            value
+                .as_object_mut()
+                .ok_or("Scheduled model object")?
+                .extend(addition.as_object().ok_or("schedule object")?.clone());
+            let raw = parse(&value)?;
+            let input = resolve_source_b(&raw)?;
+            assert_eq!(
+                input.source_raw_object_fields(family, "SP")?["schedule_name"],
+                Raw::String(name.into())
+            );
+            if name == "Negative" {
+                let Raw::Number(token) = &input
+                    .source_raw_object_fields("Schedule:Constant", "Negative")?["hourly_value"]
+                else {
+                    return Err("actual negative temperature token".into());
+                };
+                assert_eq!(token.parse::<f64>()?.to_bits(), (-5.0_f64).to_bits());
+            }
+            scheduled_custody_cases += 1;
+        }
+        assert_eq!(scheduled_custody_cases, 6);
+        for control in [
+            "MaximumTemperature",
+            "MinimumTemperature",
+            "HumidityRatio",
+            "MaximumHumidityRatio",
+            "MinimumHumidityRatio",
+            "MassFlowRate",
+            "MaximumMassFlowRate",
+            "MinimumMassFlowRate",
+            "Unknown",
+            "",
+        ] {
+            let mut value = base.clone();
+            value[family]["SP"]["control_variable"] = json!(control);
+            assert!(
+                resolve_source_b(&parse(&value)?).is_err(),
+                "unported selector {control}"
+            );
+        }
+        for field in [
+            "control_variable",
+            "schedule_name",
+            "setpoint_node_or_nodelist_name",
+        ] {
+            for replacement in [None, Some(json!(null)), Some(json!(17)), Some(json!(""))] {
+                let mut value = base.clone();
+                let object = value[family]["SP"]
+                    .as_object_mut()
+                    .ok_or("Scheduled raw fields")?;
+                if let Some(replacement) = replacement {
+                    object.insert(field.into(), replacement);
+                } else {
+                    object.remove(field);
+                }
+                assert!(
+                    resolve_source_b(&parse(&value)?).is_err(),
+                    "invalid required {field}"
+                );
+            }
+        }
+        let mut missing = base.clone();
+        missing[family]["SP"]["schedule_name"] = json!("Missing");
+        assert!(resolve_source_b(&parse(&missing)?).is_err());
+        // Genuine staged loader changes format; no synthesized idf_order or ID flag.
+        let staged = ep_raw_model::parse_epjson_str_with_idf_order(
+            &base.to_string(),
+            "Zone,Z;\nSetpointManager:Scheduled,SP,Temperature,Constant-1.0,Supply;",
+        )?;
+        assert!(!staged.is_epjson());
+        assert!(!staged.has_idf_declaration_order(family));
+        let error = resolve_source_b(&staged).expect_err("Scheduled staged IDF must remain fenced");
+        assert!(error.contains("requires direct Source epJSON"));
+    }
     let base = r#""Version":{"v":{"version_identifier":"26.1"}},"Building":{"b":{"solar_distribution":"MinimalShadowing"}},"Timestep":{"t":{"number_of_timesteps_per_hour":4}},"Zone":{"actual zone":{}}"#;
     let diagnostics = r#", "Output:Diagnostics":{"d":{"diagnostics":[{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"},{"key":"DisplayAdvancedReportVariables"}]}},"Schedule:Constant":{}"#;
     let raw = parse_epjson_str(&format!("{{{base}{diagnostics}}}"))?;

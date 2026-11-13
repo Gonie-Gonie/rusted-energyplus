@@ -294,7 +294,8 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
         || (scope == PortingScope::B
             && matches!(
                 kind,
-                "ZoneControl:Thermostat"
+                "SetpointManager:Scheduled"
+                    | "ZoneControl:Thermostat"
                     | "ThermostatSetpoint:DualSetpoint"
                     | "ZoneHVAC:EquipmentConnections"
                     | "ZoneHVAC:EquipmentList"

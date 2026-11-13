@@ -3,6 +3,35 @@
 use super::{SchemaAutomatic, SchemaDefault, SchemaDefinition, SchemaField};
 pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
     Some(match name {
+        // Native26.1 IDD A1..A4, zero numerics and no extensions/defaults.
+        "SetpointManager:Scheduled" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "control_variable",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "schedule_name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "setpoint_node_or_nodelist_name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "ZoneGroup" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

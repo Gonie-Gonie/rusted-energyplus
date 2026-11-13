@@ -2513,3 +2513,10 @@ mod warmup;
 mod multiplier_predictor;
 
 mod admissions;
+
+mod scheduled_owner;
+impl OrdinaryEquipment {
+    pub(crate) fn run_source_scheduled_owner_regressions() -> Result<usize> {
+        scheduled_owner::run()
+    }
+}

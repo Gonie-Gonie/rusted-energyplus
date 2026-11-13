@@ -87,6 +87,10 @@ impl SourceSupportAdmission {
             }
         }
         let covered_objects = [
+            // The same raw resolver and validated Source scope admit only the
+            // implemented Scheduled control/reference route. This token lets
+            // the typed guard distinguish it from legacy/broad HVAC semantics.
+            "SetpointManager:Scheduled",
             "HeatBalanceAlgorithm",
             // Both explicit Source lanes use the same genuine raw DesignDay getter.
             "SizingPeriod:DesignDay",

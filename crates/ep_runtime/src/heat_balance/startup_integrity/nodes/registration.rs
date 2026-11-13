@@ -6,6 +6,7 @@ use super::{Error, SourceBranchNodeConnections, extent};
 #[repr(i32)]
 pub(crate) enum SourceNodeObjectType {
     Invalid = -1,
+    SetpointManagerScheduled = 220,
     ZoneHvacEquipmentConnections = 261,
     ZoneHvacIdealLoadsAirSystem = 268,
     #[allow(
@@ -22,6 +23,7 @@ pub(crate) enum SourceNodeObjectType {
 impl SourceNodeObjectType {
     pub(crate) fn source_name(self) -> Result<&'static str, Error> {
         match self {
+            Self::SetpointManagerScheduled => Ok("SetpointManager:Scheduled"),
             Self::ZoneHvacEquipmentConnections => Ok("ZoneHVAC:EquipmentConnections"),
             Self::ZoneHvacIdealLoadsAirSystem => Ok("ZoneHVAC:IdealLoadsAirSystem"),
             Self::SpaceHvacEquipmentConnections => Ok("SpaceHVAC:EquipmentConnections"),

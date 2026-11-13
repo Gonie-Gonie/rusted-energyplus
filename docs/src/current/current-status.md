@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 171 paired physical cases and 4,901,176 reported values with zero
+contains 172 paired physical cases and 4,963,336 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 116 recorded Source builds,
-105 with accepted pairs and 11 without accepted pairs, including 2 builds
+validate the consumer corrections. There are 117 recorded Source builds,
+106 with accepted pairs and 11 without accepted pairs, including 2 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -185,7 +185,25 @@ rules remain exact. Positive public node flow confirms activation. Public
 averages do not instrument private Native convection-entry ACH or call history.
 Adaptive, surface-local/user/EMS/Kiva and reached window children remain bounded.
 
-Bounded Source A/B admits AdaptiveASH55 only for DesignDay-only execution. One B five-DesignDay case compares 125 series and 59,280 reported values under the fixed policies, including four adaptive outputs and the complete adaptive summary. Genuine integer status cells, actual occupancy, retained DD mean and SysTimeElapsed hour accumulators feed the existing reporting owners. One fixed five-DesignDay, DD-only AdaptiveASH55 case. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other adaptive models and arbitrary combinations remain unvalidated. Exact 10/33.5 C applicability and +/-2.5/+/-3.5 C comfort boundaries have no separate executed numerical test; public status observations are not private state or call-history evidence. No full-object, capability or frozen conformance promotion.
+Bounded Source A/B admits AdaptiveASH55 and AdaptiveCEN15251 for DesignDay-only
+execution. Two B cases with five DesignDays compare 125 series and 59,280 values
+for ASH55, and 130 series and 61,680 values for ASH55 plus CEN15251, under the
+preserved policies. Their adaptive outputs and complete AdaptiveComfortSummary
+tables use actual occupancy, the retained DesignDay mean and accumulated occupied
+hours. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, Pierce/KSU/CoolingEffectASH55
+and arbitrary compositions remain unvalidated. These finite cases do not prove
+all threshold regions or full-object support; public samples do not expose
+private state or call histories. No capability or frozen conformance promotion
+is implied.
+
+Bounded Source B accepts SetpointManager:Scheduled with Temperature control in
+direct epJSON. One five-DesignDay case compares 131 series and 62,160 values
+under unchanged inherited policies, including the actual scheduled inlet
+setpoint and matching node/SetPoint connection reports. IdealLoads does not use
+that inlet setpoint for load control. Supported schedules and node references
+remain bounded by their connected consumers. Staged IDF, other controls and
+managers, Source A, arbitrary system combinations and full-object conformance
+remain outside this validated route.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases
@@ -317,8 +335,3 @@ Routine/domain readiness is owned by the algorithm ledger and project contract;
 input support is owned by the capability registry. A finite unit pass, parser
 support or successful demo does not promote those registries. The
 [project contract](project-contract.md) defines the promotion requirements.
-
-
-## Bounded CEN15251 extension (Unit115)
-
-Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55. One unchanged B five-DesignDay pilot compares 130 series and 61,680 reported values under preserved policies. Three genuine CEN integer statuses and two temperature outputs use the live comfort owner; all five summary columns read retained People SysTimeElapsed accumulators. One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion. No blanket exact-boundary execution claim is made here. Any owner-test review is retained separately from the final same-source full QA and physical sample evidence; unobserved CEN triples/regions remain explicit.

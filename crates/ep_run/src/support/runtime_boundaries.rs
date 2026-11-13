@@ -758,13 +758,23 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
     for manager in &typed_model.setpoint_managers {
-        push_typed_unsupported_object(
-            registry,
-            unsupported_objects,
-            diagnostics,
-            manager.object_type.0.as_str(),
-            1,
-        );
+        // These two typed identities come from parse_setpoint_managers, whose
+        // NormalizedName stores uppercase. Registry families are canonical case.
+        let object_type = match manager.object_type.0.as_str() {
+            "SETPOINTMANAGER:SCHEDULED" => "SetpointManager:Scheduled",
+            "SETPOINTMANAGER:SINGLEZONE:REHEAT" => "SetpointManager:SingleZone:Reheat",
+            other => other,
+        };
+        if object_type == "SetpointManager:Scheduled"
+            && source_admission
+                .is_some_and(|admission| admission.consumes("SetpointManager:Scheduled"))
+        {
+            // Input identity, every effective field/reference and the actual
+            // Source lane were checked before this token was constructed.
+            // Legacy and every other positive manager retain the registry guard.
+            continue;
+        }
+        push_typed_unsupported_object(registry, unsupported_objects, diagnostics, object_type, 1);
     }
 
     if !typed_model.plant_loops.is_empty()

@@ -235,6 +235,7 @@ fn resolve_raw(
                             | "Space"
                             | "SpaceList"
                             | "ScheduleTypeLimits"
+                            | "SetpointManager:Scheduled"
                             | "Schedule:Constant"
                             | "Schedule:Compact"
                             | "Schedule:File"
@@ -721,6 +722,9 @@ fn resolve_raw(
     }
     if source_calendar_ingress {
         infrared::validate_defined_uses(raw, source_multizone_ingress)?;
+    }
+    if source_b_ingress {
+        source_b::validate_scheduled_setpoint_references(raw)?;
     }
     // GetProjectData distinguishes an absent object (4) from its schema field
     // default (6), and normalizes positive non-divisors before building owners.

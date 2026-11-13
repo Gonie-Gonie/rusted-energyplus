@@ -125,6 +125,11 @@ fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
     println!(
         "system-report entries: energy={energy}; ventilation={vent}; named Native-unit variants={variants}"
     );
+    let scheduled = crate::heat_balance::ordinary_equipment::OrdinaryEquipment::run_source_scheduled_owner_regressions()?;
+    assert_eq!(scheduled, 3);
+    println!(
+        "Source Scheduled owner regressions={scheduled}; authored unit operands, not Native comparison entries"
+    );
     println!("cohort native_controlled_air_cohort ... ok");
     println!(
         "cohort result: ok. 1 passed; 0 failed; predictor entries=1168; whole corrector entries=1168; positive inlet cases=810"

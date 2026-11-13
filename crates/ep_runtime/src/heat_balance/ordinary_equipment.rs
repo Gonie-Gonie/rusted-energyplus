@@ -16,6 +16,7 @@ mod source_node_lists;
 mod source_nodes;
 pub(crate) mod source_purchased_air;
 mod source_reset;
+mod source_scheduled_setpoint;
 mod source_setup_reporting;
 
 use super::inside_convection_dispatcher::ZoneEquipmentActiveElements;

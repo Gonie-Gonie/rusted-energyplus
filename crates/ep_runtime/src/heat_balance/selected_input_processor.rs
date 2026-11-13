@@ -199,6 +199,17 @@ impl SelectedInputProcessor {
         self.families.get(object_type)
     }
 
+    /// Borrow the actual selected schema without getObjectDefMaxArgs null insertion.
+    /// This is the bounded getObjectSchemaProps lookup used by direct JSON getters.
+    pub(crate) fn source_object_definition(
+        &self,
+        object_type: &str,
+    ) -> Result<&SourceObjectDefinition, SelectedInputUnavailable> {
+        self.definitions
+            .get(object_type)
+            .ok_or_else(|| SelectedInputUnavailable::Definition(object_type.into()))
+    }
+
     /// Actual presence, including null insertion, is observable by subsequent getters.
     pub fn family(&self, object_type: &str) -> Option<&SourceInputFamily> {
         self.families.get(object_type).or_else(|| {

@@ -1473,3 +1473,17 @@ The existing routine classification and historical state-contract blocks are not
 Native ThermalComfort.cc 2963-3191 owns the CEN body. WeatherManager passes the actual DesignDay mean after ASH initialization. The four real CEN state cells retain constructor0/false; DD initialization resets the means without setting firstDaySet. BeginDay with !firstDaySet updates alpha*running+(1.0-alpha)*average before firstDaySet=false and BeginHour accumulation. The subtraction is not replaced with decimal0.2. ManageThermalComfort runs ASH before CEN outside warmup/sizing; actual MRT/current occupancy and strict comfort comparisons update i32 statuses and People SysTimeElapsed totals. Registrations follow Native three dimensionless statuses then two C values; existing tabular consumers read all five actual hour cells.
 
 Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55. One unchanged B five-DesignDay pilot compares 130 series and 61,680 reported values under preserved policies. Three genuine CEN integer statuses and two temperature outputs use the live comfort owner; all five summary columns read retained People SysTimeElapsed accumulators. One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion. No blanket exact-boundary execution claim is made here. Any owner-test review is retained separately from the final same-source full QA and physical sample evidence; unobserved CEN triples/regions remain explicit.
+
+
+## Scheduled setpoint manager
+
+The bounded Source B direct-epJSON route connects Temperature control to the
+live schedule and the existing physical Node owner. GetInput, Init, Verify,
+Sim and Update retain Native order, actual equipment/air-loop readiness and
+environment flags. Environment resets and the one-time sensed-node sentinel
+reset remain in their original owners. System node output reads that same
+setpoint field; IdealLoads does not consume it for load control.
+
+IDF input, other selectors/managers and broader systems remain outside this
+validated increment. The retained comparison and execution evidence is in
+[object input domains](../../validation/evidence/object-input-domains.json).

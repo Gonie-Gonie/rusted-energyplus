@@ -76,6 +76,17 @@ impl Default for SourceAirLoopData {
     }
 }
 
+/// Native SPMScheduled selected subtype; control_variable retains CtrlVarType ordinal.
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) struct SourceScheduledSetPoint {
+    pub(crate) name: String,
+    pub(crate) control_variable: i32,
+    pub(crate) schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) setpoint: f64,
+    pub(crate) control_nodes: Vec<usize>,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct SourceSetPointManager {
     pub(crate) manager_on: bool,
@@ -84,7 +95,7 @@ pub(crate) struct SourceSetPointManager {
     pub(crate) init_one_time_flag2: bool,
     pub(crate) no_ground_temp_object_warning: [bool; 4],
     pub(crate) environment_flag: bool,
-    pub(crate) managers: Option<Vec<Infallible>>,
+    pub(crate) managers: Option<Vec<SourceScheduledSetPoint>>,
     pub(crate) manager_map: std::collections::BTreeMap<String, i32>,
 }
 impl Default for SourceSetPointManager {

@@ -344,6 +344,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ),
         ("Space", 3, 3, 1, 0, Some("tags")),
         ("SpaceList", 1, 0, 1, 0, Some("spaces")),
+        ("SetpointManager:Scheduled", 4, 0, 0, 0, None),
         ("ThermostatSetpoint:DualSetpoint", 3, 0, 0, 0, None),
         ("ZoneControl:Thermostat", 11, 1, 0, 0, None),
         ("ZoneHVAC:IdealLoadsAirSystem", 21, 11, 0, 0, None),

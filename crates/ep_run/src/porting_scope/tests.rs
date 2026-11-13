@@ -3027,6 +3027,14 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
         let mut people = input(scope);
         people["Schedule:Constant"]["Activity"] = json!({"hourly_value":120});
         people["People"] = json!({"Occupants":{"zone_or_zonelist_or_space_or_spacelist_name":"Zone","number_of_people_schedule_name":"On","number_of_people":1.5,"activity_level_schedule_name":"Activity","sensible_heat_fraction":0.6}});
+        if scope == PortingScope::B {
+            // The selected manager owns the existing supply Node; this extends
+            // the actual support-assessment caller, not just raw/IP projection.
+            people["SetpointManager:Scheduled"] = json!({"Supply setpoint":{
+                "control_variable":"Temperature", "schedule_name":"Heat",
+                "setpoint_node_or_nodelist_name":"Supply"
+            }});
+        }
         let mut actual = trace(&people, scope);
         assert!(actual.admissible, "{:?}", actual.violations);
         let raw = parse_epjson_str(&people.to_string()).expect("authored People scope");
@@ -3068,6 +3076,45 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 .iter()
                 .any(|row| row.object_type == "People")
         );
+        if scope == PortingScope::B {
+            assert_eq!(model.setpoint_managers.len(), 1);
+            assert!(
+                !support
+                    .unsupported_objects
+                    .iter()
+                    .any(|row| row.object_type == "SetpointManager:Scheduled")
+            );
+            let legacy = assess_support(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+            );
+            assert_eq!(legacy.status, SupportStatus::Unsupported);
+            assert!(
+                legacy
+                    .unsupported_objects
+                    .iter()
+                    .any(|row| row.object_type == "SetpointManager:Scheduled")
+            );
+            // An admissible trace cannot grant a token to changed raw operands.
+            for (field, bad_value) in [
+                ("control_variable", "Unknown"),
+                ("schedule_name", "Missing"),
+            ] {
+                let mut bad = people.clone();
+                bad["SetpointManager:Scheduled"]["Supply setpoint"][field] = json!(bad_value);
+                let bad_raw =
+                    parse_epjson_str(&bad.to_string()).expect("changed Scheduled raw input");
+                assert!(
+                    crate::support::SourceSupportAdmission::from_validated_scope(&bad_raw, &actual)
+                        .is_none()
+                );
+            }
+        }
     }
 }
 

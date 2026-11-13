@@ -6,6 +6,7 @@ pub(super) fn is_family(family: &str) -> bool {
     matches!(
         family,
         "NodeList"
+            | "SetpointManager:Scheduled"
             | "Output:Schedules"
             | "Schedule:Compact"
             | "Schedule:File"
@@ -32,6 +33,15 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
+        // The Native object has four alpha fields (Name is the map key), no
+        // numeric/extensible fields. This Source-B child implements only Temp.
+        ("SetpointManager:Scheduled", "control_variable") => text_is(value, &["Temperature"]),
+        ("SetpointManager:Scheduled", "schedule_name" | "setpoint_node_or_nodelist_name") => {
+            matches!(value, RawValue::String(text) if !text.is_empty())
+        }
+        // Official instance schema permits extra metadata. Reserved IDF
+        // bookkeeping was checked above; no extra field becomes a getter operand.
+        ("SetpointManager:Scheduled", _) => true,
         ("Schedule:File", "schedule_type_limits_name" | "file_name") => {
             matches!(value, RawValue::String(_))
         }
@@ -427,6 +437,11 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
 }
 pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
     match family {
+        "SetpointManager:Scheduled" => &[
+            "control_variable",
+            "schedule_name",
+            "setpoint_node_or_nodelist_name",
+        ],
         "Output:Schedules" => &["key_field"],
         "Schedule:Week:Daily" => &REGULAR_DAY_FIELDS,
         "Schedule:Day:Interval" | "Schedule:Week:Compact" => &["data"],
@@ -480,3 +495,43 @@ const REGULAR_DAY_FIELDS: [&str; 12] = [
     "customday1_schedule_day_name",
     "customday2_schedule_day_name",
 ];
+
+/// Admission validates actual raw schedule identity, not a typed empty graph.
+/// Resolution/current values and node connections remain the production getters.
+pub(super) fn validate_scheduled_setpoint_references(raw: &RawModel) -> Result<(), String> {
+    let Some(objects) = raw
+        .objects
+        .get(&ObjectType("SetpointManager:Scheduled".into()))
+    else {
+        return Ok(());
+    };
+    // No genuine Scheduled IDF_ORDER_TARGETS writer has been promoted yet.
+    // Do not infer declaration order from the converted JSON map or typed IDs.
+    if !objects.is_empty() && !raw.is_epjson() {
+        return Err("Scheduled Temperature currently requires direct Source epJSON; staged IDF metadata recovery is not implemented".into());
+    }
+    for object in objects.values() {
+        let Some(RawValue::String(schedule)) =
+            object.fields.get(&FieldName("schedule_name".into()))
+        else {
+            return Err("Scheduled setpoint requires actual schedule_name string".into());
+        };
+        // Native GetSchedule includes these two genuine built-in Constant owners.
+        let builtin = ["Constant-0.0", "Constant-1.0"]
+            .iter()
+            .any(|name| schedule.eq_ignore_ascii_case(name));
+        let constant = raw
+            .objects
+            .get(&ObjectType("Schedule:Constant".into()))
+            .is_some_and(|rows| {
+                rows.keys()
+                    .any(|name| name.0.eq_ignore_ascii_case(schedule))
+            });
+        if !builtin && !constant && !has_source_detailed_reference(raw, schedule) {
+            return Err("Scheduled setpoint schedule reference is outside the actual supported schedule owners".into());
+        }
+        // No gain-style nonnegative constraint: temperature schedules may be negative.
+        // No preview value or guessed NodeId is stored by admission.
+    }
+    Ok(())
+}
