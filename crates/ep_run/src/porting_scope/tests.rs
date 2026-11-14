@@ -3159,6 +3159,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             unit.as_object_mut()
                                 .expect("unit")
                                 .remove("humidification_control_type");
+                        } else if method == "Sum" && limit == "LimitCapacity" {
+                            unit["dehumidification_control_type"] = json!("");
                         }
                     }
                     if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
@@ -3348,7 +3350,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             let expected = match name {
                                 "None" => ep_model::DehumidificationControlType::None,
                                 "ConstantSupplyHumidityRatio" => ep_model::DehumidificationControlType::ConstantSupplyHumidityRatio,
-                                "ConstantSensibleHeatRatio" => ep_model::DehumidificationControlType::ConstantSensibleHeatRatio,
+                                // Advisory typed default remains SHR; the actual getter owns Invalid.
+                                "" | "ConstantSensibleHeatRatio" => ep_model::DehumidificationControlType::ConstantSensibleHeatRatio,
                                 _ => unreachable!(),
                             };
                             assert_eq!(
@@ -3592,8 +3595,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         unit["dehumidification_control_type"] = json!("ConstantSensibleHeatRatio");
                         match method {
                             "Flow/Person" => {
-                                // Real getter ownership does not admit positive-OA empty humidity.
-                                unit["dehumidification_control_type"] = json!("")
+                                unit["dehumidification_control_type"] = json!("Humidistat")
                             }
                             "Flow/Zone" => unit["cooling_sensible_heat_ratio"] = json!(0.0),
                             "Flow/Area" => unit["cooling_sensible_heat_ratio"] = json!(-0.0),
@@ -3644,7 +3646,12 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     }
                     7 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["design_specification_outdoor_air_object_name"] =
-                            json!("Missing")
+                            json!("Missing");
+                        if method == "Sum" {
+                            // Both refs are nonblank, but the same deep Raw prerequisite must fail.
+                            bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                                json!("");
+                        }
                     }
                     8 => {
                         bad.as_object_mut()

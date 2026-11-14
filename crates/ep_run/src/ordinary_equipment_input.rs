@@ -42,10 +42,15 @@ pub(crate) fn source_b_dehumidification_prerequisite_error(
             .objects
             .get(&ObjectType("DesignSpecification:OutdoorAir".into()))
             .is_none_or(|rows| rows.is_empty());
+    // This is the same pure Raw prerequisite used by Scope and ingress below,
+    // not a second validator. Positive refs alone never grant permission.
+    let owned_positive_oa = text(object, "design_specification_outdoor_air_object_name").is_some()
+        && text(object, "outdoor_air_inlet_node_name").is_some()
+        && source_b_positive_oa_prerequisite_error(raw).is_none();
     let non_humidistat = field(object, "humidification_control_type")
         .is_none_or(|value| text_is(value, &["", "None", "ConstantSupplyHumidityRatio"]));
-    (!no_oa || !non_humidistat).then_some(
-        "ordinary Source explicit-empty dehumidification requires no-OA non-Humidistat controls",
+    (!(no_oa || owned_positive_oa) || !non_humidistat).then_some(
+        "ordinary Source explicit-empty dehumidification requires an owned non-Humidistat no-OA or basic positive-OA composition",
     )
 }
 
@@ -208,6 +213,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
         text_is(
             value,
             &[
+                "",
                 "None",
                 "ConstantSupplyHumidityRatio",
                 "ConstantSensibleHeatRatio",
