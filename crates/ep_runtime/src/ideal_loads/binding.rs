@@ -1115,8 +1115,8 @@ fn validate_direct_zone_model(
         return unsupported(DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule);
     }
 
-    // Widened Source scalar parsing does not silently expand NoOA physics.
-    // This retained NoOA ceiling is an ownership boundary, not Native schema.
+    // Source NoOA high-W operands use only already-owned non-Humidistat paths.
+    // Keep Humidistat high-W held without changing Legacy or selector identity.
     if mode == DirectZoneValidationMode::SourceEligibility
         && !IdealLoadsFeatureFlags::from_system(system).has_outdoor_air
         && [
@@ -1125,6 +1125,14 @@ fn validate_direct_zone_model(
         ]
         .into_iter()
         .any(|value| value > 1.0)
+        && (system.dehumidification_control_type == DehumidificationControlType::Humidistat
+            || system.humidification_control_type == HumidificationControlType::Humidistat
+            || [
+                system.maximum_heating_supply_air_humidity_ratio,
+                system.minimum_cooling_supply_air_humidity_ratio,
+            ]
+            .into_iter()
+            .any(|value| !value.is_finite() || value <= 0.0))
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset);
     }

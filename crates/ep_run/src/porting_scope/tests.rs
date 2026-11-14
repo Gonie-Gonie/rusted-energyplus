@@ -3462,8 +3462,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         for invalid in [Value::Null, json!("Autosize"), json!(-1.0)] {
                             let mut bad = hard.clone();
                             bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"][missing] = invalid;
-                            // Reuse two existing null-size negative candidates;
-                            // all other null/Autosize/negative cases stay literal.
+                            // Reuse the two NoOA high-W negatives to retain
+                            // Humidistat ownership; other size negatives stay literal.
                             let no_oa_high_w = method == "Flow/Zone"
                                 && limit == "LimitFlowRate"
                                 && flow > 0.0
@@ -3489,8 +3489,10 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 unit["minimum_cooling_supply_air_humidity_ratio"] = json!(0.0077);
                                 if missing == "maximum_heating_air_flow_rate" {
                                     unit["maximum_heating_supply_air_humidity_ratio"] = json!(1.1);
+                                    unit["humidification_control_type"] = json!("Humidistat");
                                 } else {
                                     unit["minimum_cooling_supply_air_humidity_ratio"] = json!(1.2);
+                                    unit["dehumidification_control_type"] = json!("Humidistat");
                                 }
                             }
                             let bad_raw = parse_epjson_str(&bad.to_string())
@@ -4742,7 +4744,24 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     "ConstantSupplyHumidityRatio",
                 ),
             ] {
-                let humidity_ratio = 0.006_123_456_789_f64;
+                // Reuse existing rows: omitted/explicit SHR, both Constant,
+                // and inactive None/None reach the actual Source lane.
+                let high_w = (limit == "NoLimit"
+                    && ((matches!(
+                        dehumidification,
+                        "SCHEMA_DEFAULT" | "ConstantSensibleHeatRatio"
+                    ) && humidification == "None")
+                        || (dehumidification == "ConstantSupplyHumidityRatio"
+                            && humidification == "ConstantSupplyHumidityRatio")))
+                    || (limit == "LimitCapacity"
+                        && dehumidification == "None"
+                        && humidification == "None");
+                let humidity_ratio = if high_w {
+                    1.2_f64
+                } else {
+                    0.006_123_456_789_f64
+                };
+                let high_heating_w = high_w && humidification == "ConstantSupplyHumidityRatio";
                 let omitted_selector = dehumidification == "SCHEMA_DEFAULT";
                 let selected_dehumidification = if omitted_selector {
                     "ConstantSensibleHeatRatio"
@@ -4779,6 +4798,10 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 }
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["minimum_cooling_supply_air_humidity_ratio"] =
                     json!(humidity_ratio);
+                if high_heating_w {
+                    humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_heating_supply_air_humidity_ratio"] =
+                        json!(1.1);
+                }
                 let raw =
                     parse_epjson_str(&humidity.to_string()).expect("constant cooling raw input");
                 let retained = raw.clone();
@@ -4817,6 +4840,25 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     unit.minimum_cooling_supply_air_humidity_ratio.to_bits(),
                     humidity_ratio.to_bits()
                 );
+                if high_w {
+                    let legacy = ep_compiler::compile_raw_model(&raw);
+                    assert!(legacy.report.diagnostics.iter().any(|row| row.code
+                        == "InvalidNumericRange"
+                        && row.object_type == "ZoneHVAC:IdealLoadsAirSystem"
+                        && row.field.as_deref()
+                            == Some("minimum_cooling_supply_air_humidity_ratio")));
+                    if high_heating_w {
+                        assert_eq!(
+                            unit.maximum_heating_supply_air_humidity_ratio.to_bits(),
+                            1.1_f64.to_bits()
+                        );
+                        assert!(legacy.report.diagnostics.iter().any(|row| row.code
+                            == "InvalidNumericRange"
+                            && row.object_type == "ZoneHVAC:IdealLoadsAirSystem"
+                            && row.field.as_deref()
+                                == Some("maximum_heating_supply_air_humidity_ratio")));
+                    }
+                }
                 if matches!(limit, "LimitCapacity" | "LimitFlowRateAndCapacity") {
                     assert!(matches!(unit.maximum_total_cooling_capacity_w,
                         Some(ep_model::AutosizeOrNumber::Value(value)) if value.to_bits() == 900.0_f64.to_bits()));
@@ -4824,11 +4866,15 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 let simulation = ep_model::SimulationModel::from_typed(model.clone());
                 ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
                     .expect("Source constant cooling eligibility");
-                if dehumidification == "None" && humidification == "None" {
-                    ep_runtime::bind_direct_zone_purchased_air_model(&simulation)
-                        .expect("unchanged Legacy sensible numeric-capacity binding");
-                } else {
-                    assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+                if !high_w {
+                    if dehumidification == "None" && humidification == "None" {
+                        ep_runtime::bind_direct_zone_purchased_air_model(&simulation)
+                            .expect("unchanged Legacy sensible numeric-capacity binding");
+                    } else {
+                        assert!(
+                            ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err()
+                        );
+                    }
                 }
                 let mut actual_scope =
                     inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
@@ -4922,6 +4968,12 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         .to_bits(),
                     humidity_ratio.to_bits()
                 );
+                if high_heating_w {
+                    assert_eq!(
+                        fields["maximum_heating_supply_air_humidity_ratio"],
+                        SourceRaw::Number("1.1".into())
+                    );
+                }
                 assert_eq!(raw, retained);
             }
             let mut empty_dehumidification = people.clone();

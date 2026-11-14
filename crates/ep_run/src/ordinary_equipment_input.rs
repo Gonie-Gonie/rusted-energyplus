@@ -120,8 +120,8 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
             })
         });
     if !selected {
-        // Source compilation accepts Native's positive W scalar domain, but
-        // NoOA W>1 physical compositions remain outside this unit's ownership.
+        // NoOA high-W operands use the existing non-Humidistat owners only.
+        // Existing direct-empty and Humidistat prerequisites remain separate.
         if units.is_some_and(|rows| {
             rows.values().any(|unit| {
                 [
@@ -133,10 +133,29 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
                     field(unit, name)
                         .and_then(number)
                         .is_some_and(|value| value > 1.0)
-                })
+                }) && (!field(unit, "dehumidification_control_type").is_none_or(|value| {
+                    text_is(
+                        value,
+                        &[
+                            "None",
+                            "ConstantSupplyHumidityRatio",
+                            "ConstantSensibleHeatRatio",
+                        ],
+                    )
+                }) || !field(unit, "humidification_control_type").is_none_or(|value| {
+                    text_is(value, &["", "None", "ConstantSupplyHumidityRatio"])
+                }) || [
+                    "maximum_heating_supply_air_humidity_ratio",
+                    "minimum_cooling_supply_air_humidity_ratio",
+                ]
+                .iter()
+                .any(|name| {
+                    field(unit, name)
+                        .is_some_and(|value| !number(value).is_some_and(|value| value > 0.0))
+                }))
             })
         }) {
-            return Some("SourceB no-OA supply humidity ratios remain bounded to at most1".into());
+            return Some("SourceB no-OA high supply humidity ratios require positive operands and non-Humidistat controls".into());
         }
         return None;
     }
