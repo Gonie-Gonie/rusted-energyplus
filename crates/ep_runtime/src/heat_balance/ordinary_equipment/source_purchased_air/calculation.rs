@@ -554,12 +554,21 @@ impl OrdinaryEquipment {
                                 "actual PurchasedAir heating humidistat supply humidity operation",
                             ));
                         }
-                        SourcePurchasedAirHumidityControl::ConstantSupplyHumidityRatio => {
-                            if heating {
+                        SourcePurchasedAirHumidityControl::ConstantSupplyHumidityRatio
+                            if heating =>
+                        {
+                            // Native2498-2528: only cooling-capacity coupling
+                            // needs the unresolved diagnostic-aware WFromH child.
+                            if unit.mixed_air_hum_rat > unit.max_heat_supp_air_hum_rat
+                                && capacity_limited(unit.cooling_limit)
+                            {
                                 return Err(Error::Unavailable(
-                                    "actual PurchasedAir heating constant supply humidity operation",
+                                    "actual PurchasedAir heating constant humidity cooling-capacity child",
                                 ));
                             }
+                            unit.supply_hum_rat = unit.max_heat_supp_air_hum_rat;
+                        }
+                        SourcePurchasedAirHumidityControl::ConstantSupplyHumidityRatio => {
                             unit.supply_hum_rat = unit.mixed_air_hum_rat;
                         }
                         _ => {

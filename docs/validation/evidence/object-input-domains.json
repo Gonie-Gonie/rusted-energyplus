@@ -337,10 +337,10 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "All nine Scheduled controls retain bounded Source B evidence across thirty-two pairs and 2,315,520 values. The three explicit-empty fuel scenes preserve all eighteen public schedule/setpoint joins and inherited flow and structure gates. This adds no other manager, Source A manager, private-history or full-object claim."
+      "All nine Scheduled controls retain bounded Source B evidence across thirty-four pairs and 2,462,880 values. Heating-only and both-control constant-humidity scenes preserve all eighteen public schedule/setpoint joins and inherited flow and structure gates. This adds no other manager, Source A manager, private-history or full-object claim."
     ],
     "NodeList": [
-      "The bounded raw/IP NodeList owner and advisory Proven/Deferred metadata retain thirty-two Source B pairs plus the unused Source A pair. Three explicit-empty fuel scenes preserve existing order, case, blank-member, inlet, exhaust, basis, ordered-return and public identity gates. Selected Deferred consumers, Legacy/no-exhaust bounds, arbitrary names and combinations, and full-object conformance remain open."
+      "The bounded raw/IP NodeList owner and advisory Proven/Deferred metadata retain thirty-four Source B pairs plus the unused Source A pair. Heating-only and both-control constant-humidity scenes preserve existing list order, case, blank-member, inlet, exhaust, basis, ordered-return and public identity gates. Selected Deferred consumers, Legacy/no-exhaust bounds, arbitrary names and combinations, and full-object conformance remain open."
     ]
   },
   "verification": {
@@ -6298,6 +6298,68 @@
           }
         },
         "scope": "One first-pass five-command QA and two existing tests serve one default Source135 build and three fresh Native/Source pairs. Heating-empty, cooling-empty and both-empty exercise the pinned SDK resource alias through full meter conservation and producer membership. Omitted district defaults remain distinct; the old two Native-only observations are retained separately with zero Source paired credit. No new test function, additional workspace or cohort run, numeric limit change or formal-domain promotion."
+      },
+      "constant_supply_humidity_134": {
+        "final_quality": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/quality02/summary.json",
+          "sha256": "5b07cc5f089395a750e9cfa33e269c76d2f3942f658e4528f31aea5257085686",
+          "bytes": 1673
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit134-prep/owner-execution-review01.json",
+          "sha256": "2e73d60d9eb7670e8ff48978404019a72650f500c1c439ac43fd36a2cacbdd3a",
+          "bytes": 4168
+        },
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit134-prep/Root-runtime-bindings01.json",
+          "sha256": "d22fc9e2bfd97dccb5c32880780d3f9c76be917fff7eddd11ea102cc95cdc840",
+          "bytes": 3385
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit134-prep/Root-source-adoption01.json",
+          "sha256": "11046a82b0713ceb1494c4907652ce50c4396d2c08d20ac066a5f09f29f14309",
+          "bytes": 6388
+        },
+        "independent_Source_review": {
+          "path": ".runtime/object-expansion/unit134-prep/independent-Source-heating-constant-humidity-owner03-rebase-review01.json",
+          "sha256": "0629f6a347ef71d745a542f143335d672024da99a7a6824270b3e23d3d4f1fa2",
+          "bytes": 7328
+        },
+        "Root_completed_review": {
+          "path": ".runtime/object-expansion/unit134-prep/Root-completed-readback-review01.json",
+          "sha256": "0bb3a67ee38a1a6a405885d2a0bac0a8dc503ae43b187b2a186b5cd42e736d6a",
+          "bytes": 6040
+        },
+        "retained_evidence": {
+          "path": ".runtime/object-expansion/unit134-prep/Root-retained-evidence01.json",
+          "sha256": "42c59a214fa77e296937b7fd659f08224e22b5907e650f15eab4e46c6886865c",
+          "bytes": 7907
+        },
+        "case_comparisons": {
+          "HEATING_CONSTANT": {
+            "path": ".runtime/object-expansion/unit134-prep/paired-runtime-proposal01/HEATING_CONSTANT.pair-proof01.json",
+            "sha256": "e1f27419bb5fbf9d1b3eec785880980e6909340861c876a413f2f0cecd431b09",
+            "bytes": 469349
+          },
+          "BOTH_CONSTANT": {
+            "path": ".runtime/object-expansion/unit134-prep/paired-runtime-proposal01/BOTH_CONSTANT.pair-proof01.json",
+            "sha256": "46d05f0e572c5ce3d2aa752d54047304e596b686e79ea3539400a669dfffa352",
+            "bytes": 507881
+          }
+        },
+        "guarded_match_correction": {
+          "path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json",
+          "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
+          "bytes": 2919
+        },
+        "retained_failed_QA_receipts": [
+          {
+            "path": ".runtime/porting/heating-and-both-humidity-134/quality01/clippy/receipt.json",
+            "sha256": "422868ea06d216fd6a86b9dacd96cf06a0686806172cc826b174649390b71b99",
+            "bytes": 3459
+          }
+        ],
+        "scope": "One final five-command QA and two existing tests serve one default Source136 build and two fresh Native/Source pairs. First QA Clippy101 and its equivalent guarded-match correction remain retained with zero physical credit. Heating-only and both-control constant humidity add genuine Winter witnesses; both-control also retains the Summer witness. No new test function, cohort rerun, numeric policy change or formal-domain promotion."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -62235,12 +62297,367 @@
         },
         "inherited_science": "All original variable policies and complete ordered streams retain Winter heating/weather/fuel, independent cooling availability, returns, eighteen setpoint joins, exhaust, BND/UTF8, comfort/table, ancillary and JSON/CSV checks. Full raw families, producer links and first witnesses remain in the immutable comparison rather than this lean row.",
         "effective_state": "One finite explicit-empty fuel composition under the pinned EnergyPlus 26.1 Windows SDK report-resource compatibility boundary. Omitted district defaults remain distinct; no schema default, portable C++ fallback or general malformed-fuel/full-object claim."
+      },
+      {
+        "id": "B-HEATING-CONSTANT-HUMIDITY-134-120H",
+        "case_kind": "HEATING_CONSTANT",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-heating-and-both-humidity-134",
+        "input": {
+          "path": ".runtime/object-expansion/unit134-prep/heating-and-both-constant-humidity-input-proposal01/HEATING_CONSTANT/input.epJSON",
+          "sha256": "ed523bf9bc1c5eb72e5b9658ac123286c4623cda7a86d24f0a8fe23b0c43c701",
+          "bytes": 100511
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/HEATING_CONSTANT/native01/command/receipt.json",
+          "sha256": "65f9db299e65160a809e3125a3607a66ab103f85ba9053030d17963d69e4f049",
+          "bytes": 77178
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/HEATING_CONSTANT/source01/command/receipt.json",
+          "sha256": "29bd62f04e761567a307a7bc6fa28afe4f8ace8892e23ae9e8f3e0246bd613d5",
+          "bytes": 77979
+        },
+        "source_summary": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/HEATING_CONSTANT/source01/output/run-summary.json",
+          "sha256": "88b53e03486b273ff58f28458e0159e1996ae96874461cdb5eea22c2a878a7bf",
+          "bytes": 63650
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1d/1d01ee9a85d9a7ac3f7f8541f9deb4f7496c965313c1a501818659109917a305",
+          "sha256": "1d01ee9a85d9a7ac3f7f8541f9deb4f7496c965313c1a501818659109917a305"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/build136-01/eplus-rs.exe",
+          "sha256": "49640aa79abbe74d2a22c9e40310b0647e4ba873cbf81070479703a4fb72c001",
+          "bytes": 80775046
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/build136-01/build/receipt.json",
+          "sha256": "317b259dd306564205036b53d4e96270befe4c520dc57502cd3ba6b21f432c0c",
+          "bytes": 4904
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit134-prep/paired-runtime-proposal01/HEATING_CONSTANT.pair-proof01.json",
+          "sha256": "e1f27419bb5fbf9d1b3eec785880980e6909340861c876a413f2f0cecd431b09",
+          "bytes": 469349
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit134-prep/Root-completed-readback-review01.json",
+          "sha256": "0bb3a67ee38a1a6a405885d2a0bac0a8dc503ae43b187b2a186b5cd42e736d6a",
+          "bytes": 6040
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit134-prep/science-final01/HEATING_CONSTANT.recipe.json",
+          "sha256": "1261a00a221ce5134e40b1c1c91d73d5c8348167b58173747a6540eeeef8e7a8",
+          "bytes": 38266
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit134-prep/heating-and-both-constant-humidity-input-proposal02/batch-plan02.json",
+          "sha256": "08ff55c57c00d949485e568dbd1ef2b4ea79a70648ca96147eb5eba3cc0b9a48",
+          "bytes": 6541
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 20530,
+          "parsed_binary64_unequal": 20530,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.218293957412243e-07,
+          "max_rmse_delta": 1.7131264796045072e-08
+        },
+        "named_humidity_controls": [
+          {
+            "path": [
+              "ZoneHVAC:IdealLoadsAirSystem",
+              "ZONE one ideal loads 각",
+              "humidification_control_type"
+            ],
+            "before": "None",
+            "after": "ConstantSupplyHumidityRatio"
+          }
+        ],
+        "public_humidity_summary": {
+          "Native": {
+            "heating": {
+              "samples": 480,
+              "full_clock_context_operand_joins": 4320,
+              "candidate_samples": 25,
+              "witness_samples": 9,
+              "actual_latent_report_pair_counts": {
+                "heating": 5,
+                "cooling": 4,
+                "both": 0
+              },
+              "authored_target": 0.0156,
+              "authored_target_binary64_bits": "3f8ff2e48e8a71de"
+            },
+            "cooling": null
+          },
+          "Source": {
+            "heating": {
+              "samples": 480,
+              "full_clock_context_operand_joins": 4320,
+              "candidate_samples": 25,
+              "witness_samples": 9,
+              "actual_latent_report_pair_counts": {
+                "heating": 5,
+                "cooling": 4,
+                "both": 0
+              },
+              "authored_target": 0.0156,
+              "authored_target_binary64_bits": "3f8ff2e48e8a71de"
+            },
+            "cooling": null
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit134-prep/heating-and-both-constant-humidity-input-proposal01/HEATING_CONSTANT/unchanged-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "whole155_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit134-prep/build136-attempt01.json",
+            "sha256": "46b7a75f07bfbf4ae35f3428b735ee2c5c8274f89fead49c2f4a43f3ad5b2f08",
+            "bytes": 714
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/heating-and-both-humidity-134/quality02/summary.json",
+            "sha256": "5b07cc5f089395a750e9cfa33e269c76d2f3942f658e4528f31aea5257085686",
+            "bytes": 1673
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit134-prep/owner-execution-review01.json",
+            "sha256": "2e73d60d9eb7670e8ff48978404019a72650f500c1c439ac43fd36a2cacbdd3a",
+            "bytes": 4168
+          },
+          "retained_evidence": {
+            "path": ".runtime/object-expansion/unit134-prep/Root-retained-evidence01.json",
+            "sha256": "42c59a214fa77e296937b7fd659f08224e22b5907e650f15eab4e46c6886865c",
+            "bytes": 7907
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "independent_physical_reader_required": false
+        },
+        "inherited_science": "All original155 policies and ordered streams retain Winter heating/weather/fuel, cooling availability, returns, eighteen setpoint joins, exhaust, BND/UTF8, comfort/table, ancillary and JSON/CSV checks. Full projections and first-witness operands remain in the immutable comparison rather than this lean row.",
+        "effective_state": "One finite no-OA/NoLimit named heating-only or both constant-humidity composition. Actual public target-retained latent-response witnesses establish neither a global target/private-mode law nor capacity, OA, SHR, humidistat, sizing, arbitrary-combination or full-object closure."
+      },
+      {
+        "id": "B-BOTH-CONSTANT-HUMIDITY-134-120H",
+        "case_kind": "BOTH_CONSTANT",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-heating-and-both-humidity-134",
+        "input": {
+          "path": ".runtime/object-expansion/unit134-prep/heating-and-both-constant-humidity-input-proposal01/BOTH_CONSTANT/input.epJSON",
+          "sha256": "b1fce7d60c4c4d222ffad84a8d6f19bcfdcf3ccf48a6735a4ee7cff367833182",
+          "bytes": 100534
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/BOTH_CONSTANT/native01/command/receipt.json",
+          "sha256": "23129a995693569f6ad6ec8f4f10ffa8ad1222b43bd42414769feaae0a5d0278",
+          "bytes": 77838
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/BOTH_CONSTANT/source01/command/receipt.json",
+          "sha256": "cf68915386279953898ee361d939bfb4632eaf4b107154db24a71f7c7ef9a39d",
+          "bytes": 78630
+        },
+        "source_summary": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/BOTH_CONSTANT/source01/output/run-summary.json",
+          "sha256": "878acc4ef22d102ddb0a08c46a720699b9ac5cf244727252eccd6e26bd607d34",
+          "bytes": 63577
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1d/1d01ee9a85d9a7ac3f7f8541f9deb4f7496c965313c1a501818659109917a305",
+          "sha256": "1d01ee9a85d9a7ac3f7f8541f9deb4f7496c965313c1a501818659109917a305"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/build136-01/eplus-rs.exe",
+          "sha256": "49640aa79abbe74d2a22c9e40310b0647e4ba873cbf81070479703a4fb72c001",
+          "bytes": 80775046
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/build136-01/build/receipt.json",
+          "sha256": "317b259dd306564205036b53d4e96270befe4c520dc57502cd3ba6b21f432c0c",
+          "bytes": 4904
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit134-prep/paired-runtime-proposal01/BOTH_CONSTANT.pair-proof01.json",
+          "sha256": "46d05f0e572c5ce3d2aa752d54047304e596b686e79ea3539400a669dfffa352",
+          "bytes": 507881
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit134-prep/Root-completed-readback-review01.json",
+          "sha256": "0bb3a67ee38a1a6a405885d2a0bac0a8dc503ae43b187b2a186b5cd42e736d6a",
+          "bytes": 6040
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit134-prep/science-final01/BOTH_CONSTANT.recipe.json",
+          "sha256": "8cfc7166bee3625031dfcc3e9785061712a2b89894fabc3c9c35148741141dbb",
+          "bytes": 38703
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit134-prep/heating-and-both-constant-humidity-input-proposal02/batch-plan02.json",
+          "sha256": "08ff55c57c00d949485e568dbd1ef2b4ea79a70648ca96147eb5eba3cc0b9a48",
+          "bytes": 6541
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 15253,
+          "parsed_binary64_unequal": 15253,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.561137080192566e-09,
+          "max_rmse_delta": 5.756924497319098e-10
+        },
+        "named_humidity_controls": [
+          {
+            "path": [
+              "ZoneHVAC:IdealLoadsAirSystem",
+              "ZONE one ideal loads 각",
+              "humidification_control_type"
+            ],
+            "before": "None",
+            "after": "ConstantSupplyHumidityRatio"
+          },
+          {
+            "path": [
+              "ZoneHVAC:IdealLoadsAirSystem",
+              "ZONE one ideal loads 각",
+              "dehumidification_control_type"
+            ],
+            "before": "None",
+            "after": "ConstantSupplyHumidityRatio"
+          }
+        ],
+        "public_humidity_summary": {
+          "Native": {
+            "heating": {
+              "samples": 480,
+              "full_clock_context_operand_joins": 4320,
+              "candidate_samples": 25,
+              "witness_samples": 10,
+              "actual_latent_report_pair_counts": {
+                "heating": 5,
+                "cooling": 5,
+                "both": 0
+              },
+              "authored_target": 0.0156,
+              "authored_target_binary64_bits": "3f8ff2e48e8a71de"
+            },
+            "cooling": {
+              "samples": 480,
+              "full_clock_context_operand_joins": 4320,
+              "candidate_samples": 288,
+              "witness_samples": 211,
+              "actual_latent_report_pair_counts": {
+                "heating": 0,
+                "cooling": 203,
+                "both": 8
+              },
+              "authored_target": 0.0077,
+              "authored_target_binary64_bits": "3f7f8a0902de00d2"
+            }
+          },
+          "Source": {
+            "heating": {
+              "samples": 480,
+              "full_clock_context_operand_joins": 4320,
+              "candidate_samples": 25,
+              "witness_samples": 10,
+              "actual_latent_report_pair_counts": {
+                "heating": 5,
+                "cooling": 5,
+                "both": 0
+              },
+              "authored_target": 0.0156,
+              "authored_target_binary64_bits": "3f8ff2e48e8a71de"
+            },
+            "cooling": {
+              "samples": 480,
+              "full_clock_context_operand_joins": 4320,
+              "candidate_samples": 288,
+              "witness_samples": 211,
+              "actual_latent_report_pair_counts": {
+                "heating": 0,
+                "cooling": 203,
+                "both": 8
+              },
+              "authored_target": 0.0077,
+              "authored_target_binary64_bits": "3f7f8a0902de00d2"
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit134-prep/heating-and-both-constant-humidity-input-proposal01/BOTH_CONSTANT/unchanged-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "whole155_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit134-prep/build136-attempt01.json",
+            "sha256": "46b7a75f07bfbf4ae35f3428b735ee2c5c8274f89fead49c2f4a43f3ad5b2f08",
+            "bytes": 714
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/heating-and-both-humidity-134/quality02/summary.json",
+            "sha256": "5b07cc5f089395a750e9cfa33e269c76d2f3942f658e4528f31aea5257085686",
+            "bytes": 1673
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit134-prep/owner-execution-review01.json",
+            "sha256": "2e73d60d9eb7670e8ff48978404019a72650f500c1c439ac43fd36a2cacbdd3a",
+            "bytes": 4168
+          },
+          "retained_evidence": {
+            "path": ".runtime/object-expansion/unit134-prep/Root-retained-evidence01.json",
+            "sha256": "42c59a214fa77e296937b7fd659f08224e22b5907e650f15eab4e46c6886865c",
+            "bytes": 7907
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "independent_physical_reader_required": false
+        },
+        "inherited_science": "All original155 policies and ordered streams retain Winter heating/weather/fuel, cooling availability, returns, eighteen setpoint joins, exhaust, BND/UTF8, comfort/table, ancillary and JSON/CSV checks. Full projections and first-witness operands remain in the immutable comparison rather than this lean row.",
+        "effective_state": "One finite no-OA/NoLimit named heating-only or both constant-humidity composition. Actual public target-retained latent-response witnesses establish neither a global target/private-mode law nor capacity, OA, SHR, humidistat, sizing, arbitrary-combination or full-object closure."
       }
     ],
     "totals": {
-      "paired_cases": 204,
-      "reported_samples": 7276216,
-      "raw_operand_unequal": 1744767,
+      "paired_cases": 206,
+      "reported_samples": 7423576,
+      "raw_operand_unequal": 1780550,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -64540,6 +64957,23 @@
           "sha256": "5ba288e1f5202da00a1d7256a948a81b20f6a106da1aaef9a5f3d23b4fd45704",
           "bytes": 80766052
         }
+      },
+      {
+        "id": "source-dd-heating-and-both-humidity-134",
+        "receipt": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/build136-01/build/receipt.json",
+          "sha256": "317b259dd306564205036b53d4e96270befe4c520dc57502cd3ba6b21f432c0c",
+          "bytes": 4904
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/1d/1d01ee9a85d9a7ac3f7f8541f9deb4f7496c965313c1a501818659109917a305",
+          "sha256": "1d01ee9a85d9a7ac3f7f8541f9deb4f7496c965313c1a501818659109917a305"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/heating-and-both-humidity-134/build136-01/eplus-rs.exe",
+          "sha256": "49640aa79abbe74d2a22c9e40310b0647e4ba873cbf81070479703a4fb72c001",
+          "bytes": 80775046
+        }
       }
     ],
     "focused_since_workspace": {
@@ -64906,14 +65340,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 135,
-      "builds_with_accepted_paired_cases": 121,
+      "actual_recorded_builds": 136,
+      "builds_with_accepted_paired_cases": 122,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 10,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "135 recorded Source builds:121 have accepted pairs;14 have none, including four without Source execution. One first-pass five-command QA/default Source135 build serves three fresh explicit-empty fuel pairs. Prior histories, including the two earlier Native-only characterizations, keep their original separate zero paired credit.",
+      "qualification": "136 recorded Source builds: 122 have accepted pairs; 14 have none, including four without Source execution. One actual default Source136 build serves two fresh constant-humidity pairs. The failed first Clippy attempt and its equivalent guarded-match correction are retained separately from the passing final five-command QA. All previous histories keep their original credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 4,
@@ -69455,7 +69889,7 @@
       "scope": "One fixed five-DesignDay DD-only ASH55 plus CEN15251 scene. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, other comfort models and arbitrary compositions remain unvalidated. Public samples do not establish private state, all branch/threshold coverage, full-object support or frozen conformance promotion.",
       "capability_or_gate_promotion": false
     },
-    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H", "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H", "B-COOLING-FUEL-EFFICIENCY-POSITIVE-129-120H", "B-COOLING-FUEL-EFFICIENCY-FALLBACK-129-120H", "B-HEATING-AVAILABILITY-FUEL-POSITIVE-130-120H", "B-HEATING-AVAILABILITY-FUEL-FALLBACK-130-120H", "B-FUEL-RESOURCES-SHARED_ELECTRICITY-131-120H", "B-FUEL-RESOURCES-SHARED_NATURALGAS-131-120H", "B-FUEL-RESOURCES-SHARED_GASOLINE-131-120H", "B-FUEL-RESOURCES-SHARED_DIESEL-131-120H", "B-FUEL-RESOURCES-SHARED_COAL-131-120H", "B-FUEL-RESOURCES-SHARED_PROPANE-131-120H", "B-FUEL-RESOURCES-SHARED_FUELOILNO1-131-120H", "B-FUEL-RESOURCES-SHARED_FUELOILNO2-131-120H", "B-FUEL-RESOURCES-SHARED_OTHERFUEL1-131-120H", "B-FUEL-RESOURCES-SHARED_OTHERFUEL2-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTCOOLING-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGWATER-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGSTEAM-131-120H", "B-FUEL-RESOURCES-DISTINCT_NATURALGAS_ELECTRICITY-131-120H", "B-COOLING-CONSTANT-SUPPLY-HUMIDITY-132-120H", "B-EXPLICIT-EMPTY-FUEL-HEATING_EMPTY-133-120H", "B-EXPLICIT-EMPTY-FUEL-COOLING_EMPTY-133-120H", "B-EXPLICIT-EMPTY-FUEL-BOTH_EMPTY-133-120H"], "accepted_paired_cases": 33, "accepted_samples": 2375040, "retained_Scheduled_B_pairs": 32, "retained_Scheduled_B_samples": 2315520, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"HEATING_EMPTY": {"path": ".runtime/object-expansion/unit133-prep/paired-runtime-proposal01/HEATING_EMPTY.pair-proof01.json", "sha256": "5beb63defa1412782f967225e0165b9141a15d583af70b1cd1fae5e1f7b1b1a4", "bytes": 568185}, "COOLING_EMPTY": {"path": ".runtime/object-expansion/unit133-prep/paired-runtime-proposal01/COOLING_EMPTY.pair-proof01.json", "sha256": "a468e692b0dfff28d677bbd59d7756aa9e926b5e05edff3a4b6834e7b345344f", "bytes": 568510}, "BOTH_EMPTY": {"path": ".runtime/object-expansion/unit133-prep/paired-runtime-proposal01/BOTH_EMPTY.pair-proof01.json", "sha256": "3246d9d4e9ed3c0966939ffd7c977f43753a43355711bcf93c9fd5896207ade7", "bytes": 552552}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit133-prep/Root-completed-readback-review01.json", "sha256": "71cfc6037cf2c24d94d9875d0b9a6e63afde86ac855d1ecd5592fdb92c549fc7", "bytes": 6395}, "latest_source_build": "source-dd-empty-fuel-SDK-133", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit133-prep/build135-attempt01.json", "sha256": "24b930bf282907c600ba38d6349e4b551f7b49114faba9896a198669673dbdba", "bytes": 681}, "latest_actual_quality": {"path": ".runtime/porting/empty-fuel-SDK-133/quality01/summary.json", "sha256": "10e5a4161a55a0d4d71aa477cd12bcdbdb456a92590da7da5288c41d248fd41f", "bytes": 1626}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit133-prep/owner-execution-review01.json", "sha256": "d7af2d85c2fe90274a54b91d59a45748d772963cc4911c5982995c40c3b0994c", "bytes": 3780}, "latest_input_contracts": {"HEATING_EMPTY": {"path": ".runtime/object-expansion/unit133-prep/science-final01/HEATING_EMPTY.recipe.json", "sha256": "c868dcbd51fe6ab06779cd57ad067daf5631780418be5a4dc1939d81ead67e3f", "bytes": 38735}, "COOLING_EMPTY": {"path": ".runtime/object-expansion/unit133-prep/science-final01/COOLING_EMPTY.recipe.json", "sha256": "5a361de7a12820913673b6f97aaeb30caef7ff6b59804c172f5614e7cc7806e8", "bytes": 38760}, "BOTH_EMPTY": {"path": ".runtime/object-expansion/unit133-prep/science-final01/BOTH_EMPTY.recipe.json", "sha256": "370806d962e50d07bd48478688940c4f2be3a3a1d94dcc43962aa9a3e8c11bca", "bytes": 38609}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit133-prep/Root-retained-evidence01.json", "sha256": "9932184bab4aa3c3a3e426d285a55a78391a56ed0dd367369da16246accb14e0", "bytes": 10479}, "pinned_SDK_static_evidence": {"path": ".runtime/object-expansion/unit133-prep/pinned-SDK-empty-fuel-static-evidence01.json", "sha256": "5cca54a7d9d7bcfa347e85fa8c04396d9c06e6cc53bbf1b4c71cd84755c80667", "bytes": 13648}, "previous_Native_only_characterization": {"path": ".runtime/object-expansion/unit132-prep/Root-explicit-empty-fuel-disposition01.json", "sha256": "f729eab8670165bda909761d8331a139b28abca94fae351b25dd02e2ba6aa64c", "bytes": 4287}, "scope": "Thirty-two bounded Source B Scheduled/NodeList pairs retain 2,315,520 values. The unused Source A pair adds 59,520, giving thirty-three pairs and 2,375,040 values. Three fresh cases exercise exact empty heating, cooling or both fuel strings through the pinned EnergyPlus 26.1 Windows SDK Electricity resource alias. Requested hourly meters retain original limits, ordered quarter sums, bidirectional producer membership and complete catalogs. The thirteen named fuel resources and the bounded cooling constant-humidity witness remain covered. Omitted district defaults remain distinct, and the two earlier Native-only characterizations keep their separate zero Source paired credit. Heating constant humidity, other topology/OA/sizing, arbitrary combinations, Legacy/private-state and full-object conformance remain open.", "capability_or_gate_promotion": false}
+    "current_Scheduled_and_NodeLists_live_pair": {"case_rows": ["B-SCHEDULED-TEMPERATURE-DD-116-120H", "B-SCHEDULED-NINE-CONTROLS-IDF-117-120H", "B-SCHEDULED-NINE-CONTROLS-TWO-NODELISTS-IDF-118-120H", "B-SCHEDULED-NINE-CONTROLS-BLANK-NODELIST-EPJSON-119-120H", "B-SCHEDULED-NINE-CONTROLS-REAL-EXHAUST-MULTIMEMBER-EPJSON-120-120H", "A-UNUSED-NODELIST-ORIGINAL-PREFIX-121-120H", "B-SCHEDULED-NINE-CONTROLS-CASE-NODELISTS-IDF-122-120H", "B-REAL-EXHAUST-RETURN-FRACTION-TWO-BASIS-124-120H", "B-REAL-EXHAUST-ORDERED-MULTIPLE-RETURNS-125-120H", "B-SELECTED-UTF8-NODELIST-INLET-IDEALNAME-126-120H", "B-ORTHOGONAL-COOLING-AVAILABILITY-128-120H", "B-COOLING-FUEL-EFFICIENCY-POSITIVE-129-120H", "B-COOLING-FUEL-EFFICIENCY-FALLBACK-129-120H", "B-HEATING-AVAILABILITY-FUEL-POSITIVE-130-120H", "B-HEATING-AVAILABILITY-FUEL-FALLBACK-130-120H", "B-FUEL-RESOURCES-SHARED_ELECTRICITY-131-120H", "B-FUEL-RESOURCES-SHARED_NATURALGAS-131-120H", "B-FUEL-RESOURCES-SHARED_GASOLINE-131-120H", "B-FUEL-RESOURCES-SHARED_DIESEL-131-120H", "B-FUEL-RESOURCES-SHARED_COAL-131-120H", "B-FUEL-RESOURCES-SHARED_PROPANE-131-120H", "B-FUEL-RESOURCES-SHARED_FUELOILNO1-131-120H", "B-FUEL-RESOURCES-SHARED_FUELOILNO2-131-120H", "B-FUEL-RESOURCES-SHARED_OTHERFUEL1-131-120H", "B-FUEL-RESOURCES-SHARED_OTHERFUEL2-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTCOOLING-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGWATER-131-120H", "B-FUEL-RESOURCES-SHARED_DISTRICTHEATINGSTEAM-131-120H", "B-FUEL-RESOURCES-DISTINCT_NATURALGAS_ELECTRICITY-131-120H", "B-COOLING-CONSTANT-SUPPLY-HUMIDITY-132-120H", "B-EXPLICIT-EMPTY-FUEL-HEATING_EMPTY-133-120H", "B-EXPLICIT-EMPTY-FUEL-COOLING_EMPTY-133-120H", "B-EXPLICIT-EMPTY-FUEL-BOTH_EMPTY-133-120H", "B-HEATING-CONSTANT-HUMIDITY-134-120H", "B-BOTH-CONSTANT-HUMIDITY-134-120H"], "accepted_paired_cases": 35, "accepted_samples": 2522400, "retained_Scheduled_B_pairs": 34, "retained_Scheduled_B_samples": 2462880, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"HEATING_CONSTANT": {"path": ".runtime/object-expansion/unit134-prep/paired-runtime-proposal01/HEATING_CONSTANT.pair-proof01.json", "sha256": "e1f27419bb5fbf9d1b3eec785880980e6909340861c876a413f2f0cecd431b09", "bytes": 469349}, "BOTH_CONSTANT": {"path": ".runtime/object-expansion/unit134-prep/paired-runtime-proposal01/BOTH_CONSTANT.pair-proof01.json", "sha256": "46d05f0e572c5ce3d2aa752d54047304e596b686e79ea3539400a669dfffa352", "bytes": 507881}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit134-prep/Root-completed-readback-review01.json", "sha256": "0bb3a67ee38a1a6a405885d2a0bac0a8dc503ae43b187b2a186b5cd42e736d6a", "bytes": 6040}, "latest_source_build": "source-dd-heating-and-both-humidity-134", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit134-prep/build136-attempt01.json", "sha256": "46b7a75f07bfbf4ae35f3428b735ee2c5c8274f89fead49c2f4a43f3ad5b2f08", "bytes": 714}, "latest_actual_quality": {"path": ".runtime/porting/heating-and-both-humidity-134/quality02/summary.json", "sha256": "5b07cc5f089395a750e9cfa33e269c76d2f3942f658e4528f31aea5257085686", "bytes": 1673}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit134-prep/owner-execution-review01.json", "sha256": "2e73d60d9eb7670e8ff48978404019a72650f500c1c439ac43fd36a2cacbdd3a", "bytes": 4168}, "latest_input_contracts": {"HEATING_CONSTANT": {"path": ".runtime/object-expansion/unit134-prep/science-final01/HEATING_CONSTANT.recipe.json", "sha256": "1261a00a221ce5134e40b1c1c91d73d5c8348167b58173747a6540eeeef8e7a8", "bytes": 38266}, "BOTH_CONSTANT": {"path": ".runtime/object-expansion/unit134-prep/science-final01/BOTH_CONSTANT.recipe.json", "sha256": "8cfc7166bee3625031dfcc3e9785061712a2b89894fabc3c9c35148741141dbb", "bytes": 38703}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit134-prep/Root-retained-evidence01.json", "sha256": "42c59a214fa77e296937b7fd659f08224e22b5907e650f15eab4e46c6886865c", "bytes": 7907}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "Thirty-four bounded Source B Scheduled/NodeList pairs retain 2,462,880 values. The unused Source A pair adds 59,520, giving thirty-five pairs and 2,522,400 values. Fresh heating-only and both-control ConstantSupplyHumidityRatio cases retain actual Winter target-retained humidity and latent-response witnesses at the original 0.0156; both-control also retains the Summer 0.0077 witness. All original policies and full streams remain strict. Prior fuel/resource and pinned-SDK empty-fuel evidence remains scoped to its own cases. No global target or private-mode law follows. Capacity-coupled humidity, humidistat, SHR/default selectors, OA/sizing, other topology, arbitrary combinations, Legacy/private-state and full-object conformance remain open.", "capability_or_gate_promotion": false}
   },
   "additional_native_type_calibrations": [
     {

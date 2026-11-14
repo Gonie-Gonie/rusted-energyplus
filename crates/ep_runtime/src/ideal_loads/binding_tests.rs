@@ -311,7 +311,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.20));
             });
             let retained = format!("{:?}", constant.typed);
-            assert!(has_source_cooling_constant_supply_humidity_shape(
+            assert!(has_source_constant_supply_humidity_shape(
                 &constant.typed.ideal_loads_air_systems[0]
             ));
             assert!(
@@ -339,7 +339,50 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             assert_eq!(format!("{:?}", constant.typed), retained);
         }
     }
-    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 11] = [
+    // The same Source shape handles heating-only and both constant selectors.
+    // These are real typed inputs, not authored physical owner state.
+    for dehumidification in [
+        DehumidificationControlType::None,
+        DehumidificationControlType::ConstantSupplyHumidityRatio,
+    ] {
+        for cooling in [IdealLoadsLimit::NoLimit, IdealLoadsLimit::LimitFlowRate] {
+            let (constant, _) = fixture(|typed| {
+                let system = &mut typed.ideal_loads_air_systems[0];
+                system.dehumidification_control_type = dehumidification;
+                system.humidification_control_type =
+                    HumidificationControlType::ConstantSupplyHumidityRatio;
+                system.cooling_limit = cooling;
+                system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.2));
+            });
+            assert!(has_source_constant_supply_humidity_shape(
+                &constant.typed.ideal_loads_air_systems[0]
+            ));
+            validate_source_direct_zone_purchased_air_model(&constant)
+                .expect("Source heating-only/both constant-humidity eligibility");
+            let expected = match (cooling, dehumidification) {
+                (IdealLoadsLimit::NoLimit, DehumidificationControlType::None) => {
+                    DirectZonePurchasedAirBindingError::UnsupportedBranch {
+                        branch: IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityHeating,
+                    }
+                }
+                (IdealLoadsLimit::NoLimit, _) => {
+                    DirectZonePurchasedAirBindingError::UnsupportedBranch {
+                        branch: IdealLoadsPurchasedAirBranch::NoOaConstantSupplyHumidityCooling,
+                    }
+                }
+                _ => DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                    feature:
+                        DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
+                },
+            };
+            assert_eq!(
+                bind_direct_zone_purchased_air_model(&constant)
+                    .expect_err("Legacy original branch/humidity priority stays unchanged"),
+                expected
+            );
+        }
+    }
+    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 10] = [
         |system| system.cooling_limit = IdealLoadsLimit::LimitCapacity,
         |system| system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity,
         |system| system.dehumidification_control_type = DehumidificationControlType::Humidistat,
@@ -348,10 +391,6 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 DehumidificationControlType::ConstantSensibleHeatRatio;
         },
         |system| system.humidification_control_type = HumidificationControlType::Humidistat,
-        |system| {
-            system.humidification_control_type =
-                HumidificationControlType::ConstantSupplyHumidityRatio;
-        },
         |system| system.outdoor_air_inlet_node_name = Some(NormalizedName::new("SUPPLY")),
         |system| {
             system.design_specification_outdoor_air_object_name =
@@ -373,7 +412,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
             mutate(system);
         });
-        assert!(!has_source_cooling_constant_supply_humidity_shape(
+        assert!(!has_source_constant_supply_humidity_shape(
             &blocked.typed.ideal_loads_air_systems[0]
         ));
         assert!(validate_source_direct_zone_purchased_air_model(&blocked).is_err());

@@ -3811,11 +3811,28 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             }
 
             // Exercise the same real compiler/scope/token/IP caller for constant cooling.
-            for limit in ["NoLimit", "LimitFlowRate"] {
+            for (limit, dehumidification, humidification) in [
+                ("NoLimit", "ConstantSupplyHumidityRatio", "None"),
+                ("LimitFlowRate", "ConstantSupplyHumidityRatio", "None"),
+                ("NoLimit", "None", "ConstantSupplyHumidityRatio"),
+                ("LimitFlowRate", "None", "ConstantSupplyHumidityRatio"),
+                (
+                    "NoLimit",
+                    "ConstantSupplyHumidityRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                (
+                    "LimitFlowRate",
+                    "ConstantSupplyHumidityRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+            ] {
                 let humidity_ratio = 0.006_123_456_789_f64;
                 let mut humidity = people.clone();
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
-                    json!("ConstantSupplyHumidityRatio");
+                    json!(dehumidification);
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
+                    json!(humidification);
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(limit);
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_cooling_air_flow_rate"] =
                     json!(0.2);
@@ -3833,11 +3850,19 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 let unit = &model.ideal_loads_air_systems[0];
                 assert_eq!(
                     unit.dehumidification_control_type,
-                    DehumidificationControlType::ConstantSupplyHumidityRatio
+                    if dehumidification == "None" {
+                        DehumidificationControlType::None
+                    } else {
+                        DehumidificationControlType::ConstantSupplyHumidityRatio
+                    }
                 );
                 assert_eq!(
                     unit.humidification_control_type,
-                    HumidificationControlType::None
+                    if humidification == "None" {
+                        HumidificationControlType::None
+                    } else {
+                        HumidificationControlType::ConstantSupplyHumidityRatio
+                    }
                 );
                 assert_eq!(
                     unit.minimum_cooling_supply_air_humidity_ratio.to_bits(),
@@ -3886,11 +3911,11 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     .expect("retained constant cooling alpha/numeric fields");
                 assert_eq!(
                     fields["dehumidification_control_type"],
-                    SourceRaw::String("ConstantSupplyHumidityRatio".into())
+                    SourceRaw::String(dehumidification.into())
                 );
                 assert_eq!(
                     fields["humidification_control_type"],
-                    SourceRaw::String("None".into())
+                    SourceRaw::String(humidification.into())
                 );
                 assert_eq!(fields["cooling_limit"], SourceRaw::String(limit.into()));
                 let token = match &fields["minimum_cooling_supply_air_humidity_ratio"] {
@@ -3916,11 +3941,6 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 ),
                 ("NoLimit", "Humidistat", "None"),
                 ("NoLimit", "ConstantSensibleHeatRatio", "None"),
-                (
-                    "NoLimit",
-                    "ConstantSupplyHumidityRatio",
-                    "ConstantSupplyHumidityRatio",
-                ),
                 ("NoLimit", "ConstantSupplyHumidityRatio", "Humidistat"),
             ] {
                 let mut blocked = people.clone();

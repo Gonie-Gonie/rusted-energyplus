@@ -898,11 +898,10 @@ fn validate_ideal_loads(model: &TypedModel, violations: &mut Vec<String>) {
         }
         if (system.dehumidification_control_type != DehumidificationControlType::None
             || system.humidification_control_type != HumidificationControlType::None)
-            && !ep_runtime::has_source_cooling_constant_supply_humidity_shape(system)
+            && !ep_runtime::has_source_constant_supply_humidity_shape(system)
         {
             violations.push(
-                "humidity controls require the bounded Source cooling constant-supply branch"
-                    .into(),
+                "humidity controls require the bounded Source constant-supply branches".into(),
             );
         }
         if system.system_inlet_air_node_name.is_some()

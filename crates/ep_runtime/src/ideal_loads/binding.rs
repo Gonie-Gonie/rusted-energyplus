@@ -649,20 +649,31 @@ pub fn validate_source_direct_zone_purchased_air_model(
     }
 }
 
-/// Identifies the Source cooling constant-humidity shape with no OA or capacity coupling.
+/// Identifies Source constant-humidity shapes without OA or cooling-capacity coupling.
 ///
 /// This is a selector check only. The common validator still checks topology,
 /// active numeric limits and every other ordinary Source prerequisite.
 #[must_use]
-pub fn has_source_cooling_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -> bool {
+pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -> bool {
     let flags = IdealLoadsFeatureFlags::from_system(system);
     !flags.has_outdoor_air
         && !flags.has_dcv
         && !flags.has_economizer
         && !flags.has_heat_recovery
-        && system.dehumidification_control_type
+        && matches!(
+            system.dehumidification_control_type,
+            DehumidificationControlType::None
+                | DehumidificationControlType::ConstantSupplyHumidityRatio
+        )
+        && matches!(
+            system.humidification_control_type,
+            HumidificationControlType::None
+                | HumidificationControlType::ConstantSupplyHumidityRatio
+        )
+        && (system.dehumidification_control_type
             == DehumidificationControlType::ConstantSupplyHumidityRatio
-        && system.humidification_control_type == HumidificationControlType::None
+            || system.humidification_control_type
+                == HumidificationControlType::ConstantSupplyHumidityRatio)
         && matches!(
             system.cooling_limit,
             IdealLoadsLimit::NoLimit | IdealLoadsLimit::LimitFlowRate
@@ -1001,27 +1012,32 @@ fn validate_direct_zone_model(
         return unsupported(DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule);
     }
 
-    let source_constant_cooling = mode == DirectZoneValidationMode::SourceEligibility
-        && has_source_cooling_constant_supply_humidity_shape(system);
+    let source_constant_humidity = mode == DirectZoneValidationMode::SourceEligibility
+        && has_source_constant_supply_humidity_shape(system);
     let branch = select_purchased_air_branch(system);
-    if !branch.is_no_oa_sensible_with_optional_limits() && !source_constant_cooling {
+    if !branch.is_no_oa_sensible_with_optional_limits() && !source_constant_humidity {
         return Err(DirectZonePurchasedAirBindingError::UnsupportedBranch { branch });
     }
     if (system.dehumidification_control_type != DehumidificationControlType::None
         || system.humidification_control_type != HumidificationControlType::None)
-        && !source_constant_cooling
+        && !source_constant_humidity
     {
         return unsupported(
             DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
         );
     }
     // Keep the public Legacy classifier and all its numeric prerequisites intact.
-    // Only this exact Source shape consumes the already-owned constant humidity.
+    // Only these Source shapes consume the genuine constant-humidity owners.
     if classify_no_oa_sensible_subset(system)
         .unsupported_features
         .iter()
         .any(|feature| {
-            !source_constant_cooling || *feature != IdealLoadsUnsupportedFeature::Dehumidification
+            !source_constant_humidity
+                || !matches!(
+                    feature,
+                    IdealLoadsUnsupportedFeature::Dehumidification
+                        | IdealLoadsUnsupportedFeature::Humidification
+                )
         })
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset);
