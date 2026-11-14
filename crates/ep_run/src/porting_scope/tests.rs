@@ -3081,6 +3081,120 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 OaRaw::String("On".into())
             );
             assert_eq!(raw, retained);
+            // Same real Raw/Compiler/Scope/Support/IP chain, now with the
+            // four owned limit names and actual positive/zero numeric operands.
+            for limit in [
+                "NoLimit",
+                "LimitFlowRate",
+                "LimitCapacity",
+                "LimitFlowRateAndCapacity",
+            ] {
+                for (flow, capacity) in [(0.00005, 1.0), (0.0, 0.0)] {
+                    let mut hard = oa.clone();
+                    let unit = &mut hard["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
+                    unit["heating_limit"] = json!(limit);
+                    unit["cooling_limit"] = json!(limit);
+                    if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
+                        unit["maximum_heating_air_flow_rate"] = json!(flow);
+                        unit["maximum_cooling_air_flow_rate"] = json!(flow);
+                    }
+                    if matches!(limit, "LimitCapacity" | "LimitFlowRateAndCapacity") {
+                        unit["maximum_sensible_heating_capacity"] = json!(capacity);
+                        unit["maximum_total_cooling_capacity"] = json!(capacity);
+                    }
+                    let hard_raw = parse_epjson_str(&hard.to_string())
+                        .expect("actual OA hard-limit raw input");
+                    let retained_hard = hard_raw.clone();
+                    let compiled = ep_compiler::compile_raw_model_for_source(&hard_raw);
+                    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                    let model = compiled
+                        .model
+                        .as_ref()
+                        .expect("real typed OA hard-limit model");
+                    let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                    ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                        .expect("actual Source OA hard-limit eligibility");
+                    assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+                    let mut selected = inspect_porting_scope(
+                        &hard_raw,
+                        &compiled.report,
+                        Some(model),
+                        PortingScope::B,
+                    );
+                    assert!(selected.admissible, "{:?}", selected.violations);
+                    selected.environment = Some(
+                        super::environment::environment_from_weather(
+                            model,
+                            &single_day_weather_fixture(),
+                            "authored OA hard-limit admission weather",
+                        )
+                        .expect("real hard-limit environment"),
+                    );
+                    let admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                        &hard_raw, &selected,
+                    )
+                    .expect("same real hard-limit raw/scope token");
+                    let support = crate::support::assess_support_with_source_admission(
+                        &hard_raw,
+                        &compiled.report,
+                        Some(model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&admission),
+                    );
+                    assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                    assert!(crate::ordinary_equipment_input::resolve(&hard_raw).is_err());
+                    assert!(crate::ordinary_equipment_input::resolve_source_a(&hard_raw).is_err());
+                    let hard_ip = crate::ordinary_input_processor::resolve_source_b(&hard_raw)
+                        .expect("real hard-limit IP");
+                    let mut statistics = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                    hard_ip
+                        .report_source_idf_records_stats(&mut statistics)
+                        .expect("actual hard-limit statistics owner");
+                    let actual = hard_ip
+                        .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                        .expect("retained hard-limit raw alpha/numeric fields");
+                    assert_eq!(actual["heating_limit"], OaRaw::String(limit.into()));
+                    assert_eq!(actual["cooling_limit"], OaRaw::String(limit.into()));
+                    assert_eq!(hard_raw, retained_hard);
+                    for missing in [
+                        "maximum_heating_air_flow_rate",
+                        "maximum_cooling_air_flow_rate",
+                        "maximum_sensible_heating_capacity",
+                        "maximum_total_cooling_capacity",
+                    ] {
+                        if !hard["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]
+                            .as_object()
+                            .expect("unit")
+                            .contains_key(missing)
+                        {
+                            continue;
+                        }
+                        for invalid in [Value::Null, json!("Autosize"), json!(-1.0)] {
+                            let mut bad = hard.clone();
+                            bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"][missing] = invalid;
+                            let bad_raw = parse_epjson_str(&bad.to_string())
+                                .expect("actual invalid active numeric");
+                            assert!(
+                                crate::ordinary_equipment_input::resolve_source_b(&bad_raw)
+                                    .is_err()
+                            );
+                            let bad_compiled = ep_compiler::compile_raw_model_for_source(&bad_raw);
+                            assert!(
+                                !inspect_porting_scope(
+                                    &bad_raw,
+                                    &bad_compiled.report,
+                                    bad_compiled.model.as_ref(),
+                                    PortingScope::B
+                                )
+                                .admissible
+                            );
+                        }
+                    }
+                }
+            }
             // Each negative is a genuine authored raw candidate. Scope and IP
             // must both hold it; typed defaulting cannot grant permission.
             for invalid in 0..22 {
@@ -3111,7 +3225,9 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     5 => bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(""),
                     6 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heating_limit"] =
-                            json!("LimitCapacity")
+                            json!("LimitCapacity");
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_sensible_heating_capacity"] =
+                            json!("Autosize");
                     }
                     7 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["design_specification_outdoor_air_object_name"] =

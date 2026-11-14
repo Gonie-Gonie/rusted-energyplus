@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 221 paired physical cases and 8,546,056 reported values with zero
+contains 225 paired physical cases and 8,846,536 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 147 recorded Source builds,
-126 with accepted pairs and 21 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 148 recorded Source builds,
+127 with accepted pairs and 21 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -198,7 +198,7 @@ is implied.
 
 The bounded Source B direct-epJSON Humidistat producer uses one real Zone/control, RH schedules and normal-mixing ThirdOrder, Analytical or Euler prediction. Analytical single50 with the omitted dehumidifying schedule and Euler crossed65/45 qualify under all161-series rules. ThirdOrder dual40/60 remains unaccepted: 14 new dehumidifying-report points exceed the unchanged1e-12 kgWater/s limit (maximum1.1494137e-12); all original155 streams and response gates pass.
 
-The bounded Source B direct-Zone IdealLoads route connects six basic DSOA methods to actual geometry, design occupants for NoDCV, real schedules, outdoor-node state and None-recovery mixing. The six fixed comparisons retain 6 qualifying cases and 450,720 values. Full158 numeric/export/clock/ancillary checks and all original155 science gates remain strict; each qualifying engine shows positive OA and distinct public mixed-temperature/humidity responses. This slice requires NoLimit, inactive humidity controls, NoDCV and NoEconomizer. Public averages establish no exact mixing, volume/capacity or private-mode law. Source A/IDF, authored OA conditions, advanced OA, Humidistat combinations, Space/airloops/sizing and arbitrary-value completion remain open.
+The bounded Source B basic-OA route now admits NoLimit, hard flow, hard capacity and combined limits using design occupants, real schedules and owned warning/mixing state. Four fixed SUM comparisons retain 4 qualifying cases and 300,480 values: 2 finite-route and 2 zero-boundary cases. All158 policies and applicable inherited gates remain strict. Zero OA does not imply zero supply; a zero-capacity boundary requires its declared Winter response. Only the combined finite scene additionally requires same-engine heating/cooling contrasts. None of these public intervals establishes an exact capacity, mixing or private-mode law. Advanced OA, humidity combinations, Source A/IDF, Space/airloops/sizing and arbitrary-value completion remain open.
 
 Actual remaining moisture demands reach IdealLoads Humidistat consumers. Only the absent-control six-report zero path qualifies under every161-series rule. The three authored-control scenes retain zero credit after16/4/6 point failures at the unchanged1e-12 kgWater/s limit; all RMSE and original155 checks pass. The finite-cooling scene also lacks its Winter humidification witness in both engines. Broader combinations, Source A/IDF, OA, EMS/faults, AFN/Space/sizing and full-object completion remain open.
 
@@ -206,7 +206,7 @@ A separate passive diagnostic aligns all5,573 API-visible prediction frames by f
 
 The bounded Source no-outdoor-air owners retain heating-constant/cooling-capacity coupling and now implement constant sensible heat ratio (SHR) cooling. Eligibility permits named or omitted-default SHR (.7) with heating humidity explicitly None or ConstantSupplyHumidityRatio through the four cooling limit selectors, retaining all active numeric, topology, schedule and Legacy guards. Six prospectively frozen cases completed once under Source141; 6 meet every original numeric, export, clock, ancillary and science check plus their applicable public response witness. Qualifying cases: HEAT_CONST_COOL_NONE_CAPACITY_COUPLING, HEAT_CONST_COOL_NONE_FLOW_CAPACITY, HEAT_CONST_COOL_CONST_CAPACITY, HEAT_CONST_COOL_CONST_FLOW_CAPACITY, SHR_OMITTED_DEFAULTS_NO_LIMIT, SHR_NAMED_HEAT_CONST_FLOW_CAPACITY. The four prescribed heating-constant capacity/combined scenes include one designated Winter simultaneous heating/dehumidification witness; the two SHR scenes have their own Summer sensible/latent cooling witnesses. Those finite public interval responses imply no exact-quarter capacity, global SHR/humidity or private-mode law. Direct-epJSON exact-empty dehumidification remains unsupported; omitted defaults are distinct. The four Source139 comparisons from Unit137 remain unaccepted. Broader HVAC Humidistat combinations, OA/DCV/economizer/recovery, sizing, remaining combinations and full-object conformance remain open.
 
-49 bounded Source B Scheduled/NodeList pairs retain 3,585,360 values. The unused Source A pair adds59,520, giving 50 pairs and 3,644,880 values. Qualifying basic-OA scenes retain all eighteen public Scheduled joins, exhaust/returns, ordered NodeList/UTF-8 structure, weather/fuel and comfort checks under unchanged original155 rules, plus three declared OA/mixed-air outputs. Earlier evidence keeps its own scope; no private history, averaged ratio, arbitrary combination or full-object claim follows.
+53 bounded Source B Scheduled/NodeList pairs retain 3,885,840 values. The unused Source A pair adds59,520, giving 54 pairs and 3,945,360 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

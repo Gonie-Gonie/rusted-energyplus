@@ -305,7 +305,30 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         validate_source_direct_zone_purchased_air_model(&positive_oa)
             .expect("six basic DSOA methods use actual Source owners");
         assert!(bind_direct_zone_purchased_air_model(&positive_oa).is_err());
-        for invalid in 0..17 {
+        // Same real typed input/validator seam for all four owned selectors.
+        // Both zero and positive hard sizes keep Native's actual zero boundary.
+        for limit in [
+            IdealLoadsLimit::NoLimit,
+            IdealLoadsLimit::LimitFlowRate,
+            IdealLoadsLimit::LimitCapacity,
+            IdealLoadsLimit::LimitFlowRateAndCapacity,
+        ] {
+            for (flow, capacity) in [(0.00005, 1.0), (0.0, 0.0)] {
+                let mut typed = positive_oa.typed.clone();
+                let unit = &mut typed.ideal_loads_air_systems[0];
+                unit.heating_limit = limit;
+                unit.cooling_limit = limit;
+                unit.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
+                unit.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
+                unit.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(capacity));
+                unit.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(capacity));
+                let candidate = SimulationModel::from_typed(typed);
+                validate_source_direct_zone_purchased_air_model(&candidate)
+                    .expect("Source basic OA retains owned active finite/zero hard limits");
+                assert!(bind_direct_zone_purchased_air_model(&candidate).is_err());
+            }
+        }
+        for invalid in 0..19 {
             let mut typed = positive_oa.typed.clone();
             match invalid {
                 0 => {
@@ -338,10 +361,13 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                         Some(NormalizedName::new("RETURN"))
                 }
                 8 => {
-                    typed.ideal_loads_air_systems[0].heating_limit = IdealLoadsLimit::LimitCapacity
+                    typed.ideal_loads_air_systems[0].heating_limit = IdealLoadsLimit::LimitCapacity;
+                    typed.ideal_loads_air_systems[0].maximum_sensible_heating_capacity_w =
+                        Some(AutosizeOrNumber::Autosize);
                 }
                 9 => {
-                    typed.ideal_loads_air_systems[0].cooling_limit = IdealLoadsLimit::LimitFlowRate
+                    typed.ideal_loads_air_systems[0].cooling_limit = IdealLoadsLimit::LimitFlowRate;
+                    typed.ideal_loads_air_systems[0].maximum_cooling_air_flow_rate_m3_per_s = None;
                 }
                 10 => {
                     typed.ideal_loads_air_systems[0].dehumidification_control_type =
@@ -382,6 +408,16 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                         Some(NormalizedName::new("MATCHED EXHAUST"));
                     typed.ideal_loads_air_systems[0].zone_exhaust_air_node_name =
                         Some(NormalizedName::new("MATCHED EXHAUST"));
+                }
+                17 => {
+                    typed.ideal_loads_air_systems[0].cooling_limit = IdealLoadsLimit::LimitFlowRate;
+                    typed.ideal_loads_air_systems[0].maximum_cooling_air_flow_rate_m3_per_s =
+                        Some(AutosizeOrNumber::Value(-1.0));
+                }
+                18 => {
+                    typed.ideal_loads_air_systems[0].heating_limit = IdealLoadsLimit::LimitCapacity;
+                    typed.ideal_loads_air_systems[0].maximum_sensible_heating_capacity_w =
+                        Some(AutosizeOrNumber::Value(f64::NAN));
                 }
                 _ => unreachable!(),
             }

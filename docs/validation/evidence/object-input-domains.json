@@ -347,7 +347,7 @@
       "Additional bounded Source B direct-epJSON HVAC Humidistat consumer scope: zero or one same-Zone control, actual remaining moisture demands, and supported real schedules. 1 fixed scenes qualify (no-control None/Humidistat zero-demand path); only the 0 listed positive-control scenes provide their declared positive-service evidence. Full161-series comparisons and all original155 gates are mandatory; absence is a genuine six-report zero path. No universal humidity/SHR/capacity law, private mode, positive original-IDF/A, OA, EMS/fault, AFN/Space/sizing or full-object completion is implied."
     ],
     "DesignSpecification:OutdoorAir": [
-      "Bounded Source B direct-epJSON input/defaults and six basic flow methods connect actual Zone geometry, design occupants for NoDCV, real schedules, outdoor-node state and direct IdealLoads consumption. 6 fixed method scenes qualify under full158 rules and inherited science. No Source A/IDF, CO2/IAQ/DCV, economizer/recovery, Space/airloop/sizing, arbitrary-combination or full-object claim."
+      "Bounded Source B direct-epJSON basic DSOA connects actual Zone geometry, design occupants for NoDCV, real schedules, outdoor-node state and direct IdealLoads. Six basic method scenes retain their own NoLimit evidence; four hard-limit selectors share guarded owned consumption. New strict finite-route and zero-boundary scenes keep separate scope. No Source A/IDF, CO2/IAQ/DCV, economizer/recovery, Space/airloop/sizing, arbitrary-combination or full-object claim."
     ]
   },
   "verification": {
@@ -7412,6 +7412,345 @@
           "bytes": 3599
         },
         "scope": "The bounded Source B direct-Zone IdealLoads route connects six basic DSOA methods to actual geometry, design occupants for NoDCV, real schedules, outdoor-node state and None-recovery mixing. The six fixed comparisons retain 6 qualifying cases and 450,720 values. Full158 numeric/export/clock/ancillary checks and all original155 science gates remain strict; each qualifying engine shows positive OA and distinct public mixed-temperature/humidity responses. This slice requires NoLimit, inactive humidity controls, NoDCV and NoEconomizer. Public averages establish no exact mixing, volume/capacity or private-mode law. Source A/IDF, authored OA conditions, advanced OA, Humidistat combinations, Space/airloops/sizing and arbitrary-value completion remain open.",
+        "physical_domain_completion": false
+      },
+      "positive_OA_hard_limits_145": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit145-prep/build148-attempt01.json",
+          "sha256": "5033ca9472cc4aa35552d4742dcac4b63a5ffb5103dd7d1bf750f3e1a3960798",
+          "bytes": 705
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/quality01/summary.json",
+          "sha256": "552b33b4a6af1df34dcdca18203c474a93253ba651560786f7c482796109f5f2",
+          "bytes": 1663
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit145-prep/owner-execution-review01.json",
+          "sha256": "50e44c5cb1689012910ac824e03ea5b32b44866219edcc4a3688948619b1b16b",
+          "bytes": 4393
+        },
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-runtime-bindings01.json",
+          "sha256": "fc8024af01064168c702f78eed63f2ddebc58cbbd79e69c8711ced3143301a8a",
+          "bytes": 4266
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-runtime-final-review01.json",
+          "sha256": "425e667961f4fef8c6d1295cb9b3c3bb62a5100a90d06afdaa55a0c29d8c8326",
+          "bytes": 6451
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-four-pairs148-01/receipt.json",
+          "sha256": "f8d22f4e98fe67edbd0b2b6a058400d0008f04989c793710f0e7f270ad3856e9",
+          "bytes": 8029
+        },
+        "batch_readback": {
+          "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/receipt.json",
+          "sha256": "28237768a192829de9fcd4390b66ceaa50c05d3126ba1bd3d8dc07a61cf59a1f",
+          "bytes": 2671
+        },
+        "case_outcomes": {
+          "FLOW_FINITE": {
+            "accepted": true,
+            "coverage_kind": "nonzero_route_response",
+            "paired": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_FINITE.paired01.json",
+              "sha256": "3123a1480c0486e7b1b471c801ed884b58cd2d4da9b4271eb2b07d8e05c51612",
+              "bytes": 496526
+            },
+            "native_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_FINITE/native01/launch.json",
+              "sha256": "a881be44824f5f83567005355853e57645733b0321b96c324eeded4a10d017e3",
+              "bytes": 28238
+            },
+            "source_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_FINITE/source01/launch.json",
+              "sha256": "796dee9a72c3c4bbeca4542039194f77e3a9e83f6c2db46254eea1a23a080cb2",
+              "bytes": 35688
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/native-prechecks148-01/FLOW_FINITE.json",
+              "sha256": "392841456b4d152a92f0146e0be34e33f4f818316abd18848a60b6739594c9d0",
+              "bytes": 23861
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "public_response_summary": {
+              "Native": {
+                "activation_accepted": true,
+                "coverage_kind": "nonzero_route_response",
+                "positive_candidate_samples": 360,
+                "zero_OA_flow_samples": 0,
+                "Winter_positive_transport_zero_coil_samples": 0
+              },
+              "Source": {
+                "activation_accepted": true,
+                "coverage_kind": "nonzero_route_response",
+                "positive_candidate_samples": 360,
+                "zero_OA_flow_samples": 0,
+                "Winter_positive_transport_zero_coil_samples": 0
+              }
+            },
+            "finite_cross_case_response": {},
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "COMBINED_FINITE": {
+            "accepted": true,
+            "coverage_kind": "nonzero_route_response",
+            "paired": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/COMBINED_FINITE.paired01.json",
+              "sha256": "1030511a4e12f884a6e75f5ef8d6f8b8121b9d792fd0e5308f203bfd2094e9c2",
+              "bytes": 510360
+            },
+            "native_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/COMBINED_FINITE/native01/launch.json",
+              "sha256": "03c49f28f67bc1c2ce905ac929005351898ad99f9b04ae1f920affeed3ae4121",
+              "bytes": 28335
+            },
+            "source_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/COMBINED_FINITE/source01/launch.json",
+              "sha256": "ca0d0eb4f8937978c5d1b2e5ff70f0cb48c4dea216258c702d6e7308904f8a8b",
+              "bytes": 35904
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/native-prechecks148-01/COMBINED_FINITE.json",
+              "sha256": "ed82c6c3be7e9fb4c35f4ec5daf8f771a06435c4ccf3ec512319e69d55f0dd6a",
+              "bytes": 23877
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "public_response_summary": {
+              "Native": {
+                "activation_accepted": true,
+                "coverage_kind": "nonzero_route_response",
+                "positive_candidate_samples": 360,
+                "zero_OA_flow_samples": 0,
+                "Winter_positive_transport_zero_coil_samples": 0
+              },
+              "Source": {
+                "activation_accepted": true,
+                "coverage_kind": "nonzero_route_response",
+                "positive_candidate_samples": 360,
+                "zero_OA_flow_samples": 0,
+                "Winter_positive_transport_zero_coil_samples": 0
+              }
+            },
+            "finite_cross_case_response": {
+              "finite_capacity_cross_case_Native": {
+                "engine": "Native",
+                "observed_contrast_samples": {
+                  "Winter85": 24,
+                  "Summer91": 36
+                },
+                "max_abs_difference": {
+                  "Winter85": 1.913512588152328,
+                  "Summer91": 0.9411867245612313
+                },
+                "activation_accepted": true,
+                "applies_only_to": "COMBINED_FINITE"
+              },
+              "finite_capacity_cross_case_Source": {
+                "engine": "Source",
+                "observed_contrast_samples": {
+                  "Winter85": 24,
+                  "Summer91": 36
+                },
+                "max_abs_difference": {
+                  "Winter85": 1.913512588152328,
+                  "Summer91": 0.9411867245612313
+                },
+                "activation_accepted": true,
+                "applies_only_to": "COMBINED_FINITE"
+              }
+            },
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "FLOW_ZERO": {
+            "accepted": true,
+            "coverage_kind": "zero_boundary_response",
+            "paired": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_ZERO.paired01.json",
+              "sha256": "ebc25cd48c10659216ef1e2722135c6b84c92b6e777718ba399bac4f3a7a03c0",
+              "bytes": 503599
+            },
+            "native_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_ZERO/native01/launch.json",
+              "sha256": "cc0fb0011b9d6d5ac15c866939788bcf5dda404a56f3a6ad7201c5b0beef1a05",
+              "bytes": 28190
+            },
+            "source_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_ZERO/source01/launch.json",
+              "sha256": "9ca2c613718f7cc1440697641c03415349b95d5bbe6db56f6ab4c1d58911d40c",
+              "bytes": 35579
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/native-prechecks148-01/FLOW_ZERO.json",
+              "sha256": "960f1c6653f0d7952e7237e784059f8a6fa6eb7072ab10821e1dec3f50664026",
+              "bytes": 23853
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "public_response_summary": {
+              "Native": {
+                "activation_accepted": true,
+                "coverage_kind": "zero_boundary_response",
+                "positive_candidate_samples": 0,
+                "zero_OA_flow_samples": 480,
+                "Winter_positive_transport_zero_coil_samples": 0
+              },
+              "Source": {
+                "activation_accepted": true,
+                "coverage_kind": "zero_boundary_response",
+                "positive_candidate_samples": 0,
+                "zero_OA_flow_samples": 480,
+                "Winter_positive_transport_zero_coil_samples": 0
+              }
+            },
+            "finite_cross_case_response": {},
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "CAPACITY_ZERO": {
+            "accepted": true,
+            "coverage_kind": "zero_boundary_response",
+            "paired": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/CAPACITY_ZERO.paired01.json",
+              "sha256": "a521a43f3bbe9c14f3b488a8ee5d854b5561462887ef990b727474bafa7f81dd",
+              "bytes": 485938
+            },
+            "native_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/CAPACITY_ZERO/native01/launch.json",
+              "sha256": "69c3fc6ddd6e3544f66dda365606259c29fe358d84b75f0b85a3e228329e7ffa",
+              "bytes": 28285
+            },
+            "source_launch": {
+              "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/CAPACITY_ZERO/source01/launch.json",
+              "sha256": "a31ad0ff207c11303b5327bcd1a8e9af6fb48a3dd6bf57b3e70d51d6befbb3ec",
+              "bytes": 35794
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/native-prechecks148-01/CAPACITY_ZERO.json",
+              "sha256": "037d67ac69507d51e31119d1604946ab7b20d71cad2e218460437d808a44a7e9",
+              "bytes": 23869
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "public_response_summary": {
+              "Native": {
+                "activation_accepted": true,
+                "coverage_kind": "zero_boundary_response",
+                "positive_candidate_samples": 360,
+                "zero_OA_flow_samples": 0,
+                "Winter_positive_transport_zero_coil_samples": 72
+              },
+              "Source": {
+                "activation_accepted": true,
+                "coverage_kind": "zero_boundary_response",
+                "positive_candidate_samples": 360,
+                "zero_OA_flow_samples": 0,
+                "Winter_positive_transport_zero_coil_samples": 72
+              }
+            },
+            "finite_cross_case_response": {},
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          }
+        },
+        "accepted_cases": [
+          "FLOW_FINITE",
+          "COMBINED_FINITE",
+          "FLOW_ZERO",
+          "CAPACITY_ZERO"
+        ],
+        "accepted_case_comparisons": {
+          "FLOW_FINITE": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_FINITE.paired01.json",
+            "sha256": "3123a1480c0486e7b1b471c801ed884b58cd2d4da9b4271eb2b07d8e05c51612",
+            "bytes": 496526
+          },
+          "COMBINED_FINITE": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/COMBINED_FINITE.paired01.json",
+            "sha256": "1030511a4e12f884a6e75f5ef8d6f8b8121b9d792fd0e5308f203bfd2094e9c2",
+            "bytes": 510360
+          },
+          "FLOW_ZERO": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_ZERO.paired01.json",
+            "sha256": "ebc25cd48c10659216ef1e2722135c6b84c92b6e777718ba399bac4f3a7a03c0",
+            "bytes": 503599
+          },
+          "CAPACITY_ZERO": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/CAPACITY_ZERO.paired01.json",
+            "sha256": "a521a43f3bbe9c14f3b488a8ee5d854b5561462887ef990b727474bafa7f81dd",
+            "bytes": 485938
+          }
+        },
+        "accepted_values": 300480,
+        "qualifying_finite_route_cases": [
+          "FLOW_FINITE",
+          "COMBINED_FINITE"
+        ],
+        "qualifying_zero_boundary_cases": [
+          "FLOW_ZERO",
+          "CAPACITY_ZERO"
+        ],
+        "Native_processes": 4,
+        "Source_processes": 4,
+        "actual_QA_commands": 5,
+        "existing_test_functions_executed": 2,
+        "new_test_functions": 0,
+        "engine_replays": 0,
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-source-hard-limit-adoption01.json",
+          "sha256": "2e7f28a8d49620d378799727d359b55922957a0531aad76fbe40472ffa3a6dac",
+          "bytes": 8395
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-source-format-review01.json",
+          "sha256": "13b277c795b871a5060e47fb21035405dc3efd0e9e192829005e03a1a12358ab",
+          "bytes": 1881
+        },
+        "validator_orchestration": {
+          "actors": {
+            "path": ".runtime/object-expansion/unit145-prep/Root-eight-actors148-02/receipt.json",
+            "sha256": "93cb53fbe51141b9ded2d6ec60c2d3ab931a3605f1e6582dffaf1f48f9d4929b",
+            "bytes": 22000
+          },
+          "dispatcher": {
+            "path": ".runtime/object-expansion/unit145-prep/Root-dispatch-reader145.py",
+            "sha256": "b3f1883df3d194aef37023f930764b8aa9817da8f879d7bd81931c1f27a530a9",
+            "bytes": 260
+          },
+          "independent_dispatch_review": {
+            "path": ".runtime/object-expansion/unit145-prep/independent-Root-reader-dispatch-resume-static-review01.json",
+            "sha256": "843387339fb194559b99d7f4643999e3cf9252539d81392406ef369dcec860c4",
+            "bytes": 4776
+          },
+          "original_immutable_reader": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/verify145.py",
+            "sha256": "39efac6e7200829bdd8906dba3f053881f2b8e8ef5c8365f615f63d3b79151a4",
+            "bytes": 95949
+          },
+          "prior_noop_reader_stdout": {
+            "path": ".runtime/object-expansion/unit145-prep/Root-eight-actors148-01/FLOW_FINITE-native-precheck.stdout",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "retained_first_Native": {
+            "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_FINITE/native01/launch.json",
+            "sha256": "a881be44824f5f83567005355853e57645733b0321b96c324eeded4a10d017e3",
+            "bytes": 28238
+          },
+          "resume_commands": 11,
+          "new_Native_processes_in_resume": 3,
+          "new_Source_processes_in_resume": 4,
+          "model_reruns": 0,
+          "no_op_reader_physical_credit": 0,
+          "batch_exit0_is_retention_not_credit": true
+        },
+        "scope": "The bounded Source B basic-OA route now admits NoLimit, hard flow, hard capacity and combined limits using design occupants, real schedules and owned warning/mixing state. Four fixed SUM comparisons retain 4 qualifying cases and 300,480 values: 2 finite-route and 2 zero-boundary cases. All158 policies and applicable inherited gates remain strict. Zero OA does not imply zero supply; a zero-capacity boundary requires its declared Winter response. Only the combined finite scene additionally requires same-engine heating/cooling contrasts. None of these public intervals establishes an exact capacity, mixing or private-mode law. Advanced OA, humidity combinations, Source A/IDF, Space/airloops/sizing and arbitrary-value completion remain open.",
         "physical_domain_completion": false
       }
     },
@@ -65863,12 +66202,560 @@
           "no_replay": true
         },
         "effective_state": "One finite direct-epJSON, one-Zone/no-airloop basic positive-OA composition, NoLimit/NoDCV/NoEconomizer/None recovery and inactive humidity controls. Full original155 science plus three declared public outputs pass. Existential mixed-air responses imply no averaged mixing, exact volume/capacity, private mode, arbitrary combination or full-object claim."
+      },
+      {
+        "id": "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-FLOW_FINITE-145-120H",
+        "case_kind": "FLOW_FINITE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-positive-oa-hard-limits-145",
+        "input": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/FLOW_FINITE/input.epJSON",
+          "sha256": "f0033337e01f4d9a48dfed4391b5bc77bdce909014ad17448ecc40f3bc23891d",
+          "bytes": 101796
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_FINITE/native01/command/receipt.json",
+          "sha256": "285304d9088b3f9ed2acf133fde49e327915a6a333e3ece5c5aac762b7cde6b3",
+          "bytes": 70937
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_FINITE/source01/command/receipt.json",
+          "sha256": "17826034d8e5e09a117967a2a723e524d773c0f8127da16853bb685c29efff16",
+          "bytes": 71743
+        },
+        "source_summary": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_FINITE/source01/output/run-summary.json",
+          "sha256": "5d9ffad4876e552129f5e1ce8d8cba3961586515293210af9efa2b218a7c8ec7",
+          "bytes": 64760
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f9/f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f",
+          "sha256": "f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/eplus-rs.exe",
+          "sha256": "48522f97fa17c1e6f1e5a3b4afcd7d67f87c212ce416a6881529d22c3615745a",
+          "bytes": 81013037
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/build/receipt.json",
+          "sha256": "8211a63c5c0e8fe60821791fb6701a67fc91682f418b95b9870e9f0aa6267f7d",
+          "bytes": 4809
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_FINITE.paired01.json",
+          "sha256": "3123a1480c0486e7b1b471c801ed884b58cd2d4da9b4271eb2b07d8e05c51612",
+          "bytes": 496526
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-four-pairs148-01/receipt.json",
+          "sha256": "f8d22f4e98fe67edbd0b2b6a058400d0008f04989c793710f0e7f270ad3856e9",
+          "bytes": 8029
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/science-final01/FLOW_FINITE.recipe.json",
+          "sha256": "c2e2f12f1ce178ca4c24a687391d2484cb6f864a8ff22f57bd6df1e7b5afdc99",
+          "bytes": 50007
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/batch-plan01.json",
+          "sha256": "822590c44af84251f9bc7e4eade64ab2080e1806b1eedcc626dbf70afb0e2643",
+          "bytes": 11822
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 18562,
+          "parsed_binary64_unequal": 18562,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.3642420526593924e-11,
+          "max_rmse_delta": 3.2981667553707028e-12
+        },
+        "coverage_kind": "nonzero_route_response",
+        "hard_limit_selector": "LimitFlowRate",
+        "public_response_summary": {
+          "Native": {
+            "activation_accepted": true,
+            "coverage_kind": "nonzero_route_response",
+            "positive_candidate_samples": 360,
+            "zero_OA_flow_samples": 0,
+            "Winter_positive_transport_zero_coil_samples": 0
+          },
+          "Source": {
+            "activation_accepted": true,
+            "coverage_kind": "nonzero_route_response",
+            "positive_candidate_samples": 360,
+            "zero_OA_flow_samples": 0,
+            "Winter_positive_transport_zero_coil_samples": 0
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "whole158_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit145-prep/build148-attempt01.json",
+            "sha256": "5033ca9472cc4aa35552d4742dcac4b63a5ffb5103dd7d1bf750f3e1a3960798",
+            "bytes": 705
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/positive-oa-hard-limits-145/quality01/summary.json",
+            "sha256": "552b33b4a6af1df34dcdca18203c474a93253ba651560786f7c482796109f5f2",
+            "bytes": 1663
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit145-prep/owner-execution-review01.json",
+            "sha256": "50e44c5cb1689012910ac824e03ea5b32b44866219edcc4a3688948619b1b16b",
+            "bytes": 4393
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit145-prep/Root-runtime-bindings01.json",
+            "sha256": "fc8024af01064168c702f78eed63f2ddebc58cbbd79e69c8711ced3143301a8a",
+            "bytes": 4266
+          },
+          "batch_readback": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/receipt.json",
+            "sha256": "28237768a192829de9fcd4390b66ceaa50c05d3126ba1bd3d8dc07a61cf59a1f",
+            "bytes": 2671
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One fixed SUM/NoDCV/NoEconomizer/None-recovery hard-limit composition. Zero-boundary credit is separate from positive-route coverage. COMBINED alone requires independent same-engine Winter85/Summer91 contrasts. Full158 rules and all applicable inherited gates remain strict; no exact averaged cap/ratio or private-mode law."
+      },
+      {
+        "id": "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-COMBINED_FINITE-145-120H",
+        "case_kind": "COMBINED_FINITE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-positive-oa-hard-limits-145",
+        "input": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/COMBINED_FINITE/input.epJSON",
+          "sha256": "595015975aa2877f947bcb70c82c63607b578df8b45c3fb3bfd99dcc319b7919",
+          "bytes": 101925
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/COMBINED_FINITE/native01/command/receipt.json",
+          "sha256": "a428b57284953dda48600ed9a66d4c54252509817da68f403eff1f3bb87c3c48",
+          "bytes": 71005
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/COMBINED_FINITE/source01/command/receipt.json",
+          "sha256": "9eb9187c9d2a788ca74e047507b2db6cf2abd9fa1b4a7eab6b301578f2f98a1e",
+          "bytes": 71823
+        },
+        "source_summary": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/COMBINED_FINITE/source01/output/run-summary.json",
+          "sha256": "c6807cf6b9e6f0a4ea561d9609badb6c2cc6245165b8bc3a01127d3edf88a5f6",
+          "bytes": 64873
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f9/f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f",
+          "sha256": "f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/eplus-rs.exe",
+          "sha256": "48522f97fa17c1e6f1e5a3b4afcd7d67f87c212ce416a6881529d22c3615745a",
+          "bytes": 81013037
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/build/receipt.json",
+          "sha256": "8211a63c5c0e8fe60821791fb6701a67fc91682f418b95b9870e9f0aa6267f7d",
+          "bytes": 4809
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/COMBINED_FINITE.paired01.json",
+          "sha256": "1030511a4e12f884a6e75f5ef8d6f8b8121b9d792fd0e5308f203bfd2094e9c2",
+          "bytes": 510360
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-four-pairs148-01/receipt.json",
+          "sha256": "f8d22f4e98fe67edbd0b2b6a058400d0008f04989c793710f0e7f270ad3856e9",
+          "bytes": 8029
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/science-final01/COMBINED_FINITE.recipe.json",
+          "sha256": "ad6a12e1444a8e76b9ee3aee8209fbfe7fffa8926ed8646844cd6692128c2cc5",
+          "bytes": 50135
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/batch-plan01.json",
+          "sha256": "822590c44af84251f9bc7e4eade64ab2080e1806b1eedcc626dbf70afb0e2643",
+          "bytes": 11822
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 19639,
+          "parsed_binary64_unequal": 19639,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.0913936421275139e-11,
+          "max_rmse_delta": 3.029886824251378e-12
+        },
+        "coverage_kind": "nonzero_route_response",
+        "hard_limit_selector": "LimitFlowRateAndCapacity",
+        "public_response_summary": {
+          "Native": {
+            "activation_accepted": true,
+            "coverage_kind": "nonzero_route_response",
+            "positive_candidate_samples": 360,
+            "zero_OA_flow_samples": 0,
+            "Winter_positive_transport_zero_coil_samples": 0
+          },
+          "Source": {
+            "activation_accepted": true,
+            "coverage_kind": "nonzero_route_response",
+            "positive_candidate_samples": 360,
+            "zero_OA_flow_samples": 0,
+            "Winter_positive_transport_zero_coil_samples": 0
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "whole158_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit145-prep/build148-attempt01.json",
+            "sha256": "5033ca9472cc4aa35552d4742dcac4b63a5ffb5103dd7d1bf750f3e1a3960798",
+            "bytes": 705
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/positive-oa-hard-limits-145/quality01/summary.json",
+            "sha256": "552b33b4a6af1df34dcdca18203c474a93253ba651560786f7c482796109f5f2",
+            "bytes": 1663
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit145-prep/owner-execution-review01.json",
+            "sha256": "50e44c5cb1689012910ac824e03ea5b32b44866219edcc4a3688948619b1b16b",
+            "bytes": 4393
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit145-prep/Root-runtime-bindings01.json",
+            "sha256": "fc8024af01064168c702f78eed63f2ddebc58cbbd79e69c8711ced3143301a8a",
+            "bytes": 4266
+          },
+          "batch_readback": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/receipt.json",
+            "sha256": "28237768a192829de9fcd4390b66ceaa50c05d3126ba1bd3d8dc07a61cf59a1f",
+            "bytes": 2671
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One fixed SUM/NoDCV/NoEconomizer/None-recovery hard-limit composition. Zero-boundary credit is separate from positive-route coverage. COMBINED alone requires independent same-engine Winter85/Summer91 contrasts. Full158 rules and all applicable inherited gates remain strict; no exact averaged cap/ratio or private-mode law."
+      },
+      {
+        "id": "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-FLOW_ZERO-145-120H",
+        "case_kind": "FLOW_ZERO",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-positive-oa-hard-limits-145",
+        "input": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/FLOW_ZERO/input.epJSON",
+          "sha256": "8486b2a7fbae1d5ef21f556b5641afa03059c357cabca97f26f24192f0d6c655",
+          "bytes": 101788
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_ZERO/native01/command/receipt.json",
+          "sha256": "c401c9461724ca069c2b8caebf5ae86d82db1c7b27a17bd700c14dc38e364181",
+          "bytes": 70903
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_ZERO/source01/command/receipt.json",
+          "sha256": "f8f3214f9b565deac3e6c1d48ccdc526f3ce82e8124b2439a3adf906a7a78e97",
+          "bytes": 71703
+        },
+        "source_summary": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/FLOW_ZERO/source01/output/run-summary.json",
+          "sha256": "d530bc0f4f79d7252452d8c533cc8346cf851008ce11f9b3f2768934b9088c59",
+          "bytes": 64711
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f9/f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f",
+          "sha256": "f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/eplus-rs.exe",
+          "sha256": "48522f97fa17c1e6f1e5a3b4afcd7d67f87c212ce416a6881529d22c3615745a",
+          "bytes": 81013037
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/build/receipt.json",
+          "sha256": "8211a63c5c0e8fe60821791fb6701a67fc91682f418b95b9870e9f0aa6267f7d",
+          "bytes": 4809
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_ZERO.paired01.json",
+          "sha256": "ebc25cd48c10659216ef1e2722135c6b84c92b6e777718ba399bac4f3a7a03c0",
+          "bytes": 503599
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-four-pairs148-01/receipt.json",
+          "sha256": "f8d22f4e98fe67edbd0b2b6a058400d0008f04989c793710f0e7f270ad3856e9",
+          "bytes": 8029
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/science-final01/FLOW_ZERO.recipe.json",
+          "sha256": "789f7b709029163f3e18c8fad3e994da0ac438718ba9d7abb78182cd90dae629",
+          "bytes": 49987
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/batch-plan01.json",
+          "sha256": "822590c44af84251f9bc7e4eade64ab2080e1806b1eedcc626dbf70afb0e2643",
+          "bytes": 11822
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 21029,
+          "parsed_binary64_unequal": 21029,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.285814844071865e-07,
+          "max_rmse_delta": 2.4235716310900887e-08
+        },
+        "coverage_kind": "zero_boundary_response",
+        "hard_limit_selector": "LimitFlowRate",
+        "public_response_summary": {
+          "Native": {
+            "activation_accepted": true,
+            "coverage_kind": "zero_boundary_response",
+            "positive_candidate_samples": 0,
+            "zero_OA_flow_samples": 480,
+            "Winter_positive_transport_zero_coil_samples": 0
+          },
+          "Source": {
+            "activation_accepted": true,
+            "coverage_kind": "zero_boundary_response",
+            "positive_candidate_samples": 0,
+            "zero_OA_flow_samples": 480,
+            "Winter_positive_transport_zero_coil_samples": 0
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "whole158_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit145-prep/build148-attempt01.json",
+            "sha256": "5033ca9472cc4aa35552d4742dcac4b63a5ffb5103dd7d1bf750f3e1a3960798",
+            "bytes": 705
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/positive-oa-hard-limits-145/quality01/summary.json",
+            "sha256": "552b33b4a6af1df34dcdca18203c474a93253ba651560786f7c482796109f5f2",
+            "bytes": 1663
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit145-prep/owner-execution-review01.json",
+            "sha256": "50e44c5cb1689012910ac824e03ea5b32b44866219edcc4a3688948619b1b16b",
+            "bytes": 4393
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit145-prep/Root-runtime-bindings01.json",
+            "sha256": "fc8024af01064168c702f78eed63f2ddebc58cbbd79e69c8711ced3143301a8a",
+            "bytes": 4266
+          },
+          "batch_readback": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/receipt.json",
+            "sha256": "28237768a192829de9fcd4390b66ceaa50c05d3126ba1bd3d8dc07a61cf59a1f",
+            "bytes": 2671
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One fixed SUM/NoDCV/NoEconomizer/None-recovery hard-limit composition. Zero-boundary credit is separate from positive-route coverage. COMBINED alone requires independent same-engine Winter85/Summer91 contrasts. Full158 rules and all applicable inherited gates remain strict; no exact averaged cap/ratio or private-mode law."
+      },
+      {
+        "id": "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-CAPACITY_ZERO-145-120H",
+        "case_kind": "CAPACITY_ZERO",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-positive-oa-hard-limits-145",
+        "input": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/CAPACITY_ZERO/input.epJSON",
+          "sha256": "3f67dc1b5ab7bd130a8907ffebe6089d9d18d4c3b7e6557783b978f80c066c99",
+          "bytes": 101793
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/CAPACITY_ZERO/native01/command/receipt.json",
+          "sha256": "6ecca6553ef581539a4b0aa1aa06c8939222b948513b2687137d13f4cf5740f7",
+          "bytes": 70970
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/CAPACITY_ZERO/source01/command/receipt.json",
+          "sha256": "eac91b8600ef3830a8452a17a92518c80692dea89529534c25a810fbde4acb63",
+          "bytes": 71783
+        },
+        "source_summary": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/epoch148/CAPACITY_ZERO/source01/output/run-summary.json",
+          "sha256": "c34c0b2bcf09be39f0363b44a84da46efe9afc73cd019f09c3cd8df88370b98d",
+          "bytes": 64821
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f9/f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f",
+          "sha256": "f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/eplus-rs.exe",
+          "sha256": "48522f97fa17c1e6f1e5a3b4afcd7d67f87c212ce416a6881529d22c3615745a",
+          "bytes": 81013037
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/build/receipt.json",
+          "sha256": "8211a63c5c0e8fe60821791fb6701a67fc91682f418b95b9870e9f0aa6267f7d",
+          "bytes": 4809
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/CAPACITY_ZERO.paired01.json",
+          "sha256": "a521a43f3bbe9c14f3b488a8ee5d854b5561462887ef990b727474bafa7f81dd",
+          "bytes": 485938
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit145-prep/Root-four-pairs148-01/receipt.json",
+          "sha256": "f8d22f4e98fe67edbd0b2b6a058400d0008f04989c793710f0e7f270ad3856e9",
+          "bytes": 8029
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/science-final01/CAPACITY_ZERO.recipe.json",
+          "sha256": "c6fa396e93b436192e7d19ca2ba67b4ad589f0185d99188694929e7aae211917",
+          "bytes": 50016
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit145-prep/positive-OA-hard-limit-four-case-input-proposal01/batch-plan01.json",
+          "sha256": "822590c44af84251f9bc7e4eade64ab2080e1806b1eedcc626dbf70afb0e2643",
+          "bytes": 11822
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 15972,
+          "parsed_binary64_unequal": 15972,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.2732925824820995e-11,
+          "max_rmse_delta": 3.3694584395542743e-12
+        },
+        "coverage_kind": "zero_boundary_response",
+        "hard_limit_selector": "LimitCapacity",
+        "public_response_summary": {
+          "Native": {
+            "activation_accepted": true,
+            "coverage_kind": "zero_boundary_response",
+            "positive_candidate_samples": 360,
+            "zero_OA_flow_samples": 0,
+            "Winter_positive_transport_zero_coil_samples": 72
+          },
+          "Source": {
+            "activation_accepted": true,
+            "coverage_kind": "zero_boundary_response",
+            "positive_candidate_samples": 360,
+            "zero_OA_flow_samples": 0,
+            "Winter_positive_transport_zero_coil_samples": 72
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "whole158_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit145-prep/build148-attempt01.json",
+            "sha256": "5033ca9472cc4aa35552d4742dcac4b63a5ffb5103dd7d1bf750f3e1a3960798",
+            "bytes": 705
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/positive-oa-hard-limits-145/quality01/summary.json",
+            "sha256": "552b33b4a6af1df34dcdca18203c474a93253ba651560786f7c482796109f5f2",
+            "bytes": 1663
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit145-prep/owner-execution-review01.json",
+            "sha256": "50e44c5cb1689012910ac824e03ea5b32b44866219edcc4a3688948619b1b16b",
+            "bytes": 4393
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit145-prep/Root-runtime-bindings01.json",
+            "sha256": "fc8024af01064168c702f78eed63f2ddebc58cbbd79e69c8711ced3143301a8a",
+            "bytes": 4266
+          },
+          "batch_readback": {
+            "path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/receipt.json",
+            "sha256": "28237768a192829de9fcd4390b66ceaa50c05d3126ba1bd3d8dc07a61cf59a1f",
+            "bytes": 2671
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One fixed SUM/NoDCV/NoEconomizer/None-recovery hard-limit composition. Zero-boundary credit is separate from positive-route coverage. COMBINED alone requires independent same-engine Winter85/Summer91 contrasts. Full158 rules and all applicable inherited gates remain strict; no exact averaged cap/ratio or private-mode law."
       }
     ],
     "totals": {
-      "paired_cases": 221,
-      "reported_samples": 8546056,
-      "raw_operand_unequal": 2100785,
+      "paired_cases": 225,
+      "reported_samples": 8846536,
+      "raw_operand_unequal": 2175987,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -68380,6 +69267,23 @@
           "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
           "bytes": 81013767
         }
+      },
+      {
+        "id": "source-positive-oa-hard-limits-145",
+        "receipt": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/build/receipt.json",
+          "sha256": "8211a63c5c0e8fe60821791fb6701a67fc91682f418b95b9870e9f0aa6267f7d",
+          "bytes": 4809
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f9/f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f",
+          "sha256": "f925e636fbc7a5a985fe00656e06d6d1e2b73e1f3b5b2595639aa0209c057e7f"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/positive-oa-hard-limits-145/build148-01/eplus-rs.exe",
+          "sha256": "48522f97fa17c1e6f1e5a3b4afcd7d67f87c212ce416a6881529d22c3615745a",
+          "bytes": 81013037
+        }
       }
     ],
     "focused_since_workspace": {
@@ -68779,14 +69683,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 147,
-      "builds_with_accepted_paired_cases": 126,
+      "actual_recorded_builds": 148,
+      "builds_with_accepted_paired_cases": 127,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "147 recorded Source builds: 126 retain accepted pairs and 21 have none, including8 without Source execution. One Source147 default build serves six first complete basic-OA comparisons; only the 6 strict qualifying cases enter totals. All failed, observer-only and unaccepted histories retain their original credit.",
+      "qualification": "148 recorded Source builds: 127 retain accepted pairs and 21 have none, including8 without Source execution. One Source148 build serves four fixed hard-limit pairs. Only 4 strict qualifying finite-route or separately classified zero-boundary cases enter totals; prior failures and unaccepted history retain their original credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -73414,8 +74318,12 @@
       "B-IDEALLOADS-BASIC-POSITIVE-OA-FLOW_AREA-144-120H",
       "B-IDEALLOADS-BASIC-POSITIVE-OA-AIR_CHANGES-144-120H",
       "B-IDEALLOADS-BASIC-POSITIVE-OA-SUM-144-120H",
-      "B-IDEALLOADS-BASIC-POSITIVE-OA-MAXIMUM-144-120H"
-    ], "accepted_paired_cases": 50, "accepted_samples": 3644880, "retained_Scheduled_B_pairs": 49, "retained_Scheduled_B_samples": 3585360, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"FLOW_PERSON": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_PERSON.paired01.json", "sha256": "d83caf8401bae971cf2b364ce99ad59fd3209db6d96b996dcb7e25421567463e", "bytes": 543126}, "FLOW_ZONE": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_ZONE.paired01.json", "sha256": "ac0d9bdc7bf529af4c1779047089bb590442d928c712fc8732c73b697ea195a0", "bytes": 543064}, "FLOW_AREA": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_AREA.paired01.json", "sha256": "e2cb3e2275d2930954f3527b14d3baeb7508121ed3ba48b741b755fd20b7e459", "bytes": 543075}, "AIR_CHANGES": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/AIR_CHANGES.paired01.json", "sha256": "3810dd4fd435092104d032dd125d9de65dda8496138d14c9fd1453e9cda3fc70", "bytes": 543142}, "SUM": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/SUM.paired01.json", "sha256": "c8c561742f5c5998bff11b5fcd3966c3599a5d52d71f2dbaa547fda2e72b3424", "bytes": 542810}, "MAXIMUM": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/MAXIMUM.paired01.json", "sha256": "b96730cefe847ed9abf2f5622ba8b386d864caf5586308c4125535b98a4fa436", "bytes": 542982}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json", "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba", "bytes": 59630}, "latest_source_build": "source-basic-positive-oa-consumption-144", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json", "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6", "bytes": 723}, "latest_actual_quality": {"path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json", "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25", "bytes": 2381}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json", "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a", "bytes": 8067}, "latest_input_contracts": {"FLOW_PERSON": {"path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_PERSON.recipe.json", "sha256": "d538ab2635f3d08c065ec055bf56f70dc42a77512832c41484643b449eacc489", "bytes": 49184}, "FLOW_ZONE": {"path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_ZONE.recipe.json", "sha256": "148ea134c22446c6a58a682b3b7f87bd426d566f700d5ad6220d0c6229cd6ae8", "bytes": 49170}, "FLOW_AREA": {"path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_AREA.recipe.json", "sha256": "021bd8e917f7839694d4154f148b21725784c35e71d5ecb65fc070396c6ff184", "bytes": 49170}, "AIR_CHANGES": {"path": ".runtime/object-expansion/unit144-prep/science-final01/AIR_CHANGES.recipe.json", "sha256": "98413ebd62d5a3bb755cc08762f4819fc545c3f6e915965d6594b874d1b3d9a9", "bytes": 49188}, "SUM": {"path": ".runtime/object-expansion/unit144-prep/science-final01/SUM.recipe.json", "sha256": "e45d9fad4b3ada38a854136af1dd325325265e25e4b44a8199d1c0a3fecf3488", "bytes": 49128}, "MAXIMUM": {"path": ".runtime/object-expansion/unit144-prep/science-final01/MAXIMUM.recipe.json", "sha256": "df4a0cb6273ed580b157f3b99f3a6d2cceca90b3419049a584536d518611a740", "bytes": 49156}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "49 bounded Source B Scheduled/NodeList pairs retain 3,585,360 values. The unused Source A pair adds59,520, giving 50 pairs and 3,644,880 values. Qualifying basic-OA scenes retain all eighteen public Scheduled joins, exhaust/returns, ordered NodeList/UTF-8 structure, weather/fuel and comfort checks under unchanged original155 rules, plus three declared OA/mixed-air outputs. Earlier evidence keeps its own scope; no private history, averaged ratio, arbitrary combination or full-object claim follows.", "capability_or_gate_promotion": false,
+      "B-IDEALLOADS-BASIC-POSITIVE-OA-MAXIMUM-144-120H",
+      "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-FLOW_FINITE-145-120H",
+      "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-COMBINED_FINITE-145-120H",
+      "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-FLOW_ZERO-145-120H",
+      "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-CAPACITY_ZERO-145-120H"
+    ], "accepted_paired_cases": 54, "accepted_samples": 3945360, "retained_Scheduled_B_pairs": 53, "retained_Scheduled_B_samples": 3885840, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"FLOW_FINITE": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_FINITE.paired01.json", "sha256": "3123a1480c0486e7b1b471c801ed884b58cd2d4da9b4271eb2b07d8e05c51612", "bytes": 496526}, "COMBINED_FINITE": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/COMBINED_FINITE.paired01.json", "sha256": "1030511a4e12f884a6e75f5ef8d6f8b8121b9d792fd0e5308f203bfd2094e9c2", "bytes": 510360}, "FLOW_ZERO": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_ZERO.paired01.json", "sha256": "ebc25cd48c10659216ef1e2722135c6b84c92b6e777718ba399bac4f3a7a03c0", "bytes": 503599}, "CAPACITY_ZERO": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/CAPACITY_ZERO.paired01.json", "sha256": "a521a43f3bbe9c14f3b488a8ee5d854b5561462887ef990b727474bafa7f81dd", "bytes": 485938}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit145-prep/Root-four-pairs148-01/receipt.json", "sha256": "f8d22f4e98fe67edbd0b2b6a058400d0008f04989c793710f0e7f270ad3856e9", "bytes": 8029}, "latest_source_build": "source-positive-oa-hard-limits-145", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit145-prep/build148-attempt01.json", "sha256": "5033ca9472cc4aa35552d4742dcac4b63a5ffb5103dd7d1bf750f3e1a3960798", "bytes": 705}, "latest_actual_quality": {"path": ".runtime/porting/positive-oa-hard-limits-145/quality01/summary.json", "sha256": "552b33b4a6af1df34dcdca18203c474a93253ba651560786f7c482796109f5f2", "bytes": 1663}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit145-prep/owner-execution-review01.json", "sha256": "50e44c5cb1689012910ac824e03ea5b32b44866219edcc4a3688948619b1b16b", "bytes": 4393}, "latest_input_contracts": {"FLOW_FINITE": {"path": ".runtime/object-expansion/unit145-prep/science-final01/FLOW_FINITE.recipe.json", "sha256": "c2e2f12f1ce178ca4c24a687391d2484cb6f864a8ff22f57bd6df1e7b5afdc99", "bytes": 50007}, "COMBINED_FINITE": {"path": ".runtime/object-expansion/unit145-prep/science-final01/COMBINED_FINITE.recipe.json", "sha256": "ad6a12e1444a8e76b9ee3aee8209fbfe7fffa8926ed8646844cd6692128c2cc5", "bytes": 50135}, "FLOW_ZERO": {"path": ".runtime/object-expansion/unit145-prep/science-final01/FLOW_ZERO.recipe.json", "sha256": "789f7b709029163f3e18c8fad3e994da0ac438718ba9d7abb78182cd90dae629", "bytes": 49987}, "CAPACITY_ZERO": {"path": ".runtime/object-expansion/unit145-prep/science-final01/CAPACITY_ZERO.recipe.json", "sha256": "c6fa396e93b436192e7d19ca2ba67b4ad589f0185d99188694929e7aae211917", "bytes": 50016}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "53 bounded Source B Scheduled/NodeList pairs retain 3,885,840 values. The unused Source A pair adds59,520, giving 54 pairs and 3,945,360 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

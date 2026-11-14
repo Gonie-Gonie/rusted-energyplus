@@ -700,6 +700,8 @@ pub fn has_source_owned_no_oa_humidity_shape(system: &IdealLoadsAirSystem) -> bo
 /// Identifies the first owned Source positive-OA selector shape.
 /// Raw SourceB and model validation still prove format, the sole basic DSOA,
 /// real schedules and distinct bare Node identities; no physical state is made.
+/// The typed limit enum has only the four owned variants. Common validation
+/// still requires active finite hard sizes and rejects every Autosize field.
 #[must_use]
 pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool {
     system
@@ -710,8 +712,6 @@ pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool 
             .outdoor_air_inlet_node_name
             .as_ref()
             .is_some_and(|name| !name.0.trim().is_empty())
-        && system.heating_limit == IdealLoadsLimit::NoLimit
-        && system.cooling_limit == IdealLoadsLimit::NoLimit
         && system.dehumidification_control_type == DehumidificationControlType::None
         && system.humidification_control_type == HumidificationControlType::None
         && system.demand_controlled_ventilation_type

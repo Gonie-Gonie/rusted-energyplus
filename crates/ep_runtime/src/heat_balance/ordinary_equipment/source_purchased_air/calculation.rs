@@ -408,16 +408,55 @@ impl OrdinaryEquipment {
             let mut supply_enthalpy;
             if min_oa_sensible >= cool_load && control_type != 1 {
                 if flow_limited(unit.cooling_limit) && oa_flow > unit.max_cool_mass_flow_rate {
-                    let _oa_volume = oa_flow / o.environment.std_rho_air;
+                    // Native PurchasedAirManager 2058-2078: report the requested
+                    // pre-clamp volume; first warning and ELSE recurring are distinct.
+                    let oa_volume = oa_flow / o.environment.std_rho_air;
                     if unit.oa_flow_max_cool_output_error < 1 {
                         unit.oa_flow_max_cool_output_error += 1;
-                        return Err(Error::Unavailable(
-                            "actual PurchasedAir cooling OA-flow ShowWarningError",
-                        ));
+                        let message = format!(
+                            "{} \"{}\" Requested outdoor air flow rate = {} [m3/s] exceeds limit.",
+                            unit.c_object_name,
+                            unit.name,
+                            crate::heat_balance::source_round_format::truncate(oa_volume, 5)
+                                .map_err(|error| Error::Format(format!(
+                                    "PurchasedAir cooling OA flow .5T: {error:?}"
+                                )))?,
+                        );
+                        let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                            kickoff: &o.globals.kickoff_simulation,
+                            developer: o.developer_flag,
+                            warmup: &o.clock.warmup_flag,
+                            doing_sizing: &o.globals.doing_sizing,
+                        };
+                        o.backend.show_source_warning_error(&message, &flags)?;
+                        o.backend.show_continue_error(&format!(
+                            " Will be reduced to the Maximum Cooling Air Flow Rate = {} [m3/s]",
+                            crate::heat_balance::source_round_format::truncate(
+                                unit.max_cool_vol_flow_rate,
+                                5
+                            )
+                            .map_err(|error| Error::Format(
+                                format!("PurchasedAir cooling maximum OA flow .5T: {error:?}")
+                            ))?,
+                        ))?;
+                        o.backend.show_source_continue_error_time_stamp(
+                            "",
+                            o.clock,
+                            o.globals,
+                            &*o.environment,
+                            o.hvac,
+                        )?;
+                    } else {
+                        o.backend.show_source_recurring_warning_at_end(
+                            &format!(
+                                "{} \"{}\" Requested outdoor air flow rate [m3/s] reduced to Maximum Cooling Air Flow Rate warning continues...",
+                                unit.c_object_name, unit.name,
+                            ),
+                            &mut unit.oa_flow_max_cool_output_index, o.recurring, o.clock, o.globals,
+                            Some(oa_volume), None, None, "", "", "",
+                        )?;
                     }
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir cooling OA-flow recurring warning",
-                    ));
+                    oa_flow = unit.max_cool_mass_flow_rate;
                 } else if unit.economizer_type != SourcePurchasedAirEconomizer::NoEconomizer {
                     return Err(Error::Unavailable(
                         "actual PurchasedAir positive economizer operation",
@@ -626,16 +665,55 @@ impl OrdinaryEquipment {
             } else {
                 let heating = min_oa_sensible < heat_load && control_type != 2;
                 if flow_limited(unit.heating_limit) && oa_flow > unit.max_heat_mass_flow_rate {
-                    let _oa_volume = oa_flow / o.environment.std_rho_air;
+                    // Native PurchasedAirManager 2363-2383: report the requested
+                    // pre-clamp volume; first warning and ELSE recurring are distinct.
+                    let oa_volume = oa_flow / o.environment.std_rho_air;
                     if unit.oa_flow_max_heat_output_error < 1 {
                         unit.oa_flow_max_heat_output_error += 1;
-                        return Err(Error::Unavailable(
-                            "actual PurchasedAir heating OA-flow ShowWarningError",
-                        ));
+                        let message = format!(
+                            "{} \"{}\" Requested outdoor air flow rate = {} [m3/s] exceeds limit.",
+                            unit.c_object_name,
+                            unit.name,
+                            crate::heat_balance::source_round_format::truncate(oa_volume, 5)
+                                .map_err(|error| Error::Format(format!(
+                                    "PurchasedAir heating OA flow .5T: {error:?}"
+                                )))?,
+                        );
+                        let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                            kickoff: &o.globals.kickoff_simulation,
+                            developer: o.developer_flag,
+                            warmup: &o.clock.warmup_flag,
+                            doing_sizing: &o.globals.doing_sizing,
+                        };
+                        o.backend.show_source_warning_error(&message, &flags)?;
+                        o.backend.show_continue_error(&format!(
+                            " Will be reduced to the Maximum Heating Air Flow Rate = {} [m3/s]",
+                            crate::heat_balance::source_round_format::truncate(
+                                unit.max_heat_vol_flow_rate,
+                                5
+                            )
+                            .map_err(|error| Error::Format(
+                                format!("PurchasedAir heating maximum OA flow .5T: {error:?}")
+                            ))?,
+                        ))?;
+                        o.backend.show_source_continue_error_time_stamp(
+                            "",
+                            o.clock,
+                            o.globals,
+                            &*o.environment,
+                            o.hvac,
+                        )?;
+                    } else {
+                        o.backend.show_source_recurring_warning_at_end(
+                            &format!(
+                                "{} \"{}\" Requested outdoor air flow rate [m3/s] reduced to Maximum Heating Air Flow Rate warning continues...",
+                                unit.c_object_name, unit.name,
+                            ),
+                            &mut unit.oa_flow_max_heat_output_index, o.recurring, o.clock, o.globals,
+                            Some(oa_volume), None, None, "", "", "",
+                        )?;
                     }
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir heating OA-flow recurring warning",
-                    ));
+                    oa_flow = unit.max_heat_mass_flow_rate;
                 }
                 let mut heat_flow = 0.0;
                 if heat_on && heating {

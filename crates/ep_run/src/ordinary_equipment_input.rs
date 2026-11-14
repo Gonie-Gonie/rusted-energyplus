@@ -123,7 +123,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
         return None;
     }
     let error = || {
-        Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned NoLimit/None selectors".into())
+        Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned hard-limit/None selectors".into())
     };
     if !raw.is_epjson()
         || units.is_none_or(|rows| rows.len() != 1)
@@ -155,8 +155,6 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
         || ![
             ("humidification_control_type", "None"),
-            ("heating_limit", "NoLimit"),
-            ("cooling_limit", "NoLimit"),
             ("demand_controlled_ventilation_type", "None"),
             ("outdoor_air_economizer_type", "NoEconomizer"),
             ("heat_recovery_type", "None"),
@@ -165,6 +163,56 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
         .all(|(name, expected)| field(unit, name).is_none_or(|value| text_is(value, &[*expected])))
     {
         return error();
+    }
+    for (selector, flow, capacity) in [
+        (
+            "heating_limit",
+            "maximum_heating_air_flow_rate",
+            "maximum_sensible_heating_capacity",
+        ),
+        (
+            "cooling_limit",
+            "maximum_cooling_air_flow_rate",
+            "maximum_total_cooling_capacity",
+        ),
+    ] {
+        let selected = field(unit, selector);
+        if !selected.is_none_or(|value| {
+            text_is(
+                value,
+                &[
+                    "NoLimit",
+                    "LimitFlowRate",
+                    "LimitCapacity",
+                    "LimitFlowRateAndCapacity",
+                ],
+            )
+        }) {
+            return error();
+        }
+        // Preserve actual raw operands. No Autosize/string/null alias enters
+        // this route; active hard limits require the authored finite number.
+        for (name, active) in [
+            (
+                flow,
+                selected.is_some_and(|value| {
+                    text_is(value, &["LimitFlowRate", "LimitFlowRateAndCapacity"])
+                }),
+            ),
+            (
+                capacity,
+                selected.is_some_and(|value| {
+                    text_is(value, &["LimitCapacity", "LimitFlowRateAndCapacity"])
+                }),
+            ),
+        ] {
+            let value = field(unit, name);
+            if value.is_some_and(|value| !number(value).is_some_and(|number| number >= 0.0))
+                || (active && value.is_none())
+            {
+                return error();
+            }
+        }
     }
     let requirements = raw
         .objects
