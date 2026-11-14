@@ -1147,7 +1147,9 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             if total == 1 && authored_heat_fuel.is_none() && authored_cool_fuel.is_none() {
                 use crate::heat_balance::ordinary_equipment::source_purchased_air::owners::{
                     SourcePurchasedAirDcv as Dcv, SourcePurchasedAirEconomizer as Econ,
-                    SourcePurchasedAirHeatRecovery as Recovery, SourcePurchasedAirLimit as Limit,
+                    SourcePurchasedAirHeatRecovery as Recovery,
+                    SourcePurchasedAirHumidityControl as Humidity,
+                    SourcePurchasedAirLimit as Limit,
                 };
                 for explicit_empty in [false, true] {
                     let dsoa_name = "OA direct raw 규";
@@ -1177,6 +1179,14 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     );
                     if !explicit_empty {
                         fields.insert(
+                            "dehumidification_control_type".into(),
+                            V::String("ConstantSupplyHumidityRatio".into()),
+                        );
+                        fields.insert(
+                            "humidification_control_type".into(),
+                            V::String("ConstantSupplyHumidityRatio".into()),
+                        );
+                        fields.insert(
                             "demand_controlled_ventilation_type".into(),
                             V::String("CO2Setpoint".into()),
                         );
@@ -1192,6 +1202,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             "demand_controlled_ventilation_type",
                             "outdoor_air_economizer_type",
                             "heat_recovery_type",
+                            "dehumidification_control_type",
+                            "humidification_control_type",
                         ] {
                             fields.insert(field.into(), V::String(String::new()));
                         }
@@ -1405,6 +1417,17 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     assert!(oa_equipment.nodes.context_name.is_empty());
                     assert!(oa_equipment.nodes.unique_names.is_none());
                     assert_eq!(oa_equipment.nodes.number_of_check_nodes, 2); // actual supply + OA checks
+                    assert_eq!(
+                        (unit.dehumid_ctrl_type, unit.humid_ctrl_type),
+                        if explicit_empty {
+                            (Humidity::Invalid, Humidity::Invalid)
+                        } else {
+                            (
+                                Humidity::ConstantSupplyHumidityRatio,
+                                Humidity::ConstantSupplyHumidityRatio,
+                            )
+                        }
+                    );
                     assert_eq!(
                         (unit.dcv_type, unit.economizer_type, unit.ht_rec_type),
                         if explicit_empty {

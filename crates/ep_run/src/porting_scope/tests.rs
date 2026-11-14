@@ -3592,7 +3592,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         unit["dehumidification_control_type"] = json!("ConstantSensibleHeatRatio");
                         match method {
                             "Flow/Person" => {
-                                unit["dehumidification_control_type"] = json!("Humidistat")
+                                // Real getter ownership does not admit positive-OA empty humidity.
+                                unit["dehumidification_control_type"] = json!("")
                             }
                             "Flow/Zone" => unit["cooling_sensible_heat_ratio"] = json!(0.0),
                             "Flow/Area" => unit["cooling_sensible_heat_ratio"] = json!(-0.0),
@@ -4996,15 +4997,50 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 empty_model.ideal_loads_air_systems[0].dehumidification_control_type,
                 DehumidificationControlType::ConstantSensibleHeatRatio
             );
-            let empty_error = crate::ordinary_input_processor::resolve_source_b(&empty_raw)
-                .expect_err("Source must not confuse a direct empty enum with omitted SHR");
-            assert!(
-                empty_error.contains("explicit-empty dehumidification"),
-                "{empty_error}"
+            // Advisory typed SHR stays separate from the actual getter's Invalid.
+            let empty_ip = crate::ordinary_input_processor::resolve_source_b(&empty_raw)
+                .expect("owned NoOA exact-empty Source IP");
+            assert_eq!(
+                empty_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("actual empty raw fields")
+                    .get("dehumidification_control_type"),
+                Some(&SourceRaw::String(String::new()))
+            );
+            let mut empty_scope =
+                inspect_porting_scope(&empty_raw, &empty_compile.report, Some(empty_model), scope);
+            assert!(empty_scope.admissible, "{:?}", empty_scope.violations);
+            empty_scope.environment = Some(
+                super::environment::environment_from_weather(
+                    empty_model,
+                    &single_day_weather_fixture(),
+                    "actual empty NoOA admission weather",
+                )
+                .expect("real empty NoOA environment"),
+            );
+            let empty_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &empty_raw,
+                &empty_scope,
+            )
+            .expect("same exact-empty Source token");
+            let empty_support = crate::support::assess_support_with_source_admission(
+                &empty_raw,
+                &empty_compile.report,
+                Some(empty_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&empty_admission),
             );
             assert!(
-                !inspect_porting_scope(&empty_raw, &empty_compile.report, Some(empty_model), scope)
-                    .admissible
+                empty_support.allows_rust_runtime(),
+                "{:?}",
+                empty_support.diagnostics
+            );
+            assert_eq!(
+                empty_support.runtime_class,
+                crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
             );
 
             let mut invalid_shr = people.clone();
@@ -5169,8 +5205,14 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(ip.get_num_objects_found("ZoneControl:Humidistat"), 0);
                 assert_eq!(raw, retained);
                 if dehumidification == "Humidistat" {
-                    humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
-                        json!("");
+                    // Reuse the two existing negative contexts for distinct crossed holds.
+                    if humidification == "Humidistat" {
+                        humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                            json!("");
+                    } else {
+                        humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
+                            json!("");
+                    }
                     let unresolved = parse_epjson_str(&humidity.to_string())
                         .expect("actual explicit-empty humidity selector");
                     let unresolved_compile = ep_compiler::compile_raw_model_for_source(&unresolved);

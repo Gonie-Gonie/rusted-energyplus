@@ -604,11 +604,16 @@ impl OrdinaryEquipment {
                     )?;
                     errors_found = true;
                 }
-                let value = getter::alpha(output.input, object, "dehumidification_control_type")?;
+                let value = getter::alpha_field_value(
+                    output.input,
+                    object,
+                    "dehumidification_control_type",
+                )?;
                 self.purchased_unit_mut(number)?.dehumid_ctrl_type = humidity(&value);
                 self.purchased_unit_mut(number)?.cool_shr =
                     getter::real(output.input, object, "cooling_sensible_heat_ratio")?;
-                let value = getter::alpha(output.input, object, "humidification_control_type")?;
+                let value =
+                    getter::alpha_field_value(output.input, object, "humidification_control_type")?;
                 self.purchased_unit_mut(number)?.humid_ctrl_type = humidity(&value);
                 let value = getter::alpha(
                     output.input,

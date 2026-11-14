@@ -25,23 +25,36 @@ fn text<'a>(object: &'a RawObject, name: &str) -> Option<&'a str> {
         _ => None,
     }
 }
-/// One unresolved direct-epJSON enum prerequisite shared by Source ingress
-/// and scope inspection. Original IDF and omitted/named selectors stay distinct.
+/// Exact-empty humidity composition prerequisite shared by Source ingress
+/// and scope inspection. The actual getter preserves Invalid, not typed defaults.
 pub(crate) fn source_b_dehumidification_prerequisite_error(
     raw: &RawModel,
     object: &RawObject,
 ) -> Option<&'static str> {
-    (raw.is_epjson()
-        && matches!(field(object, "dehumidification_control_type"), Some(RawValue::String(text)) if text.is_empty()))
-    .then_some("ordinary Source explicit-empty dehumidification requires the actual Native enum getter")
+    if !raw.is_epjson()
+        || !matches!(field(object, "dehumidification_control_type"), Some(RawValue::String(text)) if text.is_empty())
+    {
+        return None;
+    }
+    let no_oa = field(object, "design_specification_outdoor_air_object_name").is_none()
+        && field(object, "outdoor_air_inlet_node_name").is_none()
+        && raw
+            .objects
+            .get(&ObjectType("DesignSpecification:OutdoorAir".into()))
+            .is_none_or(|rows| rows.is_empty());
+    let non_humidistat = field(object, "humidification_control_type")
+        .is_none_or(|value| text_is(value, &["", "None", "ConstantSupplyHumidityRatio"]));
+    (!no_oa || !non_humidistat).then_some(
+        "ordinary Source explicit-empty dehumidification requires no-OA non-Humidistat controls",
+    )
 }
 
 /// Humidistat raw prerequisites shared by Source B ingress and Scope.
 /// No full raw resolver or typed-default reconstruction is invoked by Scope.
 pub(crate) fn source_b_humidistat_prerequisite_error(raw: &RawModel) -> Option<String> {
-    // Newly selected dehumidistat branches distinguish Native Invalid from None.
-    // Only direct-JSON exact-empty humidification has the unresolved scratch
-    // default projection; omitted/named/IDF and all old shapes stay unchanged.
+    // Invalid is distinct from None in the actual Humidistat cross-coupling.
+    // Keep this exact-empty composition held after the real getter is owned;
+    // omitted/named/IDF and all other shapes stay unchanged.
     if raw.is_epjson()
         && raw.objects.get(&ObjectType("ZoneHVAC:IdealLoadsAirSystem".into()))
             .is_some_and(|units| units.values().any(|unit| {
@@ -49,7 +62,7 @@ pub(crate) fn source_b_humidistat_prerequisite_error(raw: &RawModel) -> Option<S
                     && matches!(field(unit, "humidification_control_type"), Some(RawValue::String(value)) if value.is_empty())
             }))
     {
-        return Some("Source Humidistat explicit-empty humidification requires the actual Native enum getter".into());
+        return Some("Source Humidistat explicit-empty humidification composition remains outside owned scope".into());
     }
     // A missing family is the genuine no-control prediction/remaining path.
     let objects = raw
@@ -137,6 +150,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
                     text_is(
                         value,
                         &[
+                            "",
                             "None",
                             "ConstantSupplyHumidityRatio",
                             "ConstantSensibleHeatRatio",
