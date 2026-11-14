@@ -351,7 +351,12 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         DehumidificationControlType::None,
         DehumidificationControlType::ConstantSupplyHumidityRatio,
     ] {
-        for cooling in [IdealLoadsLimit::NoLimit, IdealLoadsLimit::LimitFlowRate] {
+        for cooling in [
+            IdealLoadsLimit::NoLimit,
+            IdealLoadsLimit::LimitFlowRate,
+            IdealLoadsLimit::LimitCapacity,
+            IdealLoadsLimit::LimitFlowRateAndCapacity,
+        ] {
             let (constant, _) = fixture(|typed| {
                 let system = &mut typed.ideal_loads_air_systems[0];
                 system.dehumidification_control_type = dehumidification;
@@ -359,6 +364,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                     HumidificationControlType::ConstantSupplyHumidityRatio;
                 system.cooling_limit = cooling;
                 system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.2));
+                system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
             });
             assert!(has_source_constant_supply_humidity_shape(
                 &constant.typed.ideal_loads_air_systems[0]
@@ -388,29 +394,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             );
         }
     }
-    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 12] = [
-        |system| {
-            system.cooling_limit = IdealLoadsLimit::LimitCapacity;
-            system.humidification_control_type =
-                HumidificationControlType::ConstantSupplyHumidityRatio;
-        },
-        |system| {
-            system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
-            system.humidification_control_type =
-                HumidificationControlType::ConstantSupplyHumidityRatio;
-        },
-        |system| {
-            system.cooling_limit = IdealLoadsLimit::LimitCapacity;
-            system.dehumidification_control_type = DehumidificationControlType::None;
-            system.humidification_control_type =
-                HumidificationControlType::ConstantSupplyHumidityRatio;
-        },
-        |system| {
-            system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
-            system.dehumidification_control_type = DehumidificationControlType::None;
-            system.humidification_control_type =
-                HumidificationControlType::ConstantSupplyHumidityRatio;
-        },
+    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 8] = [
         |system| system.dehumidification_control_type = DehumidificationControlType::Humidistat,
         |system| {
             system.dehumidification_control_type =

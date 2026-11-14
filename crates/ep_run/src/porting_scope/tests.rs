@@ -3810,9 +3810,25 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(raw, retained);
             }
 
-            // The same real compiler/scope/token/IP caller covers the four
-            // finite-capacity shapes without seeding any physical HVAC owner.
+            // The same real compiler/scope/token/IP caller also covers heating-only
+            // and both constant capacity shapes, without physical HVAC owner seeds.
             for (limit, dehumidification, humidification) in [
+                (
+                    "LimitCapacity",
+                    "ConstantSupplyHumidityRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                (
+                    "LimitFlowRateAndCapacity",
+                    "ConstantSupplyHumidityRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                ("LimitCapacity", "None", "ConstantSupplyHumidityRatio"),
+                (
+                    "LimitFlowRateAndCapacity",
+                    "None",
+                    "ConstantSupplyHumidityRatio",
+                ),
                 ("LimitCapacity", "None", "None"),
                 ("LimitFlowRateAndCapacity", "None", "None"),
                 ("LimitCapacity", "ConstantSupplyHumidityRatio", "None"),
@@ -3973,22 +3989,6 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(raw, retained);
             }
             for (limit, dehumidification, humidification) in [
-                (
-                    "LimitCapacity",
-                    "ConstantSupplyHumidityRatio",
-                    "ConstantSupplyHumidityRatio",
-                ),
-                (
-                    "LimitFlowRateAndCapacity",
-                    "ConstantSupplyHumidityRatio",
-                    "ConstantSupplyHumidityRatio",
-                ),
-                ("LimitCapacity", "None", "ConstantSupplyHumidityRatio"),
-                (
-                    "LimitFlowRateAndCapacity",
-                    "None",
-                    "ConstantSupplyHumidityRatio",
-                ),
                 ("NoLimit", "Humidistat", "None"),
                 ("NoLimit", "ConstantSensibleHeatRatio", "None"),
                 ("NoLimit", "ConstantSupplyHumidityRatio", "Humidistat"),

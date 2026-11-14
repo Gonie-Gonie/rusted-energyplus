@@ -6531,6 +6531,52 @@
         "original_capacity_science_accepted": false,
         "new_Source_selector_tuples": 2,
         "capability_or_gate_promotion": false
+      },
+      "heating_constant_cooling_capacity_owner_138": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit138-prep/build140-attempt01.json",
+          "sha256": "ce83b2f3b26216b39d1a7351f0a9557f332cf09c4ea81ce9ee5b9784422da56b",
+          "bytes": 738
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/heating-constant-cooling-capacity-138/quality01/summary.json",
+          "sha256": "d20aa860632152583cbe9d44f182541bdd1bc695bf865aa639161d3001fb17a4",
+          "bytes": 1713
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit138-prep/owner-execution-review01.json",
+          "sha256": "d0f997fe7c48e874a23557f29cfc8e28900b124c205c59acd4a810d9cbb7f572",
+          "bytes": 3798
+        },
+        "retained_evidence": {
+          "path": ".runtime/object-expansion/unit138-prep/Root-retained-evidence01.json",
+          "sha256": "f3e2dcd45e4e16a8607348bd06fc556108d980b21c64bf58b5dbcf069ecc3286",
+          "bytes": 1794
+        },
+        "retained_failed_QA_receipts": [],
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit138-prep/Root-source-adoption01.json",
+          "sha256": "6112323b508fa844396f5eae7277a5adaf5ae26ce60bc5e9f0a35bff3cd34caa",
+          "bytes": 3319
+        },
+        "Root_Source_static_review": {
+          "path": ".runtime/object-expansion/unit138-prep/Root-source-static-review01.json",
+          "sha256": "26ffbdd6ac9ef06bcdb9e84efa3c5e0ad811f977e2e2872ec5ab7268c61b0f0d",
+          "bytes": 1750
+        },
+        "independent_Source_review": {
+          "path": ".runtime/object-expansion/unit138-prep/independent-Source-heating-constant-cooling-capacity-static-review01.json",
+          "sha256": "89e4fc7940bc4c84919de274063301868416719d0858a42ed24622ee7941ef4a",
+          "bytes": 20168
+        },
+        "scope": "The bounded Source calculation now implements the Native heating-constant/cooling-capacity coupling: it preserves the mixed humidity comparison, signed sensible and latent loads, capacity clamp, enthalpy recomposition and diagnostic humidity inverse. The shared no-outdoor-air selector additionally admits heating ConstantSupplyHumidityRatio with dehumidification_control_type explicitly None or ConstantSupplyHumidityRatio under capacity or combined flow/capacity limits, retaining all numeric, topology, schedule and Legacy boundaries. Existing admission tests and one default build validate owner integration only. No Native or Source model execution, new paired case or value is added here; positive coupled physical validation remains pending. The four earlier Source139 engineering comparisons remain unaccepted because their original Native exact-capacity witnesses failed. SHR/humidistat/OA/sizing, arbitrary combinations and full-object completion remain open.",
+        "Native_processes": 0,
+        "Source_processes": 0,
+        "accepted_paired_cases": 0,
+        "accepted_values": 0,
+        "new_Source_selector_tuples": 4,
+        "physical_domain_completion": false,
+        "capability_or_gate_promotion": false
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -65204,6 +65250,23 @@
           },
           "scope": "All four original Native exact-capacity gates failed: reported quarter-hour averages stayed below 1000W. Separate Source comparisons grant zero qualifying cases or values; no private capacity-inactive claim."
         }
+      },
+      {
+        "id": "source-dd-heating-constant-cooling-capacity-138",
+        "receipt": {
+          "path": ".runtime/porting/heating-constant-cooling-capacity-138/build140-01/build/receipt.json",
+          "sha256": "c9bd10eb450ee63066a2d02605c462cde4e7b8e9bd60c69da48a0e9ed2fb8c12",
+          "bytes": 4722
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/d7/d75b84d3d73bccf58f9a0e2af5c3970715563dce405fa6cb219de3482fddbb6c",
+          "sha256": "d75b84d3d73bccf58f9a0e2af5c3970715563dce405fa6cb219de3482fddbb6c"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/heating-constant-cooling-capacity-138/build140-01/eplus-rs.exe",
+          "sha256": "1ab8e6e5864515921d1b542ae321a479c97c888f0e542352696da2782f3452be",
+          "bytes": 80816688
+        }
       }
     ],
     "focused_since_workspace": {
@@ -65570,18 +65633,18 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 139,
+      "actual_recorded_builds": 140,
       "builds_with_accepted_paired_cases": 122,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 11,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "139 recorded Source builds: 122 retain accepted pairs; 17 have none, including six without Source execution. Build139 has four separately retained unaccepted Source engineering comparison attempts after all four original Native capacity witnesses failed. No new accepted case/value or physical-domain credit follows; all earlier failed/observer/comparison histories retain their original credit.",
+      "qualification": "140 recorded Source builds: 122 retain accepted pairs; 18 have none, including seven without Source execution. The heating-constant/cooling-capacity calculation and eligibility extension adds two existing admission tests and one default build, with no model process or paired credit. All previous quality, physical and failed histories, including the four unaccepted Source139 engineering comparisons, keep their original credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
-      "builds_without_Source_execution": 6,
-      "builds_without_accepted_paired_cases": 17
+      "builds_without_Source_execution": 7,
+      "builds_without_accepted_paired_cases": 18
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",

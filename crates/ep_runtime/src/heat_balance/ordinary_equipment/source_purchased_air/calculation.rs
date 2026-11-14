@@ -579,16 +579,34 @@ impl OrdinaryEquipment {
                         SourcePurchasedAirHumidityControl::ConstantSupplyHumidityRatio
                             if heating =>
                         {
-                            // Native2498-2528: only cooling-capacity coupling
-                            // needs the unresolved diagnostic-aware WFromH child.
-                            if unit.mixed_air_hum_rat > unit.max_heat_supp_air_hum_rat
-                                && capacity_limited(unit.cooling_limit)
-                            {
-                                return Err(Error::Unavailable(
-                                    "actual PurchasedAir heating constant humidity cooling-capacity child",
-                                ));
+                            // Native2498-2524: preserve the original signed
+                            // total/sensible/latent order; this is not net heat.
+                            if unit.mixed_air_hum_rat > unit.max_heat_supp_air_hum_rat {
+                                if capacity_limited(unit.cooling_limit) {
+                                    unit.supply_hum_rat = unit.max_heat_supp_air_hum_rat;
+                                    supply_enthalpy =
+                                        enthalpy(unit.supply_temp, unit.supply_hum_rat);
+                                    let mut cooling_total =
+                                        supply_flow * (mixed_enthalpy - supply_enthalpy);
+                                    let specific_heat = cp(unit.mixed_air_hum_rat);
+                                    let cooling_sensible = supply_flow
+                                        * specific_heat
+                                        * (unit.mixed_air_temp - unit.supply_temp);
+                                    let mut cooling_latent = cooling_total - cooling_sensible;
+                                    if cooling_latent >= unit.max_cool_tot_cap {
+                                        cooling_latent = unit.max_cool_tot_cap;
+                                        cooling_total = cooling_sensible + cooling_latent;
+                                        supply_enthalpy =
+                                            mixed_enthalpy - cooling_total / supply_flow;
+                                        unit.supply_hum_rat =
+                                            humidity_from_h(o, unit.supply_temp, supply_enthalpy)?;
+                                    }
+                                } else {
+                                    unit.supply_hum_rat = unit.max_heat_supp_air_hum_rat;
+                                }
+                            } else {
+                                unit.supply_hum_rat = unit.max_heat_supp_air_hum_rat;
                             }
-                            unit.supply_hum_rat = unit.max_heat_supp_air_hum_rat;
                         }
                         SourcePurchasedAirHumidityControl::ConstantSupplyHumidityRatio => {
                             unit.supply_hum_rat = unit.mixed_air_hum_rat;

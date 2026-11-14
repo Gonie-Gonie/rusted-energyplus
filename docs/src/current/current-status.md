@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 139 recorded Source builds,
-122 with accepted pairs and 17 without accepted pairs, including 6 builds
+validate the consumer corrections. There are 140 recorded Source builds,
+122 with accepted pairs and 18 without accepted pairs, including 7 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,7 +196,7 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-The bounded no-outdoor-air Source eligibility now includes cooling ConstantSupplyHumidityRatio with inactive heating humidity control and hard cooling capacity or combined flow/capacity limits. Four frozen 1,000 W cases completed Native execution but their reported quarter-hour average cooling rates stayed below the exact 1,000 W witness, so all four original public capacity gates failed. Separate first Source engineering comparisons are retained outside qualifying evidence, with their actual outcomes linked in the disposition/completed review. These observations do not establish private capacity-mode activity or grant any new accepted case, value or physical-domain completion. The shared diagnostic property owners remain connected; heating-constant coupled capacity, SHR/humidistat/OA/sizing and full-object completion remain open.
+The bounded Source calculation now implements the Native heating-constant/cooling-capacity coupling: it preserves the mixed humidity comparison, signed sensible and latent loads, capacity clamp, enthalpy recomposition and diagnostic humidity inverse. The shared no-outdoor-air selector additionally admits heating ConstantSupplyHumidityRatio with dehumidification_control_type explicitly None or ConstantSupplyHumidityRatio under capacity or combined flow/capacity limits, retaining all numeric, topology, schedule and Legacy boundaries. Existing admission tests and one default build validate owner integration only. No Native or Source model execution, new paired case or value is added here; positive coupled physical validation remains pending. The four earlier Source139 engineering comparisons remain unaccepted because their original Native exact-capacity witnesses failed. SHR/humidistat/OA/sizing, arbitrary combinations and full-object completion remain open.
 
 Thirty-four bounded B Scheduled/NodeList pairs retain 2,462,880 values. The
 unused A pair adds 59,520, giving thirty-five pairs and 2,522,400 values. Fresh
