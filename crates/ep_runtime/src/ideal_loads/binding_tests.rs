@@ -346,6 +346,26 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                     unit.outdoor_air_economizer_type =
                         OutdoorAirEconomizerType::DifferentialEnthalpy;
                 }
+                if method == ep_model::DesignSpecificationOutdoorAirMethod::FlowPerZone
+                    && limit == IdealLoadsLimit::NoLimit
+                    && flow > 0.0
+                {
+                    unit.heat_recovery_type = HeatRecoveryType::Sensible;
+                    unit.sensible_heat_recovery_effectiveness = 0.0;
+                    unit.latent_heat_recovery_effectiveness = 1.0;
+                } else if method == ep_model::DesignSpecificationOutdoorAirMethod::Maximum
+                    && limit == IdealLoadsLimit::NoLimit
+                    && flow > 0.0
+                {
+                    unit.heat_recovery_type = HeatRecoveryType::Enthalpy;
+                    unit.sensible_heat_recovery_effectiveness = 1.0;
+                    unit.latent_heat_recovery_effectiveness = 0.0;
+                } else if method == ep_model::DesignSpecificationOutdoorAirMethod::FlowPerArea
+                    && limit == IdealLoadsLimit::NoLimit
+                    && flow == 0.0
+                {
+                    unit.sensible_heat_recovery_effectiveness = -0.0;
+                }
                 unit.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
                 unit.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
                 unit.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(capacity));
@@ -416,7 +436,25 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                     }
                 }
                 14 => {
-                    typed.ideal_loads_air_systems[0].heat_recovery_type = HeatRecoveryType::Sensible
+                    let unit = &mut typed.ideal_loads_air_systems[0];
+                    unit.heat_recovery_type = HeatRecoveryType::Sensible;
+                    unit.sensible_heat_recovery_effectiveness = match method {
+                        ep_model::DesignSpecificationOutdoorAirMethod::FlowPerPerson => -0.1,
+                        ep_model::DesignSpecificationOutdoorAirMethod::FlowPerZone => 1.1,
+                        ep_model::DesignSpecificationOutdoorAirMethod::FlowPerArea => f64::NAN,
+                        ep_model::DesignSpecificationOutdoorAirMethod::AirChangesPerHour => {
+                            f64::INFINITY
+                        }
+                        ep_model::DesignSpecificationOutdoorAirMethod::Sum => {
+                            unit.latent_heat_recovery_effectiveness = -0.1;
+                            0.7
+                        }
+                        ep_model::DesignSpecificationOutdoorAirMethod::Maximum => {
+                            unit.latent_heat_recovery_effectiveness = 1.1;
+                            0.7
+                        }
+                        _ => unreachable!(),
+                    };
                 }
                 15 => typed.zone_humidistats.push(ep_model::ZoneHumidistat {
                     id: ep_model::ZoneHumidistatId(0),

@@ -3104,6 +3104,24 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     } else if method == "Sum" && limit == "LimitFlowRateAndCapacity" && flow > 0.0 {
                         unit["outdoor_air_economizer_type"] = json!("DifferentialEnthalpy");
                     }
+                    if method == "Flow/Zone" && limit == "NoLimit" && flow > 0.0 {
+                        unit["heat_recovery_type"] = json!("Sensible");
+                        unit["sensible_heat_recovery_effectiveness"] = json!(0.0);
+                        unit["latent_heat_recovery_effectiveness"] = json!(1.0);
+                    } else if method == "Maximum" && limit == "NoLimit" && flow > 0.0 {
+                        unit["heat_recovery_type"] = json!("Enthalpy");
+                        unit["sensible_heat_recovery_effectiveness"] = json!(1.0);
+                        unit["latent_heat_recovery_effectiveness"] = json!(0.0);
+                    } else if method == "Flow/Area" && limit == "NoLimit" {
+                        if flow == 0.0 {
+                            unit["heat_recovery_type"] = json!("");
+                            unit["sensible_heat_recovery_effectiveness"] = json!(-0.0);
+                        } else {
+                            unit.as_object_mut()
+                                .expect("actual OA unit")
+                                .remove("heat_recovery_type");
+                        }
+                    }
                     if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
                         unit["maximum_heating_air_flow_rate"] = json!(flow);
                         unit["maximum_cooling_air_flow_rate"] = json!(flow);
@@ -3218,6 +3236,45 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             ep_model::OutdoorAirEconomizerType::DifferentialEnthalpy
                         );
                     }
+                    if method == "Flow/Zone" && limit == "NoLimit" && flow > 0.0 {
+                        assert_eq!(
+                            actual["heat_recovery_type"],
+                            OaRaw::String("Sensible".into())
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0].heat_recovery_type,
+                            ep_model::HeatRecoveryType::Sensible
+                        );
+                    } else if method == "Maximum" && limit == "NoLimit" && flow > 0.0 {
+                        assert_eq!(
+                            actual["heat_recovery_type"],
+                            OaRaw::String("Enthalpy".into())
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0].heat_recovery_type,
+                            ep_model::HeatRecoveryType::Enthalpy
+                        );
+                    } else if method == "Flow/Area" && limit == "NoLimit" {
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0].heat_recovery_type,
+                            ep_model::HeatRecoveryType::None
+                        );
+                        if flow == 0.0 {
+                            assert_eq!(actual["heat_recovery_type"], OaRaw::String(String::new()));
+                            assert_eq!(
+                                actual["sensible_heat_recovery_effectiveness"],
+                                OaRaw::Number("-0.0".into())
+                            );
+                            assert_eq!(
+                                model.ideal_loads_air_systems[0]
+                                    .sensible_heat_recovery_effectiveness
+                                    .to_bits(),
+                                (-0.0_f64).to_bits()
+                            );
+                        } else {
+                            assert!(!actual.contains_key("heat_recovery_type"));
+                        }
+                    }
                     if wide_priority {
                         let list = hard_ip
                             .source_raw_object_fields("ZoneHVAC:EquipmentList", "Equipment")
@@ -3300,8 +3357,23 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             json!("")
                     }
                     2 => {
-                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heat_recovery_type"] =
-                            json!("")
+                        let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
+                        unit["heat_recovery_type"] = json!("Sensible");
+                        match method {
+                            "Flow/Person" => {
+                                unit["sensible_heat_recovery_effectiveness"] = json!(-0.1)
+                            }
+                            "Flow/Zone" => {
+                                unit["sensible_heat_recovery_effectiveness"] = json!(1.1)
+                            }
+                            "Flow/Area" => unit["latent_heat_recovery_effectiveness"] = json!(-0.1),
+                            "AirChanges/Hour" => {
+                                unit["latent_heat_recovery_effectiveness"] = json!(1.1)
+                            }
+                            "Sum" => unit["heat_recovery_type"] = json!("UNKNOWN"),
+                            "Maximum" => unit["sensible_heat_recovery_effectiveness"] = json!(null),
+                            _ => unreachable!(),
+                        }
                     }
                     3 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]

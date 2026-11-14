@@ -761,7 +761,12 @@ pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool 
                 IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
             ),
         }
-        && system.heat_recovery_type == ep_model::HeatRecoveryType::None
+        && [
+            system.sensible_heat_recovery_effectiveness,
+            system.latent_heat_recovery_effectiveness,
+        ]
+        .into_iter()
+        .all(|value| value.is_finite() && (0.0..=1.0).contains(&value))
         && !IdealLoadsFeatureFlags::from_system(system).has_autosize
 }
 
@@ -1222,6 +1227,7 @@ fn validate_direct_zone_model(
                         IdealLoadsUnsupportedFeature::OutdoorAir
                             | IdealLoadsUnsupportedFeature::DemandControlledVentilation
                             | IdealLoadsUnsupportedFeature::Economizer
+                            | IdealLoadsUnsupportedFeature::HeatRecovery
                     ))
                 || (source_owned_inactive_ventilation
                     && matches!(

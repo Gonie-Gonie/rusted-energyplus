@@ -180,11 +180,22 @@ fn saturation_temperature(
             },
         )
 }
+// The three actual Native OpMode values reaching CalcPurchAirMixedAir.
+// Off never calls this child; this is local branch transport, not retained state.
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[repr(i32)]
+enum SourcePurchasedAirOperatingMode {
+    Heat = 1,
+    Cool = 2,
+    DeadBand = 3,
+}
 fn mixed_air(
     unit: &mut SourceZonePurchasedAir,
     nodes: &Option<Vec<SourceNodeData>>,
     oa: f64,
     supply: f64,
+    operating_mode: SourcePurchasedAirOperatingMode,
+    o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
 ) -> Result<f64, Error> {
     // Native2812-2939 reads each recirculation scalar before its OA branch.
     let recirc_temperature = node(nodes, unit.zone_recirc_air_node_num)?.temperature;
@@ -200,16 +211,96 @@ fn mixed_air(
     } else {
         (0.0, 0.0, 0.0)
     };
-    let oa_after_temperature = oa_temperature;
-    let oa_after_humidity = oa_humidity;
-    let oa_after_enthalpy = oa_enthalpy;
+    let mut oa_after_temperature = oa_temperature;
+    let mut oa_after_humidity = oa_humidity;
+    let mut oa_after_enthalpy = oa_enthalpy;
+    let mut heat_recovery_on = false;
     if unit.outdoor_air && oa > 0.0 {
-        if unit.ht_rec_type != SourcePurchasedAirHeatRecovery::None {
-            return Err(Error::Unavailable(
-                "actual CalcPurchAirMixedAir positive heat-recovery owner2877",
-            ));
+        if unit.ht_rec_type == SourcePurchasedAirHeatRecovery::Sensible {
+            if operating_mode == SourcePurchasedAirOperatingMode::Heat
+                && recirc_temperature > oa_temperature
+            {
+                heat_recovery_on = true;
+            }
+            if operating_mode == SourcePurchasedAirOperatingMode::Cool
+                && recirc_temperature < oa_temperature
+            {
+                heat_recovery_on = true;
+            }
         }
-        // None recovery keeps the actual OA-after-recovery values unchanged.
+        if unit.ht_rec_type == SourcePurchasedAirHeatRecovery::Enthalpy {
+            if operating_mode == SourcePurchasedAirOperatingMode::Heat
+                && recirc_enthalpy > oa_enthalpy
+            {
+                heat_recovery_on = true;
+            }
+            if operating_mode == SourcePurchasedAirOperatingMode::Cool
+                && recirc_enthalpy < oa_enthalpy
+            {
+                heat_recovery_on = true;
+            }
+        }
+        if heat_recovery_on {
+            unit.time_ht_rec_active = o.hvac.time_step_sys;
+            oa_after_temperature =
+                oa_temperature + unit.ht_rec_sen_eff * (recirc_temperature - oa_temperature);
+            if unit.ht_rec_type == SourcePurchasedAirHeatRecovery::Enthalpy {
+                oa_after_humidity =
+                    oa_humidity + unit.ht_rec_lat_eff * (recirc_humidity - oa_humidity);
+            }
+            oa_after_enthalpy = enthalpy(oa_after_temperature, oa_after_humidity);
+            // Native2905/2906 calls the cached child twice: condition then assignment.
+            // Preserve both calls and the real MixedAir routine label/phase owners.
+            if o.psychrometrics
+                .source_saturation_temperature_from_enthalpy(
+                    oa_after_enthalpy,
+                    o.environment.current_weather.out_baro_press,
+                    "CalcPurchAirMixedAir",
+                    o.developer_flag,
+                    &mut SourcePsychrometricOwners {
+                        clock: o.clock,
+                        globals: o.globals,
+                        environment: &*o.environment,
+                        hvac: o.hvac,
+                        recurring: &mut *o.recurring,
+                        backend: &mut *o.backend,
+                    },
+                )?
+                > oa_after_temperature
+            {
+                oa_after_temperature = o
+                    .psychrometrics
+                    .source_saturation_temperature_from_enthalpy(
+                        oa_after_enthalpy,
+                        o.environment.current_weather.out_baro_press,
+                        "CalcPurchAirMixedAir",
+                        o.developer_flag,
+                        &mut SourcePsychrometricOwners {
+                            clock: o.clock,
+                            globals: o.globals,
+                            environment: &*o.environment,
+                            hvac: o.hvac,
+                            recurring: &mut *o.recurring,
+                            backend: &mut *o.backend,
+                        },
+                    )?;
+                oa_after_humidity = o.psychrometrics.source_humidity_ratio_from_enthalpy(
+                    oa_after_temperature,
+                    oa_after_enthalpy,
+                    "CalcPurchAirMixedAir",
+                    false,
+                    &mut SourcePsychrometricOwners {
+                        clock: o.clock,
+                        globals: o.globals,
+                        environment: &*o.environment,
+                        hvac: o.hvac,
+                        recurring: &mut *o.recurring,
+                        backend: &mut *o.backend,
+                    },
+                )?;
+            }
+        }
+        // None/Invalid and nonbeneficial recovery keep the original OA values.
         let mixed_enthalpy;
         if supply > oa {
             let recirc_mass = supply - oa;
@@ -537,7 +628,14 @@ impl OrdinaryEquipment {
                 if supply_flow <= 1.0e-30 {
                     supply_flow = 0.0;
                 }
-                mixed_enthalpy = mixed_air(unit, nodes, oa_flow, supply_flow)?;
+                mixed_enthalpy = mixed_air(
+                    unit,
+                    nodes,
+                    oa_flow,
+                    supply_flow,
+                    SourcePurchasedAirOperatingMode::Cool,
+                    o,
+                )?;
                 if supply_flow > 0.0 {
                     let specific_heat = cp(air_humidity);
                     unit.supply_temp = cool_load / (specific_heat * supply_flow)
@@ -789,7 +887,18 @@ impl OrdinaryEquipment {
                 if supply_flow <= 1.0e-30 {
                     supply_flow = 0.0;
                 }
-                mixed_enthalpy = mixed_air(unit, nodes, oa_flow, supply_flow)?;
+                mixed_enthalpy = mixed_air(
+                    unit,
+                    nodes,
+                    oa_flow,
+                    supply_flow,
+                    if heating {
+                        SourcePurchasedAirOperatingMode::Heat
+                    } else {
+                        SourcePurchasedAirOperatingMode::DeadBand
+                    },
+                    o,
+                )?;
                 if supply_flow > 0.0 {
                     if heat_on && heating {
                         let specific_heat = cp(air_humidity);

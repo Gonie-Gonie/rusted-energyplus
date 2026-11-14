@@ -356,7 +356,7 @@
     ],
     "ZoneHVAC:IdealLoadsAirSystem": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
-      "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV; NoLimit Flow/Person also covers None and OccupancySchedule using genuine reported occupancy. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed. Without selected outdoor air, all27 named DCV/economizer/recovery combinations share the ignored-selector path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. DifferentialDryBulb and DifferentialEnthalpy economizers require cooling LimitFlowRate or LimitFlowRateAndCapacity and a valid hard maximum. Both named controls have qualifying SUM/LimitFlowRate comparisons. Actual public active time and sensible-cooling/OA service are required independently in each engine; mechanical availability may be zero. Evidence does not imply all-method, combined-capacity, DCV/humidity or recovery composition closure. Broader hard-limit/DCV and OA/humidity/economizer compositions, active CO2/IAQ, heat recovery, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing, private-mode or full-object law.",
+      "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV; NoLimit Flow/Person also covers None and OccupancySchedule using genuine reported occupancy. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed. Without selected outdoor air, all27 named DCV/economizer/recovery combinations share the ignored-selector path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. DifferentialDryBulb and DifferentialEnthalpy economizers require cooling LimitFlowRate or LimitFlowRateAndCapacity and a valid hard maximum. Both named controls have qualifying SUM/LimitFlowRate comparisons. Actual public active time and sensible-cooling/OA service are required independently in each engine; mechanical availability may be zero. Evidence does not imply all-method, combined-capacity, DCV/humidity or recovery composition closure. The Source owner implements beneficial Sensible and Enthalpy recovery with real mode, stored Node values and psychrometric saturation correction. Sensible and Enthalpy have qualifying NoLimit SUM comparisons at unchanged .7/.65 effectiveness. Winter public active time and sensible recovery are required in each engine; Enthalpy additionally needs a positive Winter latent response. Exact-empty recovery retains actual Invalid and remains inactive, distinct from the typed default. No global Sensible latent-zero, off-rate-zero, time/effectiveness or averaged mixing law follows. Broader hard-limit/DCV and OA/humidity/economizer/recovery compositions, active CO2/IAQ, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing, private-mode or full-object law.",
       "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed."
     ],
     "ZoneControl:Thermostat": [
@@ -9119,6 +9119,341 @@
         "Source_processes": 2,
         "engine_replays": 0,
         "scope": "DifferentialDryBulb and DifferentialEnthalpy economizers require cooling LimitFlowRate or LimitFlowRateAndCapacity and a valid hard maximum. Both named controls have qualifying SUM/LimitFlowRate comparisons. Actual public active time and sensible-cooling/OA service are required independently in each engine; mechanical availability may be zero. Evidence does not imply all-method, combined-capacity, DCV/humidity or recovery composition closure.",
+        "physical_domain_completion": false
+      },
+      "basic_positive_OA_HeatRecovery_152": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit152-prep/build155-attempt01.json",
+          "sha256": "baa0bc005dbf938bfef4938a7ccea2c8d48d0e9da58c344d8eb3639352e7c7b9",
+          "bytes": 729
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/quality01/summary.json",
+          "sha256": "6f11cb248828f7f8ad0fdebc4bdde2db9845914325981c4f10fb209a75b46052",
+          "bytes": 1703
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit152-prep/owner-execution-review01.json",
+          "sha256": "b7539923f543e6480d653ca9e2c6d4a935849f603ec41e90fb34504f8e23d43c",
+          "bytes": 4485
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-source-basic-positive-OA-HeatRecovery-adoption01.json",
+          "sha256": "8f1316a5eba507508cd9ee45105e363fe492752b4c7c13d9fe3a3ec2b49db2ba",
+          "bytes": 11790
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-source-format-review01.json",
+          "sha256": "e7df0f72cfb6629050d280de9cc81ef5e77d9c6be23451eaa16648fcb0b1c93b",
+          "bytes": 2093
+        },
+        "current_QA_commands": 5,
+        "total_actual_QA_commands": 5,
+        "failed_QA_attempts": 0,
+        "existing_test_executions": [
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "ideal_loads::binding::tests::model_binding_resolves_exact_typed_ids_and_schedule_roles"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/quality01/binding-tests/receipt.json",
+              "sha256": "505125ba43f40f8ebc0ef7ce1566b4b80a2161ee977e49ab51eaadbf5646c1f4",
+              "bytes": 3587
+            },
+            "actual_exit_code": 0
+          },
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "porting_scope::tests::bounded_controls_do_not_change_ordinary_support_assessment"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/quality01/source-caller-tests/receipt.json",
+              "sha256": "909cbfb63c5f67c72c84852f43d2a7b5b26f1bc071d4419efc389af871f99d36",
+              "bytes": 3588
+            },
+            "actual_exit_code": 0
+          }
+        ],
+        "distinct_existing_test_functions": 2,
+        "actual_existing_test_body_executions": 2,
+        "new_test_functions": 0,
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-runtime-bindings01.json",
+          "sha256": "c62005a0adb1f3db8dab58376912ecbd3639873b8ccc557fcb1dc76dc262f1a2",
+          "bytes": 3636
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-runtime-final-review01.json",
+          "sha256": "638287773ba8a9d5a39a3a710d3d50de29303f8914b5b0de8955edabd79fe4d5",
+          "bytes": 5116
+        },
+        "Root_producer": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-run-two-pairs152.py",
+          "sha256": "cec674a122ca719d1f13c99b9e8f6d764f73b12affbead6f8c37eb2ffbd5b376",
+          "bytes": 5399
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-two-pairs155-01/receipt.json",
+          "sha256": "7649fee001574291b66533fab4c7762461cc40283892e71ef0c319908fa35991",
+          "bytes": 33749
+        },
+        "paired_readbacks": {
+          "RECOVERY_SENSIBLE": {
+            "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_SENSIBLE.paired155-01.json",
+            "sha256": "5f0d6ca7e5fe5cd6e3a817518a0ce4a377450d9aaac1719732c470b521aefe3d",
+            "bytes": 572518
+          },
+          "RECOVERY_ENTHALPY": {
+            "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_ENTHALPY.paired155-01.json",
+            "sha256": "787abe711a718b3fbe5180b69a83c592fb957a08fb4176b1d643de315147badd",
+            "bytes": 585921
+          }
+        },
+        "cases": {
+          "RECOVERY_SENSIBLE": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_SENSIBLE.paired155-01.json",
+              "sha256": "5f0d6ca7e5fe5cd6e3a817518a0ce4a377450d9aaac1719732c470b521aefe3d",
+              "bytes": 572518
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 23193,
+            "public_response": {
+              "Native": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "HeatRecovery": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      101,
+                      157,
+                      158
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 2400,
+                    "Winter_sensible_service_samples": 37,
+                    "Winter_latent_service_samples": 0,
+                    "activation_accepted": true,
+                    "all_new_reports_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+                }
+              },
+              "Source": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "HeatRecovery": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      101,
+                      157,
+                      158
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 2400,
+                    "Winter_sensible_service_samples": 37,
+                    "Winter_latent_service_samples": 0,
+                    "activation_accepted": true,
+                    "all_new_reports_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+                }
+              }
+            }
+          },
+          "RECOVERY_ENTHALPY": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_ENTHALPY.paired155-01.json",
+              "sha256": "787abe711a718b3fbe5180b69a83c592fb957a08fb4176b1d643de315147badd",
+              "bytes": 585921
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 21450,
+            "public_response": {
+              "Native": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "HeatRecovery": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      101,
+                      157,
+                      158
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 2400,
+                    "Winter_sensible_service_samples": 37,
+                    "Winter_latent_service_samples": 37,
+                    "activation_accepted": true,
+                    "all_new_reports_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+                }
+              },
+              "Source": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "HeatRecovery": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      101,
+                      157,
+                      158
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 2400,
+                    "Winter_sensible_service_samples": 37,
+                    "Winter_latent_service_samples": 37,
+                    "activation_accepted": true,
+                    "all_new_reports_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+                }
+              }
+            }
+          }
+        },
+        "accepted_cases": 2,
+        "accepted_values": 153120,
+        "qualifying_raw_operand_unequal": 44643,
+        "Native_processes": 2,
+        "Source_processes": 2,
+        "engine_replays": 0,
+        "scope": "The Source owner implements beneficial Sensible and Enthalpy recovery with real mode, stored Node values and psychrometric saturation correction. Sensible and Enthalpy have qualifying NoLimit SUM comparisons at unchanged .7/.65 effectiveness. Winter public active time and sensible recovery are required in each engine; Enthalpy additionally needs a positive Winter latent response. Exact-empty recovery retains actual Invalid and remains inactive, distinct from the typed default. No global Sensible latent-zero, off-rate-zero, time/effectiveness or averaged mixing law follows.",
         "physical_domain_completion": false
       }
     },
@@ -69701,12 +70036,488 @@
           "no_replay": true
         },
         "effective_state": "Fixed SUM/LimitFlowRate scene with one named Economizer, genuine active time and independent public OA/mixed and sensible-cooling service. All159 numeric/science/export/ancillary criteria qualify together. No CoolOn filter, private EconoOn/OperatingMode, global averaged mixing or whole-object completion claim."
+      },
+      {
+        "id": "basic-positive-oa-heat-recovery-152-recovery_sensible",
+        "case_kind": "RECOVERY_SENSIBLE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-heat-recovery-152",
+        "input": {
+          "path": ".runtime/object-expansion/unit152-prep/basic-positive-OA-HeatRecovery-two-case-input-proposal01/RECOVERY_SENSIBLE/input.epJSON",
+          "sha256": "7adfffaea1e314303ef796210698addf97453fd6d52e4c9b6212d331b686335a",
+          "bytes": 102365
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/epoch155/RECOVERY_SENSIBLE/native01/command/receipt.json",
+          "sha256": "91b0b4d2353facdae6e5180c81dc417206ba850182399cda859c8df50711f73d",
+          "bytes": 91246
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/epoch155/RECOVERY_SENSIBLE/source01/command/receipt.json",
+          "sha256": "0f1047bc9dccc0da15cbc76fa62037a51c99c1d836ce88b80d73a84837e912ec",
+          "bytes": 92075
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/epoch155/RECOVERY_SENSIBLE/source01/output/run-summary.json",
+          "sha256": "493001b172151f1a0207264b029603733732be9a63f2750e151f661f2aae9352",
+          "bytes": 66139
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b0/b0bbcf70db1c070216fd2d12c2aef2287093b928a7b01a9e8190223d8e5be8ed",
+          "sha256": "b0bbcf70db1c070216fd2d12c2aef2287093b928a7b01a9e8190223d8e5be8ed"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/build155-01/eplus-rs.exe",
+          "sha256": "65ae2192970430700fa8ad5b0b5f84b3a8035cb7ac968d96fca73b823825e793",
+          "bytes": 81039962
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/build155-01/build/receipt.json",
+          "sha256": "e2c3daa8d661e56c18bdbef30da5fef5734859e76fc105cb0f8d59d88e29f260",
+          "bytes": 4936
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_SENSIBLE.paired155-01.json",
+          "sha256": "5f0d6ca7e5fe5cd6e3a817518a0ce4a377450d9aaac1719732c470b521aefe3d",
+          "bytes": 572518
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-two-pairs155-01/receipt.json",
+          "sha256": "7649fee001574291b66533fab4c7762461cc40283892e71ef0c319908fa35991",
+          "bytes": 33749
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_SENSIBLE.recipe.json",
+          "sha256": "8f8c2655507808fc215ab4fa0929cac58e3e52f09c44b4cb79f01ee13e6c1b2f",
+          "bytes": 65753
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit152-prep/basic-positive-OA-HeatRecovery-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "641e2c437ca2e8b96c39eb52cec93d8b7b33519974fc4739766c88de296ba1bf",
+          "bytes": 12530
+        },
+        "totals": {
+          "series": 161,
+          "samples": 76560,
+          "raw_operand_unequal": 23193,
+          "parsed_binary64_unequal": 23193,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.2427411749958992e-07,
+          "max_rmse_delta": 2.4453082894777505e-08
+        },
+        "coverage_kind": "basic_positive_OA_HeatRecovery_fidelity",
+        "authored_selectors": {
+          "heat_recovery": "Sensible"
+        },
+        "public_response_summary": {
+          "Native": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "HeatRecovery": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  101,
+                  157,
+                  158
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 2400,
+                "Winter_sensible_service_samples": 37,
+                "Winter_latent_service_samples": 0,
+                "activation_accepted": true,
+                "all_new_reports_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+            }
+          },
+          "Source": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "HeatRecovery": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  101,
+                  157,
+                  158
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 2400,
+                "Winter_sensible_service_samples": 37,
+                "Winter_latent_service_samples": 0,
+                "activation_accepted": true,
+                "all_new_reports_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit152-prep/basic-positive-OA-HeatRecovery-two-case-input-proposal01/derived161-policy.json",
+            "sha256": "6d7cbfaf57fb8aa6c6b3c1c112b8afaf4e2620211bfce403eded737f43b328ed",
+            "bytes": 44480
+          },
+          "all158_original_policy_rules_literal": true,
+          "new_rules": {
+            "time_hr_atol": 1e-12,
+            "time_hr_rmse": 1e-12,
+            "heat_W_clone85": true
+          },
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit152-prep/build155-attempt01.json",
+            "sha256": "baa0bc005dbf938bfef4938a7ccea2c8d48d0e9da58c344d8eb3639352e7c7b9",
+            "bytes": 729
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/quality01/summary.json",
+            "sha256": "6f11cb248828f7f8ad0fdebc4bdde2db9845914325981c4f10fb209a75b46052",
+            "bytes": 1703
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit152-prep/owner-execution-review01.json",
+            "sha256": "b7539923f543e6480d653ca9e2c6d4a935849f603ec41e90fb34504f8e23d43c",
+            "bytes": 4485
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit152-prep/Root-runtime-bindings01.json",
+            "sha256": "c62005a0adb1f3db8dab58376912ecbd3639873b8ccc557fcb1dc76dc262f1a2",
+            "bytes": 3636
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit152-prep/Root-run-two-pairs152.py",
+            "sha256": "cec674a122ca719d1f13c99b9e8f6d764f73b12affbead6f8c37eb2ffbd5b376",
+            "bytes": 5399
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit152-prep/Root-runtime-final-review01.json",
+            "sha256": "638287773ba8a9d5a39a3a710d3d50de29303f8914b5b0de8955edabd79fe4d5",
+            "bytes": 5116
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Fixed NoLimit SUM/None humidity/NoDCV/NoEconomizer with unchanged .7/.65 effectiveness. Genuine Winter active time and sensible recovery qualify for both named modes; Enthalpy also requires positive Winter latent recovery. All161 criteria and exact primary-grounded Psy diagnostics retain strict credit. No Sensible latent-zero, off-rate-zero, exact time/effectiveness or private mode/psychrometric-call claim."
+      },
+      {
+        "id": "basic-positive-oa-heat-recovery-152-recovery_enthalpy",
+        "case_kind": "RECOVERY_ENTHALPY",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-heat-recovery-152",
+        "input": {
+          "path": ".runtime/object-expansion/unit152-prep/basic-positive-OA-HeatRecovery-two-case-input-proposal01/RECOVERY_ENTHALPY/input.epJSON",
+          "sha256": "bf3f4114d77fab9fbf0d94691fc372d4e06072eefcbf965b52e3238112ab6331",
+          "bytes": 102365
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/epoch155/RECOVERY_ENTHALPY/native01/command/receipt.json",
+          "sha256": "337c134ff90f708a1a079d1cf44a5b4abf148ae0260dd50c9a220148bda2ebb6",
+          "bytes": 91247
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/epoch155/RECOVERY_ENTHALPY/source01/command/receipt.json",
+          "sha256": "b1d6b047ba047d6e76c01c3b010439bb82449ef76f6004ee40c3de37ba4370b5",
+          "bytes": 92076
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/epoch155/RECOVERY_ENTHALPY/source01/output/run-summary.json",
+          "sha256": "6336d9cdc19b20316fae9fc7389470584bb99fea385f38453629a6fa9c25157b",
+          "bytes": 66137
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b0/b0bbcf70db1c070216fd2d12c2aef2287093b928a7b01a9e8190223d8e5be8ed",
+          "sha256": "b0bbcf70db1c070216fd2d12c2aef2287093b928a7b01a9e8190223d8e5be8ed"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/build155-01/eplus-rs.exe",
+          "sha256": "65ae2192970430700fa8ad5b0b5f84b3a8035cb7ac968d96fca73b823825e793",
+          "bytes": 81039962
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/build155-01/build/receipt.json",
+          "sha256": "e2c3daa8d661e56c18bdbef30da5fef5734859e76fc105cb0f8d59d88e29f260",
+          "bytes": 4936
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_ENTHALPY.paired155-01.json",
+          "sha256": "787abe711a718b3fbe5180b69a83c592fb957a08fb4176b1d643de315147badd",
+          "bytes": 585921
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit152-prep/Root-two-pairs155-01/receipt.json",
+          "sha256": "7649fee001574291b66533fab4c7762461cc40283892e71ef0c319908fa35991",
+          "bytes": 33749
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_ENTHALPY.recipe.json",
+          "sha256": "c7c9f96b53759a42ce35136eabd8a128ff132f4817f2a705ef9b2b01a8017612",
+          "bytes": 65753
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit152-prep/basic-positive-OA-HeatRecovery-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "641e2c437ca2e8b96c39eb52cec93d8b7b33519974fc4739766c88de296ba1bf",
+          "bytes": 12530
+        },
+        "totals": {
+          "series": 161,
+          "samples": 76560,
+          "raw_operand_unequal": 21450,
+          "parsed_binary64_unequal": 21450,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.0285369828343391e-07,
+          "max_rmse_delta": 9.262542810871542e-09
+        },
+        "coverage_kind": "basic_positive_OA_HeatRecovery_fidelity",
+        "authored_selectors": {
+          "heat_recovery": "Enthalpy"
+        },
+        "public_response_summary": {
+          "Native": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "HeatRecovery": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  101,
+                  157,
+                  158
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 2400,
+                "Winter_sensible_service_samples": 37,
+                "Winter_latent_service_samples": 37,
+                "activation_accepted": true,
+                "all_new_reports_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+            }
+          },
+          "Source": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "HeatRecovery": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  101,
+                  157,
+                  158
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 2400,
+                "Winter_sensible_service_samples": 37,
+                "Winter_latent_service_samples": 37,
+                "activation_accepted": true,
+                "all_new_reports_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "exact_Psy_parser": "Hash-pinned HeatRecovery_warning_diagnostics on original raw files; complete paired ancillary retained"
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit152-prep/basic-positive-OA-HeatRecovery-two-case-input-proposal01/derived161-policy.json",
+            "sha256": "6d7cbfaf57fb8aa6c6b3c1c112b8afaf4e2620211bfce403eded737f43b328ed",
+            "bytes": 44480
+          },
+          "all158_original_policy_rules_literal": true,
+          "new_rules": {
+            "time_hr_atol": 1e-12,
+            "time_hr_rmse": 1e-12,
+            "heat_W_clone85": true
+          },
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit152-prep/build155-attempt01.json",
+            "sha256": "baa0bc005dbf938bfef4938a7ccea2c8d48d0e9da58c344d8eb3639352e7c7b9",
+            "bytes": 729
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/quality01/summary.json",
+            "sha256": "6f11cb248828f7f8ad0fdebc4bdde2db9845914325981c4f10fb209a75b46052",
+            "bytes": 1703
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit152-prep/owner-execution-review01.json",
+            "sha256": "b7539923f543e6480d653ca9e2c6d4a935849f603ec41e90fb34504f8e23d43c",
+            "bytes": 4485
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit152-prep/Root-runtime-bindings01.json",
+            "sha256": "c62005a0adb1f3db8dab58376912ecbd3639873b8ccc557fcb1dc76dc262f1a2",
+            "bytes": 3636
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit152-prep/Root-run-two-pairs152.py",
+            "sha256": "cec674a122ca719d1f13c99b9e8f6d764f73b12affbead6f8c37eb2ffbd5b376",
+            "bytes": 5399
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit152-prep/Root-runtime-final-review01.json",
+            "sha256": "638287773ba8a9d5a39a3a710d3d50de29303f8914b5b0de8955edabd79fe4d5",
+            "bytes": 5116
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Fixed NoLimit SUM/None humidity/NoDCV/NoEconomizer with unchanged .7/.65 effectiveness. Genuine Winter active time and sensible recovery qualify for both named modes; Enthalpy also requires positive Winter latent recovery. All161 criteria and exact primary-grounded Psy diagnostics retain strict credit. No Sensible latent-zero, off-rate-zero, exact time/effectiveness or private mode/psychrometric-call claim."
       }
     ],
     "totals": {
-      "paired_cases": 234,
-      "reported_samples": 9520216,
-      "raw_operand_unequal": 2360992,
+      "paired_cases": 236,
+      "reported_samples": 9673336,
+      "raw_operand_unequal": 2405635,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -72337,6 +73148,23 @@
           "sha256": "e5df24f54afbf65a17323256cefcf3696c445abc992e4bd978e48288efcc1841",
           "bytes": 81030756
         }
+      },
+      {
+        "id": "source-basic-positive-oa-heat-recovery-152",
+        "receipt": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/build155-01/build/receipt.json",
+          "sha256": "e2c3daa8d661e56c18bdbef30da5fef5734859e76fc105cb0f8d59d88e29f260",
+          "bytes": 4936
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b0/b0bbcf70db1c070216fd2d12c2aef2287093b928a7b01a9e8190223d8e5be8ed",
+          "sha256": "b0bbcf70db1c070216fd2d12c2aef2287093b928a7b01a9e8190223d8e5be8ed"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/basic-positive-oa-heat-recovery-152/build155-01/eplus-rs.exe",
+          "sha256": "65ae2192970430700fa8ad5b0b5f84b3a8035cb7ac968d96fca73b823825e793",
+          "bytes": 81039962
+        }
       }
     ],
     "focused_since_workspace": {
@@ -72736,14 +73564,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 154,
-      "builds_with_accepted_paired_cases": 133,
+      "actual_recorded_builds": 155,
+      "builds_with_accepted_paired_cases": 134,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "154 recorded Source builds: 133 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying Economizer scenes add cases or values; all earlier history remains unchanged.",
+      "qualification": "155 recorded Source builds: 134 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying recovery scenes add cases or values; all earlier history remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -77384,8 +78212,10 @@
       "B-IDEALLOADS-NOOA-ENTHALPY-RECOVERY-149-120H",
       "B-IDEALLOADS-POSITIVE-OA-CO2-NO-SIMULATION-150-120H",
       "basic-positive-oa-economizer-151-econ_differential_drybulb",
-      "basic-positive-oa-economizer-151-econ_differential_enthalpy"
-    ], "accepted_paired_cases": 63, "accepted_samples": 4619040, "retained_Scheduled_B_pairs": 62, "retained_Scheduled_B_samples": 4559520, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"ECON_DIFFERENTIAL_DRYBULB": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.paired154-01.json", "sha256": "fdeb16671b1df3e2cd2b36bce94d9cdbbdd900c4b7411cf3d6a1934841cb8cee", "bytes": 581787}, "ECON_DIFFERENTIAL_ENTHALPY": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.paired154-01.json", "sha256": "4373f3de7c7136789c61d01247bdd50adac853422cc3bc422cd444cb567fb533", "bytes": 581852}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit151-prep/Root-two-pairs154-01/receipt.json", "sha256": "7510f01092e92b7221616667ccd192806b15791092f3afd0234133ddb8b19366", "bytes": 34624}, "latest_source_build": "source-basic-positive-oa-economizer-151", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit151-prep/build154-attempt01.json", "sha256": "e3ba3795cbd75d32646e413140749dfd5c9febfd311486814792732761a20cc4", "bytes": 720}, "latest_actual_quality": {"path": ".runtime/porting/basic-positive-oa-economizer-151/quality01/summary.json", "sha256": "2f43de72b8f60fbf91c707048ae9a139e54273c20ba67f64400c6ad278e020a9", "bytes": 1688}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit151-prep/owner-execution-review01.json", "sha256": "1f96911f3690603b93b8d7205a198be34cf9549158fd6f7703c93bbf9b197c13", "bytes": 4463}, "latest_input_contracts": {"ECON_DIFFERENTIAL_DRYBULB": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.recipe.json", "sha256": "b5d2f1eb4c3768d3b74a19410c82379d7f01d8f632ff65cbcaa9e3beaa5dfe38", "bytes": 62921}, "ECON_DIFFERENTIAL_ENTHALPY": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.recipe.json", "sha256": "6bac156ec4a726f1952e0d989a3873855a1314c7ea49f937beeec7bbfd90cea3", "bytes": 62931}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "62 bounded Source B Scheduled/NodeList pairs retain 4,559,520 values. The unused Source A pair adds59,520, giving 63 pairs and 4,619,040 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
+      "basic-positive-oa-economizer-151-econ_differential_enthalpy",
+      "basic-positive-oa-heat-recovery-152-recovery_sensible",
+      "basic-positive-oa-heat-recovery-152-recovery_enthalpy"
+    ], "accepted_paired_cases": 65, "accepted_samples": 4772160, "retained_Scheduled_B_pairs": 64, "retained_Scheduled_B_samples": 4712640, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"RECOVERY_SENSIBLE": {"path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_SENSIBLE.paired155-01.json", "sha256": "5f0d6ca7e5fe5cd6e3a817518a0ce4a377450d9aaac1719732c470b521aefe3d", "bytes": 572518}, "RECOVERY_ENTHALPY": {"path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_ENTHALPY.paired155-01.json", "sha256": "787abe711a718b3fbe5180b69a83c592fb957a08fb4176b1d643de315147badd", "bytes": 585921}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit152-prep/Root-two-pairs155-01/receipt.json", "sha256": "7649fee001574291b66533fab4c7762461cc40283892e71ef0c319908fa35991", "bytes": 33749}, "latest_source_build": "source-basic-positive-oa-heat-recovery-152", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit152-prep/build155-attempt01.json", "sha256": "baa0bc005dbf938bfef4938a7ccea2c8d48d0e9da58c344d8eb3639352e7c7b9", "bytes": 729}, "latest_actual_quality": {"path": ".runtime/porting/basic-positive-oa-heat-recovery-152/quality01/summary.json", "sha256": "6f11cb248828f7f8ad0fdebc4bdde2db9845914325981c4f10fb209a75b46052", "bytes": 1703}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit152-prep/owner-execution-review01.json", "sha256": "b7539923f543e6480d653ca9e2c6d4a935849f603ec41e90fb34504f8e23d43c", "bytes": 4485}, "latest_input_contracts": {"RECOVERY_SENSIBLE": {"path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_SENSIBLE.recipe.json", "sha256": "8f8c2655507808fc215ab4fa0929cac58e3e52f09c44b4cb79f01ee13e6c1b2f", "bytes": 65753}, "RECOVERY_ENTHALPY": {"path": ".runtime/object-expansion/unit152-prep/paired-runtime-proposal01/RECOVERY_ENTHALPY.recipe.json", "sha256": "c7c9f96b53759a42ce35136eabd8a128ff132f4817f2a705ef9b2b01a8017612", "bytes": 65753}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "64 bounded Source B Scheduled/NodeList pairs retain 4,712,640 values. The unused Source A pair adds59,520, giving 65 pairs and 4,772,160 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

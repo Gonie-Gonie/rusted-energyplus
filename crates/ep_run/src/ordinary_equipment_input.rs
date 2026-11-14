@@ -150,8 +150,9 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     let Some(oa_name) = text(unit, "outdoor_air_inlet_node_name") else {
         return error();
     };
-    // Omission uses Native's named defaults; present-empty/null/whitespace
-    // selectors must not acquire typed defaults on this new OA route.
+    // Omission uses Native's named defaults. Exact-empty recovery retains
+    // actual Invalid/inactive, distinct from the typed None admission default.
+    // Other positive-OA selectors remain named; no generic blank waiver.
     if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
         || !field(unit, "demand_controlled_ventilation_type")
             .is_none_or(|value| text_is(value, &["None", "OccupancySchedule", "CO2Setpoint"]))
@@ -165,14 +166,21 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
                 ],
             )
         })
-        || ![
-            ("humidification_control_type", "None"),
-            ("heat_recovery_type", "None"),
-        ]
-        .iter()
-        .all(|(name, expected)| field(unit, name).is_none_or(|value| text_is(value, &[*expected])))
+        || !field(unit, "humidification_control_type").is_none_or(|value| text_is(value, &["None"]))
+        || !field(unit, "heat_recovery_type")
+            .is_none_or(|value| text_is(value, &["", "None", "Sensible", "Enthalpy"]))
     {
         return error();
+    }
+    for name in [
+        "sensible_heat_recovery_effectiveness",
+        "latent_heat_recovery_effectiveness",
+    ] {
+        if field(unit, name)
+            .is_some_and(|value| !number(value).is_some_and(|value| (0.0..=1.0).contains(&value)))
+        {
+            return error();
+        }
     }
     // Native Init1182-1191 reports Severe without a cooling-flow limit.
     // This bounded Source route leaves that diagnostic child held.

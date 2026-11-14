@@ -880,6 +880,7 @@ pub(super) fn assess_typed_runtime_boundaries(
                         feature,
                         IdealLoadsUnsupportedFeature::DemandControlledVentilation
                             | IdealLoadsUnsupportedFeature::Economizer
+                            | IdealLoadsUnsupportedFeature::HeatRecovery
                     )
                 });
             }
