@@ -6,14 +6,21 @@ pub(crate) mod owners;
 mod registration;
 mod schema;
 use super::{OrdinaryEquipment, source_nodes::SourceNodeFluidType};
+use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::error_backend::SourceErrorBackend;
+use crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes;
+use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
+use crate::heat_balance::selected_heat_balance_input::{
+    SelectedHeatBalanceInputState, zone::SelectedZoneInputOwners,
+};
 use crate::heat_balance::selected_input_processor::{
     SourceInputFamily, SourceInputProcessorShortCut,
 };
 use crate::heat_balance::selected_schedule_manager::{
     SelectedScheduleManager, SourceScheduleIndex,
 };
+use crate::heat_balance::selected_sizing::SelectedSizingManager;
 use crate::heat_balance::source_output_registration::{
     SourceOutputDictionaryHost, SourceOutputFileHost, SourcePurchasedAirReportingOutputContext,
 };
@@ -21,6 +28,7 @@ use crate::heat_balance::startup_integrity::{
     SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType,
     SourceNodeObjectType,
 };
+use crate::weather::day::WeatherEnvironmentState;
 pub(super) use calculation::SourcePurchasedAirCalcOwners;
 pub(super) use initialization::SourcePurchasedAirInitOwners;
 use owners::*;
@@ -70,6 +78,30 @@ fn humidity(value: &str) -> SourcePurchasedAirHumidityControl {
             SourcePurchasedAirHumidityControl::ConstantSupplyHumidityRatio
         }
         _ => SourcePurchasedAirHumidityControl::Invalid,
+    }
+}
+fn dcv(value: &str) -> SourcePurchasedAirDcv {
+    match value {
+        "NONE" => SourcePurchasedAirDcv::None,
+        "OCCUPANCYSCHEDULE" => SourcePurchasedAirDcv::OccupancySchedule,
+        "CO2SETPOINT" => SourcePurchasedAirDcv::CO2SetPoint,
+        _ => SourcePurchasedAirDcv::Invalid,
+    }
+}
+fn economizer(value: &str) -> SourcePurchasedAirEconomizer {
+    match value {
+        "NOECONOMIZER" => SourcePurchasedAirEconomizer::NoEconomizer,
+        "DIFFERENTIALDRYBULB" => SourcePurchasedAirEconomizer::DifferentialDryBulb,
+        "DIFFERENTIALENTHALPY" => SourcePurchasedAirEconomizer::DifferentialEnthalpy,
+        _ => SourcePurchasedAirEconomizer::Invalid,
+    }
+}
+fn heat_recovery(value: &str) -> SourcePurchasedAirHeatRecovery {
+    match value {
+        "NONE" => SourcePurchasedAirHeatRecovery::None,
+        "SENSIBLE" => SourcePurchasedAirHeatRecovery::Sensible,
+        "ENTHALPY" => SourcePurchasedAirHeatRecovery::Enthalpy,
+        _ => SourcePurchasedAirHeatRecovery::Invalid,
     }
 }
 fn fuel(value: &str) -> SourcePurchasedAirFuel {
@@ -147,6 +179,9 @@ impl OrdinaryEquipment {
         schedules: &mut SelectedScheduleManager,
         number_zones: i32,
         branch: &mut SourceBranchNodeConnections,
+        outdoor_air_nodes: &mut SourceOutdoorAirNodes,
+        zones: &SelectedZoneInputOwners,
+        gains: &SelectedInternalHeatGains,
         any_ems: bool,
         output: &mut SourcePurchasedAirReportingOutputContext<'_, H, D>,
         initialization: &mut SourcePurchasedAirInitOwners<'_>,
@@ -164,6 +199,11 @@ impl OrdinaryEquipment {
                 number_zones,
                 branch,
                 any_ems,
+                &*initialization.sizing,
+                outdoor_air_nodes,
+                &*calculation.environment,
+                calculation.control,
+                calculation.globals,
                 calculation.backend,
                 output,
             )?;
@@ -262,6 +302,9 @@ impl OrdinaryEquipment {
             system_output,
             moisture_output,
             schedules,
+            &mut *initialization.sizing,
+            zones,
+            gains,
             calculation,
         )?;
         self.update_source_purchased_air(unit_number, first_hvac_iteration)?;
@@ -280,6 +323,11 @@ impl OrdinaryEquipment {
         number_zones: i32,
         branch: &mut SourceBranchNodeConnections,
         any_ems: bool,
+        sizing: &SelectedSizingManager,
+        outdoor_air_nodes: &mut SourceOutdoorAirNodes,
+        environment: &WeatherEnvironmentState,
+        control: &SelectedHeatBalanceInputState,
+        globals: &SelectedHeatBalanceGlobals,
         backend: &mut SourceErrorBackend<'_>,
         output: &mut SourcePurchasedAirReportingOutputContext<'_, H, D>,
     ) -> Result<(), Error> {
@@ -568,14 +616,123 @@ impl OrdinaryEquipment {
                     "design_specification_outdoor_air_object_name",
                 )?;
                 if !value.is_empty() {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir OARequirements FindItemInList405",
-                    ));
+                    let found = sizing
+                        .oa_requirements
+                        .as_ref()
+                        .ok_or(Error::Unavailable(
+                            "actual PurchasedAir OARequirements owner405",
+                        ))?
+                        .iter()
+                        .position(|row| row.name == value);
+                    let pointer = match found {
+                        Some(at) => i32::try_from(at + 1).map_err(|_| {
+                            Error::Unavailable("actual PurchasedAir OARequirements ordinal405")
+                        })?,
+                        None => 0,
+                    };
+                    self.purchased_unit_mut(number)?.oa_requirements_ptr = pointer;
+                    if pointer == 0 {
+                        purchased_air_item_not_found(
+                            backend,
+                            &shortcut.current_module_object,
+                            object,
+                            "Design Specification Outdoor Air Object Name",
+                            &value,
+                        )?;
+                        errors_found = true;
+                    } else {
+                        self.purchased_unit_mut(number)?.outdoor_air = true;
+                    }
                 }
                 if self.purchased_unit(number)?.outdoor_air {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir outdoor-air input path415",
-                    ));
+                    let oa_name = getter::alpha_field_value(
+                        output.input,
+                        object,
+                        "outdoor_air_inlet_node_name",
+                    )?;
+                    if oa_name.is_empty() {
+                        return Err(Error::Unavailable(
+                            "actual PurchasedAir automatic OA node-name byte construction415",
+                        ));
+                    }
+                    let node = self
+                        .nodes
+                        .get_source_only_single_node(
+                            output.input,
+                            backend,
+                            output.environment.diagnostic_flags,
+                            branch,
+                            &oa_name,
+                            &mut errors_found,
+                            SourceNodeObjectType::ZoneHvacIdealLoadsAirSystem,
+                            &name,
+                            SourceNodeFluidType::Air,
+                            SourceNodeConnectionType::Outlet,
+                            SourceCompFluidStream::Primary,
+                            false,
+                            "",
+                        )
+                        .map_err(|_| {
+                            Error::Unavailable("actual PurchasedAir OA GetOnlySingleNode431")
+                        })?;
+                    let node = i32::try_from(node).map_err(|_| {
+                        Error::Unavailable("actual PurchasedAir OA node int domain")
+                    })?;
+                    self.purchased_unit_mut(number)?.outdoor_air_node_num = node;
+                    let mut listed = false;
+                    outdoor_air_nodes.check_and_add_source_air_node_number(
+                        output.input,
+                        self,
+                        branch,
+                        node,
+                        &mut listed,
+                        environment,
+                        control,
+                        backend,
+                        output.environment.diagnostic_flags,
+                    )?;
+                    if !listed && globals.display_extra_warnings {
+                        return Err(Error::Unavailable(
+                            "actual PurchasedAir implicit OA-node warning437",
+                        ));
+                    }
+                    let mut unique_error = false;
+                    self.nodes
+                        .check_source_unique_node_names(
+                            "Outdoor Air Inlet Node Name",
+                            &mut unique_error,
+                            &oa_name,
+                            &name,
+                        )
+                        .map_err(|_| {
+                            Error::Unavailable("actual PurchasedAir OA CheckUniqueNodeNames444")
+                        })?;
+                    if unique_error {
+                        errors_found = true;
+                    }
+                    let value = getter::alpha_field_value(
+                        output.input,
+                        object,
+                        "demand_controlled_ventilation_type",
+                    )?;
+                    self.purchased_unit_mut(number)?.dcv_type = dcv(&value);
+                    if self.purchased_unit(number)?.dcv_type == SourcePurchasedAirDcv::CO2SetPoint
+                        && !control.carbon_dioxide_simulation
+                    {
+                        self.purchased_unit_mut(number)?.dcv_type = SourcePurchasedAirDcv::None;
+                        return Err(Error::Unavailable(
+                            "actual PurchasedAir CO2 DCV reset-warning453",
+                        ));
+                    }
+                    let value = getter::alpha_field_value(
+                        output.input,
+                        object,
+                        "outdoor_air_economizer_type",
+                    )?;
+                    self.purchased_unit_mut(number)?.economizer_type = economizer(&value);
+                    let value =
+                        getter::alpha_field_value(output.input, object, "heat_recovery_type")?;
+                    self.purchased_unit_mut(number)?.ht_rec_type = heat_recovery(&value);
                 } else {
                     self.purchased_unit_mut(number)?.dcv_type = SourcePurchasedAirDcv::None;
                     self.purchased_unit_mut(number)?.economizer_type =

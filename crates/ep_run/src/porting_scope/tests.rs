@@ -2991,6 +2991,244 @@ fn direct_sensible_limits_are_explicit_and_scope_a_rejects_conditioning() {
 
 #[test]
 fn bounded_controls_do_not_change_ordinary_support_assessment() {
+    // The first positive-OA lane traverses real Raw -> Compiler -> Scope ->
+    // environment-bound Support -> IP/statistics, without a runtime shortcut.
+    {
+        use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as OaRaw;
+        for method in [
+            "Flow/Person",
+            "Flow/Area",
+            "Flow/Zone",
+            "AirChanges/Hour",
+            "Sum",
+            "Maximum",
+        ] {
+            let mut oa = input(PortingScope::B);
+            oa["DesignSpecification:OutdoorAir"] = json!({"Actual OA":{
+                "outdoor_air_method":method, "outdoor_air_flow_per_person":0.003,
+                "outdoor_air_flow_per_zone_floor_area":0.0002, "outdoor_air_flow_per_zone":0.01,
+                "outdoor_air_flow_air_changes_per_hour":0.25,
+                "outdoor_air_schedule_name":"On",
+                "proportional_control_minimum_outdoor_air_flow_rate_schedule_name":"On"
+            }});
+            oa["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["design_specification_outdoor_air_object_name"] =
+                json!("Actual OA");
+            oa["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_inlet_node_name"] =
+                json!("Outside 각");
+            let raw = parse_epjson_str(&oa.to_string()).expect("authored basic OA raw");
+            let retained = raw.clone();
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+            let model = compiled
+                .model
+                .as_ref()
+                .expect("actual basic OA typed model");
+            let simulation = ep_model::SimulationModel::from_typed(model.clone());
+            ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                .expect("actual six-method Source OA validation");
+            assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+            let mut selected =
+                inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B);
+            assert!(selected.admissible, "{:?}", selected.violations);
+            selected.environment = Some(
+                super::environment::environment_from_weather(
+                    model,
+                    &single_day_weather_fixture(),
+                    "actual basic OA admission weather",
+                )
+                .expect("real Source OA environment"),
+            );
+            let token =
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                    .expect("same actual raw basic OA scope token");
+            let support = crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&token),
+            );
+            assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+            assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+            assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+            assert!(
+                !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A)
+                    .admissible
+            );
+            let ip =
+                crate::ordinary_input_processor::resolve_source_b(&raw).expect("real basic OA IP");
+            let mut statistics =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            ip.report_source_idf_records_stats(&mut statistics)
+                .expect("actual DSOA statistics owner");
+            let fields = ip
+                .source_raw_object_fields("DesignSpecification:OutdoorAir", "Actual OA")
+                .expect("retained actual DSOA raw fields");
+            assert_eq!(fields["outdoor_air_method"], OaRaw::String(method.into()));
+            assert_eq!(
+                fields["outdoor_air_flow_per_zone"],
+                OaRaw::Number("0.01".into())
+            );
+            assert_eq!(
+                fields["outdoor_air_schedule_name"],
+                OaRaw::String("On".into())
+            );
+            assert_eq!(
+                fields["proportional_control_minimum_outdoor_air_flow_rate_schedule_name"],
+                OaRaw::String("On".into())
+            );
+            assert_eq!(raw, retained);
+            // Each negative is a genuine authored raw candidate. Scope and IP
+            // must both hold it; typed defaulting cannot grant permission.
+            for invalid in 0..22 {
+                let mut bad = oa.clone();
+                match invalid {
+                    0 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                            json!("")
+                    }
+                    1 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =
+                            json!("")
+                    }
+                    2 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heat_recovery_type"] =
+                            json!("")
+                    }
+                    3 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]
+                            .as_object_mut()
+                            .expect("unit")
+                            .remove("dehumidification_control_type");
+                    }
+                    4 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
+                            json!("")
+                    }
+                    5 => bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(""),
+                    6 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heating_limit"] =
+                            json!("LimitCapacity")
+                    }
+                    7 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["design_specification_outdoor_air_object_name"] =
+                            json!("Missing")
+                    }
+                    8 => {
+                        bad.as_object_mut()
+                            .expect("root")
+                            .remove("DesignSpecification:OutdoorAir");
+                    }
+                    9 => {
+                        bad["DesignSpecification:OutdoorAir"]["Other"] =
+                            bad["DesignSpecification:OutdoorAir"]["Actual OA"].clone()
+                    }
+                    10 => {
+                        bad["DesignSpecification:OutdoorAir"]["Actual OA"]["outdoor_air_method"] =
+                            json!("IndoorAirQualityProcedure")
+                    }
+                    11 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_inlet_node_name"] =
+                            json!("Supply")
+                    }
+                    12 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_inlet_node_name"] =
+                            json!("Air")
+                    }
+                    13 => {
+                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_inlet_node_name"] =
+                            json!("Return")
+                    }
+                    14 => bad["NodeList"] = json!({"Outside 각":{"nodes":[{"node_name":"Other"}]}}),
+                    15 => {
+                        bad["NodeList"] =
+                            json!({"Real Returns":{"nodes":[{"node_name":"Outside 각"}]}});
+                        bad["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_return_air_node_or_nodelist_name"] =
+                            json!("Real Returns");
+                    }
+                    16 => bad["OutdoorAir:Node"] = json!({"Authored OA":{"height_above_ground":0}}),
+                    17 => {
+                        bad["OutdoorAir:NodeList"] = json!({"Authored OA":{"nodes":[{"node_or_nodelist_name":"Outside 각"}]}})
+                    }
+                    18 => {
+                        bad["ZoneControl:Humidistat"] = json!({"Uncomposed control":{"zone_name":"Zone","humidifying_relative_humidity_setpoint_schedule_name":"On"}})
+                    }
+                    19 => {
+                        bad["DesignSpecification:OutdoorAir"]["Actual OA"]["outdoor_air_schedule_name"] =
+                            json!("Missing")
+                    }
+                    20 => {
+                        bad["DesignSpecification:OutdoorAir"]["Actual OA"]["proportional_control_minimum_outdoor_air_flow_rate_schedule_name"] =
+                            json!("Missing")
+                    }
+                    21 => bad["AirLoopHVAC"] = json!({"Uncomposed airloop":{}}),
+                    _ => unreachable!(),
+                }
+                let bad_raw =
+                    parse_epjson_str(&bad.to_string()).expect("negative OA raw candidate");
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(&bad_raw).is_err(),
+                    "method={method} invalid={invalid}"
+                );
+                let bad_compiled = ep_compiler::compile_raw_model_for_source(&bad_raw);
+                assert!(
+                    !inspect_porting_scope(
+                        &bad_raw,
+                        &bad_compiled.report,
+                        bad_compiled.model.as_ref(),
+                        PortingScope::B
+                    )
+                    .admissible,
+                    "method={method} invalid={invalid}"
+                );
+            }
+            for defaults in 0..3 {
+                let mut actual = oa.clone();
+                let requirement = actual["DesignSpecification:OutdoorAir"]["Actual OA"]
+                    .as_object_mut()
+                    .expect("DSOA");
+                if defaults == 0 {
+                    requirement.remove("outdoor_air_method");
+                }
+                if defaults == 1 {
+                    requirement.insert("outdoor_air_method".into(), json!(""));
+                }
+                requirement.remove("outdoor_air_schedule_name");
+                requirement
+                    .remove("proportional_control_minimum_outdoor_air_flow_rate_schedule_name");
+                if defaults == 2 {
+                    requirement.insert("outdoor_air_schedule_name".into(), json!(""));
+                    requirement.insert(
+                        "proportional_control_minimum_outdoor_air_flow_rate_schedule_name".into(),
+                        json!(""),
+                    );
+                }
+                let actual_raw =
+                    parse_epjson_str(&actual.to_string()).expect("actual DSOA defaults");
+                crate::ordinary_equipment_input::resolve_source_b(&actual_raw)
+                    .expect("retained blank/omitted DSOA fields");
+                let actual_compiled = ep_compiler::compile_raw_model_for_source(&actual_raw);
+                assert!(
+                    !actual_compiled.has_errors(),
+                    "{:?}",
+                    actual_compiled.report.diagnostics
+                );
+                assert!(
+                    inspect_porting_scope(
+                        &actual_raw,
+                        &actual_compiled.report,
+                        actual_compiled.model.as_ref(),
+                        PortingScope::B
+                    )
+                    .admissible
+                );
+            }
+        }
+    }
+
     let mut value = input(PortingScope::A);
     value["ZoneAirHeatBalanceAlgorithm"] =
         json!({"Algorithm":{"algorithm":"ThirdOrderBackwardDifference"}});

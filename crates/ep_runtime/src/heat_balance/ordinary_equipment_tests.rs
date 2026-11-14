@@ -841,6 +841,9 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             probe_schedules.init_constant_state(timesteps)?;
             let mut probe_branch =
                 crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
+            let mut probe_outdoor_air_nodes =
+                crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes::default();
+            let probe_environment = crate::weather::day::WeatherEnvironmentState::default();
             let mut probe_registration = SourceOutputRegistration::default();
             let mut probe_prescan = SourceOutputPreScan::default();
             let probe_reports = ep_model::ReportInputs {
@@ -913,6 +916,11 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     globals.num_of_zones,
                     &mut probe_branch,
                     false,
+                    &probe_sizing,
+                    &mut probe_outdoor_air_nodes,
+                    &probe_environment,
+                    &control,
+                    &globals,
                     &mut backend,
                     &mut SourcePurchasedAirReportingOutputContext {
                         registration: &mut probe_registration,
@@ -1134,6 +1142,296 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             }
             assert!(probe_error.is_empty() && probe_console.is_empty() && probe_eio.is_empty());
             assert!(probe.purchased_air.get_purchased_air_input); // this getter does not own the caller's once latch
+            // Two fresh real getter contexts, only in the sole omitted-fuel row.
+            // No min-OA/mixing formulas or held Invalid-selector calculations.
+            if total == 1 && authored_heat_fuel.is_none() && authored_cool_fuel.is_none() {
+                use crate::heat_balance::ordinary_equipment::source_purchased_air::owners::{
+                    SourcePurchasedAirDcv as Dcv, SourcePurchasedAirEconomizer as Econ,
+                    SourcePurchasedAirHeatRecovery as Recovery,
+                };
+                for explicit_empty in [false, true] {
+                    let dsoa_name = "OA direct raw 규";
+                    let oa_name = "OA direct inlet 각";
+                    let mut oa_objects = retained_objects.clone();
+                    oa_objects.insert(
+                        "DesignSpecification:OutdoorAir".into(),
+                        BTreeMap::from([(
+                            dsoa_name.into(),
+                            BTreeMap::from([
+                                ("outdoor_air_method".into(), V::String("Flow/Zone".into())),
+                                ("outdoor_air_flow_per_zone".into(), V::Number("0.01".into())),
+                            ]),
+                        )]),
+                    );
+                    let fields = oa_objects
+                        .get_mut("ZoneHVAC:IdealLoadsAirSystem")
+                        .and_then(|rows| rows.get_mut(unit_name))
+                        .ok_or("actual OA unit raw input")?;
+                    fields.insert(
+                        "design_specification_outdoor_air_object_name".into(),
+                        V::String(dsoa_name.into()),
+                    );
+                    fields.insert(
+                        "outdoor_air_inlet_node_name".into(),
+                        V::String(oa_name.into()),
+                    );
+                    if explicit_empty {
+                        for field in [
+                            "demand_controlled_ventilation_type",
+                            "outdoor_air_economizer_type",
+                            "heat_recovery_type",
+                        ] {
+                            fields.insert(field.into(), V::String(String::new()));
+                        }
+                    }
+                    let mut oa_definitions = definitions.clone();
+                    oa_definitions.extend([
+                        SourceObjectDefinition {
+                            object_type: "ZoneHVAC:IdealLoadsAirSystem".into(),
+                            alpha_fields: 21,
+                            numeric_fields: 11,
+                            alpha_extensions: 0,
+                            numeric_extensions: 0,
+                            extension: None,
+                        },
+                        SourceObjectDefinition {
+                            object_type: "DesignSpecification:OutdoorAir".into(),
+                            alpha_fields: 4,
+                            numeric_fields: 4,
+                            alpha_extensions: 0,
+                            numeric_extensions: 0,
+                            extension: None,
+                        },
+                    ]);
+                    let oa_families = oa_objects
+                        .iter()
+                        .map(|(family, rows)| {
+                            (
+                                family.clone(),
+                                SourceInputFamily::Objects(
+                                    rows.iter()
+                                        .map(|(name, fields)| SourceObjectShape {
+                                            object_name: name.clone(),
+                                            field_sizes: fields
+                                                .iter()
+                                                .map(|(field, value)| {
+                                                    (
+                                                        field.clone(),
+                                                        match value {
+                                                            V::Null => 0,
+                                                            V::Array(values) => values.len(),
+                                                            V::Object(values) => values.len(),
+                                                            _ => 1,
+                                                        },
+                                                    )
+                                                })
+                                                .collect(),
+                                        })
+                                        .collect(),
+                                ),
+                            )
+                        })
+                        .collect();
+                    let oa_order = oa_objects
+                        .iter()
+                        .map(|(family, rows)| (family.clone(), rows.keys().cloned().collect()))
+                        .collect();
+                    let mut oa_ip =
+                        SelectedInputProcessor::from_admitted_input(oa_definitions, oa_families)?;
+                    oa_ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                        objects: oa_objects.clone(),
+                        object_order: oa_order,
+                    })?;
+                    let mut oa_shortcut = SourceInputProcessorShortCut::default();
+                    oa_shortcut.allocate_from_input(&oa_ip)?;
+                    let oa_clock = OrdinaryEquipmentInput::from_source_a_family_inventory(
+                        [("NodeList", oa_ip.get_num_objects_found("NodeList"))],
+                        timesteps,
+                    )?;
+                    let mut oa_equipment = OrdinaryEquipment::new_for_source_ordered(
+                        &model, oa_clock, &zone_ids, &space_ids,
+                    )?;
+                    let mut oa_zones = selected.clone();
+                    let mut oa_gains = crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains::default();
+                    let mut oa_sizing =
+                        crate::heat_balance::selected_sizing::SelectedSizingManager::default();
+                    let mut oa_schedules = crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+                    oa_schedules.init_constant_state(timesteps)?;
+                    let mut oa_branch = crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
+                    let mut oa_registry =
+                        crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes::default(
+                        );
+                    let mut oa_registration = SourceOutputRegistration::default();
+                    let mut oa_prescan = SourceOutputPreScan::default();
+                    let mut oa_state = error_state.clone();
+                    let (mut oa_error, mut oa_console, mut oa_eio, mut oa_eso) =
+                        (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+                    let mut oa_results = Vec::new();
+                    let mut oa_files = MemoryMtd(None);
+                    {
+                        let mut backend = SourceErrorBackend {
+                            state: &mut oa_state,
+                            error_stream: Some(&mut oa_error),
+                            console: &mut oa_console,
+                            out_unit1: None,
+                            out_unit2: None,
+                            f_message: None,
+                            message_callback: None,
+                            error_callback: None,
+                            sqlite: None,
+                        };
+                        oa_sizing.get_oa_requirements(
+                            &mut oa_ip,
+                            &mut oa_schedules,
+                            &clock,
+                            true,
+                        )?;
+                        oa_equipment.get_zone_equipment_source(
+                            &mut oa_ip,
+                            oa_clock,
+                            false,
+                            false,
+                            &globals,
+                            &mut oa_gains,
+                            SourceEquipmentInputOwners {
+                                zones: oa_zones
+                                    .zones
+                                    .as_deref_mut()
+                                    .ok_or("actual OA probe Zones")?,
+                                schedules: &mut oa_schedules,
+                                sizing: &mut oa_sizing,
+                                branch: None,
+                                source_is_epjson: true,
+                                backend: &mut backend,
+                                diagnostic_flags: Some(
+                                    crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                        kickoff: &globals.kickoff_simulation,
+                                        developer: &developer,
+                                        warmup: &clock.warmup_flag,
+                                        doing_sizing: &globals.doing_sizing,
+                                    },
+                                ),
+                            },
+                        )?;
+                        oa_prescan.add_record(unit_name, variable, &mut backend)?;
+                        let mut dictionary = SourceOutputDictionaryStreams {
+                            eso: Some(&mut oa_eso),
+                            sqlite_present: false,
+                            results_framework_output_variables: &mut oa_results,
+                        };
+                        oa_equipment.get_source_purchased_air(
+                            &mut oa_shortcut,
+                            true,
+                            &mut oa_schedules,
+                            globals.num_of_zones,
+                            &mut oa_branch,
+                            false,
+                            &oa_sizing,
+                            &mut oa_registry,
+                            &probe_environment,
+                            &control,
+                            &globals,
+                            &mut backend,
+                            &mut SourcePurchasedAirReportingOutputContext {
+                                registration: &mut oa_registration,
+                                input: &mut oa_ip,
+                                prescan: &oa_prescan,
+                                reports: &probe_reports,
+                                environment: SourceReportVariableEnvironment::from_owners(
+                                    "",
+                                    &globals,
+                                    &developer,
+                                    Some(&clock),
+                                ),
+                                minutes_in_time_step: clock.minutes_in_time_step,
+                                host: &mut oa_files,
+                                dictionary_host: &mut dictionary,
+                                eio: &mut oa_eio,
+                            },
+                        )?;
+                    }
+                    let unit = &oa_equipment
+                        .purchased_air
+                        .units
+                        .as_ref()
+                        .ok_or("actual OA units")?[0];
+                    let dsoa = oa_sizing
+                        .oa_requirements
+                        .as_ref()
+                        .ok_or("actual DSOA owner rows")?;
+                    let named = dsoa
+                        .iter()
+                        .position(|row| row.name == dsoa_name.to_ascii_uppercase())
+                        .ok_or("actual named DSOA row")?;
+                    assert_eq!(unit.oa_requirements_ptr, i32::try_from(named + 1)?);
+                    assert_ne!(
+                        usize::try_from(unit.oa_requirements_ptr)?,
+                        oa_sizing.default_oa_requirement
+                    );
+                    assert!(unit.outdoor_air);
+                    let oa_node = usize::try_from(unit.outdoor_air_node_num)?;
+                    assert_eq!(
+                        oa_equipment.source_node_id(oa_node)?,
+                        oa_name.to_ascii_uppercase()
+                    );
+                    assert_eq!(
+                        oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("actual OA physical Nodes")?
+                            [oa_node.checked_sub(1).ok_or("actual positive OA node")?]
+                        .fluid_type,
+                        source_nodes::SourceNodeFluidType::Air
+                    );
+                    assert_eq!(
+                        oa_registry.outside_air_node_list.as_deref(),
+                        Some([unit.outdoor_air_node_num].as_slice())
+                    );
+                    assert_eq!(oa_registry.number_outside_air_nodes, 1);
+                    assert!(!oa_registry.get_input_flag);
+                    assert!(oa_equipment.nodes.context_name.is_empty());
+                    assert!(oa_equipment.nodes.unique_names.is_none());
+                    assert_eq!(oa_equipment.nodes.number_of_check_nodes, 2); // actual supply + OA checks
+                    assert_eq!(
+                        (unit.dcv_type, unit.economizer_type, unit.ht_rec_type),
+                        if explicit_empty {
+                            (Dcv::Invalid, Econ::Invalid, Recovery::Invalid)
+                        } else {
+                            (Dcv::None, Econ::NoEconomizer, Recovery::None)
+                        }
+                    );
+                    assert!(!oa_ip.is_object_unused("DesignSpecification:OutdoorAir", dsoa_name));
+                    assert!(!oa_ip.is_object_unused("ZoneHVAC:IdealLoadsAirSystem", unit_name));
+                    assert!(!oa_ip.is_object_unused("NodeList", alias));
+                    assert!(!oa_ip.is_object_unused("Output:Variable", "UTF8 REQUEST"));
+                    for (family, rows) in &oa_objects {
+                        for (name, fields) in rows {
+                            assert_eq!(oa_ip.source_raw_object_fields(family, name)?, fields);
+                        }
+                    }
+                    let mut connections = Vec::new();
+                    oa_branch.report_source_node_connections(&oa_equipment, &mut connections)?;
+                    for expected in [
+                        format!(
+                            " Non-Parent Node Connection,{},ZONEHVAC:IDEALLOADSAIRSYSTEM,{},Outlet,1\n",
+                            oa_name.to_ascii_uppercase(),
+                            unit_name.to_ascii_uppercase()
+                        ),
+                        format!(
+                            " Non-Parent Node Connection,{},OUTDOORAIR:NODE,OutdoorAir:Node,OutdoorAir,1\n",
+                            oa_name.to_ascii_uppercase()
+                        ),
+                    ] {
+                        assert!(
+                            connections
+                                .windows(expected.len())
+                                .any(|bytes| bytes == expected.as_bytes())
+                        );
+                    }
+                    assert!(oa_error.is_empty() && oa_console.is_empty() && oa_eio.is_empty());
+                }
+            }
         }
         // Source InitUniqueNodeCheck must retain genuine unused NodeLists even
         // with zero controlled Zones. Use the real raw IP/getter, not a manually

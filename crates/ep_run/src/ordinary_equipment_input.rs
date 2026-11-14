@@ -101,6 +101,165 @@ pub(crate) fn source_b_humidistat_prerequisite_error(raw: &RawModel) -> Option<S
     }
 }
 
+/// Raw prerequisites for the first positive-OA SourceB composition only.
+/// Actual getters retain all DSOA operands, schedule min/max checks and usage.
+pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<String> {
+    let positive = |family: &str| {
+        raw.objects
+            .get(&ObjectType(family.into()))
+            .is_some_and(|rows| !rows.is_empty())
+    };
+    let units = raw
+        .objects
+        .get(&ObjectType("ZoneHVAC:IdealLoadsAirSystem".into()));
+    let selected = positive("DesignSpecification:OutdoorAir")
+        || units.is_some_and(|rows| {
+            rows.values().any(|unit| {
+                text(unit, "design_specification_outdoor_air_object_name").is_some()
+                    || text(unit, "outdoor_air_inlet_node_name").is_some()
+            })
+        });
+    if !selected {
+        return None;
+    }
+    let error = || {
+        Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned NoLimit/None selectors".into())
+    };
+    if !raw.is_epjson()
+        || units.is_none_or(|rows| rows.len() != 1)
+        || raw
+            .objects
+            .get(&ObjectType("Zone".into()))
+            .is_none_or(|rows| rows.len() != 1)
+        || [
+            "ZoneControl:Humidistat",
+            "OutdoorAir:Node",
+            "OutdoorAir:NodeList",
+            "DesignSpecification:OutdoorAir:SpaceList",
+            "AirLoopHVAC",
+        ]
+        .iter()
+        .any(|family| positive(family))
+    {
+        return error();
+    }
+    let unit = units?.values().next()?;
+    let Some(requirement_name) = text(unit, "design_specification_outdoor_air_object_name") else {
+        return error();
+    };
+    let Some(oa_name) = text(unit, "outdoor_air_inlet_node_name") else {
+        return error();
+    };
+    // Omission uses Native's named defaults; present-empty/null/whitespace
+    // selectors must not acquire typed defaults on this new OA route.
+    if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
+        || ![
+            ("humidification_control_type", "None"),
+            ("heating_limit", "NoLimit"),
+            ("cooling_limit", "NoLimit"),
+            ("demand_controlled_ventilation_type", "None"),
+            ("outdoor_air_economizer_type", "NoEconomizer"),
+            ("heat_recovery_type", "None"),
+        ]
+        .iter()
+        .all(|(name, expected)| field(unit, name).is_none_or(|value| text_is(value, &[*expected])))
+    {
+        return error();
+    }
+    let requirements = raw
+        .objects
+        .get(&ObjectType("DesignSpecification:OutdoorAir".into()));
+    if requirements.is_none_or(|rows| rows.len() != 1) {
+        return error();
+    }
+    let Some(requirement) = requirements?
+        .iter()
+        .find(|(name, _)| name.0.eq_ignore_ascii_case(requirement_name))
+        .map(|(_, row)| row)
+    else {
+        return error();
+    };
+    if !field(requirement, "outdoor_air_method").is_none_or(|value| {
+        text_is(
+            value,
+            &[
+                "",
+                "Flow/Person",
+                "Flow/Area",
+                "Flow/Zone",
+                "AirChanges/Hour",
+                "Sum",
+                "Maximum",
+            ],
+        )
+    }) {
+        return error();
+    }
+    let has_schedule = |reference: &str| {
+        ["Constant-0.0", "Constant-1.0"]
+            .iter()
+            .any(|name| name.eq_ignore_ascii_case(reference))
+            || raw
+                .objects
+                .get(&ObjectType("Schedule:Constant".into()))
+                .is_some_and(|rows| {
+                    rows.keys()
+                        .any(|name| name.0.eq_ignore_ascii_case(reference))
+                })
+            || source_b::has_source_detailed_reference(raw, reference)
+    };
+    for name in [
+        "outdoor_air_schedule_name",
+        "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
+    ] {
+        match field(requirement, name) {
+            None => {},
+            Some(RawValue::String(reference)) if reference.is_empty() || has_schedule(reference) => {},
+            _ => return Some("SourceB DSOA schedule requires an actual supported schedule reference; the getter retains its 0..1 contract".into()),
+        }
+    }
+    let lists = raw.objects.get(&ObjectType("NodeList".into()));
+    if lists.is_some_and(|rows| rows.keys().any(|name| name.0.eq_ignore_ascii_case(oa_name))) {
+        return error();
+    }
+    let collides = |reference: &str| {
+        reference.eq_ignore_ascii_case(oa_name) || lists.is_some_and(|rows| {
+            rows.iter().filter(|(name, _)| name.0.eq_ignore_ascii_case(reference)).any(|(_, list)| {
+                matches!(field(list, "nodes"), Some(RawValue::Array(nodes)) if nodes.iter().any(|node| {
+                    matches!(node, RawValue::Object(fields) if fields.get(&FieldName("node_name".into()))
+                        .is_some_and(|value| text_is(value, &[oa_name])))
+                }))
+            })
+        })
+    };
+    if [
+        "zone_supply_air_node_name",
+        "zone_exhaust_air_node_name",
+        "system_inlet_air_node_name",
+    ]
+    .iter()
+    .any(|name| text(unit, name).is_some_and(collides))
+        || raw
+            .objects
+            .get(&ObjectType("ZoneHVAC:EquipmentConnections".into()))
+            .is_some_and(|rows| {
+                rows.values().any(|connection| {
+                    [
+                        "zone_air_node_name",
+                        "zone_air_inlet_node_or_nodelist_name",
+                        "zone_air_exhaust_node_or_nodelist_name",
+                        "zone_return_air_node_or_nodelist_name",
+                    ]
+                    .iter()
+                    .any(|name| text(connection, name).is_some_and(collides))
+                })
+            })
+    {
+        return error();
+    }
+    None
+}
+
 fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
     field(object, name).is_none_or(|value| blank(value) || text_is(value, choices))
 }
@@ -820,6 +979,9 @@ fn resolve_raw(
     if source_b_ingress {
         source_b::validate_scheduled_setpoint_references(raw)?;
         if let Some(error) = source_b_humidistat_prerequisite_error(raw) {
+            return Err(error);
+        }
+        if let Some(error) = source_b_positive_oa_prerequisite_error(raw) {
             return Err(error);
         }
     }

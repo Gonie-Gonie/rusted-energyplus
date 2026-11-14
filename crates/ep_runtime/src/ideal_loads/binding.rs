@@ -697,6 +697,30 @@ pub fn has_source_owned_no_oa_humidity_shape(system: &IdealLoadsAirSystem) -> bo
         )
 }
 
+/// Identifies the first owned Source positive-OA selector shape.
+/// Raw SourceB and model validation still prove format, the sole basic DSOA,
+/// real schedules and distinct bare Node identities; no physical state is made.
+#[must_use]
+pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool {
+    system
+        .design_specification_outdoor_air_object_name
+        .as_ref()
+        .is_some_and(|name| !name.0.trim().is_empty())
+        && system
+            .outdoor_air_inlet_node_name
+            .as_ref()
+            .is_some_and(|name| !name.0.trim().is_empty())
+        && system.heating_limit == IdealLoadsLimit::NoLimit
+        && system.cooling_limit == IdealLoadsLimit::NoLimit
+        && system.dehumidification_control_type == DehumidificationControlType::None
+        && system.humidification_control_type == HumidificationControlType::None
+        && system.demand_controlled_ventilation_type
+            == ep_model::DemandControlledVentilationType::None
+        && system.outdoor_air_economizer_type == ep_model::OutdoorAirEconomizerType::NoEconomizer
+        && system.heat_recovery_type == ep_model::HeatRecoveryType::None
+        && !IdealLoadsFeatureFlags::from_system(system).has_autosize
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum DirectZoneValidationMode {
     LegacyBinding,
@@ -1029,6 +1053,70 @@ fn validate_direct_zone_model(
         return unsupported(DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule);
     }
 
+    let source_owned_positive_oa = mode == DirectZoneValidationMode::SourceEligibility
+        && has_source_basic_positive_oa_shape(system);
+    if source_owned_positive_oa {
+        let Some((oa_name, requirement)) = system.outdoor_air_inlet_node_name.as_ref().zip(
+            system
+                .design_specification_outdoor_air_object_name
+                .as_ref()
+                .and_then(|name| {
+                    typed
+                        .design_specification_outdoor_air_names
+                        .resolve(&name.0)
+                })
+                .and_then(|id| {
+                    typed
+                        .design_specification_outdoor_air
+                        .iter()
+                        .find(|row| row.id == id)
+                }),
+        ) else {
+            return unsupported(
+                DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
+            );
+        };
+        let oa_node = typed.node_names.resolve(&oa_name.0);
+        let exhaust_nodes = match system.zone_exhaust_air_node_name.as_ref() {
+            Some(name) => resolve_node_or_nodelist(typed, name)?,
+            None => Vec::new(),
+        };
+        let distinct_node = oa_node.is_some_and(|node| {
+            node != supply_edge.node
+                && node != zone_air_edge.node
+                && !return_nodes.contains(&node)
+                && !exhaust_nodes.contains(&node)
+        });
+        if typed.design_specification_outdoor_air.len() != 1
+            || !typed.zone_humidistats.is_empty()
+            || !matches!(
+                requirement.method,
+                ep_model::DesignSpecificationOutdoorAirMethod::FlowPerPerson
+                    | ep_model::DesignSpecificationOutdoorAirMethod::FlowPerArea
+                    | ep_model::DesignSpecificationOutdoorAirMethod::FlowPerZone
+                    | ep_model::DesignSpecificationOutdoorAirMethod::AirChangesPerHour
+                    | ep_model::DesignSpecificationOutdoorAirMethod::Sum
+                    | ep_model::DesignSpecificationOutdoorAirMethod::Maximum
+            )
+            || ![
+                requirement.outdoor_air_flow_per_person_m3_per_s_person,
+                requirement.outdoor_air_flow_per_zone_floor_area_m3_per_s_m2,
+                requirement.outdoor_air_flow_per_zone_m3_per_s,
+                requirement.outdoor_air_flow_air_changes_per_hour,
+            ]
+            .into_iter()
+            .all(|value| value.is_finite() && value >= 0.0)
+            || !distinct_node
+            || typed
+                .node_lists
+                .iter()
+                .any(|list| list.name.0.eq_ignore_ascii_case(&oa_name.0))
+        {
+            return unsupported(
+                DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
+            );
+        }
+    }
     let source_owned_humidity = mode == DirectZoneValidationMode::SourceEligibility
         && has_source_owned_no_oa_humidity_shape(system);
     if source_owned_humidity
@@ -1045,7 +1133,10 @@ fn validate_direct_zone_model(
     // Zero controls is Native's actual no-control predictor path: its three
     // demand zeros and management's remaining initialization stay real owners.
     let branch = select_purchased_air_branch(system);
-    if !branch.is_no_oa_sensible_with_optional_limits() && !source_owned_humidity {
+    if !branch.is_no_oa_sensible_with_optional_limits()
+        && !source_owned_humidity
+        && !source_owned_positive_oa
+    {
         return Err(DirectZonePurchasedAirBindingError::UnsupportedBranch { branch });
     }
     if (system.dehumidification_control_type != DehumidificationControlType::None
@@ -1073,12 +1164,14 @@ fn validate_direct_zone_model(
         .unsupported_features
         .iter()
         .any(|feature| {
-            !source_owned_humidity
-                || !matches!(
+            !((source_owned_humidity
+                && matches!(
                     feature,
                     IdealLoadsUnsupportedFeature::Dehumidification
                         | IdealLoadsUnsupportedFeature::Humidification
-                )
+                ))
+                || (source_owned_positive_oa
+                    && matches!(feature, IdealLoadsUnsupportedFeature::OutdoorAir)))
         })
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset);

@@ -345,6 +345,9 @@
     "ZoneControl:Humidistat": [
       "Producer-only Source B original direct epJSON: one actual Zone and Humidistat, supported real schedules, actual optional dehumidifying-schedule fallback, normal-mixing ThirdOrder/Analytical/Euler moisture prediction and same demand/report owners. 2 fixed scenes qualify under full161-series numeric/export/clock/ancillary and original155 gates: Analytical single50 with omitted dehumidifying schedule, Euler crossed65/45. Six genuine System/Average kgWater/s reports and prospective sign/single-target/crossed-warning witnesses bound only those inputs. Private getter handles/used flags are not observed. IdealLoads Humidistat consumers, Source A/IDF, EMS/faults, AFN/Space/latent sizing, broader values/combinations and full-object conformance remain held. ThirdOrder dual40/60 remains unaccepted: 14 points in two new dehumidifying streams exceed 1e-12 kgWater/s (maximum difference 1.1494137e-12); the original155 streams and all response gates pass.",
       "Additional bounded Source B direct-epJSON HVAC Humidistat consumer scope: zero or one same-Zone control, actual remaining moisture demands, and supported real schedules. 1 fixed scenes qualify (no-control None/Humidistat zero-demand path); only the 0 listed positive-control scenes provide their declared positive-service evidence. Full161-series comparisons and all original155 gates are mandatory; absence is a genuine six-report zero path. No universal humidity/SHR/capacity law, private mode, positive original-IDF/A, OA, EMS/fault, AFN/Space/sizing or full-object completion is implied."
+    ],
+    "DesignSpecification:OutdoorAir": [
+      "Bounded Source B direct-epJSON input/defaults and six basic flow methods connect actual Zone geometry, design occupants for NoDCV, real schedules, outdoor-node state and direct IdealLoads consumption. 6 fixed method scenes qualify under full158 rules and inherited science. No Source A/IDF, CO2/IAQ/DCV, economizer/recovery, Space/airloop/sizing, arbitrary-combination or full-object claim."
     ]
   },
   "verification": {
@@ -6973,6 +6976,443 @@
         "scope": "A separate passive diagnostic aligns all5,573 API-visible prediction frames by full clock, phase and occurrence order; 15 additional Source kickoff frames have no Native callback. The first observable difference is upstream temperature at warmup frame4, one binary64 step. Near-cap demand differences straddle18C and have different temperature-derived cache tags; actual Native cache entries and the underlying correction cause remain unobserved. The complete ordered Native ESO/MTR profile matches the original CLI run after report-ID identity and program-header normalization. Published production Source is restored unchanged. This diagnostic adds no qualifying case or value and changes no policy.",
         "physical_domain_completion": false,
         "capability_or_gate_promotion": false
+      },
+      "basic_positive_OutdoorAir_144": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json",
+          "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6",
+          "bytes": 723
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json",
+          "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25",
+          "bytes": 2381
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json",
+          "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a",
+          "bytes": 8067
+        },
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-runtime-bindings01.json",
+          "sha256": "9d79efd1e0a7180dcd61788c25a2bc63a7677837d3c3ce8334c1c4173d31b013",
+          "bytes": 5136
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-runtime-final-review01.json",
+          "sha256": "8db8d8edf574bb8f99cec5fff8c775ddebea525fa42e82ee5289c68fdebae5e9",
+          "bytes": 18074
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json",
+          "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba",
+          "bytes": 59630
+        },
+        "validator_history": {
+          "original_completed_review": {
+            "path": ".runtime/object-expansion/unit144-prep/Root-six-pairs147-01/receipt.json",
+            "sha256": "40d958cfeb5265bba61c4e4c823379553f938aa7665916995b02d50a411dd662",
+            "bytes": 70507
+          },
+          "read_only_correction_review": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/Root-readback-correction-review01.json",
+            "sha256": "87b1d0519c86b6c8aa2836dc70b3035c05003e4a767a9ecda4ec087b6f5ba51d",
+            "bytes": 1961
+          },
+          "read_only_correction_manifest": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/prepared-manifest.json",
+            "sha256": "3cf31ddec4def810d09a1b4817dc4d9a34a5c60ebc9f6a97f110cef18685baf1",
+            "bytes": 5316
+          },
+          "original_failed_readbacks": {
+            "FLOW_PERSON": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_PERSON.paired01.json",
+              "sha256": "b4a89c8b3e33eb3a6fff3a5efd9fc50289fde5f4cc8c57da6f02654c2ab0b8f2",
+              "bytes": 530336
+            },
+            "FLOW_ZONE": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_ZONE.paired01.json",
+              "sha256": "5e09f87d0f26a754a9757b146d3016c80d8e3c9ed54e079bd00a0c9f244064e3",
+              "bytes": 530276
+            },
+            "FLOW_AREA": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_AREA.paired01.json",
+              "sha256": "ddba0f0711d71a24af8af34de6738ebe6fd2ae9f9f52baff344dd59f8af1d277",
+              "bytes": 530295
+            },
+            "AIR_CHANGES": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/AIR_CHANGES.paired01.json",
+              "sha256": "7971d09ed3152b929155afebfe0dc439a982ad82f6dae5b27f4ac6d72393d0a9",
+              "bytes": 530352
+            },
+            "SUM": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/SUM.paired01.json",
+              "sha256": "08147d12a0f997e151c84885a6606b12c70a277fd5a84017d3087d32b0659c69",
+              "bytes": 530037
+            },
+            "MAXIMUM": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/MAXIMUM.paired01.json",
+              "sha256": "23f06b74c9bf2615241c7516113dc0baf708897d915fabc24dd5b5424822dbb3",
+              "bytes": 530204
+            }
+          },
+          "failed_original_readback_cases": 6,
+          "original_gate_failure_events": 18,
+          "repaired_original_validator_gate_events": 18,
+          "Source_model_failures_due_to_validator": 0,
+          "new_engine_calls_due_to_validator": 0,
+          "all_original_numeric_metrics_literal": true,
+          "original_12_actor_identities_literal": true
+        },
+        "case_outcomes": {
+          "FLOW_PERSON": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_PERSON.paired01.json",
+              "sha256": "d83caf8401bae971cf2b364ce99ad59fd3209db6d96b996dcb7e25421567463e",
+              "bytes": 543126
+            },
+            "original_failed_paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_PERSON.paired01.json",
+              "sha256": "b4a89c8b3e33eb3a6fff3a5efd9fc50289fde5f4cc8c57da6f02654c2ab0b8f2",
+              "bytes": 530336
+            },
+            "native_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_PERSON/native01/launch.json",
+              "sha256": "22ed0e0a25ebb13a47c3a23cbd40054eb47aa2dd2029327088fd924e798b0bee",
+              "bytes": 30799
+            },
+            "source_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_PERSON/source01/launch.json",
+              "sha256": "fba7f0e9dcc73060ee3d5bd1721404efa5959857f0180dc575a9b7c5759500d9",
+              "bytes": 38445
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_PERSON.native-precheck01.json",
+              "sha256": "42d7c6caccd6d4c6e8894924208fdf4b480a21fdd1e240c9e0f67ea63ea41681",
+              "bytes": 23867
+            },
+            "numeric_point_or_RMSE_failures": 0,
+            "science_failures": [],
+            "original_numeric_metrics_literal": true,
+            "public_OA_summary": {
+              "Native": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "Source": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              }
+            },
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "FLOW_ZONE": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_ZONE.paired01.json",
+              "sha256": "ac0d9bdc7bf529af4c1779047089bb590442d928c712fc8732c73b697ea195a0",
+              "bytes": 543064
+            },
+            "original_failed_paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_ZONE.paired01.json",
+              "sha256": "5e09f87d0f26a754a9757b146d3016c80d8e3c9ed54e079bd00a0c9f244064e3",
+              "bytes": 530276
+            },
+            "native_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_ZONE/native01/launch.json",
+              "sha256": "36d1f0b7f35e9fa41d928755cec55280bce74677140f628151225922eb6183ec",
+              "bytes": 30752
+            },
+            "source_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_ZONE/source01/launch.json",
+              "sha256": "446b335bbb29831356cf164f9d906a9ac5316e3081c3e1e36ef84f6aa84ac038",
+              "bytes": 38336
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_ZONE.native-precheck01.json",
+              "sha256": "b2cad19b4a514b2af42f5a1cebe51f07ebb6eaa3f005ae34869396c25eeaa223",
+              "bytes": 23859
+            },
+            "numeric_point_or_RMSE_failures": 0,
+            "science_failures": [],
+            "original_numeric_metrics_literal": true,
+            "public_OA_summary": {
+              "Native": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "Source": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              }
+            },
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "FLOW_AREA": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_AREA.paired01.json",
+              "sha256": "e2cb3e2275d2930954f3527b14d3baeb7508121ed3ba48b741b755fd20b7e459",
+              "bytes": 543075
+            },
+            "original_failed_paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_AREA.paired01.json",
+              "sha256": "ddba0f0711d71a24af8af34de6738ebe6fd2ae9f9f52baff344dd59f8af1d277",
+              "bytes": 530295
+            },
+            "native_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_AREA/native01/launch.json",
+              "sha256": "a620d464708b0c758376428bbc27b399ec7590a31bf796b41a2de8a9114767f5",
+              "bytes": 30751
+            },
+            "source_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_AREA/source01/launch.json",
+              "sha256": "418d74f3734645c7a478d995a22a0f67994138b556eaccc0e11fa8487487f54a",
+              "bytes": 38336
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_AREA.native-precheck01.json",
+              "sha256": "efb91f7ba49baf1ca96988bb24c1582cf9625b1038669270fd6a0af5f45de60e",
+              "bytes": 23859
+            },
+            "numeric_point_or_RMSE_failures": 0,
+            "science_failures": [],
+            "original_numeric_metrics_literal": true,
+            "public_OA_summary": {
+              "Native": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "Source": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              }
+            },
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "AIR_CHANGES": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/AIR_CHANGES.paired01.json",
+              "sha256": "3810dd4fd435092104d032dd125d9de65dda8496138d14c9fd1453e9cda3fc70",
+              "bytes": 543142
+            },
+            "original_failed_paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/AIR_CHANGES.paired01.json",
+              "sha256": "7971d09ed3152b929155afebfe0dc439a982ad82f6dae5b27f4ac6d72393d0a9",
+              "bytes": 530352
+            },
+            "native_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/AIR_CHANGES/native01/launch.json",
+              "sha256": "061a64c513722ad9a3918bc61184ad85491dd02334d5099e2dd831638c93fee5",
+              "bytes": 30800
+            },
+            "source_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/AIR_CHANGES/source01/launch.json",
+              "sha256": "87d7fcf3711cdb36c518a56cc1fd0e2716b4945d37e737ba5106906a6dc040ab",
+              "bytes": 38445
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/AIR_CHANGES.native-precheck01.json",
+              "sha256": "a030b7623323619a30bfa0ac6baaa083f8b1949b9d671a60be3c72df6010e927",
+              "bytes": 23867
+            },
+            "numeric_point_or_RMSE_failures": 0,
+            "science_failures": [],
+            "original_numeric_metrics_literal": true,
+            "public_OA_summary": {
+              "Native": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "Source": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              }
+            },
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "SUM": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/SUM.paired01.json",
+              "sha256": "c8c561742f5c5998bff11b5fcd3966c3599a5d52d71f2dbaa547fda2e72b3424",
+              "bytes": 542810
+            },
+            "original_failed_paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/SUM.paired01.json",
+              "sha256": "08147d12a0f997e151c84885a6606b12c70a277fd5a84017d3087d32b0659c69",
+              "bytes": 530037
+            },
+            "native_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/SUM/native01/launch.json",
+              "sha256": "9f7f021de1375ae671b86d85afa75673bfec1ff66bbf81c059337b9c59d96ec7",
+              "bytes": 30607
+            },
+            "source_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/SUM/source01/launch.json",
+              "sha256": "75c5b1299e52d06a658a70074819d485972c3882a2e011b89d03e4930fe3c61b",
+              "bytes": 38013
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/SUM.native-precheck01.json",
+              "sha256": "17549b5db963b0aed6121974bfad09cf9a47786ff5f2207f71f45bf206e02aea",
+              "bytes": 23835
+            },
+            "numeric_point_or_RMSE_failures": 0,
+            "science_failures": [],
+            "original_numeric_metrics_literal": true,
+            "public_OA_summary": {
+              "Native": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "Source": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              }
+            },
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          },
+          "MAXIMUM": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/MAXIMUM.paired01.json",
+              "sha256": "b96730cefe847ed9abf2f5622ba8b386d864caf5586308c4125535b98a4fa436",
+              "bytes": 542982
+            },
+            "original_failed_paired": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/MAXIMUM.paired01.json",
+              "sha256": "23f06b74c9bf2615241c7516113dc0baf708897d915fabc24dd5b5424822dbb3",
+              "bytes": 530204
+            },
+            "native_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/MAXIMUM/native01/launch.json",
+              "sha256": "19a251a17475f5f4d685c7b7ce14bc7b33a98cab80b565bb26bae09921cd51f6",
+              "bytes": 30704
+            },
+            "source_launch": {
+              "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/MAXIMUM/source01/launch.json",
+              "sha256": "7c919b1e3fa3a839802f120b6c1c39cebe67a397859254af748891b0e1928700",
+              "bytes": 38229
+            },
+            "native_structural_precheck": {
+              "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/MAXIMUM.native-precheck01.json",
+              "sha256": "6f90a55f21ee69cbe1e4c3af3600354d0a9fefd9fb01ccdfc8ce24dd39733162",
+              "bytes": 23851
+            },
+            "numeric_point_or_RMSE_failures": 0,
+            "science_failures": [],
+            "original_numeric_metrics_literal": true,
+            "public_OA_summary": {
+              "Native": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "Source": {
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              }
+            },
+            "accepted_cases": 1,
+            "accepted_values": 75120
+          }
+        },
+        "accepted_cases": [
+          "FLOW_PERSON",
+          "FLOW_ZONE",
+          "FLOW_AREA",
+          "AIR_CHANGES",
+          "SUM",
+          "MAXIMUM"
+        ],
+        "accepted_case_comparisons": {
+          "FLOW_PERSON": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_PERSON.paired01.json",
+            "sha256": "d83caf8401bae971cf2b364ce99ad59fd3209db6d96b996dcb7e25421567463e",
+            "bytes": 543126
+          },
+          "FLOW_ZONE": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_ZONE.paired01.json",
+            "sha256": "ac0d9bdc7bf529af4c1779047089bb590442d928c712fc8732c73b697ea195a0",
+            "bytes": 543064
+          },
+          "FLOW_AREA": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_AREA.paired01.json",
+            "sha256": "e2cb3e2275d2930954f3527b14d3baeb7508121ed3ba48b741b755fd20b7e459",
+            "bytes": 543075
+          },
+          "AIR_CHANGES": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/AIR_CHANGES.paired01.json",
+            "sha256": "3810dd4fd435092104d032dd125d9de65dda8496138d14c9fd1453e9cda3fc70",
+            "bytes": 543142
+          },
+          "SUM": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/SUM.paired01.json",
+            "sha256": "c8c561742f5c5998bff11b5fcd3966c3599a5d52d71f2dbaa547fda2e72b3424",
+            "bytes": 542810
+          },
+          "MAXIMUM": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/MAXIMUM.paired01.json",
+            "sha256": "b96730cefe847ed9abf2f5622ba8b386d864caf5586308c4125535b98a4fa436",
+            "bytes": 542982
+          }
+        },
+        "accepted_values": 450720,
+        "Native_processes": 6,
+        "Source_processes": 6,
+        "actual_QA_commands": 8,
+        "final_QA_commands": 7,
+        "existing_test_functions_executed": 3,
+        "new_test_functions": 0,
+        "engine_replays": 0,
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-source-OA-owner-adoption01.json",
+          "sha256": "a8f5dd4ca5012896232a9f8ded9371672d92a4138f569048859aaeda3fbb9fde",
+          "bytes": 6583
+        },
+        "Source_admission_adoption": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-source-OA-admission-adoption01.json",
+          "sha256": "285c2ff3edb26eee92ce905a51268614395fe0ae788b48dde90c9451893bcdfb",
+          "bytes": 8271
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-source-format-review01.json",
+          "sha256": "b5e126da67055d3a0b78c024707154af53088826a1b1857ca234519c782f3a6f",
+          "bytes": 3599
+        },
+        "scope": "The bounded Source B direct-Zone IdealLoads route connects six basic DSOA methods to actual geometry, design occupants for NoDCV, real schedules, outdoor-node state and None-recovery mixing. The six fixed comparisons retain 6 qualifying cases and 450,720 values. Full158 numeric/export/clock/ancillary checks and all original155 science gates remain strict; each qualifying engine shows positive OA and distinct public mixed-temperature/humidity responses. This slice requires NoLimit, inactive humidity controls, NoDCV and NoEconomizer. Public averages establish no exact mixing, volume/capacity or private-mode law. Source A/IDF, authored OA conditions, advanced OA, Humidistat combinations, Space/airloops/sizing and arbitrary-value completion remain open.",
+        "physical_domain_completion": false
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -64583,12 +65023,852 @@
         },
         "inherited_science": "All original155 policies and full ordered streams retain heating/cooling availability, weather/fuel, exhaust/returns, eighteen Scheduled joins, BND/UTF8, comfort/table, diagnostics/ancillary and JSON/CSV gates. Full operands remain in the immutable comparison.",
         "effective_state": "One finite HVAC Humidistat consumer scene or genuine no-control path. No private remaining-demand/mode, averaged capacity/SHR law, arbitrary-value or full-object claim."
+      },
+      {
+        "id": "B-IDEALLOADS-BASIC-POSITIVE-OA-FLOW_PERSON-144-120H",
+        "case_kind": "FLOW_PERSON",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-consumption-144",
+        "input": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/FLOW_PERSON/input.epJSON",
+          "sha256": "4bba1da93887a83ee7bd780a12fb186cab501a9e8ba708c18fbbd22838eef454",
+          "bytes": 101682
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_PERSON/native01/command/receipt.json",
+          "sha256": "9fa7d2797e4b0f06cab73e3a597581b5fa919aa1755cdca07641c6e4811e027d",
+          "bytes": 81040
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_PERSON/source01/command/receipt.json",
+          "sha256": "b7bc7152efa84d9db5a4c96c8e0a35bf8f16a256a23d89853fc3a3848d30b46f",
+          "bytes": 81882
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_PERSON/source01/output/run-summary.json",
+          "sha256": "88401205e0e29e1d8f134bd0f3d455dd28450347f34750aaaef11d978718ab54",
+          "bytes": 64936
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/45/45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb",
+          "sha256": "45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/eplus-rs.exe",
+          "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
+          "bytes": 81013767
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/build/receipt.json",
+          "sha256": "0360770af7ccc6dc24c262437ffb524bcc45a3c368f6d443d1f89153814a5f26",
+          "bytes": 5938
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_PERSON.paired01.json",
+          "sha256": "d83caf8401bae971cf2b364ce99ad59fd3209db6d96b996dcb7e25421567463e",
+          "bytes": 543126
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json",
+          "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba",
+          "bytes": 59630
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_PERSON.recipe.json",
+          "sha256": "d538ab2635f3d08c065ec055bf56f70dc42a77512832c41484643b449eacc489",
+          "bytes": 49184
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/batch-plan01.json",
+          "sha256": "ba520ad38c82f53beb1ed42940d1b1ab3aca4e9f85ba5f40294dd3b9511207e6",
+          "bytes": 13939
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 22510,
+          "parsed_binary64_unequal": 22510,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.235756255686283e-07,
+          "max_rmse_delta": 1.9383119588587697e-08
+        },
+        "outdoor_air_method": "Flow/Person",
+        "public_OA_summary": {
+          "Native": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          },
+          "Source": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "original155_rules_literal": true,
+          "new3_rules_clone_original_caps": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json",
+            "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6",
+            "bytes": 723
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json",
+            "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25",
+            "bytes": 2381
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json",
+            "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a",
+            "bytes": 8067
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit144-prep/Root-runtime-bindings01.json",
+            "sha256": "9d79efd1e0a7180dcd61788c25a2bc63a7677837d3c3ce8334c1c4173d31b013",
+            "bytes": 5136
+          },
+          "read_only_validator_correction": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/Root-readback-correction-review01.json",
+            "sha256": "87b1d0519c86b6c8aa2836dc70b3035c05003e4a767a9ecda4ec087b6f5ba51d",
+            "bytes": 1961
+          },
+          "original_failed_readback": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_PERSON.paired01.json",
+            "sha256": "b4a89c8b3e33eb3a6fff3a5efd9fc50289fde5f4cc8c57da6f02654c2ab0b8f2",
+            "bytes": 530336
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite direct-epJSON, one-Zone/no-airloop basic positive-OA composition, NoLimit/NoDCV/NoEconomizer/None recovery and inactive humidity controls. Full original155 science plus three declared public outputs pass. Existential mixed-air responses imply no averaged mixing, exact volume/capacity, private mode, arbitrary combination or full-object claim."
+      },
+      {
+        "id": "B-IDEALLOADS-BASIC-POSITIVE-OA-FLOW_ZONE-144-120H",
+        "case_kind": "FLOW_ZONE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-consumption-144",
+        "input": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/FLOW_ZONE/input.epJSON",
+          "sha256": "682c4dfae6e6594b383e4360931a49abf01a53ca55df4fbfd89f53fec388dfc1",
+          "bytes": 101680
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_ZONE/native01/command/receipt.json",
+          "sha256": "e1912ba235997e6652bb3105684c9ec40c22c7816a414793fed62ce07d9771ed",
+          "bytes": 81005
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_ZONE/source01/command/receipt.json",
+          "sha256": "135ae1e0504dbf267a7e52fe2550a9a60f42ee614c52503253717f3e2e5ce268",
+          "bytes": 81841
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_ZONE/source01/output/run-summary.json",
+          "sha256": "525742dac5ec748202fcfea65d3a8510b8851492afaedddc5fbea79af5dfac40",
+          "bytes": 64873
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/45/45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb",
+          "sha256": "45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/eplus-rs.exe",
+          "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
+          "bytes": 81013767
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/build/receipt.json",
+          "sha256": "0360770af7ccc6dc24c262437ffb524bcc45a3c368f6d443d1f89153814a5f26",
+          "bytes": 5938
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_ZONE.paired01.json",
+          "sha256": "ac0d9bdc7bf529af4c1779047089bb590442d928c712fc8732c73b697ea195a0",
+          "bytes": 543064
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json",
+          "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba",
+          "bytes": 59630
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_ZONE.recipe.json",
+          "sha256": "148ea134c22446c6a58a682b3b7f87bd426d566f700d5ad6220d0c6229cd6ae8",
+          "bytes": 49170
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/batch-plan01.json",
+          "sha256": "ba520ad38c82f53beb1ed42940d1b1ab3aca4e9f85ba5f40294dd3b9511207e6",
+          "bytes": 13939
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23030,
+          "parsed_binary64_unequal": 23030,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.0209699869155884e-07,
+          "max_rmse_delta": 1.1056701379197147e-08
+        },
+        "outdoor_air_method": "Flow/Zone",
+        "public_OA_summary": {
+          "Native": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          },
+          "Source": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "original155_rules_literal": true,
+          "new3_rules_clone_original_caps": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json",
+            "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6",
+            "bytes": 723
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json",
+            "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25",
+            "bytes": 2381
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json",
+            "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a",
+            "bytes": 8067
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit144-prep/Root-runtime-bindings01.json",
+            "sha256": "9d79efd1e0a7180dcd61788c25a2bc63a7677837d3c3ce8334c1c4173d31b013",
+            "bytes": 5136
+          },
+          "read_only_validator_correction": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/Root-readback-correction-review01.json",
+            "sha256": "87b1d0519c86b6c8aa2836dc70b3035c05003e4a767a9ecda4ec087b6f5ba51d",
+            "bytes": 1961
+          },
+          "original_failed_readback": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_ZONE.paired01.json",
+            "sha256": "5e09f87d0f26a754a9757b146d3016c80d8e3c9ed54e079bd00a0c9f244064e3",
+            "bytes": 530276
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite direct-epJSON, one-Zone/no-airloop basic positive-OA composition, NoLimit/NoDCV/NoEconomizer/None recovery and inactive humidity controls. Full original155 science plus three declared public outputs pass. Existential mixed-air responses imply no averaged mixing, exact volume/capacity, private mode, arbitrary combination or full-object claim."
+      },
+      {
+        "id": "B-IDEALLOADS-BASIC-POSITIVE-OA-FLOW_AREA-144-120H",
+        "case_kind": "FLOW_AREA",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-consumption-144",
+        "input": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/FLOW_AREA/input.epJSON",
+          "sha256": "4f315395bc56bc3b5c5117461a32af116707657e1d184317ecc6f0062042dd60",
+          "bytes": 101680
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_AREA/native01/command/receipt.json",
+          "sha256": "07047b21b0c5220f58161d5696be3c5b1827a4361a8407c0261e4e3115e212c7",
+          "bytes": 81006
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_AREA/source01/command/receipt.json",
+          "sha256": "cff203bde32754eae8850079829c54bb4e34dd5ff36c41588857afb12aad65e9",
+          "bytes": 81842
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/FLOW_AREA/source01/output/run-summary.json",
+          "sha256": "396f5b36dddcf03c71d6a4c0e7b297b3d685ebf430fd50c3b99efddbbc7d61bc",
+          "bytes": 64874
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/45/45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb",
+          "sha256": "45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/eplus-rs.exe",
+          "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
+          "bytes": 81013767
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/build/receipt.json",
+          "sha256": "0360770af7ccc6dc24c262437ffb524bcc45a3c368f6d443d1f89153814a5f26",
+          "bytes": 5938
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_AREA.paired01.json",
+          "sha256": "e2cb3e2275d2930954f3527b14d3baeb7508121ed3ba48b741b755fd20b7e459",
+          "bytes": 543075
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json",
+          "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba",
+          "bytes": 59630
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_AREA.recipe.json",
+          "sha256": "021bd8e917f7839694d4154f148b21725784c35e71d5ecb65fc070396c6ff184",
+          "bytes": 49170
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/batch-plan01.json",
+          "sha256": "ba520ad38c82f53beb1ed42940d1b1ab3aca4e9f85ba5f40294dd3b9511207e6",
+          "bytes": 13939
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 21121,
+          "parsed_binary64_unequal": 21121,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.2549647837877274e-07,
+          "max_rmse_delta": 1.7069761804181977e-08
+        },
+        "outdoor_air_method": "Flow/Area",
+        "public_OA_summary": {
+          "Native": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          },
+          "Source": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "original155_rules_literal": true,
+          "new3_rules_clone_original_caps": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json",
+            "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6",
+            "bytes": 723
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json",
+            "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25",
+            "bytes": 2381
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json",
+            "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a",
+            "bytes": 8067
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit144-prep/Root-runtime-bindings01.json",
+            "sha256": "9d79efd1e0a7180dcd61788c25a2bc63a7677837d3c3ce8334c1c4173d31b013",
+            "bytes": 5136
+          },
+          "read_only_validator_correction": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/Root-readback-correction-review01.json",
+            "sha256": "87b1d0519c86b6c8aa2836dc70b3035c05003e4a767a9ecda4ec087b6f5ba51d",
+            "bytes": 1961
+          },
+          "original_failed_readback": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/FLOW_AREA.paired01.json",
+            "sha256": "ddba0f0711d71a24af8af34de6738ebe6fd2ae9f9f52baff344dd59f8af1d277",
+            "bytes": 530295
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite direct-epJSON, one-Zone/no-airloop basic positive-OA composition, NoLimit/NoDCV/NoEconomizer/None recovery and inactive humidity controls. Full original155 science plus three declared public outputs pass. Existential mixed-air responses imply no averaged mixing, exact volume/capacity, private mode, arbitrary combination or full-object claim."
+      },
+      {
+        "id": "B-IDEALLOADS-BASIC-POSITIVE-OA-AIR_CHANGES-144-120H",
+        "case_kind": "AIR_CHANGES",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-consumption-144",
+        "input": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/AIR_CHANGES/input.epJSON",
+          "sha256": "a6212482b3ef42bd2c88f8fde5f8a90d254ac52166b6caf9465d5b4366e181c8",
+          "bytes": 101686
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/AIR_CHANGES/native01/command/receipt.json",
+          "sha256": "278d74e703477f99b6f082dc488be306486cb9083929d09e13b8141a8c909441",
+          "bytes": 81037
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/AIR_CHANGES/source01/command/receipt.json",
+          "sha256": "630f856cae33b84455d3060535362933bba16dfc97308293896f8aebcabbdd6f",
+          "bytes": 81882
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/AIR_CHANGES/source01/output/run-summary.json",
+          "sha256": "5656485e7b929972ebeb2e0393618ae08b5c0e3f2b0ca8f77505b882d42e2223",
+          "bytes": 64926
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/45/45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb",
+          "sha256": "45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/eplus-rs.exe",
+          "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
+          "bytes": 81013767
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/build/receipt.json",
+          "sha256": "0360770af7ccc6dc24c262437ffb524bcc45a3c368f6d443d1f89153814a5f26",
+          "bytes": 5938
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/AIR_CHANGES.paired01.json",
+          "sha256": "3810dd4fd435092104d032dd125d9de65dda8496138d14c9fd1453e9cda3fc70",
+          "bytes": 543142
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json",
+          "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba",
+          "bytes": 59630
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/science-final01/AIR_CHANGES.recipe.json",
+          "sha256": "98413ebd62d5a3bb755cc08762f4819fc545c3f6e915965d6594b874d1b3d9a9",
+          "bytes": 49188
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/batch-plan01.json",
+          "sha256": "ba520ad38c82f53beb1ed42940d1b1ab3aca4e9f85ba5f40294dd3b9511207e6",
+          "bytes": 13939
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 24224,
+          "parsed_binary64_unequal": 24224,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.5960540622472763e-07,
+          "max_rmse_delta": 7.287824571378219e-09
+        },
+        "outdoor_air_method": "AirChanges/Hour",
+        "public_OA_summary": {
+          "Native": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          },
+          "Source": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "original155_rules_literal": true,
+          "new3_rules_clone_original_caps": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json",
+            "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6",
+            "bytes": 723
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json",
+            "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25",
+            "bytes": 2381
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json",
+            "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a",
+            "bytes": 8067
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit144-prep/Root-runtime-bindings01.json",
+            "sha256": "9d79efd1e0a7180dcd61788c25a2bc63a7677837d3c3ce8334c1c4173d31b013",
+            "bytes": 5136
+          },
+          "read_only_validator_correction": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/Root-readback-correction-review01.json",
+            "sha256": "87b1d0519c86b6c8aa2836dc70b3035c05003e4a767a9ecda4ec087b6f5ba51d",
+            "bytes": 1961
+          },
+          "original_failed_readback": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/AIR_CHANGES.paired01.json",
+            "sha256": "7971d09ed3152b929155afebfe0dc439a982ad82f6dae5b27f4ac6d72393d0a9",
+            "bytes": 530352
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite direct-epJSON, one-Zone/no-airloop basic positive-OA composition, NoLimit/NoDCV/NoEconomizer/None recovery and inactive humidity controls. Full original155 science plus three declared public outputs pass. Existential mixed-air responses imply no averaged mixing, exact volume/capacity, private mode, arbitrary combination or full-object claim."
+      },
+      {
+        "id": "B-IDEALLOADS-BASIC-POSITIVE-OA-SUM-144-120H",
+        "case_kind": "SUM",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-consumption-144",
+        "input": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/SUM/input.epJSON",
+          "sha256": "77ef04a141fd87bdb12bb600accfcfad7c5f25d297d8023013d7578e75359615",
+          "bytes": 101674
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/SUM/native01/command/receipt.json",
+          "sha256": "89ff1da0ac5b1cf85a283b41b3f69754ef52bfb71b7b36c69f22de9cbe295cff",
+          "bytes": 80904
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/SUM/source01/command/receipt.json",
+          "sha256": "d03c09217d9cf5721abd4e73138f3f22da23a5922bf8d11d74ec9175daf366d1",
+          "bytes": 81722
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/SUM/source01/output/run-summary.json",
+          "sha256": "ac59eb3f21f03d886ea6705d523345a7b09504487a59e45a36bf40af4a291fd1",
+          "bytes": 64720
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/45/45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb",
+          "sha256": "45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/eplus-rs.exe",
+          "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
+          "bytes": 81013767
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/build/receipt.json",
+          "sha256": "0360770af7ccc6dc24c262437ffb524bcc45a3c368f6d443d1f89153814a5f26",
+          "bytes": 5938
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/SUM.paired01.json",
+          "sha256": "c8c561742f5c5998bff11b5fcd3966c3599a5d52d71f2dbaa547fda2e72b3424",
+          "bytes": 542810
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json",
+          "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba",
+          "bytes": 59630
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/science-final01/SUM.recipe.json",
+          "sha256": "e45d9fad4b3ada38a854136af1dd325325265e25e4b44a8199d1c0a3fecf3488",
+          "bytes": 49128
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/batch-plan01.json",
+          "sha256": "ba520ad38c82f53beb1ed42940d1b1ab3aca4e9f85ba5f40294dd3b9511207e6",
+          "bytes": 13939
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 20989,
+          "parsed_binary64_unequal": 20989,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1309824660420418e-07,
+          "max_rmse_delta": 9.729609678414237e-09
+        },
+        "outdoor_air_method": "Sum",
+        "public_OA_summary": {
+          "Native": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          },
+          "Source": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "original155_rules_literal": true,
+          "new3_rules_clone_original_caps": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json",
+            "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6",
+            "bytes": 723
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json",
+            "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25",
+            "bytes": 2381
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json",
+            "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a",
+            "bytes": 8067
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit144-prep/Root-runtime-bindings01.json",
+            "sha256": "9d79efd1e0a7180dcd61788c25a2bc63a7677837d3c3ce8334c1c4173d31b013",
+            "bytes": 5136
+          },
+          "read_only_validator_correction": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/Root-readback-correction-review01.json",
+            "sha256": "87b1d0519c86b6c8aa2836dc70b3035c05003e4a767a9ecda4ec087b6f5ba51d",
+            "bytes": 1961
+          },
+          "original_failed_readback": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/SUM.paired01.json",
+            "sha256": "08147d12a0f997e151c84885a6606b12c70a277fd5a84017d3087d32b0659c69",
+            "bytes": 530037
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite direct-epJSON, one-Zone/no-airloop basic positive-OA composition, NoLimit/NoDCV/NoEconomizer/None recovery and inactive humidity controls. Full original155 science plus three declared public outputs pass. Existential mixed-air responses imply no averaged mixing, exact volume/capacity, private mode, arbitrary combination or full-object claim."
+      },
+      {
+        "id": "B-IDEALLOADS-BASIC-POSITIVE-OA-MAXIMUM-144-120H",
+        "case_kind": "MAXIMUM",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-consumption-144",
+        "input": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/MAXIMUM/input.epJSON",
+          "sha256": "d582ca346e387d30348508b4b1249db971dffd6ebe3c0bb9e69cadc25db4177c",
+          "bytes": 101678
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/MAXIMUM/native01/command/receipt.json",
+          "sha256": "64ee54fdebb834c937a02305a91a2427d53b2010d6abf3b024d3588fd761e37c",
+          "bytes": 80971
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/MAXIMUM/source01/command/receipt.json",
+          "sha256": "cec36af722e225ef27b3b87aace826fae6b255acce91c5d6a2a1b3f00ccb124c",
+          "bytes": 81802
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/epoch147/MAXIMUM/source01/output/run-summary.json",
+          "sha256": "72a46127125f5c85e03118b907dd2f415a8ea343e49ecc617035b554ef1b3cce",
+          "bytes": 64819
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/45/45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb",
+          "sha256": "45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/eplus-rs.exe",
+          "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
+          "bytes": 81013767
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/build/receipt.json",
+          "sha256": "0360770af7ccc6dc24c262437ffb524bcc45a3c368f6d443d1f89153814a5f26",
+          "bytes": 5938
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/MAXIMUM.paired01.json",
+          "sha256": "b96730cefe847ed9abf2f5622ba8b386d864caf5586308c4125535b98a4fa436",
+          "bytes": 542982
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json",
+          "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba",
+          "bytes": 59630
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/science-final01/MAXIMUM.recipe.json",
+          "sha256": "df4a0cb6273ed580b157f3b99f3a6d2cceca90b3419049a584536d518611a740",
+          "bytes": 49156
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/batch-plan01.json",
+          "sha256": "ba520ad38c82f53beb1ed42940d1b1ab3aca4e9f85ba5f40294dd3b9511207e6",
+          "bytes": 13939
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 24224,
+          "parsed_binary64_unequal": 24224,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.5960540622472763e-07,
+          "max_rmse_delta": 7.287824571378219e-09
+        },
+        "outdoor_air_method": "Maximum",
+        "public_OA_summary": {
+          "Native": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          },
+          "Source": {
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "activation_accepted": true
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "original155_rules_literal": true,
+          "new3_rules_clone_original_caps": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json",
+            "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6",
+            "bytes": 723
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json",
+            "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25",
+            "bytes": 2381
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json",
+            "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a",
+            "bytes": 8067
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit144-prep/Root-runtime-bindings01.json",
+            "sha256": "9d79efd1e0a7180dcd61788c25a2bc63a7677837d3c3ce8334c1c4173d31b013",
+            "bytes": 5136
+          },
+          "read_only_validator_correction": {
+            "path": ".runtime/object-expansion/unit144-prep/readback-correction04/Root-readback-correction-review01.json",
+            "sha256": "87b1d0519c86b6c8aa2836dc70b3035c05003e4a767a9ecda4ec087b6f5ba51d",
+            "bytes": 1961
+          },
+          "original_failed_readback": {
+            "path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-01/MAXIMUM.paired01.json",
+            "sha256": "23f06b74c9bf2615241c7516113dc0baf708897d915fabc24dd5b5424822dbb3",
+            "bytes": 530204
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One finite direct-epJSON, one-Zone/no-airloop basic positive-OA composition, NoLimit/NoDCV/NoEconomizer/None recovery and inactive humidity controls. Full original155 science plus three declared public outputs pass. Existential mixed-air responses imply no averaged mixing, exact volume/capacity, private mode, arbitrary combination or full-object claim."
       }
     ],
     "totals": {
-      "paired_cases": 215,
-      "reported_samples": 8095336,
-      "raw_operand_unequal": 1964687,
+      "paired_cases": 221,
+      "reported_samples": 8546056,
+      "raw_operand_unequal": 2100785,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -67083,6 +68363,23 @@
           "sha256": "d3cb5ad1fd7c5958225aa2b6bb50271415a2e34205ecd66eb580739d62c2aabb",
           "bytes": 80991758
         }
+      },
+      {
+        "id": "source-basic-positive-oa-consumption-144",
+        "receipt": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/build/receipt.json",
+          "sha256": "0360770af7ccc6dc24c262437ffb524bcc45a3c368f6d443d1f89153814a5f26",
+          "bytes": 5938
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/45/45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb",
+          "sha256": "45c9bf2f13cd9b8eb96ddd87f82be878f75f272c7d0e192ab4f7b74846c3b4fb"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/basic-positive-oa-consumption-144/build147-01/eplus-rs.exe",
+          "sha256": "4c04d7d3d4446d92eeb35e59b648a15c157d2d9ee280c7d866cf96003956297a",
+          "bytes": 81013767
+        }
       }
     ],
     "focused_since_workspace": {
@@ -67482,14 +68779,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 146,
-      "builds_with_accepted_paired_cases": 125,
+      "actual_recorded_builds": 147,
+      "builds_with_accepted_paired_cases": 126,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "146 recorded Source builds:125 retain accepted pairs,21 have none, including8 without Source execution. The separate passive Source146/API diagnostic has one completed Source run and zero qualifying cases or values. Published Source145 code was restored; every earlier failed/unaccepted result and numeric policy remains unchanged.",
+      "qualification": "147 recorded Source builds: 126 retain accepted pairs and 21 have none, including8 without Source execution. One Source147 default build serves six first complete basic-OA comparisons; only the 6 strict qualifying cases enter totals. All failed, observer-only and unaccepted histories retain their original credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -72111,8 +73408,14 @@
       "B-COMBINED-HUMIDITY-SHR-SHR_NAMED_HEAT_CONST_FLOW_CAPACITY-139-120H",
       "B-HUMIDISTAT-PRODUCER-ANALYTICAL_SINGLE_50_OMITTED_DEHUM-140-120H",
       "B-HUMIDISTAT-PRODUCER-EULER_CROSSED_65_45-140-120H",
-      "B-HVAC-HUMIDISTAT-CONSUMER-MISSING_CONTROL_NONE_HUMIDISTAT-141-120H"
-    ], "accepted_paired_cases": 44, "accepted_samples": 3194160, "retained_Scheduled_B_pairs": 43, "retained_Scheduled_B_samples": 3134640, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"MISSING_CONTROL_NONE_HUMIDISTAT": {"path": ".runtime/object-expansion/unit141-prep/paired-runtime-proposal01/MISSING_CONTROL_NONE_HUMIDISTAT.pair01.json", "sha256": "9365523fc53a7dd974c7b099b39b6eb34752cc9352179abbb5fbb081b803908c", "bytes": 545998}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit141-prep/Root-completed-readback-review01.json", "sha256": "166a83dfcfb734358e26678cd1d51d415b9a65376cde555babb6e655e2c2177c", "bytes": 21132}, "latest_source_build": "source-dd-hvac-humidistat-consumers-141", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit141-prep/build144-attempt01.json", "sha256": "367cdff6b666a097e026b9dc5219ebe699592d6d48bdf83d08af43048eb8f3a1", "bytes": 714}, "latest_actual_quality": {"path": ".runtime/porting/hvac-humidistat-consumers-141/quality02/summary.json", "sha256": "4807ba533e18004031cd8928cdbf63238482dd6a2579fdfdc4a627ec95cfb3b6", "bytes": 1673}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit141-prep/owner-execution-review01.json", "sha256": "195634e25da8104ba04e6c1735263382dd0bbcbe2ae769c6cc49b0cd1e0f25e4", "bytes": 5448}, "latest_input_contracts": {"MISSING_CONTROL_NONE_HUMIDISTAT": {"path": ".runtime/object-expansion/unit141-prep/science-final01/MISSING_CONTROL_NONE_HUMIDISTAT.recipe.json", "sha256": "95338ccecb7d778a10f5778d31a0c389f580fc81254dc0707ed54220a09d5223", "bytes": 6753}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "43 bounded Source B Scheduled/NodeList pairs retain 3,134,640 values. The unused Source A pair adds 59,520, giving 44 pairs and 3,194,160 values. Qualifying HVAC Humidistat consumer scenes preserve all eighteen public schedule/setpoint joins, real exhaust, return-flow, ordered NodeList/UTF-8 structure, weather, fuel and comfort checks under unchanged original policies. Six moisture reports keep their separately frozen kgWater/s limits. Prior evidence keeps its own scope; public responses establish no private history or full-object claim.", "capability_or_gate_promotion": false,
+      "B-HVAC-HUMIDISTAT-CONSUMER-MISSING_CONTROL_NONE_HUMIDISTAT-141-120H",
+      "B-IDEALLOADS-BASIC-POSITIVE-OA-FLOW_PERSON-144-120H",
+      "B-IDEALLOADS-BASIC-POSITIVE-OA-FLOW_ZONE-144-120H",
+      "B-IDEALLOADS-BASIC-POSITIVE-OA-FLOW_AREA-144-120H",
+      "B-IDEALLOADS-BASIC-POSITIVE-OA-AIR_CHANGES-144-120H",
+      "B-IDEALLOADS-BASIC-POSITIVE-OA-SUM-144-120H",
+      "B-IDEALLOADS-BASIC-POSITIVE-OA-MAXIMUM-144-120H"
+    ], "accepted_paired_cases": 50, "accepted_samples": 3644880, "retained_Scheduled_B_pairs": 49, "retained_Scheduled_B_samples": 3585360, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"FLOW_PERSON": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_PERSON.paired01.json", "sha256": "d83caf8401bae971cf2b364ce99ad59fd3209db6d96b996dcb7e25421567463e", "bytes": 543126}, "FLOW_ZONE": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_ZONE.paired01.json", "sha256": "ac0d9bdc7bf529af4c1779047089bb590442d928c712fc8732c73b697ea195a0", "bytes": 543064}, "FLOW_AREA": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/FLOW_AREA.paired01.json", "sha256": "e2cb3e2275d2930954f3527b14d3baeb7508121ed3ba48b741b755fd20b7e459", "bytes": 543075}, "AIR_CHANGES": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/AIR_CHANGES.paired01.json", "sha256": "3810dd4fd435092104d032dd125d9de65dda8496138d14c9fd1453e9cda3fc70", "bytes": 543142}, "SUM": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/SUM.paired01.json", "sha256": "c8c561742f5c5998bff11b5fcd3966c3599a5d52d71f2dbaa547fda2e72b3424", "bytes": 542810}, "MAXIMUM": {"path": ".runtime/object-expansion/unit144-prep/paired-runtime-proposal02/readback147-corrected01/MAXIMUM.paired01.json", "sha256": "b96730cefe847ed9abf2f5622ba8b386d864caf5586308c4125535b98a4fa436", "bytes": 542982}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit144-prep/Root-corrected-six-readbacks147-01/receipt.json", "sha256": "a998a18d2a25943e344cc68b2b98408f5bb18dea9248c5eb0110d187f4bfe1ba", "bytes": 59630}, "latest_source_build": "source-basic-positive-oa-consumption-144", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit144-prep/build147-attempt01.json", "sha256": "efb300820b6728a1ee7694d358dc9239a156aa9b29b17bd06f665cdda03578b6", "bytes": 723}, "latest_actual_quality": {"path": ".runtime/porting/basic-positive-oa-consumption-144/quality01/summary.json", "sha256": "ebe7bdd20be27c7c897b5fd4ab3aed815947e40d8063d675d41302dcfd6f2e25", "bytes": 2381}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit144-prep/owner-execution-review02.json", "sha256": "464f3196f53562aacb4ac0cc13f73c43c9f8ce78e07813753c23544051781f5a", "bytes": 8067}, "latest_input_contracts": {"FLOW_PERSON": {"path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_PERSON.recipe.json", "sha256": "d538ab2635f3d08c065ec055bf56f70dc42a77512832c41484643b449eacc489", "bytes": 49184}, "FLOW_ZONE": {"path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_ZONE.recipe.json", "sha256": "148ea134c22446c6a58a682b3b7f87bd426d566f700d5ad6220d0c6229cd6ae8", "bytes": 49170}, "FLOW_AREA": {"path": ".runtime/object-expansion/unit144-prep/science-final01/FLOW_AREA.recipe.json", "sha256": "021bd8e917f7839694d4154f148b21725784c35e71d5ecb65fc070396c6ff184", "bytes": 49170}, "AIR_CHANGES": {"path": ".runtime/object-expansion/unit144-prep/science-final01/AIR_CHANGES.recipe.json", "sha256": "98413ebd62d5a3bb755cc08762f4819fc545c3f6e915965d6594b874d1b3d9a9", "bytes": 49188}, "SUM": {"path": ".runtime/object-expansion/unit144-prep/science-final01/SUM.recipe.json", "sha256": "e45d9fad4b3ada38a854136af1dd325325265e25e4b44a8199d1c0a3fecf3488", "bytes": 49128}, "MAXIMUM": {"path": ".runtime/object-expansion/unit144-prep/science-final01/MAXIMUM.recipe.json", "sha256": "df4a0cb6273ed580b157f3b99f3a6d2cceca90b3419049a584536d518611a740", "bytes": 49156}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "49 bounded Source B Scheduled/NodeList pairs retain 3,585,360 values. The unused Source A pair adds59,520, giving 50 pairs and 3,644,880 values. Qualifying basic-OA scenes retain all eighteen public Scheduled joins, exhaust/returns, ordered NodeList/UTF-8 structure, weather/fuel and comfort checks under unchanged original155 rules, plus three declared OA/mixed-air outputs. Earlier evidence keeps its own scope; no private history, averaged ratio, arbitrary combination or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

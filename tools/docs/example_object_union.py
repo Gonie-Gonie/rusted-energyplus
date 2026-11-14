@@ -315,7 +315,7 @@ def markdown(repo_root: Path) -> str:
         "",
         "Canonical names and official groups come from the compact [EnergyPlus 26.1 catalog](../../../data/schema/energyplus-26.1-object-index.json). It records the original schema SHA256 and pinned source commit; installed EnergyPlus is not needed to regenerate this page.",
         "",
-        "Source labels are bounded A/B, bounded A only, bounded B only, inactive declaration only, blocked, or not reviewed. B is the declared direct-Zone sensible no-OA IdealLoads route. An admitted family still requires every applicable field/reference/consumer condition. Review references are code/contract facts, not additional numerical conformance cases; promoted identities and tolerances are unchanged.",
+        "Source labels are bounded A/B, bounded A only, bounded B only, inactive declaration only, blocked, or not reviewed. B is the bounded direct-Zone IdealLoads route; each admitted field combination has its own connected-owner and evidence boundary. An admitted family still requires every applicable field/reference/consumer condition. Review references are code/contract facts, not additional numerical conformance cases; promoted identities and tolerances are unchanged.",
         "", "| Object type | Input files | Instances | Dependency review group | Compiler input typing | Source admission | Scope and review references |", "|---|---|---|---|---|---|---|",
     ]
     lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} | {row['group']} | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} | {source_review_cell(row['review'])} |" for row in known)

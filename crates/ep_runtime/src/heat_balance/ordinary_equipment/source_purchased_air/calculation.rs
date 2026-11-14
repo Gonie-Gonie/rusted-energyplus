@@ -2,6 +2,7 @@
 //! Positive OA/psychrometric diagnostic operations retain explicit boundaries.
 use super::super::source_nodes::SourceNodeData;
 use super::{OrdinaryEquipment, at, owners::*};
+use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_air_heat_balance::{
     SourceAirHeatBalance,
@@ -10,6 +11,7 @@ use crate::heat_balance::ordinary_air_heat_balance::{
 };
 use crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+use crate::heat_balance::selected_heat_balance_input::zone::SelectedZoneInputOwners;
 use crate::heat_balance::selected_heat_balance_input::{
     HeatBalanceInputError as Error, SelectedHeatBalanceInputState,
 };
@@ -17,6 +19,10 @@ use crate::heat_balance::selected_schedule_manager::{
     SelectedScheduleManager, SourceScheduleIndex,
 };
 use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
+use crate::heat_balance::selected_sizing::{
+    SelectedSizingManager,
+    outdoor_air::{SourceOutdoorAirFlowOptions, SourceOutdoorAirFlowOwners},
+};
 use crate::heat_balance::source_initialization::SourceRecurringErrorState;
 use crate::psychrometrics::{
     SourcePsychrometricAccess, SourcePsychrometricOwners, energyplus_psy_cp_air_fn_w as cp,
@@ -178,33 +184,76 @@ fn mixed_air(
     unit: &mut SourceZonePurchasedAir,
     nodes: &Option<Vec<SourceNodeData>>,
     oa: f64,
+    supply: f64,
 ) -> Result<f64, Error> {
     // Native2812-2939 reads each recirculation scalar before its OA branch.
     let recirc_temperature = node(nodes, unit.zone_recirc_air_node_num)?.temperature;
     let recirc_humidity = node(nodes, unit.zone_recirc_air_node_num)?.humidity_ratio;
     let recirc_enthalpy = node(nodes, unit.zone_recirc_air_node_num)?.enthalpy;
+    // Native reads OA Node scalars whenever OutdoorAir, including oa == 0.
+    let (oa_temperature, oa_humidity, oa_enthalpy) = if unit.outdoor_air {
+        (
+            node(nodes, unit.outdoor_air_node_num)?.temperature,
+            node(nodes, unit.outdoor_air_node_num)?.humidity_ratio,
+            node(nodes, unit.outdoor_air_node_num)?.enthalpy,
+        )
+    } else {
+        (0.0, 0.0, 0.0)
+    };
+    let oa_after_temperature = oa_temperature;
+    let oa_after_humidity = oa_humidity;
+    let oa_after_enthalpy = oa_enthalpy;
     if unit.outdoor_air && oa > 0.0 {
-        return Err(Error::Unavailable(
-            "actual CalcPurchAirMixedAir positive outdoor-air heat-recovery operation",
-        ));
+        if unit.ht_rec_type != SourcePurchasedAirHeatRecovery::None {
+            return Err(Error::Unavailable(
+                "actual CalcPurchAirMixedAir positive heat-recovery owner2877",
+            ));
+        }
+        // None recovery keeps the actual OA-after-recovery values unchanged.
+        let mixed_enthalpy;
+        if supply > oa {
+            let recirc_mass = supply - oa;
+            mixed_enthalpy = (recirc_mass * node(nodes, unit.zone_recirc_air_node_num)?.enthalpy
+                + oa * oa_after_enthalpy)
+                / supply;
+            unit.mixed_air_hum_rat = (recirc_mass
+                * node(nodes, unit.zone_recirc_air_node_num)?.humidity_ratio
+                + oa * oa_after_humidity)
+                / supply;
+            unit.mixed_air_temp = dry_bulb(mixed_enthalpy, unit.mixed_air_hum_rat);
+        } else {
+            mixed_enthalpy = oa_after_enthalpy;
+            unit.mixed_air_hum_rat = oa_after_humidity;
+            unit.mixed_air_temp = oa_after_temperature;
+        }
+        // These are genuine Native operations even for None recovery.
+        let specific_heat = cp(oa_humidity);
+        unit.ht_rec_sen_output = oa * specific_heat * (oa_after_temperature - oa_temperature);
+        unit.ht_rec_lat_output = oa * (oa_after_enthalpy - oa_enthalpy) - unit.ht_rec_sen_output;
+        Ok(mixed_enthalpy)
+    } else {
+        unit.mixed_air_temp = recirc_temperature;
+        unit.mixed_air_hum_rat = recirc_humidity;
+        unit.ht_rec_sen_output = 0.0;
+        unit.ht_rec_lat_output = 0.0;
+        Ok(recirc_enthalpy)
     }
-    unit.mixed_air_temp = recirc_temperature;
-    unit.mixed_air_hum_rat = recirc_humidity;
-    unit.ht_rec_sen_output = 0.0;
-    unit.ht_rec_lat_output = 0.0;
-    Ok(recirc_enthalpy)
 }
 
 impl OrdinaryEquipment {
     // Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
     #[allow(unused_assignments)]
+    #[allow(clippy::too_many_arguments)]
     pub(super) fn calculate_source_purchased_air(
         &mut self,
         unit_number: i32,
         controlled_zone: i32,
         system_output: &mut f64,
         moisture_output: &mut f64,
-        schedules: &SelectedScheduleManager,
+        schedules: &mut SelectedScheduleManager,
+        sizing: &mut SelectedSizingManager,
+        zones: &SelectedZoneInputOwners,
+        gains: &SelectedInternalHeatGains,
         o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
     ) -> Result<(), Error> {
         let unit = self
@@ -282,12 +331,38 @@ impl OrdinaryEquipment {
             cool_on = false;
         }
         if unit_on {
-            // Actual CalcPurchAirMinOAMassFlow2762-2810. NoOA is a real
-            // producer branch; positive OA stops at its first real child.
+            // Actual CalcPurchAirMinOAMassFlow2762-2810; only the same live
+            // sizing/Zone/People/schedule owners produce positive OA volume.
             if unit.outdoor_air {
-                return Err(Error::Unavailable(
-                    "actual CalcPurchAirMinOAMassFlow calcDesignSpecificationOutdoorAir2789",
-                ));
+                if unit.dcv_type != SourcePurchasedAirDcv::None {
+                    return Err(Error::Unavailable(
+                        "actual CalcPurchAirMinOAMassFlow positive DCV owner2783",
+                    ));
+                }
+                let volume = sizing.calculate_source_design_specification_outdoor_air_owned(
+                    unit.oa_requirements_ptr,
+                    controlled_zone,
+                    SourceOutdoorAirFlowOptions {
+                        use_occupancy_schedule: false,
+                        use_minimum_oa_schedule: true,
+                        per_person_not_set: false,
+                        maximum_volume_flow: false,
+                        space_number: 0,
+                        calculate_iaq_methods: true,
+                    },
+                    &mut SourceOutdoorAirFlowOwners {
+                        zones,
+                        gains,
+                        schedules: &mut *schedules,
+                        control: o.control,
+                        clock: o.clock,
+                        backend: &mut *o.backend,
+                    },
+                )?;
+                oa_flow = volume * o.environment.std_rho_air;
+                if oa_flow <= 1.0e-30 {
+                    oa_flow = 0.0;
+                }
             } else {
                 oa_flow = 0.0;
             }
@@ -401,7 +476,7 @@ impl OrdinaryEquipment {
                 if supply_flow <= 1.0e-30 {
                     supply_flow = 0.0;
                 }
-                mixed_enthalpy = mixed_air(unit, nodes, oa_flow)?;
+                mixed_enthalpy = mixed_air(unit, nodes, oa_flow, supply_flow)?;
                 if supply_flow > 0.0 {
                     let specific_heat = cp(air_humidity);
                     unit.supply_temp = cool_load / (specific_heat * supply_flow)
@@ -614,7 +689,7 @@ impl OrdinaryEquipment {
                 if supply_flow <= 1.0e-30 {
                     supply_flow = 0.0;
                 }
-                mixed_enthalpy = mixed_air(unit, nodes, oa_flow)?;
+                mixed_enthalpy = mixed_air(unit, nodes, oa_flow, supply_flow)?;
                 if supply_flow > 0.0 {
                     if heat_on && heating {
                         let specific_heat = cp(air_humidity);
@@ -842,10 +917,20 @@ impl OrdinaryEquipment {
                     unit.oa_lat_output = 0.0;
                 }
                 if o.control.carbon_dioxide_simulation {
+                    if unit.outdoor_air {
+                        return Err(Error::Unavailable(
+                            "actual PurchasedAir positive OA CO2 mixture2675",
+                        ));
+                    }
                     let value = node(nodes, recirc_node)?.carbon_dioxide;
                     node_mut(nodes, supply_node)?.carbon_dioxide = value;
                 }
                 if o.control.generic_contaminant_simulation {
+                    if unit.outdoor_air {
+                        return Err(Error::Unavailable(
+                            "actual PurchasedAir positive OA generic-contaminant mixture2685",
+                        ));
+                    }
                     let value = node(nodes, recirc_node)?.generic_contaminant;
                     node_mut(nodes, supply_node)?.generic_contaminant = value;
                 }

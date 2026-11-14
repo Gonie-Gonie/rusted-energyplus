@@ -18,6 +18,7 @@ pub(super) fn is_family(family: &str) -> bool {
             | "ThermostatSetpoint:DualSetpoint"
             | "ZoneControl:Thermostat"
             | "ZoneControl:Humidistat"
+            | "DesignSpecification:OutdoorAir"
             | "ZoneHVAC:EquipmentConnections"
             | "ZoneHVAC:EquipmentList"
             | "ZoneHVAC:IdealLoadsAirSystem"
@@ -33,6 +34,32 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
+        ("DesignSpecification:OutdoorAir", "outdoor_air_method") => text_is(
+            value,
+            &[
+                "",
+                "Flow/Person",
+                "Flow/Area",
+                "Flow/Zone",
+                "AirChanges/Hour",
+                "Sum",
+                "Maximum",
+            ],
+        ),
+        (
+            "DesignSpecification:OutdoorAir",
+            "outdoor_air_flow_per_person"
+            | "outdoor_air_flow_per_zone_floor_area"
+            | "outdoor_air_flow_per_zone"
+            | "outdoor_air_flow_air_changes_per_hour",
+        ) => number(value).is_some_and(|value| value >= 0.0),
+        (
+            "DesignSpecification:OutdoorAir",
+            "outdoor_air_schedule_name"
+            | "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
+        ) => {
+            matches!(value, RawValue::String(_))
+        }
         // Humidistat has four alpha fields including its map-key Name.
         (
             "ZoneControl:Humidistat",

@@ -494,6 +494,9 @@ impl SourceHvacManager {
                             o.schedules,
                             purchased_initialization.globals.num_of_zones,
                             &mut self.ancillary.branch_node_connections,
+                            &mut self.ancillary.outdoor_air_nodes,
+                            &*o.zones,
+                            &*o.gains,
                             purchased_initialization
                                 .globals
                                 .any_energy_management_system_in_model,

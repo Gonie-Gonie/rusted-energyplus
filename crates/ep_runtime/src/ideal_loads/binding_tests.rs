@@ -262,6 +262,137 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         format!("{:?}", vec![NodeId(0)])
     );
 
+    // Basic positive OA is Source-only and still passes the real model
+    // validator, common topology/numeric checks and initialization plans.
+    for method in [
+        ep_model::DesignSpecificationOutdoorAirMethod::FlowPerPerson,
+        ep_model::DesignSpecificationOutdoorAirMethod::FlowPerArea,
+        ep_model::DesignSpecificationOutdoorAirMethod::FlowPerZone,
+        ep_model::DesignSpecificationOutdoorAirMethod::AirChangesPerHour,
+        ep_model::DesignSpecificationOutdoorAirMethod::Sum,
+        ep_model::DesignSpecificationOutdoorAirMethod::Maximum,
+    ] {
+        let (positive_oa, _) = fixture(|typed| {
+            let id = ep_model::DesignSpecificationOutdoorAirId(0);
+            typed
+                .design_specification_outdoor_air_names
+                .insert("REAL OA", id);
+            typed
+                .design_specification_outdoor_air
+                .push(ep_model::DesignSpecificationOutdoorAir {
+                    id,
+                    name: NormalizedName::new("REAL OA"),
+                    method,
+                    outdoor_air_flow_per_person_m3_per_s_person: 0.003,
+                    outdoor_air_flow_per_zone_floor_area_m3_per_s_m2: 0.0002,
+                    outdoor_air_flow_per_zone_m3_per_s: 0.01,
+                    outdoor_air_flow_air_changes_per_hour: 0.25,
+                    outdoor_air_schedule: Some(ScheduleId(3)),
+                    proportional_control_minimum_outdoor_air_flow_rate_schedule: Some(ScheduleId(
+                        3,
+                    )),
+                });
+            typed.nodes.push(Node {
+                id: NodeId(3),
+                name: NormalizedName::new("REAL OUTSIDE"),
+            });
+            typed.node_names.insert("REAL OUTSIDE", NodeId(3));
+            let unit = &mut typed.ideal_loads_air_systems[0];
+            unit.design_specification_outdoor_air_object_name =
+                Some(NormalizedName::new("REAL OA"));
+            unit.outdoor_air_inlet_node_name = Some(NormalizedName::new("REAL OUTSIDE"));
+        });
+        validate_source_direct_zone_purchased_air_model(&positive_oa)
+            .expect("six basic DSOA methods use actual Source owners");
+        assert!(bind_direct_zone_purchased_air_model(&positive_oa).is_err());
+        for invalid in 0..17 {
+            let mut typed = positive_oa.typed.clone();
+            match invalid {
+                0 => {
+                    typed.ideal_loads_air_systems[0].design_specification_outdoor_air_object_name =
+                        Some(NormalizedName::new("MISSING"))
+                }
+                1 => typed.design_specification_outdoor_air.clear(),
+                2 => {
+                    typed.design_specification_outdoor_air[0].method =
+                        ep_model::DesignSpecificationOutdoorAirMethod::IndoorAirQualityProcedure
+                }
+                3 => {
+                    typed.design_specification_outdoor_air[0].outdoor_air_flow_per_zone_m3_per_s =
+                        -1.0
+                }
+                4 => {
+                    typed.design_specification_outdoor_air[0].outdoor_air_flow_per_zone_m3_per_s =
+                        f64::NAN
+                }
+                5 => {
+                    typed.ideal_loads_air_systems[0].outdoor_air_inlet_node_name =
+                        Some(NormalizedName::new("SUPPLY"))
+                }
+                6 => {
+                    typed.ideal_loads_air_systems[0].outdoor_air_inlet_node_name =
+                        Some(NormalizedName::new("ZONE AIR"))
+                }
+                7 => {
+                    typed.ideal_loads_air_systems[0].outdoor_air_inlet_node_name =
+                        Some(NormalizedName::new("RETURN"))
+                }
+                8 => {
+                    typed.ideal_loads_air_systems[0].heating_limit = IdealLoadsLimit::LimitCapacity
+                }
+                9 => {
+                    typed.ideal_loads_air_systems[0].cooling_limit = IdealLoadsLimit::LimitFlowRate
+                }
+                10 => {
+                    typed.ideal_loads_air_systems[0].dehumidification_control_type =
+                        DehumidificationControlType::ConstantSensibleHeatRatio
+                }
+                11 => {
+                    typed.ideal_loads_air_systems[0].humidification_control_type =
+                        HumidificationControlType::ConstantSupplyHumidityRatio
+                }
+                12 => {
+                    typed.ideal_loads_air_systems[0].demand_controlled_ventilation_type =
+                        DemandControlledVentilationType::OccupancySchedule
+                }
+                13 => {
+                    typed.ideal_loads_air_systems[0].outdoor_air_economizer_type =
+                        OutdoorAirEconomizerType::DifferentialDryBulb
+                }
+                14 => {
+                    typed.ideal_loads_air_systems[0].heat_recovery_type = HeatRecoveryType::Sensible
+                }
+                15 => typed.zone_humidistats.push(ep_model::ZoneHumidistat {
+                    id: ep_model::ZoneHumidistatId(0),
+                    name: NormalizedName::new("UNCOMPOSED CONTROL"),
+                    zone: ZoneId(0),
+                    humidifying_relative_humidity_setpoint_schedule: ScheduleId(3),
+                    dehumidifying_relative_humidity_setpoint_schedule: ScheduleId(3),
+                }),
+                16 => {
+                    typed
+                        .node_list_names
+                        .insert("MATCHED EXHAUST", NodeListId(0));
+                    typed.node_lists.push(NodeList {
+                        id: NodeListId(0),
+                        name: NormalizedName::new("MATCHED EXHAUST"),
+                        nodes: ep_model::NodeListMembers::Proven(vec![NodeId(3)]),
+                    });
+                    typed.zone_equipment_connections[0].zone_air_exhaust_node_or_nodelist_name =
+                        Some(NormalizedName::new("MATCHED EXHAUST"));
+                    typed.ideal_loads_air_systems[0].zone_exhaust_air_node_name =
+                        Some(NormalizedName::new("MATCHED EXHAUST"));
+                }
+                _ => unreachable!(),
+            }
+            let candidate = SimulationModel::from_typed(typed);
+            assert!(
+                validate_source_direct_zone_purchased_air_model(&candidate).is_err(),
+                "method={method:?} invalid={invalid}"
+            );
+        }
+    }
+
     let (unused_deferred, _) = fixture(|typed| {
         typed.node_names = ep_model::NameMap::source_exact_namespace();
         for node in &typed.nodes {
