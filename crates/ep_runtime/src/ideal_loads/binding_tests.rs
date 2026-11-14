@@ -299,7 +299,12 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         IdealLoadsLimit::LimitCapacity,
         IdealLoadsLimit::LimitFlowRateAndCapacity,
     ] {
-        for cooling in [IdealLoadsLimit::NoLimit, IdealLoadsLimit::LimitFlowRate] {
+        for cooling in [
+            IdealLoadsLimit::NoLimit,
+            IdealLoadsLimit::LimitFlowRate,
+            IdealLoadsLimit::LimitCapacity,
+            IdealLoadsLimit::LimitFlowRateAndCapacity,
+        ] {
             let (constant, _) = fixture(|typed| {
                 let system = &mut typed.ideal_loads_air_systems[0];
                 system.dehumidification_control_type =
@@ -309,6 +314,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 system.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(1_000.0));
                 system.cooling_limit = cooling;
                 system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.20));
+                system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
             });
             let retained = format!("{:?}", constant.typed);
             assert!(has_source_constant_supply_humidity_shape(
@@ -382,9 +388,29 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             );
         }
     }
-    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 10] = [
-        |system| system.cooling_limit = IdealLoadsLimit::LimitCapacity,
-        |system| system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity,
+    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 12] = [
+        |system| {
+            system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+            system.humidification_control_type =
+                HumidificationControlType::ConstantSupplyHumidityRatio;
+        },
+        |system| {
+            system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
+            system.humidification_control_type =
+                HumidificationControlType::ConstantSupplyHumidityRatio;
+        },
+        |system| {
+            system.cooling_limit = IdealLoadsLimit::LimitCapacity;
+            system.dehumidification_control_type = DehumidificationControlType::None;
+            system.humidification_control_type =
+                HumidificationControlType::ConstantSupplyHumidityRatio;
+        },
+        |system| {
+            system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
+            system.dehumidification_control_type = DehumidificationControlType::None;
+            system.humidification_control_type =
+                HumidificationControlType::ConstantSupplyHumidityRatio;
+        },
         |system| system.dehumidification_control_type = DehumidificationControlType::Humidistat,
         |system| {
             system.dehumidification_control_type =
@@ -425,16 +451,19 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
         Some(AutosizeOrNumber::Value(f64::NAN)),
         Some(AutosizeOrNumber::Value(f64::INFINITY)),
     ] {
-        for heating_capacity in [false, true] {
+        for invalid_field in ["cooling_flow", "heating_capacity", "cooling_capacity"] {
             let (unresolved, _) = fixture(|typed| {
                 let system = &mut typed.ideal_loads_air_systems[0];
                 system.dehumidification_control_type =
                     DehumidificationControlType::ConstantSupplyHumidityRatio;
                 system.cooling_limit = IdealLoadsLimit::LimitFlowRate;
                 system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.2));
-                if heating_capacity {
+                if invalid_field == "heating_capacity" {
                     system.heating_limit = IdealLoadsLimit::LimitCapacity;
                     system.maximum_sensible_heating_capacity_w = unresolved;
+                } else if invalid_field == "cooling_capacity" {
+                    system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
+                    system.maximum_total_cooling_capacity_w = unresolved;
                 } else {
                     system.maximum_cooling_air_flow_rate_m3_per_s = unresolved;
                 }

@@ -6459,6 +6459,78 @@
         "accepted_paired_cases": 0,
         "accepted_values": 0,
         "capability_or_gate_promotion": false
+      },
+      "cooling_capacity_unaccepted_characterization_137": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit137-prep/build139-attempt01.json",
+          "sha256": "dee583a3070de2318120bfb3952a079005f8faaf17b1a24ecd7d0bd5860ba9aa",
+          "bytes": 687
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/cooling-capacity-137/quality02/summary.json",
+          "sha256": "2b0e3e9d975d53aa6f4481ddc9c46f683fac52c2a5bcca550730d735026f8f9e",
+          "bytes": 1628
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit137-prep/owner-execution-review01.json",
+          "sha256": "dfd4b23b8133c2fd55784f49b4469f1b2a1ce9d43d429418eff73c0cd8418c24",
+          "bytes": 4116
+        },
+        "characterization_completed_review": {
+          "path": ".runtime/object-expansion/unit137-prep/Root-characterization-completed-review01.json",
+          "sha256": "5944dca4fc60d1a0fcfc31d5c33a8ed0ebba9007d9d21657e74c3f2858eedbe4",
+          "bytes": 10252
+        },
+        "test_expectation_correction": {
+          "path": ".runtime/object-expansion/unit137-prep/Root-test-expectation-correction01.json",
+          "sha256": "0ef9977947ffe8e3aff1a4246a06a6862589939adc2bb25172ea4973d851b1ef",
+          "bytes": 2017
+        },
+        "retained_failed_QA_receipts": [
+          {
+            "path": ".runtime/porting/cooling-capacity-137/quality01/source-caller-tests/receipt.json",
+            "sha256": "287a4a406b0120d1c26eccb4de89f31bff6dd0388778321f27a67f2b3ac3791f",
+            "bytes": 3144
+          }
+        ],
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit137-prep/Root-source-adoption01.json",
+          "sha256": "0e3c37994639dc5590340aa8de72eb6d657791e8947b346166ffd9dbbc7feffc",
+          "bytes": 3379
+        },
+        "Root_Source_static_review": {
+          "path": ".runtime/object-expansion/unit137-prep/Root-source-static-review01.json",
+          "sha256": "6a5ad6a2f2ecd7db9f4d568c62ec474bfb1e9a13bf72cd0cd7c04dfb6e6e9f72",
+          "bytes": 2071
+        },
+        "independent_Source_review": {
+          "path": ".runtime/object-expansion/unit137-prep/independent-Source-constant-cooling-capacity-eligibility-review01.json",
+          "sha256": "f74275ccaf998dd239935099c89836cb950221fe665a991ec21bc08a44e7b408",
+          "bytes": 14131
+        },
+        "disposition": {
+          "path": ".runtime/object-expansion/unit137-prep/Root-native-capacity-disposition01.json",
+          "sha256": "0e137aeac2c618792f609563df0c03b0ffacc126eaf7c9fead017588ef13e177",
+          "bytes": 7262
+        },
+        "Source_characterization_static_review": {
+          "path": ".runtime/object-expansion/unit137-prep/Root-unaccepted-characterization-review01.json",
+          "sha256": "9bd0c7ed04f592e25fcd6d69641e4095ddedf53364a87fa2634cea9588e09387",
+          "bytes": 1234
+        },
+        "independent_static_review": {
+          "path": ".runtime/object-expansion/unit137-prep/independent-unaccepted-Source-characterization-static-review01.json",
+          "sha256": "4746701b9ee205a46b1e5120a31f9fc587dacfb98f5855f28fc1ce3e7397236b",
+          "bytes": 7508
+        },
+        "scope": "The bounded no-outdoor-air Source eligibility now includes cooling ConstantSupplyHumidityRatio with inactive heating humidity control and hard cooling capacity or combined flow/capacity limits. Four frozen 1,000 W cases completed Native execution but their reported quarter-hour average cooling rates stayed below the exact 1,000 W witness, so all four original public capacity gates failed. Separate first Source engineering comparisons are retained outside qualifying evidence, with their actual outcomes linked in the disposition/completed review. These observations do not establish private capacity-mode activity or grant any new accepted case, value or physical-domain completion. The shared diagnostic property owners remain connected; heating-constant coupled capacity, SHR/humidistat/OA/sizing and full-object completion remain open.",
+        "Native_processes": 4,
+        "Source_processes": 4,
+        "accepted_paired_cases": 0,
+        "accepted_values": 0,
+        "original_capacity_science_accepted": false,
+        "new_Source_selector_tuples": 2,
+        "capability_or_gate_promotion": false
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -65107,6 +65179,31 @@
           "sha256": "2ca93a6cc024a211bef1480da1659dad7d79bd7d80366761a55ae61bffb6f2fc",
           "bytes": 80824569
         }
+      },
+      {
+        "id": "source-dd-cooling-capacity-137",
+        "receipt": {
+          "path": ".runtime/porting/cooling-capacity-137/build139-01/build/receipt.json",
+          "sha256": "9d8ca3c7aa2ed7f9fb1dda9bee40b6eb96d296f958df923abcadb3570825caed",
+          "bytes": 4492
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/b0/b030d4fdf146255d4609cdc76d4cde143b9ecbad05a4268ccb7a405afc670b98",
+          "sha256": "b030d4fdf146255d4609cdc76d4cde143b9ecbad05a4268ccb7a405afc670b98"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/cooling-capacity-137/build139-01/eplus-rs.exe",
+          "sha256": "176af68e73c442b08775e173058f912350d1639d8aa1259b54573a1d108564d4",
+          "bytes": 80824754
+        },
+        "unaccepted_capacity_characterization_137": {
+          "disposition": {
+            "path": ".runtime/object-expansion/unit137-prep/Root-native-capacity-disposition01.json",
+            "sha256": "0e137aeac2c618792f609563df0c03b0ffacc126eaf7c9fead017588ef13e177",
+            "bytes": 7262
+          },
+          "scope": "All four original Native exact-capacity gates failed: reported quarter-hour averages stayed below 1000W. Separate Source comparisons grant zero qualifying cases or values; no private capacity-inactive claim."
+        }
       }
     ],
     "focused_since_workspace": {
@@ -65473,18 +65570,18 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 138,
+      "actual_recorded_builds": 139,
       "builds_with_accepted_paired_cases": 122,
       "builds_with_only_retained_failed_Source_attempts": 6,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
-      "builds_with_only_unaccepted_Source_attempts": 10,
+      "builds_with_only_unaccepted_Source_attempts": 11,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "138 recorded Source builds: 122 retain accepted pairs; 16 have none, including six without Source execution. The combined saturation property/consumer owner adds one existing cache-owner test, a feature-only compile and one default build, with no model run or paired credit. All previous physical, quality and failed histories keep their original credit.",
-      "builds_with_only_retained_unaccepted_Source_comparison_attempts": 3,
+      "qualification": "139 recorded Source builds: 122 retain accepted pairs; 17 have none, including six without Source execution. Build139 has four separately retained unaccepted Source engineering comparison attempts after all four original Native capacity witnesses failed. No new accepted case/value or physical-domain credit follows; all earlier failed/observer/comparison histories retain their original credit.",
+      "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 6,
-      "builds_without_accepted_paired_cases": 16
+      "builds_without_accepted_paired_cases": 17
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",
@@ -66819,6 +66916,33 @@
         "admitted_cases": 0,
         "admitted_samples": 0,
         "classification": "Normal Source process with a retained rejected paired comparison. This execution contributes no accepted case or samples; numerical partial passes do not waive ancillary requirements."
+      },
+      {
+        "id": "unit137-Source139-four-case-engineering",
+        "unit": 137,
+        "scope": "B",
+        "source_build": "source-dd-cooling-capacity-137",
+        "build_row": {
+          "path": ".runtime/object-expansion/unit137-prep/build139-attempt01.json",
+          "sha256": "dee583a3070de2318120bfb3952a079005f8faaf17b1a24ecd7d0bd5860ba9aa",
+          "bytes": 687
+        },
+        "comparison_completed_review": {
+          "path": ".runtime/object-expansion/unit137-prep/Root-characterization-completed-review01.json",
+          "sha256": "5944dca4fc60d1a0fcfc31d5c33a8ed0ebba9007d9d21657e74c3f2858eedbe4",
+          "bytes": 10252
+        },
+        "actual_Source_executions": 4,
+        "engine_exit_codes": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "classification": "Complete numeric engineering comparisons passed, but all four original exact-capacity witnesses failed; zero qualifying cases or values."
       }
     ],
     "current_exact_OtherEquipment_name_live_pair": {

@@ -649,7 +649,9 @@ pub fn validate_source_direct_zone_purchased_air_model(
     }
 }
 
-/// Identifies Source constant-humidity shapes without OA or cooling-capacity coupling.
+/// Identifies bounded Source constant-humidity shapes without outdoor air.
+/// Cooling capacity is owned only when heating humidity control is inactive;
+/// heating constant humidity retains its separate coupled-capacity boundary.
 ///
 /// This is a selector check only. The common validator still checks topology,
 /// active numeric limits and every other ordinary Source prerequisite.
@@ -674,10 +676,16 @@ pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -
             == DehumidificationControlType::ConstantSupplyHumidityRatio
             || system.humidification_control_type
                 == HumidificationControlType::ConstantSupplyHumidityRatio)
-        && matches!(
+        && (matches!(
             system.cooling_limit,
             IdealLoadsLimit::NoLimit | IdealLoadsLimit::LimitFlowRate
-        )
+        ) || (system.dehumidification_control_type
+            == DehumidificationControlType::ConstantSupplyHumidityRatio
+            && system.humidification_control_type == HumidificationControlType::None
+            && matches!(
+                system.cooling_limit,
+                IdealLoadsLimit::LimitCapacity | IdealLoadsLimit::LimitFlowRateAndCapacity
+            )))
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

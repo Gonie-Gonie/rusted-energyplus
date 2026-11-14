@@ -3810,8 +3810,17 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(raw, retained);
             }
 
-            // Exercise the same real compiler/scope/token/IP caller for constant cooling.
+            // The same real compiler/scope/token/IP caller covers the four
+            // finite-capacity shapes without seeding any physical HVAC owner.
             for (limit, dehumidification, humidification) in [
+                ("LimitCapacity", "None", "None"),
+                ("LimitFlowRateAndCapacity", "None", "None"),
+                ("LimitCapacity", "ConstantSupplyHumidityRatio", "None"),
+                (
+                    "LimitFlowRateAndCapacity",
+                    "ConstantSupplyHumidityRatio",
+                    "None",
+                ),
                 ("NoLimit", "ConstantSupplyHumidityRatio", "None"),
                 ("LimitFlowRate", "ConstantSupplyHumidityRatio", "None"),
                 ("NoLimit", "None", "ConstantSupplyHumidityRatio"),
@@ -3836,6 +3845,10 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(limit);
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_cooling_air_flow_rate"] =
                     json!(0.2);
+                if matches!(limit, "LimitCapacity" | "LimitFlowRateAndCapacity") {
+                    humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_total_cooling_capacity"] =
+                        json!(900.0);
+                }
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["minimum_cooling_supply_air_humidity_ratio"] =
                     json!(humidity_ratio);
                 let raw =
@@ -3868,10 +3881,19 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     unit.minimum_cooling_supply_air_humidity_ratio.to_bits(),
                     humidity_ratio.to_bits()
                 );
+                if matches!(limit, "LimitCapacity" | "LimitFlowRateAndCapacity") {
+                    assert!(matches!(unit.maximum_total_cooling_capacity_w,
+                        Some(ep_model::AutosizeOrNumber::Value(value)) if value.to_bits() == 900.0_f64.to_bits()));
+                }
                 let simulation = ep_model::SimulationModel::from_typed(model.clone());
                 ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
                     .expect("Source constant cooling eligibility");
-                assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+                if dehumidification == "None" && humidification == "None" {
+                    ep_runtime::bind_direct_zone_purchased_air_model(&simulation)
+                        .expect("unchanged Legacy sensible numeric-capacity binding");
+                } else {
+                    assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+                }
                 let mut actual_scope =
                     inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
                 assert!(actual_scope.admissible, "{:?}", actual_scope.violations);
@@ -3903,7 +3925,11 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     support.runtime_class,
                     crate::support::RuntimeClass::IdealLoadsDirectZoneCoupledCompatibility
                 );
-                assert!(support.matched_capability_ids.is_empty());
+                if dehumidification == "None" && humidification == "None" {
+                    assert!(!support.matched_capability_ids.is_empty());
+                } else {
+                    assert!(support.matched_capability_ids.is_empty());
+                }
                 let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
                     .expect("real constant cooling raw IP");
                 let fields = ip
@@ -3918,6 +3944,20 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     SourceRaw::String(humidification.into())
                 );
                 assert_eq!(fields["cooling_limit"], SourceRaw::String(limit.into()));
+                if matches!(limit, "LimitCapacity" | "LimitFlowRateAndCapacity") {
+                    let token = match &fields["maximum_total_cooling_capacity"] {
+                        SourceRaw::Number(token) => Some(token),
+                        _ => None,
+                    }
+                    .expect("actual hard-sized capacity token");
+                    assert_eq!(
+                        token
+                            .parse::<f64>()
+                            .expect("actual capacity scalar")
+                            .to_bits(),
+                        900.0_f64.to_bits()
+                    );
+                }
                 let token = match &fields["minimum_cooling_supply_air_humidity_ratio"] {
                     SourceRaw::Number(token) => Some(token),
                     _ => None,
@@ -3933,11 +3973,21 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(raw, retained);
             }
             for (limit, dehumidification, humidification) in [
-                ("LimitCapacity", "ConstantSupplyHumidityRatio", "None"),
+                (
+                    "LimitCapacity",
+                    "ConstantSupplyHumidityRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
                 (
                     "LimitFlowRateAndCapacity",
                     "ConstantSupplyHumidityRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                ("LimitCapacity", "None", "ConstantSupplyHumidityRatio"),
+                (
+                    "LimitFlowRateAndCapacity",
                     "None",
+                    "ConstantSupplyHumidityRatio",
                 ),
                 ("NoLimit", "Humidistat", "None"),
                 ("NoLimit", "ConstantSensibleHeatRatio", "None"),

@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 138 recorded Source builds,
-122 with accepted pairs and 16 without accepted pairs, including 6 builds
+validate the consumer corrections. There are 139 recorded Source builds,
+122 with accepted pairs and 17 without accepted pairs, including 6 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,7 +196,7 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-The shared Source psychrometric chain retains `PsyWFnTdbH` and now includes diagnostic-aware wet-bulb humidity, relative humidity and cached enthalpy saturation temperature. PurchasedAir uses the real RH saturation path and its existing final saturation-warning counter/index with live phase, DeveloperFlag and recurring-error owners. The existing cache-owner test checks cache/error boundaries; feature-only compilation checks callers. This owner-only change records no Native or Source model run, paired values or object-domain promotion. Positive final-unit-warning execution and production capacity/SHR/humidistat/OA/sizing/full-domain behavior remain unvalidated.
+The bounded no-outdoor-air Source eligibility now includes cooling ConstantSupplyHumidityRatio with inactive heating humidity control and hard cooling capacity or combined flow/capacity limits. Four frozen 1,000 W cases completed Native execution but their reported quarter-hour average cooling rates stayed below the exact 1,000 W witness, so all four original public capacity gates failed. Separate first Source engineering comparisons are retained outside qualifying evidence, with their actual outcomes linked in the disposition/completed review. These observations do not establish private capacity-mode activity or grant any new accepted case, value or physical-domain completion. The shared diagnostic property owners remain connected; heating-constant coupled capacity, SHR/humidistat/OA/sizing and full-object completion remain open.
 
 Thirty-four bounded B Scheduled/NodeList pairs retain 2,462,880 values. The
 unused A pair adds 59,520, giving thirty-five pairs and 2,522,400 values. Fresh
