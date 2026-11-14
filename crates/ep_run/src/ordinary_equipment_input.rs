@@ -150,16 +150,17 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     let Some(oa_name) = text(unit, "outdoor_air_inlet_node_name") else {
         return error();
     };
-    // Omission uses Native's named defaults. Exact-empty recovery retains
-    // actual Invalid/inactive, distinct from the typed None admission default.
-    // Other positive-OA selectors remain named; no generic blank waiver.
+    // Omission uses Native's named defaults. Exact-empty ventilation selectors
+    // retain actual Invalid, distinct from the typed admission defaults.
+    // Only exact empty is admitted here; no generic blank or unknown waiver.
     if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
         || !field(unit, "demand_controlled_ventilation_type")
-            .is_none_or(|value| text_is(value, &["None", "OccupancySchedule", "CO2Setpoint"]))
+            .is_none_or(|value| text_is(value, &["", "None", "OccupancySchedule", "CO2Setpoint"]))
         || !field(unit, "outdoor_air_economizer_type").is_none_or(|value| {
             text_is(
                 value,
                 &[
+                    "",
                     "NoEconomizer",
                     "DifferentialDryBulb",
                     "DifferentialEnthalpy",
@@ -182,10 +183,11 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
             return error();
         }
     }
-    // Native Init1182-1191 reports Severe without a cooling-flow limit.
-    // This bounded Source route leaves that diagnostic child held.
+    // Native Init1182-1191 also treats exact-empty/actual Invalid as not
+    // NoEconomizer: a cooling-flow limit is mandatory even when it is inactive.
+    // This bounded Source route leaves the Severe diagnostic child held.
     if field(unit, "outdoor_air_economizer_type")
-        .is_some_and(|value| text_is(value, &["DifferentialDryBulb", "DifferentialEnthalpy"]))
+        .is_some_and(|value| text_is(value, &["", "DifferentialDryBulb", "DifferentialEnthalpy"]))
         && !field(unit, "cooling_limit")
             .is_some_and(|value| text_is(value, &["LimitFlowRate", "LimitFlowRateAndCapacity"]))
     {

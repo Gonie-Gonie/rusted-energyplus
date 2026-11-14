@@ -427,7 +427,9 @@ impl OrdinaryEquipment {
             if unit.outdoor_air {
                 if !matches!(
                     unit.dcv_type,
-                    SourcePurchasedAirDcv::None | SourcePurchasedAirDcv::OccupancySchedule
+                    SourcePurchasedAirDcv::None
+                        | SourcePurchasedAirDcv::OccupancySchedule
+                        | SourcePurchasedAirDcv::Invalid
                 ) {
                     return Err(Error::Unavailable(
                         "actual CalcPurchAirMinOAMassFlow positive DCV owner2783",

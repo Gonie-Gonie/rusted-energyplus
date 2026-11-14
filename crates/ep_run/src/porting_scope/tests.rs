@@ -3099,6 +3099,12 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     } else if method == "Sum" && limit == "NoLimit" && flow > 0.0 {
                         unit["demand_controlled_ventilation_type"] = json!("CO2Setpoint");
                     }
+                    if method == "AirChanges/Hour" && limit == "NoLimit" && flow > 0.0 {
+                        unit["demand_controlled_ventilation_type"] = json!("");
+                    } else if method == "Flow/Area" && limit == "LimitFlowRate" && flow > 0.0 {
+                        unit["demand_controlled_ventilation_type"] = json!("");
+                        unit["outdoor_air_economizer_type"] = json!("");
+                    }
                     if method == "Flow/Person" && limit == "LimitFlowRate" && flow > 0.0 {
                         unit["outdoor_air_economizer_type"] = json!("DifferentialDryBulb");
                     } else if method == "Sum" && limit == "LimitFlowRateAndCapacity" && flow > 0.0 {
@@ -3215,6 +3221,29 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         assert_eq!(
                             actual["demand_controlled_ventilation_type"],
                             OaRaw::String("CO2Setpoint".into())
+                        );
+                    }
+                    if (method == "AirChanges/Hour" && limit == "NoLimit"
+                        || method == "Flow/Area" && limit == "LimitFlowRate")
+                        && flow > 0.0
+                    {
+                        assert_eq!(
+                            actual["demand_controlled_ventilation_type"],
+                            OaRaw::String(String::new())
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0].demand_controlled_ventilation_type,
+                            ep_model::DemandControlledVentilationType::None
+                        );
+                    }
+                    if method == "Flow/Area" && limit == "LimitFlowRate" && flow > 0.0 {
+                        assert_eq!(
+                            actual["outdoor_air_economizer_type"],
+                            OaRaw::String(String::new())
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0].outdoor_air_economizer_type,
+                            ep_model::OutdoorAirEconomizerType::NoEconomizer
                         );
                     }
                     if method == "Flow/Person" && limit == "LimitFlowRate" && flow > 0.0 {
@@ -3339,8 +3368,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 let mut bad = oa.clone();
                 match invalid {
                     0 => {
-                        // The reset warning admits CO2 only without simulation;
-                        // the other five methods retain raw-empty rejection.
+                        // Named CO2 still cannot enable contaminant simulation.
+                        // Exact empty is owned; whitespace/type/unknown are not.
                         if method == "Flow/Person" {
                             bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
                                 json!("CO2Setpoint");
@@ -3349,12 +3378,25 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             });
                         } else {
                             bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
-                                json!("");
+                                match method {
+                                    "Flow/Zone" => json!(" "),
+                                    "Flow/Area" => json!(null),
+                                    "AirChanges/Hour" => json!(0),
+                                    "Sum" => json!("UNKNOWN"),
+                                    "Maximum" => json!(" invalid "),
+                                    _ => unreachable!(),
+                                };
                         }
                     }
                     1 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =
-                            json!("")
+                            json!("");
+                        if method == "Sum" {
+                            bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] =
+                                json!("LimitCapacity");
+                            bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_total_cooling_capacity"] =
+                                json!(1.0);
+                        }
                     }
                     2 => {
                         let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
