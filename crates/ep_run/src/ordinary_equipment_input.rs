@@ -36,6 +36,58 @@ pub(crate) fn source_b_dehumidification_prerequisite_error(
     .then_some("ordinary Source explicit-empty dehumidification requires the actual Native enum getter")
 }
 
+/// Positive Humidistat ingress is a producer-only Source B prerequisite.
+/// Scope shares the same raw check without invoking unrelated raw resolution.
+pub(crate) fn source_b_humidistat_prerequisite_error(raw: &RawModel) -> Option<String> {
+    let objects = raw
+        .objects
+        .get(&ObjectType("ZoneControl:Humidistat".into()))?;
+    if objects.is_empty() {
+        return None;
+    }
+    if !raw.is_epjson() {
+        return Some("bounded Source Humidistat currently requires direct epJSON".into());
+    }
+    let zones = raw.objects.get(&ObjectType("Zone".into()));
+    if objects.len() != 1 || zones.is_none_or(|rows| rows.len() != 1) {
+        return Some("bounded Source Humidistat requires one actual control and one Zone".into());
+    }
+    let object = objects.values().next()?;
+    let Some(zone) = text(object, "zone_name") else {
+        return Some("Source Humidistat requires an actual Zone name".into());
+    };
+    if !zones.is_some_and(|rows| rows.keys().any(|name| name.0.eq_ignore_ascii_case(zone))) {
+        return Some("Source Humidistat Zone reference is unavailable".into());
+    }
+    let Some(humidifying) = text(
+        object,
+        "humidifying_relative_humidity_setpoint_schedule_name",
+    ) else {
+        return Some("Source Humidistat requires a humidifying schedule".into());
+    };
+    let has_schedule = |reference: &str| {
+        raw.objects
+            .get(&ObjectType("Schedule:Constant".into()))
+            .is_some_and(|rows| {
+                rows.keys()
+                    .any(|name| name.0.eq_ignore_ascii_case(reference))
+            })
+            || source_b::has_source_detailed_reference(raw, reference)
+    };
+    if !has_schedule(humidifying) {
+        return Some("Source Humidistat humidifying schedule reference is unavailable".into());
+    }
+    match field(
+        object,
+        "dehumidifying_relative_humidity_setpoint_schedule_name",
+    ) {
+        None => None,
+        Some(RawValue::String(name)) if name.is_empty() => None,
+        Some(RawValue::String(name)) if has_schedule(name) => None,
+        _ => Some("Source Humidistat dehumidifying schedule reference is unavailable".into()),
+    }
+}
+
 fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
     field(object, name).is_none_or(|value| blank(value) || text_is(value, choices))
 }
@@ -250,6 +302,7 @@ fn resolve_raw(
                             | "SpaceList"
                             | "ScheduleTypeLimits"
                             | "SetpointManager:Scheduled"
+                            | "ZoneControl:Humidistat"
                             | "NodeList"
                             | "Schedule:Constant"
                             | "Schedule:Compact"
@@ -753,6 +806,9 @@ fn resolve_raw(
     }
     if source_b_ingress {
         source_b::validate_scheduled_setpoint_references(raw)?;
+        if let Some(error) = source_b_humidistat_prerequisite_error(raw) {
+            return Err(error);
+        }
     }
     // GetProjectData distinguishes an absent object (4) from its schema field
     // default (6), and normalizes positive non-divisors before building owners.

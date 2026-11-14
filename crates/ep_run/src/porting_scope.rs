@@ -165,6 +165,12 @@ pub fn inspect_porting_scope(
     {
         violations.push(error.into());
     }
+    if scope == PortingScope::B
+        && let Some(error) =
+            crate::ordinary_equipment_input::source_b_humidistat_prerequisite_error(raw)
+    {
+        violations.push(error);
+    }
     validate_project_controls(raw, &settings, &mut violations);
     if object_counts.contains_key("SizingPeriod:DesignDay")
         && settings["simulation_control"]["run_simulation_for_sizing_periods"] == false
@@ -313,6 +319,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                 kind,
                 "SetpointManager:Scheduled"
                     | "ZoneControl:Thermostat"
+                    | "ZoneControl:Humidistat"
                     | "ThermostatSetpoint:DualSetpoint"
                     | "ZoneHVAC:EquipmentConnections"
                     | "ZoneHVAC:EquipmentList"

@@ -73,6 +73,10 @@ impl SourceFaultsManager {
     pub(crate) fn source_number_faulty_thermostat(&self) -> &i32 {
         &self.number_faulty_thermostat
     }
+    /// Borrow the actual retained count before the Native humidity fault gate.
+    pub(crate) fn source_number_faulty_humidistat(&self) -> &i32 {
+        &self.number_faulty_humidistat
+    }
     pub(crate) fn check_and_read_source_faults(
         &mut self,
         input: &SelectedInputProcessor,

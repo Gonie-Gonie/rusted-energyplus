@@ -1,5 +1,6 @@
 //! Genuine mixed-zone prediction, physical rollback and setpoint handoff.
 use super::*;
+mod humidity_control;
 fn down_interpolate(old_step: f64, new_step: f64, old: &[f64; 4], new: &mut [f64; 4]) -> f64 {
     let ratio = old_step / new_step;
     new[0] = old[0];
@@ -147,7 +148,7 @@ impl SourceZoneSpaceHeatBalanceData {
             self.temp_ind_load = self.temp_ind_coef;
         }
         self.calculate_source_predicted_sensible(rafn_fraction, number, controller, owners)?;
-        self.calculate_source_predicted_humidity(number, controller, owners)?;
+        self.calculate_source_predicted_humidity(rafn_fraction, number, controller, owners)?;
         Ok(())
     }
     // Keep Original constructor/local initialization and later assignment order, including unconsumed suffix writes.
@@ -481,35 +482,6 @@ impl SourceZoneSpaceHeatBalanceData {
                 zone.list_multiplier,
                 zone.is_controlled,
             )?;
-        Ok(())
-    }
-    fn calculate_source_predicted_humidity(
-        &mut self,
-        number: i32,
-        controller: &mut SourceZoneAirPredictorCorrector,
-        owners: &SourceZoneAirOwners<'_, '_>,
-    ) -> Result<(), Error> {
-        if zone(owners, number)?.humidity_control_zone_index > 0 {
-            return Err(Error::Unavailable(
-                "positive predicted humidity control3492",
-            ));
-        }
-        if owners.globals.doing_sizing && owners.control.do_latent_sizing {
-            return Err(Error::Unavailable(
-                "positive predicted ZoneEquipConfig latent sizing3634",
-            ));
-        }
-        let row = controller
-            .demand
-            .zone_moisture
-            .as_mut()
-            .and_then(|a| a.get_mut(index(number).ok()?))
-            .ok_or(Error::Unavailable(
-                "actual predicted ZoneSysMoistureDemand3806",
-            ))?;
-        row.base.total_output_required = 0.0;
-        row.output_required_to_dehumidifying_sp = 0.0;
-        row.output_required_to_humidifying_sp = 0.0;
         Ok(())
     }
 }

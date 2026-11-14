@@ -13,6 +13,8 @@ pub(crate) struct SourceTStatObject {
 pub(crate) struct SourceZoneAirControls {
     pub(crate) number_temperature_zones: i32,
     pub(crate) number_humidity_zones: i32,
+    pub(crate) humidity_controlled_zones: Option<Vec<SourceHumidityControlledZone>>,
+    pub(crate) humidity_control_zone_unique_names: std::collections::BTreeSet<String>,
     pub(crate) number_comfort_zones: i32,
     pub(crate) number_thermostat_statements: usize,
     pub(crate) number_comfort_statements: usize,
@@ -33,6 +35,8 @@ impl Default for SourceZoneAirControls {
         Self {
             number_temperature_zones: 0,
             number_humidity_zones: 0,
+            humidity_controlled_zones: None,
+            humidity_control_zone_unique_names: std::collections::BTreeSet::new(),
             number_comfort_zones: 0,
             number_thermostat_statements: 0,
             number_comfort_statements: 0,
@@ -49,6 +53,24 @@ impl Default for SourceZoneAirControls {
             comfort_thermostat_objects: None,
         }
     }
+}
+
+/// Sole retained DataZoneControls.hh156-176 humidity-control record.
+/// Schedule handles and ErrorIndex are runtime owners, never typed projections.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(crate) struct SourceHumidityControlledZone {
+    pub(crate) control_name: String,
+    pub(crate) zone_name: String,
+    pub(crate) actual_zone_number: i32,
+    pub(crate) humidifying_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) dehumidifying_schedule:
+        Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    pub(crate) error_index: i32,
+    pub(crate) ems_override_humidify_setpoint_on: bool,
+    pub(crate) ems_override_humidify_setpoint_value: f64,
+    pub(crate) ems_override_dehumidify_setpoint_on: bool,
+    pub(crate) ems_override_dehumidify_setpoint_value: f64,
 }
 
 /// Exact DataZoneControls.hh79-86 enum; both control modes construct Invalid.

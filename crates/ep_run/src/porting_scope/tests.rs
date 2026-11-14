@@ -4153,6 +4153,87 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 .admissible
             );
 
+            // The Humidistat family owns predictive moisture only here. Actual
+            // IdealLoads Humidistat consumers remain outside Source admission.
+            for high in [None, Some(""), Some("Cool")] {
+                let mut humidity = people.clone();
+                humidity["ZoneControl:Humidistat"] = json!({"Humidity owner":{
+                    "zone_name":"Zone",
+                    "humidifying_relative_humidity_setpoint_schedule_name":"Heat"
+                }});
+                if let Some(high) = high {
+                    humidity["ZoneControl:Humidistat"]["Humidity owner"]["dehumidifying_relative_humidity_setpoint_schedule_name"] =
+                        json!(high);
+                }
+                let raw =
+                    parse_epjson_str(&humidity.to_string()).expect("real Humidistat raw operands");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("real Source Humidistat typed model");
+                let control = &model.zone_humidistats[0];
+                if high.is_none() || high == Some("") {
+                    assert_eq!(
+                        control.humidifying_relative_humidity_setpoint_schedule,
+                        control.dehumidifying_relative_humidity_setpoint_schedule
+                    );
+                    assert!(ep_compiler::compile_raw_model(&raw).has_errors());
+                } else {
+                    assert_ne!(
+                        control.humidifying_relative_humidity_setpoint_schedule,
+                        control.dehumidifying_relative_humidity_setpoint_schedule
+                    );
+                    assert!(!ep_compiler::compile_raw_model(&raw).has_errors());
+                }
+                let scope_trace = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(scope_trace.admissible, "{:?}", scope_trace.violations);
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("real four-alpha Humidistat IP");
+                assert_eq!(ip.get_num_objects_found("ZoneControl:Humidistat"), 1);
+                let mut statistics =
+                    ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                ip.report_source_idf_records_stats(&mut statistics)
+                    .expect("admitted Humidistat reaches actual post-allocation input statistics");
+                let actual = ip
+                    .source_raw_object_fields("ZoneControl:Humidistat", "Humidity owner")
+                    .expect("actual Humidistat raw fields");
+                assert_eq!(
+                    actual["humidifying_relative_humidity_setpoint_schedule_name"],
+                    SourceRaw::String("Heat".into())
+                );
+                if let Some(high) = high {
+                    assert_eq!(
+                        actual["dehumidifying_relative_humidity_setpoint_schedule_name"],
+                        SourceRaw::String(high.into())
+                    );
+                } else {
+                    assert!(
+                        !actual
+                            .contains_key("dehumidifying_relative_humidity_setpoint_schedule_name")
+                    );
+                }
+                // The new input family does not silently open any unported HVAC consumer.
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                    json!("Humidistat");
+                let blocked = parse_epjson_str(&humidity.to_string())
+                    .expect("actual blocked HVAC Humidistat selector");
+                let blocked_compile = ep_compiler::compile_raw_model_for_source(&blocked);
+                assert!(!blocked_compile.has_errors());
+                assert!(
+                    !inspect_porting_scope(
+                        &blocked,
+                        &blocked_compile.report,
+                        blocked_compile.model.as_ref(),
+                        scope
+                    )
+                    .admissible
+                );
+                assert_eq!(raw, retained);
+            }
+
             // Unit127: a real cooling schedule reaches Source eligibility,
             // scope/support and raw IP; this does not simulate any HVAC flow.
             for value in [0.0_f64, 1.0] {

@@ -12470,16 +12470,29 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
-            let Some(dehumidifying_relative_humidity_setpoint_schedule) = self
-                .required_schedule_reference(
+            // Native862-866: Source keeps a true omitted/exact-blank optional
+            // schedule as the same humidifying handle. Legacy remains required.
+            let dehumidifying_relative_humidity_setpoint_schedule = if self.source_file_declarations
+                && match field_value(
+                    &object,
+                    "dehumidifying_relative_humidity_setpoint_schedule_name",
+                ) {
+                    None => true,
+                    Some(RawValue::String(value)) => value.is_empty(),
+                    _ => false,
+                } {
+                humidifying_relative_humidity_setpoint_schedule
+            } else {
+                let Some(schedule) = self.required_schedule_reference(
                     model,
                     "ZoneControl:Humidistat",
                     &name,
                     &object,
                     "dehumidifying_relative_humidity_setpoint_schedule_name",
-                )
-            else {
-                continue;
+                ) else {
+                    continue;
+                };
+                schedule
             };
             let Some(id_value) = self.checked_id(
                 "ZoneControl:Humidistat",

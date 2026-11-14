@@ -17,6 +17,7 @@ pub(super) fn is_family(family: &str) -> bool {
             | "Schedule:Year"
             | "ThermostatSetpoint:DualSetpoint"
             | "ZoneControl:Thermostat"
+            | "ZoneControl:Humidistat"
             | "ZoneHVAC:EquipmentConnections"
             | "ZoneHVAC:EquipmentList"
             | "ZoneHVAC:IdealLoadsAirSystem"
@@ -32,6 +33,18 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
+        // Humidistat has four alpha fields including its map-key Name.
+        (
+            "ZoneControl:Humidistat",
+            "zone_name"
+            | "humidifying_relative_humidity_setpoint_schedule_name"
+            | "dehumidifying_relative_humidity_setpoint_schedule_name",
+        ) => {
+            matches!(value, RawValue::String(_))
+        }
+        // The instance schema permits extra metadata, with reserved IDF
+        // bookkeeping still checked above. No metadata becomes a getter field.
+        ("ZoneControl:Humidistat", _) => true,
         // The Native object has four alpha fields (Name is the map key), no
 
         // numeric/extensible fields. All nine Native selectors reach real Node fields.
@@ -459,6 +472,10 @@ pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
         "Schedule:Compact" => &[],
         "Schedule:File" => &["file_name", "column_number", "rows_to_skip_at_top"],
         "ThermostatSetpoint:DualSetpoint" => &[],
+        "ZoneControl:Humidistat" => &[
+            "zone_name",
+            "humidifying_relative_humidity_setpoint_schedule_name",
+        ],
         "ZoneControl:Thermostat" => &[
             "zone_or_zonelist_name",
             "control_type_schedule_name",

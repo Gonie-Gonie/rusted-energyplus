@@ -2,6 +2,7 @@
 use super::*;
 use std::io::Write;
 mod current;
+mod humidistat;
 mod thermostat;
 impl SourceZoneAirPredictorCorrector {
     pub(crate) fn get_source_zone_air_setpoints(
@@ -66,11 +67,7 @@ impl SourceZoneAirPredictorCorrector {
                 .get_num_objects_found(&owners.shortcut.current_module_object),
         )
         .map_err(|_| Error::Unavailable("Source humidity object count int811"))?;
-        if self.controls.number_humidity_zones > 0 {
-            return Err(Error::Unavailable(
-                "positive HumidityControlZone allocation814",
-            ));
-        }
+        self.get_source_humidity_controls(owners)?;
         owners.shortcut.current_module_object = "ZoneControl:Thermostat:ThermalComfort".into();
         self.controls.number_comfort_statements = owners
             .input
