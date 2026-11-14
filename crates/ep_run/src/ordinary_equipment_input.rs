@@ -120,6 +120,24 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
             })
         });
     if !selected {
+        // Source compilation accepts Native's positive W scalar domain, but
+        // NoOA W>1 physical compositions remain outside this unit's ownership.
+        if units.is_some_and(|rows| {
+            rows.values().any(|unit| {
+                [
+                    "maximum_heating_supply_air_humidity_ratio",
+                    "minimum_cooling_supply_air_humidity_ratio",
+                ]
+                .iter()
+                .any(|name| {
+                    field(unit, name)
+                        .and_then(number)
+                        .is_some_and(|value| value > 1.0)
+                })
+            })
+        }) {
+            return Some("SourceB no-OA supply humidity ratios remain bounded to at most1".into());
+        }
         return None;
     }
     let error = || {
@@ -192,15 +210,13 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     {
         return error();
     }
-    // Both actual GET operands have exclusiveMinimum0. Keep the compiler's
-    // existing ceiling1 as a bounded lane restriction; Native has no upper bound.
+    // Both actual GET operands have exclusiveMinimum0 and no upper bound.
+    // The separate NoOA early path retains that physical ownership ceiling.
     for name in [
         "maximum_heating_supply_air_humidity_ratio",
         "minimum_cooling_supply_air_humidity_ratio",
     ] {
-        if field(unit, name)
-            .is_some_and(|value| !number(value).is_some_and(|value| value > 0.0 && value <= 1.0))
-        {
+        if field(unit, name).is_some_and(|value| !number(value).is_some_and(|value| value > 0.0)) {
             return error();
         }
     }

@@ -12880,22 +12880,50 @@ impl<'a> Compiler<'a> {
                     13.0,
                     -100.0..=200.0,
                 ),
-                maximum_heating_supply_air_humidity_ratio: self.number_range_default(
-                    "ZoneHVAC:IdealLoadsAirSystem",
-                    &name,
-                    &object,
-                    "maximum_heating_supply_air_humidity_ratio",
-                    0.0156,
-                    0.0..=1.0,
-                ),
-                minimum_cooling_supply_air_humidity_ratio: self.number_range_default(
-                    "ZoneHVAC:IdealLoadsAirSystem",
-                    &name,
-                    &object,
-                    "minimum_cooling_supply_air_humidity_ratio",
-                    0.0077,
-                    0.0..=1.0,
-                ),
+                maximum_heating_supply_air_humidity_ratio: if self.source_file_declarations {
+                    // Native schema: exclusiveMinimum0 and no upper bound.
+                    // Source physical eligibility remains a separate boundary.
+                    self.number_bounded_default(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "maximum_heating_supply_air_humidity_ratio",
+                        0.0156,
+                        (0.0, false),
+                        (f64::MAX, true),
+                    )
+                } else {
+                    self.number_range_default(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "maximum_heating_supply_air_humidity_ratio",
+                        0.0156,
+                        0.0..=1.0,
+                    )
+                },
+                minimum_cooling_supply_air_humidity_ratio: if self.source_file_declarations {
+                    // Native schema: exclusiveMinimum0 and no upper bound.
+                    // Source physical eligibility remains a separate boundary.
+                    self.number_bounded_default(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "minimum_cooling_supply_air_humidity_ratio",
+                        0.0077,
+                        (0.0, false),
+                        (f64::MAX, true),
+                    )
+                } else {
+                    self.number_range_default(
+                        "ZoneHVAC:IdealLoadsAirSystem",
+                        &name,
+                        &object,
+                        "minimum_cooling_supply_air_humidity_ratio",
+                        0.0077,
+                        0.0..=1.0,
+                    )
+                },
                 heating_limit: self.enum_default(
                     "ZoneHVAC:IdealLoadsAirSystem",
                     &name,

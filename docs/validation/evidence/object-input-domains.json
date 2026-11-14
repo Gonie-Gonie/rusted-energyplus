@@ -356,7 +356,7 @@
     ],
     "ZoneHVAC:IdealLoadsAirSystem": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
-      "Bounded Source B direct epJSON supports six basic IdealLoads outdoor-air methods using real schedules and nodes. Existing qualifying evidence covers None humidity, SUM hard flow/capacity/combined limits with NoDCV, and NoLimit Flow/Person with None or genuine current-occupancy DCV. Positive-OA CO2Setpoint without simulation retains the Native warning/reset; active CO2/IAQ remains unsupported. DifferentialDryBulb and DifferentialEnthalpy require cooling flow or combined limits and have qualifying SUM/LimitFlowRate evidence. Named recovery uses real mode, stored Nodes and saturation owners, with qualifying NoLimit SUM evidence at .7/.65 and independent Winter sensible plus Enthalpy latent responses. Without OA, all27 named ventilation-selector combinations and schema-valid omission/exact-empty retain the ignored-selector path. Existing JSON-number getter and bounded EquipmentList evidence remains unchanged. Positive-OA exact-empty DCV preserves actual Invalid/design-occupancy operations; exact-empty economizer is inactive in calculation but requires cooling flow at initialization. Both fixed empty-selector scenes retain qualifying evidence. Positive-OA Source B additionally owns the six named non-Humidistat humidity combinations and genuine omission defaults through the unchanged real getter and calculation. Both supply humidity ratios remain finite, strictly positive and at most one in this bounded lane; Native itself has no W ceiling. Active SHR is strictly positive and at most one. Exact-empty humidity, Humidistat with OA and active CO2/IAQ remain held. Both fixed SUM scenes qualify: constant-supply humidity in both directions, and actual omitted default SHR with no humidification. Each qualifying engine independently needs all original positive OA/mixed and prospectively applicable Winter/Summer sensible/latent witnesses across fourteen complete public streams. Constant cooling may have either latent direction. No averaged SHR, supply-W target equality, opposite-control zero, global capacity law or private mode/getter observation is claimed. Broader compositions, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value/full-object completion remain open. Public intervals imply no universal averaged flow, capacity, mixing, effectiveness or off-rate-zero law.",
+      "Bounded Source B direct epJSON supports six basic IdealLoads outdoor-air methods using real schedules and nodes. Existing qualifying evidence covers SUM hard flow/capacity/combined limits, Flow/Person genuine current-occupancy DCV, no-simulation CO2 warning/reset, SUM flow-limited named economizers, NoLimit SUM named recovery and two exact-empty ventilation-selector scenes. Six named non-Humidistat humidity combinations and genuine omission defaults have bounded owners; both fixed constant-supply/default-SHR scenes retain qualifying evidence. Active SHR remains strictly positive and at most one. Humidistat with OA, active CO2/IAQ and exact-empty humidity remain held. Without OA, all27 named ventilation-selector combinations and schema-valid omission/exact-empty retain the ignored-selector path. Existing JSON-number getter and bounded EquipmentList evidence remains unchanged. Source B positive-OA supply humidity ratios use the Native finite, strictly positive domain without an artificial upper-one ceiling. Ordinary Legacy retains its original zero-to-one compiler behavior, and Source NoOA W>1 physical execution remains explicitly held. The real getter, saturation clip, calculation and state are unchanged; high authored values are not injected as outlet observations. The single fixed SUM/NoLimit ConstantBoth scene with authored Float1.1/1.2 qualifies. Each qualifying engine independently needs all unchanged158 numerical/science/export/ancillary conditions, positive OA/mixed response and inherited fourteen-stream Winter sensible-plus-latent heating and Summer sensible-cooling-plus-either-latent witnesses. The actual high-W case identity remains separate from the inherited ConstantBoth gate identity. No supply-W target equality, averaged SHR/enthalpy/capacity/flow law, new RH-warning permission, private mode or full-object completion follows. Broader compositions, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals imply no universal averaged mixing, effectiveness or off-rate-zero law.",
       "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed."
     ],
     "ZoneControl:Thermostat": [
@@ -10191,6 +10191,242 @@
         "Source_processes": 2,
         "engine_replays": 0,
         "scope": "Positive-OA Source B additionally owns the six named non-Humidistat humidity combinations and genuine omission defaults through the unchanged real getter and calculation. Both supply humidity ratios remain finite, strictly positive and at most one in this bounded lane; Native itself has no W ceiling. Active SHR is strictly positive and at most one. Exact-empty humidity, Humidistat with OA and active CO2/IAQ remain held. Both fixed SUM scenes qualify: constant-supply humidity in both directions, and actual omitted default SHR with no humidification. Each qualifying engine independently needs all original positive OA/mixed and prospectively applicable Winter/Summer sensible/latent witnesses across fourteen complete public streams. Constant cooling may have either latent direction. No averaged SHR, supply-W target equality, opposite-control zero, global capacity law or private mode/getter observation is claimed.",
+        "physical_domain_completion": false
+      },
+      "positive_OA_supply_humidity_above_one_155": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit155-prep/build158-attempt01.json",
+          "sha256": "6c408681cef00c24e4c1c02e3cb821119b3f63e932b106ec3392338a1d552ac3",
+          "bytes": 732
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/quality01/summary.json",
+          "sha256": "0563acf2358cb0098dd95b6e82bc0ee3bdad24af2d2c1a228bd14d2c200ed245",
+          "bytes": 1371
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit155-prep/owner-execution-review01.json",
+          "sha256": "066d047a01f1593ec290f91a399b5dcceadf061c3010b7d82c67e034f139eb81",
+          "bytes": 3758
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit155-prep/Root-source-positive-OA-supply-humidity-above-one-adoption01.json",
+          "sha256": "80a7bd2c7d19580ddbe6b53ce2a511e8b963159832473efb582b13660efa51a1",
+          "bytes": 8429
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit155-prep/Root-source-format-review01.json",
+          "sha256": "2055b46707bed716329ba5a47290b362e2d10c740c22c5568d02c8c00d7c457e",
+          "bytes": 1676
+        },
+        "current_QA_commands": 4,
+        "total_actual_QA_commands": 4,
+        "failed_QA_attempts": 0,
+        "existing_test_executions": [
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "porting_scope::tests::bounded_controls_do_not_change_ordinary_support_assessment"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-high-supply-humidity-155/quality01/source-caller-tests/receipt.json",
+              "sha256": "a325cdd73f3567d2d6895e2ef383239b3d9e3b6f6146210296a02b34bd6aee79",
+              "bytes": 3250
+            },
+            "actual_exit_code": 0
+          }
+        ],
+        "distinct_existing_test_functions": 1,
+        "actual_existing_test_body_executions": 1,
+        "current_existing_test_body_executions": 1,
+        "targeted_test_reruns": 0,
+        "unchanged_getter_regression_retained_without_current_rerun": true,
+        "new_test_functions": 0,
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit155-prep/Root-runtime-bindings01.json",
+          "sha256": "97ecf68f5cd085ac71700e4fdef53343b8113fca1c529dbdf246cf8961fe21ec",
+          "bytes": 3632
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit155-prep/Root-runtime-final-review01.json",
+          "sha256": "3bc28de58aa630f831233b57e923b8fae0bb9d2a75a3c86ad05d22146ca6a291",
+          "bytes": 5113
+        },
+        "Root_producer": {
+          "path": ".runtime/object-expansion/unit155-prep/Root-run-single-pair155.py",
+          "sha256": "f04d12e801c4f311c0b4ddf423857babfce195af1ea22c36ad78d3505578f3fd",
+          "bytes": 5397
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit155-prep/Root-single-pair158-01/receipt.json",
+          "sha256": "803c032ba1f586a33305f9862fb642d83eb2d1bfc8a1a3a92c907d0f67fb48da",
+          "bytes": 18360
+        },
+        "paired_readbacks": {
+          "OA_CONSTANT_SUPPLY_BOTH_HIGH_W": {
+            "path": ".runtime/object-expansion/unit155-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH_HIGH_W.paired158-01.json",
+            "sha256": "0184cab5f1b837da02057e385c04fdf20b7e6c3253a7f3fbe63fd8b68e411042",
+            "bytes": 679256
+          }
+        },
+        "cases": {
+          "OA_CONSTANT_SUPPLY_BOTH_HIGH_W": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit155-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH_HIGH_W.paired158-01.json",
+              "sha256": "0184cab5f1b837da02057e385c04fdf20b7e6c3253a7f3fbe63fd8b68e411042",
+              "bytes": 679256
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 16506,
+            "public_response": {
+              "Native": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "public_humidity": {
+                  "passed": true,
+                  "observation": {
+                    "actual_case_kind": "OA_CONSTANT_SUPPLY_BOTH_HIGH_W",
+                    "inherited_public_gate_case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                    "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                    "policy_indices": [
+                      6,
+                      152,
+                      87,
+                      88,
+                      89,
+                      90,
+                      93,
+                      94,
+                      95,
+                      96,
+                      99,
+                      101,
+                      154,
+                      155
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 6720,
+                    "Winter_sensible_and_latent_heating_samples": 25,
+                    "Summer_sensible_and_latent_service_samples": 288,
+                    "Summer_SHR_sensible_and_latent_cooling_samples": 212,
+                    "activation_accepted": true,
+                    "all_streams_finite": true,
+                    "counts_are_observations_not_targets": true,
+                    "no_private_or_averaged_law": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "CO2_reset_warning_forbidden": true,
+                  "observed_CO2_reset_warnings": 0,
+                  "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+                }
+              },
+              "Source": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "public_humidity": {
+                  "passed": true,
+                  "observation": {
+                    "actual_case_kind": "OA_CONSTANT_SUPPLY_BOTH_HIGH_W",
+                    "inherited_public_gate_case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                    "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                    "policy_indices": [
+                      6,
+                      152,
+                      87,
+                      88,
+                      89,
+                      90,
+                      93,
+                      94,
+                      95,
+                      96,
+                      99,
+                      101,
+                      154,
+                      155
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 6720,
+                    "Winter_sensible_and_latent_heating_samples": 25,
+                    "Summer_sensible_and_latent_service_samples": 288,
+                    "Summer_SHR_sensible_and_latent_cooling_samples": 212,
+                    "activation_accepted": true,
+                    "all_streams_finite": true,
+                    "counts_are_observations_not_targets": true,
+                    "no_private_or_averaged_law": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "CO2_reset_warning_forbidden": true,
+                  "observed_CO2_reset_warnings": 0,
+                  "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+                }
+              }
+            }
+          }
+        },
+        "accepted_cases": 1,
+        "accepted_values": 75120,
+        "qualifying_raw_operand_unequal": 16506,
+        "Native_processes": 1,
+        "Source_processes": 1,
+        "engine_replays": 0,
+        "scope": "Source B positive-OA supply humidity ratios use the Native finite, strictly positive domain without an artificial upper-one ceiling. Ordinary Legacy retains its original zero-to-one compiler behavior, and Source NoOA W>1 physical execution remains explicitly held. The real getter, saturation clip, calculation and state are unchanged; high authored values are not injected as outlet observations. The single fixed SUM/NoLimit ConstantBoth scene with authored Float1.1/1.2 qualifies. Each qualifying engine independently needs all unchanged158 numerical/science/export/ancillary conditions, positive OA/mixed response and inherited fourteen-stream Winter sensible-plus-latent heating and Summer sensible-cooling-plus-either-latent witnesses. The actual high-W case identity remains separate from the inherited ConstantBoth gate identity. No supply-W target equality, averaged SHR/enthalpy/capacity/flow law, new RH-warning permission, private mode or full-object completion follows.",
         "physical_domain_completion": false
       }
     },
@@ -72182,12 +72418,285 @@
           "no_replay": true
         },
         "effective_state": "Fixed positive-OA named constant-supply or actual omitted-SHR scene retains all unchanged158 numeric/science/export/ancillary conditions, independent positive OA/mixed response and the prospectively required public sensible/latent response. No supply-W target equality, averaged SHR/flow/enthalpy/capacity law, opposite-control zero or private mode/getter claim follows."
+      },
+      {
+        "id": "source-positive-oa-constant-supply-both-high-W",
+        "case_kind": "OA_CONSTANT_SUPPLY_BOTH_HIGH_W",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-positive-oa-high-supply-humidity-155",
+        "input": {
+          "path": ".runtime/object-expansion/unit155-prep/positive-OA-supply-humidity-above-one-single-case-input-proposal01/OA_CONSTANT_SUPPLY_BOTH_HIGH_W/input.epJSON",
+          "sha256": "226db88073c415565f8ff34dc7546c13dabf5c7e349f859ad8ff2cd42fbdc320",
+          "bytes": 101714
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/epoch158/OA_CONSTANT_SUPPLY_BOTH_HIGH_W/native01/command/receipt.json",
+          "sha256": "98b603d302465bc111aa38e3cf5b0c9b92eba94ea93129895f6a38a020773c47",
+          "bytes": 98847
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/epoch158/OA_CONSTANT_SUPPLY_BOTH_HIGH_W/source01/command/receipt.json",
+          "sha256": "030f9a4c7ac2c6a24f3232036c82292c53c06dcbcaa9956861edf6df5290c6bc",
+          "bytes": 99715
+        },
+        "source_summary": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/epoch158/OA_CONSTANT_SUPPLY_BOTH_HIGH_W/source01/output/run-summary.json",
+          "sha256": "a04428470911cb9002da846006f6a917114dc9a86e7d4134bed2488164029e1e",
+          "bytes": 65522
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/ed/ed31b61bdbc2491ad93f123ee4b3adf5f8d916d525cb6224188de3ba2c287d9f",
+          "sha256": "ed31b61bdbc2491ad93f123ee4b3adf5f8d916d525cb6224188de3ba2c287d9f"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/build158-01/eplus-rs.exe",
+          "sha256": "346e65da9c0bad668bf1d879f3edf4a2ce6dc227615aa775bb1a1564c44920c0",
+          "bytes": 81045692
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/build158-01/build/receipt.json",
+          "sha256": "dd01b8720f124d91a3f6029f005ba62e3941709e6fa830b4d3c36ef1d7360bd5",
+          "bytes": 4600
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit155-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH_HIGH_W.paired158-01.json",
+          "sha256": "0184cab5f1b837da02057e385c04fdf20b7e6c3253a7f3fbe63fd8b68e411042",
+          "bytes": 679256
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit155-prep/Root-single-pair158-01/receipt.json",
+          "sha256": "803c032ba1f586a33305f9862fb642d83eb2d1bfc8a1a3a92c907d0f67fb48da",
+          "bytes": 18360
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit155-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH_HIGH_W.recipe.json",
+          "sha256": "ef46b11a9d28137aa7f71ad551a58e80ac4f07996625b9d76193a55765aafd8a",
+          "bytes": 69099
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit155-prep/positive-OA-supply-humidity-above-one-single-case-input-proposal01/batch-plan01.json",
+          "sha256": "cfe804228438bdc772bea77a5e0c9d845664a70dd7496b878aa8f6bb4bc69b93",
+          "bytes": 11181
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 16506,
+          "parsed_binary64_unequal": 16506,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 4.190951585769653e-09,
+          "max_rmse_delta": 8.357285399471617e-10
+        },
+        "coverage_kind": "positive_OA_supply_humidity_above_one",
+        "authored_selectors": {
+          "dehumidification_control_type": "ConstantSupplyHumidityRatio",
+          "humidification_control_type": "ConstantSupplyHumidityRatio"
+        },
+        "authored_supply_W_tokens": {
+          "maximum_heating_supply_air_humidity_ratio": "1.1",
+          "minimum_cooling_supply_air_humidity_ratio": "1.2"
+        },
+        "public_response_summary": {
+          "Native": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "public_humidity": {
+              "passed": true,
+              "observation": {
+                "actual_case_kind": "OA_CONSTANT_SUPPLY_BOTH_HIGH_W",
+                "inherited_public_gate_case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                "policy_indices": [
+                  6,
+                  152,
+                  87,
+                  88,
+                  89,
+                  90,
+                  93,
+                  94,
+                  95,
+                  96,
+                  99,
+                  101,
+                  154,
+                  155
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 6720,
+                "Winter_sensible_and_latent_heating_samples": 25,
+                "Summer_sensible_and_latent_service_samples": 288,
+                "Summer_SHR_sensible_and_latent_cooling_samples": 212,
+                "activation_accepted": true,
+                "all_streams_finite": true,
+                "counts_are_observations_not_targets": true,
+                "no_private_or_averaged_law": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "CO2_reset_warning_forbidden": true,
+              "observed_CO2_reset_warnings": 0,
+              "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+            }
+          },
+          "Source": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "public_humidity": {
+              "passed": true,
+              "observation": {
+                "actual_case_kind": "OA_CONSTANT_SUPPLY_BOTH_HIGH_W",
+                "inherited_public_gate_case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                "policy_indices": [
+                  6,
+                  152,
+                  87,
+                  88,
+                  89,
+                  90,
+                  93,
+                  94,
+                  95,
+                  96,
+                  99,
+                  101,
+                  154,
+                  155
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 6720,
+                "Winter_sensible_and_latent_heating_samples": 25,
+                "Summer_sensible_and_latent_service_samples": 288,
+                "Summer_SHR_sensible_and_latent_cooling_samples": 212,
+                "activation_accepted": true,
+                "all_streams_finite": true,
+                "counts_are_observations_not_targets": true,
+                "no_private_or_averaged_law": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "CO2_reset_warning_forbidden": true,
+              "observed_CO2_reset_warnings": 0,
+              "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_original_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit155-prep/build158-attempt01.json",
+            "sha256": "6c408681cef00c24e4c1c02e3cb821119b3f63e932b106ec3392338a1d552ac3",
+            "bytes": 732
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/positive-oa-high-supply-humidity-155/quality01/summary.json",
+            "sha256": "0563acf2358cb0098dd95b6e82bc0ee3bdad24af2d2c1a228bd14d2c200ed245",
+            "bytes": 1371
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit155-prep/owner-execution-review01.json",
+            "sha256": "066d047a01f1593ec290f91a399b5dcceadf061c3010b7d82c67e034f139eb81",
+            "bytes": 3758
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit155-prep/Root-runtime-bindings01.json",
+            "sha256": "97ecf68f5cd085ac71700e4fdef53343b8113fca1c529dbdf246cf8961fe21ec",
+            "bytes": 3632
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit155-prep/Root-run-single-pair155.py",
+            "sha256": "f04d12e801c4f311c0b4ddf423857babfce195af1ea22c36ad78d3505578f3fd",
+            "bytes": 5397
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit155-prep/Root-runtime-final-review01.json",
+            "sha256": "3bc28de58aa630f831233b57e923b8fae0bb9d2a75a3c86ad05d22146ca6a291",
+            "bytes": 5113
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "One fixed positive-OA ConstantBoth scene authors only supply-W Float1.1/1.2 above the prior artificial ceiling. The whole two-Float inverse restores the154 ConstantBoth input, not144SUM. Actual155 identity is distinct from the inherited154 ConstantBoth public-gate identity. Every unchanged158 numeric/science/export/ancillary criterion, independent OA/mixed witness and applicable Winter/Summer sensible/latent witness remains mandatory. No supply-W target equality, averaged law, opposite-zero or private state claim follows; NoOA W>1 execution and ordinary Legacy widening remain held."
       }
     ],
     "totals": {
-      "paired_cases": 240,
-      "reported_samples": 9973816,
-      "raw_operand_unequal": 2489713,
+      "paired_cases": 241,
+      "reported_samples": 10048936,
+      "raw_operand_unequal": 2506219,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -74869,6 +75378,23 @@
           "sha256": "2b14ea4d1729fd0b223579d1cb9a869335f6666df83ff9f1b7a2b5bcf08c0144",
           "bytes": 81042272
         }
+      },
+      {
+        "id": "source-positive-oa-high-supply-humidity-155",
+        "receipt": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/build158-01/build/receipt.json",
+          "sha256": "dd01b8720f124d91a3f6029f005ba62e3941709e6fa830b4d3c36ef1d7360bd5",
+          "bytes": 4600
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/ed/ed31b61bdbc2491ad93f123ee4b3adf5f8d916d525cb6224188de3ba2c287d9f",
+          "sha256": "ed31b61bdbc2491ad93f123ee4b3adf5f8d916d525cb6224188de3ba2c287d9f"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/positive-oa-high-supply-humidity-155/build158-01/eplus-rs.exe",
+          "sha256": "346e65da9c0bad668bf1d879f3edf4a2ce6dc227615aa775bb1a1564c44920c0",
+          "bytes": 81045692
+        }
       }
     ],
     "focused_since_workspace": {
@@ -75268,14 +75794,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 157,
-      "builds_with_accepted_paired_cases": 136,
+      "actual_recorded_builds": 158,
+      "builds_with_accepted_paired_cases": 137,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "157 recorded Source builds: 136 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying non-Humidistat humidity scenes add cases or values; all earlier history remains unchanged.",
+      "qualification": "158 recorded Source builds: 137 retain accepted pairs and 21 have none, including 8 without Source execution. Only the strict qualifying high-W scene add cases or values; all earlier history remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -79922,8 +80448,9 @@
       "positive-oa-exact-empty-selectors-153-empty_dcv_no_limit",
       "positive-oa-exact-empty-selectors-153-empty_dcv_and_econ_flow_limit",
       "source-positive-oa-humidity-oa-constant-supply-both",
-      "source-positive-oa-humidity-oa-default-shr-none"
-    ], "accepted_paired_cases": 69, "accepted_samples": 5072640, "retained_Scheduled_B_pairs": 68, "retained_Scheduled_B_samples": 5013120, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"OA_CONSTANT_SUPPLY_BOTH": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.paired157-01.json", "sha256": "136c2699929f512575d4695111af1bde06fdf060d4147c520565dcbe3e678bba", "bytes": 678679}, "OA_DEFAULT_SHR_NONE": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.paired157-01.json", "sha256": "f9c8add7ece0f45b7598fcf3c093b92c326da83a8e3914b18a27f9648b955917", "bytes": 643372}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit154-prep/Root-two-pairs157-01/receipt.json", "sha256": "bf22ec3ddfd8fe4d6602edd56b783f4c014620410a616445ec0fcdbf428182c8", "bytes": 34302}, "latest_source_build": "source-positive-oa-non-humidistat-humidity-154", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit154-prep/build157-attempt01.json", "sha256": "e97b226dda551f4494d3989814d4709e0e9964999b255379412324ebe01ce472", "bytes": 741}, "latest_actual_quality": {"path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/summary.json", "sha256": "4dfc00c12b8ccd0877776b4aed1821d8a1cd5074af9b7bc8551f2e70fb775e5f", "bytes": 1383}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit154-prep/owner-execution-review02.json", "sha256": "04a5e365a74d8581562cf6cc9f897dec0694b5add8cf33b60c5087792727223a", "bytes": 8148}, "latest_input_contracts": {"OA_CONSTANT_SUPPLY_BOTH": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.recipe.json", "sha256": "a7a0a7d394198b2ae89c5d7344501ed48e96951fd02aab9d5a486ee8a03e75cc", "bytes": 63305}, "OA_DEFAULT_SHR_NONE": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.recipe.json", "sha256": "75ad0b09847bb3e032f31ac6a0ff0a7c34da608a405d469f55c3b3292172a83e", "bytes": 63228}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "68 bounded Source B Scheduled/NodeList pairs retain 5,013,120 values. The unused Source A pair adds59,520, giving 69 pairs and 5,072,640 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
+      "source-positive-oa-humidity-oa-default-shr-none",
+      "source-positive-oa-constant-supply-both-high-W"
+    ], "accepted_paired_cases": 70, "accepted_samples": 5147760, "retained_Scheduled_B_pairs": 69, "retained_Scheduled_B_samples": 5088240, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"OA_CONSTANT_SUPPLY_BOTH_HIGH_W": {"path": ".runtime/object-expansion/unit155-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH_HIGH_W.paired158-01.json", "sha256": "0184cab5f1b837da02057e385c04fdf20b7e6c3253a7f3fbe63fd8b68e411042", "bytes": 679256}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit155-prep/Root-single-pair158-01/receipt.json", "sha256": "803c032ba1f586a33305f9862fb642d83eb2d1bfc8a1a3a92c907d0f67fb48da", "bytes": 18360}, "latest_source_build": "source-positive-oa-high-supply-humidity-155", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit155-prep/build158-attempt01.json", "sha256": "6c408681cef00c24e4c1c02e3cb821119b3f63e932b106ec3392338a1d552ac3", "bytes": 732}, "latest_actual_quality": {"path": ".runtime/porting/positive-oa-high-supply-humidity-155/quality01/summary.json", "sha256": "0563acf2358cb0098dd95b6e82bc0ee3bdad24af2d2c1a228bd14d2c200ed245", "bytes": 1371}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit155-prep/owner-execution-review01.json", "sha256": "066d047a01f1593ec290f91a399b5dcceadf061c3010b7d82c67e034f139eb81", "bytes": 3758}, "latest_input_contracts": {"OA_CONSTANT_SUPPLY_BOTH_HIGH_W": {"path": ".runtime/object-expansion/unit155-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH_HIGH_W.recipe.json", "sha256": "ef46b11a9d28137aa7f71ad551a58e80ac4f07996625b9d76193a55765aafd8a", "bytes": 69099}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "69 bounded Source B Scheduled/NodeList pairs retain 5,088,240 values. The unused Source A pair adds59,520, giving 70 pairs and 5,147,760 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

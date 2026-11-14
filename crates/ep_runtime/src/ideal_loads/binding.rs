@@ -756,11 +756,10 @@ pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool 
             HumidificationControlType::None
                 | HumidificationControlType::ConstantSupplyHumidityRatio
         )
-        // Native schema is strictly positive; the existing compiler ceiling1
-        // remains an explicit bound of this Source lane, not a Native maximum.
+        // Actual Source positive-OA W operands have no Native upper bound.
         && [system.maximum_heating_supply_air_humidity_ratio,
             system.minimum_cooling_supply_air_humidity_ratio]
-            .into_iter().all(|value| value.is_finite() && value > 0.0 && value <= 1.0)
+            .into_iter().all(|value| value.is_finite() && value > 0.0)
         && matches!(
             system.demand_controlled_ventilation_type,
             ep_model::DemandControlledVentilationType::None
@@ -1116,6 +1115,19 @@ fn validate_direct_zone_model(
         return unsupported(DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule);
     }
 
+    // Widened Source scalar parsing does not silently expand NoOA physics.
+    // This retained NoOA ceiling is an ownership boundary, not Native schema.
+    if mode == DirectZoneValidationMode::SourceEligibility
+        && !IdealLoadsFeatureFlags::from_system(system).has_outdoor_air
+        && [
+            system.maximum_heating_supply_air_humidity_ratio,
+            system.minimum_cooling_supply_air_humidity_ratio,
+        ]
+        .into_iter()
+        .any(|value| value > 1.0)
+    {
+        return unsupported(DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset);
+    }
     let source_owned_positive_oa = mode == DirectZoneValidationMode::SourceEligibility
         && has_source_basic_positive_oa_shape(system);
     if source_owned_positive_oa {

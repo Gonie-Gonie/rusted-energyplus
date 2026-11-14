@@ -3135,6 +3135,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 json!("ConstantSupplyHumidityRatio");
                             unit["humidification_control_type"] =
                                 json!("ConstantSupplyHumidityRatio");
+                            unit["maximum_heating_supply_air_humidity_ratio"] = json!(1.1);
+                            unit["minimum_cooling_supply_air_humidity_ratio"] = json!(1.2);
                         } else if method == "Flow/Zone" && limit == "LimitCapacity" {
                             unit["dehumidification_control_type"] =
                                 json!("ConstantSupplyHumidityRatio");
@@ -3389,6 +3391,39 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             );
                         }
                     }
+                    if method == "Flow/Zone" && limit == "LimitFlowRate" && flow > 0.0 {
+                        assert_eq!(
+                            actual["maximum_heating_supply_air_humidity_ratio"],
+                            OaRaw::Number("1.1".into())
+                        );
+                        assert_eq!(
+                            actual["minimum_cooling_supply_air_humidity_ratio"],
+                            OaRaw::Number("1.2".into())
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0]
+                                .maximum_heating_supply_air_humidity_ratio
+                                .to_bits(),
+                            1.1_f64.to_bits()
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0]
+                                .minimum_cooling_supply_air_humidity_ratio
+                                .to_bits(),
+                            1.2_f64.to_bits()
+                        );
+                        let legacy = ep_compiler::compile_raw_model(&hard_raw);
+                        assert!(legacy.report.diagnostics.iter().any(|row| row.code
+                            == "InvalidNumericRange"
+                            && row.object_type == "ZoneHVAC:IdealLoadsAirSystem"
+                            && row.field.as_deref()
+                                == Some("maximum_heating_supply_air_humidity_ratio")));
+                        assert!(legacy.report.diagnostics.iter().any(|row| row.code
+                            == "InvalidNumericRange"
+                            && row.object_type == "ZoneHVAC:IdealLoadsAirSystem"
+                            && row.field.as_deref()
+                                == Some("minimum_cooling_supply_air_humidity_ratio")));
+                    }
                     if wide_priority {
                         let list = hard_ip
                             .source_raw_object_fields("ZoneHVAC:EquipmentList", "Equipment")
@@ -3427,6 +3462,37 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         for invalid in [Value::Null, json!("Autosize"), json!(-1.0)] {
                             let mut bad = hard.clone();
                             bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"][missing] = invalid;
+                            // Reuse two existing null-size negative candidates;
+                            // all other null/Autosize/negative cases stay literal.
+                            let no_oa_high_w = method == "Flow/Zone"
+                                && limit == "LimitFlowRate"
+                                && flow > 0.0
+                                && matches!(
+                                    missing,
+                                    "maximum_heating_air_flow_rate"
+                                        | "maximum_cooling_air_flow_rate"
+                                )
+                                && bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"][missing].is_null();
+                            if no_oa_high_w {
+                                bad.as_object_mut()
+                                    .expect("root")
+                                    .remove("DesignSpecification:OutdoorAir");
+                                let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
+                                unit.as_object_mut()
+                                    .expect("unit")
+                                    .remove("design_specification_outdoor_air_object_name");
+                                unit.as_object_mut()
+                                    .expect("unit")
+                                    .remove("outdoor_air_inlet_node_name");
+                                unit[missing] = json!(flow);
+                                unit["maximum_heating_supply_air_humidity_ratio"] = json!(0.0156);
+                                unit["minimum_cooling_supply_air_humidity_ratio"] = json!(0.0077);
+                                if missing == "maximum_heating_air_flow_rate" {
+                                    unit["maximum_heating_supply_air_humidity_ratio"] = json!(1.1);
+                                } else {
+                                    unit["minimum_cooling_supply_air_humidity_ratio"] = json!(1.2);
+                                }
+                            }
                             let bad_raw = parse_epjson_str(&bad.to_string())
                                 .expect("actual invalid active numeric");
                             assert!(
@@ -3434,6 +3500,23 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                     .is_err()
                             );
                             let bad_compiled = ep_compiler::compile_raw_model_for_source(&bad_raw);
+                            if no_oa_high_w {
+                                assert!(
+                                    !bad_compiled.has_errors(),
+                                    "{:?}",
+                                    bad_compiled.report.diagnostics
+                                );
+                                let model = bad_compiled
+                                    .model
+                                    .as_ref()
+                                    .expect("actual NoOA high-W advisory model");
+                                assert!(
+                                    ep_runtime::validate_source_direct_zone_purchased_air_model(
+                                        &ep_model::SimulationModel::from_typed(model.clone())
+                                    )
+                                    .is_err()
+                                );
+                            }
                             assert!(
                                 !inspect_porting_scope(
                                     &bad_raw,
