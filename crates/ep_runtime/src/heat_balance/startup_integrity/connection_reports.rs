@@ -143,10 +143,8 @@ pub(crate) fn report_source_loop_connections(
     if o.outdoor_air_nodes.number_outside_air_nodes > 0 {
         line(bnd, "! <Outdoor Air Node>,<NodeNumber>,<Node Name>")?;
     }
-    // Preserve empty-range behavior, checked first-row access and the first unsupported positive-child failure after prior writes.
-    #[allow(clippy::never_loop)]
     for ordinal in 1..=o.outdoor_air_nodes.number_outside_air_nodes {
-        let _node = o
+        let node = *o
             .outdoor_air_nodes
             .outside_air_node_list
             .as_ref()
@@ -154,9 +152,13 @@ pub(crate) fn report_source_loop_connections(
             .ok_or(Error::Unavailable(
                 "actual ReportLoopConnections2244 OutsideAirNodeList",
             ))?;
-        return Err(Error::Unavailable(
-            "actual ReportLoopConnections2245 NodeID",
-        ));
+        let number = usize::try_from(node)
+            .map_err(|_| Error::Unavailable("actual ReportLoopConnections2245 NodeID ordinal"))?;
+        writeln!(
+            bnd,
+            " Outdoor Air Node,{node},{}",
+            o.equipment.source_node_id(number)?
+        )?;
     }
     line(bnd, SEPARATOR)?;
     line(bnd, LOOP_FORMAT_700)?;

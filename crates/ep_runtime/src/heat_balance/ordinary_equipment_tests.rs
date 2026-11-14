@@ -386,6 +386,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             ("Zone", 4, 9, 0, 0, None),
             ("Output:Variable", 4, 0, 0, 0, None),
             ("NodeList", 1, 0, 1, 0, Some("nodes")),
+            ("OutdoorAir:Node", 8, 1, 0, 0, None),
+            ("OutdoorAir:NodeList", 0, 0, 1, 0, Some("nodes")),
             ("ZoneHVAC:EquipmentList", 2, 0, 4, 2, Some("equipment")),
             ("ZoneHVAC:EquipmentConnections", 8, 0, 0, 0, None),
             ("SpaceHVAC:EquipmentConnections", 7, 0, 0, 0, None),
@@ -1335,6 +1337,185 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 "GetNodeListsInput: NodeList=\"UNUSED PREFIX\", blank node name in list."
             ));
             positive_gains.validate_source_initial_gain_allocations(total, total)?;
+            if total == 1 {
+                // Registry/Node transport only, on actual GetNodeListsInput nodes.
+                // Weather scalars below are authored INPUT operands, not oracle output.
+                use crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes;
+                use crate::heat_balance::startup_integrity::SourceBranchNodeConnections;
+                let mut outdoor = SourceOutdoorAirNodes::default();
+                let mut actual_nodes = positive.clone();
+                let mut connections = SourceBranchNodeConnections::default();
+                let node_number = i32::try_from(
+                    actual_nodes
+                        .nodes
+                        .node_ids
+                        .as_ref()
+                        .ok_or("actual outdoor NodeIDs")?
+                        .iter()
+                        .position(|name| name == "NODE B")
+                        .ok_or("real getter Node B")?,
+                )?;
+                let at = usize::try_from(node_number - 1)?;
+                let original_count = actual_nodes.nodes.number_of_nodes;
+                let original_ref = actual_nodes
+                    .nodes
+                    .node_references
+                    .as_ref()
+                    .ok_or("real NodeRef")?[at];
+                let mut environment = crate::weather::day::WeatherEnvironmentState::default();
+                environment.current_weather.out_dry_bulb_temp = 12.0;
+                environment.current_weather.out_wet_bulb_temp = 8.0;
+                environment.current_weather.out_hum_rat = 0.005;
+                environment.current_weather.wind_speed = 3.0;
+                environment.current_weather.wind_dir = 240.0;
+                environment.current_weather.out_baro_press = 101325.0;
+                let mut state = error_state.clone();
+                let (mut errors, mut console) = (Vec::new(), Vec::new());
+                let mut backend = SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                let flags = Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                });
+                let mut okay = true;
+                outdoor.check_and_add_source_air_node_number(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &mut connections,
+                    0,
+                    &mut okay,
+                    &environment,
+                    &control,
+                    &mut backend,
+                    flags,
+                )?;
+                assert!(!okay && !outdoor.get_input_flag);
+                assert_eq!(outdoor.number_outside_air_nodes, 0);
+                assert_eq!(actual_nodes.nodes, positive.nodes);
+                outdoor.check_and_add_source_air_node_number(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &mut connections,
+                    node_number,
+                    &mut okay,
+                    &environment,
+                    &control,
+                    &mut backend,
+                    flags,
+                )?;
+                assert!(!okay);
+                assert_eq!(
+                    outdoor.outside_air_node_list.as_deref(),
+                    Some([node_number].as_slice())
+                );
+                assert_eq!(outdoor.number_outside_air_nodes, 1);
+                assert_eq!(*connections.source_number_node_connections(), 1);
+                assert_eq!(actual_nodes.nodes.number_of_nodes, original_count);
+                assert_eq!(
+                    actual_nodes
+                        .nodes
+                        .node_references
+                        .as_ref()
+                        .ok_or("actual NodeRef")?[at],
+                    original_ref + 1
+                );
+                let node = &actual_nodes.nodes.physical.as_ref().ok_or("real OA Node")?[at];
+                assert_eq!(node.fluid_type, source_nodes::SourceNodeFluidType::Air);
+                assert_eq!(
+                    (
+                        node.temperature,
+                        node.humidity_ratio,
+                        node.pressure,
+                        node.quality
+                    ),
+                    (
+                        environment.current_weather.out_dry_bulb_temp,
+                        environment.current_weather.out_hum_rat,
+                        environment.current_weather.out_baro_press,
+                        0.0
+                    )
+                );
+                assert_eq!(
+                    (
+                        node.outdoor_air_wet_bulb,
+                        node.outdoor_air_wind_speed,
+                        node.outdoor_air_wind_direction
+                    ),
+                    (
+                        environment.current_weather.out_wet_bulb_temp,
+                        environment.current_weather.wind_speed,
+                        environment.current_weather.wind_dir
+                    )
+                );
+                assert!(node.enthalpy.is_finite());
+                let first = node.clone();
+                environment.current_weather.out_dry_bulb_temp = 20.0;
+                environment.current_weather.wind_speed = 5.0;
+                outdoor.check_and_add_source_air_node_number(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &mut connections,
+                    node_number,
+                    &mut okay,
+                    &environment,
+                    &control,
+                    &mut backend,
+                    flags,
+                )?;
+                assert!(okay);
+                assert_eq!(*connections.source_number_node_connections(), 1);
+                assert_eq!(
+                    actual_nodes
+                        .nodes
+                        .node_references
+                        .as_ref()
+                        .ok_or("same NodeRef")?[at],
+                    original_ref + 1
+                );
+                assert_eq!(
+                    actual_nodes
+                        .nodes
+                        .physical
+                        .as_ref()
+                        .ok_or("unchanged existing OA")?[at],
+                    first
+                );
+                outdoor.set_source_outdoor_air_nodes(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &environment,
+                    &control,
+                )?;
+                let updated = &actual_nodes
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .ok_or("updated same OA Node")?[at];
+                assert_eq!(
+                    updated.temperature,
+                    environment.current_weather.out_dry_bulb_temp
+                );
+                assert_eq!(
+                    updated.outdoor_air_wind_speed,
+                    environment.current_weather.wind_speed
+                );
+                assert_eq!(
+                    updated.mass_flow_rate.to_bits(),
+                    first.mass_flow_rate.to_bits()
+                );
+                assert_eq!(outdoor.number_outside_air_nodes, 1);
+            }
             let mut inconsistent = positive.clone();
             inconsistent
                 .nodes

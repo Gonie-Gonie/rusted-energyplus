@@ -17,23 +17,96 @@ impl Default for SourceOutdoorAirNodes {
     }
 }
 impl SourceOutdoorAirNodes {
-    pub(super) fn set_source_outdoor_air_nodes(
+    pub(crate) fn set_source_outdoor_air_nodes(
         &mut self,
         input: &mut SelectedInputProcessor,
+        equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
+        environment: &crate::weather::day::WeatherEnvironmentState,
+        control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
     ) -> Result<(), Error> {
         if self.get_input_flag {
             self.get_source_input(input)?;
             self.get_input_flag = false;
         }
-        if let Some(ordinal) = (1..=self.number_outside_air_nodes).next() {
-            let _node = self
+        for ordinal in 1..=self.number_outside_air_nodes {
+            let node = *self
                 .outside_air_node_list
                 .as_ref()
                 .and_then(|v| v.get(ordinal - 1))
                 .ok_or(Error::Unavailable(
                     "actual outside-air node list ordinal381",
                 ))?;
-            return Err(Error::Unavailable("actual positive SetOANodeValues382"));
+            equipment.set_source_outdoor_air_node_values(node, true, environment, control)?;
+        }
+        Ok(())
+    }
+
+    /// Native CheckAndAdd440-519; the positive PurchasedAir getter remains held.
+    #[allow(
+        dead_code,
+        reason = "Owner prerequisite only; the genuine positive-OA getter is a separate port."
+    )]
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn check_and_add_source_air_node_number(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
+        branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
+        node_number: i32,
+        okay: &mut bool,
+        environment: &crate::weather::day::WeatherEnvironmentState,
+        control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
+        backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
+        flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
+    ) -> Result<(), Error> {
+        if self.get_input_flag {
+            self.get_source_input(input)?;
+            self.get_input_flag = false;
+            self.set_source_outdoor_air_nodes(input, equipment, environment, control)?;
+        }
+        *okay = false;
+        if self.number_outside_air_nodes > 0 {
+            let nodes = self
+                .outside_air_node_list
+                .as_ref()
+                .and_then(|v| v.get(..self.number_outside_air_nodes))
+                .ok_or(Error::Unavailable(
+                    "actual CheckAndAdd outside-air registry",
+                ))?;
+            *okay = nodes.contains(&node_number);
+        }
+        if node_number > 0 && !*okay {
+            self.number_outside_air_nodes = self
+                .number_outside_air_nodes
+                .checked_add(1)
+                .filter(|&n| i32::try_from(n).is_ok())
+                .ok_or(Error::Unavailable(
+                    "defined Native NumOutsideAirNodes increment",
+                ))?;
+            let nodes = self.outside_air_node_list.get_or_insert_with(Vec::new);
+            nodes.resize(self.number_outside_air_nodes, 0);
+            nodes[self.number_outside_air_nodes - 1] = node_number;
+            // Real Native TmpNums assignment is local ordinal scratch, not Node state.
+            let mut temporary = nodes
+                .iter()
+                .map(|&number| usize::try_from(number))
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(|_| Error::Unavailable("actual CheckAndAdd temporary Node ordinals"))?;
+            equipment.register_source_outdoor_air_node(
+                input,
+                branch,
+                node_number,
+                self.number_outside_air_nodes,
+                &mut temporary,
+                backend,
+                flags,
+            )?;
+            equipment.set_source_outdoor_air_node_values(
+                node_number,
+                false,
+                environment,
+                control,
+            )?;
         }
         Ok(())
     }

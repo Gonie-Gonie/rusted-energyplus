@@ -125,7 +125,7 @@ impl SourceHvacManager {
         )?;
         self.ancillary
             .outdoor_air_nodes
-            .set_source_outdoor_air_nodes(o.input)?;
+            .set_source_outdoor_air_nodes(o.input, o.equipment, o.environment, o.control)?;
         self.manage_source_refrigerated_case_racks(o)?;
         o.zone_air_update(
             &self.ancillary.availability,

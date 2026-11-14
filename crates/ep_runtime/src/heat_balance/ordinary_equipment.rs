@@ -14,6 +14,7 @@ mod source_marked_nodes;
 mod source_node_connections;
 mod source_node_lists;
 mod source_nodes;
+mod source_outdoor_air_nodes;
 pub(crate) mod source_purchased_air;
 mod source_reset;
 mod source_scheduled_setpoint;

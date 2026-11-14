@@ -163,7 +163,7 @@ impl SourceBranchNodeConnections {
                 object_type,
                 row.object_name,
                 connection_type,
-                row.fluid_stream as i32
+                row.fluid_stream.source_value()
             )?;
         }
         let mut number_non_connected: i32 = 0;

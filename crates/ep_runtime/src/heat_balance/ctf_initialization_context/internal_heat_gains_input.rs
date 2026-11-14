@@ -438,3 +438,16 @@ impl CtfInitializationContext<'_> {
         Ok(())
     }
 }
+
+impl SelectedInternalHeatGains {
+    /// Borrow the actual ZoneIntGain.NOFOCC cell after real People timestep sums.
+    /// No typed design level, report average or synthetic zero replaces this owner.
+    pub(crate) fn source_zone_current_occupants(&self, zone: i32) -> Result<&f64, E> {
+        self.allocations
+            .zone_int_gain
+            .as_ref()
+            .and_then(|rows| rows.get(index(zone).ok()?))
+            .map(|row| &row[0])
+            .ok_or_else(|| unavailable("actual DSOA ZoneIntGain.NOFOCC owner"))
+    }
+}

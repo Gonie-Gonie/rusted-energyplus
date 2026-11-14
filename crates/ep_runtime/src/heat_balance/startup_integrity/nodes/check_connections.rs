@@ -368,7 +368,7 @@ impl SourceBranchNodeConnections {
                     "actual CheckNodeConnections1347 NodeConnections maxval allocation",
                 ))?
                 .iter()
-                .map(|row| row.fluid_stream as i32)
+                .map(|row| row.fluid_stream.source_value())
                 .max()
                 .ok_or(Error::Unavailable(
                     "actual CheckNodeConnections1347 empty positive NodeConnections maxval",
@@ -418,9 +418,9 @@ impl SourceBranchNodeConnections {
                 }
                 let first_row = self.checked_connection(first)?;
                 if first_row.connection_type == Connection::Inlet {
-                    *local_mut(&mut inlet_count, first_row.fluid_stream as i32)? += 1;
+                    *local_mut(&mut inlet_count, first_row.fluid_stream.source_value())? += 1;
                 } else if first_row.connection_type == Connection::Outlet {
-                    *local_mut(&mut outlet_count, first_row.fluid_stream as i32)? += 1;
+                    *local_mut(&mut outlet_count, first_row.fluid_stream.source_value())? += 1;
                 }
                 for second in first + 1..=*local(&node_objects, object + 1)? - 1 {
                     if self.checked_connection(second)?.object_is_parent {
@@ -428,9 +428,9 @@ impl SourceBranchNodeConnections {
                     }
                     let row = self.checked_connection(second)?;
                     if row.connection_type == Connection::Inlet {
-                        *local_mut(&mut inlet_count, row.fluid_stream as i32)? += 1;
+                        *local_mut(&mut inlet_count, row.fluid_stream.source_value())? += 1;
                     } else if row.connection_type == Connection::Outlet {
-                        *local_mut(&mut outlet_count, row.fluid_stream as i32)? += 1;
+                        *local_mut(&mut outlet_count, row.fluid_stream.source_value())? += 1;
                     }
                 }
                 for stream in 1..=max_fluid_stream {

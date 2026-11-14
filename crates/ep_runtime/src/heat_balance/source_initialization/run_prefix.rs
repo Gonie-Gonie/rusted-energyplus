@@ -60,7 +60,7 @@ impl CtfInitializationReports {
             .ok_or(SourceInitializationError::Association("startup"))?;
         let schedules = self
             .selected_schedule_manager
-            .as_ref()
+            .as_mut()
             .ok_or(SourceInitializationError::Association("Schedule"))?;
         let weather = self.source_initialization_weather.as_mut().ok_or(
             SourceInitializationError::Association("same pre-weather state"),
@@ -133,6 +133,7 @@ impl CtfInitializationReports {
                 input,
                 &mut self.input_processor_shortcut,
                 schedules,
+                raw.project.source_is_epjson,
                 &raw.sizing,
                 controls,
                 globals,

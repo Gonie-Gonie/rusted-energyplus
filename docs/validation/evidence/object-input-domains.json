@@ -6891,6 +6891,46 @@
         "failed_QA_attempts": 1,
         "scope": "The bounded Source B no-outdoor-air IdealLoads route now connects the actual remaining moisture-demand owner to Humidistat HVAC consumers. Four inputs were frozen before outcomes; 1 qualify under all161-series numeric, export, clock, ancillary and original155 gates plus their declared response or absence criteria. Qualifying scenes: no-control None/Humidistat zero-demand path. 0 retain their required positive Winter/Summer public service signatures; the absent-control case, when qualifying, verifies six complete zero-within-policy moisture reports without positive-service credit. The three authored-control scenes remain unaccepted: 16, 4 and 6 points respectively exceed the frozen 1e-12 kgWater/s limit (maximum differences 1.1335064187452133e-12, 1.1476311911960517e-12 and 1.144359445122119e-12). All RMSE limits and original155 checks pass. The finite-cooling scene additionally lacks the Winter humidification witness in both engines. Only the absent-control scene qualifies, with six zero-within-policy reports and no positive-service credit. Public interval responses establish no private-mode, averaged ratio or exact capacity law. Optional final supply-saturation diagnostics retain full first-warning/phase/recurring semantics and paired ERR/END. Current144 serves four fresh pairs without replay. The parent140 ThirdOrder14 point failures and failed142 startup retain zero credit. Broader values/combinations, Source A/IDF, OA/DCV/economizer/recovery, sizing, faults/EMS/AFN/Space and full-object conformance remain open.",
         "capability_or_gate_promotion": false
+      },
+      "DSOA_and_OutdoorAirNodes_owner_prerequisites_142": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit142-prep/build145-attempt01.json",
+          "sha256": "5bf966ac79f306122ef95e7a7563b0ba94e0bed66cfdaf8102111ffd2ba150bb",
+          "bytes": 709
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/oa-input-node-owners-142/quality02/summary.json",
+          "sha256": "613a049298e7329af9532a5ca562f7dd06c22f43c413b493585eda6c5e9b902b",
+          "bytes": 1648
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit142-prep/owner-execution-review01.json",
+          "sha256": "d41fcfa8f1c09913bb53cc803e07852b032326c0ce2ad0c8a7e8db0ba342dacb",
+          "bytes": 7306
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit142-prep/Root-source-adoption01.json",
+          "sha256": "89c5a6e62faa5683c59d274bfcca99f020e1f9d293e064addea44742c43e1708",
+          "bytes": 12325
+        },
+        "Source_test_extension": {
+          "path": ".runtime/object-expansion/unit142-prep/Root-DSOA-test-extension-adoption02.json",
+          "sha256": "2b3329f082e4db2a4f08d2e456180e33b1671eb4b0e0b92e2dbb698d7daec453",
+          "bytes": 2816
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit142-prep/Root-source-format-review01.json",
+          "sha256": "58259539bca54bc0b2b364742f0f38482d54ad6cea987c3727691061355e7a00",
+          "bytes": 4586
+        },
+        "actual_Native_processes": 0,
+        "actual_Source_processes": 0,
+        "new_test_functions": 0,
+        "accepted_cases": 0,
+        "accepted_values": 0,
+        "scope": "Outdoor-air prerequisites now include the real DSOA input owner and six basic flow methods, using actual Zone geometry, live People occupancy and schedule owners. The real outdoor-node registry supports CheckAndAdd, global-weather updates and ordered BND identities. Two existing owner tests cover the input and state handoffs; no new test function or physical comparison is added. Positive OA admission, equipment consumption/mixing, authored outdoor-node fields, advanced CO2/Space/IDF paths and full-object completion remain open.",
+        "physical_domain_completion": false,
+        "capability_or_gate_promotion": false
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -66967,6 +67007,23 @@
           "sha256": "6cbc5d5018e3d8f0e5dbd0a4411275eb587be37f2e2286b8b2219aae6028dcd2",
           "bytes": 80887690
         }
+      },
+      {
+        "id": "source-oa-input-node-owner-prerequisites-142",
+        "receipt": {
+          "path": ".runtime/porting/oa-input-node-owners-142/build145-01/build/receipt.json",
+          "sha256": "876a47280e985c1caf38c620206189b89abbe318621a0e6748a5c4721ae95d6f",
+          "bytes": 6353
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/28/28890a7d5b24cec531a19dc496863e44d08034efb24154ed5b024fec2205ed55",
+          "sha256": "28890a7d5b24cec531a19dc496863e44d08034efb24154ed5b024fec2205ed55"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/oa-input-node-owners-142/build145-01/eplus-rs.exe",
+          "sha256": "bbda1de544d7d1480b870b171a9f37854fbd8871d4255149a32e4fa29268361e",
+          "bytes": 80936809
+        }
       }
     ],
     "focused_since_workspace": {
@@ -67366,18 +67423,18 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 144,
+      "actual_recorded_builds": 145,
       "builds_with_accepted_paired_cases": 125,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 12,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "144 recorded Source builds: 125 retain accepted pairs; 19 have none, including seven without Source execution. Source144 serves four fresh HVAC Humidistat consumer comparisons; 1 satisfy every unchanged qualifying criterion. Only the missing-control six-zero-report scene qualifies, without positive-service credit. The three authored-control comparisons retain zero credit after 16/4/6 point failures at the unchanged 1e-12 kgWater/s limit; all RMSE and original155 checks pass. The finite-cooling comparison also lacks its Winter humidification witness in both engines. Earlier failed142 startup, unaccepted140 ThirdOrder14 point failures and137 exact-cap-witness failures retain zero credit.",
+      "qualification": "145 recorded Source builds: 125 retain accepted pairs, 20 have none, including 8 without Source execution. Source145 verifies outdoor-air input/node owner prerequisites through two existing tests and strict default QA; it has no engine execution or paired credit. All earlier failed and unaccepted attempts retain zero credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
-      "builds_without_Source_execution": 7,
-      "builds_without_accepted_paired_cases": 19
+      "builds_without_Source_execution": 8,
+      "builds_without_accepted_paired_cases": 20
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",

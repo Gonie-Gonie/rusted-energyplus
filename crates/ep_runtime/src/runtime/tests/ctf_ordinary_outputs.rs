@@ -4183,7 +4183,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     field_sizes: Default::default(),
                 };
                 let mut people_ip = SelectedInputProcessor::from_admitted_input(
-                    definitions,
+                    definitions.clone(),
                     std::collections::BTreeMap::from([
                         (
                             "People".into(),
@@ -4776,6 +4776,219 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                             .manage_timestep(&mut owners);
                         Ok((reached, air))
                     };
+                    // DSOA owner precursor: reuse this real People getter and
+                    // timestep/report seam, without fabricating NOFOCC/geometry.
+                    for occupied in [true, false] {
+                        use crate::heat_balance::selected_input_processor::{
+                            SourceInputStatisticsInput, SourceInputStatisticsValue as V,
+                        };
+                        use crate::heat_balance::selected_sizing::outdoor_air::{
+                            SourceOutdoorAirFlowOptions, SourceOutdoorAirFlowOwners,
+                        };
+                        let mut candidate = people_getter_base.clone();
+                        let rows = candidate.heat_balance_input.as_mut().ok_or("DSOA raw People")?
+                            .objects.get_mut("People").ok_or("DSOA People rows")?;
+                        for row in rows {
+                            row.fields.insert("number_of_people_schedule_name".into(),
+                                ProjectInputValue::String(if occupied { "Constant-1.0" } else { "Constant-0.0" }.into()));
+                        }
+                        // One complete actual IP custody transfer, not a parsed-f64
+                        // round trip: the large token must take the integer-overflow arm.
+                        let mut objects = std::collections::BTreeMap::new();
+                        for family in ["Zone", "People"] {
+                            let raw = &candidate.heat_balance_input.as_ref().ok_or("DSOA raw input")?.objects[family];
+                            objects.insert(family.to_owned(), raw.iter().map(|row| {
+                                (row.object_name.clone(), row.fields.iter().map(|(field, value)| {
+                                    (field.clone(), match value {
+                                        ProjectInputValue::String(value) => V::String(value.clone()),
+                                        ProjectInputValue::Number(value) => V::Number(value.to_string()),
+                                    })
+                                }).collect::<std::collections::BTreeMap<_, _>>())
+                            }).collect::<std::collections::BTreeMap<_, _>>());
+                        }
+                        let type_rows = std::collections::BTreeMap::from([
+                            ("Activity Type".into(), std::collections::BTreeMap::from([
+                                ("unit_type".into(), V::String("ActivityLevel".into()))])),
+                            ("DSOA Fraction".into(), std::collections::BTreeMap::from([
+                                ("lower_limit_value".into(), V::Number("0".into())),
+                                ("upper_limit_value".into(), V::Number("1".into())),
+                                ("numeric_type".into(), V::String("Continuous".into())),
+                                ("unit_type".into(), V::String("Dimensionless".into()))])),
+                        ]);
+                        objects.insert("ScheduleTypeLimits".into(), type_rows);
+                        let constants = [
+                            ("Activity", "ACTIVITY", 120.0_f64),
+                            ("Unused People Auxiliary", "UNUSED PEOPLE AUXILIARY", 0.125),
+                            ("Fanger Method Two", "FANGER METHOD TWO", 2.0),
+                        ];
+                        objects.insert("Schedule:Constant".into(), constants.iter().map(|(name, _, value)| {
+                            ((*name).into(), std::collections::BTreeMap::from([
+                                ("schedule_type_limits_name".into(), V::String("Activity Type".into())),
+                                ("hourly_value".into(), V::Number(value.to_string())),
+                            ]))
+                        }).collect());
+                        objects.insert("Schedule:Compact".into(), std::collections::BTreeMap::from([
+                            ("DSOA daily fraction".into(), std::collections::BTreeMap::from([
+                                ("schedule_type_limits_name".into(), V::String("DSOA Fraction".into())),
+                                ("data".into(), V::Array([
+                                    V::String("Through: 12/31".into()), V::String("For: AllDays".into()),
+                                    V::String("Until: 12:00".into()), V::Number("0.25".into()),
+                                    V::String("Until: 24:00".into()), V::Number("1".into()),
+                                ].into_iter().map(|value| V::Object(std::collections::BTreeMap::from([
+                                    ("field".into(), value)
+                                ]))).collect())),
+                            ]))
+                        ]));
+                        let mut dsoa_rows = std::collections::BTreeMap::new();
+                        for (number, method) in ["Flow/Person", "Flow/Zone", "Flow/Area", "AirChanges/Hour", "Sum", "Maximum"].into_iter().enumerate() {
+                            dsoa_rows.insert(format!("BASIC {number}"), std::collections::BTreeMap::from([
+                                ("outdoor_air_method".into(), V::String(method.into())),
+                                ("outdoor_air_flow_per_person".into(), V::Number("0.5".into())),
+                                ("outdoor_air_flow_per_zone_floor_area".into(), V::Number("0.25".into())),
+                                ("outdoor_air_flow_per_zone".into(), V::Number("2".into())),
+                                ("outdoor_air_flow_air_changes_per_hour".into(), V::Number("3600".into())),
+                            ]));
+                        }
+                        dsoa_rows.insert("DEFAULT".into(), std::collections::BTreeMap::new());
+                        for (name, token) in [("LARGE", "10000000000000000000000"), ("UNSIGNED", "18446744073709551615")] {
+                            dsoa_rows.insert(name.into(), std::collections::BTreeMap::from([
+                                ("outdoor_air_method".into(), V::String("Flow/Zone".into())),
+                                ("outdoor_air_flow_per_zone".into(), V::Number(token.into())),
+                            ]));
+                        }
+                        dsoa_rows.insert("SCHEDULED".into(), std::collections::BTreeMap::from([
+                            ("outdoor_air_method".into(), V::String("Flow/Zone".into())),
+                            ("outdoor_air_flow_per_zone".into(), V::Number("2".into())),
+                            ("outdoor_air_schedule_name".into(), V::String("DSOA daily fraction".into())),
+                            ("proportional_control_minimum_outdoor_air_flow_rate_schedule_name".into(), V::String("Unused People Auxiliary".into())),
+                        ]));
+                        objects.insert("DesignSpecification:OutdoorAir".into(), dsoa_rows);
+                        let mut actual_definitions = definitions.clone();
+                        for (name, alphas, numerics, extensions, key) in [
+                            ("DesignSpecification:OutdoorAir", 4, 4, 0, None),
+                            ("DesignSpecification:OutdoorAir:SpaceList", 1, 0, 2, Some("space_specs")),
+                            ("Schedule:Compact", 2, 0, 1, Some("data")),
+                        ] {
+                            actual_definitions.push(SourceObjectDefinition { object_type: name.into(), alpha_fields: alphas,
+                                numeric_fields: numerics, alpha_extensions: extensions, numeric_extensions: 0,
+                                extension: key.map(str::to_owned) });
+                        }
+                        let families = objects.iter().map(|(family, rows)| {
+                            (family.clone(), SourceInputFamily::Objects(rows.iter().map(|(name, fields)| SourceObjectShape {
+                                object_name: name.clone(), field_sizes: fields.iter().map(|(field, value)| {
+                                    (field.clone(), match value { V::Null => 0, V::Array(rows) => rows.len(), V::Object(fields) => fields.len(), _ => 1 })
+                                }).collect(),
+                            }).collect()))
+                        }).collect();
+                        let order = objects.iter().map(|(family, rows)| (family.clone(), rows.keys().cloned().collect())).collect();
+                        let mut ip = SelectedInputProcessor::from_admitted_input(actual_definitions, families)?;
+                        ip.retain_source_input_statistics(SourceInputStatisticsInput { objects, object_order: order })?;
+                        assert_eq!(ip.source_raw_object_fields("DesignSpecification:OutdoorAir", "LARGE")?["outdoor_air_flow_per_zone"],
+                            V::Number("10000000000000000000000".into()));
+                        let mut schedules = SelectedScheduleManager::default();
+                        schedules.init_constant_state(4)?;
+                        schedules.process_schedule_input(&mut ip, &SelectedScheduleInput {
+                            source_is_epjson: Some(true),
+                            types: vec![
+                                SourceScheduleTypeInput { object_name: "Activity Type".into(), name: "ACTIVITY TYPE".into(), lower: None, upper: None,
+                                    numeric_type: None, unit: ep_model::ScheduleUnitType::ActivityLevel },
+                                SourceScheduleTypeInput { object_name: "DSOA Fraction".into(), name: "DSOA FRACTION".into(), lower: Some(0.0), upper: Some(1.0),
+                                    numeric_type: Some("CONTINUOUS".into()), unit: ep_model::ScheduleUnitType::Dimensionless },
+                            ],
+                            constants: constants.into_iter().map(|(object_name, name, value)| SourceConstantScheduleInput {
+                                object_name: object_name.into(), name: name.into(), type_name: Some("ACTIVITY TYPE".into()), value,
+                            }).collect(),
+                        }, 4, &mut PeopleAudit(Vec::new()))?;
+                        let mut clock = people_clock.clone(); clock.hour_of_day = 1; clock.time_step = 1;
+                        let environment = crate::weather::day::WeatherEnvironmentState {
+                            day_of_year_schedule: 1, day_of_week: 2, ..Default::default()
+                        };
+                        schedules.update_source_schedule_values(&clock, &environment)?;
+                        candidate.selected_input_processor = Some(ip);
+                        candidate.selected_schedule_manager = Some(schedules);
+                        let (mut candidate, mut state, mut errors, mut eio, reached) = read_sizing(candidate, &people_model)?;
+                        assert!(reached.is_ok() && errors.is_empty());
+                        let (reached, mut air) = run_auto(&mut candidate, None)?;
+                        assert!(matches!(reached, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Unavailable(
+                            "same refrigeration selected official schema definition"))));
+                        let (mut console, mut modules) = (Vec::new(), crate::heat_balance::selected_gain_modules::SourceGainModules::default());
+                        let mut facility = crate::heat_balance::facility_electric_service::FacilityElectricService::new();
+                        let mut backend = SourceErrorBackend { state: &mut state, error_stream: Some(&mut errors), console: &mut console,
+                            out_unit1: None, out_unit2: None, f_message: None, message_callback: None, error_callback: None, sqlite: None };
+                        {
+                            let mut provider = crate::heat_balance::selected_gain_modules::SourceModuleGainProvider {
+                                modules: &mut modules, input: candidate.selected_input_processor.as_mut().ok_or("DSOA report IP")?, facility: Some(&mut facility),
+                            };
+                            let child = SourceGainStepOwners {
+                                clock: &clock, globals: candidate.selected_heat_balance_globals.as_ref().ok_or("DSOA globals")?,
+                                control: &candidate.heat_balance_input_state, zones: candidate.selected_zone_input.as_mut().ok_or("DSOA Zones")?,
+                                schedules: candidate.selected_schedule_manager.as_ref().ok_or("DSOA schedules")?, backend: &mut backend,
+                                modules: &mut provider, latent: Some(&mut air), room_air: None, radiation: None,
+                                zone_generic_gain: SourceZoneGenericGainAllocation::Unavailable,
+                            };
+                            candidate.selected_internal_heat_gains.report_timestep(&child)?;
+                        }
+                        {
+                            let mut context = CtfInitializationContext { reports: &mut candidate, eio: &mut eio, backend };
+                            replay_cen_final_mapping(&mut context, &people_model, &cen_surface_input_checkpoint, &environment)?;
+                            let r = &mut *context.reports;
+                            let mut owners = crate::heat_balance::selected_heat_balance_input::surface::SurfaceGetterOwners {
+                                model: &people_model, input: r.selected_input_processor.as_mut().ok_or("DSOA floor IP")?,
+                                shortcut: &mut r.input_processor_shortcut, zones: r.selected_zone_input.as_mut().ok_or("DSOA floor Zones")?,
+                                control: &mut r.heat_balance_input_state, globals: r.selected_heat_balance_globals.as_ref().ok_or("DSOA floor globals")?,
+                                environment: &environment,
+                            };
+                            r.surface_geometry_input.set_floor_and_roof_areas(&mut owners, &mut context.backend)?;
+                        }
+                        let mut backend = SourceErrorBackend { state: &mut state, error_stream: Some(&mut errors), console: &mut console,
+                            out_unit1: None, out_unit2: None, f_message: None, message_callback: None, error_callback: None, sqlite: None };
+                        let mut sizing = crate::heat_balance::selected_sizing::SelectedSizingManager::default();
+                        assert!(!candidate.selected_schedule_manager.as_ref().ok_or("DSOA unused schedule owner")?
+                            .schedules.iter().find(|row|row.name=="UNUSED PEOPLE AUXILIARY").ok_or("DSOA unused fourth schedule")?.is_used);
+                        sizing.get_oa_requirements(candidate.selected_input_processor.as_mut().ok_or("DSOA getter IP")?,
+                            candidate.selected_schedule_manager.as_mut().ok_or("DSOA getter schedules")?, &clock, true)?;
+                        let rows = sizing.oa_requirements.as_ref().ok_or("DSOA rows")?;
+                        let indices: std::collections::BTreeMap<_, _> = rows.iter().enumerate().map(|(i,row)| Ok((row.name.clone(), i32::try_from(i+1)?)))
+                            .collect::<Result<_, std::num::TryFromIntError>>()?;
+                        assert_eq!(rows[usize::try_from(indices["LARGE"]-1)?].flow_per_zone.to_bits(), 1e22_f64.to_bits());
+                        assert_eq!(rows[usize::try_from(indices["UNSIGNED"]-1)?].flow_per_zone, -1.0);
+                        assert_eq!(rows[usize::try_from(indices["DEFAULT"]-1)?].flow_per_person, 0.00944);
+                        assert_eq!(rows.last().ok_or("DSOA default-last")?.name, "Default-0.00944[m3/s-person]");
+                        let row = &rows[usize::try_from(indices["BASIC 1"]-1)?];
+                        assert_eq!((row.flow_per_person,row.flow_per_area,row.flow_air_changes_per_hour),(0.0,0.0,0.0));
+                        for name in indices.keys().filter(|name| !name.starts_with("Default-")) {
+                            assert!(!candidate.selected_input_processor.as_ref().ok_or("DSOA used IP")?.is_object_unused("DesignSpecification:OutdoorAir", name));
+                        }
+                        let mut statistics = crate::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                        candidate.selected_input_processor.as_mut().ok_or("DSOA statistics owner")?
+                            .report_source_idf_records_stats(&mut statistics)?;
+                        let options = |use_occupancy_schedule, maximum_volume_flow, use_minimum_oa_schedule| SourceOutdoorAirFlowOptions {
+                            use_occupancy_schedule, use_minimum_oa_schedule, per_person_not_set: false,
+                            maximum_volume_flow, space_number: 0, calculate_iaq_methods: true,
+                        };
+                        let zone = &candidate.selected_zone_input.as_ref().ok_or("DSOA actual geometry")?.zones.as_ref().ok_or("DSOA actual Zone")?[0];
+                        assert_eq!((zone.floor_area,zone.volume,zone.total_occupants,zone.multiplier,zone.list_multiplier),(1.0,1.0,3.0,1,1));
+                        assert_eq!(*candidate.selected_internal_heat_gains.source_zone_current_occupants(1)?, if occupied {3.0}else{0.0});
+                        let mut owners = SourceOutdoorAirFlowOwners {
+                            zones: candidate.selected_zone_input.as_ref().ok_or("DSOA actual Zones")?, gains: &candidate.selected_internal_heat_gains,
+                            schedules: candidate.selected_schedule_manager.as_mut().ok_or("DSOA actual schedule owner")?,
+                            control: &candidate.heat_balance_input_state, clock: &clock, backend: &mut backend,
+                        };
+                        // Compact expected SI examples, not a second implementation of the body.
+                        for (number,expected) in [1.5,2.0,0.25,1.0,4.75,2.0].into_iter().enumerate() {
+                            assert_eq!(sizing.calculate_source_design_specification_outdoor_air_owned(indices[&format!("BASIC {number}")],1,options(false,false,false),&mut owners)?, expected);
+                        }
+                        assert_eq!(sizing.calculate_source_design_specification_outdoor_air_owned(indices["BASIC 0"],1,options(true,false,false),&mut owners)?,if occupied{1.5}else{0.0});
+                        assert_eq!(sizing.calculate_source_design_specification_outdoor_air_owned(indices["BASIC 0"],1,options(true,true,false),&mut owners)?,if occupied{1.5}else{0.0});
+                        assert_eq!(sizing.calculate_source_design_specification_outdoor_air_owned(indices["SCHEDULED"],1,options(false,false,true),&mut owners)?,0.5);
+                        assert_eq!(sizing.calculate_source_design_specification_outdoor_air_owned(indices["SCHEDULED"],1,options(false,true,true),&mut owners)?,2.0);
+                        let mut afternoon = clock.clone();afternoon.hour_of_day=13;
+                        owners.schedules.update_source_schedule_values(&afternoon,&environment)?;
+                        owners.clock = &afternoon;
+                        assert_eq!(sizing.calculate_source_design_specification_outdoor_air_owned(indices["SCHEDULED"],1,options(false,false,true),&mut owners)?,2.0);
+                        assert!(owners.schedules.schedules.iter().find(|row|row.name=="UNUSED PEOPLE AUXILIARY").ok_or("DSOA fourth schedule")?.is_used);
+                        assert!(errors.is_empty());
+                    }
                     for (sensible_token, mat, expected_sensible) in [
                         (None, 20.0, 173.20701915999996_f64),
                         (Some(""), 20.0, 173.20701915999996),

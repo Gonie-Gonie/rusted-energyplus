@@ -1,6 +1,7 @@
-//! Actual eight-getter ManageSizing path for the admitted empty-sizing domain.
+//! Actual ManageSizing input owners; active sizing calculations remain bounded.
 //! Input DoSizing switches and calculation globals are separate borrowed owners.
 pub(crate) mod autosizing;
+pub(crate) mod outdoor_air;
 pub(crate) mod sizer_output;
 mod terminal_unit;
 use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure};
@@ -38,8 +39,18 @@ pub struct SelectedSummaryReportInput {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(i32)]
 pub(crate) enum SelectedOAFlowMethod {
-    PerPerson,
+    Invalid = -1,
+    PerPerson = 0,
+    PerZone = 1,
+    PerArea = 2,
+    AirChanges = 3,
+    Sum = 4,
+    Maximum = 5,
+    IndoorAirQualityProcedure = 6,
+    ProportionalOccupancySchedule = 7,
+    ProportionalDesignOccupancy = 8,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -252,43 +263,6 @@ fn local_arrays(args: SourceArgumentCounts) -> LocalArrays {
 }
 
 impl SelectedSizingManager {
-    fn get_oa_requirements(
-        &mut self,
-        input: &mut SelectedInputProcessor,
-        schedules: &SelectedScheduleManager,
-    ) -> Result<(), SelectedSizingError> {
-        let count = input.get_num_objects_found("DesignSpecification:OutdoorAir");
-        let args = input.get_object_def_max_args("DesignSpecification:OutdoorAir")?;
-        let lists = input.get_num_objects_found("DesignSpecification:OutdoorAir:SpaceList");
-        self.number_of_oa_requirements = count
-            .checked_add(lists)
-            .ok_or(SelectedSizingError::Unavailable("OA count size"))?;
-        let locals = local_arrays(args);
-        self.number_of_oa_requirements = self
-            .number_of_oa_requirements
-            .checked_add(1)
-            .ok_or(SelectedSizingError::Unavailable("default OA count size"))?;
-        self.oa_requirements = Some(vec![
-            SelectedOARequirement::default();
-            self.number_of_oa_requirements
-        ]);
-        self.default_oa_requirement = self.number_of_oa_requirements;
-        let default = self
-            .oa_requirements
-            .as_mut()
-            .and_then(|rows| rows.last_mut())
-            .ok_or(SelectedSizingError::Unavailable("OA allocation"))?;
-        default.name = "Default-0.00944[m3/s-person]".into();
-        default.flow_method = SelectedOAFlowMethod::PerPerson;
-        default.flow_per_person = 0.00944;
-        default.flow_fraction_schedule = Some(schedules.always_on()?);
-        if count > 0 || lists > 0 {
-            return Err(SelectedSizingError::Unavailable("positive OA input"));
-        }
-        drop(locals);
-        Ok(())
-    }
-
     fn get_zone_air_distribution(
         &mut self,
         input: &mut SelectedInputProcessor,
@@ -434,7 +408,8 @@ impl SelectedSizingManager {
         &mut self,
         input: &mut SelectedInputProcessor,
         shortcut: &mut SourceInputProcessorShortCut,
-        schedules: &SelectedScheduleManager,
+        schedules: &mut SelectedScheduleManager,
+        source_is_epjson: bool,
         declarations: &SelectedSizingInput,
         controls: SetupSimulationControls,
         globals: &mut SelectedHeatBalanceGlobals,
@@ -460,7 +435,7 @@ impl SelectedSizingManager {
         }
         self.system_sizing_run_done = false;
         self.zone_sizing_run_done = false;
-        self.get_oa_requirements(input, schedules)?;
+        self.get_oa_requirements(input, schedules, weather_global, source_is_epjson)?;
         self.get_zone_air_distribution(input)?;
         self.get_zone_hvac_sizing(input)?;
         self.get_air_terminal_sizing(input, shortcut)?;

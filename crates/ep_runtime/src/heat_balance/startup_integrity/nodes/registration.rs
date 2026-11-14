@@ -6,6 +6,12 @@ use super::{Error, SourceBranchNodeConnections, extent};
 #[repr(i32)]
 pub(crate) enum SourceNodeObjectType {
     Invalid = -1,
+    OutdoorAirNode = 177,
+    #[allow(
+        dead_code,
+        reason = "Authored OA-list getter remains a separate Native owner port."
+    )]
+    OutdoorAirNodeList = 178,
     SetpointManagerScheduled = 220,
     ZoneHvacEquipmentConnections = 261,
     ZoneHvacIdealLoadsAirSystem = 268,
@@ -23,6 +29,8 @@ pub(crate) enum SourceNodeObjectType {
 impl SourceNodeObjectType {
     pub(crate) fn source_name(self) -> Result<&'static str, Error> {
         match self {
+            Self::OutdoorAirNode => Ok("OutdoorAir:Node"),
+            Self::OutdoorAirNodeList => Ok("OutdoorAir:NodeList"),
             Self::SetpointManagerScheduled => Ok("SetpointManager:Scheduled"),
             Self::ZoneHvacEquipmentConnections => Ok("ZoneHVAC:EquipmentConnections"),
             Self::ZoneHvacIdealLoadsAirSystem => Ok("ZoneHVAC:IdealLoadsAirSystem"),
@@ -78,37 +86,68 @@ pub(crate) enum SourceNodeConnectionType {
     Num = 16,
 }
 
-/// Whole named Native CompFluidStream enumeration.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[repr(i32)]
-pub(crate) enum SourceCompFluidStream {
-    Invalid = -1,
-    Primary = 1,
-    Secondary = 2,
-    Tertiary = 3,
-    Quaternary = 4,
-    Num = 5,
-}
+/// Native CompFluidStream integer transport, including named constructor values.
+/// CheckAndAdd casts the positive OA ordinal; Native does not close it at Num.
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[repr(transparent)]
+pub(crate) struct SourceCompFluidStream(i32);
+#[allow(
+    non_upper_case_globals,
+    reason = "Preserve the existing Native enum spelling at every caller."
+)]
 impl SourceCompFluidStream {
-    pub(crate) fn source_increment(self, increment: usize) -> Result<Self, Error> {
-        let increment = i32::try_from(increment)
-            .map_err(|_| Error::Unavailable("actual Node fluid-stream signed increment domain"))?;
-        let value = (self as i32)
-            .checked_add(increment)
-            .ok_or(Error::Unavailable(
-                "actual Node fluid-stream signed addition domain",
-            ))?;
+    pub(crate) const Invalid: Self = Self(-1);
+    pub(crate) const Primary: Self = Self(1);
+    pub(crate) const Secondary: Self = Self(2);
+    pub(crate) const Tertiary: Self = Self(3);
+    pub(crate) const Quaternary: Self = Self(4);
+    pub(crate) const Num: Self = Self(5);
+
+    pub(crate) fn source_positive(value: i32) -> Result<Self, Error> {
         match value {
-            -1 => Ok(Self::Invalid),
             1 => Ok(Self::Primary),
             2 => Ok(Self::Secondary),
             3 => Ok(Self::Tertiary),
             4 => Ok(Self::Quaternary),
             5 => Ok(Self::Num),
+            value if value > 0 => Ok(Self(value)),
             _ => Err(Error::Unavailable(
-                "actual Node fluid-stream unnamed enum value",
+                "actual positive Native OA fluid-stream ordinal",
             )),
         }
+    }
+    pub(crate) fn source_value(self) -> i32 {
+        self.0
+    }
+    pub(crate) fn source_increment(self, increment: usize) -> Result<Self, Error> {
+        let increment = i32::try_from(increment)
+            .map_err(|_| Error::Unavailable("actual Node fluid-stream signed increment domain"))?;
+        let value = self.0.checked_add(increment).ok_or(Error::Unavailable(
+            "actual Node fluid-stream signed addition domain",
+        ))?;
+        if value == -1 {
+            return Ok(Self::Invalid);
+        }
+        if value == 0 {
+            return Err(Error::Unavailable(
+                "actual Node fluid-stream unnamed enum value",
+            ));
+        }
+        Self::source_positive(value)
+    }
+}
+impl std::fmt::Debug for SourceCompFluidStream {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = match self.0 {
+            -1 => "Invalid",
+            1 => "Primary",
+            2 => "Secondary",
+            3 => "Tertiary",
+            4 => "Quaternary",
+            5 => "Num",
+            value => return write!(f, "CompFluidStream({value})"),
+        };
+        f.write_str(name)
     }
 }
 
