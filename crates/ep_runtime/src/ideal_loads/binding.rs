@@ -663,6 +663,23 @@ pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -
         && has_source_owned_no_oa_humidity_shape(system)
 }
 
+/// Native GET469-473 ignores named DCV selectors when no OA is selected.
+/// This Source-only selector creates no state; Legacy flags remain literal.
+#[must_use]
+pub fn has_source_inactive_no_oa_dcv_shape(system: &IdealLoadsAirSystem) -> bool {
+    system
+        .design_specification_outdoor_air_object_name
+        .is_none()
+        && system.outdoor_air_inlet_node_name.is_none()
+        && matches!(
+            system.demand_controlled_ventilation_type,
+            ep_model::DemandControlledVentilationType::OccupancySchedule
+                | ep_model::DemandControlledVentilationType::Co2Setpoint
+        )
+        && system.outdoor_air_economizer_type == ep_model::OutdoorAirEconomizerType::NoEconomizer
+        && system.heat_recovery_type == ep_model::HeatRecoveryType::None
+}
+
 /// Identifies owned Source humidity selectors without outdoor air.
 /// This selector creates no physical binding or numerical state. The validator
 /// still checks active hard limits, active SHR and every common prerequisite.
@@ -670,7 +687,7 @@ pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -
 pub fn has_source_owned_no_oa_humidity_shape(system: &IdealLoadsAirSystem) -> bool {
     let flags = IdealLoadsFeatureFlags::from_system(system);
     !flags.has_outdoor_air
-        && !flags.has_dcv
+        && (!flags.has_dcv || has_source_inactive_no_oa_dcv_shape(system))
         && !flags.has_economizer
         && !flags.has_heat_recovery
         && matches!(
@@ -1120,6 +1137,8 @@ fn validate_direct_zone_model(
             );
         }
     }
+    let source_owned_inactive_dcv = mode == DirectZoneValidationMode::SourceEligibility
+        && has_source_inactive_no_oa_dcv_shape(system);
     let source_owned_humidity = mode == DirectZoneValidationMode::SourceEligibility
         && has_source_owned_no_oa_humidity_shape(system);
     if source_owned_humidity
@@ -1178,6 +1197,11 @@ fn validate_direct_zone_model(
                         feature,
                         IdealLoadsUnsupportedFeature::OutdoorAir
                             | IdealLoadsUnsupportedFeature::DemandControlledVentilation
+                    ))
+                || (source_owned_inactive_dcv
+                    && matches!(
+                        feature,
+                        IdealLoadsUnsupportedFeature::DemandControlledVentilation
                     )))
         })
     {

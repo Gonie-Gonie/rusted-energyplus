@@ -3591,6 +3591,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             // explicit trailing empty strings are advisory graph omissions,
             // while the original raw/IP cells remain the Node getter's input.
             let mut warning = people.clone();
+            warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                json!("OccupancySchedule");
             warning["NodeList"] = json!({"Supply List":{"nodes":[
                 {"node_name":"Supply"},{"node_name":""},{"node_name":""}]}});
             warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["zone_supply_air_node_name"] =
@@ -3634,7 +3636,9 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             );
             let simulation = ep_model::SimulationModel::from_typed(warning_model.clone());
             assert_eq!(simulation.graph.node_list_members.len(), 1);
-            assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_ok());
+            assert!(ep_runtime::bind_direct_zone_purchased_air_model(&simulation).is_err());
+            ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                .expect("Source retains the named inactive occupancy selector without OA");
             let mut warning_scope = inspect_porting_scope(
                 &warning_raw,
                 &warning_compile.report,
@@ -3673,6 +3677,12 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             let warning_ip = crate::ordinary_input_processor::resolve_source_b(&warning_raw)
                 .expect("actual Source IP transfer");
             use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as SourceRaw;
+            assert_eq!(
+                warning_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("actual inactive DCV raw fields")["demand_controlled_ventilation_type"],
+                SourceRaw::String("OccupancySchedule".into())
+            );
             let original_members = match &warning_ip
                 .source_raw_object_fields("NodeList", "Supply List")
                 .expect("actual raw NodeList fields")["nodes"]
@@ -3893,6 +3903,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             // A genuine optional Source exhaust remains outside the unchanged
             // legacy direct binding. Source eligibility returns no physical binding.
             let mut exhaust = people.clone();
+            exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                json!("CO2Setpoint");
             exhaust["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_air_exhaust_node_or_nodelist_name"] =
                 json!("Exhaust");
             exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["zone_exhaust_air_node_name"] =
@@ -3981,6 +3993,12 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
                     .expect("real exhaust object")["zone_exhaust_air_node_name"],
                 SourceRaw::String("Exhaust".into())
+            );
+            assert_eq!(
+                exhaust_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("actual inactive CO2 raw fields")["demand_controlled_ventilation_type"],
+                SourceRaw::String("CO2Setpoint".into())
             );
             assert_eq!(exhaust_raw, original_exhaust_raw);
 
@@ -5176,6 +5194,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 }
                 assert_eq!(raw, retained);
                 let mut no_exhaust = returns.clone();
+                no_exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                    json!("None");
                 no_exhaust["ZoneHVAC:EquipmentConnections"]["Connection"]
                     .as_object_mut()
                     .expect("Connection")

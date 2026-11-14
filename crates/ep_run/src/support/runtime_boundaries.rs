@@ -882,6 +882,16 @@ pub(super) fn assess_typed_runtime_boundaries(
                     )
                 });
             }
+            if source_ideal_loads_eligible(&simulation_model, source_admission)
+                && ep_runtime::has_source_inactive_no_oa_dcv_shape(system)
+            {
+                unsupported_features.retain(|feature| {
+                    !matches!(
+                        feature,
+                        IdealLoadsUnsupportedFeature::DemandControlledVentilation
+                    )
+                });
+            }
             if !unsupported_features.is_empty() {
                 diagnostics.push(
                     RunDiagnostic::new(

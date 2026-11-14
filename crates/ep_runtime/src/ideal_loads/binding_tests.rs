@@ -722,8 +722,9 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 Some(NormalizedName::new("OUTSIDE AIR"));
         },
         |system| {
+            // Inactive without OA; this existing context retains humidity.
             system.demand_controlled_ventilation_type =
-                DemandControlledVentilationType::OccupancySchedule;
+                DemandControlledVentilationType::Co2Setpoint;
         },
         |system| system.outdoor_air_economizer_type = OutdoorAirEconomizerType::DifferentialDryBulb,
         |system| system.heat_recovery_type = HeatRecoveryType::Sensible,
@@ -737,10 +738,16 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
             mutate(system);
         });
-        assert!(!has_source_constant_supply_humidity_shape(
-            &blocked.typed.ideal_loads_air_systems[0]
-        ));
-        assert!(validate_source_direct_zone_purchased_air_model(&blocked).is_err());
+        let inactive_dcv =
+            has_source_inactive_no_oa_dcv_shape(&blocked.typed.ideal_loads_air_systems[0]);
+        assert_eq!(
+            has_source_constant_supply_humidity_shape(&blocked.typed.ideal_loads_air_systems[0]),
+            inactive_dcv
+        );
+        assert_eq!(
+            validate_source_direct_zone_purchased_air_model(&blocked).is_ok(),
+            inactive_dcv
+        );
         assert!(bind_direct_zone_purchased_air_model(&blocked).is_err());
     }
     for unresolved in [
@@ -834,6 +841,11 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             .schedule_names
             .insert("129 COOLING FUEL EFFICIENCY", efficiency);
         typed.ideal_loads_air_systems[0].cooling_fuel_efficiency_schedule = Some(efficiency);
+        if value == 0.0 {
+            // Reuse this existing no-OA schedule context; no new fixture.
+            typed.ideal_loads_air_systems[0].demand_controlled_ventilation_type =
+                DemandControlledVentilationType::OccupancySchedule;
+        }
         let cooling = SimulationModel::from_typed(typed.clone());
         assert_eq!(
             cooling.typed.ideal_loads_air_systems[0].cooling_fuel_efficiency_schedule,

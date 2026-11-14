@@ -919,6 +919,7 @@ fn validate_ideal_loads(model: &TypedModel, violations: &mut Vec<String>) {
             || system.outdoor_air_economizer_type != OutdoorAirEconomizerType::NoEconomizer
             || system.heat_recovery_type != HeatRecoveryType::None)
             && !ep_runtime::has_source_basic_positive_oa_shape(system)
+            && !ep_runtime::has_source_inactive_no_oa_dcv_shape(system)
         {
             violations
                 .push("OA, DCV, economizer and heat recovery are outside no-OA scope B".into());
