@@ -49,6 +49,27 @@ pub(super) fn alpha(
         )),
     }
 }
+// Native InputProcessor::getAlphaFieldValue reads the original JSON string.
+// Its present empty string is distinct from scratch getObjectItem's default.
+pub(super) fn alpha_field_value(
+    input: &SelectedInputProcessor,
+    object: &str,
+    field: &str,
+) -> Result<String, Error> {
+    let DefaultValue::Alpha(default) = descriptor(field)?.default else {
+        return Err(Error::Unavailable("actual PurchasedAir alpha schema type"));
+    };
+    let fields = input
+        .source_raw_object_fields(FAMILY, object)
+        .map_err(|_| Error::Unavailable("actual PurchasedAir retained raw object fields"))?;
+    match fields.get(field) {
+        None => Ok(uppercase(default)),
+        Some(V::String(value)) => Ok(uppercase(value)),
+        _ => Err(Error::Unavailable(
+            "actual PurchasedAir getAlphaFieldValue string type",
+        )),
+    }
+}
 pub(super) fn real(
     input: &SelectedInputProcessor,
     object: &str,

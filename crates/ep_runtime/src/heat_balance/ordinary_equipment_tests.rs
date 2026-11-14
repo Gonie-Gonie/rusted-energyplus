@@ -612,7 +612,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
         );
         assert!(source.internal_gains.zone.is_none() && source.internal_gains.space.is_none());
         // Retain the original omitted-default/UTF8 actual-getter probe and
-        // exercise all13 schema-legal fuels through the same real registration.
+        // exercise all13 named fuels and explicit-empty SDK compatibility through
+        // the same real registration, preserving the original omitted defaults.
         // Numeric HVAC sums belong to physical cases; no energies are seeded here.
         use crate::heat_balance::ordinary_equipment::source_purchased_air::owners::SourcePurchasedAirFuel as F;
         use crate::heat_balance::source_output_registration::{
@@ -642,23 +643,65 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 M::DistrictHeatingSteam,
             ),
         ];
-        let resource_rows = resources.len() + 1;
-        let fuel_cases =
-            std::iter::once((
+        let resource_rows = resources.len() + 4;
+        let fuel_cases = std::iter::once((
+            None,
+            None,
+            F::DistrictHeatingWater,
+            F::DistrictCooling,
+            M::DistrictHeatingWater,
+            M::DistrictCooling,
+            "DistrictHeatingWater",
+            "DistrictCooling",
+        ))
+        .chain(resources.into_iter().map(|(name, fuel, resource)| {
+            (
+                Some(name),
+                Some(name),
+                fuel,
+                fuel,
+                resource,
+                resource,
+                name,
+                name,
+            )
+        }))
+        .chain([
+            (
+                Some(""),
                 None,
-                F::DistrictHeatingWater,
+                F::Invalid,
                 F::DistrictCooling,
-                M::DistrictHeatingWater,
+                M::Electricity,
                 M::DistrictCooling,
-                "DistrictHeatingWater",
+                "Electricity",
                 "DistrictCooling",
-            ))
-            .chain(resources.into_iter().map(|(name, fuel, resource)| {
-                (Some(name), fuel, fuel, resource, resource, name, name)
-            }))
-            .take(if total == 1 { resource_rows } else { 0 });
+            ),
+            (
+                None,
+                Some(""),
+                F::DistrictHeatingWater,
+                F::Invalid,
+                M::DistrictHeatingWater,
+                M::Electricity,
+                "DistrictHeatingWater",
+                "Electricity",
+            ),
+            (
+                Some(""),
+                Some(""),
+                F::Invalid,
+                F::Invalid,
+                M::Electricity,
+                M::Electricity,
+                "Electricity",
+                "Electricity",
+            ),
+        ])
+        .take(if total == 1 { resource_rows } else { 0 });
         for (
-            authored_fuel,
+            authored_heat_fuel,
+            authored_cool_fuel,
             heat_fuel,
             cool_fuel,
             heat_resource,
@@ -716,13 +759,16 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         )]),
                     ),
                 ]);
-            if let Some(name) = authored_fuel {
-                let fields = objects
-                    .get_mut("ZoneHVAC:IdealLoadsAirSystem")
-                    .and_then(|rows| rows.get_mut(unit_name))
-                    .ok_or("actual raw fuel fields")?;
-                for field in ["heating_fuel_type", "cooling_fuel_type"] {
-                    fields.insert(field.into(), V::String(name.into()));
+            for (field, authored) in [
+                ("heating_fuel_type", authored_heat_fuel),
+                ("cooling_fuel_type", authored_cool_fuel),
+            ] {
+                if let Some(name) = authored {
+                    objects
+                        .get_mut("ZoneHVAC:IdealLoadsAirSystem")
+                        .and_then(|rows| rows.get_mut(unit_name))
+                        .ok_or("actual raw fuel fields")?
+                        .insert(field.into(), V::String(name.into()));
                 }
             }
             let retained_objects = objects.clone();
@@ -893,6 +939,31 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 (actual_unit.heating_fuel_type, actual_unit.cooling_fuel_type),
                 (heat_fuel, cool_fuel)
             );
+            // The same actual getObjectItem scratch still defaults explicit
+            // empty/omitted alphas, independently of the direct raw fuel owner.
+            for (field, authored, default) in [
+                (
+                    "heating_fuel_type",
+                    authored_heat_fuel,
+                    "DistrictHeatingWater",
+                ),
+                ("cooling_fuel_type", authored_cool_fuel, "DistrictCooling"),
+            ] {
+                let index = probe_shortcut
+                    .alpha_field_names
+                    .iter()
+                    .position(|name| name == field)
+                    .ok_or("actual fuel scratch field identity")?;
+                let blank = authored.is_none_or(str::is_empty);
+                assert_eq!(probe_shortcut.alpha_field_blanks[index], blank);
+                assert_eq!(
+                    probe_shortcut.alpha_args[index],
+                    authored
+                        .filter(|value| !value.is_empty())
+                        .unwrap_or(default)
+                        .to_ascii_uppercase()
+                );
+            }
             assert_eq!(actual_unit.zone_supply_air_node_num, 1);
             assert_eq!(probe.nodes.number_of_unique_node_names, 1);
             assert_eq!(

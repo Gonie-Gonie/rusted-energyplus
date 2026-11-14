@@ -33,6 +33,10 @@ fn unit(
 fn fuel_resource(fuel: SourcePurchasedAirFuel) -> Result<SourceMeterResource, Error> {
     match fuel {
         SourcePurchasedAirFuel::Electricity => Ok(SourceMeterResource::Electricity),
+        // Fixed EnergyPlus 26.1 Windows SDK compatibility: explicit JSON empty
+        // stays Invalid(-1), whose actual unchecked array read yields Electricity.
+        // This is a report-resource alias, not a schema or physical fuel default.
+        SourcePurchasedAirFuel::Invalid => Ok(SourceMeterResource::Electricity),
         SourcePurchasedAirFuel::NaturalGas => Ok(SourceMeterResource::NaturalGas),
         SourcePurchasedAirFuel::Gasoline => Ok(SourceMeterResource::Gasoline),
         SourcePurchasedAirFuel::Diesel => Ok(SourceMeterResource::Diesel),

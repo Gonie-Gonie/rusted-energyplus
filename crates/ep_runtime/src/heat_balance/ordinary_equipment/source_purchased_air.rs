@@ -641,7 +641,7 @@ impl OrdinaryEquipment {
                     )?;
                     errors_found = true;
                 }
-                let value = getter::alpha(output.input, object, "heating_fuel_type")?;
+                let value = getter::alpha_field_value(output.input, object, "heating_fuel_type")?;
                 self.purchased_unit_mut(number)?.heating_fuel_type = fuel(&value);
                 let value = getter::alpha(
                     output.input,
@@ -659,7 +659,7 @@ impl OrdinaryEquipment {
                     )?;
                     errors_found = true;
                 }
-                let value = getter::alpha(output.input, object, "cooling_fuel_type")?;
+                let value = getter::alpha_field_value(output.input, object, "cooling_fuel_type")?;
                 self.purchased_unit_mut(number)?.cooling_fuel_type = fuel(&value);
             }
             self.nodes

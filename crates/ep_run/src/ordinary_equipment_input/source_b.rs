@@ -395,51 +395,51 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             blank(value) || matches!(value, RawValue::String(_))
         }
         ("ZoneHVAC:IdealLoadsAirSystem", "heating_fuel_type") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "",
-                        "Coal",
-                        "Diesel",
-                        "DistrictCooling",
-                        "DistrictHeatingSteam",
-                        "DistrictHeatingWater",
-                        "Electricity",
-                        "FuelOilNo1",
-                        "FuelOilNo2",
-                        "Gasoline",
-                        "NaturalGas",
-                        "OtherFuel1",
-                        "OtherFuel2",
-                        "Propane",
-                    ],
-                )
+            // Exact empty is legal; null and whitespace-only are not fuel enums.
+            text_is(
+                value,
+                &[
+                    "",
+                    "Coal",
+                    "Diesel",
+                    "DistrictCooling",
+                    "DistrictHeatingSteam",
+                    "DistrictHeatingWater",
+                    "Electricity",
+                    "FuelOilNo1",
+                    "FuelOilNo2",
+                    "Gasoline",
+                    "NaturalGas",
+                    "OtherFuel1",
+                    "OtherFuel2",
+                    "Propane",
+                ],
+            )
         }
         ("ZoneHVAC:IdealLoadsAirSystem", "cooling_fuel_efficiency_schedule_name") => {
             blank(value) || matches!(value, RawValue::String(_))
         }
         ("ZoneHVAC:IdealLoadsAirSystem", "cooling_fuel_type") => {
-            blank(value)
-                || text_is(
-                    value,
-                    &[
-                        "",
-                        "Coal",
-                        "Diesel",
-                        "DistrictCooling",
-                        "DistrictHeatingSteam",
-                        "DistrictHeatingWater",
-                        "Electricity",
-                        "FuelOilNo1",
-                        "FuelOilNo2",
-                        "Gasoline",
-                        "NaturalGas",
-                        "OtherFuel1",
-                        "OtherFuel2",
-                        "Propane",
-                    ],
-                )
+            // Exact empty is legal; null and whitespace-only are not fuel enums.
+            text_is(
+                value,
+                &[
+                    "",
+                    "Coal",
+                    "Diesel",
+                    "DistrictCooling",
+                    "DistrictHeatingSteam",
+                    "DistrictHeatingWater",
+                    "Electricity",
+                    "FuelOilNo1",
+                    "FuelOilNo2",
+                    "Gasoline",
+                    "NaturalGas",
+                    "OtherFuel1",
+                    "OtherFuel2",
+                    "Propane",
+                ],
+            )
         }
         _ => false,
     }

@@ -3574,6 +3574,114 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             );
             assert_eq!(exhaust_raw, original_exhaust_raw);
 
+            // Explicit JSON empty fuel remains authored through the real
+            // compiler/scope/token/support/IP path. Typed defaults are advisory;
+            // the separate real runtime getter owns Invalid and actual meters.
+            for (heating, cooling) in [
+                (Some(""), None),
+                (None, Some("")),
+                (Some(""), Some("")),
+                (None, None),
+            ] {
+                let mut fuel_input = exhaust.clone();
+                for (field, authored) in [
+                    ("heating_fuel_type", heating),
+                    ("cooling_fuel_type", cooling),
+                ] {
+                    if let Some(value) = authored {
+                        fuel_input["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"][field] = json!(value);
+                    }
+                }
+                let raw = parse_epjson_str(&fuel_input.to_string()).expect("real empty-fuel JSON");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("real empty-fuel advisory model");
+                assert_eq!(
+                    model.ideal_loads_air_systems[0].heating_fuel_type,
+                    ep_model::IdealLoadsFuelType::DistrictHeatingWater
+                );
+                assert_eq!(
+                    model.ideal_loads_air_systems[0].cooling_fuel_type,
+                    ep_model::IdealLoadsFuelType::DistrictCooling
+                );
+                let simulation = ep_model::SimulationModel::from_typed(model.clone());
+                ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
+                    .expect("real raw-owner Source eligibility");
+                let mut selected =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(selected.admissible, "{:?}", selected.violations);
+                selected.environment = Some(
+                    super::environment::environment_from_weather(
+                        model,
+                        &single_day_weather_fixture(),
+                        "authored empty-fuel custody weather",
+                    )
+                    .expect("real empty-fuel environment"),
+                );
+                let admission =
+                    crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                        .expect("actual empty-fuel Source admission");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert!(support.matched_capability_ids.is_empty());
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("real fuel raw IP");
+                let fields = ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained real fuel fields");
+                for (field, authored) in [
+                    ("heating_fuel_type", heating),
+                    ("cooling_fuel_type", cooling),
+                ] {
+                    assert_eq!(
+                        fields.get(field),
+                        authored
+                            .map(|value| SourceRaw::String(value.into()))
+                            .as_ref()
+                    );
+                }
+                assert_eq!(raw, retained);
+                for field in ["heating_fuel_type", "cooling_fuel_type"] {
+                    for value in [
+                        json!(null),
+                        json!(" "),
+                        json!("Water"),
+                        json!("None"),
+                        json!(7),
+                        json!(true),
+                    ] {
+                        let mut invalid = fuel_input.clone();
+                        invalid["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"][field] = value;
+                        let invalid_raw = parse_epjson_str(&invalid.to_string())
+                            .expect("malformed fuel retained raw");
+                        assert!(
+                            crate::ordinary_equipment_input::resolve_source_b(&invalid_raw)
+                                .is_err()
+                        );
+                        assert!(
+                            crate::support::SourceSupportAdmission::from_validated_scope(
+                                &invalid_raw,
+                                &selected
+                            )
+                            .is_none()
+                        );
+                    }
+                }
+            }
+
             // Unit126: actual compile -> scope -> support -> retained raw IP
             // custody for selected mixed-ASCII/UTF-8 identities. The runtime
             // owner probe remains separate; this is not a simulation result.
