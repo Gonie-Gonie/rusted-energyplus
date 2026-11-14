@@ -1147,7 +1147,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             if total == 1 && authored_heat_fuel.is_none() && authored_cool_fuel.is_none() {
                 use crate::heat_balance::ordinary_equipment::source_purchased_air::owners::{
                     SourcePurchasedAirDcv as Dcv, SourcePurchasedAirEconomizer as Econ,
-                    SourcePurchasedAirHeatRecovery as Recovery,
+                    SourcePurchasedAirHeatRecovery as Recovery, SourcePurchasedAirLimit as Limit,
                 };
                 for explicit_empty in [false, true] {
                     let dsoa_name = "OA direct raw 규";
@@ -1175,6 +1175,14 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         "outdoor_air_inlet_node_name".into(),
                         V::String(oa_name.into()),
                     );
+                    if !explicit_empty {
+                        // Inactive NoLimit capacity still passes through the actual
+                        // GetPurchasedAir numeric accessor with its original lexeme.
+                        fields.insert(
+                            "maximum_sensible_heating_capacity".into(),
+                            V::Number("10000000000000000000000".into()),
+                        );
+                    }
                     if explicit_empty {
                         for field in [
                             "demand_controlled_ventilation_type",
@@ -1401,6 +1409,20 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             (Dcv::None, Econ::NoEconomizer, Recovery::None)
                         }
                     );
+                    if !explicit_empty {
+                        assert_eq!(unit.heating_limit, Limit::None);
+                        assert!(unit.max_heat_sens_cap.is_finite());
+                        assert_eq!(unit.max_heat_sens_cap.to_bits(), (1.0e22_f64).to_bits());
+                        assert_eq!(
+                            oa_ip
+                                .source_raw_object_fields(
+                                    "ZoneHVAC:IdealLoadsAirSystem",
+                                    unit_name
+                                )?
+                                .get("maximum_sensible_heating_capacity"),
+                            Some(&V::Number("10000000000000000000000".into())),
+                        );
+                    }
                     assert!(!oa_ip.is_object_unused("DesignSpecification:OutdoorAir", dsoa_name));
                     assert!(!oa_ip.is_object_unused("ZoneHVAC:IdealLoadsAirSystem", unit_name));
                     assert!(!oa_ip.is_object_unused("NodeList", alias));

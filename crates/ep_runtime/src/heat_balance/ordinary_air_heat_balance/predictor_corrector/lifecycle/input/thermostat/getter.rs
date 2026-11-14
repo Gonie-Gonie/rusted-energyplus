@@ -97,18 +97,17 @@ fn uppercase(text: &str) -> Result<String, Error> {
 }
 
 fn number(token: &str) -> Result<f64, Error> {
-    if token.bytes().any(|byte| matches!(byte, b'.' | b'e' | b'E')) {
-        token
-            .parse::<f64>()
-            .map_err(|_| Error::Unavailable("actual thermostat JSON floating scalar"))
-    } else {
-        // Native839-845 converts the integer JSON branch through int64 first.
-        // In particular integer -0 becomes +0.0; float -0.0 keeps its sign.
-        token
-            .parse::<i64>()
-            .map(|value| value as f64)
-            .map_err(|_| Error::Unavailable("actual thermostat JSON signed integer domain"))
-    }
+    // Native integer storage is converted through i64 before Real64.
+    // Bare -0 becomes +0.0; floating -0.0 retains its sign.
+    ep_model::classify_source_json_number(token)
+        .map(ep_model::SourceJsonNumber::as_f64)
+        .map_err(|_| {
+            if token.bytes().any(|byte| matches!(byte, b'.' | b'e' | b'E')) {
+                Error::Unavailable("actual thermostat JSON floating scalar")
+            } else {
+                Error::Unavailable("actual thermostat JSON signed integer domain")
+            }
+        })
 }
 
 fn fill(

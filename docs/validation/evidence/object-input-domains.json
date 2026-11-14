@@ -347,7 +347,17 @@
       "Additional bounded Source B direct-epJSON HVAC Humidistat consumer scope: zero or one same-Zone control, actual remaining moisture demands, and supported real schedules. 1 fixed scenes qualify (no-control None/Humidistat zero-demand path); only the 0 listed positive-control scenes provide their declared positive-service evidence. Full161-series comparisons and all original155 gates are mandatory; absence is a genuine six-report zero path. No universal humidity/SHR/capacity law, private mode, positive original-IDF/A, OA, EMS/fault, AFN/Space/sizing or full-object completion is implied."
     ],
     "DesignSpecification:OutdoorAir": [
-      "Bounded Source B direct-epJSON basic DSOA connects actual Zone geometry, design occupants for NoDCV, real schedules, outdoor-node state and direct IdealLoads. Six basic method scenes retain their own NoLimit evidence; four hard-limit selectors share guarded owned consumption. New strict finite-route and zero-boundary scenes keep separate scope. No Source A/IDF, CO2/IAQ/DCV, economizer/recovery, Space/airloop/sizing, arbitrary-combination or full-object claim."
+      "Bounded Source B direct-epJSON basic DSOA connects actual Zone geometry, design occupants for NoDCV, real schedules, outdoor-node state and direct IdealLoads. Six basic method scenes retain their own NoLimit evidence; four hard-limit selectors share guarded owned consumption. New strict finite-route and zero-boundary scenes keep separate scope. No Source A/IDF, CO2/IAQ/DCV, economizer/recovery, Space/airloop/sizing, arbitrary-combination or full-object claim.",
+      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
+    ],
+    "ZoneHVAC:EquipmentList": [
+      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
+    ],
+    "ZoneHVAC:IdealLoadsAirSystem": [
+      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
+    ],
+    "ZoneControl:Thermostat": [
+      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
     ]
   },
   "verification": {
@@ -7751,6 +7761,214 @@
           "batch_exit0_is_retention_not_credit": true
         },
         "scope": "The bounded Source B basic-OA route now admits NoLimit, hard flow, hard capacity and combined limits using design occupants, real schedules and owned warning/mixing state. Four fixed SUM comparisons retain 4 qualifying cases and 300,480 values: 2 finite-route and 2 zero-boundary cases. All158 policies and applicable inherited gates remain strict. Zero OA does not imply zero supply; a zero-capacity boundary requires its declared Winter response. Only the combined finite scene additionally requires same-engine heating/cooling contrasts. None of these public intervals establishes an exact capacity, mixing or private-mode law. Advanced OA, humidity combinations, Source A/IDF, Space/airloops/sizing and arbitrary-value completion remain open.",
+        "physical_domain_completion": false
+      },
+      "JSON_accessor_fidelity_146": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit146-prep/build149-attempt01.json",
+          "sha256": "d429603b4ed8d47dbcfb13b4941029d51f8e13f2e503ad9801947458d69b257a",
+          "bytes": 702
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit146-prep/owner-execution-review01.json",
+          "sha256": "ff0dacba9926e93843b1aaba8f9c6f965d8ca7ad20869a5eb3d48f863929a853",
+          "bytes": 9071
+        },
+        "quality": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-final-quality-summary01.json",
+          "sha256": "c1220374e44b05493ef8a0eb5f7019bc0dc15275e029a4857950f8b06aa513ff",
+          "bytes": 7838
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-source-format-review01.json",
+          "sha256": "46f79ba0866a9af84df183f1fa0e32bd35e3510ab3fc7252c89875dc52e31af6",
+          "bytes": 3439
+        },
+        "completed_review": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-one-pair149-01/receipt.json",
+          "sha256": "fb3cf4656f4a0c1a30b6a1e622cfa2403939925d483b9b0a5c063942b7b69ecd",
+          "bytes": 8572
+        },
+        "paired_readback": {
+          "path": ".runtime/object-expansion/unit146-prep/paired-runtime-proposal02/JSON_ACCESSORS.paired149-01.json",
+          "sha256": "dc3538b053df44dcaa59d4172d957bd7e767379bc18267cc83e6bc428a9eeb64",
+          "bytes": 540082
+        },
+        "runtime_bindings": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-runtime-bindings01.json",
+          "sha256": "4f36c387ceaaf39168bdceb1c698342c62c72da5a9d7c66d00dfb0fe35f3d182",
+          "bytes": 4274
+        },
+        "Root_producer": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-run-pair146.py",
+          "sha256": "6bb7b7a089a8b0f57dbd4522424d58aaf7001c2e1ff1f7f52b528f25550ff277",
+          "bytes": 4437
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-runtime-final-review01.json",
+          "sha256": "28b2584c4b48f54f087d67c6f74547e6e0473368c3e2a0f9b24f521fb7a6362c",
+          "bytes": 6023
+        },
+        "independent_final_runtime_review": {
+          "path": ".runtime/object-expansion/unit146-prep/independent-final146-runtime02-recipe-static-review01.json",
+          "sha256": "07a9898e372d58e6edba5d820c59d8ba2e417818126ba2aa4bd4a64d6437ec73",
+          "bytes": 3181
+        },
+        "independent_actual149_authority_closure": {
+          "path": ".runtime/object-expansion/unit146-prep/independent-actual149-QA-owner-lineage-authority-closure01.json",
+          "sha256": "e996019f6104467308bf2f2798e9f1dc942391145e111cb4fc9fd7045cce97cd",
+          "bytes": 2911
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-source-JSON-accessor-adoption01.json",
+          "sha256": "ee675f33d207026929b06367d819127c0e5d11b4fb41e7afc10d0392fdce75a4",
+          "bytes": 15733
+        },
+        "Source_test_lint_correction": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-test-assertion-correction01/manifest.json",
+          "sha256": "ac0bced3380fac04964f9f0fa3b634846d9cbf1c299eea8d7de93ccf40eb3db4",
+          "bytes": 1787
+        },
+        "Source_test_lint_lineage": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-test-lint-snapshot-lineage01.json",
+          "sha256": "ffda2d0e3888b0059882295cba430f8475308073aab67cbc3b30f4dc7d20c0d5",
+          "bytes": 3655
+        },
+        "all_actual_QA_runs": [
+          {
+            "name": "format",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/format/receipt.json",
+              "sha256": "baf170682d2e609a65748c84aa1886a9cfd5274724579b4f84ecc9cd8be80b02",
+              "bytes": 4021
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "format-check",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/format-check/receipt.json",
+              "sha256": "2624fccba1973e76e32a3828ebd5c50080b5ecf874b055c65f044463c611d724",
+              "bytes": 4057
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "compiler-order",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/compiler-order/receipt.json",
+              "sha256": "824ae3f74bc06384d66598a54bc802b83f84b44a004adf562c2f29f9096ce880",
+              "bytes": 4105
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "compiler-duplicates",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/compiler-duplicates/receipt.json",
+              "sha256": "73074972904cf1e00f95fedb73b8c82066379ca3b13007e55c5dd3c4abdd8621",
+              "bytes": 4118
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "node-owner-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/node-owner-tests/receipt.json",
+              "sha256": "9d1680e1a7029c75caad05d281841bc7bf4cf6850207957024c368c1c1c106a5",
+              "bytes": 4142
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "Source-ingress-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/Source-ingress-tests/receipt.json",
+              "sha256": "f7004ec02f52b0d3c81edc0910d94a51cba309eb4ab862c8ed2d5b427fb37ce1",
+              "bytes": 4163
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "source-caller-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/source-caller-tests/receipt.json",
+              "sha256": "1c4c71df8e2df057fc00e93679ca339fa0e0a8bdfd5dc92a1d96a82db2713e87",
+              "bytes": 4122
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "clippy",
+            "recorder_exit": 101,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality01/clippy/receipt.json",
+              "sha256": "7d7f8840d5fc4137a53bbd4fe129737ca8a8ab8390c175fcd3c5483f5dce9a82",
+              "bytes": 4027
+            },
+            "exit_code": 101
+          },
+          {
+            "name": "format",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality-correction01/format/receipt.json",
+              "sha256": "79c5d76fd280ae20b2d62041af2eb351eba8a2e96188115d0098a10b80e004d5",
+              "bytes": 4042
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "format-check",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality-correction01/format-check/receipt.json",
+              "sha256": "e349131f3dbff88ba5f8e81342bd2603ca7997e130279791d4f3507ddabb4852",
+              "bytes": 4079
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "source-caller-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality-correction01/source-caller-tests/receipt.json",
+              "sha256": "d65b3abf7d6fb966c7d019668836c7ca8600b1a85e9ef80c926774457f80f62a",
+              "bytes": 4144
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "clippy",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/JSON-accessor-fidelity-146/quality-correction01/clippy/receipt.json",
+              "sha256": "1352d5a1697385e9030f6d7d2e938530f638b59ef1228a5db5e8597ae0a391c2",
+              "bytes": 4047
+            },
+            "exit_code": 0
+          }
+        ],
+        "current_QA_commands": 4,
+        "total_actual_QA_commands": 12,
+        "failed_QA_attempts": 1,
+        "distinct_existing_test_functions": 5,
+        "actual_existing_test_body_executions": 6,
+        "new_test_functions": 0,
+        "Native_processes": 1,
+        "Source_processes": 1,
+        "model_reruns": 0,
+        "qualifying_cases": 1,
+        "qualifying_values": 75120,
+        "raw_operand_unequal": 20989,
+        "scope": "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
         "physical_domain_completion": false
       }
     },
@@ -66750,12 +66968,145 @@
           "no_replay": true
         },
         "effective_state": "One fixed SUM/NoDCV/NoEconomizer/None-recovery hard-limit composition. Zero-boundary credit is separate from positive-route coverage. COMBINED alone requires independent same-engine Winter85/Summer91 contrasts. Full158 rules and all applicable inherited gates remain strict; no exact averaged cap/ratio or private-mode law."
+      },
+      {
+        "id": "B-IDEALLOADS-JSON-ACCESSORS-146-120H",
+        "case_kind": "JSON_ACCESSORS",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-JSON-accessor-fidelity-146",
+        "input": {
+          "path": ".runtime/object-expansion/unit146-prep/single-JSON-accessor-probe-input-proposal01/input.epJSON",
+          "sha256": "fffba1173eb91c334d7e13f3ad95126f9fd7ab527c72168351f2aae0a60bfc38",
+          "bytes": 101767
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/JSON-accessor-fidelity-146/epoch149/JSON_ACCESSORS/native01/command/receipt.json",
+          "sha256": "3e7612a62b52737b8960fdff3a1fec377a560a0fad26a3c0e155694c2541c3f7",
+          "bytes": 77246
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/JSON-accessor-fidelity-146/epoch149/JSON_ACCESSORS/source01/command/receipt.json",
+          "sha256": "34ce81f76fcb2662d3b84e35e68aef7c70fe8bfc6256fceaae9f7aeedc934a50",
+          "bytes": 78057
+        },
+        "source_summary": {
+          "path": ".runtime/porting/JSON-accessor-fidelity-146/epoch149/JSON_ACCESSORS/source01/output/run-summary.json",
+          "sha256": "444e02f71a6d1c55e48337ee80886f1b205e7c95364d3a5d35fd721ba78c70ba",
+          "bytes": 64828
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f2/f24caedff7f558ae2b22bbee4f5c83c6d0fdadf090e70f9feeee0c6ecc9828b3",
+          "sha256": "f24caedff7f558ae2b22bbee4f5c83c6d0fdadf090e70f9feeee0c6ecc9828b3"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/JSON-accessor-fidelity-146/build149-01/eplus-rs.exe",
+          "sha256": "e687463be4388bbfc73cf12f1f468f3283c3e573a38ef564c4aaeaddfba2ced3",
+          "bytes": 81026939
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/JSON-accessor-fidelity-146/build149-01/build/receipt.json",
+          "sha256": "e447b9cf0f31e27160413c19eb51ae2fad27cb2cb8fb31a787dab50af603aec1",
+          "bytes": 5472
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit146-prep/paired-runtime-proposal02/JSON_ACCESSORS.paired149-01.json",
+          "sha256": "dc3538b053df44dcaa59d4172d957bd7e767379bc18267cc83e6bc428a9eeb64",
+          "bytes": 540082
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit146-prep/Root-one-pair149-01/receipt.json",
+          "sha256": "fb3cf4656f4a0c1a30b6a1e622cfa2403939925d483b9b0a5c063942b7b69ecd",
+          "bytes": 8572
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit146-prep/science-final01/JSON_ACCESSORS.recipe.json",
+          "sha256": "d550f70d50a40b686ba024469f86d6f555f2c27ed9cfce9b025dbff9995ff9f0",
+          "bytes": 50383
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit146-prep/single-JSON-accessor-probe-input-proposal01/batch-plan01.json",
+          "sha256": "d244ee312217014f1b139c63cec015bdef4e94781e4310e15797f1ba0e2227fb",
+          "bytes": 4958
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 20989,
+          "parsed_binary64_unequal": 20989,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1309824660420418e-07,
+          "max_rmse_delta": 9.729609678414237e-09
+        },
+        "coverage_kind": "fixed_JSON_accessor_composition",
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "whole158_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit146-prep/build149-attempt01.json",
+            "sha256": "d429603b4ed8d47dbcfb13b4941029d51f8e13f2e503ad9801947458d69b257a",
+            "bytes": 702
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit146-prep/Root-final-quality-summary01.json",
+            "sha256": "c1220374e44b05493ef8a0eb5f7019bc0dc15275e029a4857950f8b06aa513ff",
+            "bytes": 7838
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit146-prep/owner-execution-review01.json",
+            "sha256": "ff0dacba9926e93843b1aaba8f9c6f965d8ca7ad20869a5eb3d48f863929a853",
+            "bytes": 9071
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit146-prep/Root-runtime-bindings01.json",
+            "sha256": "4f36c387ceaaf39168bdceb1c698342c62c72da5a9d7c66d00dfb0fe35f3d182",
+            "bytes": 4274
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit146-prep/Root-run-pair146.py",
+            "sha256": "6bb7b7a089a8b0f57dbd4522424d58aaf7001c2e1ff1f7f52b528f25550ff277",
+            "bytes": 4437
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit146-prep/Root-runtime-final-review01.json",
+            "sha256": "28b2584c4b48f54f087d67c6f74547e6e0473368c3e2a0f9b24f521fb7a6362c",
+            "bytes": 6023
+          },
+          "independent_final_runtime_review": {
+            "path": ".runtime/object-expansion/unit146-prep/independent-final146-runtime02-recipe-static-review01.json",
+            "sha256": "07a9898e372d58e6edba5d820c59d8ba2e417818126ba2aa4bd4a64d6437ec73",
+            "bytes": 3181
+          },
+          "independent_actual149_authority_closure": {
+            "path": ".runtime/object-expansion/unit146-prep/independent-actual149-QA-owner-lineage-authority-closure01.json",
+            "sha256": "e996019f6104467308bf2f2798e9f1dc942391145e111cb4fc9fd7045cce97cd",
+            "bytes": 2911
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "no_replay": true
+        },
+        "effective_state": "Two authored bare4294967297 EquipmentList priorities resolve to positive typed1; the inactive NoLimit heating capacity is authored as bare10000000000000000000000 (JSON integer lexeme) and Native stores finite Float1e22. Raw/staged/typed-graph evidence and actual same-source getter QA support these accessor paths; no private getter telemetry, active huge-capacity coverage or arbitrary-value completion."
       }
     ],
     "totals": {
-      "paired_cases": 225,
-      "reported_samples": 8846536,
-      "raw_operand_unequal": 2175987,
+      "paired_cases": 226,
+      "reported_samples": 8921656,
+      "raw_operand_unequal": 2196976,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -69284,6 +69635,23 @@
           "sha256": "48522f97fa17c1e6f1e5a3b4afcd7d67f87c212ce416a6881529d22c3615745a",
           "bytes": 81013037
         }
+      },
+      {
+        "id": "source-JSON-accessor-fidelity-146",
+        "receipt": {
+          "path": ".runtime/porting/JSON-accessor-fidelity-146/build149-01/build/receipt.json",
+          "sha256": "e447b9cf0f31e27160413c19eb51ae2fad27cb2cb8fb31a787dab50af603aec1",
+          "bytes": 5472
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f2/f24caedff7f558ae2b22bbee4f5c83c6d0fdadf090e70f9feeee0c6ecc9828b3",
+          "sha256": "f24caedff7f558ae2b22bbee4f5c83c6d0fdadf090e70f9feeee0c6ecc9828b3"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/JSON-accessor-fidelity-146/build149-01/eplus-rs.exe",
+          "sha256": "e687463be4388bbfc73cf12f1f468f3283c3e573a38ef564c4aaeaddfba2ced3",
+          "bytes": 81026939
+        }
       }
     ],
     "focused_since_workspace": {
@@ -69683,14 +70051,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 148,
-      "builds_with_accepted_paired_cases": 127,
+      "actual_recorded_builds": 149,
+      "builds_with_accepted_paired_cases": 128,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "148 recorded Source builds: 127 retain accepted pairs and 21 have none, including8 without Source execution. One Source148 build serves four fixed hard-limit pairs. Only 4 strict qualifying finite-route or separately classified zero-boundary cases enter totals; prior failures and unaccepted history retain their original credit.",
+      "qualification": "149 recorded Source builds: 128 retain accepted pairs and 21 have none, including 8 without Source execution. Only the strict single JSON-accessor comparison adds qualifying credit; all earlier history remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -74322,8 +74690,9 @@
       "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-FLOW_FINITE-145-120H",
       "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-COMBINED_FINITE-145-120H",
       "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-FLOW_ZERO-145-120H",
-      "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-CAPACITY_ZERO-145-120H"
-    ], "accepted_paired_cases": 54, "accepted_samples": 3945360, "retained_Scheduled_B_pairs": 53, "retained_Scheduled_B_samples": 3885840, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"FLOW_FINITE": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_FINITE.paired01.json", "sha256": "3123a1480c0486e7b1b471c801ed884b58cd2d4da9b4271eb2b07d8e05c51612", "bytes": 496526}, "COMBINED_FINITE": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/COMBINED_FINITE.paired01.json", "sha256": "1030511a4e12f884a6e75f5ef8d6f8b8121b9d792fd0e5308f203bfd2094e9c2", "bytes": 510360}, "FLOW_ZERO": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/FLOW_ZERO.paired01.json", "sha256": "ebc25cd48c10659216ef1e2722135c6b84c92b6e777718ba399bac4f3a7a03c0", "bytes": 503599}, "CAPACITY_ZERO": {"path": ".runtime/object-expansion/unit145-prep/paired-runtime-proposal02/readback148-01/CAPACITY_ZERO.paired01.json", "sha256": "a521a43f3bbe9c14f3b488a8ee5d854b5561462887ef990b727474bafa7f81dd", "bytes": 485938}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit145-prep/Root-four-pairs148-01/receipt.json", "sha256": "f8d22f4e98fe67edbd0b2b6a058400d0008f04989c793710f0e7f270ad3856e9", "bytes": 8029}, "latest_source_build": "source-positive-oa-hard-limits-145", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit145-prep/build148-attempt01.json", "sha256": "5033ca9472cc4aa35552d4742dcac4b63a5ffb5103dd7d1bf750f3e1a3960798", "bytes": 705}, "latest_actual_quality": {"path": ".runtime/porting/positive-oa-hard-limits-145/quality01/summary.json", "sha256": "552b33b4a6af1df34dcdca18203c474a93253ba651560786f7c482796109f5f2", "bytes": 1663}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit145-prep/owner-execution-review01.json", "sha256": "50e44c5cb1689012910ac824e03ea5b32b44866219edcc4a3688948619b1b16b", "bytes": 4393}, "latest_input_contracts": {"FLOW_FINITE": {"path": ".runtime/object-expansion/unit145-prep/science-final01/FLOW_FINITE.recipe.json", "sha256": "c2e2f12f1ce178ca4c24a687391d2484cb6f864a8ff22f57bd6df1e7b5afdc99", "bytes": 50007}, "COMBINED_FINITE": {"path": ".runtime/object-expansion/unit145-prep/science-final01/COMBINED_FINITE.recipe.json", "sha256": "ad6a12e1444a8e76b9ee3aee8209fbfe7fffa8926ed8646844cd6692128c2cc5", "bytes": 50135}, "FLOW_ZERO": {"path": ".runtime/object-expansion/unit145-prep/science-final01/FLOW_ZERO.recipe.json", "sha256": "789f7b709029163f3e18c8fad3e994da0ac438718ba9d7abb78182cd90dae629", "bytes": 49987}, "CAPACITY_ZERO": {"path": ".runtime/object-expansion/unit145-prep/science-final01/CAPACITY_ZERO.recipe.json", "sha256": "c6fa396e93b436192e7d19ca2ba67b4ad589f0185d99188694929e7aae211917", "bytes": 50016}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "53 bounded Source B Scheduled/NodeList pairs retain 3,885,840 values. The unused Source A pair adds59,520, giving 54 pairs and 3,945,360 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
+      "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-CAPACITY_ZERO-145-120H",
+      "B-IDEALLOADS-JSON-ACCESSORS-146-120H"
+    ], "accepted_paired_cases": 55, "accepted_samples": 4020480, "retained_Scheduled_B_pairs": 54, "retained_Scheduled_B_samples": 3960960, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"JSON_ACCESSORS": {"path": ".runtime/object-expansion/unit146-prep/paired-runtime-proposal02/JSON_ACCESSORS.paired149-01.json", "sha256": "dc3538b053df44dcaa59d4172d957bd7e767379bc18267cc83e6bc428a9eeb64", "bytes": 540082}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit146-prep/Root-one-pair149-01/receipt.json", "sha256": "fb3cf4656f4a0c1a30b6a1e622cfa2403939925d483b9b0a5c063942b7b69ecd", "bytes": 8572}, "latest_source_build": "source-JSON-accessor-fidelity-146", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit146-prep/build149-attempt01.json", "sha256": "d429603b4ed8d47dbcfb13b4941029d51f8e13f2e503ad9801947458d69b257a", "bytes": 702}, "latest_actual_quality": {"path": ".runtime/object-expansion/unit146-prep/Root-final-quality-summary01.json", "sha256": "c1220374e44b05493ef8a0eb5f7019bc0dc15275e029a4857950f8b06aa513ff", "bytes": 7838}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit146-prep/owner-execution-review01.json", "sha256": "ff0dacba9926e93843b1aaba8f9c6f965d8ca7ad20869a5eb3d48f863929a853", "bytes": 9071}, "latest_input_contracts": {"JSON_ACCESSORS": {"path": ".runtime/object-expansion/unit146-prep/science-final01/JSON_ACCESSORS.recipe.json", "sha256": "d550f70d50a40b686ba024469f86d6f555f2c27ed9cfce9b025dbff9995ff9f0", "bytes": 50383}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "54 bounded Source B Scheduled/NodeList pairs retain 3,960,960 values. The unused Source A pair adds59,520, giving 55 pairs and 4,020,480 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

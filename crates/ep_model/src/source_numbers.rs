@@ -204,6 +204,17 @@ impl SourceJsonNumber {
             Self::Float(value) => value,
         }
     }
+
+    /// Native getIntFieldValue narrows stored integers through signed i64.
+    /// Floating storage is not an integer-schema operand. Schema bounds are
+    /// checked by the caller before this C++20 modulo-width conversion.
+    #[must_use]
+    pub fn as_i32(self) -> Option<i32> {
+        match self {
+            Self::Integer(value) => Some(value as i32),
+            Self::Float(_) => None,
+        }
+    }
 }
 
 /// The operand is not a fully consumed, finite JSON number.

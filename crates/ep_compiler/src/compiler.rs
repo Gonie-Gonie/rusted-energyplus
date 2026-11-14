@@ -14670,20 +14670,63 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let Some(cooling_sequence) = self.required_positive_u32(
-                "ZoneHVAC:EquipmentList",
-                &entry_name,
-                &entry_object,
-                "zone_equipment_cooling_sequence",
-            ) else {
+            // Only direct Source epJSON EquipmentList priorities use Native's
+            // integer storage -> int64 -> int32 accessor. Other u32 fields and
+            // Legacy/IDF compilation keep their existing numeric contract.
+            let mut sequence = |field: &str| {
+                if !self.source_file_declarations || !self.raw_model.is_epjson() {
+                    return self.required_positive_u32(
+                        "ZoneHVAC:EquipmentList",
+                        &entry_name,
+                        &entry_object,
+                        field,
+                    );
+                }
+                let Some(value) = field_value(&entry_object, field) else {
+                    return self.required_positive_u32(
+                        "ZoneHVAC:EquipmentList",
+                        &entry_name,
+                        &entry_object,
+                        field,
+                    );
+                };
+                let kind = match value {
+                    RawValue::Number(token) => ep_model::classify_source_json_number(token).ok(),
+                    _ => None,
+                };
+                let Some(kind @ ep_model::SourceJsonNumber::Integer(signed)) = kind else {
+                    self.error(
+                        "InvalidInteger", "ZoneHVAC:EquipmentList", Some(&entry_name), Some(field),
+                        format!("ZoneHVAC:EquipmentList/{entry_name} field {field} requires stored JSON integer"),
+                    );
+                    return None;
+                };
+                // Native schema minimum0 reads the signed-i64 value BEFORE
+                // narrowing: a wrapped negative u64 cannot become valid int1.
+                if signed < 0 {
+                    self.error(
+                        "InvalidNumericRange", "ZoneHVAC:EquipmentList", Some(&entry_name), Some(field),
+                        format!("ZoneHVAC:EquipmentList/{entry_name} field {field} must be nonnegative before integer narrowing"),
+                    );
+                    return None;
+                }
+                let narrowed = kind.as_i32()?;
+                // Preserve the existing positive typed/bounded priority scope.
+                if narrowed <= 0 {
+                    self.error(
+                        "InvalidNumericRange", "ZoneHVAC:EquipmentList", Some(&entry_name), Some(field),
+                        format!("ZoneHVAC:EquipmentList/{entry_name} field {field} must be greater than 0"),
+                    );
+                    return None;
+                }
+                Some(narrowed as u32)
+            };
+            let Some(cooling_sequence) = sequence("zone_equipment_cooling_sequence") else {
                 continue;
             };
-            let Some(heating_or_no_load_sequence) = self.required_positive_u32(
-                "ZoneHVAC:EquipmentList",
-                &entry_name,
-                &entry_object,
-                "zone_equipment_heating_or_no_load_sequence",
-            ) else {
+            let Some(heating_or_no_load_sequence) =
+                sequence("zone_equipment_heating_or_no_load_sequence")
+            else {
                 continue;
             };
 
@@ -21024,6 +21067,48 @@ mod tests {
                 && diagnostic.object_type == "ZoneHVAC:EquipmentConnections"
         }));
 
+        // Source integer narrowing must not bypass the existing duplicate check.
+        use ep_raw_model::{FieldName, ObjectType, RawValue};
+        let mut narrowed = raw_model.clone();
+        let list = narrowed
+            .objects
+            .get_mut(&ObjectType("ZoneHVAC:EquipmentList".into()))
+            .and_then(|rows| rows.values_mut().next())
+            .ok_or("actual EquipmentList")?;
+        let Some(RawValue::Array(entries)) = list.fields.get_mut(&FieldName("equipment".into()))
+        else {
+            return Err("actual equipment entries".into());
+        };
+        let RawValue::Object(first) = &mut entries[0] else {
+            return Err("actual first equipment".into());
+        };
+        for field in [
+            "zone_equipment_cooling_sequence",
+            "zone_equipment_heating_or_no_load_sequence",
+        ] {
+            first.insert(
+                FieldName(field.into()),
+                RawValue::Number("4294967297".into()),
+            );
+        }
+        let retained = narrowed.clone();
+        let source = compile_raw_model_for_source(&narrowed);
+        assert!(source.has_errors());
+        for field in [
+            "zone_equipment_cooling_sequence",
+            "zone_equipment_heating_or_no_load_sequence",
+        ] {
+            assert!(
+                source
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|d| d.code == "DuplicateZoneEquipmentSequence"
+                        && d.field.as_deref() == Some(field))
+            );
+        }
+        assert_eq!(narrowed, retained);
+
         Ok(())
     }
 
@@ -21077,6 +21162,100 @@ mod tests {
         assert_eq!(graph.zone_ideal_loads[0].heating_or_no_load_sequence, 1);
         assert_eq!(graph.zone_ideal_loads[1].ideal_loads_air_system.0, 1);
         assert_eq!(graph.zone_ideal_loads[1].heating_or_no_load_sequence, 2);
+
+        // Same real list/graph: wide bare integer priorities normalize only in
+        // Source, while all authored RawModel operands remain unchanged.
+        use ep_raw_model::{FieldName, ObjectType, RawValue};
+        let mut source_raw = raw_model.clone();
+        let list = source_raw
+            .objects
+            .get_mut(&ObjectType("ZoneHVAC:EquipmentList".into()))
+            .and_then(|rows| rows.values_mut().next())
+            .ok_or("actual EquipmentList")?;
+        let Some(RawValue::Array(entries)) = list.fields.get_mut(&FieldName("equipment".into()))
+        else {
+            return Err("actual equipment entries".into());
+        };
+        for (index, entry) in entries.iter_mut().enumerate() {
+            let RawValue::Object(fields) = entry else {
+                return Err("actual equipment object".into());
+            };
+            let token = if index == 0 {
+                "4294967298"
+            } else {
+                "4294967297"
+            };
+            for field in [
+                "zone_equipment_cooling_sequence",
+                "zone_equipment_heating_or_no_load_sequence",
+            ] {
+                fields.insert(FieldName(field.into()), RawValue::Number(token.into()));
+            }
+        }
+        let retained = source_raw.clone();
+        assert!(compile_raw_model(&source_raw).has_errors());
+        let source = compile_raw_model_for_source(&source_raw);
+        assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+        let typed = source.model.ok_or("actual Source narrowed model")?;
+        assert_eq!(
+            typed.zone_equipment_lists[0].equipment[0].cooling_sequence,
+            2
+        );
+        assert_eq!(
+            typed.zone_equipment_lists[0].equipment[1].cooling_sequence,
+            1
+        );
+        let source_graph = ModelGraph::from_typed(&typed);
+        assert_eq!(source_graph.zone_ideal_loads[0].ideal_loads_air_system.0, 0);
+        assert_eq!(
+            source_graph.zone_ideal_loads[0].heating_or_no_load_sequence,
+            1
+        );
+        assert_eq!(source_graph.zone_ideal_loads[1].ideal_loads_air_system.0, 1);
+        assert_eq!(
+            source_graph.zone_ideal_loads[1].heating_or_no_load_sequence,
+            2
+        );
+        assert_eq!(source_raw, retained);
+        // Strong integer kind and signed schema minimum precede narrowing;
+        // zero and negative narrowed priorities keep the old bounded restriction.
+        for (token, code) in [
+            ("1.0", "InvalidInteger"),
+            ("1e0", "InvalidInteger"),
+            ("18446744073709551616", "InvalidInteger"),
+            ("-4294967295", "InvalidNumericRange"),
+            ("18446744069414584321", "InvalidNumericRange"),
+            ("4294967296", "InvalidNumericRange"),
+            ("0", "InvalidNumericRange"),
+            ("2147483648", "InvalidNumericRange"),
+        ] {
+            let mut invalid = source_raw.clone();
+            let list = invalid
+                .objects
+                .get_mut(&ObjectType("ZoneHVAC:EquipmentList".into()))
+                .and_then(|rows| rows.values_mut().next())
+                .ok_or("actual invalid list")?;
+            let Some(RawValue::Array(entries)) =
+                list.fields.get_mut(&FieldName("equipment".into()))
+            else {
+                return Err("actual invalid entries".into());
+            };
+            let RawValue::Object(first) = &mut entries[0] else {
+                return Err("actual invalid equipment".into());
+            };
+            first.insert(
+                FieldName("zone_equipment_cooling_sequence".into()),
+                RawValue::Number(token.into()),
+            );
+            let result = compile_raw_model_for_source(&invalid);
+            assert!(result.has_errors(), "token={token}");
+            assert!(
+                result.report.diagnostics.iter().any(|d| d.code == code
+                    && d.field.as_deref() == Some("zone_equipment_cooling_sequence")),
+                "token={token}: {:?}",
+                result.report.diagnostics
+            );
+        }
 
         Ok(())
     }

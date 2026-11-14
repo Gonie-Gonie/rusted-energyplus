@@ -1487,7 +1487,9 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-53 bounded Source B Scheduled/NodeList pairs retain 3,885,840 values. The unused Source A pair adds59,520, giving 54 pairs and 3,945,360 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.
+54 bounded Source B Scheduled/NodeList pairs retain 3,960,960 values. The unused Source A pair adds59,520, giving 55 pairs and 4,020,480 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.
 
 Reported setpoint state does not establish private histories or IdealLoads load-control effects.
 Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).
+
+Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.

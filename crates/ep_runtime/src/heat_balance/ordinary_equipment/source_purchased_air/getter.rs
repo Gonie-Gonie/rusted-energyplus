@@ -10,16 +10,17 @@ fn uppercase(value: &str) -> String {
     value.to_ascii_uppercase()
 }
 fn number(value: &str) -> Result<f64, Error> {
-    if value.bytes().any(|byte| matches!(byte, b'.' | b'e' | b'E')) {
-        value
-            .parse::<f64>()
-            .map_err(|_| Error::Unavailable("actual PurchasedAir JSON double scalar"))
-    } else {
-        value
-            .parse::<i64>()
-            .map(|v| v as f64)
-            .map_err(|_| Error::Unavailable("actual PurchasedAir JSON signed integer scalar"))
-    }
+    // Native integer storage is converted through i64 before Real64.
+    // Bare -0 becomes +0.0; floating -0.0 retains its sign.
+    ep_model::classify_source_json_number(value)
+        .map(ep_model::SourceJsonNumber::as_f64)
+        .map_err(|_| {
+            if value.bytes().any(|byte| matches!(byte, b'.' | b'e' | b'E')) {
+                Error::Unavailable("actual PurchasedAir JSON double scalar")
+            } else {
+                Error::Unavailable("actual PurchasedAir JSON signed integer scalar")
+            }
+        })
 }
 fn descriptor(name: &str) -> Result<&'static Field, Error> {
     FIELDS

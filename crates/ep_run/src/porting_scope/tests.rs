@@ -3102,6 +3102,18 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         unit["maximum_sensible_heating_capacity"] = json!(capacity);
                         unit["maximum_total_cooling_capacity"] = json!(capacity);
                     }
+                    // Reuse one genuine SUM/NoLimit positive context: no extra
+                    // getter/physics fixture or RawModel normalization is added.
+                    let wide_priority = method == "Sum" && limit == "NoLimit" && flow > 0.0;
+                    if wide_priority {
+                        for field in [
+                            "zone_equipment_cooling_sequence",
+                            "zone_equipment_heating_or_no_load_sequence",
+                        ] {
+                            hard["ZoneHVAC:EquipmentList"]["Equipment"]["equipment"][0][field] =
+                                json!(4_294_967_297_u64);
+                        }
+                    }
                     let hard_raw = parse_epjson_str(&hard.to_string())
                         .expect("actual OA hard-limit raw input");
                     let retained_hard = hard_raw.clone();
@@ -3111,6 +3123,14 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         .model
                         .as_ref()
                         .expect("real typed OA hard-limit model");
+                    if wide_priority {
+                        assert!(ep_compiler::compile_raw_model(&hard_raw).has_errors());
+                        let entry = &model.zone_equipment_lists[0].equipment[0];
+                        assert_eq!(
+                            (entry.cooling_sequence, entry.heating_or_no_load_sequence),
+                            (1, 1)
+                        );
+                    }
                     let simulation = ep_model::SimulationModel::from_typed(model.clone());
                     ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
                         .expect("actual Source OA hard-limit eligibility");
@@ -3158,6 +3178,27 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         .expect("retained hard-limit raw alpha/numeric fields");
                     assert_eq!(actual["heating_limit"], OaRaw::String(limit.into()));
                     assert_eq!(actual["cooling_limit"], OaRaw::String(limit.into()));
+                    if wide_priority {
+                        let list = hard_ip
+                            .source_raw_object_fields("ZoneHVAC:EquipmentList", "Equipment")
+                            .expect("actual retained EquipmentList");
+                        let entries = match list.get("equipment") {
+                            Some(OaRaw::Array(entries)) => Some(entries),
+                            _ => None,
+                        }
+                        .expect("actual retained entries");
+                        let entry = match entries.first() {
+                            Some(OaRaw::Object(entry)) => Some(entry),
+                            _ => None,
+                        }
+                        .expect("actual retained entry");
+                        for field in [
+                            "zone_equipment_cooling_sequence",
+                            "zone_equipment_heating_or_no_load_sequence",
+                        ] {
+                            assert_eq!(entry[field], OaRaw::Number("4294967297".into()));
+                        }
+                    }
                     assert_eq!(hard_raw, retained_hard);
                     for missing in [
                         "maximum_heating_air_flow_rate",

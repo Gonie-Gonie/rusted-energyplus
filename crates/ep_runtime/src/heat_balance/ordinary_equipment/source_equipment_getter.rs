@@ -34,10 +34,9 @@ pub(super) fn integer(
     match fields.get(field) {
         None => Ok(0),
         Some(V::String(value)) if value.is_empty() => Ok(0),
-        Some(V::Number(value)) => value
-            .parse::<i64>()
+        Some(V::Number(value)) => ep_model::classify_source_json_number(value)
             .ok()
-            .and_then(|value| i32::try_from(value).ok())
+            .and_then(ep_model::SourceJsonNumber::as_i32)
             .ok_or_else(|| unavailable("actual Equipment JSON getIntFieldValue integer domain")),
         _ => Err(unavailable("actual Equipment JSON getIntFieldValue type")),
     }

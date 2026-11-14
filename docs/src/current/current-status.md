@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 225 paired physical cases and 8,846,536 reported values with zero
+contains 226 paired physical cases and 8,921,656 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 148 recorded Source builds,
-127 with accepted pairs and 21 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 149 recorded Source builds,
+128 with accepted pairs and 21 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -206,7 +206,7 @@ A separate passive diagnostic aligns all5,573 API-visible prediction frames by f
 
 The bounded Source no-outdoor-air owners retain heating-constant/cooling-capacity coupling and now implement constant sensible heat ratio (SHR) cooling. Eligibility permits named or omitted-default SHR (.7) with heating humidity explicitly None or ConstantSupplyHumidityRatio through the four cooling limit selectors, retaining all active numeric, topology, schedule and Legacy guards. Six prospectively frozen cases completed once under Source141; 6 meet every original numeric, export, clock, ancillary and science check plus their applicable public response witness. Qualifying cases: HEAT_CONST_COOL_NONE_CAPACITY_COUPLING, HEAT_CONST_COOL_NONE_FLOW_CAPACITY, HEAT_CONST_COOL_CONST_CAPACITY, HEAT_CONST_COOL_CONST_FLOW_CAPACITY, SHR_OMITTED_DEFAULTS_NO_LIMIT, SHR_NAMED_HEAT_CONST_FLOW_CAPACITY. The four prescribed heating-constant capacity/combined scenes include one designated Winter simultaneous heating/dehumidification witness; the two SHR scenes have their own Summer sensible/latent cooling witnesses. Those finite public interval responses imply no exact-quarter capacity, global SHR/humidity or private-mode law. Direct-epJSON exact-empty dehumidification remains unsupported; omitted defaults are distinct. The four Source139 comparisons from Unit137 remain unaccepted. Broader HVAC Humidistat combinations, OA/DCV/economizer/recovery, sizing, remaining combinations and full-object conformance remain open.
 
-53 bounded Source B Scheduled/NodeList pairs retain 3,885,840 values. The unused Source A pair adds59,520, giving 54 pairs and 3,945,360 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.
+54 bounded Source B Scheduled/NodeList pairs retain 3,960,960 values. The unused Source A pair adds59,520, giving 55 pairs and 4,020,480 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases
@@ -338,3 +338,5 @@ Routine/domain readiness is owned by the algorithm ledger and project contract;
 input support is owned by the capability registry. A finite unit pass, parser
 support or successful demo does not promote those registries. The
 [project contract](project-contract.md) defines the promotion requirements.
+
+Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.

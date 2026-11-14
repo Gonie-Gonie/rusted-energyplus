@@ -3492,6 +3492,8 @@ mod source_a_compact_ingress {
         );
         // Direct literal text retains numeric kind through actual RawModel and
         // Source A/B IP. A serde Value roundtrip here would hide bare -0.
+        // Kind/bits follow the classifier and Native accessor only; wrapped
+        // negative u64 results do not establish whole-model schema/physical validity.
         for (operand, expected, integer) in [
             ("-0", 0.0_f64, true),
             ("-0.0", -0.0, false),
@@ -3500,6 +3502,15 @@ mod source_a_compact_ingress {
             ("-1e-9999", -0.0, false),
             ("1E+00", 1.0, false),
             ("18446744073709551615", -1.0, true),
+            ("9223372036854775808", -9_223_372_036_854_775_808.0, true),
+            ("9223372036854775808.0", 9_223_372_036_854_775_808.0, false),
+            ("18446744073709551616", 18_446_744_073_709_551_616.0, false),
+            (
+                "18446744073709551616e0",
+                18_446_744_073_709_551_616.0,
+                false,
+            ),
+            ("-9223372036854775809", -9_223_372_036_854_775_808.0, false),
         ] {
             let source = format!(
                 r#"{{

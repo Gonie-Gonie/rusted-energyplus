@@ -31,25 +31,17 @@ const FIELDS: [&str; 8] = [
 ];
 
 fn json_number(token: &str) -> Result<f64, E> {
-    if token.bytes().any(|byte| matches!(byte, b'.' | b'e' | b'E')) {
-        token
-            .parse()
-            .map_err(|_| E::Unavailable("actual DSOA JSON double"))
-    } else if let Ok(value) = token.parse::<i64>() {
-        Ok(value as f64)
-    } else if let Ok(value) = token.parse::<u64>() {
-        // Native setObjectItemValue842 gets int64 even for an unsigned JSON integer.
-        Ok((value as i64) as f64)
-    } else {
-        // Native nlohmann lexer8310 falls from overflowing integer storage to double.
-        token
-            .parse::<f64>()
-            .ok()
-            .filter(|value| value.is_finite())
-            .ok_or(E::Unavailable(
-                "actual DSOA overflowing integer JSON double",
-            ))
-    }
+    // Native integer storage is converted through i64 before Real64.
+    // Bare -0 becomes +0.0; floating -0.0 retains its sign.
+    ep_model::classify_source_json_number(token)
+        .map(ep_model::SourceJsonNumber::as_f64)
+        .map_err(|_| {
+            if token.bytes().any(|byte| matches!(byte, b'.' | b'e' | b'E')) {
+                E::Unavailable("actual DSOA JSON double")
+            } else {
+                E::Unavailable("actual DSOA overflowing integer JSON double")
+            }
+        })
 }
 
 fn get_object(
