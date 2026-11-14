@@ -333,6 +333,19 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                     unit.demand_controlled_ventilation_type =
                         DemandControlledVentilationType::Co2Setpoint;
                 }
+                if method == ep_model::DesignSpecificationOutdoorAirMethod::FlowPerPerson
+                    && limit == IdealLoadsLimit::LimitFlowRate
+                    && flow > 0.0
+                {
+                    unit.outdoor_air_economizer_type =
+                        OutdoorAirEconomizerType::DifferentialDryBulb;
+                } else if method == ep_model::DesignSpecificationOutdoorAirMethod::Sum
+                    && limit == IdealLoadsLimit::LimitFlowRateAndCapacity
+                    && flow > 0.0
+                {
+                    unit.outdoor_air_economizer_type =
+                        OutdoorAirEconomizerType::DifferentialEnthalpy;
+                }
                 unit.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
                 unit.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
                 unit.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(capacity));
@@ -394,8 +407,13 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 }
                 12 => typed.ideal_loads_air_systems[0].outdoor_air_inlet_node_name = None,
                 13 => {
-                    typed.ideal_loads_air_systems[0].outdoor_air_economizer_type =
-                        OutdoorAirEconomizerType::DifferentialDryBulb
+                    let unit = &mut typed.ideal_loads_air_systems[0];
+                    unit.outdoor_air_economizer_type =
+                        OutdoorAirEconomizerType::DifferentialDryBulb;
+                    if method == ep_model::DesignSpecificationOutdoorAirMethod::Sum {
+                        unit.cooling_limit = IdealLoadsLimit::LimitCapacity;
+                        unit.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(1.0));
+                    }
                 }
                 14 => {
                     typed.ideal_loads_air_systems[0].heat_recovery_type = HeatRecoveryType::Sensible

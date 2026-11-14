@@ -3099,6 +3099,11 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     } else if method == "Sum" && limit == "NoLimit" && flow > 0.0 {
                         unit["demand_controlled_ventilation_type"] = json!("CO2Setpoint");
                     }
+                    if method == "Flow/Person" && limit == "LimitFlowRate" && flow > 0.0 {
+                        unit["outdoor_air_economizer_type"] = json!("DifferentialDryBulb");
+                    } else if method == "Sum" && limit == "LimitFlowRateAndCapacity" && flow > 0.0 {
+                        unit["outdoor_air_economizer_type"] = json!("DifferentialEnthalpy");
+                    }
                     if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
                         unit["maximum_heating_air_flow_rate"] = json!(flow);
                         unit["maximum_cooling_air_flow_rate"] = json!(flow);
@@ -3192,6 +3197,25 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         assert_eq!(
                             actual["demand_controlled_ventilation_type"],
                             OaRaw::String("CO2Setpoint".into())
+                        );
+                    }
+                    if method == "Flow/Person" && limit == "LimitFlowRate" && flow > 0.0 {
+                        assert_eq!(
+                            actual["outdoor_air_economizer_type"],
+                            OaRaw::String("DifferentialDryBulb".into())
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0].outdoor_air_economizer_type,
+                            ep_model::OutdoorAirEconomizerType::DifferentialDryBulb
+                        );
+                    } else if method == "Sum" && limit == "LimitFlowRateAndCapacity" && flow > 0.0 {
+                        assert_eq!(
+                            actual["outdoor_air_economizer_type"],
+                            OaRaw::String("DifferentialEnthalpy".into())
+                        );
+                        assert_eq!(
+                            model.ideal_loads_air_systems[0].outdoor_air_economizer_type,
+                            ep_model::OutdoorAirEconomizerType::DifferentialEnthalpy
                         );
                     }
                     if wide_priority {
@@ -3289,7 +3313,19 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
                             json!("")
                     }
-                    5 => bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(""),
+                    5 => {
+                        let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
+                        if method == "Flow/Person" {
+                            unit["outdoor_air_economizer_type"] = json!("DifferentialDryBulb");
+                            unit["cooling_limit"] = json!("NoLimit");
+                        } else if method == "Sum" {
+                            unit["outdoor_air_economizer_type"] = json!("DifferentialEnthalpy");
+                            unit["cooling_limit"] = json!("LimitCapacity");
+                            unit["maximum_total_cooling_capacity"] = json!(1.0);
+                        } else {
+                            unit["cooling_limit"] = json!("");
+                        }
+                    }
                     6 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heating_limit"] =
                             json!("LimitCapacity");

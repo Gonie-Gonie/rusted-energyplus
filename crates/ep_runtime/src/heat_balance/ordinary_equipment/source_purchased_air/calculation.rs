@@ -461,10 +461,28 @@ impl OrdinaryEquipment {
                         )?;
                     }
                     oa_flow = unit.max_cool_mass_flow_rate;
-                } else if unit.economizer_type != SourcePurchasedAirEconomizer::NoEconomizer {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir positive economizer operation",
-                    ));
+                } else if (unit.economizer_type
+                    == SourcePurchasedAirEconomizer::DifferentialDryBulb
+                    && node(nodes, outdoor_node)?.temperature
+                        < node(nodes, recirc_node)?.temperature)
+                    || (unit.economizer_type == SourcePurchasedAirEconomizer::DifferentialEnthalpy
+                        && node(nodes, outdoor_node)?.enthalpy < node(nodes, recirc_node)?.enthalpy)
+                {
+                    // Native2082-2108: the outer non-NoEconomizer check is
+                    // implied by these two named short-circuit predicates.
+                    let specific_heat = cp(air_humidity);
+                    let delta = node(nodes, outdoor_node)?.temperature
+                        - node(nodes, zone_node)?.temperature;
+                    if delta < -1.0e-5 {
+                        supply_flow = cool_load / specific_heat / delta;
+                        if flow_limited(unit.cooling_limit) && unit.max_cool_mass_flow_rate > 0.0 {
+                            supply_flow = min(max(supply_flow, 0.0), unit.max_cool_mass_flow_rate);
+                        }
+                        if supply_flow > oa_flow {
+                            oa_flow = supply_flow;
+                            unit.time_econo_active = o.hvac.time_step_sys;
+                        }
+                    }
                 }
                 let mut cool_flow = 0.0;
                 if cool_on {

@@ -356,7 +356,7 @@
     ],
     "ZoneHVAC:IdealLoadsAirSystem": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
-      "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV. NoLimit Flow/Person also has qualifying None and OccupancySchedule DCV evidence using genuine reported occupancy. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. Hard-limit/DCV and OA/humidity compositions, active CO2/IAQ, economizer/recovery, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing or private-mode law.",
+      "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV; NoLimit Flow/Person also covers None and OccupancySchedule using genuine reported occupancy. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed. Without selected outdoor air, all27 named DCV/economizer/recovery combinations share the ignored-selector path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. DifferentialDryBulb and DifferentialEnthalpy economizers require cooling LimitFlowRate or LimitFlowRateAndCapacity and a valid hard maximum. Both named controls have qualifying SUM/LimitFlowRate comparisons. Actual public active time and sensible-cooling/OA service are required independently in each engine; mechanical availability may be zero. Evidence does not imply all-method, combined-capacity, DCV/humidity or recovery composition closure. Broader hard-limit/DCV and OA/humidity/economizer compositions, active CO2/IAQ, heat recovery, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing, private-mode or full-object law.",
       "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed."
     ],
     "ZoneControl:Thermostat": [
@@ -8836,6 +8836,289 @@
         "Source_processes": 1,
         "engine_replays": 0,
         "scope": "With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed.",
+        "physical_domain_completion": false
+      },
+      "basic_positive_OA_Economizer_151": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit151-prep/build154-attempt01.json",
+          "sha256": "e3ba3795cbd75d32646e413140749dfd5c9febfd311486814792732761a20cc4",
+          "bytes": 720
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/quality01/summary.json",
+          "sha256": "2f43de72b8f60fbf91c707048ae9a139e54273c20ba67f64400c6ad278e020a9",
+          "bytes": 1688
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit151-prep/owner-execution-review01.json",
+          "sha256": "1f96911f3690603b93b8d7205a198be34cf9549158fd6f7703c93bbf9b197c13",
+          "bytes": 4463
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-source-basic-positive-OA-Economizer-adoption01.json",
+          "sha256": "15cb05ec125a0aba34aef1caa1c54d1095a203a1b4c713f6b65967b94aeaac58",
+          "bytes": 11467
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-source-format-review01.json",
+          "sha256": "0f7be6682b2eb9d1c1522e442c24e302810c814585f137920bb2afc1cc1c1247",
+          "bytes": 2088
+        },
+        "current_QA_commands": 5,
+        "total_actual_QA_commands": 5,
+        "failed_QA_attempts": 0,
+        "existing_test_executions": [
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "ideal_loads::binding::tests::model_binding_resolves_exact_typed_ids_and_schedule_roles"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/basic-positive-oa-economizer-151/quality01/binding-tests/receipt.json",
+              "sha256": "d7d30a13d838ed3b55ccdc38aa9496b122941127f420942dd211db08f74b2f46",
+              "bytes": 3581
+            },
+            "actual_exit_code": 0
+          },
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "porting_scope::tests::bounded_controls_do_not_change_ordinary_support_assessment"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/basic-positive-oa-economizer-151/quality01/source-caller-tests/receipt.json",
+              "sha256": "c8d5a0e3c77b810ba2511ec5de7b2c97ba0a40e2a78a5430251c463c7f650f50",
+              "bytes": 3582
+            },
+            "actual_exit_code": 0
+          }
+        ],
+        "distinct_existing_test_functions": 2,
+        "actual_existing_test_body_executions": 2,
+        "new_test_functions": 0,
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-runtime-bindings01.json",
+          "sha256": "17c50b7ccd1e76434351d2647dad5df859f6b441064a917f4aa8df69c65ce2a3",
+          "bytes": 3659
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-runtime-final-review01.json",
+          "sha256": "f5022663fe83de2d7cf9edcbd833dcea252c88fbeac737dbee13dcfac331b84b",
+          "bytes": 5139
+        },
+        "Root_producer": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-run-two-pairs151.py",
+          "sha256": "5a099017760ae86a8279041239454c5a26148cb83bc465f84b640d0e369d45bb",
+          "bytes": 5410
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-two-pairs154-01/receipt.json",
+          "sha256": "7510f01092e92b7221616667ccd192806b15791092f3afd0234133ddb8b19366",
+          "bytes": 34624
+        },
+        "paired_readbacks": {
+          "ECON_DIFFERENTIAL_DRYBULB": {
+            "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.paired154-01.json",
+            "sha256": "fdeb16671b1df3e2cd2b36bce94d9cdbbdd900c4b7411cf3d6a1934841cb8cee",
+            "bytes": 581787
+          },
+          "ECON_DIFFERENTIAL_ENTHALPY": {
+            "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.paired154-01.json",
+            "sha256": "4373f3de7c7136789c61d01247bdd50adac853422cc3bc422cd444cb567fb533",
+            "bytes": 581852
+          }
+        },
+        "cases": {
+          "ECON_DIFFERENTIAL_DRYBULB": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.paired154-01.json",
+              "sha256": "fdeb16671b1df3e2cd2b36bce94d9cdbbdd900c4b7411cf3d6a1934841cb8cee",
+              "bytes": 581787
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 20667,
+            "public_response": {
+              "Native": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 77,
+                    "mixed_temperature_response_samples": 77,
+                    "mixed_humidity_response_samples": 73,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "Economizer": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      152,
+                      63,
+                      81,
+                      82,
+                      99,
+                      101,
+                      153
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "positive_Economizer_service_samples": 315,
+                    "maximum_actual_active_time_hr": 0.25000000000000006,
+                    "activation_accepted": true,
+                    "mechanical_availability_is_observation_only": true,
+                    "all_time_values_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                }
+              },
+              "Source": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 77,
+                    "mixed_temperature_response_samples": 77,
+                    "mixed_humidity_response_samples": 73,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "Economizer": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      152,
+                      63,
+                      81,
+                      82,
+                      99,
+                      101,
+                      153
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "positive_Economizer_service_samples": 315,
+                    "maximum_actual_active_time_hr": 0.25000000000000006,
+                    "activation_accepted": true,
+                    "mechanical_availability_is_observation_only": true,
+                    "all_time_values_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                }
+              }
+            }
+          },
+          "ECON_DIFFERENTIAL_ENTHALPY": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.paired154-01.json",
+              "sha256": "4373f3de7c7136789c61d01247bdd50adac853422cc3bc422cd444cb567fb533",
+              "bytes": 581852
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 18713,
+            "public_response": {
+              "Native": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 82,
+                    "mixed_temperature_response_samples": 82,
+                    "mixed_humidity_response_samples": 78,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "Economizer": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      152,
+                      63,
+                      81,
+                      82,
+                      99,
+                      101,
+                      153
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "positive_Economizer_service_samples": 305,
+                    "maximum_actual_active_time_hr": 0.25000000000000006,
+                    "activation_accepted": true,
+                    "mechanical_availability_is_observation_only": true,
+                    "all_time_values_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                }
+              },
+              "Source": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 82,
+                    "mixed_temperature_response_samples": 82,
+                    "mixed_humidity_response_samples": 78,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "Economizer": {
+                  "passed": true,
+                  "observation": {
+                    "policy_indices": [
+                      156,
+                      6,
+                      152,
+                      63,
+                      81,
+                      82,
+                      99,
+                      101,
+                      153
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "positive_Economizer_service_samples": 305,
+                    "maximum_actual_active_time_hr": 0.25000000000000006,
+                    "activation_accepted": true,
+                    "mechanical_availability_is_observation_only": true,
+                    "all_time_values_finite_and_nonnegative": true,
+                    "no_private_mode_reconstruction": true
+                  },
+                  "error": null
+                }
+              }
+            }
+          }
+        },
+        "accepted_cases": 2,
+        "accepted_values": 151200,
+        "qualifying_raw_operand_unequal": 39380,
+        "Native_processes": 2,
+        "Source_processes": 2,
+        "engine_replays": 0,
+        "scope": "DifferentialDryBulb and DifferentialEnthalpy economizers require cooling LimitFlowRate or LimitFlowRateAndCapacity and a valid hard maximum. Both named controls have qualifying SUM/LimitFlowRate comparisons. Actual public active time and sensible-cooling/OA service are required independently in each engine; mechanical availability may be zero. Evidence does not imply all-method, combined-capacity, DCV/humidity or recovery composition closure.",
         "physical_domain_completion": false
       }
     },
@@ -68990,12 +69273,440 @@
           "no_replay": true
         },
         "effective_state": "One NoLimit SUM direct-epJSON input retains authored CO2Setpoint without any contaminant simulation family. Genuine first-getter warning/reset and all original positive OA/mixed/sensible, numeric/export/ancillary criteria qualify together. No private effective enum or phase flag is exported; active CO2 control, IAQ and full object completion remain open."
+      },
+      {
+        "id": "basic-positive-oa-economizer-151-econ_differential_drybulb",
+        "case_kind": "ECON_DIFFERENTIAL_DRYBULB",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-economizer-151",
+        "input": {
+          "path": ".runtime/object-expansion/unit151-prep/basic-positive-OA-Economizer-two-case-input-proposal01/ECON_DIFFERENTIAL_DRYBULB/input.epJSON",
+          "sha256": "d364d58d333417b4d9291a67c7c71e1f2c1850757c6c30fbdf372b35bb58f719",
+          "bytes": 101959
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/epoch154/ECON_DIFFERENTIAL_DRYBULB/native01/command/receipt.json",
+          "sha256": "cc02768a0173d1d0116b98d6af029fedaa762e090fcd345e7e09fcb751584541",
+          "bytes": 87564
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/epoch154/ECON_DIFFERENTIAL_DRYBULB/source01/command/receipt.json",
+          "sha256": "c2f92043ba25abad716bb5a90e10b642284aa4eb5392f0bf5c7f698546720d40",
+          "bytes": 88413
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/epoch154/ECON_DIFFERENTIAL_DRYBULB/source01/output/run-summary.json",
+          "sha256": "299b2d5ebda736b730dde6ec00e33073b5a5a3e0854a07b83dfe31d813b3c3a0",
+          "bytes": 65600
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/bf/bffcb8f6de08e05ea03448ee3fa8b7cc6b9f94ee9fbd0a80f3de323d5e15989e",
+          "sha256": "bffcb8f6de08e05ea03448ee3fa8b7cc6b9f94ee9fbd0a80f3de323d5e15989e"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/build154-01/eplus-rs.exe",
+          "sha256": "e5df24f54afbf65a17323256cefcf3696c445abc992e4bd978e48288efcc1841",
+          "bytes": 81030756
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/build154-01/build/receipt.json",
+          "sha256": "951eb79e078170361b8551765e053747cf096f3c8f23abae1545a7d2737e1ba7",
+          "bytes": 4932
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.paired154-01.json",
+          "sha256": "fdeb16671b1df3e2cd2b36bce94d9cdbbdd900c4b7411cf3d6a1934841cb8cee",
+          "bytes": 581787
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-two-pairs154-01/receipt.json",
+          "sha256": "7510f01092e92b7221616667ccd192806b15791092f3afd0234133ddb8b19366",
+          "bytes": 34624
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.recipe.json",
+          "sha256": "b5d2f1eb4c3768d3b74a19410c82379d7f01d8f632ff65cbcaa9e3beaa5dfe38",
+          "bytes": 62921
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit151-prep/basic-positive-OA-Economizer-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "3bada946a584d4d0cf45cd48b6f67d873e4063a3fed52f381d89ce7088e74167",
+          "bytes": 11832
+        },
+        "totals": {
+          "series": 159,
+          "samples": 75600,
+          "raw_operand_unequal": 20667,
+          "parsed_binary64_unequal": 20667,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1862797439098358e-07,
+          "max_rmse_delta": 1.9638996797518766e-08
+        },
+        "coverage_kind": "basic_positive_OA_Economizer_fidelity",
+        "authored_selectors": {
+          "economizer": "DifferentialDryBulb",
+          "cooling_limit": "LimitFlowRate"
+        },
+        "public_response_summary": {
+          "Native": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 77,
+                "mixed_temperature_response_samples": 77,
+                "mixed_humidity_response_samples": 73,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "Economizer": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  152,
+                  63,
+                  81,
+                  82,
+                  99,
+                  101,
+                  153
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "positive_Economizer_service_samples": 315,
+                "maximum_actual_active_time_hr": 0.25000000000000006,
+                "activation_accepted": true,
+                "mechanical_availability_is_observation_only": true,
+                "all_time_values_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            }
+          },
+          "Source": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 77,
+                "mixed_temperature_response_samples": 77,
+                "mixed_humidity_response_samples": 73,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "Economizer": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  152,
+                  63,
+                  81,
+                  82,
+                  99,
+                  101,
+                  153
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "positive_Economizer_service_samples": 315,
+                "maximum_actual_active_time_hr": 0.25000000000000006,
+                "activation_accepted": true,
+                "mechanical_availability_is_observation_only": true,
+                "all_time_values_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit151-prep/basic-positive-OA-Economizer-two-case-input-proposal01/derived159-policy.json",
+            "sha256": "ab2f97c00409dea63ec6166cd7c0e6102b125626d2238ff1c550181b52cc0910",
+            "bytes": 43925
+          },
+          "all158_original_policy_rules_literal": true,
+          "new_time_rule": {
+            "units": "hr",
+            "atol": 1e-12,
+            "rtol": 0.0,
+            "rmse_max": 1e-12
+          },
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit151-prep/build154-attempt01.json",
+            "sha256": "e3ba3795cbd75d32646e413140749dfd5c9febfd311486814792732761a20cc4",
+            "bytes": 720
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-economizer-151/quality01/summary.json",
+            "sha256": "2f43de72b8f60fbf91c707048ae9a139e54273c20ba67f64400c6ad278e020a9",
+            "bytes": 1688
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit151-prep/owner-execution-review01.json",
+            "sha256": "1f96911f3690603b93b8d7205a198be34cf9549158fd6f7703c93bbf9b197c13",
+            "bytes": 4463
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit151-prep/Root-runtime-bindings01.json",
+            "sha256": "17c50b7ccd1e76434351d2647dad5df859f6b441064a917f4aa8df69c65ce2a3",
+            "bytes": 3659
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit151-prep/Root-run-two-pairs151.py",
+            "sha256": "5a099017760ae86a8279041239454c5a26148cb83bc465f84b640d0e369d45bb",
+            "bytes": 5410
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit151-prep/Root-runtime-final-review01.json",
+            "sha256": "f5022663fe83de2d7cf9edcbd833dcea252c88fbeac737dbee13dcfac331b84b",
+            "bytes": 5139
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Fixed SUM/LimitFlowRate scene with one named Economizer, genuine active time and independent public OA/mixed and sensible-cooling service. All159 numeric/science/export/ancillary criteria qualify together. No CoolOn filter, private EconoOn/OperatingMode, global averaged mixing or whole-object completion claim."
+      },
+      {
+        "id": "basic-positive-oa-economizer-151-econ_differential_enthalpy",
+        "case_kind": "ECON_DIFFERENTIAL_ENTHALPY",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-basic-positive-oa-economizer-151",
+        "input": {
+          "path": ".runtime/object-expansion/unit151-prep/basic-positive-OA-Economizer-two-case-input-proposal01/ECON_DIFFERENTIAL_ENTHALPY/input.epJSON",
+          "sha256": "2305211f081d30aadcdfc53c919d4920e6c7545aee8fbcd4cdbed44cbd225d86",
+          "bytes": 101960
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/epoch154/ECON_DIFFERENTIAL_ENTHALPY/native01/command/receipt.json",
+          "sha256": "bc3820e040c384aa121b5cd55eb8ffab823033ceb2146046014c638800c00ef0",
+          "bytes": 87588
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/epoch154/ECON_DIFFERENTIAL_ENTHALPY/source01/command/receipt.json",
+          "sha256": "3477fc810a443881092e20991b94e255cf177d0eedcaa4839c821b30f9339db7",
+          "bytes": 88440
+        },
+        "source_summary": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/epoch154/ECON_DIFFERENTIAL_ENTHALPY/source01/output/run-summary.json",
+          "sha256": "2f30adb289316adcb825b36694098a06d47e1dc01233f11f807ff35035e0e29c",
+          "bytes": 65627
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/bf/bffcb8f6de08e05ea03448ee3fa8b7cc6b9f94ee9fbd0a80f3de323d5e15989e",
+          "sha256": "bffcb8f6de08e05ea03448ee3fa8b7cc6b9f94ee9fbd0a80f3de323d5e15989e"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/build154-01/eplus-rs.exe",
+          "sha256": "e5df24f54afbf65a17323256cefcf3696c445abc992e4bd978e48288efcc1841",
+          "bytes": 81030756
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/build154-01/build/receipt.json",
+          "sha256": "951eb79e078170361b8551765e053747cf096f3c8f23abae1545a7d2737e1ba7",
+          "bytes": 4932
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.paired154-01.json",
+          "sha256": "4373f3de7c7136789c61d01247bdd50adac853422cc3bc422cd444cb567fb533",
+          "bytes": 581852
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit151-prep/Root-two-pairs154-01/receipt.json",
+          "sha256": "7510f01092e92b7221616667ccd192806b15791092f3afd0234133ddb8b19366",
+          "bytes": 34624
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.recipe.json",
+          "sha256": "6bac156ec4a726f1952e0d989a3873855a1314c7ea49f937beeec7bbfd90cea3",
+          "bytes": 62931
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit151-prep/basic-positive-OA-Economizer-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "3bada946a584d4d0cf45cd48b6f67d873e4063a3fed52f381d89ce7088e74167",
+          "bytes": 11832
+        },
+        "totals": {
+          "series": 159,
+          "samples": 75600,
+          "raw_operand_unequal": 18713,
+          "parsed_binary64_unequal": 18713,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1862797439098358e-07,
+          "max_rmse_delta": 1.9638996335787958e-08
+        },
+        "coverage_kind": "basic_positive_OA_Economizer_fidelity",
+        "authored_selectors": {
+          "economizer": "DifferentialEnthalpy",
+          "cooling_limit": "LimitFlowRate"
+        },
+        "public_response_summary": {
+          "Native": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 82,
+                "mixed_temperature_response_samples": 82,
+                "mixed_humidity_response_samples": 78,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "Economizer": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  152,
+                  63,
+                  81,
+                  82,
+                  99,
+                  101,
+                  153
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "positive_Economizer_service_samples": 305,
+                "maximum_actual_active_time_hr": 0.25000000000000006,
+                "activation_accepted": true,
+                "mechanical_availability_is_observation_only": true,
+                "all_time_values_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            }
+          },
+          "Source": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 82,
+                "mixed_temperature_response_samples": 82,
+                "mixed_humidity_response_samples": 78,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "Economizer": {
+              "passed": true,
+              "observation": {
+                "policy_indices": [
+                  156,
+                  6,
+                  152,
+                  63,
+                  81,
+                  82,
+                  99,
+                  101,
+                  153
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "positive_Economizer_service_samples": 305,
+                "maximum_actual_active_time_hr": 0.25000000000000006,
+                "activation_accepted": true,
+                "mechanical_availability_is_observation_only": true,
+                "all_time_values_finite_and_nonnegative": true,
+                "no_private_mode_reconstruction": true
+              },
+              "error": null
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit151-prep/basic-positive-OA-Economizer-two-case-input-proposal01/derived159-policy.json",
+            "sha256": "ab2f97c00409dea63ec6166cd7c0e6102b125626d2238ff1c550181b52cc0910",
+            "bytes": 43925
+          },
+          "all158_original_policy_rules_literal": true,
+          "new_time_rule": {
+            "units": "hr",
+            "atol": 1e-12,
+            "rtol": 0.0,
+            "rmse_max": 1e-12
+          },
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit151-prep/build154-attempt01.json",
+            "sha256": "e3ba3795cbd75d32646e413140749dfd5c9febfd311486814792732761a20cc4",
+            "bytes": 720
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/basic-positive-oa-economizer-151/quality01/summary.json",
+            "sha256": "2f43de72b8f60fbf91c707048ae9a139e54273c20ba67f64400c6ad278e020a9",
+            "bytes": 1688
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit151-prep/owner-execution-review01.json",
+            "sha256": "1f96911f3690603b93b8d7205a198be34cf9549158fd6f7703c93bbf9b197c13",
+            "bytes": 4463
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit151-prep/Root-runtime-bindings01.json",
+            "sha256": "17c50b7ccd1e76434351d2647dad5df859f6b441064a917f4aa8df69c65ce2a3",
+            "bytes": 3659
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit151-prep/Root-run-two-pairs151.py",
+            "sha256": "5a099017760ae86a8279041239454c5a26148cb83bc465f84b640d0e369d45bb",
+            "bytes": 5410
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit151-prep/Root-runtime-final-review01.json",
+            "sha256": "f5022663fe83de2d7cf9edcbd833dcea252c88fbeac737dbee13dcfac331b84b",
+            "bytes": 5139
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Fixed SUM/LimitFlowRate scene with one named Economizer, genuine active time and independent public OA/mixed and sensible-cooling service. All159 numeric/science/export/ancillary criteria qualify together. No CoolOn filter, private EconoOn/OperatingMode, global averaged mixing or whole-object completion claim."
       }
     ],
     "totals": {
-      "paired_cases": 232,
-      "reported_samples": 9369016,
-      "raw_operand_unequal": 2321612,
+      "paired_cases": 234,
+      "reported_samples": 9520216,
+      "raw_operand_unequal": 2360992,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -71609,6 +72320,23 @@
           "sha256": "e4994731fe2380437753d53ca34a2905472fb345eac59ede4a64fe0752316aea",
           "bytes": 81023634
         }
+      },
+      {
+        "id": "source-basic-positive-oa-economizer-151",
+        "receipt": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/build154-01/build/receipt.json",
+          "sha256": "951eb79e078170361b8551765e053747cf096f3c8f23abae1545a7d2737e1ba7",
+          "bytes": 4932
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/bf/bffcb8f6de08e05ea03448ee3fa8b7cc6b9f94ee9fbd0a80f3de323d5e15989e",
+          "sha256": "bffcb8f6de08e05ea03448ee3fa8b7cc6b9f94ee9fbd0a80f3de323d5e15989e"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/basic-positive-oa-economizer-151/build154-01/eplus-rs.exe",
+          "sha256": "e5df24f54afbf65a17323256cefcf3696c445abc992e4bd978e48288efcc1841",
+          "bytes": 81030756
+        }
       }
     ],
     "focused_since_workspace": {
@@ -72008,14 +72736,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 153,
-      "builds_with_accepted_paired_cases": 132,
+      "actual_recorded_builds": 154,
+      "builds_with_accepted_paired_cases": 133,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "153 recorded Source builds: 132 retain accepted pairs and 21 have none, including 8 without Source execution. Only a strict qualifying warning/reset comparison adds a case or values; all earlier history remains unchanged.",
+      "qualification": "154 recorded Source builds: 133 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying Economizer scenes add cases or values; all earlier history remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -76654,8 +77382,10 @@
       "B-IDEALLOADS-NO-OA-INACTIVE-CO2-DCV-148-120H",
       "B-IDEALLOADS-NOOA-DRY-SENSIBLE-149-120H",
       "B-IDEALLOADS-NOOA-ENTHALPY-RECOVERY-149-120H",
-      "B-IDEALLOADS-POSITIVE-OA-CO2-NO-SIMULATION-150-120H"
-    ], "accepted_paired_cases": 61, "accepted_samples": 4467840, "retained_Scheduled_B_pairs": 60, "retained_Scheduled_B_samples": 4408320, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"POSITIVE_OA_CO2_NO_SIMULATION": {"path": ".runtime/object-expansion/unit150-prep/paired-runtime-proposal01/POSITIVE_OA_CO2_NO_SIMULATION.paired153-01.json", "sha256": "445ce12716d5fef03ed951af6e1530fada8f76bdda9a9b7e36d0e97084e3e750", "bytes": 547474}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit150-prep/Root-one-pair153-01/receipt.json", "sha256": "39eba4c402aeba975cd98a6d7f17b30ca851b2df8ee0dc126d876aab61c5df51", "bytes": 8883}, "latest_source_build": "source-positive-oa-co2-warning-reset-150", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit150-prep/build153-attempt01.json", "sha256": "499d6bd9e52f8b68dbd5e5299845dfca843befb3faa47c0cc8435e25b5f98880", "bytes": 723}, "latest_actual_quality": {"path": ".runtime/porting/positive-oa-co2-warning-reset-150/quality01/summary.json", "sha256": "a0ab7ee50d023b1a7754f099c2b1d658ff2ece1163b576d114290fecdbd477ea", "bytes": 2037}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit150-prep/owner-execution-review01.json", "sha256": "c466acf6af0cc8d084ea261a747af9943b377b1c89698dbe55a4232c336a9779", "bytes": 4947}, "latest_input_contracts": {"POSITIVE_OA_CO2_NO_SIMULATION": {"path": ".runtime/object-expansion/unit150-prep/paired-runtime-proposal01/POSITIVE_OA_CO2_NO_SIMULATION.recipe.json", "sha256": "9e8222acce250390e1fac18ba83d61f3ecef7e01025718541f16d68acd496fbc", "bytes": 50739}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "60 bounded Source B Scheduled/NodeList pairs retain 4,408,320 values. The unused Source A pair adds59,520, giving 61 pairs and 4,467,840 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
+      "B-IDEALLOADS-POSITIVE-OA-CO2-NO-SIMULATION-150-120H",
+      "basic-positive-oa-economizer-151-econ_differential_drybulb",
+      "basic-positive-oa-economizer-151-econ_differential_enthalpy"
+    ], "accepted_paired_cases": 63, "accepted_samples": 4619040, "retained_Scheduled_B_pairs": 62, "retained_Scheduled_B_samples": 4559520, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"ECON_DIFFERENTIAL_DRYBULB": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.paired154-01.json", "sha256": "fdeb16671b1df3e2cd2b36bce94d9cdbbdd900c4b7411cf3d6a1934841cb8cee", "bytes": 581787}, "ECON_DIFFERENTIAL_ENTHALPY": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.paired154-01.json", "sha256": "4373f3de7c7136789c61d01247bdd50adac853422cc3bc422cd444cb567fb533", "bytes": 581852}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit151-prep/Root-two-pairs154-01/receipt.json", "sha256": "7510f01092e92b7221616667ccd192806b15791092f3afd0234133ddb8b19366", "bytes": 34624}, "latest_source_build": "source-basic-positive-oa-economizer-151", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit151-prep/build154-attempt01.json", "sha256": "e3ba3795cbd75d32646e413140749dfd5c9febfd311486814792732761a20cc4", "bytes": 720}, "latest_actual_quality": {"path": ".runtime/porting/basic-positive-oa-economizer-151/quality01/summary.json", "sha256": "2f43de72b8f60fbf91c707048ae9a139e54273c20ba67f64400c6ad278e020a9", "bytes": 1688}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit151-prep/owner-execution-review01.json", "sha256": "1f96911f3690603b93b8d7205a198be34cf9549158fd6f7703c93bbf9b197c13", "bytes": 4463}, "latest_input_contracts": {"ECON_DIFFERENTIAL_DRYBULB": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_DRYBULB.recipe.json", "sha256": "b5d2f1eb4c3768d3b74a19410c82379d7f01d8f632ff65cbcaa9e3beaa5dfe38", "bytes": 62921}, "ECON_DIFFERENTIAL_ENTHALPY": {"path": ".runtime/object-expansion/unit151-prep/paired-runtime-proposal01/ECON_DIFFERENTIAL_ENTHALPY.recipe.json", "sha256": "6bac156ec4a726f1952e0d989a3873855a1314c7ea49f937beeec7bbfd90cea3", "bytes": 62931}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "62 bounded Source B Scheduled/NodeList pairs retain 4,559,520 values. The unused Source A pair adds59,520, giving 63 pairs and 4,619,040 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

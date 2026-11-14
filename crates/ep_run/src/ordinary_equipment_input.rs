@@ -155,13 +155,31 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
         || !field(unit, "demand_controlled_ventilation_type")
             .is_none_or(|value| text_is(value, &["None", "OccupancySchedule", "CO2Setpoint"]))
+        || !field(unit, "outdoor_air_economizer_type").is_none_or(|value| {
+            text_is(
+                value,
+                &[
+                    "NoEconomizer",
+                    "DifferentialDryBulb",
+                    "DifferentialEnthalpy",
+                ],
+            )
+        })
         || ![
             ("humidification_control_type", "None"),
-            ("outdoor_air_economizer_type", "NoEconomizer"),
             ("heat_recovery_type", "None"),
         ]
         .iter()
         .all(|(name, expected)| field(unit, name).is_none_or(|value| text_is(value, &[*expected])))
+    {
+        return error();
+    }
+    // Native Init1182-1191 reports Severe without a cooling-flow limit.
+    // This bounded Source route leaves that diagnostic child held.
+    if field(unit, "outdoor_air_economizer_type")
+        .is_some_and(|value| text_is(value, &["DifferentialDryBulb", "DifferentialEnthalpy"]))
+        && !field(unit, "cooling_limit")
+            .is_some_and(|value| text_is(value, &["LimitFlowRate", "LimitFlowRateAndCapacity"]))
     {
         return error();
     }

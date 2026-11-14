@@ -753,7 +753,14 @@ pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool 
                 | ep_model::DemandControlledVentilationType::OccupancySchedule
                 | ep_model::DemandControlledVentilationType::Co2Setpoint
         )
-        && system.outdoor_air_economizer_type == ep_model::OutdoorAirEconomizerType::NoEconomizer
+        && match system.outdoor_air_economizer_type {
+            ep_model::OutdoorAirEconomizerType::NoEconomizer => true,
+            ep_model::OutdoorAirEconomizerType::DifferentialDryBulb
+            | ep_model::OutdoorAirEconomizerType::DifferentialEnthalpy => matches!(
+                system.cooling_limit,
+                IdealLoadsLimit::LimitFlowRate | IdealLoadsLimit::LimitFlowRateAndCapacity
+            ),
+        }
         && system.heat_recovery_type == ep_model::HeatRecoveryType::None
         && !IdealLoadsFeatureFlags::from_system(system).has_autosize
 }
@@ -1214,6 +1221,7 @@ fn validate_direct_zone_model(
                         feature,
                         IdealLoadsUnsupportedFeature::OutdoorAir
                             | IdealLoadsUnsupportedFeature::DemandControlledVentilation
+                            | IdealLoadsUnsupportedFeature::Economizer
                     ))
                 || (source_owned_inactive_ventilation
                     && matches!(
