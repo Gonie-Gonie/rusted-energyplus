@@ -714,8 +714,11 @@ pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool 
             .is_some_and(|name| !name.0.trim().is_empty())
         && system.dehumidification_control_type == DehumidificationControlType::None
         && system.humidification_control_type == HumidificationControlType::None
-        && system.demand_controlled_ventilation_type
-            == ep_model::DemandControlledVentilationType::None
+        && matches!(
+            system.demand_controlled_ventilation_type,
+            ep_model::DemandControlledVentilationType::None
+                | ep_model::DemandControlledVentilationType::OccupancySchedule
+        )
         && system.outdoor_air_economizer_type == ep_model::OutdoorAirEconomizerType::NoEconomizer
         && system.heat_recovery_type == ep_model::HeatRecoveryType::None
         && !IdealLoadsFeatureFlags::from_system(system).has_autosize
@@ -1171,7 +1174,11 @@ fn validate_direct_zone_model(
                         | IdealLoadsUnsupportedFeature::Humidification
                 ))
                 || (source_owned_positive_oa
-                    && matches!(feature, IdealLoadsUnsupportedFeature::OutdoorAir)))
+                    && matches!(
+                        feature,
+                        IdealLoadsUnsupportedFeature::OutdoorAir
+                            | IdealLoadsUnsupportedFeature::DemandControlledVentilation
+                    )))
         })
     {
         return unsupported(DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset);

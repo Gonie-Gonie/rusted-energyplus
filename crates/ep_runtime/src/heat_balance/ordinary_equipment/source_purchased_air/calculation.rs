@@ -334,7 +334,10 @@ impl OrdinaryEquipment {
             // Actual CalcPurchAirMinOAMassFlow2762-2810; only the same live
             // sizing/Zone/People/schedule owners produce positive OA volume.
             if unit.outdoor_air {
-                if unit.dcv_type != SourcePurchasedAirDcv::None {
+                if !matches!(
+                    unit.dcv_type,
+                    SourcePurchasedAirDcv::None | SourcePurchasedAirDcv::OccupancySchedule
+                ) {
                     return Err(Error::Unavailable(
                         "actual CalcPurchAirMinOAMassFlow positive DCV owner2783",
                     ));
@@ -343,7 +346,8 @@ impl OrdinaryEquipment {
                     unit.oa_requirements_ptr,
                     controlled_zone,
                     SourceOutdoorAirFlowOptions {
-                        use_occupancy_schedule: false,
+                        use_occupancy_schedule: unit.dcv_type
+                            == SourcePurchasedAirDcv::OccupancySchedule,
                         use_minimum_oa_schedule: true,
                         per_person_not_set: false,
                         maximum_volume_flow: false,

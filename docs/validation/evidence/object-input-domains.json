@@ -348,13 +348,15 @@
     ],
     "DesignSpecification:OutdoorAir": [
       "Bounded Source B direct-epJSON basic DSOA connects actual Zone geometry, design occupants for NoDCV, real schedules, outdoor-node state and direct IdealLoads. Six basic method scenes retain their own NoLimit evidence; four hard-limit selectors share guarded owned consumption. New strict finite-route and zero-boundary scenes keep separate scope. No Source A/IDF, CO2/IAQ/DCV, economizer/recovery, Space/airloop/sizing, arbitrary-combination or full-object claim.",
-      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
+      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
+      "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV. NoLimit Flow/Person also has qualifying None and OccupancySchedule DCV evidence using genuine reported occupancy. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. Hard-limit/DCV and OA/humidity compositions, CO2, economizer/recovery, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing or private-mode law."
     ],
     "ZoneHVAC:EquipmentList": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
     ],
     "ZoneHVAC:IdealLoadsAirSystem": [
-      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
+      "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
+      "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV. NoLimit Flow/Person also has qualifying None and OccupancySchedule DCV evidence using genuine reported occupancy. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. Hard-limit/DCV and OA/humidity compositions, CO2, economizer/recovery, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing or private-mode law."
     ],
     "ZoneControl:Thermostat": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
@@ -7969,6 +7971,277 @@
         "qualifying_values": 75120,
         "raw_operand_unequal": 20989,
         "scope": "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
+        "physical_domain_completion": false
+      },
+      "current_occupancy_DCV_147": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit147-prep/build150-attempt01.json",
+          "sha256": "fa39176124ca16f035755e1500ec20c583de0b52a0b39e4e64ba67598329efb4",
+          "bytes": 699
+        },
+        "actual_quality": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-final-quality-summary01.json",
+          "sha256": "c68e98613b8b36192f8333c7941784c528ed34b70f184f84941cf623141b6ca7",
+          "bytes": 5485
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit147-prep/owner-execution-review01.json",
+          "sha256": "f626f4f0daf2ddc76760b28a9b7826ac7c2d2b01aaca3a31e59353d5f7ac11ec",
+          "bytes": 4962
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-source-current-occupancy-adoption02.json",
+          "sha256": "317ffaaa8f4ded13bb8152277512d5498aaacd4c863421cd136d66242ed07ed2",
+          "bytes": 11342
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-source-format-review01.json",
+          "sha256": "6401cc961f04d6beadf42d0fd515cbaa1151aae3841e10bc4b6ede22ea5a79d9",
+          "bytes": 2908
+        },
+        "Source_support_correction": {
+          "path": ".runtime/object-expansion/unit147-prep/Source-support-DCV-correction01/prepared-manifest.json",
+          "sha256": "1b7ee029f246030583260564958c088b5ec61f2d3dead6d991c27c7947fa6535",
+          "bytes": 1777
+        },
+        "all_actual_QA_runs": [
+          {
+            "name": "format",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality01/format/receipt.json",
+              "sha256": "8512f10bdb340ef99b54ffbe28b01bd00b78b475fc97abfba995b9708d95a564",
+              "bytes": 3299
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "format-check",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality01/format-check/receipt.json",
+              "sha256": "5ec263d39a15765ad3d2eb8859ef47a29db7ad16260a80e012a1bc9b4692f91b",
+              "bytes": 3335
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "binding-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality01/binding-tests/receipt.json",
+              "sha256": "5c5fc92e58aa41b19ca2e929b9fb5af2caf70f567895554822bea0b4dfc4aeb9",
+              "bytes": 3455
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "source-caller-tests",
+            "recorder_exit": 101,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality01/source-caller-tests/receipt.json",
+              "sha256": "5afbd3519be4adaf03691c1b25a5197a5d0438f0c13f34ff555ac8dbfa97d2ce",
+              "bytes": 3458
+            },
+            "exit_code": 101
+          },
+          {
+            "name": "format",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality02/format/receipt.json",
+              "sha256": "a13ef627f4dd19a32e64e5f5f16a84254ef7dac205f0ef06275cc95c2bd1ccf4",
+              "bytes": 3411
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "format-check",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality02/format-check/receipt.json",
+              "sha256": "a9c675e9401de7912aebe60b903b3e931e261d64f33d6f03192510a3808efa35",
+              "bytes": 3447
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "binding-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality02/binding-tests/receipt.json",
+              "sha256": "b1d861707e38864e3d08b054c927ab5fd55fa56fa11fae2e47ad785822c61712",
+              "bytes": 3566
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "source-caller-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality02/source-caller-tests/receipt.json",
+              "sha256": "64d57db74186645bb23ed2f2b9f3ffbe8bd6dacf421bb43fd9fa2435c228432d",
+              "bytes": 3568
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "clippy",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/quality02/clippy/receipt.json",
+              "sha256": "6d9db387f487274da3aa84350629824c447ac1d3ff15dc54ebc6f02f11b138ca",
+              "bytes": 3470
+            },
+            "exit_code": 0
+          }
+        ],
+        "current_QA_commands": 5,
+        "total_actual_QA_commands": 9,
+        "failed_QA_attempts": 1,
+        "distinct_existing_test_functions": 2,
+        "actual_existing_test_body_executions": 4,
+        "targeted_test_reruns": 2,
+        "new_test_functions": 0,
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-runtime-bindings01.json",
+          "sha256": "16bd75b272f874e90eac8155f37ff3483ed6f432e77b58a3b896ca51bac06b3f",
+          "bytes": 4029
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-runtime-final-review01.json",
+          "sha256": "2511e25cf5d91f8174cce2caff72fa72027647f6e4cedbd54498a650794b8804",
+          "bytes": 5961
+        },
+        "Root_producer": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-run-pairs147.py",
+          "sha256": "a97bbea0a56641a0803eceaecf2a9cd6392b98057e2878c9d2a3efb771e48076",
+          "bytes": 5455
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-two-pairs150-01/receipt.json",
+          "sha256": "6e6396ee7e99391995a72ee7ccbf838fedc6010eeb7f4602a7dcb8848f410b10",
+          "bytes": 5376
+        },
+        "actors": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-four-actors150-01/receipt.json",
+          "sha256": "cb046478e9776fedbbe856370b1355c81abf8dffed9ac39a6b2e68146c2b571a",
+          "bytes": 11973
+        },
+        "batch_readback": {
+          "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/receipt.json",
+          "sha256": "b23d7417aa731fc048c9bc5725e94f7958d40a8d61c73957d502bbc1935cde5c",
+          "bytes": 72692
+        },
+        "case_outcomes": {
+          "NONE": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/NONE.paired01.json",
+              "sha256": "210c7513d336ea8a3c5ad7d6719096fa6b459a9ae60411bac78ec7f87711dc08",
+              "bytes": 678294
+            },
+            "native_launch": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/NONE/native01/launch.json",
+              "sha256": "5e624ae2f2f7619505d3a37f573311809a62b83458b6d31ac3f66aa5600a27a7",
+              "bytes": 28380
+            },
+            "source_launch": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/NONE/source01/launch.json",
+              "sha256": "22ca16079ca3b446a5e5ae8cea0f6b19bf04b01fa6aedb05bd018392b92083fd",
+              "bytes": 35556
+            },
+            "native_precheck": {
+              "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/NONE.native-precheck150-01.json",
+              "sha256": "0d348fed35278fc87c339397cf0ebba977db3a9d8799f83f3b51a15306f12fdc",
+              "bytes": 23826
+            },
+            "engineering_comparison_completed": true,
+            "numeric_failures": 0,
+            "science_failures": [],
+            "raw_operand_unequal": 22510
+          },
+          "OCCUPANCY": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/OCCUPANCY.paired01.json",
+              "sha256": "7f4bc3ee8e77c0bd11d6b53be00c57c0e12a835ec8f02c2c0b6422e5e05e8135",
+              "bytes": 678229
+            },
+            "native_launch": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/OCCUPANCY/native01/launch.json",
+              "sha256": "841f15f85a503fede155576bda3124c5019c99896938bd01965b07c83e393343",
+              "bytes": 28501
+            },
+            "source_launch": {
+              "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/OCCUPANCY/source01/launch.json",
+              "sha256": "bc6fc8b6ca824648b3e9b4788834bee45a1d4d6fffc69e5527f97d5ee0099e32",
+              "bytes": 35823
+            },
+            "native_precheck": {
+              "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/OCCUPANCY.native-precheck150-01.json",
+              "sha256": "31f4ab33b29445687c11d27a440eb693daf2e434ea9e03f1fa917d04fc914f56",
+              "bytes": 23846
+            },
+            "engineering_comparison_completed": true,
+            "numeric_failures": 0,
+            "science_failures": [],
+            "raw_operand_unequal": 19721
+          }
+        },
+        "cross_case_public_response": {
+          "Native": {
+            "passed": true,
+            "observation": {
+              "activation_accepted": true,
+              "samples_per_case": 480,
+              "full_clock_context_operand_joins": 4800,
+              "observed_zero_group_samples": 120,
+              "observed_positive_group_samples": 240,
+              "zero_response_samples": 120,
+              "positive_response_samples": 240,
+              "count_consistency_failed_samples": 0
+            },
+            "error": null
+          },
+          "Source": {
+            "passed": true,
+            "observation": {
+              "activation_accepted": true,
+              "samples_per_case": 480,
+              "full_clock_context_operand_joins": 4800,
+              "observed_zero_group_samples": 120,
+              "observed_positive_group_samples": 240,
+              "zero_response_samples": 120,
+              "positive_response_samples": 240,
+              "count_consistency_failed_samples": 0
+            },
+            "error": null
+          }
+        },
+        "accepted_cases": [
+          "NONE",
+          "OCCUPANCY"
+        ],
+        "accepted_case_comparisons": {
+          "NONE": {
+            "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/NONE.paired01.json",
+            "sha256": "210c7513d336ea8a3c5ad7d6719096fa6b459a9ae60411bac78ec7f87711dc08",
+            "bytes": 678294
+          },
+          "OCCUPANCY": {
+            "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/OCCUPANCY.paired01.json",
+            "sha256": "7f4bc3ee8e77c0bd11d6b53be00c57c0e12a835ec8f02c2c0b6422e5e05e8135",
+            "bytes": 678229
+          }
+        },
+        "accepted_values": 151200,
+        "raw_operand_unequal": 42231,
+        "Native_processes": 2,
+        "Source_processes": 2,
+        "engine_replays": 0,
+        "batch_exit0_is_retention_not_credit": true,
+        "scope": "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV. NoLimit Flow/Person also has qualifying None and OccupancySchedule DCV evidence using genuine reported occupancy. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. Hard-limit/DCV and OA/humidity compositions, CO2, economizer/recovery, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing or private-mode law.",
         "physical_domain_completion": false
       }
     },
@@ -67101,12 +67374,332 @@
           "no_replay": true
         },
         "effective_state": "Two authored bare4294967297 EquipmentList priorities resolve to positive typed1; the inactive NoLimit heating capacity is authored as bare10000000000000000000000 (JSON integer lexeme) and Native stores finite Float1e22. Raw/staged/typed-graph evidence and actual same-source getter QA support these accessor paths; no private getter telemetry, active huge-capacity coverage or arbitrary-value completion."
+      },
+      {
+        "id": "B-IDEALLOADS-DCV-NONE-147-120H",
+        "case_kind": "NONE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-current-occupancy-dcv-147",
+        "input": {
+          "path": ".runtime/object-expansion/unit147-prep/DCV-current-occupancy-two-case-input-proposal01/NONE/input.epJSON",
+          "sha256": "ff8284cca51ea04b073f1583550735e7cc5cbad9f1e070a5583e1443f9279b9d",
+          "bytes": 101873
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/NONE/native01/command/receipt.json",
+          "sha256": "897bb6ed5a3933f1b132938c44239846672bf975d416d733b4cc8c61de57ed56",
+          "bytes": 72175
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/NONE/source01/command/receipt.json",
+          "sha256": "35a5a30141ae924a059b591ab2f9cc638dbab5cd9de7af2773465096519d9389",
+          "bytes": 72955
+        },
+        "source_summary": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/NONE/source01/output/run-summary.json",
+          "sha256": "86b535d5ffa4b2254cc751cb258b9401014ad28b0f2f232613c8d5d748c71e2c",
+          "bytes": 64813
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/4e/4ef3f2d50fff9033903c227b27d00c340d10554b332877b0689c437ff9a7dd72",
+          "sha256": "4ef3f2d50fff9033903c227b27d00c340d10554b332877b0689c437ff9a7dd72"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/build150-01/eplus-rs.exe",
+          "sha256": "5221b7654de1b0411fb35f8ca425dcdc5d001f57edb726d730f02fcc4540b988",
+          "bytes": 81012992
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/build150-01/build/receipt.json",
+          "sha256": "1f64fac1c3d679a44f97a7509f962bcca20499f049098be31f917e574932a789",
+          "bytes": 4918
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/NONE.paired01.json",
+          "sha256": "210c7513d336ea8a3c5ad7d6719096fa6b459a9ae60411bac78ec7f87711dc08",
+          "bytes": 678294
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-two-pairs150-01/receipt.json",
+          "sha256": "6e6396ee7e99391995a72ee7ccbf838fedc6010eeb7f4602a7dcb8848f410b10",
+          "bytes": 5376
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit147-prep/science-final01/NONE.recipe.json",
+          "sha256": "6a38b305c9f9a19ee9a1f32da1c5a5c30141173da7664d0c1e4f1df12ca66c6e",
+          "bytes": 49772
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit147-prep/DCV-current-occupancy-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "2682a6d9dbc72cc9fa2ba8f1b9fc27892c252b2aad8e7df77aed19c966337089",
+          "bytes": 6438
+        },
+        "totals": {
+          "series": 159,
+          "samples": 75600,
+          "raw_operand_unequal": 22510,
+          "parsed_binary64_unequal": 22510,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.235756255686283e-07,
+          "max_rmse_delta": 1.9383119588587697e-08
+        },
+        "coverage_kind": "same_engine_current_occupancy_DCV_response",
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit147-prep/DCV-current-occupancy-two-case-input-proposal01/derived159-policy.json",
+            "sha256": "372af794bcdd466a59ef522d9d937e5d03445e1c4da07a95e1017b1f62b7fe93",
+            "bytes": 43892
+          },
+          "all_old158_policy_rule_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "public_response_summary": {
+          "Native": {
+            "passed": true,
+            "observation": {
+              "activation_accepted": true,
+              "samples_per_case": 480,
+              "full_clock_context_operand_joins": 4800,
+              "observed_zero_group_samples": 120,
+              "observed_positive_group_samples": 240,
+              "zero_response_samples": 120,
+              "positive_response_samples": 240,
+              "count_consistency_failed_samples": 0
+            },
+            "error": null
+          },
+          "Source": {
+            "passed": true,
+            "observation": {
+              "activation_accepted": true,
+              "samples_per_case": 480,
+              "full_clock_context_operand_joins": 4800,
+              "observed_zero_group_samples": 120,
+              "observed_positive_group_samples": 240,
+              "zero_response_samples": 120,
+              "positive_response_samples": 240,
+              "count_consistency_failed_samples": 0
+            },
+            "error": null
+          }
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit147-prep/build150-attempt01.json",
+            "sha256": "fa39176124ca16f035755e1500ec20c583de0b52a0b39e4e64ba67598329efb4",
+            "bytes": 699
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-final-quality-summary01.json",
+            "sha256": "c68e98613b8b36192f8333c7941784c528ed34b70f184f84941cf623141b6ca7",
+            "bytes": 5485
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit147-prep/owner-execution-review01.json",
+            "sha256": "f626f4f0daf2ddc76760b28a9b7826ac7c2d2b01aaca3a31e59353d5f7ac11ec",
+            "bytes": 4962
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-runtime-bindings01.json",
+            "sha256": "16bd75b272f874e90eac8155f37ff3483ed6f432e77b58a3b896ca51bac06b3f",
+            "bytes": 4029
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-run-pairs147.py",
+            "sha256": "a97bbea0a56641a0803eceaecf2a9cd6392b98057e2878c9d2a3efb771e48076",
+            "bytes": 5455
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-runtime-final-review01.json",
+            "sha256": "2511e25cf5d91f8174cce2caff72fa72027647f6e4cedbd54498a650794b8804",
+            "bytes": 5961
+          },
+          "batch_readback": {
+            "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/receipt.json",
+            "sha256": "b23d7417aa731fc048c9bc5725e94f7958d40a8d61c73957d502bbc1935cde5c",
+            "bytes": 72692
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Bounded NoLimit Flow/Person with explicit None/None humidity, NoEconomizer and None recovery. Both engines independently compare full reported occupancy profiles and require genuine zero/positive OA responses. This does not establish hard-limit/DCV compositions, private occupancy allocation or an averaged count-times-flow law."
+      },
+      {
+        "id": "B-IDEALLOADS-DCV-OCCUPANCY-147-120H",
+        "case_kind": "OCCUPANCY",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-current-occupancy-dcv-147",
+        "input": {
+          "path": ".runtime/object-expansion/unit147-prep/DCV-current-occupancy-two-case-input-proposal01/OCCUPANCY/input.epJSON",
+          "sha256": "b65e64fc6ceb7174b70225f6728c52295c9c252864d81b969172d9298a82ee44",
+          "bytes": 101886
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/OCCUPANCY/native01/command/receipt.json",
+          "sha256": "333db9a3a76c245e8ab77db059fdeeff340ac135e7a2873ae80145bc96e5ea9e",
+          "bytes": 72260
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/OCCUPANCY/source01/command/receipt.json",
+          "sha256": "652ebbf1992e53aebec0c930a2c838e4ffb3a8b6ddeed7ff9b08c1b4db5c76b7",
+          "bytes": 73055
+        },
+        "source_summary": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/epoch150/OCCUPANCY/source01/output/run-summary.json",
+          "sha256": "eae336f98e4086c79796b5d60db43c3d9959fc7d502b7250e9360a720bcf1d97",
+          "bytes": 64950
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/4e/4ef3f2d50fff9033903c227b27d00c340d10554b332877b0689c437ff9a7dd72",
+          "sha256": "4ef3f2d50fff9033903c227b27d00c340d10554b332877b0689c437ff9a7dd72"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/build150-01/eplus-rs.exe",
+          "sha256": "5221b7654de1b0411fb35f8ca425dcdc5d001f57edb726d730f02fcc4540b988",
+          "bytes": 81012992
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/build150-01/build/receipt.json",
+          "sha256": "1f64fac1c3d679a44f97a7509f962bcca20499f049098be31f917e574932a789",
+          "bytes": 4918
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/OCCUPANCY.paired01.json",
+          "sha256": "7f4bc3ee8e77c0bd11d6b53be00c57c0e12a835ec8f02c2c0b6422e5e05e8135",
+          "bytes": 678229
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit147-prep/Root-two-pairs150-01/receipt.json",
+          "sha256": "6e6396ee7e99391995a72ee7ccbf838fedc6010eeb7f4602a7dcb8848f410b10",
+          "bytes": 5376
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit147-prep/science-final01/OCCUPANCY.recipe.json",
+          "sha256": "3fd39f97e867a7894ada08ecb69eae67970640774f205c60c472f0ac0e9a8084",
+          "bytes": 49815
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit147-prep/DCV-current-occupancy-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "2682a6d9dbc72cc9fa2ba8f1b9fc27892c252b2aad8e7df77aed19c966337089",
+          "bytes": 6438
+        },
+        "totals": {
+          "series": 159,
+          "samples": 75600,
+          "raw_operand_unequal": 19721,
+          "parsed_binary64_unequal": 19721,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.234010025858879e-07,
+          "max_rmse_delta": 2.5251446357426273e-08
+        },
+        "coverage_kind": "same_engine_current_occupancy_DCV_response",
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit147-prep/DCV-current-occupancy-two-case-input-proposal01/derived159-policy.json",
+            "sha256": "372af794bcdd466a59ef522d9d937e5d03445e1c4da07a95e1017b1f62b7fe93",
+            "bytes": 43892
+          },
+          "all_old158_policy_rule_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "public_response_summary": {
+          "Native": {
+            "passed": true,
+            "observation": {
+              "activation_accepted": true,
+              "samples_per_case": 480,
+              "full_clock_context_operand_joins": 4800,
+              "observed_zero_group_samples": 120,
+              "observed_positive_group_samples": 240,
+              "zero_response_samples": 120,
+              "positive_response_samples": 240,
+              "count_consistency_failed_samples": 0
+            },
+            "error": null
+          },
+          "Source": {
+            "passed": true,
+            "observation": {
+              "activation_accepted": true,
+              "samples_per_case": 480,
+              "full_clock_context_operand_joins": 4800,
+              "observed_zero_group_samples": 120,
+              "observed_positive_group_samples": 240,
+              "zero_response_samples": 120,
+              "positive_response_samples": 240,
+              "count_consistency_failed_samples": 0
+            },
+            "error": null
+          }
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit147-prep/build150-attempt01.json",
+            "sha256": "fa39176124ca16f035755e1500ec20c583de0b52a0b39e4e64ba67598329efb4",
+            "bytes": 699
+          },
+          "actual_quality": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-final-quality-summary01.json",
+            "sha256": "c68e98613b8b36192f8333c7941784c528ed34b70f184f84941cf623141b6ca7",
+            "bytes": 5485
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit147-prep/owner-execution-review01.json",
+            "sha256": "f626f4f0daf2ddc76760b28a9b7826ac7c2d2b01aaca3a31e59353d5f7ac11ec",
+            "bytes": 4962
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-runtime-bindings01.json",
+            "sha256": "16bd75b272f874e90eac8155f37ff3483ed6f432e77b58a3b896ca51bac06b3f",
+            "bytes": 4029
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-run-pairs147.py",
+            "sha256": "a97bbea0a56641a0803eceaecf2a9cd6392b98057e2878c9d2a3efb771e48076",
+            "bytes": 5455
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit147-prep/Root-runtime-final-review01.json",
+            "sha256": "2511e25cf5d91f8174cce2caff72fa72027647f6e4cedbd54498a650794b8804",
+            "bytes": 5961
+          },
+          "batch_readback": {
+            "path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/receipt.json",
+            "sha256": "b23d7417aa731fc048c9bc5725e94f7958d40a8d61c73957d502bbc1935cde5c",
+            "bytes": 72692
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Bounded NoLimit Flow/Person with explicit None/None humidity, NoEconomizer and None recovery. Both engines independently compare full reported occupancy profiles and require genuine zero/positive OA responses. This does not establish hard-limit/DCV compositions, private occupancy allocation or an averaged count-times-flow law."
       }
     ],
     "totals": {
-      "paired_cases": 226,
-      "reported_samples": 8921656,
-      "raw_operand_unequal": 2196976,
+      "paired_cases": 228,
+      "reported_samples": 9072856,
+      "raw_operand_unequal": 2239207,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -69652,6 +70245,23 @@
           "sha256": "e687463be4388bbfc73cf12f1f468f3283c3e573a38ef564c4aaeaddfba2ced3",
           "bytes": 81026939
         }
+      },
+      {
+        "id": "source-current-occupancy-dcv-147",
+        "receipt": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/build150-01/build/receipt.json",
+          "sha256": "1f64fac1c3d679a44f97a7509f962bcca20499f049098be31f917e574932a789",
+          "bytes": 4918
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/4e/4ef3f2d50fff9033903c227b27d00c340d10554b332877b0689c437ff9a7dd72",
+          "sha256": "4ef3f2d50fff9033903c227b27d00c340d10554b332877b0689c437ff9a7dd72"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/current-occupancy-dcv-147/build150-01/eplus-rs.exe",
+          "sha256": "5221b7654de1b0411fb35f8ca425dcdc5d001f57edb726d730f02fcc4540b988",
+          "bytes": 81012992
+        }
       }
     ],
     "focused_since_workspace": {
@@ -70051,14 +70661,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 149,
-      "builds_with_accepted_paired_cases": 128,
+      "actual_recorded_builds": 150,
+      "builds_with_accepted_paired_cases": 129,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "149 recorded Source builds: 128 retain accepted pairs and 21 have none, including 8 without Source execution. Only the strict single JSON-accessor comparison adds qualifying credit; all earlier history remains unchanged.",
+      "qualification": "150 recorded Source builds: 129 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying current-occupancy scenes add cases or values; all earlier history remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -74691,8 +75301,10 @@
       "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-COMBINED_FINITE-145-120H",
       "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-FLOW_ZERO-145-120H",
       "B-IDEALLOADS-POSITIVE-OA-HARD-LIMIT-CAPACITY_ZERO-145-120H",
-      "B-IDEALLOADS-JSON-ACCESSORS-146-120H"
-    ], "accepted_paired_cases": 55, "accepted_samples": 4020480, "retained_Scheduled_B_pairs": 54, "retained_Scheduled_B_samples": 3960960, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"JSON_ACCESSORS": {"path": ".runtime/object-expansion/unit146-prep/paired-runtime-proposal02/JSON_ACCESSORS.paired149-01.json", "sha256": "dc3538b053df44dcaa59d4172d957bd7e767379bc18267cc83e6bc428a9eeb64", "bytes": 540082}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit146-prep/Root-one-pair149-01/receipt.json", "sha256": "fb3cf4656f4a0c1a30b6a1e622cfa2403939925d483b9b0a5c063942b7b69ecd", "bytes": 8572}, "latest_source_build": "source-JSON-accessor-fidelity-146", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit146-prep/build149-attempt01.json", "sha256": "d429603b4ed8d47dbcfb13b4941029d51f8e13f2e503ad9801947458d69b257a", "bytes": 702}, "latest_actual_quality": {"path": ".runtime/object-expansion/unit146-prep/Root-final-quality-summary01.json", "sha256": "c1220374e44b05493ef8a0eb5f7019bc0dc15275e029a4857950f8b06aa513ff", "bytes": 7838}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit146-prep/owner-execution-review01.json", "sha256": "ff0dacba9926e93843b1aaba8f9c6f965d8ca7ad20869a5eb3d48f863929a853", "bytes": 9071}, "latest_input_contracts": {"JSON_ACCESSORS": {"path": ".runtime/object-expansion/unit146-prep/science-final01/JSON_ACCESSORS.recipe.json", "sha256": "d550f70d50a40b686ba024469f86d6f555f2c27ed9cfce9b025dbff9995ff9f0", "bytes": 50383}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "54 bounded Source B Scheduled/NodeList pairs retain 3,960,960 values. The unused Source A pair adds59,520, giving 55 pairs and 4,020,480 values. Qualifying basic-OA hard-limit scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under unchanged158 policies. Finite-route and zero-boundary coverage are separate; no private history, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
+      "B-IDEALLOADS-JSON-ACCESSORS-146-120H",
+      "B-IDEALLOADS-DCV-NONE-147-120H",
+      "B-IDEALLOADS-DCV-OCCUPANCY-147-120H"
+    ], "accepted_paired_cases": 57, "accepted_samples": 4171680, "retained_Scheduled_B_pairs": 56, "retained_Scheduled_B_samples": 4112160, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"NONE": {"path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/NONE.paired01.json", "sha256": "210c7513d336ea8a3c5ad7d6719096fa6b459a9ae60411bac78ec7f87711dc08", "bytes": 678294}, "OCCUPANCY": {"path": ".runtime/object-expansion/unit147-prep/paired-runtime-proposal02/readback150-01/OCCUPANCY.paired01.json", "sha256": "7f4bc3ee8e77c0bd11d6b53be00c57c0e12a835ec8f02c2c0b6422e5e05e8135", "bytes": 678229}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit147-prep/Root-two-pairs150-01/receipt.json", "sha256": "6e6396ee7e99391995a72ee7ccbf838fedc6010eeb7f4602a7dcb8848f410b10", "bytes": 5376}, "latest_source_build": "source-current-occupancy-dcv-147", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit147-prep/build150-attempt01.json", "sha256": "fa39176124ca16f035755e1500ec20c583de0b52a0b39e4e64ba67598329efb4", "bytes": 699}, "latest_actual_quality": {"path": ".runtime/object-expansion/unit147-prep/Root-final-quality-summary01.json", "sha256": "c68e98613b8b36192f8333c7941784c528ed34b70f184f84941cf623141b6ca7", "bytes": 5485}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit147-prep/owner-execution-review01.json", "sha256": "f626f4f0daf2ddc76760b28a9b7826ac7c2d2b01aaca3a31e59353d5f7ac11ec", "bytes": 4962}, "latest_input_contracts": {"NONE": {"path": ".runtime/object-expansion/unit147-prep/science-final01/NONE.recipe.json", "sha256": "6a38b305c9f9a19ee9a1f32da1c5a5c30141173da7664d0c1e4f1df12ca66c6e", "bytes": 49772}, "OCCUPANCY": {"path": ".runtime/object-expansion/unit147-prep/science-final01/OCCUPANCY.recipe.json", "sha256": "3fd39f97e867a7894ada08ecb69eae67970640774f205c60c472f0ac0e9a8084", "bytes": 49815}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "56 bounded Source B Scheduled/NodeList pairs retain 4,112,160 values. The unused Source A pair adds59,520, giving 57 pairs and 4,171,680 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

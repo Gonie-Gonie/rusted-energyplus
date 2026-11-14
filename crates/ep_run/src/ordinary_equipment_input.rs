@@ -123,7 +123,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
         return None;
     }
     let error = || {
-        Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned hard-limit/None selectors".into())
+        Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned hard-limit, None humidity and basic DCV selectors".into())
     };
     if !raw.is_epjson()
         || units.is_none_or(|rows| rows.len() != 1)
@@ -153,9 +153,10 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     // Omission uses Native's named defaults; present-empty/null/whitespace
     // selectors must not acquire typed defaults on this new OA route.
     if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
+        || !field(unit, "demand_controlled_ventilation_type")
+            .is_none_or(|value| text_is(value, &["None", "OccupancySchedule"]))
         || ![
             ("humidification_control_type", "None"),
-            ("demand_controlled_ventilation_type", "None"),
             ("outdoor_air_economizer_type", "NoEconomizer"),
             ("heat_recovery_type", "None"),
         ]

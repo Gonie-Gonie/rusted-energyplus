@@ -318,6 +318,15 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 let unit = &mut typed.ideal_loads_air_systems[0];
                 unit.heating_limit = limit;
                 unit.cooling_limit = limit;
+                // Reuse one existing positive per-person context for actual
+                // current-occupancy DCV eligibility; no extra fixture or loop.
+                if method == ep_model::DesignSpecificationOutdoorAirMethod::FlowPerPerson
+                    && limit == IdealLoadsLimit::NoLimit
+                    && flow > 0.0
+                {
+                    unit.demand_controlled_ventilation_type =
+                        DemandControlledVentilationType::OccupancySchedule;
+                }
                 unit.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
                 unit.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
                 unit.maximum_sensible_heating_capacity_w = Some(AutosizeOrNumber::Value(capacity));
@@ -379,7 +388,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 }
                 12 => {
                     typed.ideal_loads_air_systems[0].demand_controlled_ventilation_type =
-                        DemandControlledVentilationType::OccupancySchedule
+                        DemandControlledVentilationType::Co2Setpoint
                 }
                 13 => {
                     typed.ideal_loads_air_systems[0].outdoor_air_economizer_type =

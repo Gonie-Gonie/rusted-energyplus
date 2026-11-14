@@ -3094,6 +3094,9 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     let unit = &mut hard["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
                     unit["heating_limit"] = json!(limit);
                     unit["cooling_limit"] = json!(limit);
+                    if method == "Flow/Person" && limit == "NoLimit" && flow > 0.0 {
+                        unit["demand_controlled_ventilation_type"] = json!("OccupancySchedule");
+                    }
                     if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
                         unit["maximum_heating_air_flow_rate"] = json!(flow);
                         unit["maximum_cooling_air_flow_rate"] = json!(flow);
@@ -3178,6 +3181,12 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         .expect("retained hard-limit raw alpha/numeric fields");
                     assert_eq!(actual["heating_limit"], OaRaw::String(limit.into()));
                     assert_eq!(actual["cooling_limit"], OaRaw::String(limit.into()));
+                    if method == "Flow/Person" && limit == "NoLimit" && flow > 0.0 {
+                        assert_eq!(
+                            actual["demand_controlled_ventilation_type"],
+                            OaRaw::String("OccupancySchedule".into())
+                        );
+                    }
                     if wide_priority {
                         let list = hard_ip
                             .source_raw_object_fields("ZoneHVAC:EquipmentList", "Equipment")
@@ -3242,8 +3251,14 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 let mut bad = oa.clone();
                 match invalid {
                     0 => {
+                        // Other five existing methods retain the empty-selector
+                        // rejection; this per-person candidate keeps CO2 held.
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
-                            json!("")
+                            if method == "Flow/Person" {
+                                json!("CO2Setpoint")
+                            } else {
+                                json!("")
+                            }
                     }
                     1 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =
