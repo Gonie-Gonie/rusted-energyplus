@@ -723,6 +723,26 @@ pub fn energyplus_psy_rh_fn_tdb_w_pb(
     }
 }
 
+// Shared arithmetic only; the caller owns the actual cached Psat visit and
+// every diagnostic. Native Psychrometrics.hh1365-1386 and1445-1458.
+fn raw_psy_w_fn_tdb_rh_pb(rh: f64, p: f64, saturation: f64) -> f64 {
+    let dew = rh * saturation;
+    let difference = p - dew;
+    let denominator = if difference < 1000.0 {
+        1000.0
+    } else {
+        difference
+    };
+    dew * 0.62198 / denominator
+}
+fn finish_psy_w_fn_tdb_rh_pb(humidity: f64) -> f64 {
+    if humidity < 1.0e-5 { 1.0e-5 } else { humidity }
+}
+fn raw_psy_w_fn_tdb_twb_pb(t: f64, wet: f64, p: f64, saturation: f64) -> f64 {
+    let star = 0.62198 * saturation / (p - saturation);
+    ((2501.0 - 2.381 * wet) * star - (t - wet)) / (2501.0 + 1.805 * t - 4.186 * wet)
+}
+
 /// EnergyPlus `PsyWFnTdbRhPb` with the instance-owned default Psat cache.
 /// Ordered denominator/humidity floors and nested cache effects are preserved.
 /// Warning recurrence and ErrorManager output remain source-only observations.
@@ -800,12 +820,24 @@ fn energyplus_psy_tsat_fn_h_pb_raw_with_properties(
     barometric_pressure_pa: f64,
     mut saturated_enthalpy: impl FnMut(f64, f64) -> f64,
 ) -> f64 {
-    const CASE_RANGE: [f64; 10] = [
-        -4.24e4, -2.2138e4, -6.7012e2, 2.7297e4, 7.5222e4, 1.8379e5, 4.7577e5, 1.5445e6, 3.8353e6,
-        4.5866e7,
-    ];
+    let (shifted_enthalpy, local_enthalpy) = tsat_h_pb_enthalpy_values(enthalpy_j_per_kg);
+    let (_, seed) = tsat_h_pb_polynomial_seed(shifted_enthalpy);
+    let result = tsat_h_pb_pressure_correction::<std::convert::Infallible>(
+        seed,
+        local_enthalpy,
+        barometric_pressure_pa,
+        |temperature, pressure| Ok(saturated_enthalpy(temperature, pressure)),
+    );
+    match result {
+        Ok((temperature, _)) => temperature,
+        Err(never) => match never {},
+    }
+}
 
-    let mut shifted_enthalpy = enthalpy_j_per_kg + 1.78637e4;
+// Native Psychrometrics.cc942-949; retain ObjexxFCL ordered min/max, including
+// negative zero and NaN argument order, without f64::min/max normalization.
+fn tsat_h_pb_enthalpy_values(enthalpy_j_per_kg: f64) -> (f64, f64) {
+    let shifted_enthalpy = enthalpy_j_per_kg + 1.78637e4;
     let local_enthalpy = if enthalpy_j_per_kg >= 0.0 {
         if enthalpy_j_per_kg < 1.0e-5 {
             1.0e-5
@@ -817,6 +849,17 @@ fn energyplus_psy_tsat_fn_h_pb_raw_with_properties(
     } else {
         enthalpy_j_per_kg
     };
+
+    (shifted_enthalpy, local_enthalpy)
+}
+
+// One literal copy of all nine Native polynomials. The returned HH includes
+// only the original case1/case9 clamps, used by the later error continuation.
+fn tsat_h_pb_polynomial_seed(mut shifted_enthalpy: f64) -> (f64, f64) {
+    const CASE_RANGE: [f64; 10] = [
+        -4.24e4, -2.2138e4, -6.7012e2, 2.7297e4, 7.5222e4, 1.8379e5, 4.7577e5, 1.5445e6, 3.8353e6,
+        4.5866e7,
+    ];
 
     let mut begin = 0usize;
     let mut end = 9usize;
@@ -924,16 +967,27 @@ fn energyplus_psy_tsat_fn_h_pb_raw_with_properties(
         }
     };
 
+    (shifted_enthalpy, seed)
+}
+
+// Native1033-1070; stop before later effects if the actual property child fails.
+// On exhaustion the result remains the polynomial seed, not the last trial.
+fn tsat_h_pb_pressure_correction<E>(
+    seed: f64,
+    local_enthalpy: f64,
+    barometric_pressure_pa: f64,
+    mut saturated_enthalpy: impl FnMut(f64, f64) -> Result<f64, E>,
+) -> Result<(f64, i32), E> {
     let pressure_correction_required = (barometric_pressure_pa - 1.0133e5).abs() / 1.0133e5 > 0.01;
     if !pressure_correction_required {
-        return seed;
+        return Ok((seed, 0));
     }
 
     let mut first_temperature_c = seed;
-    let first_enthalpy = saturated_enthalpy(first_temperature_c, barometric_pressure_pa);
+    let first_enthalpy = saturated_enthalpy(first_temperature_c, barometric_pressure_pa)?;
     let mut first_error = first_enthalpy - local_enthalpy;
     if (first_error / local_enthalpy).abs() <= 0.1e-4 {
-        return first_temperature_c;
+        return Ok((first_temperature_c, 0));
     }
 
     let mut second_temperature_c = first_temperature_c * 0.9;
@@ -941,7 +995,7 @@ fn energyplus_psy_tsat_fn_h_pb_raw_with_properties(
     let mut iteration_count = 0;
     while iteration_count <= 30 {
         iteration_count += 1;
-        let second_enthalpy = saturated_enthalpy(second_temperature_c, barometric_pressure_pa);
+        let second_enthalpy = saturated_enthalpy(second_temperature_c, barometric_pressure_pa)?;
         let second_error = second_enthalpy - local_enthalpy;
         if (second_error / local_enthalpy).abs() <= 0.1e-4 || second_error == first_error {
             result = second_temperature_c;
@@ -955,7 +1009,7 @@ fn energyplus_psy_tsat_fn_h_pb_raw_with_properties(
         second_temperature_c = next_temperature_c;
         first_error = second_error;
     }
-    result
+    Ok((result, iteration_count))
 }
 
 /// Original non-interpolation `PsyTsatFnPb_raw` route, including the saved

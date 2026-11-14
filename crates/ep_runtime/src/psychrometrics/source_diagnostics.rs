@@ -1,7 +1,7 @@
 //! Actual backend-aware property calls over the sole psychrometric state.
 //! Numeric-only callers retain their established API without a diagnostic claim.
 use super::SourcePsychrometricAccess;
-use super::psy02_state::{SourcePsatLookup, with_state};
+use super::psy02_state::{SourcePsatLookup, SourceTsatEnthalpyLookup, with_state};
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
@@ -13,7 +13,11 @@ use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 const RELATIVE_HUMIDITY: usize = 1;
 const W_FROM_DEW_POINT: usize = 4;
 const W_FROM_ENTHALPY: usize = 5;
+const W_FROM_WET_BULB: usize = 6;
+const W_FROM_RELATIVE_HUMIDITY: usize = 7;
 const PSAT: usize = 8;
+const TSAT_FROM_ENTHALPY: usize = 9;
+const W_FROM_WET_BULB_HUMIDITY: usize = 15;
 
 /// Temporary live references to actual phase, timestamp and diagnostic owners.
 /// This creates no phase flags, recurrence rows, shadow cache or error backend.
@@ -107,6 +111,147 @@ impl SourcePsychrometricOwners<'_, '_> {
         Ok(())
     }
 
+    // These three Native error children use no comma for a nonempty caller;
+    // the empty caller remains the literal " Routine=Unknown,".
+    fn timestamp_without_comma(&mut self, called_from: &str) -> Result<(), Error> {
+        let routine = if called_from.is_empty() {
+            " Routine=Unknown,".into()
+        } else {
+            format!(" Routine={called_from}")
+        };
+        self.backend.show_source_continue_error_time_stamp(
+            &routine,
+            self.clock,
+            self.globals,
+            self.environment,
+            self.hvac,
+        )
+    }
+
+    // Native Psychrometrics.cc786-818; the original input wet bulb is retained
+    // until this complete error child returns, before the outer clamp.
+    fn w_from_wet_bulb_temperature_error(
+        &mut self,
+        temperature: f64,
+        wet: f64,
+        pressure: f64,
+        called_from: &str,
+    ) -> Result<(), Error> {
+        if wet > temperature + 0.01
+            && with_state(|state| state.source_report_errors)
+            && !self.clock.warmup_flag
+        {
+            if first(W_FROM_WET_BULB) {
+                set_string(format!(
+                    " Dry-Bulb= {} Pressure= {}",
+                    trimmed(temperature, 2)?,
+                    trimmed(pressure, 2)?,
+                ));
+                self.backend
+                    .show_warning_message("Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)")?;
+                self.timestamp_without_comma(called_from)?;
+                self.backend.show_continue_error(&string())?;
+                set_string(format!("Calculated Wet-Bulb= {}", trimmed(wet, 2)?));
+                self.backend.show_continue_error(&format!(
+                    "{} ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb",
+                    string(),
+                ))?;
+            }
+            self.recurring(
+                W_FROM_WET_BULB,
+                "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)",
+                wet,
+                "C",
+            )?;
+        }
+        Ok(())
+    }
+
+    // Native Psychrometrics.cc822-857. ReportErrors controls this error child
+    // only; the actual nested Psat owner has its own original phase gate.
+    fn w_from_wet_bulb_humidity_error(
+        &mut self,
+        temperature: f64,
+        wet: f64,
+        pressure: f64,
+        humidity: f64,
+        called_from: &str,
+    ) -> Result<(), Error> {
+        if humidity < 0.0
+            && with_state(|state| state.source_report_errors)
+            && !self.clock.warmup_flag
+        {
+            if first(W_FROM_WET_BULB_HUMIDITY) {
+                set_string(format!(
+                    " Dry-Bulb= {} Wet-Bulb= {} Pressure= {}",
+                    trimmed(temperature, 2)?,
+                    trimmed(wet, 2)?,
+                    trimmed(pressure, 2)?,
+                ));
+                self.backend
+                    .show_warning_message("Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)")?;
+                self.timestamp_without_comma(called_from)?;
+                self.backend.show_continue_error(&string())?;
+                set_string(format!(
+                    "Calculated Humidity Ratio= {}, will recalculate Humidity Ratio",
+                    trimmed(humidity, 4)?,
+                ));
+                self.backend.show_continue_error(&format!(
+                    "{} using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)",
+                    string(),
+                ))?;
+            }
+            self.recurring(
+                W_FROM_WET_BULB_HUMIDITY,
+                "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)",
+                humidity,
+                "[]",
+            )?;
+        }
+        Ok(())
+    }
+
+    // Native Psychrometrics.cc1228-1266, including the original differently
+    // named recurring message. This child does NOT consult ReportErrors.
+    fn w_from_relative_humidity_error(
+        &mut self,
+        temperature: f64,
+        relative: f64,
+        pressure: f64,
+        humidity: f64,
+        called_from: &str,
+    ) -> Result<(), Error> {
+        if humidity <= -0.0001 && !self.clock.warmup_flag {
+            if first(W_FROM_RELATIVE_HUMIDITY) {
+                set_string(format!(
+                    " Dry-Bulb= {} Relative Humidity [%]= {} Pressure= {}",
+                    trimmed(temperature, 2)?,
+                    trimmed(relative * 100.0, 2)?,
+                    trimmed(pressure, 2)?,
+                ));
+                self.backend
+                    .show_warning_message("Calculated Humidity Ratio is invalid (PsyWFnTdbRhPb)")?;
+                self.timestamp_without_comma(called_from)?;
+                self.backend.show_continue_error(&string())?;
+                set_string(format!(
+                    "Calculated Humidity Ratio= {}",
+                    trimmed(humidity, 4)?
+                ));
+                self.backend.show_continue_error(&format!(
+                    "{} ... Humidity Ratio set to .00001",
+                    string(),
+                ))?;
+            }
+            self.recurring(
+                W_FROM_RELATIVE_HUMIDITY,
+                "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)",
+                humidity,
+                "[]",
+            )?;
+        }
+        Ok(())
+    }
+
     fn recurring(
         &mut self,
         kind: usize,
@@ -156,6 +301,178 @@ impl SourcePsychrometricAccess {
             enthalpy,
             humidity,
         ))
+    }
+
+    /// Cached Native PsyTsatFnHPb with original-input miss semantics and
+    /// genuine range, child-property and conditional convergence diagnostics.
+    pub(crate) fn source_saturation_temperature_from_enthalpy(
+        &mut self,
+        enthalpy: f64,
+        pressure: f64,
+        called_from: &str,
+        developer_flag: &bool,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let index = match with_state(|state| state.begin_source_tsat_enthalpy(enthalpy, pressure)) {
+            SourceTsatEnthalpyLookup::Hit(value) => return Ok(value),
+            SourceTsatEnthalpyLookup::Miss { index } => index,
+        };
+        let (shifted_enthalpy, local_enthalpy) = super::tsat_h_pb_enthalpy_values(enthalpy);
+        let mut flag_error = false;
+        if (shifted_enthalpy <= -4.24e4 || shifted_enthalpy >= 4.5866e7)
+            && !owners.clock.warmup_flag
+        {
+            if first(TSAT_FROM_ENTHALPY) {
+                owners
+                    .backend
+                    .show_warning_message("Enthalpy out of range (PsyTsatFnHPb)")?;
+                owners.timestamp(called_from)?;
+                // The first warning uses the PRE-CLAMP HH, and the flag is
+                // published only after this actual continuation succeeds.
+                set_string(format!(
+                    " Enthalpy={} Pressure= {}",
+                    trimmed(shifted_enthalpy, 5)?,
+                    trimmed(pressure, 2)?,
+                ));
+                owners.backend.show_continue_error(&string())?;
+                flag_error = true;
+            }
+            owners.recurring(
+                TSAT_FROM_ENTHALPY,
+                "Enthalpy out of range (PsyTsatFnHPb)",
+                shifted_enthalpy,
+                "J/kg",
+            )?;
+        }
+        let (clamped_enthalpy, seed) = super::tsat_h_pb_polynomial_seed(shifted_enthalpy);
+        if flag_error {
+            owners.backend.show_continue_error(&format!(
+                " Initial Resultant Temperature= {}",
+                trimmed(seed, 2)?
+            ))?;
+        }
+        let (temperature, iterations) = super::tsat_h_pb_pressure_correction(
+            seed,
+            local_enthalpy,
+            pressure,
+            |temperature, pressure| {
+                let humidity = self.source_humidity_ratio_from_wet_bulb(
+                    temperature,
+                    temperature,
+                    pressure,
+                    called_from,
+                    owners,
+                )?;
+                Ok::<f64, Error>(super::energyplus_psy_h_fn_tdb_w(temperature, humidity))
+            },
+        )?;
+        // Native retains this unusual first-range-warning-only guard, including
+        // a convergence on iteration31. A later range recurrence sets no flag.
+        if flag_error && iterations > 30 {
+            let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &owners.globals.kickoff_simulation,
+                developer: developer_flag,
+                warmup: &owners.clock.warmup_flag,
+                doing_sizing: &owners.globals.doing_sizing,
+            };
+            owners
+                .backend
+                .show_source_severe_error("Temperature did not converge (PsyTsatFnHPb)", &flags)?;
+            owners.timestamp_without_comma(called_from)?;
+            // Unlike the first range diagnostic, this uses HH after case clamps.
+            set_string(format!(
+                " Enthalpy={} Pressure= {}",
+                trimmed(clamped_enthalpy, 5)?,
+                trimmed(pressure, 2)?,
+            ));
+            owners.backend.show_continue_error(&format!(
+                "{} Last T={}",
+                string(),
+                trimmed(temperature, 2)?
+            ))?;
+        }
+        with_state(|state| state.finish_source_tsat_enthalpy(index, temperature));
+        Ok(temperature)
+    }
+
+    /// Actual PsyWFnTdbTwbPb over the single Psat cache and live diagnostics.
+    /// No result is produced if an earlier Native diagnostic backend fails.
+    pub(crate) fn source_humidity_ratio_from_wet_bulb(
+        &mut self,
+        temperature: f64,
+        wet: f64,
+        pressure: f64,
+        called_from: &str,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let mut wet = wet;
+        if wet > temperature {
+            if wet > temperature + 0.01 {
+                owners.w_from_wet_bulb_temperature_error(
+                    temperature,
+                    wet,
+                    pressure,
+                    called_from,
+                )?;
+            }
+            wet = temperature;
+        }
+        let nested_from = if called_from.is_empty() {
+            "PsyWFnTdbTwbPb"
+        } else {
+            called_from
+        };
+        let saturation = self.source_saturation_pressure(wet, nested_from, owners)?;
+        let humidity = super::raw_psy_w_fn_tdb_twb_pb(temperature, wet, pressure, saturation);
+        if humidity < 0.0 {
+            owners.w_from_wet_bulb_humidity_error(
+                temperature,
+                wet,
+                pressure,
+                humidity,
+                called_from,
+            )?;
+            return self.source_humidity_ratio_from_relative_humidity(
+                temperature,
+                0.0001,
+                pressure,
+                called_from,
+                owners,
+            );
+        }
+        Ok(humidity)
+    }
+
+    // Complete Native PsyWFnTdbRhPb child, also retaining the RH=0.0001
+    // fallback's separate nested Psat call/caller name and final floor.
+    pub(crate) fn source_humidity_ratio_from_relative_humidity(
+        &mut self,
+        temperature: f64,
+        relative: f64,
+        pressure: f64,
+        called_from: &str,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let nested_from = if called_from.is_empty() {
+            "PsyWFnTdbRhPb"
+        } else {
+            called_from
+        };
+        let saturation = self.source_saturation_pressure(temperature, nested_from, owners)?;
+        let humidity = super::raw_psy_w_fn_tdb_rh_pb(relative, pressure, saturation);
+        if humidity < 1.0e-5 {
+            if humidity <= -0.0001 {
+                owners.w_from_relative_humidity_error(
+                    temperature,
+                    relative,
+                    pressure,
+                    humidity,
+                    called_from,
+                )?;
+            }
+            return Ok(1.0e-5);
+        }
+        Ok(humidity)
     }
 
     /// Actual stateful PsyRhoAirFnPbTdbW; negative density reaches the genuine

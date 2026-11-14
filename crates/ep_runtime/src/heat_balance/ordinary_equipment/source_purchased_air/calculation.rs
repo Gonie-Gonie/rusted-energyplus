@@ -18,8 +18,7 @@ use crate::heat_balance::selected_schedule_manager::{
 use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
 use crate::heat_balance::source_initialization::SourceRecurringErrorState;
 use crate::psychrometrics::{
-    EnergyPlusPsychrometricFunction as Property, SourcePsychrometricAccess,
-    SourcePsychrometricOwners, energyplus_psy_cp_air_fn_w as cp,
+    SourcePsychrometricAccess, SourcePsychrometricOwners, energyplus_psy_cp_air_fn_w as cp,
     energyplus_psy_h_fn_tdb_w as enthalpy, energyplus_psy_tdb_fn_h_w as dry_bulb,
 };
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
@@ -33,6 +32,7 @@ pub(crate) struct SourcePurchasedAirCalcOwners<'a, 'backend> {
     pub(crate) hvac: &'a SelectedHvacGlobals,
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) globals: &'a SelectedHeatBalanceGlobals,
+    pub(crate) developer_flag: &'a bool,
     pub(crate) recurring: &'a mut SourceRecurringErrorState,
     pub(crate) environment: &'a mut WeatherEnvironmentState,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
@@ -100,24 +100,23 @@ fn saturation(
     o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
     temperature: f64,
 ) -> Result<f64, Error> {
-    // A positive out-of-range Psat diagnostic is not represented by the
-    // existing property transport. Stop at the actual call, never clamp input.
-    if temperature <= -100.0 || temperature >= 200.0 {
-        return Err(Error::Unavailable(
-            "actual CalcPurchAirLoads PsyPsatFnTemp diagnostic inside WFromRh",
-        ));
-    }
-    Ok(o.psychrometrics
-        .evaluate(
-            Property::WFromRh,
-            &[
-                temperature,
-                1.0,
-                o.environment.current_weather.out_baro_press,
-            ],
+    // Native PsyWFnTdbRhPb(SupplyTemp, 1.0, OutBaroPress, RoutineName).
+    // Preserve original operands; the actual Psat child owns range diagnostics.
+    o.psychrometrics
+        .source_humidity_ratio_from_relative_humidity(
+            temperature,
+            1.0,
+            o.environment.current_weather.out_baro_press,
+            "CalcPurchAirLoads",
+            &mut SourcePsychrometricOwners {
+                clock: o.clock,
+                globals: o.globals,
+                environment: &*o.environment,
+                hvac: o.hvac,
+                recurring: &mut *o.recurring,
+                backend: &mut *o.backend,
+            },
         )
-        .map_err(|_| Error::Unavailable("actual CalcPurchAirLoads WFromRh state/cache"))?
-        .result)
 }
 fn humidity_from_h(
     o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
@@ -140,15 +139,24 @@ fn humidity_from_h(
     )
 }
 fn saturation_temperature(
-    _o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
-    _h: f64,
+    o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
+    h: f64,
 ) -> Result<f64, Error> {
-    // Native raw Tsat has range, nested Psat and convergence diagnostics which
-    // the current property transport does not expose. Stop at the genuine
-    // property call before silently accepting that unrepresented operation.
-    Err(Error::Unavailable(
-        "actual CalcPurchAirLoads PsyTsatFnHPb diagnostic-aware operation",
-    ))
+    o.psychrometrics
+        .source_saturation_temperature_from_enthalpy(
+            h,
+            o.environment.current_weather.out_baro_press,
+            "CalcPurchAirLoads",
+            o.developer_flag,
+            &mut SourcePsychrometricOwners {
+                clock: o.clock,
+                globals: o.globals,
+                environment: &*o.environment,
+                hvac: o.hvac,
+                recurring: &mut *o.recurring,
+                backend: &mut *o.backend,
+            },
+        )
 }
 fn mixed_air(
     unit: &mut SourceZonePurchasedAir,
@@ -651,13 +659,46 @@ impl OrdinaryEquipment {
                 if delta_humidity > 0.00025 {
                     if unit.saturation_output_error < 1 {
                         unit.saturation_output_error += 1;
-                        return Err(Error::Unavailable(
-                            "actual PurchasedAir saturation ShowWarningError",
-                        ));
+                        let truncated = |value| {
+                            crate::heat_balance::source_round_format::truncate(value, 5).map_err(
+                                |error| {
+                                    Error::Format(format!("PurchasedAir saturation .5T: {error:?}"))
+                                },
+                            )
+                        };
+                        let message = format!(
+                            "{} \"{}\" Supply humidity ratio = {} exceeds saturation limit {} [kgWater/kgDryAir]",
+                            unit.c_object_name,
+                            unit.name,
+                            truncated(original_humidity)?,
+                            truncated(saturated_humidity)?,
+                        );
+                        let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                            kickoff: &o.globals.kickoff_simulation,
+                            developer: o.developer_flag,
+                            warmup: &o.clock.warmup_flag,
+                            doing_sizing: &o.globals.doing_sizing,
+                        };
+                        o.backend.show_source_warning_error(&message, &flags)?;
+                        o.backend
+                            .show_continue_error(" Simulation continuing . . . ")?;
+                        o.backend.show_source_continue_error_time_stamp(
+                            "",
+                            o.clock,
+                            o.globals,
+                            &*o.environment,
+                            o.hvac,
+                        )?;
+                    } else {
+                        o.backend.show_source_recurring_warning_at_end(
+                            &format!(
+                                "{} \"{}\" Supply humidity ratio exceeds saturation limit warning continues, delta max/min [kgWater/kgDryAir]...",
+                                unit.c_object_name, unit.name,
+                            ),
+                            &mut unit.saturation_output_index, o.recurring, o.clock, o.globals,
+                            Some(delta_humidity), Some(delta_humidity), None, "", "", "",
+                        )?;
                     }
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir saturation recurring warning",
-                    ));
                 }
                 supply_enthalpy = enthalpy(unit.supply_temp, unit.supply_hum_rat);
                 let specific_heat = cp(air_humidity);

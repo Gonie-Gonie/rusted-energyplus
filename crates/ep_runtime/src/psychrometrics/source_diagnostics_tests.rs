@@ -513,6 +513,524 @@ fn source_psat_keeps_miss_failure_prefix_and_same_cell_callback_reentry() {
         );
         assert_eq!(caller.errors.tracking.total_warning_errors, count);
     });
+    // The same borrowed owners now cover the actual Tsat wet-bulb child;
+    // no new fixture, private physics seed or separate numerical cache.
+    for (temperature, wet, pressure, warnings) in [
+        (23.0, 15.0, 101325.0, 0),
+        (23.0, 23.005, 101325.0, 0),
+        (23.0, 23.02, 101325.0, 1),
+        (50.0, 0.0, 101325.0, 1),
+        (20.0, 20.0, 100.0, 1),
+    ] {
+        with_fresh_psychrometric_state(|| {
+            let mut caller = Caller::new();
+            let mut numerical = EnergyPlusPsychrometricsState::default();
+            let expected = numerical
+                .evaluate(Function::WFromTwb, &[temperature, wet, pressure])
+                .unwrap()
+                .result;
+            let actual = caller
+                .with_owners(|owners| {
+                    SourcePsychrometricAccess.source_humidity_ratio_from_wet_bulb(
+                        temperature,
+                        wet,
+                        pressure,
+                        "Declared wet-bulb caller",
+                        owners,
+                    )
+                })
+                .unwrap();
+            assert_eq!(actual.to_bits(), expected.to_bits());
+            assert_eq!(caller.errors.tracking.total_warning_errors, warnings);
+            assert_eq!(
+                with_state(|state| state.final_caches()),
+                numerical.final_caches()
+            );
+            assert!(with_state(|state| state.source_report_errors));
+        });
+    }
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        // Three real diagnostics in their Native order, with the RH fallback
+        // reusing the actual 200C Psat cell, including its prior warning.
+        let actual = caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess
+                    .source_humidity_ratio_from_wet_bulb(200.0, 300.0, 101325.0, "", owners)
+            })
+            .unwrap();
+        let mut numerical = EnergyPlusPsychrometricsState::default();
+        let expected = numerical
+            .evaluate(Function::WFromTwb, &[200.0, 300.0, 101325.0])
+            .unwrap()
+            .result;
+        assert_eq!(actual.to_bits(), expected.to_bits());
+        assert_eq!(
+            with_state(|state| state.final_caches()),
+            numerical.final_caches()
+        );
+        assert_eq!(
+            caller.errors.tracking.total_warning_errors, 3,
+            "ShowWarningMessage is uncounted; recurring registration counts each warning"
+        );
+        assert_eq!(
+            with_state(|state| state.source_error_indices[W_FROM_WET_BULB]),
+            1
+        );
+        assert_eq!(with_state(|state| state.source_error_indices[PSAT]), 2);
+        assert_eq!(
+            with_state(|state| state.source_error_indices[W_FROM_WET_BULB_HUMIDITY]),
+            3
+        );
+        let text = String::from_utf8(caller.stream.clone()).unwrap();
+        let mut cursor = 0;
+        for expected in [
+            "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)",
+            " Routine=Unknown,",
+            "Calculated Wet-Bulb= 300.00 ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb",
+            "Temperature out of range [-100. to 200.] (PsyPsatFnTemp)",
+            " Routine=PsyWFnTdbTwbPb,",
+            " Input Temperature=200.00",
+            "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)",
+            " Routine=Unknown,",
+            " using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)",
+        ] {
+            cursor += text[cursor..].find(expected).expect(expected) + expected.len();
+        }
+        caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess
+                    .source_humidity_ratio_from_wet_bulb(200.0, 300.0, 101325.0, "", owners)
+            })
+            .unwrap();
+        assert_eq!(
+            caller.errors.tracking.total_warning_errors, 5,
+            "two additional recurring calls; Psat is a cache hit"
+        );
+        let rows = caller.recurring.rows.as_ref().unwrap();
+        assert_eq!(rows[0].count, 2);
+        assert_eq!(rows[1].count, 1, "cached Psat hit skips its raw diagnostic");
+        assert_eq!(rows[2].count, 2);
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        caller.clock.warmup_flag = true;
+        caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_humidity_ratio_from_wet_bulb(
+                    200.0,
+                    300.0,
+                    101325.0,
+                    "Warmup caller",
+                    owners,
+                )
+            })
+            .unwrap();
+        assert!(caller.stream.is_empty());
+        assert_eq!(with_state(|state| state.source_error_indices), [0; 19]);
+        caller.clock.warmup_flag = false;
+        caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_humidity_ratio_from_wet_bulb(
+                    200.0,
+                    300.0,
+                    101325.0,
+                    "Warmup caller",
+                    owners,
+                )
+            })
+            .unwrap();
+        assert_eq!(caller.errors.tracking.total_warning_errors, 2);
+        assert_eq!(
+            with_state(|state| state.source_error_indices[PSAT]),
+            0,
+            "warmup-populated cache hit remains warning-free"
+        );
+        assert_eq!(caller.recurring.number, 2);
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let actual = caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_humidity_ratio_from_relative_humidity(
+                    23.0,
+                    -1.0,
+                    101325.0,
+                    "Actual RH caller",
+                    owners,
+                )
+            })
+            .unwrap();
+        assert_eq!(actual.to_bits(), 1.0e-5_f64.to_bits());
+        assert_eq!(
+            with_state(|state| state.source_error_indices[W_FROM_RELATIVE_HUMIDITY]),
+            1
+        );
+        let text = String::from_utf8(caller.stream.clone()).unwrap();
+        assert!(text.contains("Calculated Humidity Ratio is invalid (PsyWFnTdbRhPb)"));
+        assert!(text.contains(" Routine=Actual RH caller Environment="));
+        assert_eq!(
+            caller.recurring.rows.as_ref().unwrap()[0].message,
+            " ** Warning ** Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)"
+        );
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let mut failing = Failing;
+        let mut backend = SourceErrorBackend {
+            state: &mut caller.errors,
+            error_stream: Some(&mut failing),
+            console: &mut caller.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        let failure = SourcePsychrometricAccess.source_humidity_ratio_from_wet_bulb(
+            23.0,
+            24.0,
+            101325.0,
+            "Failure before clamp",
+            &mut SourcePsychrometricOwners {
+                clock: &caller.clock,
+                globals: &caller.globals,
+                environment: &caller.environment,
+                hvac: &caller.hvac,
+                recurring: &mut caller.recurring,
+                backend: &mut backend,
+            },
+        );
+        assert!(matches!(failure, Err(Error::Backend(_))));
+        assert!(
+            with_state(|state| state.final_caches().psat.is_empty()),
+            "failure precedes clamp and nested Psat"
+        );
+        assert_eq!(with_state(|state| state.source_error_indices), [0; 19]);
+        assert!(with_state(|state| state
+            .source_string
+            .starts_with(" Dry-Bulb= ")));
+    });
+    let tsat_slot = |h: f64, p: f64| {
+        let index = (((h.to_bits() as i64) >> 24) ^ ((p.to_bits() as i64) >> 24)) as usize
+            & (crate::psychrometrics::ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        with_state(|state| {
+            state
+                .final_caches()
+                .tsat_h_pb
+                .into_iter()
+                .find_map(|slot| match slot {
+                    Slot::TsatHPb {
+                        index: found,
+                        i_h,
+                        i_pb,
+                        value,
+                    } if found == index => Some((i_h, i_pb, value)),
+                    _ => None,
+                })
+                .expect("same actual TsatHPb cell")
+        })
+    };
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let value = caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess
+                    .source_saturation_temperature_from_enthalpy(0.0, 0.0, "", &false, owners)
+            })
+            .unwrap();
+        assert_eq!(
+            value.to_bits(),
+            0.0_f64.to_bits(),
+            "Native default zero tags hit before raw"
+        );
+        assert!(with_state(
+            |state| state.final_caches() == Default::default()
+        ));
+        assert!(caller.stream.is_empty());
+    });
+    for (h, p) in [(0.0, 101330.0), (25000.0, 90000.0), (100000.0, 75000.0)] {
+        with_fresh_psychrometric_state(|| {
+            let mut caller = Caller::new();
+            let mut numerical = EnergyPlusPsychrometricsState::default();
+            let expected = numerical
+                .evaluate(Function::TsatHPb, &[h, p])
+                .unwrap()
+                .result;
+            let actual = caller
+                .with_owners(|owners| {
+                    SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                        h,
+                        p,
+                        "Declared Tsat caller",
+                        &false,
+                        owners,
+                    )
+                })
+                .unwrap();
+            assert_eq!(actual.to_bits(), expected.to_bits());
+            assert_eq!(
+                with_state(|state| state.final_caches()),
+                numerical.final_caches()
+            );
+            assert_eq!(tsat_slot(h, p).0, (h.to_bits() as i64) >> 24);
+            assert_eq!(tsat_slot(h, p).1, (p.to_bits() as i64) >> 24);
+        });
+    }
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let first_h = 25000.0_f64;
+        let next_h = f64::from_bits(first_h.to_bits() + 1);
+        let a = caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                    first_h, 101330.0, "", &false, owners,
+                )
+            })
+            .unwrap();
+        let b = caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                    next_h, 101330.0, "", &false, owners,
+                )
+            })
+            .unwrap();
+        assert_eq!(
+            a.to_bits(),
+            b.to_bits(),
+            "same signed24 tags hit the first original-input result"
+        );
+        assert!(caller.stream.is_empty());
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        for h in [-100000.0, -400000.0] {
+            caller
+                .with_owners(|owners| {
+                    SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                        h,
+                        101330.0,
+                        "Actual range caller",
+                        &false,
+                        owners,
+                    )
+                })
+                .unwrap();
+        }
+        let text = String::from_utf8(caller.stream.clone()).unwrap();
+        assert_eq!(
+            text.matches("Enthalpy out of range (PsyTsatFnHPb)").count(),
+            1
+        );
+        assert_eq!(
+            text.matches(" Initial Resultant Temperature= ").count(),
+            1,
+            "repeated range does not set FlagError"
+        );
+        assert!(text.contains(" Routine=Actual range caller,"));
+        assert_eq!(
+            with_state(|state| state.source_error_indices[TSAT_FROM_ENTHALPY]),
+            1
+        );
+        let row = &caller.recurring.rows.as_ref().unwrap()[0];
+        assert_eq!(row.count, 2);
+        assert_eq!(
+            row.max_value.to_bits(),
+            (-100000.0_f64 + 1.78637e4).to_bits()
+        );
+        assert_eq!(
+            row.min_value.to_bits(),
+            (-400000.0_f64 + 1.78637e4).to_bits()
+        );
+        assert_eq!(
+            (row.max_units.as_str(), row.min_units.as_str()),
+            ("J/kg", "J/kg")
+        );
+        let count = caller.errors.tracking.total_warning_errors;
+        caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                    -400000.0, 101330.0, "", &false, owners,
+                )
+            })
+            .unwrap();
+        assert_eq!(
+            caller.errors.tracking.total_warning_errors, count,
+            "cache hit skips the entire raw route"
+        );
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        caller.clock.warmup_flag = true;
+        caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                    -100000.0, 101330.0, "", &false, owners,
+                )
+            })
+            .unwrap();
+        caller.clock.warmup_flag = false;
+        caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                    -100000.0, 101330.0, "", &false, owners,
+                )
+            })
+            .unwrap();
+        assert!(
+            caller.stream.is_empty(),
+            "warmup-populated cache hit has no post-warmup diagnostic"
+        );
+        assert_eq!(
+            with_state(|state| state.source_error_indices[TSAT_FROM_ENTHALPY]),
+            0
+        );
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let old = SourcePsychrometricAccess
+            .evaluate(Function::TsatHPb, &[25000.0, 101330.0])
+            .unwrap()
+            .result;
+        let mut failing = Failing;
+        let mut backend = SourceErrorBackend {
+            state: &mut caller.errors,
+            error_stream: Some(&mut failing),
+            console: &mut caller.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        let failure = SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+            -100000.0,
+            101330.0,
+            "Failure before timestamp/String",
+            &false,
+            &mut SourcePsychrometricOwners {
+                clock: &caller.clock,
+                globals: &caller.globals,
+                environment: &caller.environment,
+                hvac: &caller.hvac,
+                recurring: &mut caller.recurring,
+                backend: &mut backend,
+            },
+        );
+        assert!(matches!(failure, Err(Error::Backend(_))));
+        let (tag, pressure_tag, stored) = tsat_slot(-100000.0, 101330.0);
+        assert_eq!(tag, ((-100000.0_f64).to_bits() as i64) >> 24);
+        assert_eq!(pressure_tag, (101330.0_f64.to_bits() as i64) >> 24);
+        assert_eq!(stored.to_bits(), old.to_bits());
+        assert_eq!(
+            with_state(|state| state.source_error_indices[TSAT_FROM_ENTHALPY]),
+            0
+        );
+        assert!(with_state(|state| state.source_string.is_empty()));
+        assert_eq!(caller.recurring.number, 0);
+        let hit = caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                    -100000.0, 101330.0, "", &false, owners,
+                )
+            })
+            .unwrap();
+        assert_eq!(hit.to_bits(), old.to_bits());
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let called = Cell::new(false);
+        let mut callback = |_: &mut SourceErrorState, _, _: &[u8]| {
+            if !called.replace(true) {
+                SourcePsychrometricAccess
+                    .evaluate(Function::TsatHPb, &[25000.0, 101330.0])
+                    .unwrap();
+            }
+        };
+        let mut backend = SourceErrorBackend {
+            state: &mut caller.errors,
+            error_stream: Some(&mut caller.stream),
+            console: &mut caller.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: Some(&mut callback),
+            sqlite: None,
+        };
+        let result = SourcePsychrometricAccess
+            .source_saturation_temperature_from_enthalpy(
+                -100000.0,
+                101330.0,
+                "Reentrant range caller",
+                &false,
+                &mut SourcePsychrometricOwners {
+                    clock: &caller.clock,
+                    globals: &caller.globals,
+                    environment: &caller.environment,
+                    hvac: &caller.hvac,
+                    recurring: &mut caller.recurring,
+                    backend: &mut backend,
+                },
+            )
+            .unwrap();
+        let (tag, _, stored) = tsat_slot(25000.0, 101330.0);
+        assert_eq!(
+            tag,
+            (25000.0_f64.to_bits() as i64) >> 24,
+            "outer finish preserves callback tag"
+        );
+        assert_eq!(
+            stored.to_bits(),
+            result.to_bits(),
+            "outer finish changes only the referenced cell value"
+        );
+        let hit = caller
+            .with_owners(|owners| {
+                SourcePsychrometricAccess.source_saturation_temperature_from_enthalpy(
+                    25000.0, 101330.0, "", &false, owners,
+                )
+            })
+            .unwrap();
+        assert_eq!(hit.to_bits(), result.to_bits());
+    });
+    for temperature in [-120.0, 300.0] {
+        with_fresh_psychrometric_state(|| {
+            let mut caller = Caller::new();
+            let mut numerical = EnergyPlusPsychrometricsState::default();
+            let expected = numerical
+                .evaluate(Function::WFromRh, &[temperature, 1.0, 101325.0])
+                .unwrap()
+                .result;
+            let actual = caller
+                .with_owners(|owners| {
+                    SourcePsychrometricAccess.source_humidity_ratio_from_relative_humidity(
+                        temperature,
+                        1.0,
+                        101325.0,
+                        "CalcPurchAirLoads",
+                        owners,
+                    )
+                })
+                .unwrap();
+            assert_eq!(actual.to_bits(), expected.to_bits());
+            assert_eq!(
+                with_state(|state| state.final_caches()),
+                numerical.final_caches()
+            );
+            assert_eq!(caller.errors.tracking.total_warning_errors, 1);
+            assert_eq!(with_state(|state| state.source_error_indices[PSAT]), 1);
+            assert_eq!(
+                with_state(|state| state.source_error_indices[W_FROM_RELATIVE_HUMIDITY]),
+                0
+            );
+            let text = String::from_utf8(caller.stream.clone()).unwrap();
+            assert!(text.contains("Temperature out of range [-100. to 200.] (PsyPsatFnTemp)"));
+            assert!(text.contains(" Routine=CalcPurchAirLoads,"));
+        });
+    }
     for (value, precision, expected) in [
         (12.3499, 2, "12.34"),
         (-12.34, 2, "-12.33"),

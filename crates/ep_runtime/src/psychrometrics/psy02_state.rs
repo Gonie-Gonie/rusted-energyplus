@@ -124,6 +124,13 @@ pub(super) enum SourcePsatLookup {
     Miss { index: usize, representative: f64 },
 }
 
+// Original H/P remain caller locals; only the actual sparse-cell identity
+// crosses the released RefCell loan before any diagnostic/backend callback.
+pub(super) enum SourceTsatEnthalpyLookup {
+    Hit(f64),
+    Miss { index: usize },
+}
+
 /// Equivalent of one fresh EnergyPlusData's selected numerical property state.
 #[derive(Clone, Debug)]
 pub struct EnergyPlusPsychrometricsState {
@@ -133,6 +140,9 @@ pub struct EnergyPlusPsychrometricsState {
     // real backend-aware calls own writes, never a second cache or counter seed.
     pub(super) source_error_indices: [i32; 19],
     pub(super) source_string: String,
+    // Native PsychrometricsData::ReportErrors. Only construction/clear writes
+    // true; the pinned source has no other writer or public control setter.
+    pub(super) source_report_errors: bool,
 }
 
 impl Default for EnergyPlusPsychrometricsState {
@@ -150,6 +160,7 @@ impl Default for EnergyPlusPsychrometricsState {
             slots: std::array::from_fn(|_| BTreeMap::new()),
             source_error_indices: [0; 19],
             source_string: String::new(),
+            source_report_errors: true,
         }
     }
 }
@@ -450,6 +461,47 @@ impl EnergyPlusPsychrometricsState {
         result
     }
 
+    // Native Psychrometrics.hh1105-1115: signed tags FIRST, raw ORIGINAL
+    // inputs on miss, same cell held conceptually across all raw callbacks.
+    pub(super) fn begin_source_tsat_enthalpy(
+        &mut self,
+        h: f64,
+        p: f64,
+    ) -> SourceTsatEnthalpyLookup {
+        let ht = signed_tag(h, 24);
+        let pt = signed_tag(p, 24);
+        let index = (ht ^ pt) as usize & (ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        let EnergyPlusPsychrometricCacheSlot::TsatHPb {
+            i_h, i_pb, value, ..
+        } = self.slot(3, index)
+        else {
+            unreachable!()
+        };
+        if i_h == ht && i_pb == pt {
+            return SourceTsatEnthalpyLookup::Hit(value);
+        }
+        self.slots[3].insert(
+            index,
+            EnergyPlusPsychrometricCacheSlot::TsatHPb {
+                index,
+                i_h: ht,
+                i_pb: pt,
+                value,
+            },
+        );
+        SourceTsatEnthalpyLookup::Miss { index }
+    }
+    pub(super) fn finish_source_tsat_enthalpy(&mut self, index: usize, result: f64) {
+        let slot = self.slots[3]
+            .entry(index)
+            .or_insert_with(|| default_slot(3, index));
+        let EnergyPlusPsychrometricCacheSlot::TsatHPb { value, .. } = slot else {
+            unreachable!()
+        };
+        // Never restore tags after callback/reentry into this same cache cell.
+        *value = result;
+    }
+
     fn tsat_h_pb(&mut self, h: f64, p: f64) -> f64 {
         let ht = signed_tag(h, 24);
         let pt = signed_tag(p, 24);
@@ -509,22 +561,15 @@ impl EnergyPlusPsychrometricsState {
     }
 
     fn w_from_rh(&mut self, t: f64, rh: f64, p: f64) -> f64 {
-        let dew = rh * self.psat(t);
-        let difference = p - dew;
-        let denominator = if difference < 1000.0 {
-            1000.0
-        } else {
-            difference
-        };
-        let w = dew * 0.62198 / denominator;
-        if w < 1.0e-5 { 1.0e-5 } else { w }
+        let psat = self.psat(t);
+        let w = super::raw_psy_w_fn_tdb_rh_pb(rh, p, psat);
+        super::finish_psy_w_fn_tdb_rh_pb(w)
     }
 
     fn w_from_twb(&mut self, t: f64, wet: f64, p: f64) -> f64 {
         let wet = if wet > t { t } else { wet };
         let psat = self.psat(wet);
-        let star = 0.62198 * psat / (p - psat);
-        let w = ((2501.0 - 2.381 * wet) * star - (t - wet)) / (2501.0 + 1.805 * t - 4.186 * wet);
+        let w = super::raw_psy_w_fn_tdb_twb_pb(t, wet, p, psat);
         if w < 0.0 {
             self.w_from_rh(t, 0.0001, p)
         } else {

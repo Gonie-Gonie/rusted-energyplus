@@ -477,6 +477,7 @@ impl SourceHvacManager {
                                 // phase owners; no copied flags or mutable alias exists.
                                 clock: purchased_initialization.clock,
                                 globals: purchased_initialization.globals,
+                                developer_flag: &o.project.system.developer_flag,
                                 recurring: o.recurring_errors,
                                 environment: o.environment,
                                 control: o.control,

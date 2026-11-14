@@ -1112,6 +1112,7 @@ impl Factory {
             hvac: &self.startup.hvac_globals,
             clock: init.clock,
             globals: init.globals,
+            developer_flag: &self.project.system.developer_flag,
             recurring: &mut self.ancillary.source_recurring_errors,
             environment: &mut self.weather.environment,
             control: &self.control,

@@ -265,6 +265,7 @@ fn simulate(source: &mut Factory, name: &str) -> std::result::Result<(), Error> 
         hvac: &source.startup.hvac_globals,
         clock: initialization.clock,
         globals: initialization.globals,
+        developer_flag: &source.project.system.developer_flag,
         recurring: &mut source.ancillary.source_recurring_errors,
         environment: &mut source.weather.environment,
         control: &source.control,
