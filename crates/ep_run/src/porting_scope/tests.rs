@@ -3593,6 +3593,14 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             let mut warning = people.clone();
             warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
                 json!("OccupancySchedule");
+            warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =
+                json!("DifferentialEnthalpy");
+            warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heat_recovery_type"] =
+                json!("Enthalpy");
+            warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["sensible_heat_recovery_effectiveness"] =
+                json!(1.0);
+            warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["latent_heat_recovery_effectiveness"] =
+                json!(0.0);
             warning["NodeList"] = json!({"Supply List":{"nodes":[
                 {"node_name":"Supply"},{"node_name":""},{"node_name":""}]}});
             warning["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["zone_supply_air_node_name"] =
@@ -3682,6 +3690,26 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
                     .expect("actual inactive DCV raw fields")["demand_controlled_ventilation_type"],
                 SourceRaw::String("OccupancySchedule".into())
+            );
+            assert_eq!(
+                warning_model.ideal_loads_air_systems[0].outdoor_air_economizer_type,
+                ep_model::OutdoorAirEconomizerType::DifferentialEnthalpy
+            );
+            assert_eq!(
+                warning_model.ideal_loads_air_systems[0].heat_recovery_type,
+                ep_model::HeatRecoveryType::Enthalpy
+            );
+            assert_eq!(
+                warning_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained inactive ventilation")["outdoor_air_economizer_type"],
+                SourceRaw::String("DifferentialEnthalpy".into())
+            );
+            assert_eq!(
+                warning_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained inactive ventilation")["heat_recovery_type"],
+                SourceRaw::String("Enthalpy".into())
             );
             let original_members = match &warning_ip
                 .source_raw_object_fields("NodeList", "Supply List")
@@ -3905,6 +3933,14 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             let mut exhaust = people.clone();
             exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
                 json!("CO2Setpoint");
+            exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =
+                json!("DifferentialDryBulb");
+            exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heat_recovery_type"] =
+                json!("Sensible");
+            exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["sensible_heat_recovery_effectiveness"] =
+                json!(0.0);
+            exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["latent_heat_recovery_effectiveness"] =
+                json!(1.0);
             exhaust["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_air_exhaust_node_or_nodelist_name"] =
                 json!("Exhaust");
             exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["zone_exhaust_air_node_name"] =
@@ -4000,6 +4036,26 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     .expect("actual inactive CO2 raw fields")["demand_controlled_ventilation_type"],
                 SourceRaw::String("CO2Setpoint".into())
             );
+            assert_eq!(
+                exhaust_model.ideal_loads_air_systems[0].outdoor_air_economizer_type,
+                ep_model::OutdoorAirEconomizerType::DifferentialDryBulb
+            );
+            assert_eq!(
+                exhaust_model.ideal_loads_air_systems[0].heat_recovery_type,
+                ep_model::HeatRecoveryType::Sensible
+            );
+            assert_eq!(
+                exhaust_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained inactive ventilation")["outdoor_air_economizer_type"],
+                SourceRaw::String("DifferentialDryBulb".into())
+            );
+            assert_eq!(
+                exhaust_ip
+                    .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
+                    .expect("retained inactive ventilation")["heat_recovery_type"],
+                SourceRaw::String("Sensible".into())
+            );
             assert_eq!(exhaust_raw, original_exhaust_raw);
 
             // Explicit JSON empty fuel remains authored through the real
@@ -4015,9 +4071,17 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 for (field, authored) in [
                     ("heating_fuel_type", heating),
                     ("cooling_fuel_type", cooling),
+                    ("demand_controlled_ventilation_type", heating),
+                    ("outdoor_air_economizer_type", heating),
+                    ("heat_recovery_type", heating),
                 ] {
                     if let Some(value) = authored {
                         fuel_input["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"][field] = json!(value);
+                    } else {
+                        fuel_input["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]
+                            .as_object_mut()
+                            .expect("actual retained empty-or-omitted unit")
+                            .remove(field);
                     }
                 }
                 let raw = parse_epjson_str(&fuel_input.to_string()).expect("real empty-fuel JSON");
@@ -4035,6 +4099,18 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(
                     model.ideal_loads_air_systems[0].cooling_fuel_type,
                     ep_model::IdealLoadsFuelType::DistrictCooling
+                );
+                assert_eq!(
+                    (
+                        model.ideal_loads_air_systems[0].demand_controlled_ventilation_type,
+                        model.ideal_loads_air_systems[0].outdoor_air_economizer_type,
+                        model.ideal_loads_air_systems[0].heat_recovery_type,
+                    ),
+                    (
+                        ep_model::DemandControlledVentilationType::None,
+                        ep_model::OutdoorAirEconomizerType::NoEconomizer,
+                        ep_model::HeatRecoveryType::None,
+                    )
                 );
                 let simulation = ep_model::SimulationModel::from_typed(model.clone());
                 ep_runtime::validate_source_direct_zone_purchased_air_model(&simulation)
@@ -4073,6 +4149,9 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 for (field, authored) in [
                     ("heating_fuel_type", heating),
                     ("cooling_fuel_type", cooling),
+                    ("demand_controlled_ventilation_type", heating),
+                    ("outdoor_air_economizer_type", heating),
+                    ("heat_recovery_type", heating),
                 ] {
                     assert_eq!(
                         fields.get(field),
@@ -5195,6 +5274,10 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 assert_eq!(raw, retained);
                 let mut no_exhaust = returns.clone();
                 no_exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                    json!("None");
+                no_exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =
+                    json!("NoEconomizer");
+                no_exhaust["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heat_recovery_type"] =
                     json!("None");
                 no_exhaust["ZoneHVAC:EquipmentConnections"]["Connection"]
                     .as_object_mut()

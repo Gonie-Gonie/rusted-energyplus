@@ -357,7 +357,7 @@
     "ZoneHVAC:IdealLoadsAirSystem": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
       "Bounded Source B direct epJSON supports the six basic IdealLoads outdoor-air methods with real schedules and nodes, None humidity control and owned warning/mixing state. Hard flow, capacity and combined-limit evidence covers SUM with NoDCV. NoLimit Flow/Person also has qualifying None and OccupancySchedule DCV evidence using genuine reported occupancy. Native JSON-number access retains authored wide integer lexemes, bounded positive EquipmentList priorities and the IdealLoads, thermostat and DSOA numeric getters. Hard-limit/DCV and OA/humidity compositions, CO2, economizer/recovery, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value completion remain open. Public intervals establish no exact averaged capacity/mixing or private-mode law.",
-      "Without selected outdoor air, named OccupancySchedule and CO2Setpoint selectors are ignored and the actual getter assigns effective None. The fixed no-OA authored-CO2 scene meets every frozen sensible, numeric and ancillary criterion. This is inactive-selector fidelity; positive-OA CO2 control and general inactive-feature combinations remain unsupported, and no private runtime enum is observed."
+      "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. Positive-OA CO2, economizer and recovery remain outside the admitted scope, and no active-effect, private-enum or full-object completion claim follows."
     ],
     "ZoneControl:Thermostat": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
@@ -8441,6 +8441,177 @@
         "Source_processes": 1,
         "engine_replays": 0,
         "scope": "Without selected outdoor air, named OccupancySchedule and CO2Setpoint selectors are ignored and the actual getter assigns effective None. The fixed no-OA authored-CO2 scene meets every frozen sensible, numeric and ancillary criterion. This is inactive-selector fidelity; positive-OA CO2 control and general inactive-feature combinations remain unsupported, and no private runtime enum is observed.",
+        "physical_domain_completion": false
+      },
+      "NoOA_inactive_ventilation_selectors_149": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit149-prep/build152-attempt01.json",
+          "sha256": "e4e700c7da1f1f3388a87317c67c6e6794ec761f2912a6f7a8aa1e333c7f776b",
+          "bytes": 714
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/quality01/summary.json",
+          "sha256": "0ef34756c849a69910d010066f01c45d9fd323bd247710a2c2cc23f9bada5f88",
+          "bytes": 1678
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit149-prep/owner-execution-review01.json",
+          "sha256": "9ecbe44df51c8675a16fe89e7e557f845ef350c154af66a48dae2b54e2a4d495",
+          "bytes": 4222
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-source-NoOA-inactive-ventilation-adoption01.json",
+          "sha256": "48efa470f5d74171a53ee1072cbd07b14fa7f92844a93b72a3ab35c2e384f6f2",
+          "bytes": 10168
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-source-format-review01.json",
+          "sha256": "0c34f07590dc920850b6fe3ca81e6db280c2ecedaf64f990840b3c19844c327a",
+          "bytes": 1846
+        },
+        "current_QA_commands": 5,
+        "total_actual_QA_commands": 5,
+        "failed_QA_attempts": 0,
+        "existing_test_executions": [
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "ideal_loads::binding::tests::model_binding_resolves_exact_typed_ids_and_schedule_roles"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/no-oa-inactive-ventilation-149/quality01/binding-tests/receipt.json",
+              "sha256": "f10d30121e32d7c901ebdf6478b1a9a74d91f4423765f7549288a8861707773b",
+              "bytes": 3359
+            },
+            "actual_exit_code": 0
+          },
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "porting_scope::tests::bounded_controls_do_not_change_ordinary_support_assessment"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/no-oa-inactive-ventilation-149/quality01/source-caller-tests/receipt.json",
+              "sha256": "d242dde17eaac90c112ba7ea15910bc1df43dd2bc99035a76d3447b9a0bca0c7",
+              "bytes": 3360
+            },
+            "actual_exit_code": 0
+          }
+        ],
+        "distinct_existing_test_functions": 2,
+        "actual_existing_test_body_executions": 2,
+        "new_test_functions": 0,
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-runtime-bindings01.json",
+          "sha256": "611317657742f3ff48a8dfeae3f19e260e3c51dd5d38650b9c332f2bd5dd6a1c",
+          "bytes": 3606
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-runtime-final-review01.json",
+          "sha256": "8d64aae69dbccff04c7ed8a450dd5fd87a8ed6eb2cb8e709ec5ce784fe5bbe4a",
+          "bytes": 5088
+        },
+        "Root_producer": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-run-two-pairs149.py",
+          "sha256": "08d246716f0e1e4af196bd27e13bb9497686fade2ca47c5d800681139883b525",
+          "bytes": 5394
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-two-pairs152-01/receipt.json",
+          "sha256": "a0c4b33c9d1f6ee8784b9061cd94ee9100fc5e08f49e4c4fc2f7a461b21cdadd",
+          "bytes": 33878
+        },
+        "paired_readbacks": {
+          "NOOA_DRY_SENSIBLE": {
+            "path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_DRY_SENSIBLE.paired152-01.json",
+            "sha256": "041f99fd7b836e7a0e507de2b2fa786f6bf495b1b551e6f52839b6585d1a04a4",
+            "bytes": 455650
+          },
+          "NOOA_ENTHALPY_RECOVERY": {
+            "path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_ENTHALPY_RECOVERY.paired152-01.json",
+            "sha256": "70fa353ae1cfe05e191e54c213e9a22e1288011e2313a062b6cc9ca6d1af4f0a",
+            "bytes": 455864
+          }
+        },
+        "cases": {
+          "NOOA_DRY_SENSIBLE": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_DRY_SENSIBLE.paired152-01.json",
+              "sha256": "041f99fd7b836e7a0e507de2b2fa786f6bf495b1b551e6f52839b6585d1a04a4",
+              "bytes": 455650
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 20472,
+            "public_response": {
+              "Native": {
+                "passed": true,
+                "observation": {
+                  "index": 101,
+                  "samples": 480,
+                  "all_actual_OA_mass_values_numerical_zero": true,
+                  "max_abs_actual_OA_mass_flow": 0.0,
+                  "no_CO2_reset_warning": true
+                },
+                "error": null
+              },
+              "Source": {
+                "passed": true,
+                "observation": {
+                  "index": 101,
+                  "samples": 480,
+                  "all_actual_OA_mass_values_numerical_zero": true,
+                  "max_abs_actual_OA_mass_flow": 0.0,
+                  "no_CO2_reset_warning": true
+                },
+                "error": null
+              }
+            }
+          },
+          "NOOA_ENTHALPY_RECOVERY": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_ENTHALPY_RECOVERY.paired152-01.json",
+              "sha256": "70fa353ae1cfe05e191e54c213e9a22e1288011e2313a062b6cc9ca6d1af4f0a",
+              "bytes": 455864
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 20472,
+            "public_response": {
+              "Native": {
+                "passed": true,
+                "observation": {
+                  "index": 101,
+                  "samples": 480,
+                  "all_actual_OA_mass_values_numerical_zero": true,
+                  "max_abs_actual_OA_mass_flow": 0.0,
+                  "no_CO2_reset_warning": true
+                },
+                "error": null
+              },
+              "Source": {
+                "passed": true,
+                "observation": {
+                  "index": 101,
+                  "samples": 480,
+                  "all_actual_OA_mass_values_numerical_zero": true,
+                  "max_abs_actual_OA_mass_flow": 0.0,
+                  "no_CO2_reset_warning": true
+                },
+                "error": null
+              }
+            }
+          }
+        },
+        "accepted_cases": 2,
+        "accepted_values": 147360,
+        "qualifying_raw_operand_unequal": 40944,
+        "Native_processes": 2,
+        "Source_processes": 2,
+        "engine_replays": 0,
+        "scope": "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. Positive-OA CO2, economizer and recovery remain outside the admitted scope, and no active-effect, private-enum or full-object completion claim follows.",
         "physical_domain_completion": false
       }
     },
@@ -68041,12 +68212,322 @@
           "no_replay": true
         },
         "effective_state": "One raw CO2Setpoint selector without DSOA/OA links. Pinned Native/Source getter branches assign effectiveNone; all public101 intervals are numeric0 with no CO2-reset warning, while every original positive sensible criterion remains mandatory. Runtime enum/handle state is not exported; no active CO2 or arbitrary inactive-feature completion claim."
+      },
+      {
+        "id": "B-IDEALLOADS-NOOA-DRY-SENSIBLE-149-120H",
+        "case_kind": "NOOA_DRY_SENSIBLE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-no-oa-inactive-ventilation-149",
+        "input": {
+          "path": ".runtime/object-expansion/unit149-prep/NoOA-inactive-ventilation-two-case-input-proposal01/NOOA_DRY_SENSIBLE/input.epJSON",
+          "sha256": "8a252e80ca6b6d07697ffbb322f709b484222f580a8ccf45c994b7b3f91dcc73",
+          "bytes": 100505
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/epoch152/NOOA_DRY_SENSIBLE/native01/command/receipt.json",
+          "sha256": "49de206f88bd6831b3fe433efab9fadd13aa7b37b73efd01358a20b44a8a7691",
+          "bytes": 59856
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/epoch152/NOOA_DRY_SENSIBLE/source01/command/receipt.json",
+          "sha256": "e2f3c7a56b67c5cd4313e6166b1262569523c6dbd3d7ed82e20bc5cbd43d6fe7",
+          "bytes": 60679
+        },
+        "source_summary": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/epoch152/NOOA_DRY_SENSIBLE/source01/output/run-summary.json",
+          "sha256": "af38b7d5fbade2e68a9b9d799a0afbb106d7fe2049e74b9098d8ca89dd5f5379",
+          "bytes": 63974
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f8/f80f1edc61f04a55781cad3154d63d722ce0f158dfd3c0c6d0db66fe7cb1463e",
+          "sha256": "f80f1edc61f04a55781cad3154d63d722ce0f158dfd3c0c6d0db66fe7cb1463e"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/build152-01/eplus-rs.exe",
+          "sha256": "df2446b3d1397a894e56ca20af48335b88580438440e8eb0586758ac8fbc51ba",
+          "bytes": 81020913
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/build152-01/build/receipt.json",
+          "sha256": "f37894a80da8038f2841e50886d2223312adb037127c17e2e3e7f1cb3c26c132",
+          "bytes": 4710
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_DRY_SENSIBLE.paired152-01.json",
+          "sha256": "041f99fd7b836e7a0e507de2b2fa786f6bf495b1b551e6f52839b6585d1a04a4",
+          "bytes": 455650
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-two-pairs152-01/receipt.json",
+          "sha256": "a0c4b33c9d1f6ee8784b9061cd94ee9100fc5e08f49e4c4fc2f7a461b21cdadd",
+          "bytes": 33878
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit149-prep/science-final01/NOOA_DRY_SENSIBLE.recipe.json",
+          "sha256": "e20eedddbd74797a58c280f0c462a2f40c7f328d8e3eeb65c800c0dc9e247bf6",
+          "bytes": 48222
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit149-prep/NoOA-inactive-ventilation-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "29d10855e1cd5c452425954c775e49d5a65dbc3074854182da35bb5b68c88bef",
+          "bytes": 3419
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 20472,
+          "parsed_binary64_unequal": 20472,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.285814844071865e-07,
+          "max_rmse_delta": 2.4235716310900887e-08
+        },
+        "coverage_kind": "NoOA_inactive_ventilation_selector_fidelity",
+        "authored_fields": {
+          "demand_controlled_ventilation_type": "CO2Setpoint",
+          "outdoor_air_economizer_type": "DifferentialDryBulb",
+          "heat_recovery_type": "Sensible",
+          "sensible_heat_recovery_effectiveness": 0.0,
+          "latent_heat_recovery_effectiveness": 1.0
+        },
+        "public_response_summary": {
+          "Native": {
+            "passed": true,
+            "observation": {
+              "index": 101,
+              "samples": 480,
+              "all_actual_OA_mass_values_numerical_zero": true,
+              "max_abs_actual_OA_mass_flow": 0.0,
+              "no_CO2_reset_warning": true
+            },
+            "error": null
+          },
+          "Source": {
+            "passed": true,
+            "observation": {
+              "index": 101,
+              "samples": 480,
+              "all_actual_OA_mass_values_numerical_zero": true,
+              "max_abs_actual_OA_mass_flow": 0.0,
+              "no_CO2_reset_warning": true
+            },
+            "error": null
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit130-prep/heating-availability-fuel-two-case-input-proposal01/POSITIVE/unchanged-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "whole155_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit149-prep/build152-attempt01.json",
+            "sha256": "e4e700c7da1f1f3388a87317c67c6e6794ec761f2912a6f7a8aa1e333c7f776b",
+            "bytes": 714
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/no-oa-inactive-ventilation-149/quality01/summary.json",
+            "sha256": "0ef34756c849a69910d010066f01c45d9fd323bd247710a2c2cc23f9bada5f88",
+            "bytes": 1678
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit149-prep/owner-execution-review01.json",
+            "sha256": "9ecbe44df51c8675a16fe89e7e557f845ef350c154af66a48dae2b54e2a4d495",
+            "bytes": 4222
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit149-prep/Root-runtime-bindings01.json",
+            "sha256": "611317657742f3ff48a8dfeae3f19e260e3c51dd5d38650b9c332f2bd5dd6a1c",
+            "bytes": 3606
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit149-prep/Root-run-two-pairs149.py",
+            "sha256": "08d246716f0e1e4af196bd27e13bb9497686fade2ca47c5d800681139883b525",
+            "bytes": 5394
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit149-prep/Root-runtime-final-review01.json",
+            "sha256": "8d64aae69dbccff04c7ed8a450dd5fd87a8ed6eb2cb8e709ec5ce784fe5bbe4a",
+            "bytes": 5088
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Finite NoOA named-selector composition and authored effectiveness boundaries. Source/Native getters share the NoOA reset path; public101 is numeric0 and all old positive sensible requirements hold. No private enum or active economizer/recovery effect is observed."
+      },
+      {
+        "id": "B-IDEALLOADS-NOOA-ENTHALPY-RECOVERY-149-120H",
+        "case_kind": "NOOA_ENTHALPY_RECOVERY",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-no-oa-inactive-ventilation-149",
+        "input": {
+          "path": ".runtime/object-expansion/unit149-prep/NoOA-inactive-ventilation-two-case-input-proposal01/NOOA_ENTHALPY_RECOVERY/input.epJSON",
+          "sha256": "c7eb228a250c1155abb481b7d0f51c1093390efc1e7c79e3641606a920a451e9",
+          "bytes": 100512
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/epoch152/NOOA_ENTHALPY_RECOVERY/native01/command/receipt.json",
+          "sha256": "176454d405d5131eda06d01adb054547c0d684e3b6dd9d8bbff8ea30a4c5f7df",
+          "bytes": 59985
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/epoch152/NOOA_ENTHALPY_RECOVERY/source01/command/receipt.json",
+          "sha256": "490ba89ff2d1c719c83abef31770ff18f1738a1ce7220639fae199124603b0e2",
+          "bytes": 60824
+        },
+        "source_summary": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/epoch152/NOOA_ENTHALPY_RECOVERY/source01/output/run-summary.json",
+          "sha256": "b7f2c9fbcd25cdd4ab0639337566dde9006586b601c2ce22d6cbb7f1e860b565",
+          "bytes": 64109
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f8/f80f1edc61f04a55781cad3154d63d722ce0f158dfd3c0c6d0db66fe7cb1463e",
+          "sha256": "f80f1edc61f04a55781cad3154d63d722ce0f158dfd3c0c6d0db66fe7cb1463e"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/build152-01/eplus-rs.exe",
+          "sha256": "df2446b3d1397a894e56ca20af48335b88580438440e8eb0586758ac8fbc51ba",
+          "bytes": 81020913
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/build152-01/build/receipt.json",
+          "sha256": "f37894a80da8038f2841e50886d2223312adb037127c17e2e3e7f1cb3c26c132",
+          "bytes": 4710
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_ENTHALPY_RECOVERY.paired152-01.json",
+          "sha256": "70fa353ae1cfe05e191e54c213e9a22e1288011e2313a062b6cc9ca6d1af4f0a",
+          "bytes": 455864
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit149-prep/Root-two-pairs152-01/receipt.json",
+          "sha256": "a0c4b33c9d1f6ee8784b9061cd94ee9100fc5e08f49e4c4fc2f7a461b21cdadd",
+          "bytes": 33878
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit149-prep/science-final01/NOOA_ENTHALPY_RECOVERY.recipe.json",
+          "sha256": "80587189162193a77dc7fc0ca0a879871175db754e19769a85a738668ea0f049",
+          "bytes": 48269
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit149-prep/NoOA-inactive-ventilation-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "29d10855e1cd5c452425954c775e49d5a65dbc3074854182da35bb5b68c88bef",
+          "bytes": 3419
+        },
+        "totals": {
+          "series": 155,
+          "samples": 73680,
+          "raw_operand_unequal": 20472,
+          "parsed_binary64_unequal": 20472,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.285814844071865e-07,
+          "max_rmse_delta": 2.4235716310900887e-08
+        },
+        "coverage_kind": "NoOA_inactive_ventilation_selector_fidelity",
+        "authored_fields": {
+          "demand_controlled_ventilation_type": "OccupancySchedule",
+          "outdoor_air_economizer_type": "DifferentialEnthalpy",
+          "heat_recovery_type": "Enthalpy",
+          "sensible_heat_recovery_effectiveness": 1.0,
+          "latent_heat_recovery_effectiveness": 0.0
+        },
+        "public_response_summary": {
+          "Native": {
+            "passed": true,
+            "observation": {
+              "index": 101,
+              "samples": 480,
+              "all_actual_OA_mass_values_numerical_zero": true,
+              "max_abs_actual_OA_mass_flow": 0.0,
+              "no_CO2_reset_warning": true
+            },
+            "error": null
+          },
+          "Source": {
+            "passed": true,
+            "observation": {
+              "index": 101,
+              "samples": 480,
+              "all_actual_OA_mass_values_numerical_zero": true,
+              "max_abs_actual_OA_mass_flow": 0.0,
+              "no_CO2_reset_warning": true
+            },
+            "error": null
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit130-prep/heating-availability-fuel-two-case-input-proposal01/POSITIVE/unchanged-policy.json",
+            "sha256": "5f5a181d504428587e853c89d63a3f7ffe2cac20cea33a4f0c350028823803ca",
+            "bytes": 42826
+          },
+          "whole155_policy_bytes_literal": true,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit149-prep/build152-attempt01.json",
+            "sha256": "e4e700c7da1f1f3388a87317c67c6e6794ec761f2912a6f7a8aa1e333c7f776b",
+            "bytes": 714
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/no-oa-inactive-ventilation-149/quality01/summary.json",
+            "sha256": "0ef34756c849a69910d010066f01c45d9fd323bd247710a2c2cc23f9bada5f88",
+            "bytes": 1678
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit149-prep/owner-execution-review01.json",
+            "sha256": "9ecbe44df51c8675a16fe89e7e557f845ef350c154af66a48dae2b54e2a4d495",
+            "bytes": 4222
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit149-prep/Root-runtime-bindings01.json",
+            "sha256": "611317657742f3ff48a8dfeae3f19e260e3c51dd5d38650b9c332f2bd5dd6a1c",
+            "bytes": 3606
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit149-prep/Root-run-two-pairs149.py",
+            "sha256": "08d246716f0e1e4af196bd27e13bb9497686fade2ca47c5d800681139883b525",
+            "bytes": 5394
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit149-prep/Root-runtime-final-review01.json",
+            "sha256": "8d64aae69dbccff04c7ed8a450dd5fd87a8ed6eb2cb8e709ec5ce784fe5bbe4a",
+            "bytes": 5088
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Finite NoOA named-selector composition and authored effectiveness boundaries. Source/Native getters share the NoOA reset path; public101 is numeric0 and all old positive sensible requirements hold. No private enum or active economizer/recovery effect is observed."
       }
     ],
     "totals": {
-      "paired_cases": 229,
-      "reported_samples": 9146536,
-      "raw_operand_unequal": 2259679,
+      "paired_cases": 231,
+      "reported_samples": 9293896,
+      "raw_operand_unequal": 2300623,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -70626,6 +71107,23 @@
           "sha256": "599c6e28edaeb08ffc57d495124718f0df916f2f8774b147c2413db6055a2828",
           "bytes": 81017529
         }
+      },
+      {
+        "id": "source-no-oa-inactive-ventilation-149",
+        "receipt": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/build152-01/build/receipt.json",
+          "sha256": "f37894a80da8038f2841e50886d2223312adb037127c17e2e3e7f1cb3c26c132",
+          "bytes": 4710
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/f8/f80f1edc61f04a55781cad3154d63d722ce0f158dfd3c0c6d0db66fe7cb1463e",
+          "sha256": "f80f1edc61f04a55781cad3154d63d722ce0f158dfd3c0c6d0db66fe7cb1463e"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/no-oa-inactive-ventilation-149/build152-01/eplus-rs.exe",
+          "sha256": "df2446b3d1397a894e56ca20af48335b88580438440e8eb0586758ac8fbc51ba",
+          "bytes": 81020913
+        }
       }
     ],
     "focused_since_workspace": {
@@ -71025,14 +71523,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 151,
-      "builds_with_accepted_paired_cases": 130,
+      "actual_recorded_builds": 152,
+      "builds_with_accepted_paired_cases": 131,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "151 recorded Source builds: 130 retain accepted pairs and 21 have none, including 8 without Source execution. Only a strict qualifying no-OA inactive-selector scene adds a case or values; all earlier history remains unchanged.",
+      "qualification": "152 recorded Source builds: 131 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying scenes add cases or values; all earlier history remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -75668,8 +76166,10 @@
       "B-IDEALLOADS-JSON-ACCESSORS-146-120H",
       "B-IDEALLOADS-DCV-NONE-147-120H",
       "B-IDEALLOADS-DCV-OCCUPANCY-147-120H",
-      "B-IDEALLOADS-NO-OA-INACTIVE-CO2-DCV-148-120H"
-    ], "accepted_paired_cases": 58, "accepted_samples": 4245360, "retained_Scheduled_B_pairs": 57, "retained_Scheduled_B_samples": 4185840, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"NO_OA_INACTIVE_CO2": {"path": ".runtime/object-expansion/unit148-prep/paired-runtime-proposal02/NO_OA_INACTIVE_CO2.paired151-01.json", "sha256": "98d6c1544f8ce3c9f086140d6eda24fe98fa66eb0cb0a26e313e03fd72aa2b1b", "bytes": 454915}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit148-prep/Root-one-pair151-01/receipt.json", "sha256": "b99ddc1910eaece83840351c0d0f81772d2db8367732694b2d7af956f882b450", "bytes": 8608}, "latest_source_build": "source-no-oa-inactive-dcv-148", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit148-prep/build151-attempt01.json", "sha256": "47c58cd5915ee346403e370b80ce7b5b9c6538986d09aa1385f0277b184244f1", "bytes": 690}, "latest_actual_quality": {"path": ".runtime/object-expansion/unit148-prep/Root-final-quality-summary01.json", "sha256": "fa691eae5bc6081cbd5aead33887fdac2375fe362f8415e7d8d1d91c18486380", "bytes": 5376}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit148-prep/owner-execution-review01.json", "sha256": "00677d86e47345edb4d962340e38a7b98d3a7f60b6b9c3c58a5713f25e867fce", "bytes": 5268}, "latest_input_contracts": {"NO_OA_INACTIVE_CO2": {"path": ".runtime/object-expansion/unit148-prep/science-final01/NO_OA_INACTIVE_CO2.recipe.json", "sha256": "45593a99ed7742429b7b1eb987600c2fabaa7f0633fcbcacbd9316732ce78a19", "bytes": 48459}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "57 bounded Source B Scheduled/NodeList pairs retain 4,185,840 values. The unused Source A pair adds59,520, giving 58 pairs and 4,245,360 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
+      "B-IDEALLOADS-NO-OA-INACTIVE-CO2-DCV-148-120H",
+      "B-IDEALLOADS-NOOA-DRY-SENSIBLE-149-120H",
+      "B-IDEALLOADS-NOOA-ENTHALPY-RECOVERY-149-120H"
+    ], "accepted_paired_cases": 60, "accepted_samples": 4392720, "retained_Scheduled_B_pairs": 59, "retained_Scheduled_B_samples": 4333200, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"NOOA_DRY_SENSIBLE": {"path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_DRY_SENSIBLE.paired152-01.json", "sha256": "041f99fd7b836e7a0e507de2b2fa786f6bf495b1b551e6f52839b6585d1a04a4", "bytes": 455650}, "NOOA_ENTHALPY_RECOVERY": {"path": ".runtime/object-expansion/unit149-prep/paired-runtime-proposal02/NOOA_ENTHALPY_RECOVERY.paired152-01.json", "sha256": "70fa353ae1cfe05e191e54c213e9a22e1288011e2313a062b6cc9ca6d1af4f0a", "bytes": 455864}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit149-prep/Root-two-pairs152-01/receipt.json", "sha256": "a0c4b33c9d1f6ee8784b9061cd94ee9100fc5e08f49e4c4fc2f7a461b21cdadd", "bytes": 33878}, "latest_source_build": "source-no-oa-inactive-ventilation-149", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit149-prep/build152-attempt01.json", "sha256": "e4e700c7da1f1f3388a87317c67c6e6794ec761f2912a6f7a8aa1e333c7f776b", "bytes": 714}, "latest_actual_quality": {"path": ".runtime/porting/no-oa-inactive-ventilation-149/quality01/summary.json", "sha256": "0ef34756c849a69910d010066f01c45d9fd323bd247710a2c2cc23f9bada5f88", "bytes": 1678}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit149-prep/owner-execution-review01.json", "sha256": "9ecbe44df51c8675a16fe89e7e557f845ef350c154af66a48dae2b54e2a4d495", "bytes": 4222}, "latest_input_contracts": {"NOOA_DRY_SENSIBLE": {"path": ".runtime/object-expansion/unit149-prep/science-final01/NOOA_DRY_SENSIBLE.recipe.json", "sha256": "e20eedddbd74797a58c280f0c462a2f40c7f328d8e3eeb65c800c0dc9e247bf6", "bytes": 48222}, "NOOA_ENTHALPY_RECOVERY": {"path": ".runtime/object-expansion/unit149-prep/science-final01/NOOA_ENTHALPY_RECOVERY.recipe.json", "sha256": "80587189162193a77dc7fc0ca0a879871175db754e19769a85a738668ea0f049", "bytes": 48269}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "59 bounded Source B Scheduled/NodeList pairs retain 4,333,200 values. The unused Source A pair adds59,520, giving 60 pairs and 4,392,720 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

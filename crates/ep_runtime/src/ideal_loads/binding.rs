@@ -663,21 +663,38 @@ pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -
         && has_source_owned_no_oa_humidity_shape(system)
 }
 
-/// Native GET469-473 ignores named DCV selectors when no OA is selected.
-/// This Source-only selector creates no state; Legacy flags remain literal.
+/// Native GET469-475 resets all three ventilation selectors without OA.
+/// Source eligibility alone may ignore these flags; no owner state is changed.
 #[must_use]
-pub fn has_source_inactive_no_oa_dcv_shape(system: &IdealLoadsAirSystem) -> bool {
+pub fn has_source_inactive_no_oa_ventilation_shape(system: &IdealLoadsAirSystem) -> bool {
     system
         .design_specification_outdoor_air_object_name
         .is_none()
         && system.outdoor_air_inlet_node_name.is_none()
         && matches!(
             system.demand_controlled_ventilation_type,
-            ep_model::DemandControlledVentilationType::OccupancySchedule
+            ep_model::DemandControlledVentilationType::None
+                | ep_model::DemandControlledVentilationType::OccupancySchedule
                 | ep_model::DemandControlledVentilationType::Co2Setpoint
         )
-        && system.outdoor_air_economizer_type == ep_model::OutdoorAirEconomizerType::NoEconomizer
-        && system.heat_recovery_type == ep_model::HeatRecoveryType::None
+        && matches!(
+            system.outdoor_air_economizer_type,
+            ep_model::OutdoorAirEconomizerType::NoEconomizer
+                | ep_model::OutdoorAirEconomizerType::DifferentialDryBulb
+                | ep_model::OutdoorAirEconomizerType::DifferentialEnthalpy
+        )
+        && matches!(
+            system.heat_recovery_type,
+            ep_model::HeatRecoveryType::None
+                | ep_model::HeatRecoveryType::Sensible
+                | ep_model::HeatRecoveryType::Enthalpy
+        )
+        && [
+            system.sensible_heat_recovery_effectiveness,
+            system.latent_heat_recovery_effectiveness,
+        ]
+        .into_iter()
+        .all(|value| value.is_finite() && (0.0..=1.0).contains(&value))
 }
 
 /// Identifies owned Source humidity selectors without outdoor air.
@@ -687,9 +704,8 @@ pub fn has_source_inactive_no_oa_dcv_shape(system: &IdealLoadsAirSystem) -> bool
 pub fn has_source_owned_no_oa_humidity_shape(system: &IdealLoadsAirSystem) -> bool {
     let flags = IdealLoadsFeatureFlags::from_system(system);
     !flags.has_outdoor_air
-        && (!flags.has_dcv || has_source_inactive_no_oa_dcv_shape(system))
-        && !flags.has_economizer
-        && !flags.has_heat_recovery
+        && ((!flags.has_dcv && !flags.has_economizer && !flags.has_heat_recovery)
+            || has_source_inactive_no_oa_ventilation_shape(system))
         && matches!(
             system.dehumidification_control_type,
             DehumidificationControlType::None
@@ -1137,8 +1153,8 @@ fn validate_direct_zone_model(
             );
         }
     }
-    let source_owned_inactive_dcv = mode == DirectZoneValidationMode::SourceEligibility
-        && has_source_inactive_no_oa_dcv_shape(system);
+    let source_owned_inactive_ventilation = mode == DirectZoneValidationMode::SourceEligibility
+        && has_source_inactive_no_oa_ventilation_shape(system);
     let source_owned_humidity = mode == DirectZoneValidationMode::SourceEligibility
         && has_source_owned_no_oa_humidity_shape(system);
     if source_owned_humidity
@@ -1198,10 +1214,12 @@ fn validate_direct_zone_model(
                         IdealLoadsUnsupportedFeature::OutdoorAir
                             | IdealLoadsUnsupportedFeature::DemandControlledVentilation
                     ))
-                || (source_owned_inactive_dcv
+                || (source_owned_inactive_ventilation
                     && matches!(
                         feature,
                         IdealLoadsUnsupportedFeature::DemandControlledVentilation
+                            | IdealLoadsUnsupportedFeature::Economizer
+                            | IdealLoadsUnsupportedFeature::HeatRecovery
                     )))
         })
     {

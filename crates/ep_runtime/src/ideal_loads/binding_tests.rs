@@ -722,11 +722,22 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 Some(NormalizedName::new("OUTSIDE AIR"));
         },
         |system| {
-            // Inactive without OA; this existing context retains humidity.
+            // Named crossed selectors are ignored by the real NoOA getter.
             system.demand_controlled_ventilation_type =
                 DemandControlledVentilationType::Co2Setpoint;
+            system.outdoor_air_economizer_type = OutdoorAirEconomizerType::DifferentialDryBulb;
+            system.heat_recovery_type = HeatRecoveryType::Sensible;
+            system.sensible_heat_recovery_effectiveness = 0.0;
+            system.latent_heat_recovery_effectiveness = 1.0;
         },
-        |system| system.outdoor_air_economizer_type = OutdoorAirEconomizerType::DifferentialDryBulb,
+        |system| {
+            system.demand_controlled_ventilation_type =
+                DemandControlledVentilationType::OccupancySchedule;
+            system.outdoor_air_economizer_type = OutdoorAirEconomizerType::DifferentialEnthalpy;
+            system.heat_recovery_type = HeatRecoveryType::Enthalpy;
+            system.sensible_heat_recovery_effectiveness = 1.0;
+            system.latent_heat_recovery_effectiveness = 0.0;
+        },
         |system| system.heat_recovery_type = HeatRecoveryType::Sensible,
     ];
     for mutate in blocked {
@@ -738,15 +749,15 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
             mutate(system);
         });
-        let inactive_dcv =
-            has_source_inactive_no_oa_dcv_shape(&blocked.typed.ideal_loads_air_systems[0]);
+        let inactive_ventilation =
+            has_source_inactive_no_oa_ventilation_shape(&blocked.typed.ideal_loads_air_systems[0]);
         assert_eq!(
             has_source_constant_supply_humidity_shape(&blocked.typed.ideal_loads_air_systems[0]),
-            inactive_dcv
+            inactive_ventilation
         );
         assert_eq!(
             validate_source_direct_zone_purchased_air_model(&blocked).is_ok(),
-            inactive_dcv
+            inactive_ventilation
         );
         assert!(bind_direct_zone_purchased_air_model(&blocked).is_err());
     }
