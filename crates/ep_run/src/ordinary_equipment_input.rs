@@ -233,7 +233,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
             )
         })
         || !field(unit, "humidification_control_type")
-            .is_none_or(|value| text_is(value, &["None", "ConstantSupplyHumidityRatio"]))
+            .is_none_or(|value| text_is(value, &["", "None", "ConstantSupplyHumidityRatio"]))
         || !field(unit, "heat_recovery_type")
             .is_none_or(|value| text_is(value, &["", "None", "Sensible", "Enthalpy"]))
     {

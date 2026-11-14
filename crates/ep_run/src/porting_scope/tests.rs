@@ -3151,6 +3151,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         } else if method == "Flow/Area" && limit == "LimitFlowRateAndCapacity" {
                             unit["humidification_control_type"] =
                                 json!("ConstantSupplyHumidityRatio");
+                        } else if method == "Flow/Area" && limit == "LimitCapacity" {
+                            unit["humidification_control_type"] = json!("");
                         } else if method == "AirChanges/Hour" && limit == "LimitCapacity" {
                             unit.as_object_mut()
                                 .expect("unit")
@@ -3161,6 +3163,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 .remove("humidification_control_type");
                         } else if method == "Sum" && limit == "LimitCapacity" {
                             unit["dehumidification_control_type"] = json!("");
+                            unit["humidification_control_type"] = json!("");
                         }
                     }
                     if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
@@ -3375,7 +3378,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 OaRaw::String(name.into())
                             );
                             let expected = match name {
-                                "None" => ep_model::HumidificationControlType::None,
+                                // Advisory typed default remains None; the actual getter owns Invalid.
+                                "" | "None" => ep_model::HumidificationControlType::None,
                                 "ConstantSupplyHumidityRatio" => {
                                     ep_model::HumidificationControlType::ConstantSupplyHumidityRatio
                                 }
@@ -3608,7 +3612,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     4 => {
                         let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
                         match method {
-                            "Flow/Person" => unit["humidification_control_type"] = json!(""),
+                            "Flow/Person" => unit["humidification_control_type"] = json!(" "),
                             "Flow/Zone" => {
                                 unit["maximum_heating_supply_air_humidity_ratio"] = json!(0.0)
                             }
@@ -3650,6 +3654,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         if method == "Sum" {
                             // Both refs are nonblank, but the same deep Raw prerequisite must fail.
                             bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                                json!("");
+                            bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
                                 json!("");
                         }
                     }
