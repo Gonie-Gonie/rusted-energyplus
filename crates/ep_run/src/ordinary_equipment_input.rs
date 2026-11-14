@@ -36,9 +36,22 @@ pub(crate) fn source_b_dehumidification_prerequisite_error(
     .then_some("ordinary Source explicit-empty dehumidification requires the actual Native enum getter")
 }
 
-/// Positive Humidistat ingress is a producer-only Source B prerequisite.
-/// Scope shares the same raw check without invoking unrelated raw resolution.
+/// Humidistat raw prerequisites shared by Source B ingress and Scope.
+/// No full raw resolver or typed-default reconstruction is invoked by Scope.
 pub(crate) fn source_b_humidistat_prerequisite_error(raw: &RawModel) -> Option<String> {
+    // Newly selected dehumidistat branches distinguish Native Invalid from None.
+    // Only direct-JSON exact-empty humidification has the unresolved scratch
+    // default projection; omitted/named/IDF and all old shapes stay unchanged.
+    if raw.is_epjson()
+        && raw.objects.get(&ObjectType("ZoneHVAC:IdealLoadsAirSystem".into()))
+            .is_some_and(|units| units.values().any(|unit| {
+                matches!(field(unit, "dehumidification_control_type"), Some(RawValue::String(value)) if value.eq_ignore_ascii_case("Humidistat"))
+                    && matches!(field(unit, "humidification_control_type"), Some(RawValue::String(value)) if value.is_empty())
+            }))
+    {
+        return Some("Source Humidistat explicit-empty humidification requires the actual Native enum getter".into());
+    }
+    // A missing family is the genuine no-control prediction/remaining path.
     let objects = raw
         .objects
         .get(&ObjectType("ZoneControl:Humidistat".into()))?;

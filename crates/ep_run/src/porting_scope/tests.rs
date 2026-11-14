@@ -4063,38 +4063,6 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 );
                 assert_eq!(raw, retained);
             }
-            for (limit, dehumidification, humidification) in [
-                ("NoLimit", "Humidistat", "None"),
-                ("NoLimit", "ConstantSupplyHumidityRatio", "Humidistat"),
-            ] {
-                let mut blocked = people.clone();
-                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(limit);
-                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_cooling_air_flow_rate"] =
-                    json!(0.2);
-                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["maximum_total_cooling_capacity"] =
-                    json!(900.0);
-                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
-                    json!(dehumidification);
-                blocked["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
-                    json!(humidification);
-                let raw = parse_epjson_str(&blocked.to_string()).expect("blocked humidity raw");
-                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
-                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
-                let model = compiled
-                    .model
-                    .as_ref()
-                    .expect("blocked humidity typed model");
-                assert!(
-                    ep_runtime::validate_source_direct_zone_purchased_air_model(
-                        &ep_model::SimulationModel::from_typed(model.clone())
-                    )
-                    .is_err()
-                );
-                assert!(
-                    !inspect_porting_scope(&raw, &compiled.report, Some(model), scope).admissible
-                );
-            }
-
             let mut empty_dehumidification = people.clone();
             empty_dehumidification["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
                 json!("");
@@ -4153,8 +4121,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 .admissible
             );
 
-            // The Humidistat family owns predictive moisture only here. Actual
-            // IdealLoads Humidistat consumers remain outside Source admission.
+            // The real Humidistat producer and its consumer retain original raw
+            // schedule pointers. This test validates admission and custody only.
             for high in [None, Some(""), Some("Cool")] {
                 let mut humidity = people.clone();
                 humidity["ZoneControl:Humidistat"] = json!({"Humidity owner":{
@@ -4215,23 +4183,98 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             .contains_key("dehumidifying_relative_humidity_setpoint_schedule_name")
                     );
                 }
-                // The new input family does not silently open any unported HVAC consumer.
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
                     json!("Humidistat");
-                let blocked = parse_epjson_str(&humidity.to_string())
-                    .expect("actual blocked HVAC Humidistat selector");
-                let blocked_compile = ep_compiler::compile_raw_model_for_source(&blocked);
-                assert!(!blocked_compile.has_errors());
+                let selected = parse_epjson_str(&humidity.to_string())
+                    .expect("actual connected HVAC Humidistat selector");
+                let selected_compile = ep_compiler::compile_raw_model_for_source(&selected);
+                assert!(!selected_compile.has_errors());
                 assert!(
-                    !inspect_porting_scope(
-                        &blocked,
-                        &blocked_compile.report,
-                        blocked_compile.model.as_ref(),
+                    inspect_porting_scope(
+                        &selected,
+                        &selected_compile.report,
+                        selected_compile.model.as_ref(),
                         scope
                     )
                     .admissible
                 );
+                crate::ordinary_input_processor::resolve_source_b(&selected)
+                    .expect("same actual connected Humidistat Source IP");
                 assert_eq!(raw, retained);
+            }
+            // A missing ZoneControl object is an actual Native zero-demand path,
+            // not a fabricated moisture load. Exercise the real raw/typed token.
+            for (dehumidification, humidification) in [
+                ("Humidistat", "None"),
+                ("ConstantSupplyHumidityRatio", "Humidistat"),
+                ("None", "Humidistat"),
+                ("Humidistat", "Humidistat"),
+            ] {
+                let mut humidity = people.clone();
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                    json!(dehumidification);
+                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
+                    json!(humidification);
+                let raw =
+                    parse_epjson_str(&humidity.to_string()).expect("actual absent-control input");
+                let retained = raw.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+                let model = compiled
+                    .model
+                    .as_ref()
+                    .expect("actual absent-control typed model");
+                assert!(model.zone_humidistats.is_empty());
+                let mut selected =
+                    inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
+                assert!(selected.admissible, "{:?}", selected.violations);
+                selected.environment = Some(
+                    super::environment::environment_from_weather(
+                        model,
+                        &single_day_weather_fixture(),
+                        "actual absent Humidistat control weather",
+                    )
+                    .expect("actual Source scope environment"),
+                );
+                let admission =
+                    crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                        .expect("actual absence-path Source token");
+                let support = crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&admission),
+                );
+                assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+                assert!(support.matched_capability_ids.is_empty());
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("actual absent-control Source IP");
+                assert_eq!(ip.get_num_objects_found("ZoneControl:Humidistat"), 0);
+                assert_eq!(raw, retained);
+                if dehumidification == "Humidistat" {
+                    humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
+                        json!("");
+                    let unresolved = parse_epjson_str(&humidity.to_string())
+                        .expect("actual explicit-empty humidity selector");
+                    let unresolved_compile = ep_compiler::compile_raw_model_for_source(&unresolved);
+                    assert!(!unresolved_compile.has_errors());
+                    assert!(
+                        crate::ordinary_equipment_input::resolve_source_b(&unresolved).is_err()
+                    );
+                    assert!(
+                        !inspect_porting_scope(
+                            &unresolved,
+                            &unresolved_compile.report,
+                            unresolved_compile.model.as_ref(),
+                            scope
+                        )
+                        .admissible
+                    );
+                }
             }
 
             // Unit127: a real cooling schedule reaches Source eligibility,

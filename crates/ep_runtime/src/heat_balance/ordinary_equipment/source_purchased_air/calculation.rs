@@ -4,8 +4,9 @@ use super::super::source_nodes::SourceNodeData;
 use super::{OrdinaryEquipment, at, owners::*};
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_air_heat_balance::{
-    SourceAirHeatBalance, environment::SourceZoneFanHeatBalanceArrays,
-    predictor_corrector::SourceZoneAirPredictorCorrector,
+    SourceAirHeatBalance,
+    environment::SourceZoneFanHeatBalanceArrays,
+    predictor_corrector::{SourceSystemMoistureDemand, SourceZoneAirPredictorCorrector},
 };
 use crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
@@ -95,6 +96,21 @@ fn schedule(
     schedules.source_current_schedule_value(
         pointer.ok_or(Error::Unavailable("actual PurchasedAir Schedule pointer"))?,
     )
+}
+// The same actual remaining demand, read at each original PurchasedAir branch.
+// No typed demand, private copy, scalar cache or fabricated absence zero exists.
+fn moisture_demand(
+    controller: &SourceZoneAirPredictorCorrector,
+    zone: i32,
+) -> Result<&SourceSystemMoistureDemand, Error> {
+    controller
+        .demand
+        .zone_moisture
+        .as_ref()
+        .and_then(|rows| rows.get(at(zone).ok()?))
+        .ok_or(Error::Unavailable(
+            "actual PurchasedAir ZoneSysMoistureDemand ordinal",
+        ))
 }
 fn saturation(
     o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
@@ -344,9 +360,13 @@ impl OrdinaryEquipment {
                 if cool_on
                     && unit.dehumid_ctrl_type == SourcePurchasedAirHumidityControl::Humidistat
                 {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir cooling humidistat moisture-demand operation",
-                    ));
+                    let load = moisture_demand(o.controller, controlled_zone)?
+                        .remaining_output_to_dehumid_sp;
+                    let delta =
+                        unit.min_cool_supp_air_hum_rat - node(nodes, zone_node)?.humidity_ratio;
+                    if delta < -0.00025 && load < 0.0 {
+                        dehumid_flow = load / delta;
+                    }
                 }
                 let mut humid_flow = 0.0;
                 if heat_on
@@ -357,9 +377,13 @@ impl OrdinaryEquipment {
                             | SourcePurchasedAirHumidityControl::None
                     )
                 {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir cooling humidification moisture-demand operation",
-                    ));
+                    let load = moisture_demand(o.controller, controlled_zone)?
+                        .remaining_output_to_humid_sp;
+                    let delta =
+                        unit.max_heat_supp_air_hum_rat - node(nodes, zone_node)?.humidity_ratio;
+                    if delta > 0.00025 && load > 0.0 {
+                        humid_flow = load / delta;
+                    }
                 }
                 if capacity_limited(unit.cooling_limit) && unit.max_cool_tot_cap == 0.0 {
                     cool_flow = 0.0;
@@ -424,9 +448,14 @@ impl OrdinaryEquipment {
                             unit.supply_hum_rat = min(unit.supply_hum_rat, unit.mixed_air_hum_rat);
                         }
                         SourcePurchasedAirHumidityControl::Humidistat => {
-                            return Err(Error::Unavailable(
-                                "actual PurchasedAir cooling humidistat supply humidity operation",
-                            ));
+                            let load = moisture_demand(o.controller, controlled_zone)?
+                                .remaining_output_to_dehumid_sp;
+                            let supply_for_dehumidification =
+                                load / supply_flow + node(nodes, zone_node)?.humidity_ratio;
+                            let supply_for_dehumidification =
+                                max(supply_for_dehumidification, unit.min_cool_supp_air_hum_rat);
+                            unit.supply_hum_rat =
+                                min(unit.mixed_air_hum_rat, supply_for_dehumidification);
                         }
                         _ => {
                             unit.supply_hum_rat = unit.mixed_air_hum_rat;
@@ -440,9 +469,13 @@ impl OrdinaryEquipment {
                                 | SourcePurchasedAirHumidityControl::None
                         )
                     {
-                        return Err(Error::Unavailable(
-                            "actual PurchasedAir cooling humidification supply humidity operation",
-                        ));
+                        let load = moisture_demand(o.controller, controlled_zone)?
+                            .remaining_output_to_humid_sp;
+                        let supply_for_humidification =
+                            load / supply_flow + node(nodes, zone_node)?.humidity_ratio;
+                        let supply_for_humidification =
+                            min(supply_for_humidification, unit.max_heat_supp_air_hum_rat);
+                        unit.supply_hum_rat = max(unit.supply_hum_rat, supply_for_humidification);
                     }
                     let original_humidity = unit.supply_hum_rat;
                     let saturated_humidity = saturation(o, unit.supply_temp)?;
@@ -546,16 +579,24 @@ impl OrdinaryEquipment {
                             | SourcePurchasedAirHumidityControl::None
                     ) || !heating)
                 {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir heating/deadband dehumidification demand operation",
-                    ));
+                    let load = moisture_demand(o.controller, controlled_zone)?
+                        .remaining_output_to_dehumid_sp;
+                    let delta =
+                        unit.min_cool_supp_air_hum_rat - node(nodes, zone_node)?.humidity_ratio;
+                    if delta < -0.00025 && load < 0.0 {
+                        dehumid_flow = load / delta;
+                    }
                 }
                 let mut humid_flow = 0.0;
                 if heat_on && unit.humid_ctrl_type == SourcePurchasedAirHumidityControl::Humidistat
                 {
-                    return Err(Error::Unavailable(
-                        "actual PurchasedAir heating humidification demand operation",
-                    ));
+                    let load = moisture_demand(o.controller, controlled_zone)?
+                        .remaining_output_to_humid_sp;
+                    let delta =
+                        unit.max_heat_supp_air_hum_rat - node(nodes, zone_node)?.humidity_ratio;
+                    if delta > 0.00025 && load > 0.0 {
+                        humid_flow = load / delta;
+                    }
                 }
                 if capacity_limited(unit.heating_limit) && unit.max_heat_sens_cap == 0.0 {
                     heat_flow = 0.0;
@@ -601,9 +642,14 @@ impl OrdinaryEquipment {
                             unit.supply_hum_rat = unit.mixed_air_hum_rat;
                         }
                         SourcePurchasedAirHumidityControl::Humidistat => {
-                            return Err(Error::Unavailable(
-                                "actual PurchasedAir heating humidistat supply humidity operation",
-                            ));
+                            let load = moisture_demand(o.controller, controlled_zone)?
+                                .remaining_output_to_humid_sp;
+                            let supply_for_humidification =
+                                load / supply_flow + node(nodes, zone_node)?.humidity_ratio;
+                            let supply_for_humidification =
+                                min(supply_for_humidification, unit.max_heat_supp_air_hum_rat);
+                            unit.supply_hum_rat =
+                                max(unit.supply_hum_rat, supply_for_humidification);
                         }
                         SourcePurchasedAirHumidityControl::ConstantSupplyHumidityRatio
                             if heating =>
@@ -652,9 +698,33 @@ impl OrdinaryEquipment {
                                 | SourcePurchasedAirHumidityControl::None
                         ) || !heating)
                     {
-                        return Err(Error::Unavailable(
-                            "actual PurchasedAir heating/deadband dehumidification supply operation",
-                        ));
+                        let load = moisture_demand(o.controller, controlled_zone)?
+                            .remaining_output_to_dehumid_sp;
+                        let supply_for_dehumidification =
+                            load / supply_flow + node(nodes, zone_node)?.humidity_ratio;
+                        let supply_for_dehumidification =
+                            max(supply_for_dehumidification, unit.min_cool_supp_air_hum_rat);
+                        unit.supply_hum_rat = min(unit.supply_hum_rat, supply_for_dehumidification);
+                        supply_enthalpy = enthalpy(unit.supply_temp, unit.supply_hum_rat);
+                        if unit.supply_hum_rat < unit.mixed_air_hum_rat {
+                            // Native2547-2555 uses this signed latent output and
+                            // strict >, not magnitude, >= or a positive-load rewrite.
+                            let specific_heat = cp(unit.mixed_air_hum_rat);
+                            let sensible = supply_flow
+                                * specific_heat
+                                * (unit.supply_temp - unit.mixed_air_temp);
+                            let mut latent =
+                                supply_flow * (supply_enthalpy - mixed_enthalpy) - sensible;
+                            if capacity_limited(unit.cooling_limit)
+                                && latent > unit.max_cool_tot_cap
+                            {
+                                latent = unit.max_cool_tot_cap;
+                                supply_enthalpy =
+                                    mixed_enthalpy + (latent + sensible) / supply_flow;
+                                unit.supply_hum_rat =
+                                    humidity_from_h(o, unit.supply_temp, supply_enthalpy)?;
+                            }
+                        }
                     }
                     unit.supply_hum_rat =
                         min(unit.supply_hum_rat, saturation(o, unit.supply_temp)?);

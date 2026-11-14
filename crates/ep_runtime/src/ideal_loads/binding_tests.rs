@@ -446,6 +446,85 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             assert_eq!(format!("{:?}", shr.typed), retained);
         }
     }
+    // Typed eligibility only: no physical moisture-demand owner is authored.
+    // Missing Humidistat is Native's real no-control producer path; one row
+    // must refer to the same actual Zone. Legacy still rejects these selectors.
+    for (dehumidification, humidification) in [
+        (
+            DehumidificationControlType::Humidistat,
+            HumidificationControlType::None,
+        ),
+        (
+            DehumidificationControlType::None,
+            HumidificationControlType::Humidistat,
+        ),
+        (
+            DehumidificationControlType::Humidistat,
+            HumidificationControlType::Humidistat,
+        ),
+    ] {
+        for with_control in [false, true] {
+            let (humidity, _) = fixture(|typed| {
+                let system = &mut typed.ideal_loads_air_systems[0];
+                system.dehumidification_control_type = dehumidification;
+                system.humidification_control_type = humidification;
+                if with_control {
+                    system.cooling_limit = IdealLoadsLimit::LimitFlowRateAndCapacity;
+                    system.maximum_cooling_air_flow_rate_m3_per_s =
+                        Some(AutosizeOrNumber::Value(0.2));
+                    system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
+                    typed.zone_humidistats.push(ep_model::ZoneHumidistat {
+                        id: ep_model::ZoneHumidistatId(0),
+                        name: NormalizedName::new("HUMIDITY CONTROL"),
+                        zone: ZoneId(0),
+                        humidifying_relative_humidity_setpoint_schedule: ScheduleId(1),
+                        dehumidifying_relative_humidity_setpoint_schedule: ScheduleId(2),
+                    });
+                    typed
+                        .zone_humidistat_names
+                        .insert("HUMIDITY CONTROL", ep_model::ZoneHumidistatId(0));
+                }
+            });
+            let retained = format!("{:?}", humidity.typed);
+            assert!(has_source_owned_no_oa_humidity_shape(
+                &humidity.typed.ideal_loads_air_systems[0]
+            ));
+            assert!(!has_source_constant_supply_humidity_shape(
+                &humidity.typed.ideal_loads_air_systems[0]
+            ));
+            validate_source_direct_zone_purchased_air_model(&humidity)
+                .expect("Source Humidistat uses genuine absent or connected producer");
+            assert!(bind_direct_zone_purchased_air_model(&humidity).is_err());
+            assert_eq!(format!("{:?}", humidity.typed), retained);
+            if with_control {
+                let mut wrong_zone = humidity.typed.clone();
+                wrong_zone.zone_humidistats[0].zone = ZoneId(1);
+                assert_eq!(
+                    validate_source_direct_zone_purchased_air_model(&SimulationModel::from_typed(
+                        wrong_zone
+                    )),
+                    Err(DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                        feature:
+                            DirectZonePurchasedAirBindingFeature::SourceHumidityControlAssociation,
+                    }),
+                );
+                let mut duplicate = humidity.typed.clone();
+                let mut second = duplicate.zone_humidistats[0].clone();
+                second.id = ep_model::ZoneHumidistatId(1);
+                second.name = NormalizedName::new("SECOND HUMIDITY CONTROL");
+                duplicate
+                    .zone_humidistat_names
+                    .insert("SECOND HUMIDITY CONTROL", second.id);
+                duplicate.zone_humidistats.push(second);
+                assert!(
+                    validate_source_direct_zone_purchased_air_model(&SimulationModel::from_typed(
+                        duplicate
+                    ))
+                    .is_err()
+                );
+            }
+        }
+    }
     for invalid in [-1.0_f64, 0.0, 1.1, f64::NAN, f64::INFINITY] {
         let (shr, _) = fixture(|typed| {
             let system = &mut typed.ideal_loads_air_systems[0];
@@ -460,9 +539,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             })
         );
     }
-    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 7] = [
-        |system| system.dehumidification_control_type = DehumidificationControlType::Humidistat,
-        |system| system.humidification_control_type = HumidificationControlType::Humidistat,
+    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 5] = [
         |system| system.outdoor_air_inlet_node_name = Some(NormalizedName::new("SUPPLY")),
         |system| {
             system.design_specification_outdoor_air_object_name =

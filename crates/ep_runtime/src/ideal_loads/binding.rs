@@ -511,6 +511,8 @@ pub enum DirectZonePurchasedAirBindingFeature {
     SensibleOnlyHumidityControlsInactive,
     /// The model Zone timestep can produce a positive nominal step.
     PositiveNominalSystemTimestep,
+    /// A selected Source Humidistat uses zero controls or one actual same-Zone row.
+    SourceHumidityControlAssociation,
 }
 
 /// Fail-closed error while binding one typed model to the CP300 coupling.
@@ -650,10 +652,14 @@ pub fn validate_source_direct_zone_purchased_air_model(
 }
 
 /// Retains the public constant-supply subset of the owned Source humidity shape.
-/// SHR has its own selector and does not change this existing API's answers.
+/// SHR and Humidistat do not change this existing constant-supply API's answers.
 #[must_use]
 pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -> bool {
-    system.dehumidification_control_type != DehumidificationControlType::ConstantSensibleHeatRatio
+    !matches!(
+        system.dehumidification_control_type,
+        DehumidificationControlType::ConstantSensibleHeatRatio
+            | DehumidificationControlType::Humidistat
+    ) && system.humidification_control_type != HumidificationControlType::Humidistat
         && has_source_owned_no_oa_humidity_shape(system)
 }
 
@@ -672,11 +678,13 @@ pub fn has_source_owned_no_oa_humidity_shape(system: &IdealLoadsAirSystem) -> bo
             DehumidificationControlType::None
                 | DehumidificationControlType::ConstantSupplyHumidityRatio
                 | DehumidificationControlType::ConstantSensibleHeatRatio
+                | DehumidificationControlType::Humidistat
         )
         && matches!(
             system.humidification_control_type,
             HumidificationControlType::None
                 | HumidificationControlType::ConstantSupplyHumidityRatio
+                | HumidificationControlType::Humidistat
         )
         && (system.dehumidification_control_type != DehumidificationControlType::None
             || system.humidification_control_type != HumidificationControlType::None)
@@ -1023,6 +1031,19 @@ fn validate_direct_zone_model(
 
     let source_owned_humidity = mode == DirectZoneValidationMode::SourceEligibility
         && has_source_owned_no_oa_humidity_shape(system);
+    if source_owned_humidity
+        && (system.dehumidification_control_type == DehumidificationControlType::Humidistat
+            || system.humidification_control_type == HumidificationControlType::Humidistat)
+        && (typed.zone_humidistats.len() > 1
+            || typed
+                .zone_humidistats
+                .iter()
+                .any(|control| control.zone != zone.id))
+    {
+        return unsupported(DirectZonePurchasedAirBindingFeature::SourceHumidityControlAssociation);
+    }
+    // Zero controls is Native's actual no-control predictor path: its three
+    // demand zeros and management's remaining initialization stay real owners.
     let branch = select_purchased_air_branch(system);
     if !branch.is_no_oa_sensible_with_optional_limits() && !source_owned_humidity {
         return Err(DirectZonePurchasedAirBindingError::UnsupportedBranch { branch });

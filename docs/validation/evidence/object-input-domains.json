@@ -337,13 +337,14 @@
       "Unit115 compares the entire requested AdaptiveComfortSummary CSV body with actual ASH90/80 and CEN Category I/II/III occupied-hour cells, including exact order and formatting. No hours are reconstructed from reported status counts; no numeric-hour target is imposed. Other summary families remain unpromoted."
     ],
     "SetpointManager:Scheduled": [
-      "All nine Scheduled controls retain bounded Source B evidence across 42 pairs and 3,058,080 values. Accepted Humidistat producer scenes preserve all eighteen public schedule/setpoint joins and inherited flow/structure gates. No other manager, Source A manager, private-history or full-object claim is added."
+      "All nine Scheduled controls retain bounded Source B evidence across 43 pairs and 3,134,640 values. Accepted HVAC Humidistat consumer scenes preserve all eighteen public schedule/setpoint joins and inherited flow/structure gates. No other manager, Source A manager, private-history or full-object claim is added."
     ],
     "NodeList": [
-      "The bounded raw/IP NodeList owner and advisory Proven/Deferred metadata retain 42 Source B pairs plus the unused Source A pair. Accepted Humidistat producer scenes preserve original list order, case, blank-member, inlet, exhaust, basis, ordered-return and public identity gates. Selected Deferred consumers, Legacy/no-exhaust bounds, arbitrary names/combinations and full-object conformance remain open."
+      "The bounded raw/IP NodeList owner and advisory Proven/Deferred metadata retain 43 Source B pairs plus the unused Source A pair. Accepted HVAC Humidistat consumer scenes preserve all original list order, case, blank-member, inlet, exhaust, basis, return and public identity gates. Selected Deferred consumers, Legacy/no-exhaust bounds, arbitrary names/combinations and full-object conformance remain open."
     ],
     "ZoneControl:Humidistat": [
-      "Producer-only Source B original direct epJSON: one actual Zone and Humidistat, supported real schedules, actual optional dehumidifying-schedule fallback, normal-mixing ThirdOrder/Analytical/Euler moisture prediction and same demand/report owners. 2 fixed scenes qualify under full161-series numeric/export/clock/ancillary and original155 gates: Analytical single50 with omitted dehumidifying schedule, Euler crossed65/45. Six genuine System/Average kgWater/s reports and prospective sign/single-target/crossed-warning witnesses bound only those inputs. Private getter handles/used flags are not observed. IdealLoads Humidistat consumers, Source A/IDF, EMS/faults, AFN/Space/latent sizing, broader values/combinations and full-object conformance remain held. ThirdOrder dual40/60 remains unaccepted: 14 points in two new dehumidifying streams exceed 1e-12 kgWater/s (maximum difference 1.1494137e-12); the original155 streams and all response gates pass."
+      "Producer-only Source B original direct epJSON: one actual Zone and Humidistat, supported real schedules, actual optional dehumidifying-schedule fallback, normal-mixing ThirdOrder/Analytical/Euler moisture prediction and same demand/report owners. 2 fixed scenes qualify under full161-series numeric/export/clock/ancillary and original155 gates: Analytical single50 with omitted dehumidifying schedule, Euler crossed65/45. Six genuine System/Average kgWater/s reports and prospective sign/single-target/crossed-warning witnesses bound only those inputs. Private getter handles/used flags are not observed. IdealLoads Humidistat consumers, Source A/IDF, EMS/faults, AFN/Space/latent sizing, broader values/combinations and full-object conformance remain held. ThirdOrder dual40/60 remains unaccepted: 14 points in two new dehumidifying streams exceed 1e-12 kgWater/s (maximum difference 1.1494137e-12); the original155 streams and all response gates pass.",
+      "Additional bounded Source B direct-epJSON HVAC Humidistat consumer scope: zero or one same-Zone control, actual remaining moisture demands, and supported real schedules. 1 fixed scenes qualify (no-control None/Humidistat zero-demand path); only the 0 listed positive-control scenes provide their declared positive-service evidence. Full161-series comparisons and all original155 gates are mandatory; absence is a genuine six-report zero path. No universal humidity/SHR/capacity law, private mode, positive original-IDF/A, OA, EMS/fault, AFN/Space/sizing or full-object completion is implied."
     ]
   },
   "verification": {
@@ -6796,6 +6797,99 @@
         },
         "retained_failed_QA_receipts": [],
         "scope": "The bounded Source B Humidistat producer now owns one original-epJSON Zone/control, real relative-humidity schedules and normal-mixing ThirdOrder, Analytical and Euler moisture prediction. Three fixed Native/Source comparisons completed once under corrected Source143; 2 satisfy all161-series numeric, clock, export, ancillary and unchanged original155 gates plus their prospective six-report response criteria. Qualifying scenes: Analytical single50 with omitted dehumidifying schedule, Euler crossed65/45. Public demand reports cover selected/humidifying/dehumidifying loads and their factor1 system counterparts; crossed-target diagnostics retain full first-warning and recurring semantics with observed counts. Raw optional-field omission is retained, while private schedule handles, used flags and solver coefficients are unobserved. The initial Source142 startup failed before physics at a missing genuine input-statistics schema and retains zero paired credit; its Native structural precheck and all failed artifacts remain separate. Source143 adds that schema and an actual statistics-owner regression in the existing caller. This is a producer-only boundary. IdealLoads Humidistat consumers, Source A/IDF ingress, EMS/faults, AFN/Space/sizing, arbitrary inputs and full-object conformance remain open. ThirdOrder dual40/60 remains unaccepted: 14 points in two new dehumidifying streams exceed 1e-12 kgWater/s (maximum difference 1.1494137e-12); the original155 streams and all response gates pass.",
+        "capability_or_gate_promotion": false
+      },
+      "HVAC_Humidistat_consumer_141": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit141-prep/build144-attempt01.json",
+          "sha256": "367cdff6b666a097e026b9dc5219ebe699592d6d48bdf83d08af43048eb8f3a1",
+          "bytes": 714
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/quality02/summary.json",
+          "sha256": "4807ba533e18004031cd8928cdbf63238482dd6a2579fdfdc4a627ec95cfb3b6",
+          "bytes": 1673
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit141-prep/owner-execution-review01.json",
+          "sha256": "195634e25da8104ba04e6c1735263382dd0bbcbe2ae769c6cc49b0cd1e0f25e4",
+          "bytes": 5448
+        },
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-runtime-bindings01.json",
+          "sha256": "d0a69b080198b8c3e1388f38a95553a12e318b576d036087a9422bc85f443a35",
+          "bytes": 7203
+        },
+        "Root_completed_review": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-completed-readback-review01.json",
+          "sha256": "166a83dfcfb734358e26678cd1d51d415b9a65376cde555babb6e655e2c2177c",
+          "bytes": 21132
+        },
+        "retained_evidence": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json",
+          "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46",
+          "bytes": 20532
+        },
+        "accepted_cases": [
+          "MISSING_CONTROL_NONE_HUMIDISTAT"
+        ],
+        "accepted_case_comparisons": {
+          "MISSING_CONTROL_NONE_HUMIDISTAT": {
+            "path": ".runtime/object-expansion/unit141-prep/paired-runtime-proposal01/MISSING_CONTROL_NONE_HUMIDISTAT.pair01.json",
+            "sha256": "9365523fc53a7dd974c7b099b39b6eb34752cc9352179abbb5fbb081b803908c",
+            "bytes": 545998
+          }
+        },
+        "unaccepted_case_kinds": [
+          "DEHUMIDISTAT_HEATING_CONSTANT",
+          "HUMIDISTAT_COOLING_SHR",
+          "BOTH_HUMIDISTAT_FINITE_COOLING"
+        ],
+        "accepted_cases_count": 1,
+        "accepted_values": 76560,
+        "Native_processes": 4,
+        "Source_processes": 4,
+        "actual_Source_builds": 1,
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-source-adoption01.json",
+          "sha256": "1bcb0e9f288e5d7f0a432378c3f1f8bb4ef1d47acb8445e721870f1cf3a73299",
+          "bytes": 5039
+        },
+        "Root_Source_static_review": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-source-static-review01.json",
+          "sha256": "e5f317d2d64e76294c5154a4d7f30fab46d9da39e361368777c31435bbb6694f",
+          "bytes": 1665
+        },
+        "independent_Source_review": {
+          "path": ".runtime/object-expansion/unit141-prep/independent-Source143-HVAC-Humidistat-consumer-successor02-static-review01.json",
+          "sha256": "ae65c9d07ea380846fa27efeaaf60088014749c7835293ce1194d7141122228e",
+          "bytes": 2208
+        },
+        "independent_semantic_Source_review": {
+          "path": ".runtime/object-expansion/unit141-prep/independent-Source-HVAC-Humidistat-consumer-static-review01.json",
+          "sha256": "ecf28f8716e546b03450ef3160e8a921596e99017022daa7c0294832646e26d2",
+          "bytes": 5784
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-source-format-review01.json",
+          "sha256": "0d238d7222c95e3a283683060c8aded377174213b664a8a0ef184af5fd954438",
+          "bytes": 2324
+        },
+        "Source_test_coverage_correction": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-test-coverage-correction-adoption01.json",
+          "sha256": "33288d58b673920d00f6b806df04a2fec6bf6a764ece17a8cdb5e5842c6a4ac3",
+          "bytes": 2005
+        },
+        "retained_failed_QA_receipts": [
+          {
+            "path": ".runtime/porting/hvac-humidistat-consumers-141/quality01/source-caller-tests/receipt.json",
+            "sha256": "f758caccf00bc77074e16a6a19b59f62b9aa43537e8139347fdade29f23bf755",
+            "bytes": 3465
+          }
+        ],
+        "total_actual_QA_commands": 9,
+        "failed_QA_attempts": 1,
+        "scope": "The bounded Source B no-outdoor-air IdealLoads route now connects the actual remaining moisture-demand owner to Humidistat HVAC consumers. Four inputs were frozen before outcomes; 1 qualify under all161-series numeric, export, clock, ancillary and original155 gates plus their declared response or absence criteria. Qualifying scenes: no-control None/Humidistat zero-demand path. 0 retain their required positive Winter/Summer public service signatures; the absent-control case, when qualifying, verifies six complete zero-within-policy moisture reports without positive-service credit. The three authored-control scenes remain unaccepted: 16, 4 and 6 points respectively exceed the frozen 1e-12 kgWater/s limit (maximum differences 1.1335064187452133e-12, 1.1476311911960517e-12 and 1.144359445122119e-12). All RMSE limits and original155 checks pass. The finite-cooling scene additionally lacks the Winter humidification witness in both engines. Only the absent-control scene qualifies, with six zero-within-policy reports and no positive-service credit. Public interval responses establish no private-mode, averaged ratio or exact capacity law. Optional final supply-saturation diagnostics retain full first-warning/phase/recurring semantics and paired ERR/END. Current144 serves four fresh pairs without replay. The parent140 ThirdOrder14 point failures and failed142 startup retain zero credit. Broader values/combinations, Source A/IDF, OA/DCV/economizer/recovery, sizing, faults/EMS/AFN/Space and full-object conformance remain open.",
         "capability_or_gate_promotion": false
       }
     },
@@ -64235,12 +64329,184 @@
         },
         "inherited_science": "All original155 policies and full ordered streams retain heating/cooling availability, weather/fuel, exhaust/returns, eighteen Scheduled joins, BND/UTF8, comfort/table, diagnostics/ancillary and JSON/CSV gates. Full operands remain in the immutable comparison.",
         "effective_state": "One fixed producer-only Humidistat scene. No private schedule-handle, solver-coefficient, HVAC humidification action, arbitrary-value or full-object claim."
+      },
+      {
+        "id": "B-HVAC-HUMIDISTAT-CONSUMER-MISSING_CONTROL_NONE_HUMIDISTAT-141-120H",
+        "case_kind": "MISSING_CONTROL_NONE_HUMIDISTAT",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-dd-hvac-humidistat-consumers-141",
+        "input": {
+          "path": ".runtime/object-expansion/unit141-prep/HVAC-humidistat-four-case-input-proposal01/MISSING_CONTROL_NONE_HUMIDISTAT/input.epJSON",
+          "sha256": "16828b99a9ad40d0859a77424d6adec364e80ddd456f6f551ae3032777ad32f6",
+          "bytes": 101887
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/MISSING_CONTROL_NONE_HUMIDISTAT/native01/command/receipt.json",
+          "sha256": "a1da971d35becb16dfe167250b45cbdea5ff57aa6e5446e3877afb5b1a8255e3",
+          "bytes": 73181
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/MISSING_CONTROL_NONE_HUMIDISTAT/source01/command/receipt.json",
+          "sha256": "65f7880df19d791937187f600bfe73c5a12d0ad3b7e4585a0821478a8a514ad0",
+          "bytes": 74040
+        },
+        "source_summary": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/MISSING_CONTROL_NONE_HUMIDISTAT/source01/output/run-summary.json",
+          "sha256": "140e7671258e438ffed1b622e5c50ff23e6b017930fc67b452fd1378e23cc2d6",
+          "bytes": 66142
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/8a/8a6030272523fa9c90ee3cd96dfcc70290bef7aff2e2fdee534617f52402318c",
+          "sha256": "8a6030272523fa9c90ee3cd96dfcc70290bef7aff2e2fdee534617f52402318c"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/build144-01/eplus-rs.exe",
+          "sha256": "6cbc5d5018e3d8f0e5dbd0a4411275eb587be37f2e2286b8b2219aae6028dcd2",
+          "bytes": 80887690
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/build144-01/build/receipt.json",
+          "sha256": "719e95bdd658600f03fca0b23af4ed67f9c62cb455721264a9c36a058c0d65b2",
+          "bytes": 4814
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit141-prep/paired-runtime-proposal01/MISSING_CONTROL_NONE_HUMIDISTAT.pair01.json",
+          "sha256": "9365523fc53a7dd974c7b099b39b6eb34752cc9352179abbb5fbb081b803908c",
+          "bytes": 545998
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit141-prep/Root-completed-readback-review01.json",
+          "sha256": "166a83dfcfb734358e26678cd1d51d415b9a65376cde555babb6e655e2c2177c",
+          "bytes": 21132
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit141-prep/HVAC-humidistat-four-case-input-proposal01/MISSING_CONTROL_NONE_HUMIDISTAT/plan01.json",
+          "sha256": "fa5509a44652d10e29668a284e617f21c0bac073cf56a9a7db5d89a227dbb9c1",
+          "bytes": 2563
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit141-prep/HVAC-humidistat-four-case-input-proposal01/batch-plan01.json",
+          "sha256": "1dc0e427628267311300f15a4a6ba1026c5875869bc10100e21ef8aeb9463226",
+          "bytes": 10815
+        },
+        "totals": {
+          "series": 161,
+          "samples": 76560,
+          "raw_operand_unequal": 20472,
+          "parsed_binary64_unequal": 20472,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.285814844071865e-07,
+          "max_rmse_delta": 2.4235716310900887e-08
+        },
+        "algorithm": "ThirdOrderBackwardDifference",
+        "humidity_selectors": {
+          "humidification": "None",
+          "dehumidification": "Humidistat",
+          "authored_control_count": 0
+        },
+        "required_public_witness_kinds": [
+          "All six moisture reports finite and abs<=unchanged1e-12 at all480 clocks",
+          "All original155 gates including genuine normal heat/cool/return/exhaust activation"
+        ],
+        "authored_control_absent": true,
+        "public_activation_summary": {
+          "Native": {
+            "applicable": true,
+            "activation_accepted": true,
+            "kind": "Genuine no-control six-report zero path",
+            "case_kind": "MISSING_CONTROL_NONE_HUMIDISTAT",
+            "required_signatures": [
+              "All six moisture reports finite and abs<=unchanged1e-12 at all480 clocks",
+              "All original155 gates including genuine normal heat/cool/return/exhaust activation"
+            ],
+            "observed_signature_counts": {
+              "Winter humidification signature": 0,
+              "Summer dehumidification signature": 0,
+              "Winter constant-heating target signature": 0,
+              "Summer sensible-plus-latent cooling signature": 168
+            },
+            "missing_control_zero_violations": 0,
+            "authored_control_absent": true,
+            "max_abs_factor1_public_pair_delta": 0.0
+          },
+          "Source": {
+            "applicable": true,
+            "activation_accepted": true,
+            "kind": "Genuine no-control six-report zero path",
+            "case_kind": "MISSING_CONTROL_NONE_HUMIDISTAT",
+            "required_signatures": [
+              "All six moisture reports finite and abs<=unchanged1e-12 at all480 clocks",
+              "All original155 gates including genuine normal heat/cool/return/exhaust activation"
+            ],
+            "observed_signature_counts": {
+              "Winter humidification signature": 0,
+              "Summer dehumidification signature": 0,
+              "Winter constant-heating target signature": 0,
+              "Summer sensible-plus-latent cooling signature": 168
+            },
+            "missing_control_zero_violations": 0,
+            "authored_control_absent": true,
+            "max_abs_factor1_public_pair_delta": 0.0
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit140-prep/humidistat-three-case-input-proposal01/derived-policy.json",
+            "sha256": "105b7a6bf40c964897baf573acd4a59ea3ad2f0c16918c28aa79fc78266af6e6",
+            "bytes": 45355
+          },
+          "original155_rules_literal": true,
+          "new6_kgWater_s_rules": {
+            "atol": 1e-12,
+            "rtol": 0.0,
+            "rmse_max": 1e-12
+          },
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit141-prep/build144-attempt01.json",
+            "sha256": "367cdff6b666a097e026b9dc5219ebe699592d6d48bdf83d08af43048eb8f3a1",
+            "bytes": 714
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/hvac-humidistat-consumers-141/quality02/summary.json",
+            "sha256": "4807ba533e18004031cd8928cdbf63238482dd6a2579fdfdc4a627ec95cfb3b6",
+            "bytes": 1673
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit141-prep/owner-execution-review01.json",
+            "sha256": "195634e25da8104ba04e6c1735263382dd0bbcbe2ae769c6cc49b0cd1e0f25e4",
+            "bytes": 5448
+          },
+          "retained_evidence": {
+            "path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json",
+            "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46",
+            "bytes": 20532
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "shared_Source_build_rows": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "independent_physical_reader_required": false
+        },
+        "inherited_science": "All original155 policies and full ordered streams retain heating/cooling availability, weather/fuel, exhaust/returns, eighteen Scheduled joins, BND/UTF8, comfort/table, diagnostics/ancillary and JSON/CSV gates. Full operands remain in the immutable comparison.",
+        "effective_state": "One finite HVAC Humidistat consumer scene or genuine no-control path. No private remaining-demand/mode, averaged capacity/SHR law, arbitrary-value or full-object claim."
       }
     ],
     "totals": {
-      "paired_cases": 214,
-      "reported_samples": 8018776,
-      "raw_operand_unequal": 1944215,
+      "paired_cases": 215,
+      "reported_samples": 8095336,
+      "raw_operand_unequal": 1964687,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -66684,6 +66950,23 @@
           "sha256": "ae0fb9379fc0d3a6530dfbac9abb9997617d5ee127c96d646bd30ffd207be2ad",
           "bytes": 80875669
         }
+      },
+      {
+        "id": "source-dd-hvac-humidistat-consumers-141",
+        "receipt": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/build144-01/build/receipt.json",
+          "sha256": "719e95bdd658600f03fca0b23af4ed67f9c62cb455721264a9c36a058c0d65b2",
+          "bytes": 4814
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/8a/8a6030272523fa9c90ee3cd96dfcc70290bef7aff2e2fdee534617f52402318c",
+          "sha256": "8a6030272523fa9c90ee3cd96dfcc70290bef7aff2e2fdee534617f52402318c"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/hvac-humidistat-consumers-141/build144-01/eplus-rs.exe",
+          "sha256": "6cbc5d5018e3d8f0e5dbd0a4411275eb587be37f2e2286b8b2219aae6028dcd2",
+          "bytes": 80887690
+        }
       }
     ],
     "focused_since_workspace": {
@@ -67083,14 +67366,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 143,
-      "builds_with_accepted_paired_cases": 124,
+      "actual_recorded_builds": 144,
+      "builds_with_accepted_paired_cases": 125,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 1,
       "builds_with_only_unaccepted_Source_attempts": 12,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "143 recorded Source builds: 124 retain accepted pairs; 19 have none, including seven without Source execution. The failed Source142 startup retains zero credit; corrected Source143 serves three fresh complete comparisons; 2 satisfy every unchanged qualifying criterion. Only those cases enter accepted totals. Earlier failed, owner-only and unaccepted engineering histories retain their original credit.",
+      "qualification": "144 recorded Source builds: 125 retain accepted pairs; 19 have none, including seven without Source execution. Source144 serves four fresh HVAC Humidistat consumer comparisons; 1 satisfy every unchanged qualifying criterion. Only the missing-control six-zero-report scene qualifies, without positive-service credit. The three authored-control comparisons retain zero credit after 16/4/6 point failures at the unchanged 1e-12 kgWater/s limit; all RMSE and original155 checks pass. The finite-cooling comparison also lacks its Winter humidification witness in both engines. Earlier failed142 startup, unaccepted140 ThirdOrder14 point failures and137 exact-cap-witness failures retain zero credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 7,
@@ -71667,8 +71950,9 @@
       "B-COMBINED-HUMIDITY-SHR-SHR_OMITTED_DEFAULTS_NO_LIMIT-139-120H",
       "B-COMBINED-HUMIDITY-SHR-SHR_NAMED_HEAT_CONST_FLOW_CAPACITY-139-120H",
       "B-HUMIDISTAT-PRODUCER-ANALYTICAL_SINGLE_50_OMITTED_DEHUM-140-120H",
-      "B-HUMIDISTAT-PRODUCER-EULER_CROSSED_65_45-140-120H"
-    ], "accepted_paired_cases": 43, "accepted_samples": 3117600, "retained_Scheduled_B_pairs": 42, "retained_Scheduled_B_samples": 3058080, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"ANALYTICAL_SINGLE_50_OMITTED_DEHUM": {"path": ".runtime/object-expansion/unit140-prep/paired-runtime-proposal02/ANALYTICAL_SINGLE_50_OMITTED_DEHUM.pair01.json", "sha256": "18799d9affb89e30dd145a8e5e7f4288dc32a9b60d70d5eb1d8547489280cd23", "bytes": 518358}, "EULER_CROSSED_65_45": {"path": ".runtime/object-expansion/unit140-prep/paired-runtime-proposal02/EULER_CROSSED_65_45.pair01.json", "sha256": "f0611854bb995ad87fce476d8ddc398ffcbecdf95da190ba854dfc0a83710b1f", "bytes": 521384}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit140-prep/Root-completed-readback-review02.json", "sha256": "bcb2566107baa526d8678cffe03074bf7bb808d3911d9d72e9ad0cf05c163731", "bytes": 14632}, "latest_source_build": "source-dd-humidistat-moisture-producer-140-statistics-integration", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit140-prep/build143-attempt01.json", "sha256": "e8fee8e24c22375d692d7b2343e34167b72a9dd5e4a031d5692f0a150dd280a0", "bytes": 746}, "latest_actual_quality": {"path": ".runtime/porting/humidistat-moisture-producer-140/quality02/summary.json", "sha256": "238761e29b5db9805d087d069d0ed1282771f187fab999fd9acc8e7b97b92ff2", "bytes": 1702}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit140-prep/owner-execution-review02.json", "sha256": "0e8f2b988032351cdb31fd1439e6449309d858ee8a2c9ede92edc234a6c0e112", "bytes": 6462}, "latest_input_contracts": {"ANALYTICAL_SINGLE_50_OMITTED_DEHUM": {"path": ".runtime/object-expansion/unit140-prep/science-final02/ANALYTICAL_SINGLE_50_OMITTED_DEHUM.recipe.json", "sha256": "fc44155dfe7c9e248947754edbe7b1a529b0f0fd46701ca6b1b5a20c2b7dc9cc", "bytes": 5819}, "EULER_CROSSED_65_45": {"path": ".runtime/object-expansion/unit140-prep/science-final02/EULER_CROSSED_65_45.recipe.json", "sha256": "e07561bc9f825f7640153637d1dd7469971c66637c0b14de027b55b29e37b1fb", "bytes": 5789}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit140-prep/Root-retained-physical-evidence02.json", "sha256": "fd445aecf4a11ea610d1e701b12e3edc42ce43f4d73f6227bb50648769164d41", "bytes": 14001}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "42 bounded Source B Scheduled/NodeList pairs retain 3,058,080 values. The unused Source A pair adds 59,520, giving 43 pairs and 3,117,600 values. Qualifying Humidistat producer scenes preserve all eighteen public schedule/setpoint joins, real exhaust, return-flow, ordered NodeList/UTF-8 structure, weather, fuel and comfort checks under unchanged original policies. The six new moisture reports retain their separately frozen kgWater/s limits. Prior evidence keeps its own scope; public responses establish no private history or full-object claim.", "capability_or_gate_promotion": false,
+      "B-HUMIDISTAT-PRODUCER-EULER_CROSSED_65_45-140-120H",
+      "B-HVAC-HUMIDISTAT-CONSUMER-MISSING_CONTROL_NONE_HUMIDISTAT-141-120H"
+    ], "accepted_paired_cases": 44, "accepted_samples": 3194160, "retained_Scheduled_B_pairs": 43, "retained_Scheduled_B_samples": 3134640, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"MISSING_CONTROL_NONE_HUMIDISTAT": {"path": ".runtime/object-expansion/unit141-prep/paired-runtime-proposal01/MISSING_CONTROL_NONE_HUMIDISTAT.pair01.json", "sha256": "9365523fc53a7dd974c7b099b39b6eb34752cc9352179abbb5fbb081b803908c", "bytes": 545998}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit141-prep/Root-completed-readback-review01.json", "sha256": "166a83dfcfb734358e26678cd1d51d415b9a65376cde555babb6e655e2c2177c", "bytes": 21132}, "latest_source_build": "source-dd-hvac-humidistat-consumers-141", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit141-prep/build144-attempt01.json", "sha256": "367cdff6b666a097e026b9dc5219ebe699592d6d48bdf83d08af43048eb8f3a1", "bytes": 714}, "latest_actual_quality": {"path": ".runtime/porting/hvac-humidistat-consumers-141/quality02/summary.json", "sha256": "4807ba533e18004031cd8928cdbf63238482dd6a2579fdfdc4a627ec95cfb3b6", "bytes": 1673}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit141-prep/owner-execution-review01.json", "sha256": "195634e25da8104ba04e6c1735263382dd0bbcbe2ae769c6cc49b0cd1e0f25e4", "bytes": 5448}, "latest_input_contracts": {"MISSING_CONTROL_NONE_HUMIDISTAT": {"path": ".runtime/object-expansion/unit141-prep/science-final01/MISSING_CONTROL_NONE_HUMIDISTAT.recipe.json", "sha256": "95338ccecb7d778a10f5778d31a0c389f580fc81254dc0707ed54220a09d5223", "bytes": 6753}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "43 bounded Source B Scheduled/NodeList pairs retain 3,134,640 values. The unused Source A pair adds 59,520, giving 44 pairs and 3,194,160 values. Qualifying HVAC Humidistat consumer scenes preserve all eighteen public schedule/setpoint joins, real exhaust, return-flow, ordered NodeList/UTF-8 structure, weather, fuel and comfort checks under unchanged original policies. Six moisture reports keep their separately frozen kgWater/s limits. Prior evidence keeps its own scope; public responses establish no private history or full-object claim.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",
@@ -71678,6 +71962,11 @@
         "path": ".runtime/object-expansion/unit140-prep/Root-source-adoption01.json",
         "sha256": "edded7e0875a57cdd991bc359e7eee1be277e9234f613a61a4a9bf2e7dad659e",
         "bytes": 8292
+      },
+      "latest_Source_consumer_adoption": {
+        "path": ".runtime/object-expansion/unit141-prep/Root-source-adoption01.json",
+        "sha256": "1bcb0e9f288e5d7f0a432378c3f1f8bb4ef1d47acb8445e721870f1cf3a73299",
+        "bytes": 5039
       }
     },
     "current_Humidistat_producer_live_pairs": {
@@ -71738,6 +72027,57 @@
       "physical_domain_completion": false,
       "Source_B_producer_only": true,
       "HVAC_Humidistat_consumers_held": true
+    },
+    "current_HVAC_Humidistat_consumer_live_pairs": {
+      "case_rows": [
+        "B-HVAC-HUMIDISTAT-CONSUMER-MISSING_CONTROL_NONE_HUMIDISTAT-141-120H"
+      ],
+      "accepted_paired_cases": 1,
+      "accepted_samples": 76560,
+      "latest_complete_comparisons": {
+        "MISSING_CONTROL_NONE_HUMIDISTAT": {
+          "path": ".runtime/object-expansion/unit141-prep/paired-runtime-proposal01/MISSING_CONTROL_NONE_HUMIDISTAT.pair01.json",
+          "sha256": "9365523fc53a7dd974c7b099b39b6eb34752cc9352179abbb5fbb081b803908c",
+          "bytes": 545998
+        }
+      },
+      "Root_completed_review": {
+        "path": ".runtime/object-expansion/unit141-prep/Root-completed-readback-review01.json",
+        "sha256": "166a83dfcfb734358e26678cd1d51d415b9a65376cde555babb6e655e2c2177c",
+        "bytes": 21132
+      },
+      "retained_evidence": {
+        "path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json",
+        "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46",
+        "bytes": 20532
+      },
+      "actual_Source_build": {
+        "path": ".runtime/object-expansion/unit141-prep/build144-attempt01.json",
+        "sha256": "367cdff6b666a097e026b9dc5219ebe699592d6d48bdf83d08af43048eb8f3a1",
+        "bytes": 714
+      },
+      "actual_quality": {
+        "path": ".runtime/porting/hvac-humidistat-consumers-141/quality02/summary.json",
+        "sha256": "4807ba533e18004031cd8928cdbf63238482dd6a2579fdfdc4a627ec95cfb3b6",
+        "bytes": 1673
+      },
+      "owner_execution_review": {
+        "path": ".runtime/object-expansion/unit141-prep/owner-execution-review01.json",
+        "sha256": "195634e25da8104ba04e6c1735263382dd0bbcbe2ae769c6cc49b0cd1e0f25e4",
+        "bytes": 5448
+      },
+      "Source_adoption": {
+        "path": ".runtime/object-expansion/unit141-prep/Root-source-adoption01.json",
+        "sha256": "1bcb0e9f288e5d7f0a432378c3f1f8bb4ef1d47acb8445e721870f1cf3a73299",
+        "bytes": 5039
+      },
+      "Source_format_review": {
+        "path": ".runtime/object-expansion/unit141-prep/Root-source-format-review01.json",
+        "sha256": "0d238d7222c95e3a283683060c8aded377174213b664a8a0ef184af5fd954438",
+        "bytes": 2324
+      },
+      "scope": "Additional bounded Source B direct-epJSON HVAC Humidistat consumer scope: zero or one same-Zone control, actual remaining moisture demands, and supported real schedules. 1 fixed scenes qualify (no-control None/Humidistat zero-demand path); only the 0 listed positive-control scenes provide their declared positive-service evidence. Full161-series comparisons and all original155 gates are mandatory; absence is a genuine six-report zero path. No universal humidity/SHR/capacity law, private mode, positive original-IDF/A, OA, EMS/fault, AFN/Space/sizing or full-object completion is implied.",
+      "physical_domain_completion": false
     }
   },
   "additional_native_type_calibrations": [
