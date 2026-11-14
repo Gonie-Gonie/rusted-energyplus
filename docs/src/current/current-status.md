@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 136 recorded Source builds,
-122 with accepted pairs and 14 without accepted pairs, including 4 builds
+validate the consumer corrections. There are 137 recorded Source builds,
+122 with accepted pairs and 15 without accepted pairs, including 5 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -195,6 +195,8 @@ and arbitrary compositions remain unvalidated. These finite cases do not prove
 all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
+
+The shared Source psychrometric owner now connects diagnostic-aware `PsyWFnTdbH` through one raw inverse and the real phase, String and recurring-error owners. One existing property-owner test checks diagnostic boundaries and the negative floor; feature-only compilation checks the existing callers. This owner-only change adds no Native or Source model run, paired values or object-domain promotion. Capacity-dependent humidity and diagnostic-aware Tsat remain open.
 
 Thirty-four bounded B Scheduled/NodeList pairs retain 2,462,880 values. The
 unused A pair adds 59,520, giving thirty-five pairs and 2,522,400 values. Fresh

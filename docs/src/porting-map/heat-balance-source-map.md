@@ -258,6 +258,8 @@ while its caller continues through the air balance, final surface pass, and
 
 ## Source Ownership Boundary
 
+The shared Source psychrometric owner now connects diagnostic-aware `PsyWFnTdbH` through one raw inverse and the real phase, String and recurring-error owners. One existing property-owner test checks diagnostic boundaries and the negative floor; feature-only compilation checks the existing callers. This owner-only change adds no Native or Source model run, paired values or object-domain promotion. Capacity-dependent humidity and diagnostic-aware Tsat remain open.
+
 The official `1ZoneUncontrolled` dynamic promotion lane retains the following
 EnergyPlus 26.1.0 ownership boundaries. `ManageHeatBalance` calls initialization,
 surface work, before-reporting EMS, `RecKeepHeatBalance`, `ReportHeatBalance`,

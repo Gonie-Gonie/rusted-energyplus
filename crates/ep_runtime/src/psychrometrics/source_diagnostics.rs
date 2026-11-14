@@ -1,4 +1,4 @@
-//! Actual backend-aware Psat and dew-point property calls over the sole state.
+//! Actual backend-aware property calls over the sole psychrometric state.
 //! Numeric-only callers retain their established API without a diagnostic claim.
 use super::SourcePsychrometricAccess;
 use super::psy02_state::{SourcePsatLookup, with_state};
@@ -12,6 +12,7 @@ use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 // Exact zero-based PsychCacheData.hh PsychrometricFunction identities.
 const RELATIVE_HUMIDITY: usize = 1;
 const W_FROM_DEW_POINT: usize = 4;
+const W_FROM_ENTHALPY: usize = 5;
 const PSAT: usize = 8;
 
 /// Temporary live references to actual phase, timestamp and diagnostic owners.
@@ -55,6 +56,57 @@ impl SourcePsychrometricOwners<'_, '_> {
             self.hvac,
         )
     }
+    // Native Psychrometrics.cc606-637. The outer caller deliberately reaches
+    // this function at equality; this inner test remains strictly less than.
+    fn w_from_enthalpy_error(
+        &mut self,
+        temperature: f64,
+        enthalpy: f64,
+        humidity: f64,
+        called_from: &str,
+    ) -> Result<(), Error> {
+        if humidity < -0.0001 && !self.clock.warmup_flag {
+            if first(W_FROM_ENTHALPY) {
+                set_string(format!(
+                    " Dry-Bulb= {} Enthalpy= {}",
+                    trimmed(temperature, 2)?,
+                    trimmed(enthalpy, 3)?,
+                ));
+                self.backend
+                    .show_warning_message("Calculated Humidity Ratio invalid (PsyWFnTdbH)")?;
+                // Unlike Psat, the nonempty caller has no trailing comma.
+                let routine = if called_from.is_empty() {
+                    " Routine=Unknown,".into()
+                } else {
+                    format!(" Routine={called_from}")
+                };
+                self.backend.show_source_continue_error_time_stamp(
+                    &routine,
+                    self.clock,
+                    self.globals,
+                    self.environment,
+                    self.hvac,
+                )?;
+                self.backend.show_continue_error(&string())?;
+                set_string(format!(
+                    "Calculated Humidity Ratio= {}",
+                    trimmed(humidity, 4)?,
+                ));
+                self.backend.show_continue_error(&format!(
+                    "{} ... Humidity Ratio set to .00001",
+                    string(),
+                ))?;
+            }
+            self.recurring(
+                W_FROM_ENTHALPY,
+                "Calculated Humidity Ratio invalid (PsyWFnTdbH)",
+                humidity,
+                "[]",
+            )?;
+        }
+        Ok(())
+    }
+
     fn recurring(
         &mut self,
         kind: usize,
@@ -84,6 +136,28 @@ impl SourcePsychrometricOwners<'_, '_> {
 }
 
 impl SourcePsychrometricAccess {
+    /// Actual PsyWFnTdbH, preserving the raw inverse until all diagnostics finish.
+    /// The pure numerical API and this backend-aware route share one equation.
+    #[track_caller]
+    pub(crate) fn source_humidity_ratio_from_enthalpy(
+        &mut self,
+        temperature: f64,
+        enthalpy: f64,
+        called_from: &str,
+        suppress_warnings: bool,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let humidity = super::raw_psy_w_fn_tdb_h(temperature, enthalpy);
+        if humidity <= -0.0001 && !suppress_warnings {
+            owners.w_from_enthalpy_error(temperature, enthalpy, humidity, called_from)?;
+        }
+        Ok(super::finish_psy_w_fn_tdb_h(
+            temperature,
+            enthalpy,
+            humidity,
+        ))
+    }
+
     /// Actual stateful PsyRhoAirFnPbTdbW; negative density reaches the genuine
     /// severe/continue/timestamp/fatal backend in Original198-222 order.
     pub(crate) fn source_air_density(

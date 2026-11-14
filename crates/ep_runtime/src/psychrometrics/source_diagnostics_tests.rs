@@ -233,6 +233,154 @@ fn source_dew_point_whole_degree_retries_keep_actual_warmup_and_recurring_owners
         assert_eq!(row.max_value.to_bits(), expected.to_bits());
         assert_eq!(caller.errors.tracking.total_warning_errors, 2);
     });
+    // Same genuine Source phase/String/recurring/backend owners for WFromH.
+    // This tests property arguments, not seeded PurchasedAir/HVAC state.
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let mut access = SourcePsychrometricAccess;
+        let inputs: [(f64, f64); 6] = [
+            (0.0, 0.0),
+            (-0.0, -0.0),
+            (2_500_940.0, 1.0),
+            (-1.0, 1.0e-5),
+            (-250.094, 1.0e-5),
+            // Raw inverse is exactly -0.0001: outer call, inner no warning.
+            (f64::from_bits(0xc06f_4302_0c49_ba5f), 1.0e-5),
+        ];
+        for (enthalpy, expected) in inputs {
+            let actual = caller
+                .with_owners(|owners| {
+                    access.source_humidity_ratio_from_enthalpy(
+                        0.0,
+                        enthalpy,
+                        "Declared W caller",
+                        false,
+                        owners,
+                    )
+                })
+                .unwrap();
+            assert_eq!(actual.to_bits(), expected.to_bits());
+        }
+        assert!(caller.stream.is_empty());
+        assert!(with_state(|state| state.source_string.is_empty()));
+        assert_eq!(caller.recurring.number, 0);
+        assert!(with_state(|state| state
+            .source_error_indices
+            .iter()
+            .all(|v| *v == 0)));
+        let raw_enthalpy = -2_500_940.0;
+        caller.clock.warmup_flag = true;
+        caller
+            .with_owners(|owners| {
+                access.source_humidity_ratio_from_enthalpy(
+                    0.0,
+                    raw_enthalpy,
+                    "Declared W caller",
+                    false,
+                    owners,
+                )
+            })
+            .unwrap();
+        caller.clock.warmup_flag = false;
+        caller
+            .with_owners(|owners| {
+                access.source_humidity_ratio_from_enthalpy(
+                    0.0,
+                    raw_enthalpy,
+                    "Declared W caller",
+                    true,
+                    owners,
+                )
+            })
+            .unwrap();
+        assert!(caller.stream.is_empty());
+        assert!(with_state(|state| state.source_string.is_empty()));
+        caller.globals.doing_sizing = true;
+        for _ in 0..2 {
+            let actual = caller
+                .with_owners(|owners| {
+                    access.source_humidity_ratio_from_enthalpy(
+                        0.0,
+                        raw_enthalpy,
+                        "Declared W caller",
+                        false,
+                        owners,
+                    )
+                })
+                .unwrap();
+            assert_eq!(actual.to_bits(), 1.0e-5_f64.to_bits());
+        }
+        let text = String::from_utf8(caller.stream.clone()).unwrap();
+        assert_eq!(text.matches("Calculated Humidity Ratio invalid").count(), 1);
+        assert!(text.contains(" Routine=Declared W caller During Sizing"));
+        assert!(!text.contains(" Routine=Declared W caller,"));
+        assert!(text.contains("Simulation time=01/01 00:45 - 01:00"));
+        assert!(text.contains(" Dry-Bulb= 0.00 Enthalpy= "));
+        assert!(
+            text.contains("Calculated Humidity Ratio= -0.9999 ... Humidity Ratio set to .00001")
+        );
+        assert_eq!(
+            with_state(|state| state.source_error_indices[W_FROM_ENTHALPY]),
+            1
+        );
+        assert_eq!(
+            with_state(|state| state.source_string.clone()),
+            "Calculated Humidity Ratio= -0.9999"
+        );
+        assert_eq!(caller.recurring.number, 1);
+        let row = &caller.recurring.rows.as_ref().unwrap()[0];
+        assert_eq!((row.count, row.warmup_count, row.sizing_count), (2, 0, 2));
+        assert_eq!(
+            (row.max_value.to_bits(), row.min_value.to_bits()),
+            ((-1.0_f64).to_bits(), (-1.0_f64).to_bits())
+        );
+        assert_eq!(
+            (row.max_units.as_str(), row.min_units.as_str()),
+            ("[]", "[]")
+        );
+        assert_eq!(caller.errors.tracking.total_warning_errors, 2);
+        assert!(with_state(
+            |state| state.final_caches() == Default::default()
+        ));
+    });
+    with_fresh_psychrometric_state(|| {
+        let mut caller = Caller::new();
+        let mut failing = Failing;
+        let mut backend = SourceErrorBackend {
+            state: &mut caller.errors,
+            error_stream: Some(&mut failing),
+            console: &mut caller.console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        let failure = SourcePsychrometricAccess.source_humidity_ratio_from_enthalpy(
+            0.0,
+            -2_500_940.0,
+            "",
+            false,
+            &mut SourcePsychrometricOwners {
+                clock: &caller.clock,
+                globals: &caller.globals,
+                environment: &caller.environment,
+                hvac: &caller.hvac,
+                recurring: &mut caller.recurring,
+                backend: &mut backend,
+            },
+        );
+        assert!(matches!(failure, Err(Error::Backend(_))));
+        assert!(with_state(|state| state
+            .source_string
+            .starts_with(" Dry-Bulb= ")));
+        assert_eq!(
+            with_state(|state| state.source_error_indices[W_FROM_ENTHALPY]),
+            0
+        );
+        assert_eq!(caller.recurring.number, 0);
+    });
 }
 
 struct Failing;

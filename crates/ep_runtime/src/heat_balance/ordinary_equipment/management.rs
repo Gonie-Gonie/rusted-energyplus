@@ -473,6 +473,11 @@ impl SourceHvacManager {
                                 air: o.air,
                                 fan: o.fan,
                                 hvac: o.hvac,
+                                // The init struct already borrows these same immutable
+                                // phase owners; no copied flags or mutable alias exists.
+                                clock: purchased_initialization.clock,
+                                globals: purchased_initialization.globals,
+                                recurring: o.recurring_errors,
                                 environment: o.environment,
                                 control: o.control,
                                 psychrometrics: o.psychrometrics,

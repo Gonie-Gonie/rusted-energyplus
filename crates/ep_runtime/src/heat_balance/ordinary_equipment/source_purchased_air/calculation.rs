@@ -8,6 +8,7 @@ use crate::heat_balance::ordinary_air_heat_balance::{
     predictor_corrector::SourceZoneAirPredictorCorrector,
 };
 use crate::heat_balance::ordinary_equipment::management::availability::SourceAvailability;
+use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::{
     HeatBalanceInputError as Error, SelectedHeatBalanceInputState,
 };
@@ -15,12 +16,13 @@ use crate::heat_balance::selected_schedule_manager::{
     SelectedScheduleManager, SourceScheduleIndex,
 };
 use crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals;
+use crate::heat_balance::source_initialization::SourceRecurringErrorState;
 use crate::psychrometrics::{
     EnergyPlusPsychrometricFunction as Property, SourcePsychrometricAccess,
-    energyplus_psy_cp_air_fn_w as cp, energyplus_psy_h_fn_tdb_w as enthalpy,
-    energyplus_psy_tdb_fn_h_w as dry_bulb,
+    SourcePsychrometricOwners, energyplus_psy_cp_air_fn_w as cp,
+    energyplus_psy_h_fn_tdb_w as enthalpy, energyplus_psy_tdb_fn_h_w as dry_bulb,
 };
-use crate::weather::day::WeatherEnvironmentState;
+use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 
 /// Only temporary borrows of the existing owners. No numerical storage or cache.
 pub(crate) struct SourcePurchasedAirCalcOwners<'a, 'backend> {
@@ -29,6 +31,9 @@ pub(crate) struct SourcePurchasedAirCalcOwners<'a, 'backend> {
     pub(crate) air: &'a SourceAirHeatBalance,
     pub(crate) fan: &'a SourceZoneFanHeatBalanceArrays,
     pub(crate) hvac: &'a SelectedHvacGlobals,
+    pub(crate) clock: &'a WeatherGlobalState,
+    pub(crate) globals: &'a SelectedHeatBalanceGlobals,
+    pub(crate) recurring: &'a mut SourceRecurringErrorState,
     pub(crate) environment: &'a mut WeatherEnvironmentState,
     pub(crate) control: &'a SelectedHeatBalanceInputState,
     pub(crate) psychrometrics: &'a mut SourcePsychrometricAccess,
@@ -115,15 +120,24 @@ fn saturation(
         .result)
 }
 fn humidity_from_h(
-    _o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
-    _temperature: f64,
-    _h: f64,
+    o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
+    temperature: f64,
+    h: f64,
 ) -> Result<f64, Error> {
-    // The current scalar helper hides the pre-floor raw W used by the Native
-    // warning call. No second inverse equation or fabricated recurrence state.
-    Err(Error::Unavailable(
-        "actual CalcPurchAirLoads PsyWFnTdbH diagnostic-aware operation",
-    ))
+    o.psychrometrics.source_humidity_ratio_from_enthalpy(
+        temperature,
+        h,
+        "CalcPurchAirLoads",
+        false,
+        &mut SourcePsychrometricOwners {
+            clock: o.clock,
+            globals: o.globals,
+            environment: &*o.environment,
+            hvac: o.hvac,
+            recurring: &mut *o.recurring,
+            backend: &mut *o.backend,
+        },
+    )
 }
 fn saturation_temperature(
     _o: &mut SourcePurchasedAirCalcOwners<'_, '_>,
