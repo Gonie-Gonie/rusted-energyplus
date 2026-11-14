@@ -3096,6 +3096,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     unit["cooling_limit"] = json!(limit);
                     if method == "Flow/Person" && limit == "NoLimit" && flow > 0.0 {
                         unit["demand_controlled_ventilation_type"] = json!("OccupancySchedule");
+                    } else if method == "Sum" && limit == "NoLimit" && flow > 0.0 {
+                        unit["demand_controlled_ventilation_type"] = json!("CO2Setpoint");
                     }
                     if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
                         unit["maximum_heating_air_flow_rate"] = json!(flow);
@@ -3186,6 +3188,11 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             actual["demand_controlled_ventilation_type"],
                             OaRaw::String("OccupancySchedule".into())
                         );
+                    } else if method == "Sum" && limit == "NoLimit" && flow > 0.0 {
+                        assert_eq!(
+                            actual["demand_controlled_ventilation_type"],
+                            OaRaw::String("CO2Setpoint".into())
+                        );
                     }
                     if wide_priority {
                         let list = hard_ip
@@ -3251,14 +3258,18 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 let mut bad = oa.clone();
                 match invalid {
                     0 => {
-                        // Other five existing methods retain the empty-selector
-                        // rejection; this per-person candidate keeps CO2 held.
-                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
-                            if method == "Flow/Person" {
-                                json!("CO2Setpoint")
-                            } else {
-                                json!("")
-                            }
+                        // The reset warning admits CO2 only without simulation;
+                        // the other five methods retain raw-empty rejection.
+                        if method == "Flow/Person" {
+                            bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                                json!("CO2Setpoint");
+                            bad["ZoneAirContaminantBalance"] = json!({
+                                "Uncomposed CO2": {"carbon_dioxide_concentration": "Yes"}
+                            });
+                        } else {
+                            bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                                json!("");
+                        }
                     }
                     1 => {
                         bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =

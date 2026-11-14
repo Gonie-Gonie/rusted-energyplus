@@ -1176,6 +1176,10 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         V::String(oa_name.into()),
                     );
                     if !explicit_empty {
+                        fields.insert(
+                            "demand_controlled_ventilation_type".into(),
+                            V::String("CO2Setpoint".into()),
+                        );
                         // Inactive NoLimit capacity still passes through the actual
                         // GetPurchasedAir numeric accessor with its original lexeme.
                         fields.insert(
@@ -1451,7 +1455,29 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                 .any(|bytes| bytes == expected.as_bytes())
                         );
                     }
-                    assert!(oa_error.is_empty() && oa_console.is_empty() && oa_eio.is_empty());
+                    assert!(oa_console.is_empty() && oa_eio.is_empty());
+                    assert_eq!(oa_state.tracking.total_severe_errors, 0);
+                    assert_eq!(oa_state.tracking.total_warning_errors_during_warmup, 0);
+                    assert_eq!(oa_state.tracking.total_warning_errors_during_sizing, 0);
+                    if explicit_empty {
+                        assert!(oa_error.is_empty());
+                        assert_eq!(oa_state.tracking.total_warning_errors, 0);
+                    } else {
+                        assert_eq!(oa_state.tracking.total_warning_errors, 1);
+                        assert_eq!(
+                            std::str::from_utf8(&oa_error)?,
+                            format!(
+                                concat!(
+                                    "Program Version,authored Rust-only equipment storage,authored typed/raw Source owner table\n",
+                                    "   ** Warning ** GetPurchasedAir: ZoneHVAC:IdealLoadsAirSystem=\"{} invalid data\n",
+                                    "   **   ~~~   ** Demand Controlled Ventilation Type=CO2SETPOINT but CO2 simulation is not active.\n",
+                                    "   **   ~~~   ** Resetting Demand Controlled Ventilation Type to NoDCV\n",
+                                    "   **   ~~~   ** To activate CO2 simulation, use ZoneAirContaminantBalance object and specify \"Carbon Dioxide Concentration\"=\"Yes\".\n",
+                                ),
+                                unit_name.to_ascii_uppercase(),
+                            )
+                        );
+                    }
                 }
             }
         }

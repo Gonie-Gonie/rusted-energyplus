@@ -751,6 +751,7 @@ pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool 
             system.demand_controlled_ventilation_type,
             ep_model::DemandControlledVentilationType::None
                 | ep_model::DemandControlledVentilationType::OccupancySchedule
+                | ep_model::DemandControlledVentilationType::Co2Setpoint
         )
         && system.outdoor_air_economizer_type == ep_model::OutdoorAirEconomizerType::NoEconomizer
         && system.heat_recovery_type == ep_model::HeatRecoveryType::None

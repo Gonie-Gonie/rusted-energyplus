@@ -326,6 +326,12 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 {
                     unit.demand_controlled_ventilation_type =
                         DemandControlledVentilationType::OccupancySchedule;
+                } else if method == ep_model::DesignSpecificationOutdoorAirMethod::Sum
+                    && limit == IdealLoadsLimit::NoLimit
+                    && flow > 0.0
+                {
+                    unit.demand_controlled_ventilation_type =
+                        DemandControlledVentilationType::Co2Setpoint;
                 }
                 unit.maximum_heating_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
                 unit.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(flow));
@@ -386,10 +392,7 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                     typed.ideal_loads_air_systems[0].humidification_control_type =
                         HumidificationControlType::ConstantSupplyHumidityRatio
                 }
-                12 => {
-                    typed.ideal_loads_air_systems[0].demand_controlled_ventilation_type =
-                        DemandControlledVentilationType::Co2Setpoint
-                }
+                12 => typed.ideal_loads_air_systems[0].outdoor_air_inlet_node_name = None,
                 13 => {
                     typed.ideal_loads_air_systems[0].outdoor_air_economizer_type =
                         OutdoorAirEconomizerType::DifferentialDryBulb

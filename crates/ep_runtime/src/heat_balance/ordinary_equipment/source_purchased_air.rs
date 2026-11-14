@@ -720,9 +720,27 @@ impl OrdinaryEquipment {
                         && !control.carbon_dioxide_simulation
                     {
                         self.purchased_unit_mut(number)?.dcv_type = SourcePurchasedAirDcv::None;
-                        return Err(Error::Unavailable(
-                            "actual PurchasedAir CO2 DCV reset-warning453",
-                        ));
+                        let flags = output.environment.diagnostic_flags.as_ref().ok_or(
+                            Error::Unavailable(
+                                "actual PurchasedAir CO2 warning live phase owners453",
+                            ),
+                        )?;
+                        backend.show_source_warning_error(
+                            &format!(
+                                "GetPurchasedAir: {}=\"{} invalid data",
+                                shortcut.current_module_object, name
+                            ),
+                            flags,
+                        )?;
+                        backend.show_continue_error(&format!(
+                            "Demand Controlled Ventilation Type={value} but CO2 simulation is not active."
+                        ))?;
+                        backend.show_continue_error(
+                            "Resetting Demand Controlled Ventilation Type to NoDCV",
+                        )?;
+                        backend.show_continue_error(
+                            "To activate CO2 simulation, use ZoneAirContaminantBalance object and specify \"Carbon Dioxide Concentration\"=\"Yes\".",
+                        )?;
                     }
                     let value = getter::alpha_field_value(
                         output.input,

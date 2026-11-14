@@ -154,7 +154,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     // selectors must not acquire typed defaults on this new OA route.
     if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
         || !field(unit, "demand_controlled_ventilation_type")
-            .is_none_or(|value| text_is(value, &["None", "OccupancySchedule"]))
+            .is_none_or(|value| text_is(value, &["None", "OccupancySchedule", "CO2Setpoint"]))
         || ![
             ("humidification_control_type", "None"),
             ("outdoor_air_economizer_type", "NoEconomizer"),
