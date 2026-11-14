@@ -927,9 +927,11 @@ fn validate_ideal_loads(model: &TypedModel, violations: &mut Vec<String>) {
         if (system.dehumidification_control_type != DehumidificationControlType::None
             || system.humidification_control_type != HumidificationControlType::None)
             && !ep_runtime::has_source_owned_no_oa_humidity_shape(system)
+            && !ep_runtime::has_source_basic_positive_oa_shape(system)
         {
-            violations
-                .push("humidity controls require the bounded Source owned no-OA branches".into());
+            violations.push(
+                "humidity controls require bounded Source-owned no-OA or basic positive-OA branches".into(),
+            );
         }
         if system.system_inlet_air_node_name.is_some()
             || system

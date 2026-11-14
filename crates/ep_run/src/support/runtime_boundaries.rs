@@ -878,7 +878,9 @@ pub(super) fn assess_typed_runtime_boundaries(
                 unsupported_features.retain(|feature| {
                     !matches!(
                         feature,
-                        IdealLoadsUnsupportedFeature::DemandControlledVentilation
+                        IdealLoadsUnsupportedFeature::Dehumidification
+                            | IdealLoadsUnsupportedFeature::Humidification
+                            | IdealLoadsUnsupportedFeature::DemandControlledVentilation
                             | IdealLoadsUnsupportedFeature::Economizer
                             | IdealLoadsUnsupportedFeature::HeatRecovery
                     )

@@ -3128,6 +3128,37 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 .remove("heat_recovery_type");
                         }
                     }
+                    // Reuse genuine existing rows: no extra context or loop.
+                    if flow > 0.0 {
+                        if method == "Flow/Zone" && limit == "LimitFlowRate" {
+                            unit["dehumidification_control_type"] =
+                                json!("ConstantSupplyHumidityRatio");
+                            unit["humidification_control_type"] =
+                                json!("ConstantSupplyHumidityRatio");
+                        } else if method == "Flow/Zone" && limit == "LimitCapacity" {
+                            unit["dehumidification_control_type"] =
+                                json!("ConstantSupplyHumidityRatio");
+                        } else if method == "Maximum" && limit == "LimitCapacity" {
+                            unit["dehumidification_control_type"] =
+                                json!("ConstantSensibleHeatRatio");
+                        } else if method == "Maximum" && limit == "LimitFlowRateAndCapacity" {
+                            unit["dehumidification_control_type"] =
+                                json!("ConstantSensibleHeatRatio");
+                            unit["humidification_control_type"] =
+                                json!("ConstantSupplyHumidityRatio");
+                        } else if method == "Flow/Area" && limit == "LimitFlowRateAndCapacity" {
+                            unit["humidification_control_type"] =
+                                json!("ConstantSupplyHumidityRatio");
+                        } else if method == "AirChanges/Hour" && limit == "LimitCapacity" {
+                            unit.as_object_mut()
+                                .expect("unit")
+                                .remove("dehumidification_control_type");
+                        } else if method == "AirChanges/Hour" && limit == "LimitFlowRate" {
+                            unit.as_object_mut()
+                                .expect("unit")
+                                .remove("humidification_control_type");
+                        }
+                    }
                     if matches!(limit, "LimitFlowRate" | "LimitFlowRateAndCapacity") {
                         unit["maximum_heating_air_flow_rate"] = json!(flow);
                         unit["maximum_cooling_air_flow_rate"] = json!(flow);
@@ -3304,6 +3335,60 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             assert!(!actual.contains_key("heat_recovery_type"));
                         }
                     }
+                    let authored_unit = &hard["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
+                    match authored_unit.get("dehumidification_control_type") {
+                        Some(value) => {
+                            let name = value.as_str().expect("authored humidity selector");
+                            assert_eq!(
+                                actual["dehumidification_control_type"],
+                                OaRaw::String(name.into())
+                            );
+                            let expected = match name {
+                                "None" => ep_model::DehumidificationControlType::None,
+                                "ConstantSupplyHumidityRatio" => ep_model::DehumidificationControlType::ConstantSupplyHumidityRatio,
+                                "ConstantSensibleHeatRatio" => ep_model::DehumidificationControlType::ConstantSensibleHeatRatio,
+                                _ => unreachable!(),
+                            };
+                            assert_eq!(
+                                model.ideal_loads_air_systems[0].dehumidification_control_type,
+                                expected
+                            );
+                        }
+                        None => {
+                            assert!(!actual.contains_key("dehumidification_control_type"));
+                            assert_eq!(
+                                model.ideal_loads_air_systems[0].dehumidification_control_type,
+                                ep_model::DehumidificationControlType::ConstantSensibleHeatRatio
+                            );
+                        }
+                    }
+                    match authored_unit.get("humidification_control_type") {
+                        Some(value) => {
+                            let name = value.as_str().expect("authored humidity selector");
+                            assert_eq!(
+                                actual["humidification_control_type"],
+                                OaRaw::String(name.into())
+                            );
+                            let expected = match name {
+                                "None" => ep_model::HumidificationControlType::None,
+                                "ConstantSupplyHumidityRatio" => {
+                                    ep_model::HumidificationControlType::ConstantSupplyHumidityRatio
+                                }
+                                _ => unreachable!(),
+                            };
+                            assert_eq!(
+                                model.ideal_loads_air_systems[0].humidification_control_type,
+                                expected
+                            );
+                        }
+                        None => {
+                            assert!(!actual.contains_key("humidification_control_type"));
+                            assert_eq!(
+                                model.ideal_loads_air_systems[0].humidification_control_type,
+                                ep_model::HumidificationControlType::None
+                            );
+                        }
+                    }
                     if wide_priority {
                         let list = hard_ip
                             .source_raw_object_fields("ZoneHVAC:EquipmentList", "Equipment")
@@ -3418,14 +3503,39 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         }
                     }
                     3 => {
-                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]
-                            .as_object_mut()
-                            .expect("unit")
-                            .remove("dehumidification_control_type");
+                        let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
+                        unit["dehumidification_control_type"] = json!("ConstantSensibleHeatRatio");
+                        match method {
+                            "Flow/Person" => {
+                                unit["dehumidification_control_type"] = json!("Humidistat")
+                            }
+                            "Flow/Zone" => unit["cooling_sensible_heat_ratio"] = json!(0.0),
+                            "Flow/Area" => unit["cooling_sensible_heat_ratio"] = json!(-0.0),
+                            "AirChanges/Hour" => unit["cooling_sensible_heat_ratio"] = json!(1.1),
+                            "Sum" => unit["cooling_sensible_heat_ratio"] = json!("0.7"),
+                            "Maximum" => unit["cooling_sensible_heat_ratio"] = json!(null),
+                            _ => unreachable!(),
+                        }
                     }
                     4 => {
-                        bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
-                            json!("")
+                        let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];
+                        match method {
+                            "Flow/Person" => unit["humidification_control_type"] = json!(""),
+                            "Flow/Zone" => {
+                                unit["maximum_heating_supply_air_humidity_ratio"] = json!(0.0)
+                            }
+                            "Flow/Area" => {
+                                unit["maximum_heating_supply_air_humidity_ratio"] = json!(-0.0)
+                            }
+                            "AirChanges/Hour" => {
+                                unit["minimum_cooling_supply_air_humidity_ratio"] = json!(0.0)
+                            }
+                            "Sum" => {
+                                unit["minimum_cooling_supply_air_humidity_ratio"] = json!(-0.0)
+                            }
+                            "Maximum" => unit["humidification_control_type"] = json!("Humidistat"),
+                            _ => unreachable!(),
+                        }
                     }
                     5 => {
                         let unit = &mut bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"];

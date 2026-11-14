@@ -745,8 +745,22 @@ pub fn has_source_basic_positive_oa_shape(system: &IdealLoadsAirSystem) -> bool 
             .outdoor_air_inlet_node_name
             .as_ref()
             .is_some_and(|name| !name.0.trim().is_empty())
-        && system.dehumidification_control_type == DehumidificationControlType::None
-        && system.humidification_control_type == HumidificationControlType::None
+        && matches!(
+            system.dehumidification_control_type,
+            DehumidificationControlType::None
+                | DehumidificationControlType::ConstantSupplyHumidityRatio
+                | DehumidificationControlType::ConstantSensibleHeatRatio
+        )
+        && matches!(
+            system.humidification_control_type,
+            HumidificationControlType::None
+                | HumidificationControlType::ConstantSupplyHumidityRatio
+        )
+        // Native schema is strictly positive; the existing compiler ceiling1
+        // remains an explicit bound of this Source lane, not a Native maximum.
+        && [system.maximum_heating_supply_air_humidity_ratio,
+            system.minimum_cooling_supply_air_humidity_ratio]
+            .into_iter().all(|value| value.is_finite() && value > 0.0 && value <= 1.0)
         && matches!(
             system.demand_controlled_ventilation_type,
             ep_model::DemandControlledVentilationType::None
@@ -1193,6 +1207,7 @@ fn validate_direct_zone_model(
     if (system.dehumidification_control_type != DehumidificationControlType::None
         || system.humidification_control_type != HumidificationControlType::None)
         && !source_owned_humidity
+        && !source_owned_positive_oa
     {
         return unsupported(
             DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
@@ -1200,7 +1215,7 @@ fn validate_direct_zone_model(
     }
     // Native schema: active SHR is strictly positive and at most one. This
     // Source-only check leaves inactive SHR and Legacy error priority unchanged.
-    if source_owned_humidity
+    if (source_owned_humidity || source_owned_positive_oa)
         && system.dehumidification_control_type
             == DehumidificationControlType::ConstantSensibleHeatRatio
         && (!system.cooling_sensible_heat_ratio.is_finite()
@@ -1225,6 +1240,8 @@ fn validate_direct_zone_model(
                     && matches!(
                         feature,
                         IdealLoadsUnsupportedFeature::OutdoorAir
+                            | IdealLoadsUnsupportedFeature::Dehumidification
+                            | IdealLoadsUnsupportedFeature::Humidification
                             | IdealLoadsUnsupportedFeature::DemandControlledVentilation
                             | IdealLoadsUnsupportedFeature::Economizer
                             | IdealLoadsUnsupportedFeature::HeatRecovery

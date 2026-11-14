@@ -356,7 +356,7 @@
     ],
     "ZoneHVAC:IdealLoadsAirSystem": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
-      "Bounded Source B direct epJSON supports six basic IdealLoads outdoor-air methods using real schedules, nodes and None humidity control. Qualifying evidence covers SUM hard flow/capacity/combined limits with NoDCV, and NoLimit Flow/Person with None or genuine current-occupancy DCV. Positive-OA CO2Setpoint without simulation retains the Native warning/reset; active CO2/IAQ remains unsupported. DifferentialDryBulb and DifferentialEnthalpy require cooling flow or combined limits; both have qualifying SUM/LimitFlowRate evidence. Sensible and Enthalpy recovery use real mode, stored Nodes and saturation owners, with qualifying NoLimit SUM evidence at .7/.65 effectiveness and independent Winter sensible plus Enthalpy latent responses. Without OA, all27 named ventilation-selector combinations and schema-valid omission/exact-empty retain the ignored-selector path. Existing JSON-number getter and bounded EquipmentList evidence remains unchanged. With positive outdoor air, exact-empty DCV retains actual Invalid and uses the original design-occupancy operations. Exact-empty economizer is inactive in calculation but still requires a cooling-flow limit at initialization. Raw empty is distinct from advisory model defaults; the getter is unchanged and its prior regression is retained without a current rerun. Both fixed SUM scenes qualify: empty DCV with NoLimit, and empty DCV/economizer with cooling LimitFlowRate. Every unchanged158-series numeric, public OA/mixed, science and ancillary condition remains mandatory. No private enum or exact inactive-time observation is claimed. Broader method/DCV/limit/humidity/economizer/recovery compositions, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value/full-object completion remain open. Public intervals imply no universal averaged flow, capacity, mixing, effectiveness, Sensible-latent-zero or off-rate-zero law.",
+      "Bounded Source B direct epJSON supports six basic IdealLoads outdoor-air methods using real schedules and nodes. Existing qualifying evidence covers None humidity, SUM hard flow/capacity/combined limits with NoDCV, and NoLimit Flow/Person with None or genuine current-occupancy DCV. Positive-OA CO2Setpoint without simulation retains the Native warning/reset; active CO2/IAQ remains unsupported. DifferentialDryBulb and DifferentialEnthalpy require cooling flow or combined limits and have qualifying SUM/LimitFlowRate evidence. Named recovery uses real mode, stored Nodes and saturation owners, with qualifying NoLimit SUM evidence at .7/.65 and independent Winter sensible plus Enthalpy latent responses. Without OA, all27 named ventilation-selector combinations and schema-valid omission/exact-empty retain the ignored-selector path. Existing JSON-number getter and bounded EquipmentList evidence remains unchanged. Positive-OA exact-empty DCV preserves actual Invalid/design-occupancy operations; exact-empty economizer is inactive in calculation but requires cooling flow at initialization. Both fixed empty-selector scenes retain qualifying evidence. Positive-OA Source B additionally owns the six named non-Humidistat humidity combinations and genuine omission defaults through the unchanged real getter and calculation. Both supply humidity ratios remain finite, strictly positive and at most one in this bounded lane; Native itself has no W ceiling. Active SHR is strictly positive and at most one. Exact-empty humidity, Humidistat with OA and active CO2/IAQ remain held. Both fixed SUM scenes qualify: constant-supply humidity in both directions, and actual omitted default SHR with no humidification. Each qualifying engine independently needs all original positive OA/mixed and prospectively applicable Winter/Summer sensible/latent witnesses across fourteen complete public streams. Constant cooling may have either latent direction. No averaged SHR, supply-W target equality, opposite-control zero, global capacity law or private mode/getter observation is claimed. Broader compositions, Source A/IDF outdoor air, Space/airloops/sizing and arbitrary-value/full-object completion remain open. Public intervals imply no universal averaged flow, capacity, mixing, effectiveness or off-rate-zero law.",
       "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed."
     ],
     "ZoneControl:Thermostat": [
@@ -9706,6 +9706,491 @@
         "Source_processes": 2,
         "engine_replays": 0,
         "scope": "With positive outdoor air, exact-empty DCV retains actual Invalid and uses the original design-occupancy operations. Exact-empty economizer is inactive in calculation but still requires a cooling-flow limit at initialization. Raw empty is distinct from advisory model defaults; the getter is unchanged and its prior regression is retained without a current rerun. Both fixed SUM scenes qualify: empty DCV with NoLimit, and empty DCV/economizer with cooling LimitFlowRate. Every unchanged158-series numeric, public OA/mixed, science and ancillary condition remains mandatory. No private enum or exact inactive-time observation is claimed.",
+        "physical_domain_completion": false
+      },
+      "positive_OA_non_Humidistat_humidity_154": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit154-prep/build157-attempt01.json",
+          "sha256": "e97b226dda551f4494d3989814d4709e0e9964999b255379412324ebe01ce472",
+          "bytes": 741
+        },
+        "actual_quality": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/summary.json",
+          "sha256": "4dfc00c12b8ccd0877776b4aed1821d8a1cd5074af9b7bc8551f2e70fb775e5f",
+          "bytes": 1383
+        },
+        "owner_execution_review": {
+          "path": ".runtime/object-expansion/unit154-prep/owner-execution-review02.json",
+          "sha256": "04a5e365a74d8581562cf6cc9f897dec0694b5add8cf33b60c5087792727223a",
+          "bytes": 8148
+        },
+        "Source_adoption": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-source-positive-OA-non-Humidistat-humidity-adoption02.json",
+          "sha256": "a1a555b177eebf076d1688f799b46dfe11e456db74c88c05884a2245bd02a4e7",
+          "bytes": 11704
+        },
+        "Source_format_review": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-source-format-review02.json",
+          "sha256": "cd6fd50d92835df29742634205fd68345306d6d50dba0285972219accd46a791",
+          "bytes": 5592
+        },
+        "current_QA_commands": 4,
+        "total_actual_QA_commands": 7,
+        "failed_QA_attempts": 1,
+        "prior_failed_quality": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality01/summary.json",
+          "sha256": "287d9f204f0162a2d88853cc5fc11ded4724839bc3c2a297a2bc0faf95803904",
+          "bytes": 1061
+        },
+        "failed_execution": {
+          "kind": "targeted_existing_test",
+          "test_names": [
+            "porting_scope::tests::bounded_controls_do_not_change_ordinary_support_assessment"
+          ],
+          "receipt": {
+            "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality01/source-caller-tests/receipt.json",
+            "sha256": "bf2f3449b6caea2580e73500c37951fa6db3e5ad1d84d884b34bdda82fdac6d8",
+            "bytes": 3284
+          },
+          "actual_exit_code": 101,
+          "source_snapshot": {
+            "path": ".runtime/porting/source-objects/bc/bcd5f73a00fb71d49f9f4983d8e9fbb6d379b8ab52953ab12afbe92f689e08d7",
+            "sha256": "bcd5f73a00fb71d49f9f4983d8e9fbb6d379b8ab52953ab12afbe92f689e08d7"
+          },
+          "qualifying_current_test_credit": false
+        },
+        "all_actual_QA_runs": [
+          {
+            "name": "format",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality01/format/receipt.json",
+              "sha256": "67d8984d729ea40bacb4c37d5a8e0df2fe5ea6a5180b9a725d8fbf972c6b71aa",
+              "bytes": 3125
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "format-check",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality01/format-check/receipt.json",
+              "sha256": "d835c36241e82317f8eb44e444d604982f53961c69c01426825c0871aab382d6",
+              "bytes": 3160
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "source-caller-tests",
+            "recorder_exit": 101,
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality01/source-caller-tests/receipt.json",
+              "sha256": "bf2f3449b6caea2580e73500c37951fa6db3e5ad1d84d884b34bdda82fdac6d8",
+              "bytes": 3284
+            },
+            "exit_code": 101
+          },
+          {
+            "name": "format",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/format/receipt.json",
+              "sha256": "4c8326be69b1fb3ecc54885c7591e8bbe677be718987f5fdbae640d3c7281c82",
+              "bytes": 3209
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "format-check",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/format-check/receipt.json",
+              "sha256": "bf1005e09a0a7126afb72692fc2e29857ec12a728ba7b53d89b8b8dfb6bb3afb",
+              "bytes": 3247
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "source-caller-tests",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/source-caller-tests/receipt.json",
+              "sha256": "16fcb76c279c2bae669999cbfb9524d9c02d011aed2cb722fd8fecdc496cdc97",
+              "bytes": 3368
+            },
+            "exit_code": 0
+          },
+          {
+            "name": "clippy",
+            "recorder_exit": 0,
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/clippy/receipt.json",
+              "sha256": "df1bd8d79bead42b31cdd2ecc3e2e5447fb42a1133a00af36cbf8745a420bccf",
+              "bytes": 3304
+            },
+            "exit_code": 0
+          }
+        ],
+        "Source_scope_correction": {
+          "path": ".runtime/object-expansion/unit154-prep/source-positive-OA-humidity-Scope-correction-proposal02/prepared-manifest.json",
+          "sha256": "2f45bc6800b126e81330cdd69781d0f1612fed6269ba6d97e57f6ba3dc6462ea",
+          "bytes": 1963
+        },
+        "existing_test_executions": [
+          {
+            "kind": "targeted_existing_test",
+            "test_names": [
+              "porting_scope::tests::bounded_controls_do_not_change_ordinary_support_assessment"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/source-caller-tests/receipt.json",
+              "sha256": "16fcb76c279c2bae669999cbfb9524d9c02d011aed2cb722fd8fecdc496cdc97",
+              "bytes": 3368
+            },
+            "actual_exit_code": 0,
+            "source_snapshot": {
+              "path": ".runtime/porting/source-objects/10/10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3",
+              "sha256": "10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3"
+            }
+          }
+        ],
+        "distinct_existing_test_functions": 1,
+        "actual_existing_test_body_executions": 2,
+        "current_existing_test_body_executions": 1,
+        "targeted_test_reruns": 1,
+        "unchanged_getter_regression_retained_without_current_rerun": true,
+        "new_test_functions": 0,
+        "Root_runtime_bindings": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-runtime-bindings01.json",
+          "sha256": "ae7409845b551d4819e32da23f407b667b05bd89ea3cb7193d8ea17cb4db8a7f",
+          "bytes": 4628
+        },
+        "Root_runtime_review": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-runtime-final-review01.json",
+          "sha256": "77f4c5e8d528ed02297dba3da679728304652a4a435cd0c9a13c04a637dd9c36",
+          "bytes": 6108
+        },
+        "Root_producer": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-run-two-pairs154.py",
+          "sha256": "0e4470b79eebfcd8de44f45a8284cb2ec5ae6bafb7c5d0eca5f24b3d54ca0c14",
+          "bytes": 5415
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-two-pairs157-01/receipt.json",
+          "sha256": "bf22ec3ddfd8fe4d6602edd56b783f4c014620410a616445ec0fcdbf428182c8",
+          "bytes": 34302
+        },
+        "paired_readbacks": {
+          "OA_CONSTANT_SUPPLY_BOTH": {
+            "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.paired157-01.json",
+            "sha256": "136c2699929f512575d4695111af1bde06fdf060d4147c520565dcbe3e678bba",
+            "bytes": 678679
+          },
+          "OA_DEFAULT_SHR_NONE": {
+            "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.paired157-01.json",
+            "sha256": "f9c8add7ece0f45b7598fcf3c093b92c326da83a8e3914b18a27f9648b955917",
+            "bytes": 643372
+          }
+        },
+        "cases": {
+          "OA_CONSTANT_SUPPLY_BOTH": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.paired157-01.json",
+              "sha256": "136c2699929f512575d4695111af1bde06fdf060d4147c520565dcbe3e678bba",
+              "bytes": 678679
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 21406,
+            "public_response": {
+              "Native": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "public_humidity": {
+                  "passed": true,
+                  "observation": {
+                    "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                    "policy_indices": [
+                      6,
+                      152,
+                      87,
+                      88,
+                      89,
+                      90,
+                      93,
+                      94,
+                      95,
+                      96,
+                      99,
+                      101,
+                      154,
+                      155
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 6720,
+                    "Winter_sensible_and_latent_heating_samples": 24,
+                    "Summer_sensible_and_latent_service_samples": 287,
+                    "Summer_SHR_sensible_and_latent_cooling_samples": 224,
+                    "activation_accepted": true,
+                    "all_streams_finite": true,
+                    "counts_are_observations_not_targets": true,
+                    "no_private_or_averaged_law": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "CO2_reset_warning_forbidden": true,
+                  "observed_CO2_reset_warnings": 0,
+                  "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+                }
+              },
+              "Source": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "public_humidity": {
+                  "passed": true,
+                  "observation": {
+                    "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                    "policy_indices": [
+                      6,
+                      152,
+                      87,
+                      88,
+                      89,
+                      90,
+                      93,
+                      94,
+                      95,
+                      96,
+                      99,
+                      101,
+                      154,
+                      155
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 6720,
+                    "Winter_sensible_and_latent_heating_samples": 24,
+                    "Summer_sensible_and_latent_service_samples": 287,
+                    "Summer_SHR_sensible_and_latent_cooling_samples": 224,
+                    "activation_accepted": true,
+                    "all_streams_finite": true,
+                    "counts_are_observations_not_targets": true,
+                    "no_private_or_averaged_law": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "CO2_reset_warning_forbidden": true,
+                  "observed_CO2_reset_warnings": 0,
+                  "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+                }
+              }
+            }
+          },
+          "OA_DEFAULT_SHR_NONE": {
+            "accepted": true,
+            "paired": {
+              "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.paired157-01.json",
+              "sha256": "f9c8add7ece0f45b7598fcf3c093b92c326da83a8e3914b18a27f9648b955917",
+              "bytes": 643372
+            },
+            "numeric_failures": 0,
+            "science_failures": [],
+            "observed_raw_operand_unequal": 20695,
+            "public_response": {
+              "Native": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "public_humidity": {
+                  "passed": true,
+                  "observation": {
+                    "case_kind": "OA_DEFAULT_SHR_NONE",
+                    "policy_indices": [
+                      6,
+                      152,
+                      87,
+                      88,
+                      89,
+                      90,
+                      93,
+                      94,
+                      95,
+                      96,
+                      99,
+                      101,
+                      154,
+                      155
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 6720,
+                    "Winter_sensible_and_latent_heating_samples": 0,
+                    "Summer_sensible_and_latent_service_samples": 72,
+                    "Summer_SHR_sensible_and_latent_cooling_samples": 72,
+                    "activation_accepted": true,
+                    "all_streams_finite": true,
+                    "counts_are_observations_not_targets": true,
+                    "no_private_or_averaged_law": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "CO2_reset_warning_forbidden": true,
+                  "observed_CO2_reset_warnings": 0,
+                  "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+                }
+              },
+              "Source": {
+                "public_OA": {
+                  "passed": true,
+                  "observation": {
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 4320,
+                    "common_candidate_samples": 360,
+                    "mixed_temperature_response_samples": 360,
+                    "mixed_humidity_response_samples": 360,
+                    "activation_accepted": true
+                  },
+                  "error": null
+                },
+                "public_humidity": {
+                  "passed": true,
+                  "observation": {
+                    "case_kind": "OA_DEFAULT_SHR_NONE",
+                    "policy_indices": [
+                      6,
+                      152,
+                      87,
+                      88,
+                      89,
+                      90,
+                      93,
+                      94,
+                      95,
+                      96,
+                      99,
+                      101,
+                      154,
+                      155
+                    ],
+                    "samples": 480,
+                    "full_clock_context_operand_joins": 6720,
+                    "Winter_sensible_and_latent_heating_samples": 0,
+                    "Summer_sensible_and_latent_service_samples": 72,
+                    "Summer_SHR_sensible_and_latent_cooling_samples": 72,
+                    "activation_accepted": true,
+                    "all_streams_finite": true,
+                    "counts_are_observations_not_targets": true,
+                    "no_private_or_averaged_law": true
+                  },
+                  "error": null
+                },
+                "diagnostics": {
+                  "passed": true,
+                  "counters": {
+                    "Warmup": {
+                      "warnings": 1,
+                      "severe": 0
+                    },
+                    "Sizing": {
+                      "warnings": 0,
+                      "severe": 0
+                    }
+                  },
+                  "completed": {
+                    "warnings": 6,
+                    "severe": 0
+                  },
+                  "CO2_reset_warning_forbidden": true,
+                  "observed_CO2_reset_warnings": 0,
+                  "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+                }
+              }
+            }
+          }
+        },
+        "accepted_cases": 2,
+        "accepted_values": 150240,
+        "qualifying_raw_operand_unequal": 42101,
+        "Native_processes": 2,
+        "Source_processes": 2,
+        "engine_replays": 0,
+        "scope": "Positive-OA Source B additionally owns the six named non-Humidistat humidity combinations and genuine omission defaults through the unchanged real getter and calculation. Both supply humidity ratios remain finite, strictly positive and at most one in this bounded lane; Native itself has no W ceiling. Active SHR is strictly positive and at most one. Exact-empty humidity, Humidistat with OA and active CO2/IAQ remain held. Both fixed SUM scenes qualify: constant-supply humidity in both directions, and actual omitted default SHR with no humidification. Each qualifying engine independently needs all original positive OA/mixed and prospectively applicable Winter/Summer sensible/latent witnesses across fourteen complete public streams. Constant cooling may have either latent direction. No averaged SHR, supply-W target equality, opposite-control zero, global capacity law or private mode/getter observation is claimed.",
         "physical_domain_completion": false
       }
     },
@@ -71167,12 +71652,542 @@
           "no_replay": true
         },
         "effective_state": "Fixed positive-OA exact-empty selector scene retains all unchanged158 numeric/science/export/ancillary conditions and positive OA/mixed response. Staged raw empty remains distinct from advisory typed defaults; actual Invalid semantics follow unchanged real getter/native code. No private enum, EconoOn/time-zero or averaged-flow law is observed or claimed."
+      },
+      {
+        "id": "source-positive-oa-humidity-oa-constant-supply-both",
+        "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-positive-oa-non-humidistat-humidity-154",
+        "input": {
+          "path": ".runtime/object-expansion/unit154-prep/positive-OA-non-Humidistat-humidity-two-case-input-proposal01/OA_CONSTANT_SUPPLY_BOTH/input.epJSON",
+          "sha256": "a7ee783aab2dd42a775e386675c5a76ea5ca5432622408cc29ec79ed2c0a2c0e",
+          "bytes": 101720
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/epoch157/OA_CONSTANT_SUPPLY_BOTH/native01/command/receipt.json",
+          "sha256": "49135f78958a92aea3d8fd0c2204fa4b325d61a10794be29ef3bafa9ad715cdb",
+          "bytes": 94093
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/epoch157/OA_CONSTANT_SUPPLY_BOTH/source01/command/receipt.json",
+          "sha256": "f6d07aa0bdd1d1abb3ec3314ea0ae5011f8633db06d65a143df8352edb5db79f",
+          "bytes": 94944
+        },
+        "source_summary": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/epoch157/OA_CONSTANT_SUPPLY_BOTH/source01/output/run-summary.json",
+          "sha256": "6245f30dfe1a1ee525a63d129dc492ce1206268794334c61f44f1e821e410a8a",
+          "bytes": 65410
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/10/10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3",
+          "sha256": "10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/build157-01/eplus-rs.exe",
+          "sha256": "2b14ea4d1729fd0b223579d1cb9a869335f6666df83ff9f1b7a2b5bcf08c0144",
+          "bytes": 81042272
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/build157-01/build/receipt.json",
+          "sha256": "10bc7f8ad360846d5e68da63d63d4d27dd209d7117ff812ecd161bb44e2fb28e",
+          "bytes": 4718
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.paired157-01.json",
+          "sha256": "136c2699929f512575d4695111af1bde06fdf060d4147c520565dcbe3e678bba",
+          "bytes": 678679
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-two-pairs157-01/receipt.json",
+          "sha256": "bf22ec3ddfd8fe4d6602edd56b783f4c014620410a616445ec0fcdbf428182c8",
+          "bytes": 34302
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.recipe.json",
+          "sha256": "a7a0a7d394198b2ae89c5d7344501ed48e96951fd02aab9d5a486ee8a03e75cc",
+          "bytes": 63305
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit154-prep/positive-OA-non-Humidistat-humidity-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "c66d44c48e1681bca280722099f7ca974c561246bfb9e3a426a08ca696aab74c",
+          "bytes": 13680
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 21406,
+          "parsed_binary64_unequal": 21406,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1641608327627182e-07,
+          "max_rmse_delta": 1.3528157423815439e-08
+        },
+        "coverage_kind": "positive_OA_non_Humidistat_humidity",
+        "authored_selectors": {
+          "dehumidification_control_type": "ConstantSupplyHumidityRatio",
+          "humidification_control_type": "ConstantSupplyHumidityRatio"
+        },
+        "public_response_summary": {
+          "Native": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "public_humidity": {
+              "passed": true,
+              "observation": {
+                "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                "policy_indices": [
+                  6,
+                  152,
+                  87,
+                  88,
+                  89,
+                  90,
+                  93,
+                  94,
+                  95,
+                  96,
+                  99,
+                  101,
+                  154,
+                  155
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 6720,
+                "Winter_sensible_and_latent_heating_samples": 24,
+                "Summer_sensible_and_latent_service_samples": 287,
+                "Summer_SHR_sensible_and_latent_cooling_samples": 224,
+                "activation_accepted": true,
+                "all_streams_finite": true,
+                "counts_are_observations_not_targets": true,
+                "no_private_or_averaged_law": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "CO2_reset_warning_forbidden": true,
+              "observed_CO2_reset_warnings": 0,
+              "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+            }
+          },
+          "Source": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "public_humidity": {
+              "passed": true,
+              "observation": {
+                "case_kind": "OA_CONSTANT_SUPPLY_BOTH",
+                "policy_indices": [
+                  6,
+                  152,
+                  87,
+                  88,
+                  89,
+                  90,
+                  93,
+                  94,
+                  95,
+                  96,
+                  99,
+                  101,
+                  154,
+                  155
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 6720,
+                "Winter_sensible_and_latent_heating_samples": 24,
+                "Summer_sensible_and_latent_service_samples": 287,
+                "Summer_SHR_sensible_and_latent_cooling_samples": 224,
+                "activation_accepted": true,
+                "all_streams_finite": true,
+                "counts_are_observations_not_targets": true,
+                "no_private_or_averaged_law": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "CO2_reset_warning_forbidden": true,
+              "observed_CO2_reset_warnings": 0,
+              "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_original_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit154-prep/build157-attempt01.json",
+            "sha256": "e97b226dda551f4494d3989814d4709e0e9964999b255379412324ebe01ce472",
+            "bytes": 741
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/summary.json",
+            "sha256": "4dfc00c12b8ccd0877776b4aed1821d8a1cd5074af9b7bc8551f2e70fb775e5f",
+            "bytes": 1383
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit154-prep/owner-execution-review02.json",
+            "sha256": "04a5e365a74d8581562cf6cc9f897dec0694b5add8cf33b60c5087792727223a",
+            "bytes": 8148
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit154-prep/Root-runtime-bindings01.json",
+            "sha256": "ae7409845b551d4819e32da23f407b667b05bd89ea3cb7193d8ea17cb4db8a7f",
+            "bytes": 4628
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit154-prep/Root-run-two-pairs154.py",
+            "sha256": "0e4470b79eebfcd8de44f45a8284cb2ec5ae6bafb7c5d0eca5f24b3d54ca0c14",
+            "bytes": 5415
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit154-prep/Root-runtime-final-review01.json",
+            "sha256": "77f4c5e8d528ed02297dba3da679728304652a4a435cd0c9a13c04a637dd9c36",
+            "bytes": 6108
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Fixed positive-OA named constant-supply or actual omitted-SHR scene retains all unchanged158 numeric/science/export/ancillary conditions, independent positive OA/mixed response and the prospectively required public sensible/latent response. No supply-W target equality, averaged SHR/flow/enthalpy/capacity law, opposite-control zero or private mode/getter claim follows."
+      },
+      {
+        "id": "source-positive-oa-humidity-oa-default-shr-none",
+        "case_kind": "OA_DEFAULT_SHR_NONE",
+        "group": "ZoneHVAC:IdealLoadsAirSystem",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-positive-oa-non-humidistat-humidity-154",
+        "input": {
+          "path": ".runtime/object-expansion/unit154-prep/positive-OA-non-Humidistat-humidity-two-case-input-proposal01/OA_DEFAULT_SHR_NONE/input.epJSON",
+          "sha256": "8c0d9a333af3f092ac78dfb9680306d3e66114f1c248b288dba77cb1cc8501d8",
+          "bytes": 101620
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/epoch157/OA_DEFAULT_SHR_NONE/native01/command/receipt.json",
+          "sha256": "945b3a7a478825ae0dbeafe2ac1421f70e9d97dbdaee51caf0b61618b04e0079",
+          "bytes": 93973
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/epoch157/OA_DEFAULT_SHR_NONE/source01/command/receipt.json",
+          "sha256": "5b57b15115258e0556e55881b4254639571957e1bd6ba17fec29a95225019a04",
+          "bytes": 94812
+        },
+        "source_summary": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/epoch157/OA_DEFAULT_SHR_NONE/source01/output/run-summary.json",
+          "sha256": "e6fceec0dc0df3ea624f6e567182d48d39949bb0d87860b4c8991c42b2301aab",
+          "bytes": 65314
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/10/10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3",
+          "sha256": "10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/build157-01/eplus-rs.exe",
+          "sha256": "2b14ea4d1729fd0b223579d1cb9a869335f6666df83ff9f1b7a2b5bcf08c0144",
+          "bytes": 81042272
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/build157-01/build/receipt.json",
+          "sha256": "10bc7f8ad360846d5e68da63d63d4d27dd209d7117ff812ecd161bb44e2fb28e",
+          "bytes": 4718
+        },
+        "complete_comparison": {
+          "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.paired157-01.json",
+          "sha256": "f9c8add7ece0f45b7598fcf3c093b92c326da83a8e3914b18a27f9648b955917",
+          "bytes": 643372
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/object-expansion/unit154-prep/Root-two-pairs157-01/receipt.json",
+          "sha256": "bf22ec3ddfd8fe4d6602edd56b783f4c014620410a616445ec0fcdbf428182c8",
+          "bytes": 34302
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.recipe.json",
+          "sha256": "75ad0b09847bb3e032f31ac6a0ff0a7c34da608a405d469f55c3b3292172a83e",
+          "bytes": 63228
+        },
+        "batch_plan": {
+          "path": ".runtime/object-expansion/unit154-prep/positive-OA-non-Humidistat-humidity-two-case-input-proposal01/batch-plan01.json",
+          "sha256": "c66d44c48e1681bca280722099f7ca974c561246bfb9e3a426a08ca696aab74c",
+          "bytes": 13680
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 20695,
+          "parsed_binary64_unequal": 20695,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1309824660420418e-07,
+          "max_rmse_delta": 9.72958362062004e-09
+        },
+        "coverage_kind": "positive_OA_non_Humidistat_humidity",
+        "authored_selectors": {
+          "dehumidification_control_type": "OMITTED",
+          "humidification_control_type": "None"
+        },
+        "public_response_summary": {
+          "Native": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "public_humidity": {
+              "passed": true,
+              "observation": {
+                "case_kind": "OA_DEFAULT_SHR_NONE",
+                "policy_indices": [
+                  6,
+                  152,
+                  87,
+                  88,
+                  89,
+                  90,
+                  93,
+                  94,
+                  95,
+                  96,
+                  99,
+                  101,
+                  154,
+                  155
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 6720,
+                "Winter_sensible_and_latent_heating_samples": 0,
+                "Summer_sensible_and_latent_service_samples": 72,
+                "Summer_SHR_sensible_and_latent_cooling_samples": 72,
+                "activation_accepted": true,
+                "all_streams_finite": true,
+                "counts_are_observations_not_targets": true,
+                "no_private_or_averaged_law": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "CO2_reset_warning_forbidden": true,
+              "observed_CO2_reset_warnings": 0,
+              "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+            }
+          },
+          "Source": {
+            "public_OA": {
+              "passed": true,
+              "observation": {
+                "samples": 480,
+                "full_clock_context_operand_joins": 4320,
+                "common_candidate_samples": 360,
+                "mixed_temperature_response_samples": 360,
+                "mixed_humidity_response_samples": 360,
+                "activation_accepted": true
+              },
+              "error": null
+            },
+            "public_humidity": {
+              "passed": true,
+              "observation": {
+                "case_kind": "OA_DEFAULT_SHR_NONE",
+                "policy_indices": [
+                  6,
+                  152,
+                  87,
+                  88,
+                  89,
+                  90,
+                  93,
+                  94,
+                  95,
+                  96,
+                  99,
+                  101,
+                  154,
+                  155
+                ],
+                "samples": 480,
+                "full_clock_context_operand_joins": 6720,
+                "Winter_sensible_and_latent_heating_samples": 0,
+                "Summer_sensible_and_latent_service_samples": 72,
+                "Summer_SHR_sensible_and_latent_cooling_samples": 72,
+                "activation_accepted": true,
+                "all_streams_finite": true,
+                "counts_are_observations_not_targets": true,
+                "no_private_or_averaged_law": true
+              },
+              "error": null
+            },
+            "diagnostics": {
+              "passed": true,
+              "counters": {
+                "Warmup": {
+                  "warnings": 1,
+                  "severe": 0
+                },
+                "Sizing": {
+                  "warnings": 0,
+                  "severe": 0
+                }
+              },
+              "completed": {
+                "warnings": 6,
+                "severe": 0
+              },
+              "CO2_reset_warning_forbidden": true,
+              "observed_CO2_reset_warnings": 0,
+              "exact_Psy_parser": "Hash-pinned inherited153 parser and no-reset wrapper; no new diagnostic family permission."
+            }
+          }
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_original_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "actual_build": {
+            "path": ".runtime/object-expansion/unit154-prep/build157-attempt01.json",
+            "sha256": "e97b226dda551f4494d3989814d4709e0e9964999b255379412324ebe01ce472",
+            "bytes": 741
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/summary.json",
+            "sha256": "4dfc00c12b8ccd0877776b4aed1821d8a1cd5074af9b7bc8551f2e70fb775e5f",
+            "bytes": 1383
+          },
+          "owner_execution_review": {
+            "path": ".runtime/object-expansion/unit154-prep/owner-execution-review02.json",
+            "sha256": "04a5e365a74d8581562cf6cc9f897dec0694b5add8cf33b60c5087792727223a",
+            "bytes": 8148
+          },
+          "runtime_bindings": {
+            "path": ".runtime/object-expansion/unit154-prep/Root-runtime-bindings01.json",
+            "sha256": "ae7409845b551d4819e32da23f407b667b05bd89ea3cb7193d8ea17cb4db8a7f",
+            "bytes": 4628
+          },
+          "Root_producer": {
+            "path": ".runtime/object-expansion/unit154-prep/Root-run-two-pairs154.py",
+            "sha256": "0e4470b79eebfcd8de44f45a8284cb2ec5ae6bafb7c5d0eca5f24b3d54ca0c14",
+            "bytes": 5415
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/object-expansion/unit154-prep/Root-runtime-final-review01.json",
+            "sha256": "77f4c5e8d528ed02297dba3da679728304652a4a435cd0c9a13c04a637dd9c36",
+            "bytes": 6108
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "effective_state": "Fixed positive-OA named constant-supply or actual omitted-SHR scene retains all unchanged158 numeric/science/export/ancillary conditions, independent positive OA/mixed response and the prospectively required public sensible/latent response. No supply-W target equality, averaged SHR/flow/enthalpy/capacity law, opposite-control zero or private mode/getter claim follows."
       }
     ],
     "totals": {
-      "paired_cases": 238,
-      "reported_samples": 9823576,
-      "raw_operand_unequal": 2447612,
+      "paired_cases": 240,
+      "reported_samples": 9973816,
+      "raw_operand_unequal": 2489713,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -73837,6 +74852,23 @@
           "sha256": "ee2427b93926996860c00bfdd1247786f2d1e9a7c3ae8f0e9b4d6aef2d1f62ec",
           "bytes": 81039962
         }
+      },
+      {
+        "id": "source-positive-oa-non-humidistat-humidity-154",
+        "receipt": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/build157-01/build/receipt.json",
+          "sha256": "10bc7f8ad360846d5e68da63d63d4d27dd209d7117ff812ecd161bb44e2fb28e",
+          "bytes": 4718
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/10/10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3",
+          "sha256": "10c6b9ed763ea622ec7156be232b86fe4e9e1a12e0388c207e1a41da9d4c7ca3"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/build157-01/eplus-rs.exe",
+          "sha256": "2b14ea4d1729fd0b223579d1cb9a869335f6666df83ff9f1b7a2b5bcf08c0144",
+          "bytes": 81042272
+        }
       }
     ],
     "focused_since_workspace": {
@@ -74236,14 +75268,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 156,
-      "builds_with_accepted_paired_cases": 135,
+      "actual_recorded_builds": 157,
+      "builds_with_accepted_paired_cases": 136,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "156 recorded Source builds: 135 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying exact-empty scenes add cases or values; all earlier history remains unchanged.",
+      "qualification": "157 recorded Source builds: 136 retain accepted pairs and 21 have none, including 8 without Source execution. Only strict qualifying non-Humidistat humidity scenes add cases or values; all earlier history remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -78888,8 +79920,10 @@
       "basic-positive-oa-heat-recovery-152-recovery_sensible",
       "basic-positive-oa-heat-recovery-152-recovery_enthalpy",
       "positive-oa-exact-empty-selectors-153-empty_dcv_no_limit",
-      "positive-oa-exact-empty-selectors-153-empty_dcv_and_econ_flow_limit"
-    ], "accepted_paired_cases": 67, "accepted_samples": 4922400, "retained_Scheduled_B_pairs": 66, "retained_Scheduled_B_samples": 4862880, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"EMPTY_DCV_NO_LIMIT": {"path": ".runtime/object-expansion/unit153-prep/paired-runtime-proposal01/EMPTY_DCV_NO_LIMIT.paired156-01.json", "sha256": "f4bb513e451d1b60d42b913c8d0e348edbc0bd9e8de7b818a04c41f7ae9e32ca", "bytes": 544827}, "EMPTY_DCV_AND_ECON_FLOW_LIMIT": {"path": ".runtime/object-expansion/unit153-prep/paired-runtime-proposal01/EMPTY_DCV_AND_ECON_FLOW_LIMIT.paired156-01.json", "sha256": "699b62497e471ec99377c14a8f1c4b9d3a402bddc6f3ee463cbcfbe9dc348e16", "bytes": 541877}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit153-prep/Root-two-pairs156-01/receipt.json", "sha256": "6c823830acdcc3012a10645f5b4a41c8f01b6104f15effa049fd6e1e879c18ea", "bytes": 34384}, "latest_source_build": "source-positive-oa-empty-selectors-153", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit153-prep/build156-attempt01.json", "sha256": "dbbac52ebbc6bafe67826b58d1907616312d35ddd3e8d09a10ca4047ea74918d", "bytes": 717}, "latest_actual_quality": {"path": ".runtime/porting/positive-oa-empty-selectors-153/quality01/summary.json", "sha256": "8b461799051c8e1e368126ce5b8b35bdda76e03abec6a9f3f0e2b61200f4e3db", "bytes": 1351}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit153-prep/owner-execution-review01.json", "sha256": "62b25ac8b30802fa43f6493f6b86fab24bdfdac0db06a8ad5662521475058918", "bytes": 3604}, "latest_input_contracts": {"EMPTY_DCV_NO_LIMIT": {"path": ".runtime/object-expansion/unit153-prep/paired-runtime-proposal01/EMPTY_DCV_NO_LIMIT.recipe.json", "sha256": "83e72ee460e66773c3d57ce5563d7b4865e1db3ff78476fc00ec09e2e89c7acd", "bytes": 60611}, "EMPTY_DCV_AND_ECON_FLOW_LIMIT": {"path": ".runtime/object-expansion/unit153-prep/paired-runtime-proposal01/EMPTY_DCV_AND_ECON_FLOW_LIMIT.recipe.json", "sha256": "05baa317b08f621403159ef5de3b719410a41ae68264429609edd1a29ad6a697", "bytes": 62200}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "66 bounded Source B Scheduled/NodeList pairs retain 4,862,880 values. The unused Source A pair adds59,520, giving 67 pairs and 4,922,400 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
+      "positive-oa-exact-empty-selectors-153-empty_dcv_and_econ_flow_limit",
+      "source-positive-oa-humidity-oa-constant-supply-both",
+      "source-positive-oa-humidity-oa-default-shr-none"
+    ], "accepted_paired_cases": 69, "accepted_samples": 5072640, "retained_Scheduled_B_pairs": 68, "retained_Scheduled_B_samples": 5013120, "unused_NodeList_A_pairs": 1, "unused_NodeList_A_samples": 59520, "latest_complete_comparisons": {"OA_CONSTANT_SUPPLY_BOTH": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.paired157-01.json", "sha256": "136c2699929f512575d4695111af1bde06fdf060d4147c520565dcbe3e678bba", "bytes": 678679}, "OA_DEFAULT_SHR_NONE": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.paired157-01.json", "sha256": "f9c8add7ece0f45b7598fcf3c093b92c326da83a8e3914b18a27f9648b955917", "bytes": 643372}}, "latest_Root_completed_review": {"path": ".runtime/object-expansion/unit154-prep/Root-two-pairs157-01/receipt.json", "sha256": "bf22ec3ddfd8fe4d6602edd56b783f4c014620410a616445ec0fcdbf428182c8", "bytes": 34302}, "latest_source_build": "source-positive-oa-non-humidistat-humidity-154", "latest_actual_Source_build": {"path": ".runtime/object-expansion/unit154-prep/build157-attempt01.json", "sha256": "e97b226dda551f4494d3989814d4709e0e9964999b255379412324ebe01ce472", "bytes": 741}, "latest_actual_quality": {"path": ".runtime/porting/positive-oa-non-humidistat-humidity-154/quality02/summary.json", "sha256": "4dfc00c12b8ccd0877776b4aed1821d8a1cd5074af9b7bc8551f2e70fb775e5f", "bytes": 1383}, "latest_owner_execution_review": {"path": ".runtime/object-expansion/unit154-prep/owner-execution-review02.json", "sha256": "04a5e365a74d8581562cf6cc9f897dec0694b5add8cf33b60c5087792727223a", "bytes": 8148}, "latest_input_contracts": {"OA_CONSTANT_SUPPLY_BOTH": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_CONSTANT_SUPPLY_BOTH.recipe.json", "sha256": "a7a0a7d394198b2ae89c5d7344501ed48e96951fd02aab9d5a486ee8a03e75cc", "bytes": 63305}, "OA_DEFAULT_SHR_NONE": {"path": ".runtime/object-expansion/unit154-prep/paired-runtime-proposal01/OA_DEFAULT_SHR_NONE.recipe.json", "sha256": "75ad0b09847bb3e032f31ac6a0ff0a7c34da608a405d469f55c3b3292172a83e", "bytes": 63228}}, "latest_retained_evidence": {"path": ".runtime/object-expansion/unit141-prep/Root-retained-physical-evidence01.json", "sha256": "d97758ae21610b8dd0284d6b5f3b1846b5f3218d93beceb62abdbf48baca3d46", "bytes": 20532}, "latest_guarded_match_correction": {"path": ".runtime/object-expansion/unit134-prep/Root-source-style-correction01.json", "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64", "bytes": 2919}, "scope": "68 bounded Source B Scheduled/NodeList pairs retain 5,013,120 values. The unused Source A pair adds59,520, giving 69 pairs and 5,072,640 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.", "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
         "sha256": "2f3e1c71fab190d5cb62b58f75461c0c2413cc68716c4de9fdcd33a2ea268b47",

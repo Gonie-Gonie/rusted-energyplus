@@ -123,7 +123,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
         return None;
     }
     let error = || {
-        Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned hard-limit, None humidity and basic DCV selectors".into())
+        Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned hard-limit, non-Humidistat humidity and basic DCV selectors".into())
     };
     if !raw.is_epjson()
         || units.is_none_or(|rows| rows.len() != 1)
@@ -153,9 +153,17 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     // Omission uses Native's named defaults. Exact-empty ventilation selectors
     // retain actual Invalid, distinct from the typed admission defaults.
     // Only exact empty is admitted here; no generic blank or unknown waiver.
-    if !field(unit, "dehumidification_control_type").is_some_and(|value| text_is(value, &["None"]))
-        || !field(unit, "demand_controlled_ventilation_type")
-            .is_none_or(|value| text_is(value, &["", "None", "OccupancySchedule", "CO2Setpoint"]))
+    if !field(unit, "dehumidification_control_type").is_none_or(|value| {
+        text_is(
+            value,
+            &[
+                "None",
+                "ConstantSupplyHumidityRatio",
+                "ConstantSensibleHeatRatio",
+            ],
+        )
+    }) || !field(unit, "demand_controlled_ventilation_type")
+        .is_none_or(|value| text_is(value, &["", "None", "OccupancySchedule", "CO2Setpoint"]))
         || !field(unit, "outdoor_air_economizer_type").is_none_or(|value| {
             text_is(
                 value,
@@ -167,11 +175,34 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
                 ],
             )
         })
-        || !field(unit, "humidification_control_type").is_none_or(|value| text_is(value, &["None"]))
+        || !field(unit, "humidification_control_type")
+            .is_none_or(|value| text_is(value, &["None", "ConstantSupplyHumidityRatio"]))
         || !field(unit, "heat_recovery_type")
             .is_none_or(|value| text_is(value, &["", "None", "Sensible", "Enthalpy"]))
     {
         return error();
+    }
+    // Actual omitted dehumidification defaults to SHR, not None. The
+    // draft07 exclusive minimum rejects both signs of zero before Calc.
+    let active_shr = field(unit, "dehumidification_control_type")
+        .is_none_or(|value| text_is(value, &["ConstantSensibleHeatRatio"]));
+    if active_shr
+        && field(unit, "cooling_sensible_heat_ratio")
+            .is_some_and(|value| !number(value).is_some_and(|value| value > 0.0 && value <= 1.0))
+    {
+        return error();
+    }
+    // Both actual GET operands have exclusiveMinimum0. Keep the compiler's
+    // existing ceiling1 as a bounded lane restriction; Native has no upper bound.
+    for name in [
+        "maximum_heating_supply_air_humidity_ratio",
+        "minimum_cooling_supply_air_humidity_ratio",
+    ] {
+        if field(unit, name)
+            .is_some_and(|value| !number(value).is_some_and(|value| value > 0.0 && value <= 1.0))
+        {
+            return error();
+        }
     }
     for name in [
         "sensible_heat_recovery_effectiveness",
