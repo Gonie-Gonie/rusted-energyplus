@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 206 paired physical cases and 7,423,576 reported values with zero
+contains 212 paired physical cases and 7,865,656 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -125,8 +125,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 140 recorded Source builds,
-122 with accepted pairs and 18 without accepted pairs, including 7 builds
+validate the consumer corrections. There are 141 recorded Source builds,
+123 with accepted pairs and 18 without accepted pairs, including 7 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -196,17 +196,9 @@ all threshold regions or full-object support; public samples do not expose
 private state or call histories. No capability or frozen conformance promotion
 is implied.
 
-The bounded Source calculation now implements the Native heating-constant/cooling-capacity coupling: it preserves the mixed humidity comparison, signed sensible and latent loads, capacity clamp, enthalpy recomposition and diagnostic humidity inverse. The shared no-outdoor-air selector additionally admits heating ConstantSupplyHumidityRatio with dehumidification_control_type explicitly None or ConstantSupplyHumidityRatio under capacity or combined flow/capacity limits, retaining all numeric, topology, schedule and Legacy boundaries. Existing admission tests and one default build validate owner integration only. No Native or Source model execution, new paired case or value is added here; positive coupled physical validation remains pending. The four earlier Source139 engineering comparisons remain unaccepted because their original Native exact-capacity witnesses failed. SHR/humidistat/OA/sizing, arbitrary combinations and full-object completion remain open.
+The bounded Source no-outdoor-air owners retain heating-constant/cooling-capacity coupling and now implement constant sensible heat ratio (SHR) cooling. Eligibility permits named or omitted-default SHR (.7) with heating humidity explicitly None or ConstantSupplyHumidityRatio through the four cooling limit selectors, retaining all active numeric, topology, schedule and Legacy guards. Six prospectively frozen cases completed once under Source141; 6 meet every original numeric, export, clock, ancillary and science check plus their applicable public response witness. Qualifying cases: HEAT_CONST_COOL_NONE_CAPACITY_COUPLING, HEAT_CONST_COOL_NONE_FLOW_CAPACITY, HEAT_CONST_COOL_CONST_CAPACITY, HEAT_CONST_COOL_CONST_FLOW_CAPACITY, SHR_OMITTED_DEFAULTS_NO_LIMIT, SHR_NAMED_HEAT_CONST_FLOW_CAPACITY. The four prescribed heating-constant capacity/combined scenes include one designated Winter simultaneous heating/dehumidification witness; the two SHR scenes have their own Summer sensible/latent cooling witnesses. Those finite public interval responses imply no exact-quarter capacity, global SHR/humidity or private-mode law. Direct-epJSON exact-empty dehumidification remains unsupported; omitted defaults are distinct. The four Source139 comparisons from Unit137 remain unaccepted. Humidistat, OA/DCV/economizer/recovery, sizing, remaining combinations and full-object conformance remain open.
 
-Thirty-four bounded B Scheduled/NodeList pairs retain 2,462,880 values. The
-unused A pair adds 59,520, giving thirty-five pairs and 2,522,400 values. Fresh
-heating-only and both-control constant-humidity cases add actual Winter humidity
-and latent-response witnesses at the original 0.0156; both-control also retains
-the Summer 0.0077 witness. Full original policies and streams remain strict,
-without a global target or private-mode law. Prior named-fuel, schedule and
-pinned-SDK empty-fuel evidence remains scoped to its own cases. Capacity-coupled
-humidity, humidistat, SHR/default selectors, OA, sizing, other topology, arbitrary
-combinations, Legacy/private-state and full-object conformance remain open.
+40 bounded Source B Scheduled/NodeList pairs retain 2,904,960 values. The unused Source A pair adds 59,520, giving 41 pairs and 2,964,480 values. Strict accepted Unit139 scenes retain all eighteen public schedule/setpoint joins, real exhaust, return-flow, ordered NodeList/UTF-8 structure, weather, fuel and comfort checks under unchanged policies. Prior named/SDK-empty fuel and NoLimit humidity evidence keeps its own scope. Public response witnesses do not establish global target/ratio laws, private histories, remaining selector combinations or full-object conformance.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

@@ -649,14 +649,19 @@ pub fn validate_source_direct_zone_purchased_air_model(
     }
 }
 
-/// Identifies bounded Source constant-humidity shapes without outdoor air.
-/// The real Source owner retains both cooling and heating coupled-capacity
-/// operations; all active hard limits still pass the common numeric guards.
-///
-/// This is a selector check only. The common validator still checks topology,
-/// active numeric limits and every other ordinary Source prerequisite.
+/// Retains the public constant-supply subset of the owned Source humidity shape.
+/// SHR has its own selector and does not change this existing API's answers.
 #[must_use]
 pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -> bool {
+    system.dehumidification_control_type != DehumidificationControlType::ConstantSensibleHeatRatio
+        && has_source_owned_no_oa_humidity_shape(system)
+}
+
+/// Identifies owned Source humidity selectors without outdoor air.
+/// This selector creates no physical binding or numerical state. The validator
+/// still checks active hard limits, active SHR and every common prerequisite.
+#[must_use]
+pub fn has_source_owned_no_oa_humidity_shape(system: &IdealLoadsAirSystem) -> bool {
     let flags = IdealLoadsFeatureFlags::from_system(system);
     !flags.has_outdoor_air
         && !flags.has_dcv
@@ -666,16 +671,15 @@ pub fn has_source_constant_supply_humidity_shape(system: &IdealLoadsAirSystem) -
             system.dehumidification_control_type,
             DehumidificationControlType::None
                 | DehumidificationControlType::ConstantSupplyHumidityRatio
+                | DehumidificationControlType::ConstantSensibleHeatRatio
         )
         && matches!(
             system.humidification_control_type,
             HumidificationControlType::None
                 | HumidificationControlType::ConstantSupplyHumidityRatio
         )
-        && (system.dehumidification_control_type
-            == DehumidificationControlType::ConstantSupplyHumidityRatio
-            || system.humidification_control_type
-                == HumidificationControlType::ConstantSupplyHumidityRatio)
+        && (system.dehumidification_control_type != DehumidificationControlType::None
+            || system.humidification_control_type != HumidificationControlType::None)
         && matches!(
             system.cooling_limit,
             IdealLoadsLimit::NoLimit
@@ -1017,27 +1021,38 @@ fn validate_direct_zone_model(
         return unsupported(DirectZonePurchasedAirBindingFeature::NoCoolingAvailabilitySchedule);
     }
 
-    let source_constant_humidity = mode == DirectZoneValidationMode::SourceEligibility
-        && has_source_constant_supply_humidity_shape(system);
+    let source_owned_humidity = mode == DirectZoneValidationMode::SourceEligibility
+        && has_source_owned_no_oa_humidity_shape(system);
     let branch = select_purchased_air_branch(system);
-    if !branch.is_no_oa_sensible_with_optional_limits() && !source_constant_humidity {
+    if !branch.is_no_oa_sensible_with_optional_limits() && !source_owned_humidity {
         return Err(DirectZonePurchasedAirBindingError::UnsupportedBranch { branch });
     }
     if (system.dehumidification_control_type != DehumidificationControlType::None
         || system.humidification_control_type != HumidificationControlType::None)
-        && !source_constant_humidity
+        && !source_owned_humidity
     {
         return unsupported(
             DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
         );
     }
+    // Native schema: active SHR is strictly positive and at most one. This
+    // Source-only check leaves inactive SHR and Legacy error priority unchanged.
+    if source_owned_humidity
+        && system.dehumidification_control_type
+            == DehumidificationControlType::ConstantSensibleHeatRatio
+        && (!system.cooling_sensible_heat_ratio.is_finite()
+            || system.cooling_sensible_heat_ratio <= 0.0
+            || system.cooling_sensible_heat_ratio > 1.0)
+    {
+        return unsupported(DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset);
+    }
     // Keep the public Legacy classifier and all its numeric prerequisites intact.
-    // Only these Source shapes consume the genuine constant-humidity owners.
+    // Only these Source shapes consume the genuine humidity owners.
     if classify_no_oa_sensible_subset(system)
         .unsupported_features
         .iter()
         .any(|feature| {
-            !source_constant_humidity
+            !source_owned_humidity
                 || !matches!(
                     feature,
                     IdealLoadsUnsupportedFeature::Dehumidification

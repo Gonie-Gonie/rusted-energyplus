@@ -394,12 +394,74 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
             );
         }
     }
-    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 8] = [
-        |system| system.dehumidification_control_type = DehumidificationControlType::Humidistat,
-        |system| {
+    // Admission only: the real raw/getter/default and Calc owners retain SHR.
+    // Reuse this one test for all limit selectors and the independent heat selector.
+    for humidification in [
+        HumidificationControlType::None,
+        HumidificationControlType::ConstantSupplyHumidityRatio,
+    ] {
+        for cooling in [
+            IdealLoadsLimit::NoLimit,
+            IdealLoadsLimit::LimitFlowRate,
+            IdealLoadsLimit::LimitCapacity,
+            IdealLoadsLimit::LimitFlowRateAndCapacity,
+        ] {
+            let (shr, _) = fixture(|typed| {
+                let system = &mut typed.ideal_loads_air_systems[0];
+                system.dehumidification_control_type =
+                    DehumidificationControlType::ConstantSensibleHeatRatio;
+                system.humidification_control_type = humidification;
+                system.cooling_limit = cooling;
+                system.maximum_cooling_air_flow_rate_m3_per_s = Some(AutosizeOrNumber::Value(0.2));
+                system.maximum_total_cooling_capacity_w = Some(AutosizeOrNumber::Value(900.0));
+                system.cooling_sensible_heat_ratio = match cooling {
+                    IdealLoadsLimit::NoLimit => 0.7,
+                    IdealLoadsLimit::LimitFlowRate => 1.0,
+                    _ => 0.35,
+                };
+            });
+            let retained = format!("{:?}", shr.typed);
+            assert!(has_source_owned_no_oa_humidity_shape(
+                &shr.typed.ideal_loads_air_systems[0]
+            ));
+            assert!(!has_source_constant_supply_humidity_shape(
+                &shr.typed.ideal_loads_air_systems[0]
+            ));
+            validate_source_direct_zone_purchased_air_model(&shr)
+                .expect("Source owns named/default SHR without a physical binding");
+            let expected = if cooling == IdealLoadsLimit::NoLimit {
+                DirectZonePurchasedAirBindingError::UnsupportedBranch {
+                    branch: IdealLoadsPurchasedAirBranch::NoOaConstantSensibleHeatRatioCooling,
+                }
+            } else {
+                DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                    feature:
+                        DirectZonePurchasedAirBindingFeature::SensibleOnlyHumidityControlsInactive,
+                }
+            };
+            assert_eq!(
+                bind_direct_zone_purchased_air_model(&shr).expect_err("Legacy SHR priority"),
+                expected
+            );
+            assert_eq!(format!("{:?}", shr.typed), retained);
+        }
+    }
+    for invalid in [-1.0_f64, 0.0, 1.1, f64::NAN, f64::INFINITY] {
+        let (shr, _) = fixture(|typed| {
+            let system = &mut typed.ideal_loads_air_systems[0];
             system.dehumidification_control_type =
                 DehumidificationControlType::ConstantSensibleHeatRatio;
-        },
+            system.cooling_sensible_heat_ratio = invalid;
+        });
+        assert_eq!(
+            validate_source_direct_zone_purchased_air_model(&shr),
+            Err(DirectZonePurchasedAirBindingError::UnsupportedFeature {
+                feature: DirectZonePurchasedAirBindingFeature::NoOaSensibleNumericLimitSubset,
+            })
+        );
+    }
+    let blocked: [fn(&mut ep_model::IdealLoadsAirSystem); 7] = [
+        |system| system.dehumidification_control_type = DehumidificationControlType::Humidistat,
         |system| system.humidification_control_type = HumidificationControlType::Humidistat,
         |system| system.outdoor_air_inlet_node_name = Some(NormalizedName::new("SUPPLY")),
         |system| {

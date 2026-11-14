@@ -3813,6 +3813,35 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             // The same real compiler/scope/token/IP caller also covers heating-only
             // and both constant capacity shapes, without physical HVAC owner seeds.
             for (limit, dehumidification, humidification) in [
+                ("NoLimit", "SCHEMA_DEFAULT", "None"),
+                ("NoLimit", "ConstantSensibleHeatRatio", "None"),
+                ("LimitFlowRate", "ConstantSensibleHeatRatio", "None"),
+                ("LimitCapacity", "ConstantSensibleHeatRatio", "None"),
+                (
+                    "LimitFlowRateAndCapacity",
+                    "ConstantSensibleHeatRatio",
+                    "None",
+                ),
+                (
+                    "NoLimit",
+                    "ConstantSensibleHeatRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                (
+                    "LimitFlowRate",
+                    "ConstantSensibleHeatRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                (
+                    "LimitCapacity",
+                    "ConstantSensibleHeatRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
+                (
+                    "LimitFlowRateAndCapacity",
+                    "ConstantSensibleHeatRatio",
+                    "ConstantSupplyHumidityRatio",
+                ),
                 (
                     "LimitCapacity",
                     "ConstantSupplyHumidityRatio",
@@ -3853,9 +3882,31 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 ),
             ] {
                 let humidity_ratio = 0.006_123_456_789_f64;
+                let omitted_selector = dehumidification == "SCHEMA_DEFAULT";
+                let selected_dehumidification = if omitted_selector {
+                    "ConstantSensibleHeatRatio"
+                } else {
+                    dehumidification
+                };
+                let shr = if humidification == "None" {
+                    0.35_f64
+                } else {
+                    1.0_f64
+                };
                 let mut humidity = people.clone();
-                humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
-                    json!(dehumidification);
+                if omitted_selector {
+                    humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]
+                        .as_object_mut()
+                        .expect("real default SHR object")
+                        .remove("dehumidification_control_type");
+                } else {
+                    humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                        json!(dehumidification);
+                }
+                if selected_dehumidification == "ConstantSensibleHeatRatio" && !omitted_selector {
+                    humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_sensible_heat_ratio"] =
+                        json!(shr);
+                }
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["humidification_control_type"] =
                     json!(humidification);
                 humidity["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_limit"] = json!(limit);
@@ -3879,12 +3930,20 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 let unit = &model.ideal_loads_air_systems[0];
                 assert_eq!(
                     unit.dehumidification_control_type,
-                    if dehumidification == "None" {
-                        DehumidificationControlType::None
-                    } else {
-                        DehumidificationControlType::ConstantSupplyHumidityRatio
+                    match selected_dehumidification {
+                        "None" => DehumidificationControlType::None,
+                        "ConstantSensibleHeatRatio" =>
+                            DehumidificationControlType::ConstantSensibleHeatRatio,
+                        _ => DehumidificationControlType::ConstantSupplyHumidityRatio,
                     }
                 );
+                if selected_dehumidification == "ConstantSensibleHeatRatio" {
+                    let expected = if omitted_selector { 0.7_f64 } else { shr };
+                    assert_eq!(
+                        unit.cooling_sensible_heat_ratio.to_bits(),
+                        expected.to_bits()
+                    );
+                }
                 assert_eq!(
                     unit.humidification_control_type,
                     if humidification == "None" {
@@ -3951,10 +4010,26 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                 let fields = ip
                     .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
                     .expect("retained constant cooling alpha/numeric fields");
-                assert_eq!(
-                    fields["dehumidification_control_type"],
-                    SourceRaw::String(dehumidification.into())
-                );
+                if omitted_selector {
+                    assert!(!fields.contains_key("dehumidification_control_type"));
+                    assert!(!fields.contains_key("cooling_sensible_heat_ratio"));
+                } else {
+                    assert_eq!(
+                        fields["dehumidification_control_type"],
+                        SourceRaw::String(dehumidification.into())
+                    );
+                    if selected_dehumidification == "ConstantSensibleHeatRatio" {
+                        let actual = match &fields["cooling_sensible_heat_ratio"] {
+                            SourceRaw::Number(token) => Some(token),
+                            _ => None,
+                        }
+                        .expect("real explicit SHR numeric token");
+                        assert_eq!(
+                            actual.parse::<f64>().expect("finite SHR").to_bits(),
+                            shr.to_bits()
+                        );
+                    }
+                }
                 assert_eq!(
                     fields["humidification_control_type"],
                     SourceRaw::String(humidification.into())
@@ -3990,7 +4065,6 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
             }
             for (limit, dehumidification, humidification) in [
                 ("NoLimit", "Humidistat", "None"),
-                ("NoLimit", "ConstantSensibleHeatRatio", "None"),
                 ("NoLimit", "ConstantSupplyHumidityRatio", "Humidistat"),
             ] {
                 let mut blocked = people.clone();
@@ -4020,6 +4094,64 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     !inspect_porting_scope(&raw, &compiled.report, Some(model), scope).admissible
                 );
             }
+
+            let mut empty_dehumidification = people.clone();
+            empty_dehumidification["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                json!("");
+            let empty_raw = parse_epjson_str(&empty_dehumidification.to_string())
+                .expect("direct epJSON empty alpha");
+            assert!(empty_raw.is_epjson());
+            let empty_compile = ep_compiler::compile_raw_model_for_source(&empty_raw);
+            assert!(
+                !empty_compile.has_errors(),
+                "{:?}",
+                empty_compile.report.diagnostics
+            );
+            let empty_model = empty_compile
+                .model
+                .as_ref()
+                .expect("existing typed default projection");
+            assert_eq!(
+                empty_model.ideal_loads_air_systems[0].dehumidification_control_type,
+                DehumidificationControlType::ConstantSensibleHeatRatio
+            );
+            let empty_error = crate::ordinary_input_processor::resolve_source_b(&empty_raw)
+                .expect_err("Source must not confuse a direct empty enum with omitted SHR");
+            assert!(
+                empty_error.contains("explicit-empty dehumidification"),
+                "{empty_error}"
+            );
+            assert!(
+                !inspect_porting_scope(&empty_raw, &empty_compile.report, Some(empty_model), scope)
+                    .admissible
+            );
+
+            let mut invalid_shr = people.clone();
+            invalid_shr["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["dehumidification_control_type"] =
+                json!("ConstantSensibleHeatRatio");
+            invalid_shr["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["cooling_sensible_heat_ratio"] =
+                json!(0.0);
+            let invalid_raw =
+                parse_epjson_str(&invalid_shr.to_string()).expect("real zero SHR token");
+            let invalid_compile = ep_compiler::compile_raw_model_for_source(&invalid_raw);
+            assert!(
+                !invalid_compile.has_errors(),
+                "{:?}",
+                invalid_compile.report.diagnostics
+            );
+            let invalid_model = invalid_compile
+                .model
+                .as_ref()
+                .expect("typed zero SHR token");
+            assert!(
+                !inspect_porting_scope(
+                    &invalid_raw,
+                    &invalid_compile.report,
+                    Some(invalid_model),
+                    scope
+                )
+                .admissible
+            );
 
             // Unit127: a real cooling schedule reaches Source eligibility,
             // scope/support and raw IP; this does not simulate any HVAC flow.

@@ -862,7 +862,7 @@ pub(super) fn assess_typed_runtime_boundaries(
 
             let mut unsupported_features = unsupported_features_for_selected_branch(system);
             if source_ideal_loads_eligible(&simulation_model, source_admission)
-                && ep_runtime::has_source_constant_supply_humidity_shape(system)
+                && ep_runtime::has_source_owned_no_oa_humidity_shape(system)
             {
                 unsupported_features.retain(|feature| {
                     !matches!(

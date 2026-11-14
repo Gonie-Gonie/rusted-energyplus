@@ -405,9 +405,23 @@ impl OrdinaryEquipment {
                             unit.supply_hum_rat = unit.min_cool_supp_air_hum_rat;
                         }
                         SourcePurchasedAirHumidityControl::ConstantSensibleHeatRatio => {
-                            return Err(Error::Unavailable(
-                                "actual PurchasedAir cooling SHR humidity operation",
-                            ));
+                            // Native2213-2226: retain the original signed load and
+                            // ordered overdrying/minimum/mixed-humidity limits.
+                            let specific_heat = cp(unit.mixed_air_hum_rat);
+                            let cooling_sensible = supply_flow
+                                * specific_heat
+                                * (unit.mixed_air_temp - unit.supply_temp);
+                            let cooling_total = cooling_sensible / unit.cool_shr;
+                            supply_enthalpy = mixed_enthalpy - cooling_total / supply_flow;
+                            supply_enthalpy =
+                                max(supply_enthalpy, enthalpy(unit.supply_temp, 0.00001));
+                            unit.supply_hum_rat = min(
+                                unit.supply_hum_rat,
+                                humidity_from_h(o, unit.supply_temp, supply_enthalpy)?,
+                            );
+                            unit.supply_hum_rat =
+                                max(unit.supply_hum_rat, unit.min_cool_supp_air_hum_rat);
+                            unit.supply_hum_rat = min(unit.supply_hum_rat, unit.mixed_air_hum_rat);
                         }
                         SourcePurchasedAirHumidityControl::Humidistat => {
                             return Err(Error::Unavailable(
@@ -454,7 +468,22 @@ impl OrdinaryEquipment {
                                             unit.supply_temp=min(unit.supply_temp,unit.mixed_air_temp);
                                         }
                                     }
-                                    SourcePurchasedAirHumidityControl::ConstantSensibleHeatRatio=>return Err(Error::Unavailable("actual PurchasedAir capacity SHR humidity operation")),
+                                    SourcePurchasedAirHumidityControl::ConstantSensibleHeatRatio => {
+                                        // Native2273-2284: honor total capacity while
+                                        // adjusting both T and W, in source order.
+                                        let specific_heat = cp(unit.mixed_air_hum_rat);
+                                        let cooling_sensible = cooling_total * unit.cool_shr;
+                                        unit.supply_temp = unit.mixed_air_temp
+                                            - cooling_sensible / (specific_heat * supply_flow);
+                                        unit.supply_temp =
+                                            min(unit.supply_temp, unit.mixed_air_temp);
+                                        supply_enthalpy = max(
+                                            supply_enthalpy,
+                                            enthalpy(unit.supply_temp, 0.00001),
+                                        );
+                                        unit.supply_hum_rat =
+                                            humidity_from_h(o, unit.supply_temp, supply_enthalpy)?;
+                                    }
                                     SourcePurchasedAirHumidityControl::Humidistat=>{unit.supply_hum_rat=humidity_from_h(o,unit.supply_temp,supply_enthalpy)?;}
                                     _=>{}
                                 }

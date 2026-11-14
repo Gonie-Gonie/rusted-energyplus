@@ -153,6 +153,18 @@ pub fn inspect_porting_scope(
     {
         violations.push(error);
     }
+    if scope == PortingScope::B
+        && let Some(objects) = raw.objects.get(&ep_raw_model::ObjectType(
+            "ZoneHVAC:IdealLoadsAirSystem".into(),
+        ))
+        && let Some(error) = objects.values().find_map(|object| {
+            crate::ordinary_equipment_input::source_b_dehumidification_prerequisite_error(
+                raw, object,
+            )
+        })
+    {
+        violations.push(error.into());
+    }
     validate_project_controls(raw, &settings, &mut violations);
     if object_counts.contains_key("SizingPeriod:DesignDay")
         && settings["simulation_control"]["run_simulation_for_sizing_periods"] == false
@@ -898,11 +910,10 @@ fn validate_ideal_loads(model: &TypedModel, violations: &mut Vec<String>) {
         }
         if (system.dehumidification_control_type != DehumidificationControlType::None
             || system.humidification_control_type != HumidificationControlType::None)
-            && !ep_runtime::has_source_constant_supply_humidity_shape(system)
+            && !ep_runtime::has_source_owned_no_oa_humidity_shape(system)
         {
-            violations.push(
-                "humidity controls require the bounded Source constant-supply branches".into(),
-            );
+            violations
+                .push("humidity controls require the bounded Source owned no-OA branches".into());
         }
         if system.system_inlet_air_node_name.is_some()
             || system

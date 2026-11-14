@@ -25,6 +25,17 @@ fn text<'a>(object: &'a RawObject, name: &str) -> Option<&'a str> {
         _ => None,
     }
 }
+/// One unresolved direct-epJSON enum prerequisite shared by Source ingress
+/// and scope inspection. Original IDF and omitted/named selectors stay distinct.
+pub(crate) fn source_b_dehumidification_prerequisite_error(
+    raw: &RawModel,
+    object: &RawObject,
+) -> Option<&'static str> {
+    (raw.is_epjson()
+        && matches!(field(object, "dehumidification_control_type"), Some(RawValue::String(text)) if text.is_empty()))
+    .then_some("ordinary Source explicit-empty dehumidification requires the actual Native enum getter")
+}
+
 fn selected(object: &RawObject, name: &str, choices: &[&str]) -> bool {
     field(object, name).is_none_or(|value| blank(value) || text_is(value, choices))
 }
@@ -279,6 +290,13 @@ fn resolve_raw(
                 return Err(format!("blank ordinary {} name", family.0));
             }
             for (field, value) in &object.fields {
+                if source_b_ingress
+                    && family.0 == "ZoneHVAC:IdealLoadsAirSystem"
+                    && field.0 == "dehumidification_control_type"
+                    && let Some(error) = source_b_dehumidification_prerequisite_error(raw, object)
+                {
+                    return Err(error.into());
+                }
                 if !admitted_field(&family.0, &field.0, value, source_calendar_ingress)
                     && !((source_b_family || source_compact_family)
                         && source_b::admitted_field(&family.0, &field.0, value))
