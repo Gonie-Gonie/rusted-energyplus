@@ -6931,6 +6931,48 @@
         "scope": "Outdoor-air prerequisites now include the real DSOA input owner and six basic flow methods, using actual Zone geometry, live People occupancy and schedule owners. The real outdoor-node registry supports CheckAndAdd, global-weather updates and ordered BND identities. Two existing owner tests cover the input and state handoffs; no new test function or physical comparison is added. Positive OA admission, equipment consumption/mixing, authored outdoor-node fields, advanced CO2/Space/IDF paths and full-object completion remain open.",
         "physical_domain_completion": false,
         "capability_or_gate_promotion": false
+      },
+      "instantaneous_moisture_diagnostic_143": {
+        "actual_Source_build": {
+          "path": ".runtime/object-expansion/unit143-prep/build146-attempt01.json",
+          "sha256": "21f76b75a8f39bc21b3d93a0f4709ca0af30cf404f54eecdeba76b2163b7fa08",
+          "bytes": 717
+        },
+        "completed_readback": {
+          "path": ".runtime/object-expansion/unit143-prep/Root-completed-passive-readback01.json",
+          "sha256": "82fb0f59168b7f99c95a9dc640ceacadaa8a1a998cbf97f9fb55d24b23c5f3d4",
+          "bytes": 100614
+        },
+        "Native_API_CLI_complete_profile_crosscheck": {
+          "path": ".runtime/object-expansion/unit143-prep/Root-Native-API-CLI-reported-profile-crosscheck01.json",
+          "sha256": "dcc925387ed7ecda374af78960af412e28bf3798cb5d11ed122d605e0697f06f",
+          "bytes": 3010
+        },
+        "Source_restoration": {
+          "path": ".runtime/object-expansion/unit143-prep/Root-diagnostic146-restoration01.json",
+          "sha256": "482a10fcff31952a77d4b1cdb44076e7bfada8649a40f18218aa47565f762c18",
+          "bytes": 1597
+        },
+        "Source_trace": {
+          "path": ".runtime/porting/passive-moisture-diagnostic-143/source01/instantaneous.jsonl",
+          "sha256": "584500c0e4dd5bdf408dbc04067aa84654e2df16befd55ce8b43d87075616076",
+          "bytes": 22138974
+        },
+        "Native_trace": {
+          "path": ".runtime/porting/passive-moisture-diagnostic-143/native01/instantaneous.jsonl",
+          "sha256": "1cefe04b92f5a6753532401f145c9d99350804cde7df415ffdb23b40eb9b3b3c",
+          "bytes": 20115900
+        },
+        "actual_Native_API_processes": 1,
+        "actual_Source_processes": 1,
+        "matched_prediction_frames": 5573,
+        "additional_Source_kickoff_frames": 15,
+        "new_test_functions": 0,
+        "accepted_cases": 0,
+        "accepted_values": 0,
+        "scope": "A separate passive diagnostic aligns all5,573 API-visible prediction frames by full clock, phase and occurrence order; 15 additional Source kickoff frames have no Native callback. The first observable difference is upstream temperature at warmup frame4, one binary64 step. Near-cap demand differences straddle18C and have different temperature-derived cache tags; actual Native cache entries and the underlying correction cause remain unobserved. The complete ordered Native ESO/MTR profile matches the original CLI run after report-ID identity and program-header normalization. Published production Source is restored unchanged. This diagnostic adds no qualifying case or value and changes no policy.",
+        "physical_domain_completion": false,
+        "capability_or_gate_promotion": false
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -67024,6 +67066,23 @@
           "sha256": "bbda1de544d7d1480b870b171a9f37854fbd8871d4255149a32e4fa29268361e",
           "bytes": 80936809
         }
+      },
+      {
+        "id": "source-passive-moisture-diagnostic-143",
+        "receipt": {
+          "path": ".runtime/porting/passive-moisture-diagnostic-143/build146-01/build/receipt.json",
+          "sha256": "2bb282a9caab70029ed5076ff474e7c69d66129b5ff4874ec4e3b7e89ec3745a",
+          "bytes": 4450
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/4f/4ff41847bcd58f65223fcdbe0df948d0ec3d487a2442527b97d782a3880529d4",
+          "sha256": "4ff41847bcd58f65223fcdbe0df948d0ec3d487a2442527b97d782a3880529d4"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/passive-moisture-diagnostic-143/build146-01/eplus-rs.exe",
+          "sha256": "d3cb5ad1fd7c5958225aa2b6bb50271415a2e34205ecd66eb580739d62c2aabb",
+          "bytes": 80991758
+        }
       }
     ],
     "focused_since_workspace": {
@@ -67423,18 +67482,18 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 145,
+      "actual_recorded_builds": 146,
       "builds_with_accepted_paired_cases": 125,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
-      "builds_with_only_retained_unaccepted_observer_attempts": 1,
-      "builds_with_only_unaccepted_Source_attempts": 12,
+      "builds_with_only_retained_unaccepted_observer_attempts": 2,
+      "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "145 recorded Source builds: 125 retain accepted pairs, 20 have none, including 8 without Source execution. Source145 verifies outdoor-air input/node owner prerequisites through two existing tests and strict default QA; it has no engine execution or paired credit. All earlier failed and unaccepted attempts retain zero credit.",
+      "qualification": "146 recorded Source builds:125 retain accepted pairs,21 have none, including8 without Source execution. The separate passive Source146/API diagnostic has one completed Source run and zero qualifying cases or values. Published Source145 code was restored; every earlier failed/unaccepted result and numeric policy remains unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
-      "builds_without_accepted_paired_cases": 20
+      "builds_without_accepted_paired_cases": 21
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",
@@ -67724,6 +67783,50 @@
           }
         ],
         "classification": "Unaccepted observer/trace availability, not engine or physics failure. A completed engine0 and was rejected for the absent current-primary geometry-consumers.json; B was never launched. Changed code/build77 is separately recorded; old76 artifacts and actors are not replayed."
+      },
+      {
+        "unit": 143,
+        "scope": "B",
+        "source_build": "source-passive-moisture-diagnostic-143",
+        "build_row": {
+          "path": ".runtime/object-expansion/unit143-prep/build146-attempt01.json",
+          "sha256": "21f76b75a8f39bc21b3d93a0f4709ca0af30cf404f54eecdeba76b2163b7fa08",
+          "bytes": 717
+        },
+        "summary": {
+          "path": ".runtime/object-expansion/unit143-prep/Root-completed-passive-readback01.json",
+          "sha256": "82fb0f59168b7f99c95a9dc640ceacadaa8a1a998cbf97f9fb55d24b23c5f3d4",
+          "bytes": 100614
+        },
+        "comparison": {
+          "path": ".runtime/object-expansion/unit143-prep/Root-completed-passive-readback01.json",
+          "sha256": "82fb0f59168b7f99c95a9dc640ceacadaa8a1a998cbf97f9fb55d24b23c5f3d4",
+          "bytes": 100614
+        },
+        "actual_Source_receipt": {
+          "path": ".runtime/porting/passive-moisture-diagnostic-143/source-command01/receipt.json",
+          "sha256": "e17c253ca640211c74f5a54ef39bbe2c38f350d72f4c567a23ed5384c2de90ee",
+          "bytes": 11594
+        },
+        "actual_Native_API_receipt": {
+          "path": ".runtime/porting/passive-moisture-diagnostic-143/native-command01/receipt.json",
+          "sha256": "2e3d674099bd095d931211313b6212a43cabd364c81ddb1a69b046c11b90e3e9",
+          "bytes": 19335
+        },
+        "source_summary": {
+          "path": ".runtime/porting/passive-moisture-diagnostic-143/source01/output/run-summary.json",
+          "sha256": "ed65a565a2ec72cb711bd645462dcc4ea6c818758bd2694713b58cc87c839a02",
+          "bytes": 65308
+        },
+        "actual_Source_executions": 1,
+        "Source_A_executions": 0,
+        "Source_B_executions": 1,
+        "engine_exit_code": 0,
+        "normal_engine_completion": true,
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "classification": "Completed passive instantaneous diagnostic, deliberately nonqualifying API/observer context. No engine failure or physics-completion claim; published code restored, no policy change."
       }
     ],
     "current_Ceiling_alias_live_pair": {
