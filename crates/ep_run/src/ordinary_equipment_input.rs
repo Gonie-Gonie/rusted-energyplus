@@ -783,6 +783,23 @@ fn resolve_raw(
                         && source_b::admitted_field(&family.0, &field.0, value))
                     && !(source_node_list_family
                         && source_node_lists::admitted_field(&field.0, value, raw.is_epjson()))
+                    // Only direct JSON single-instance metadata is ignored by
+                    // Native's nine-argument getter (map-key A1 plus eight body fields).
+                    // Keep every known operand and all IDF predicates unchanged.
+                    && !(source_b_family
+                        && raw.is_epjson()
+                        && family.0 == "OutdoorAir:Node"
+                        && !matches!(
+                            field.0.as_str(),
+                            "height_above_ground"
+                                | "drybulb_temperature_schedule_name"
+                                | "wetbulb_temperature_schedule_name"
+                                | "wind_speed_schedule_name"
+                                | "wind_direction_schedule_name"
+                                | "wind_pressure_coefficient_curve_name"
+                                | "symmetric_wind_pressure_coefficient_curve"
+                                | "wind_angle_type"
+                        ))
                     && !(source_people_family && people::admitted_field(&field.0, value))
                     && !(source_angle_family && people::admitted_angle_field(&field.0, value))
                     && !(source_simple_glazing_family

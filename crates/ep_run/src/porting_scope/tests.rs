@@ -3204,6 +3204,18 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             {"field":"Through: 12/31"},{"field":"For: AllDays"},
                             {"field":"Until: 24:00"},{"field":1.0}
                         ]}});
+                        // Same one positive cell, all known OA operands held.
+                        // Unknown JSON members do not become IDF fields or A1.
+                        hard["OutdoorAir:Node"]["Outside 각"]["metadata_extra"] =
+                            json!({"retained":[null,true,1.25,"value"]});
+                        hard["OutdoorAir:Node"]["Outside 각"]["extra_number"] = json!(-1.25);
+                        hard["OutdoorAir:Node"]["Outside 각"]["idf_order"] =
+                            json!("ignored direct JSON metadata");
+                        hard["OutdoorAir:Node"]["Outside 각"]["idf_max_fields"] =
+                            json!([null, "ignored"]);
+                        hard["OutdoorAir:Node"]["Outside 각"]["idf_max_extensible_fields"] =
+                            json!(null);
+                        hard["OutdoorAir:Node"]["Outside 각"]["name"] = json!(false);
                     }
                     // Same existing cells: genuine mixed topology and list-only
                     // admission, without another parse/context or a Node-state seed.
@@ -3370,6 +3382,30 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 hard_ip
                                     .source_raw_object_fields("Schedule:Compact", "OA wind compact")
                                     .is_ok()
+                            );
+                            assert_eq!(
+                                oa.get("idf_order"),
+                                Some(&OaRaw::String("ignored direct JSON metadata".into()))
+                            );
+                            assert_eq!(
+                                oa.get("idf_max_fields"),
+                                Some(&OaRaw::Array(vec![
+                                    OaRaw::Null,
+                                    OaRaw::String("ignored".into())
+                                ]))
+                            );
+                            assert_eq!(oa.get("idf_max_extensible_fields"), Some(&OaRaw::Null));
+                            assert_eq!(oa.get("name"), Some(&OaRaw::Bool(false)));
+                            assert_eq!(
+                                oa.get("extra_number"),
+                                Some(&OaRaw::Number("-1.25".into()))
+                            );
+                            assert!(
+                                matches!(oa.get("metadata_extra"), Some(OaRaw::Object(fields))
+                                if fields.get("retained") == Some(&OaRaw::Array(vec![
+                                    OaRaw::Null, OaRaw::Bool(true), OaRaw::Number("1.25".into()),
+                                    OaRaw::String("value".into()),
+                                ])))
                             );
                         }
                         if method == "Flow/Person" && limit == "LimitFlowRate" {
