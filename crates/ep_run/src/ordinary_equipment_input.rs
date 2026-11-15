@@ -132,6 +132,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
         .get(&ObjectType("ZoneHVAC:IdealLoadsAirSystem".into()));
     let selected = positive("DesignSpecification:OutdoorAir")
         || positive("OutdoorAir:Node")
+        || positive("OutdoorAir:NodeList")
         || units.is_some_and(|rows| {
             rows.values().any(|unit| {
                 text(unit, "design_specification_outdoor_air_object_name").is_some()
@@ -190,7 +191,6 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
             .is_none_or(|rows| rows.len() != 1)
         || [
             "ZoneControl:Humidistat",
-            "OutdoorAir:NodeList",
             "DesignSpecification:OutdoorAir:SpaceList",
             "AirLoopHVAC",
         ]
@@ -206,7 +206,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     let Some(oa_name) = text(unit, "outdoor_air_inlet_node_name") else {
         return error();
     };
-    if let Some(error) = source_b_authored_outdoor_air_node_prerequisite_error(raw, oa_name) {
+    if let Some(error) = source_b_authored_outdoor_air_node_prerequisite_error(raw) {
         return Some(error);
     }
     // Omission uses Native's named defaults. Exact-empty ventilation selectors
@@ -429,70 +429,79 @@ fn has_source_schedule_reference(raw: &RawModel, reference: &str) -> bool {
 
 /// Local authored-object prerequisites only. The existing full positive-OA
 /// validator calls this leaf after proving both real references; no reverse edge.
-fn source_b_authored_outdoor_air_node_prerequisite_error(
-    raw: &RawModel,
-    outdoor_air_name: &str,
-) -> Option<String> {
-    let objects = raw.objects.get(&ObjectType("OutdoorAir:Node".into()))?;
-    if objects.is_empty() {
-        return None;
-    }
+fn source_b_authored_outdoor_air_node_prerequisite_error(raw: &RawModel) -> Option<String> {
     let error = || {
-        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, owned DB/WB and wind schedule references, and schema-legal inactive no-AFN WPC alpha fields".into())
+        Some("SourceB authored outdoor air requires schema-shaped nameless lists and finite-height singles, owned DB/WB and wind schedules, and inactive no-AFN WPC alpha fields".into())
     };
-    if objects.len() != 1 {
-        return error();
+    for object in raw
+        .objects
+        .get(&ObjectType("OutdoorAir:NodeList".into()))
+        .into_iter()
+        .flat_map(|objects| objects.values())
+    {
+        if field(object, "nodes").is_some_and(|value| {
+            !matches!(value, RawValue::Array(members) if members.iter().all(|member| {
+                matches!(member, RawValue::Object(fields)
+                    if matches!(fields.get(&FieldName("node_or_nodelist_name".into())), Some(RawValue::String(_))))
+            }))
+        }) {
+            return error();
+        }
     }
-    let (name, object) = objects.iter().next()?;
-    if !name.0.eq_ignore_ascii_case(outdoor_air_name)
-        || field(object, "height_above_ground").is_some_and(|value| {
+    for object in raw
+        .objects
+        .get(&ObjectType("OutdoorAir:Node".into()))
+        .into_iter()
+        .flat_map(|objects| objects.values())
+    {
+        if field(object, "height_above_ground").is_some_and(|value| {
             !matches!(value, RawValue::Number(token) if ep_model::classify_source_json_number(token)
                 .map(ep_model::SourceJsonNumber::as_f64)
                 .is_ok_and(|height| height.is_finite()))
-        })
-    {
-        return error();
-    }
-    let inactive_wpc_fields = [
-        "wind_pressure_coefficient_curve_name",
-        "symmetric_wind_pressure_coefficient_curve",
-        "wind_angle_type",
-    ]
-    .iter()
-    .any(|name| field(object, name).is_some());
-    if inactive_wpc_fields
-        && raw.objects.iter().any(|(family, objects)| {
-            !objects.is_empty()
-                && (family.0.starts_with("AirflowNetwork:")
-                    || family.0.starts_with("Duct:Loss:")
-                    || family.0.starts_with("Curve:")
-                    || family.0.starts_with("Table:"))
-        })
-    {
-        return error();
-    }
-    if field(object, "wind_pressure_coefficient_curve_name")
-        .is_some_and(|value| !matches!(value, RawValue::String(_)))
-        || field(object, "symmetric_wind_pressure_coefficient_curve").is_some_and(|value| {
-            !matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"))
-        })
-        || field(object, "wind_angle_type").is_some_and(|value| {
-            !matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "Absolute" | "Relative"))
-        })
-    {
-        return error();
-    }
-    for name in [
-        "drybulb_temperature_schedule_name",
-        "wetbulb_temperature_schedule_name",
-        "wind_speed_schedule_name",
-        "wind_direction_schedule_name",
-    ] {
-        match field(object, name) {
-            None => {}
-            Some(RawValue::String(reference))
-                if reference.is_empty() || has_source_schedule_reference(raw, reference) => {}
-            _ => return error(),
+        }) {
+            return error();
+        }
+        let inactive_wpc_fields = [
+            "wind_pressure_coefficient_curve_name",
+            "symmetric_wind_pressure_coefficient_curve",
+            "wind_angle_type",
+        ]
+        .iter()
+        .any(|name| field(object, name).is_some());
+        if inactive_wpc_fields
+            && raw.objects.iter().any(|(family, objects)| {
+                !objects.is_empty()
+                    && (family.0.starts_with("AirflowNetwork:")
+                        || family.0.starts_with("Duct:Loss:")
+                        || family.0.starts_with("Curve:")
+                        || family.0.starts_with("Table:"))
+            })
+        {
+            return error();
+        }
+        if field(object, "wind_pressure_coefficient_curve_name")
+            .is_some_and(|value| !matches!(value, RawValue::String(_)))
+            || field(object, "symmetric_wind_pressure_coefficient_curve").is_some_and(|value| {
+                !matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"))
+            })
+            || field(object, "wind_angle_type").is_some_and(|value| {
+                !matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "Absolute" | "Relative"))
+            })
+        {
+            return error();
+        }
+        for name in [
+            "drybulb_temperature_schedule_name",
+            "wetbulb_temperature_schedule_name",
+            "wind_speed_schedule_name",
+            "wind_direction_schedule_name",
+        ] {
+            match field(object, name) {
+                None => {}
+                Some(RawValue::String(reference))
+                    if reference.is_empty() || has_source_schedule_reference(raw, reference) => {}
+                _ => return error(),
+            }
         }
     }
     None
@@ -755,6 +764,7 @@ fn resolve_raw(
                         | "Output:Meter"
                         | "Output:Meter:MeterFileOnly"
                 )
+                && !(source_b_family && family.0 == "OutdoorAir:NodeList")
                 && !source_angle_family
                 && !(source_calendar_ingress && family.0 == "Output:Diagnostics")
             {

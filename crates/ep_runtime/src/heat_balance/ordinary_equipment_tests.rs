@@ -2030,6 +2030,454 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         probe_environment.current_weather.out_baro_press = old_p;
                     }
                 }
+                // One new context after the existing false/true loop, in the sole
+                // omitted-fuel row. Original contexts and consumed latches stay intact.
+                {
+                    let consumer_name = "Auto appended OA";
+                    let requirement_name = "Mixed OA requirement";
+                    let mut multi_objects = retained_objects.clone();
+                    multi_objects
+                        .get_mut("NodeList")
+                        .ok_or("same real NodeList family")?
+                        .insert(
+                            "Expanded OA list".into(),
+                            BTreeMap::from([(
+                                "nodes".into(),
+                                V::Array(vec![
+                                    V::Object(BTreeMap::from([(
+                                        "node_name".into(),
+                                        V::String("List OA A".into()),
+                                    )])),
+                                    V::Object(BTreeMap::from([(
+                                        "node_name".into(),
+                                        V::String("List OA B".into()),
+                                    )])),
+                                    V::Object(BTreeMap::from([(
+                                        "node_name".into(),
+                                        V::String(String::new()),
+                                    )])),
+                                ]),
+                            )]),
+                        );
+                    multi_objects.insert(
+                        "OutdoorAir:NodeList".into(),
+                        BTreeMap::from([
+                            (String::new(), BTreeMap::new()),
+                            (
+                                "\t ".into(),
+                                BTreeMap::from([("nodes".into(), V::Array(Vec::new()))]),
+                            ),
+                            (
+                                "Authored topology".into(),
+                                BTreeMap::from([
+                                    (
+                                        "nodes".into(),
+                                        V::Array(vec![
+                                            V::Object(BTreeMap::from([(
+                                                "node_or_nodelist_name".into(),
+                                                V::String(String::new()),
+                                            )])),
+                                            V::Object(BTreeMap::from([(
+                                                "node_or_nodelist_name".into(),
+                                                V::String("Expanded OA list".into()),
+                                            )])),
+                                            V::Object(BTreeMap::from([(
+                                                "node_or_nodelist_name".into(),
+                                                V::String("Direct OA".into()),
+                                            )])),
+                                            V::Object(BTreeMap::from([(
+                                                "node_or_nodelist_name".into(),
+                                                V::String("Expanded OA list".into()),
+                                            )])),
+                                            V::Object(BTreeMap::from([(
+                                                "node_or_nodelist_name".into(),
+                                                V::String(" ".into()),
+                                            )])),
+                                        ]),
+                                    ),
+                                    (
+                                        "idf_order".into(),
+                                        V::String("ignored direct JSON metadata".into()),
+                                    ),
+                                    ("idf_max_extensible_fields".into(), V::Number("0".into())),
+                                ]),
+                            ),
+                        ]),
+                    );
+                    multi_objects.insert(
+                        "OutdoorAir:Node".into(),
+                        BTreeMap::from([
+                            ("Single lower".into(), BTreeMap::new()),
+                            (
+                                "Single upper".into(),
+                                BTreeMap::from([
+                                    ("height_above_ground".into(), V::Number("12.5".into())),
+                                    (
+                                        "wind_speed_schedule_name".into(),
+                                        V::String("Constant-1.0".into()),
+                                    ),
+                                    (
+                                        "wind_pressure_coefficient_curve_name".into(),
+                                        V::String("Unused no-AFN curve 각".into()),
+                                    ),
+                                    (
+                                        "symmetric_wind_pressure_coefficient_curve".into(),
+                                        V::String("Yes".into()),
+                                    ),
+                                    ("wind_angle_type".into(), V::String("Relative".into())),
+                                ]),
+                            ),
+                        ]),
+                    );
+                    multi_objects.insert(
+                        "DesignSpecification:OutdoorAir".into(),
+                        BTreeMap::from([(
+                            requirement_name.into(),
+                            BTreeMap::from([
+                                ("outdoor_air_method".into(), V::String("Flow/Zone".into())),
+                                ("outdoor_air_flow_per_zone".into(), V::Number("0.01".into())),
+                            ]),
+                        )]),
+                    );
+                    let multi_unit = multi_objects
+                        .get_mut("ZoneHVAC:IdealLoadsAirSystem")
+                        .and_then(|rows| rows.get_mut(unit_name))
+                        .ok_or("same real mixed OA consumer")?;
+                    multi_unit.insert(
+                        "design_specification_outdoor_air_object_name".into(),
+                        V::String(requirement_name.into()),
+                    );
+                    multi_unit.insert(
+                        "outdoor_air_inlet_node_name".into(),
+                        V::String(consumer_name.into()),
+                    );
+                    let mut multi_definitions = definitions.clone();
+                    multi_definitions.push(SourceObjectDefinition {
+                        object_type: "ZoneHVAC:IdealLoadsAirSystem".into(),
+                        alpha_fields: 21,
+                        numeric_fields: 11,
+                        alpha_extensions: 0,
+                        numeric_extensions: 0,
+                        extension: None,
+                    });
+                    multi_definitions.push(SourceObjectDefinition {
+                        object_type: "DesignSpecification:OutdoorAir".into(),
+                        alpha_fields: 4,
+                        numeric_fields: 4,
+                        alpha_extensions: 0,
+                        numeric_extensions: 0,
+                        extension: None,
+                    });
+                    let multi_families = multi_objects
+                        .iter()
+                        .map(|(family, rows)| {
+                            (
+                                family.clone(),
+                                SourceInputFamily::Objects(
+                                    rows.iter()
+                                        .map(|(name, fields)| SourceObjectShape {
+                                            object_name: name.clone(),
+                                            field_sizes: fields
+                                                .iter()
+                                                .map(|(field, value)| {
+                                                    (
+                                                        field.clone(),
+                                                        match value {
+                                                            V::Null => 0,
+                                                            V::Array(values) => values.len(),
+                                                            V::Object(values) => values.len(),
+                                                            _ => 1,
+                                                        },
+                                                    )
+                                                })
+                                                .collect(),
+                                        })
+                                        .collect(),
+                                ),
+                            )
+                        })
+                        .collect();
+                    let multi_order = multi_objects
+                        .iter()
+                        .map(|(family, rows)| (family.clone(), rows.keys().cloned().collect()))
+                        .collect();
+                    let mut multi_ip = SelectedInputProcessor::from_admitted_input(
+                        multi_definitions,
+                        multi_families,
+                    )?;
+                    multi_ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                        objects: multi_objects.clone(),
+                        object_order: multi_order,
+                    })?;
+                    assert_eq!(
+                        multi_ip
+                            .get_object_def_max_args("OutdoorAir:NodeList")?
+                            .alphas,
+                        5
+                    );
+                    let mut multi_prescan = SourceOutputPreScan::default();
+                    multi_ip.report_source_idf_records_stats(&mut multi_prescan)?;
+                    let mut multi_shortcut = SourceInputProcessorShortCut::default();
+                    multi_shortcut.allocate_from_input(&multi_ip)?;
+                    let multi_clock = OrdinaryEquipmentInput::from_source_a_family_inventory(
+                        [("NodeList", multi_ip.get_num_objects_found("NodeList"))],
+                        timesteps,
+                    )?;
+                    let mut multi_equipment = OrdinaryEquipment::new_for_source_ordered(
+                        &model,
+                        multi_clock,
+                        &zone_ids,
+                        &space_ids,
+                    )?;
+                    let mut multi_zones = selected.clone();
+                    let mut multi_gains = crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains::default();
+                    let mut multi_sizing =
+                        crate::heat_balance::selected_sizing::SelectedSizingManager::default();
+                    let mut multi_schedules = crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+                    multi_schedules.init_constant_state(timesteps)?;
+                    let mut multi_branch = crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
+                    let mut multi_registry =
+                        crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes::default(
+                        );
+                    let mut multi_registration = SourceOutputRegistration::default();
+                    let mut multi_files = MemoryMtd(None, Vec::new());
+                    let mut multi_state = error_state.clone();
+                    let (
+                        mut multi_error,
+                        mut multi_console,
+                        mut multi_eio,
+                        mut multi_eso,
+                        mut multi_results,
+                    ) = (Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
+                    {
+                        let mut backend = SourceErrorBackend {
+                            state: &mut multi_state,
+                            error_stream: Some(&mut multi_error),
+                            console: &mut multi_console,
+                            out_unit1: None,
+                            out_unit2: None,
+                            f_message: None,
+                            message_callback: None,
+                            error_callback: None,
+                            sqlite: None,
+                        };
+                        assert!(multi_registry.get_input_flag);
+                        assert!(multi_registry.prepare_source_outdoor_air_nodes_input(
+                            &mut multi_ip,
+                            &mut multi_equipment,
+                            &mut multi_branch,
+                            true,
+                            &mut backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &developer,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            }),
+                            &mut multi_schedules,
+                            &mut globals.any_local_environments_in_model,
+                        )?);
+                        assert!(!multi_registry.get_input_flag);
+                        assert_eq!(multi_registry.number_outside_air_nodes, 6);
+                        assert_eq!(
+                            multi_registry.outside_air_node_list.as_deref(),
+                            Some([1, 2, 4, 5, 6, 7].as_slice())
+                        );
+                        assert_eq!(
+                            multi_equipment
+                                .nodes
+                                .node_ids
+                                .as_deref()
+                                .ok_or("real mixed NodeIDs")?,
+                            [
+                                "Undefined",
+                                "LIST OA A",
+                                "LIST OA B",
+                                physical.to_ascii_uppercase().as_str(),
+                                "DIRECT OA",
+                                " ",
+                                "SINGLE LOWER",
+                                "SINGLE UPPER",
+                            ]
+                        );
+                        assert_eq!(
+                            multi_equipment.nodes.node_references.as_deref(),
+                            Some([2, 2, 0, 0, 0, 0, 0].as_slice())
+                        );
+                        let expanded = &multi_equipment
+                            .nodes
+                            .node_lists
+                            .as_ref()
+                            .ok_or("real expanded general NodeList")?[0];
+                        assert_eq!(expanded.number_of_nodes, 2);
+                        assert_eq!(expanded.node_numbers.as_deref(), Some([1, 2, 0].as_slice()));
+                        let lower = &multi_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("real mixed physical nodes")?[5];
+                        assert_eq!(
+                            lower.height.to_bits(),
+                            super::source_nodes::SourceNodeData::default()
+                                .height
+                                .to_bits()
+                        );
+                        let upper = &multi_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("real mixed upper node")?[6];
+                        assert_eq!(upper.height.to_bits(), 12.5_f64.to_bits());
+                        assert!(upper.outdoor_air_wind_speed_schedule.is_some());
+                        assert!(!upper.is_local_node);
+                        assert!(globals.any_local_environments_in_model);
+                        multi_sizing.get_oa_requirements(
+                            &mut multi_ip,
+                            &mut multi_schedules,
+                            &clock,
+                            true,
+                        )?;
+                        multi_equipment.get_zone_equipment_source(
+                            &mut multi_ip,
+                            multi_clock,
+                            false,
+                            false,
+                            &globals,
+                            &mut multi_gains,
+                            SourceEquipmentInputOwners {
+                                zones: multi_zones
+                                    .zones
+                                    .as_deref_mut()
+                                    .ok_or("same real mixed OA zones")?,
+                                schedules: &mut multi_schedules,
+                                sizing: &mut multi_sizing,
+                                branch: None,
+                                source_is_epjson: true,
+                                backend: &mut backend,
+                                diagnostic_flags: Some(
+                                    crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                        kickoff: &globals.kickoff_simulation,
+                                        developer: &developer,
+                                        warmup: &clock.warmup_flag,
+                                        doing_sizing: &globals.doing_sizing,
+                                    },
+                                ),
+                            },
+                        )?;
+                        multi_prescan.add_record(unit_name, variable, &mut backend)?;
+                        let mut dictionary = SourceOutputDictionaryStreams {
+                            eso: Some(&mut multi_eso),
+                            sqlite_present: false,
+                            results_framework_output_variables: &mut multi_results,
+                        };
+                        multi_equipment.get_source_purchased_air(
+                            &mut multi_shortcut, true, &mut multi_schedules, &mut multi_branch,
+                            &multi_sizing, &mut multi_registry, &control,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                                hvac: &phase_hvac, developer: &developer, psychrometrics: &mut psychrometrics,
+                                recurring: &mut recurring, backend: &mut backend,
+                            },
+                            &mut SourcePurchasedAirInputOutputContext {
+                                registration: &mut multi_registration, input: &mut multi_ip,
+                                prescan: &multi_prescan, reports: &probe_reports, minimum_report_frequency: "",
+                                minutes_in_time_step: clock.minutes_in_time_step, host: &mut multi_files,
+                                dictionary_host: &mut dictionary, eio: &mut multi_eio,
+                            },
+                        )?;
+                        assert_eq!(multi_registry.number_outside_air_nodes, 7);
+                        assert_eq!(
+                            multi_registry.outside_air_node_list.as_deref(),
+                            Some([1, 2, 4, 5, 6, 7, 8].as_slice())
+                        );
+                        assert_eq!(multi_equipment.source_node_id(8)?, "AUTO APPENDED OA");
+                        assert_eq!(
+                            multi_equipment.nodes.node_references.as_deref(),
+                            Some([2, 2, 1, 0, 0, 0, 0, 1].as_slice())
+                        );
+                        multi_registry.apply_source_zone_outdoor_environment(
+                            &mut multi_ip, &mut multi_equipment, &control, &mut multi_branch, true,
+                            &mut multi_schedules, &multi_zones,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                                hvac: &phase_hvac, developer: &developer, psychrometrics: &mut psychrometrics,
+                                recurring: &mut recurring, backend: &mut backend,
+                            },
+                        )?;
+                        let upper = &multi_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("same actual mixed SetOut nodes")?[6];
+                        assert_eq!(upper.outdoor_air_wind_speed.to_bits(), 1.0_f64.to_bits());
+                        assert!(
+                            multi_equipment
+                                .nodes
+                                .physical
+                                .as_ref()
+                                .ok_or("same mixed consumer")?[7]
+                                .temperature
+                                .is_finite()
+                        );
+                        assert!(!multi_registry.prepare_source_outdoor_air_nodes_input(
+                            &mut multi_ip,
+                            &mut multi_equipment,
+                            &mut multi_branch,
+                            true,
+                            &mut backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &developer,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            }),
+                            &mut multi_schedules,
+                            &mut globals.any_local_environments_in_model,
+                        )?);
+                    }
+                    assert!(!multi_ip.is_object_unused("OutdoorAir:NodeList", ""));
+                    assert!(!multi_ip.is_object_unused("OutdoorAir:NodeList", "\t "));
+                    assert!(!multi_ip.is_object_unused("OutdoorAir:NodeList", "Authored topology"));
+                    assert!(!multi_ip.is_object_unused("OutdoorAir:Node", "Single lower"));
+                    assert!(!multi_ip.is_object_unused("OutdoorAir:Node", "Single upper"));
+                    assert_eq!(
+                        multi_ip
+                            .source_raw_object_fields("OutdoorAir:NodeList", "Authored topology")?,
+                        &multi_objects["OutdoorAir:NodeList"]["Authored topology"]
+                    );
+                    assert_eq!(multi_state.tracking.total_warning_errors, 1);
+                    assert_eq!(multi_state.tracking.total_severe_errors, 0);
+                    assert!(
+                        multi_error
+                            .windows(b"blank node name in list.".len())
+                            .any(|part| part == b"blank node name in list.")
+                    );
+                    let mut connections = Vec::new();
+                    multi_branch
+                        .report_source_node_connections(&multi_equipment, &mut connections)?;
+                    let connections = String::from_utf8(connections)?;
+                    let outside_connections = connections
+                        .lines()
+                        .filter(|line| {
+                            line.starts_with(" Non-Parent Node Connection,")
+                                && line.contains(",OutdoorAir,")
+                        })
+                        .collect::<Vec<_>>();
+                    assert_eq!(
+                        outside_connections,
+                        [
+                            " Non-Parent Node Connection,LIST OA A,OUTDOORAIR:NODELIST,OutdoorAir:NodeList,OutdoorAir,1",
+                            " Non-Parent Node Connection,LIST OA B,OUTDOORAIR:NODELIST,OutdoorAir:NodeList,OutdoorAir,2",
+                            " Non-Parent Node Connection,DIRECT OA,OUTDOORAIR:NODELIST,OutdoorAir:NodeList,OutdoorAir,3",
+                            " Non-Parent Node Connection,LIST OA A,OUTDOORAIR:NODELIST,OutdoorAir:NodeList,OutdoorAir,4",
+                            " Non-Parent Node Connection,LIST OA B,OUTDOORAIR:NODELIST,OutdoorAir:NodeList,OutdoorAir,5",
+                            " Non-Parent Node Connection, ,OUTDOORAIR:NODELIST,OutdoorAir:NodeList,OutdoorAir,6",
+                            " Non-Parent Node Connection,SINGLE LOWER,OUTDOORAIR:NODE,OutdoorAir:Node,OutdoorAir,7",
+                            " Non-Parent Node Connection,SINGLE UPPER,OUTDOORAIR:NODE,OutdoorAir:Node,OutdoorAir,8",
+                            " Non-Parent Node Connection,AUTO APPENDED OA,OUTDOORAIR:NODE,OutdoorAir:Node,OutdoorAir,7",
+                        ]
+                    );
+                }
             }
         }
         // Source InitUniqueNodeCheck must retain genuine unused NodeLists even

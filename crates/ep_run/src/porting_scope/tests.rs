@@ -3205,6 +3205,25 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             {"field":"Until: 24:00"},{"field":1.0}
                         ]}});
                     }
+                    // Same existing cells: genuine mixed topology and list-only
+                    // admission, without another parse/context or a Node-state seed.
+                    if flow > 0.0 && method == "Sum" && limit == "LimitFlowRate" {
+                        hard["OutdoorAir:Node"]["Additional authored OA"] =
+                            json!({"wind_speed_schedule_name":"Constant-1.0"});
+                        hard["NodeList"]["OA expansion"] =
+                            json!({"nodes":[{"node_name":"List A"},{"node_name":"List B"}]});
+                        hard["OutdoorAir:NodeList"] = json!({
+                            "":{}, "\t ":{"nodes":[]},
+                            "Mixed":{"nodes":[{"node_or_nodelist_name":""},{"node_or_nodelist_name":"OA expansion"},{"node_or_nodelist_name":"Direct OA"},{"node_or_nodelist_name":"OA expansion"},{"node_or_nodelist_name":" "}],
+                                "idf_order":"ignored direct JSON metadata", "idf_max_extensible_fields":0}
+                        });
+                    } else if flow > 0.0 && method == "Maximum" && limit == "NoLimit" {
+                        hard["OutdoorAir:NodeList"] = json!({
+                            "":{}, "\t ":{"nodes":[]},
+                            "Mixed":{"nodes":[{"node_or_nodelist_name":""},{"node_or_nodelist_name":"List-only extra"},{"node_or_nodelist_name":"Outside 각"},{"node_or_nodelist_name":"Outside 각"},{"node_or_nodelist_name":" "}],
+                                "idf_order":"ignored direct JSON metadata", "idf_max_extensible_fields":0}
+                        });
+                    }
                     let hard_raw = parse_epjson_str(&hard.to_string())
                         .expect("actual OA hard-limit raw input");
                     let retained_hard = hard_raw.clone();
@@ -3258,19 +3277,64 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
                     assert!(crate::ordinary_equipment_input::resolve(&hard_raw).is_err());
                     assert!(crate::ordinary_equipment_input::resolve_source_a(&hard_raw).is_err());
-                    let hard_ip = crate::ordinary_input_processor::resolve_source_b(&hard_raw)
+                    let mut hard_ip = crate::ordinary_input_processor::resolve_source_b(&hard_raw)
                         .expect("real hard-limit IP");
                     let mut statistics = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
                     hard_ip
                         .report_source_idf_records_stats(&mut statistics)
                         .expect("actual hard-limit statistics owner");
-                    if hard.get("OutdoorAir:Node").is_some() {
+                    if hard.get("OutdoorAir:NodeList").is_some() {
                         assert!(
                             support
                                 .source_consumed_objects
                                 .iter()
-                                .any(|row| row.object_type == "OutdoorAir:Node" && row.count == 1)
+                                .any(|row| row.object_type == "OutdoorAir:NodeList"
+                                    && row.count == 3)
                         );
+                        assert_eq!(
+                            hard_ip
+                                .get_object_def_max_args("OutdoorAir:NodeList")
+                                .expect("real nameless extensible shape")
+                                .alphas,
+                            5
+                        );
+                        assert!(
+                            hard_ip
+                                .source_raw_object_fields("OutdoorAir:NodeList", "")
+                                .expect("empty nameless IP identity")
+                                .is_empty()
+                        );
+                        assert_eq!(
+                            hard_ip
+                                .source_raw_object_fields("OutdoorAir:NodeList", "\t ")
+                                .expect("whitespace nameless IP identity")
+                                .get("nodes"),
+                            Some(&OaRaw::Array(Vec::new()))
+                        );
+                        let mixed = hard_ip
+                            .source_raw_object_fields("OutdoorAir:NodeList", "Mixed")
+                            .expect("real retained mixed list");
+                        assert_eq!(
+                            mixed.get("idf_order"),
+                            Some(&OaRaw::String("ignored direct JSON metadata".into()))
+                        );
+                        assert_eq!(
+                            mixed.get("idf_max_extensible_fields"),
+                            Some(&OaRaw::Number("0".into()))
+                        );
+                        assert!(
+                            matches!(mixed.get("nodes"), Some(OaRaw::Array(members)) if members.len() == 5)
+                        );
+                    }
+                    if hard.get("OutdoorAir:Node").is_some() {
+                        assert!(support.source_consumed_objects.iter().any(|row| {
+                            row.object_type == "OutdoorAir:Node"
+                                && row.count
+                                    == hard["OutdoorAir:Node"]
+                                        .as_object()
+                                        .expect("actual authored singles")
+                                        .len()
+                        }));
                         let oa = hard_ip
                             .source_raw_object_fields("OutdoorAir:Node", "Outside 각")
                             .expect("actual authored OA raw custody");
@@ -3840,7 +3904,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 json!({"Outside 각":{"symmetric_wind_pressure_coefficient_curve":"no"}})
                             }
                             "Sum" => json!({"Outside 각":{}}),
-                            "Maximum" => json!({"Mismatched OA":{}}),
+                            "Maximum" => json!({"Mismatched OA":{"height_above_ground":null}}),
                             _ => unreachable!(),
                         };
                         if method == "Sum" {
@@ -3855,7 +3919,17 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         }
                     }
                     17 => {
-                        bad["OutdoorAir:NodeList"] = json!({"Authored OA":{"nodes":[{"node_or_nodelist_name":"Outside 각"}]}})
+                        bad["OutdoorAir:NodeList"] = match method {
+                            "Flow/Person" => json!({"Authored OA":{"nodes":null}}),
+                            "Flow/Zone" => json!({"Authored OA":{"nodes":"Outside 각"}}),
+                            "Flow/Area" => json!({"Authored OA":{"nodes":[{}]}}),
+                            "AirChanges/Hour" => {
+                                json!({"Authored OA":{"nodes":[{"node_or_nodelist_name":null}]}})
+                            }
+                            "Sum" => json!({"Authored OA":{"nodes":[{"node_or_nodelist_name":1}]}}),
+                            "Maximum" => json!({"Authored OA":{"nodes":["Outside 각"]}}),
+                            _ => unreachable!(),
+                        }
                     }
                     18 => {
                         bad["ZoneControl:Humidistat"] = json!({"Uncomposed control":{"zone_name":"Zone","humidifying_relative_humidity_setpoint_schedule_name":"On"}})

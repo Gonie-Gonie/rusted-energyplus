@@ -356,7 +356,7 @@
     ],
     "ZoneHVAC:IdealLoadsAirSystem": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
-      "Bounded Source B direct epJSON retains its established outdoor-air, hard-limit, DCV/economizer/recovery and non-Humidistat humidity evidence. On basic positive-OA paths, named or present exact-empty humidity choices still require both actual OA references and every existing prerequisite. One matching authored OutdoorAir:Node permits finite Native-effective height and omitted, exact-empty or owned supported DB, WB and wind schedule fields, including both named temperature schedules. On this ordinary no-AFN route, the curve-name field is any String; symmetry is exactly empty/No/Yes and angle is exactly empty/Absolute/Relative. Direct epJSON enum case is significant. Omitted and exact-empty fields retain the actual defaults and blank metadata. Actual A2 then A3 lookup, nullable pointers and used state determine IsLocal; positional AnyLocal alone does not. The genuine eight-alpha getter still marks the object used, fills all fields and preserves positional counts, counted default Height and AnyLocal effects; these do not create IsLocal without a temperature pointer. Ordinary weather handling does not resolve the WPC curve or write AFN pressure state. True InitCall preserves global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. A present WB pointer selects the existing backend-aware W(Tdb,Twb,P) owner, including the combined route. With only DB present, global W is written BEFORE cached Twb and nested TsatPb/Psat; computed WB commits only on child success. Earlier weather/clamp writes, failure prefixes and later H/P/Quality retain their order. False local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. The same live owners, cache, saved pressure and default interpolation=false remain through three cold callers/HB. Fixed inherited and inactive-WPC scenes retain unchanged158-series policies, full original science, clocks, exports, ancillary and independent nine-report OA/mixed response. Distinct DB/WB schedule names with equal declared values establish one normal boundary, not arbitrary order, private clamp or call-count evidence. Active AFN/Curve/Table objects, defaulted multizone AFN, duct-loss routes, EMS, multiple nodes/NodeList, Source A/IDF, crossed Humidistat and arbitrary/full-object compositions stay held. Legacy and other getter/type/numeric guards remain unchanged.",
+      "Bounded Source B direct epJSON retains its established outdoor-air, hard-limit, DCV/economizer/recovery and non-Humidistat humidity evidence. On basic positive-OA paths, named or present exact-empty humidity choices still require both actual OA references and every existing prerequisite. Coherent authored OutdoorAir:Node singles and nameless OutdoorAir:NodeList objects reach the bounded ordinary no-AFN owner under the same full positive-OA prerequisites. Each single permits finite Native-effective height and omitted, exact-empty or owned supported DB, WB and wind schedule fields, including both named temperature schedules. On this ordinary no-AFN route, the curve-name field is any String; symmetry is exactly empty/No/Yes and angle is exactly empty/Absolute/Relative. Direct epJSON enum case is significant. Omitted and exact-empty fields retain the actual defaults and blank metadata. Actual A2 then A3 lookup, nullable pointers and used state determine IsLocal; positional AnyLocal alone does not. The genuine eight-alpha getter still marks the object used, fills all fields and preserves positional counts, counted default Height and AnyLocal effects; these do not create IsLocal without a temperature pointer. Ordinary weather handling does not resolve the WPC curve or write AFN pressure state. OutdoorAir:NodeList instance keys are input-order and used-object identities, never an A1 node name. Omitted or empty member arrays perform the real zero-alpha input fill; each nodes array member is an Object with a required String node_or_nodelist_name field. An exact-empty field value returns zero nodes, while whitespace remains a real name. All OA-list objects are filled before all singles in actual IP order. Every returned membership preserves the exact Native allocation/reference effects: newly assigned names begin at ref0 and references to existing names increment. OutsideAir registrations and advancing fluid streams are retained per membership; only the final outdoor-node registry deduplicates node numbers. Single registration still precedes Height and schedule writes. Success alone commits the final list/count and clears the consumed input flag. The selected IdealLoads member consumer uses the existing registry path without invented reference or registration effects. True InitCall preserves global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. A present WB pointer selects the existing backend-aware W(Tdb,Twb,P) owner, including the combined route. With only DB present, global W is written BEFORE cached Twb and nested TsatPb/Psat; computed WB commits only on child success. Earlier weather/clamp writes, failure prefixes and later H/P/Quality retain their order. False local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. The same live owners, cache, saved pressure and default interpolation=false remain through three cold callers/HB. Fixed inherited scenes and the selected coherent multi/list scene retain unchanged158-series policies, full original science, clocks, ancillary and independent nine-report OA/mixed response. The new scene preserves every inherited active OA climate field and all numeric values. A complete source-derived topology prediction, sealed before actors from the empty node seed and actual report cutoff, is compared against the whole BND body, including node references, ordered registrations, streams and conditional blocks. Complete general-NodeList and Scheduled-manager exports retain public name/order custody; neither export is private OA getter telemetry. Prediction changes cannot be fitted to observed output. Distinct DB/WB schedule names with equal declared values establish one normal boundary, not arbitrary order, private clamp or call-count evidence. Active AFN/Curve/Table objects, defaulted multizone AFN, duct-loss routes, EMS, Source A/IDF, crossed Humidistat and arbitrary/full-object compositions stay held. Legacy and other getter/type/numeric guards remain unchanged.",
       "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed."
     ],
     "ZoneControl:Thermostat": [
@@ -367,8 +367,8 @@
       "One fixed unused SGS UNUSED NORMAL definition uses U-factor4.2, SHGC0.57 and omitted VT, with an explicit new Output:Constructions Materials request. The unchanged158-series/75120-value profile, original twelve engine/eight paired/two export gates, nine-role OA/mixed witnesses and complete EIO comparison remain mandatory. Root separately observes actual Material Details row presence; equal EIO alone is not a presence proof. Material Details does not expose optical SHGC/VT, window physics or private runtime properties. Existing typed classification and historical diagnostic addendum remain unchanged."
     ],
     "OutdoorAir:Node": [
-      "Bounded Source B direct epJSON only: exactly one authored OutdoorAir:Node matches the selected IdealLoads OA reference, with actual DSOA and every existing positive-OA prerequisite. Height is omitted/default or finite after Native numeric conversion. DB, WB and wind fields are omitted, exact-empty Strings or existing supported schedule references, including both named temperature schedules. On the ordinary no-AFN path, wind_pressure_coefficient_curve_name permits any String, symmetric_wind_pressure_coefficient_curve exactly empty/No/Yes, and wind_angle_type exactly empty/Absolute/Relative. These direct epJSON enums do not trim or case-fold; null, numeric, boolean, container and unknown-enum values stay held. Actual A2 then A3 lookup/null assignment/used state and ordered registration remain owners. AnyLocal is positional; IsLocal follows actual temperature pointers. All eight alpha slots, default/blank distinctions, object-used state, highest-field counts and counted N1 default remain genuine. Late-field presence can set AnyLocal; it does not make a local-temperature pointer. Ordinary GetInput never consumes A6-A8 into curve/AFN properties. No AirflowNetwork:SimulationControl, default multizone conjunction or duct-loss route may enter this boundary; positive AFN/Curve/Table families remain held. True InitCall retains global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. Any present WB pointer selects existing real W(Tdb,Twb,P), including both named schedules. DB-only instead writes global W before cached Twb and nested TsatPb/Psat, preserving live pressure, diagnostics, iteration order and default interpolation=false. Computed Twb replaces WB only on child success; earlier weather/clamp writes remain and H/P/Quality stay later. No additional outer clamp follows the computed Twb result; the psychrometric owner retains its own Native final clamp. False/local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. Three cold callers/HB transport actual owners without copied state or resets. Fixed scenes establish unchanged158/75120,12engine/8pair/2exports and nine-report OA/mixed evidence. The one combined scene uses distinct real temperature schedule names with equal values; separate existing owner tests cover their declared non-equal clamp effects. Direct private DB/WB/Height/wind/call counts, active WPC/AFN curve validity or pressure physics, arbitrary schedule/value compositions, interpolation/statistics variants, EMS, multiple nodes/NodeList, other consumers, Source A/IDF, TypedModel completion and full-object conformance remain unestablished.",
-      "The original110-type corpus already contains OutdoorAir:Node (12 original occurrences); its raw_source_getter/raw_only/bounded_b category changes neither the141-object registry classifications nor the116-type inventory. Numerical evidence is limited to fixed negative-global, point, wind, WB-with-wind, DB-only, combined DB/WB and inactive-WPC scenes. The inactive fields pass the real getter and positional/default effects; their unused curve String establishes no active AFN reference validity or wind-pressure physics. Private Height/DB/WB/wind/call counts, universal averaged laws and arbitrary/full-object combinations remain unobserved. Existing owner tests and frozen full comparisons provide separate scoped evidence."
+      "Bounded ordinary no-AFN Source B direct epJSON only: coherent authored OutdoorAir:Node singles and nameless OutdoorAir:NodeList objects use actual DSOA and every existing positive-OA prerequisite. The selected IdealLoads OA node may already be a list or single registry member; the real CheckAndAdd owner appends only a genuinely absent node. Height is omitted/default or finite after Native numeric conversion. DB, WB and wind fields are omitted, exact-empty Strings or existing supported schedule references, including both named temperature schedules. On the ordinary no-AFN path, wind_pressure_coefficient_curve_name permits any String, symmetric_wind_pressure_coefficient_curve exactly empty/No/Yes, and wind_angle_type exactly empty/Absolute/Relative. These direct epJSON enums do not trim or case-fold; null, numeric, boolean, container and unknown-enum values stay held. OutdoorAir:NodeList instance keys are input-order and used-object identities, never an A1 node name. Omitted or empty member arrays perform the real zero-alpha input fill; each nodes array member is an Object with a required String node_or_nodelist_name field. An exact-empty field value returns zero nodes, while whitespace remains a real name. All OA-list objects are filled before all singles in actual IP order. Every returned membership preserves the exact Native allocation/reference effects: newly assigned names begin at ref0 and references to existing names increment. OutsideAir registrations and advancing fluid streams are retained per membership; only the final outdoor-node registry deduplicates node numbers. Single registration still precedes Height and schedule writes. Success alone commits the final list/count and clears the consumed input flag. The selected IdealLoads member consumer uses the existing registry path without invented reference or registration effects. Actual A2 then A3 lookup/null assignment/used state and ordered registration remain owners. AnyLocal is positional; IsLocal follows actual temperature pointers. All eight alpha slots, default/blank distinctions, object-used state, highest-field counts and counted N1 default remain genuine. Late-field presence can set AnyLocal; it does not make a local-temperature pointer. Ordinary GetInput never consumes A6-A8 into curve/AFN properties. No AirflowNetwork:SimulationControl, default multizone conjunction or duct-loss route may enter this boundary; positive AFN/Curve/Table families remain held. True InitCall retains global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. Any present WB pointer selects existing real W(Tdb,Twb,P), including both named schedules. DB-only instead writes global W before cached Twb and nested TsatPb/Psat, preserving live pressure, diagnostics, iteration order and default interpolation=false. Computed Twb replaces WB only on child success; earlier weather/clamp writes remain and H/P/Quality stay later. No additional outer clamp follows the computed Twb result; the psychrometric owner retains its own Native final clamp. False/local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. Three cold callers/HB transport actual owners without copied state or resets. The selected coherent scene preserves the inherited active OA climate, all numeric inputs and original output requests. Its complete BND prediction is derived and reviewed before actors from genuine empty owner state through general-list allocation, Zone equipment, OA lists and singles, Scheduled managers, PurchasedAir and the real reporting cutoff. Whole-body comparison covers node/reference identities, connection order, streams, registry order and conditional report blocks; complete general-list and Scheduled-manager exports cover their actual public raw/order custody. Original numeric science, clocks, ancillary and nine-report OA/mixed gates remain mandatory. A selected member consumer and existing owner tests provide distinct evidence; no physical absent-node autoappend or private getter-state witness is inferred. The one combined scene uses distinct real temperature schedule names with equal values; separate existing owner tests cover their declared non-equal clamp effects. Direct private DB/WB/Height/wind/call counts, active WPC/AFN curve validity or pressure physics, arbitrary schedule/value compositions, interpolation/statistics variants, EMS, other consumers, Source A/IDF, TypedModel completion and full-object conformance remain unestablished. Exact-empty OA-list entries are the defined zero-node route. Safe general-NodeList trailing blanks and unreferenced warning-only definitions remain separate from an expanded interior-blank zero prefix, whose Native one-based Node(0)/NodeRef(0) access is undefined or assertion-dependent; the Source checked stop does not claim completion of that partition. Native-fatal invalid combinations, arbitrary schema metadata and broad list/consumer combinations have no full-domain or exact fatal-prefix claim here.",
+      "The original110-type corpus already contains OutdoorAir:Node (12 original occurrences); its raw_source_getter/raw_only/bounded_b category and all141 prior registry classifications remain unchanged. The additional bounded OutdoorAir:NodeList dependency row raises the current registry to142; it does not change the original116-type example union or establish full-domain support. Numerical evidence is limited to fixed negative-global, point, wind, WB-with-wind, DB-only, combined DB/WB, inactive-WPC and the selected coherent multi/list scenes. The latter adds genuine list/single getter and whole-topology/export custody while preserving the active climate and original science. The inactive fields pass the real getter and positional/default effects; their unused curve String establishes no active AFN reference validity or wind-pressure physics. Private Height/DB/WB/wind/call counts, universal averaged laws and arbitrary/full-object combinations remain unobserved. Existing owner tests and frozen full comparisons provide separate scoped evidence."
     ]
   },
   "verification": {
@@ -11654,6 +11654,61 @@
         "additional_QA_commands_for_recovery": 0,
         "prior_failed_Source_CLI_exit": null,
         "engine_reruns_scope": "unit after failed recording; accepted fresh pair has no rerun"
+      },
+      "authored_OutdoorAir_multiple_singles_and_lists": {
+        "actual_quality": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/quality03/summary.json",
+          "sha256": "0d4d8a21bdc08f7d1bba57c93a68a39583c50f7d5d0ff4e5ad9fe50aa8ee9329",
+          "bytes": 2125
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/evidence01/quality-ledger.json",
+          "sha256": "f4c5c92652f9024ee7a4e2e540ba572183eb4cc4c6f6112172dcf6e31d602638",
+          "bytes": 7374
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/quality03/quality-preparation.json",
+          "sha256": "5e4775408e4f04882184dc395fa4aec1a12fdb09e11b8d24e810dfc76a2c8fd4",
+          "bytes": 15441
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/evidence02/source-authority.json",
+          "sha256": "285b4a1a6a3e01172510c05630a8eddf46cd58d461fe71a48ef5c5b37ab63b17",
+          "bytes": 35860
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/object-expansion/unit159-prep/independent-actual-authored-OutdoorAir-multiple-singles-and-lists-Source-authority-static-review01.json",
+          "sha256": "59f3ea387bca6f119b4460128eae09e4ed94f741cff59149c7f5f6962dfd8d21",
+          "bytes": 4712
+        },
+        "total_actual_QA_commands": 13,
+        "current_QA_commands": 6,
+        "failed_QA_attempts": 2,
+        "current_test_body_executions": 3,
+        "historical_test_body_executions": 1,
+        "total_actual_test_body_executions": 4,
+        "distinct_existing_test_functions": 3,
+        "new_test_functions": 0,
+        "current_getter_execution": true,
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "correction_reviews": [
+          {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/test-scope-correction01.json",
+            "sha256": "6882a2c154fba38c7ca68d09d35b45aaa5ad33ad190de19d2864a1171e556a32",
+            "bytes": 1920
+          },
+          {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/support-classification-correction01.json",
+            "sha256": "eca27e3dd618f7d207785d2b4594da949e0a5222ce072690a00b29e2ce0a922e",
+            "bytes": 1986
+          }
+        ],
+        "actual_test_execution_evidence": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/evidence02/source-evidence.json",
+          "sha256": "de43d6aa46a5d3c73c4d85a3a2b800779163c29028bce6f40c029c0fd2483ef4",
+          "bytes": 22717
+        }
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -76467,12 +76522,231 @@
           "value": 12.5,
           "bits": "4029000000000000"
         }
+      },
+      {
+        "id": "ideal-loads-coherent-outdoor-air-multiple-singles-and-lists",
+        "case_kind": "AUTHORED_OUTDOOR_AIR_MULTIPLE_SINGLES_AND_LISTS",
+        "group": "OutdoorAir:Node",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-authored-outdoor-air-multiple-singles-and-lists",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/authored-OutdoorAir-multi-list-CLOSED-fixed-input-data-proposal01/input.epJSON",
+          "sha256": "06178da5d503c62560d82dcebfdb2e87b46584dd061c3045b3361aee02b14554",
+          "bytes": 103628
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/native/command/receipt.json",
+          "sha256": "3792974eb9ee5a75813e71526e523f4459577df760f2990b039692f3c5119e5b",
+          "bytes": 232478
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/source/command/receipt.json",
+          "sha256": "4722314cbfd1c92cf11efe42980c109e7edaad91ec6ef7cc97426fa981549f3a",
+          "bytes": 233963
+        },
+        "source_summary": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/source/output/run-summary.json",
+          "sha256": "bbd1a8005422d76abe23e74935e54254f4a0aada75543aca135ed45fa124daff",
+          "bytes": 64928
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cb/cbfae935380cd2dce190b35c861ba8114c58cda502e1f048b461d03aa5518e33",
+          "sha256": "cbfae935380cd2dce190b35c861ba8114c58cda502e1f048b461d03aa5518e33"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/build01/frozen/eplus-rs.exe",
+          "sha256": "15fdc08c1290e4155547e265d454e29fffa35a8b9ddc314448045ca5b77bf9d1",
+          "bytes": 81270196
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/build01/build/receipt.json",
+          "sha256": "a17469e0d9e37bdec65c6bddc2f6fe4a8b0d3381cc3fc0f8b6568430319d7b1b",
+          "bytes": 10689
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/readback.json",
+          "sha256": "23ba35503b6877e68b4cfc6877331b1544cbf65205509ef0e17cc9c1d25311a3",
+          "bytes": 541308
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/Root-scientific-review.json",
+          "sha256": "2b2f8d1055e47b56cbf3e0013db62e88366db48bce4b5ed97429b9adcfe6ed40",
+          "bytes": 17828
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/case-config.json",
+          "sha256": "5778bca119b184469712ddad7757f19ca87b142a42a677938c6b69cb06e90afe",
+          "bytes": 115715
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse_delta": 2.039620483986755e-08
+        },
+        "coverage_kind": "authored_OutdoorAir_multiple_singles_and_lists",
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false,
+          "new_report_requests": 0
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v3/release.json",
+            "sha256": "7db47ee8c24d7742e8f69317876135515602b37bd059d6b529de42b7278adfd0",
+            "bytes": 7398
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/binding.json",
+            "sha256": "8b92da9d1f3344d888e23b8bd1d6a05292a748fff915588d47419179cd0c496c",
+            "bytes": 1197
+          },
+          "case_config": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/case-config.json",
+            "sha256": "5778bca119b184469712ddad7757f19ca87b142a42a677938c6b69cb06e90afe",
+            "bytes": 115715
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/evidence02/source-authority.json",
+            "sha256": "285b4a1a6a3e01172510c05630a8eddf46cd58d461fe71a48ef5c5b37ab63b17",
+            "bytes": 35860
+          },
+          "completion": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/completed.json",
+            "sha256": "eac14b44d112bcb78464400b9a602bd210d8705c5a4faad17321214ddf1c6142",
+            "bytes": 2433
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/verify-command/receipt.json",
+            "sha256": "5775f2399727aa347cac58feaae1be009589f5db9a42858f237d25d4db51f976",
+            "bytes": 233681
+          },
+          "Native_precheck": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/native-precheck.json",
+            "sha256": "24e1ba5c6e3657847237059700ed487bb5e6e8c03af46d7396ccf0fbbf20edb5",
+            "bytes": 21816
+          },
+          "Native_precheck_receipt": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/precheck-command/receipt.json",
+            "sha256": "b0036051fb238b6c3de8047600dc1727a7831c7c0e29b5ae77250e35d27348d3",
+            "bytes": 232860
+          },
+          "actual_build": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/build01/build-row.json",
+            "sha256": "f233de232929c685870d6bf515286bb06ba1cfc134a97ca8c2ece8e186dafd03",
+            "bytes": 1263
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/quality03/summary.json",
+            "sha256": "0d4d8a21bdc08f7d1bba57c93a68a39583c50f7d5d0ff4e5ad9fe50aa8ee9329",
+            "bytes": 2125
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/evidence02/source-authority.json",
+            "sha256": "285b4a1a6a3e01172510c05630a8eddf46cd58d461fe71a48ef5c5b37ab63b17",
+            "bytes": 35860
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "profile": "ideal_loads.oa_topology.v1",
+          "topology_prediction": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/topology01/structural-BND-prediction.json",
+            "sha256": "b39d2cfa3d3209bfa0c40641cc9d9787c222cd85997ca719c7e19c09c5c7d4ad",
+            "bytes": 32660
+          },
+          "topology_derivation": {
+            "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/topology01/derivation.json",
+            "sha256": "4cf96ea2ac995569c578d938467c1c78530f38d1c251eaeaf9d3f666dd5283aa",
+            "bytes": 113412
+          },
+          "topology_prediction_reviews": {
+            "Root": {
+              "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/topology01/Root-prediction-review.json",
+              "sha256": "73735eeee00615db6c58c3571e96752090565d33b7f9a8bc97f92ed44f436b40",
+              "bytes": 2442
+            },
+            "independent": {
+              "path": ".runtime/object-expansion/unit159-prep/independent-OutdoorAir-multi-list-final-prediction-review01.json",
+              "sha256": "0f8afbc93cce19c7d9d28dc65663eda546430ad952e714395d7a40f5c68516a8",
+              "bytes": 2442
+            }
+          }
+        },
+        "scientific_gate_counts": {
+          "engine": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "public_response_summary": {
+          "Native": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.03148489327319126,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          },
+          "Source": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.031484893273194814,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          }
+        },
+        "effective_state": "One coherent ordinary SourceB direct-epJSON scene preserves all inherited active OA climate, numeric inputs, output requests and scientific gates. Multiple singles and nameless lists execute real list-first input, repeated-membership refs/streams and registry-only dedupe; selected IdealLoads uses actual existing membership. Whole BND is predicted from empty state and reviewed before actors, including Suspicious blocks; complete NodeList/SPM exports preserve public raw/order custody. These public artifacts do not observe private OA fields or getter calls. Existing owner tests separately cover absent-node autoappend and safe trailing-blank diagnostics. SourceA/IDF, AFN/EMS/linked children, Native undefined Node0 partitions, arbitrary/full-object completion remain unestablished.",
+        "authored_height": {
+          "JSON_kind": "Float",
+          "value": 12.5,
+          "bits": "4029000000000000"
+        }
       }
     ],
     "totals": {
-      "paired_cases": 253,
-      "reported_samples": 10947496,
-      "raw_operand_unequal": 2762150,
+      "paired_cases": 254,
+      "reported_samples": 11022616,
+      "raw_operand_unequal": 2785218,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -79482,6 +79756,33 @@
           "sha256": "ca175e63057732b93c3e57c4337ba0225b17bcce6a19968b8411e72543bda37f",
           "bytes": 6431
         }
+      },
+      {
+        "id": "source-authored-outdoor-air-multiple-singles-and-lists",
+        "receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/build01/build/receipt.json",
+          "sha256": "a17469e0d9e37bdec65c6bddc2f6fe4a8b0d3381cc3fc0f8b6568430319d7b1b",
+          "bytes": 10689
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cb/cbfae935380cd2dce190b35c861ba8114c58cda502e1f048b461d03aa5518e33",
+          "sha256": "cbfae935380cd2dce190b35c861ba8114c58cda502e1f048b461d03aa5518e33"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/build01/frozen/eplus-rs.exe",
+          "sha256": "15fdc08c1290e4155547e265d454e29fffa35a8b9ddc314448045ca5b77bf9d1",
+          "bytes": 81270196
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/build01/frozen/build-receipt.json",
+          "sha256": "7c53a4a172bb1a3e4134b2781f6d8a78452c164b7c9c83e8dfbd69f96d0a451d",
+          "bytes": 1645007
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/quality03/quality-preparation.json",
+          "sha256": "5e4775408e4f04882184dc395fa4aec1a12fdb09e11b8d24e810dfc76a2c8fd4",
+          "bytes": 15441
+        }
       }
     ],
     "focused_since_workspace": {
@@ -79928,14 +80229,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 171,
-      "builds_with_accepted_paired_cases": 149,
+      "actual_recorded_builds": 172,
+      "builds_with_accepted_paired_cases": 150,
       "builds_with_only_retained_failed_Source_attempts": 8,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 14,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "171 recorded Source builds: 149 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "172 recorded Source builds: 150 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -84631,47 +84932,48 @@
         "ideal-loads-unused-simple-glazing-material",
         "ideal-loads-authored-outdoor-air-node-db-schedule",
         "ideal-loads-authored-outdoor-air-node-db-wb-schedules",
-        "ideal-loads-authored-outdoor-air-node-inactive-wpc-recorded-after-disk-recovery"
+        "ideal-loads-authored-outdoor-air-node-inactive-wpc-recorded-after-disk-recovery",
+        "ideal-loads-coherent-outdoor-air-multiple-singles-and-lists"
       ],
-      "accepted_paired_cases": 82,
-      "accepted_samples": 6046320,
-      "retained_Scheduled_B_pairs": 81,
-      "retained_Scheduled_B_samples": 5986800,
+      "accepted_paired_cases": 83,
+      "accepted_samples": 6121440,
+      "retained_Scheduled_B_pairs": 82,
+      "retained_Scheduled_B_samples": 6061920,
       "unused_NodeList_A_pairs": 1,
       "unused_NodeList_A_samples": 59520,
       "latest_complete_comparisons": {
-        "AUTHORED_OUTDOOR_AIR_NODE_INACTIVE_WPC_FIELDS": {
-          "path": ".runtime/porting/authored-outdoor-air-node-inactive-wpc/corrected01/runtime01/readback.json",
-          "sha256": "ba901cdb2e8de4cee4713a8122cfd48e8b8bc0b7d85f233c1968862889234b8c",
-          "bytes": 543711
+        "AUTHORED_OUTDOOR_AIR_MULTIPLE_SINGLES_AND_LISTS": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/readback.json",
+          "sha256": "23ba35503b6877e68b4cfc6877331b1544cbf65205509ef0e17cc9c1d25311a3",
+          "bytes": 541308
         }
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/porting/authored-outdoor-air-node-inactive-wpc/corrected01/runtime01/Root-scientific-review.json",
-        "sha256": "33781c80c2710628b78614363bad5d869c8ea725b1a9f87fb94e3491f7a9bc65",
-        "bytes": 7958
+        "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/Root-scientific-review.json",
+        "sha256": "2b2f8d1055e47b56cbf3e0013db62e88366db48bce4b5ed97429b9adcfe6ed40",
+        "bytes": 17828
       },
-      "latest_source_build": "source-authored-outdoor-air-node-inactive-wpc",
+      "latest_source_build": "source-authored-outdoor-air-multiple-singles-and-lists",
       "latest_actual_Source_build": {
-        "path": ".runtime/porting/authored-outdoor-air-node-inactive-wpc/build01/build-row.json",
-        "sha256": "163fda8c388dd6b74b6a22061ce977a00848a45d1683f389bb9383371bc43261",
-        "bytes": 1216
+        "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/build01/build-row.json",
+        "sha256": "f233de232929c685870d6bf515286bb06ba1cfc134a97ca8c2ece8e186dafd03",
+        "bytes": 1263
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/authored-outdoor-air-node-inactive-wpc/quality01/summary.json",
-        "sha256": "9764fa6a9bf95331685064413465a72432809156c44c4a21be0a5c8decf2cd3e",
-        "bytes": 2071
+        "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/quality03/summary.json",
+        "sha256": "0d4d8a21bdc08f7d1bba57c93a68a39583c50f7d5d0ff4e5ad9fe50aa8ee9329",
+        "bytes": 2125
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/porting/authored-outdoor-air-node-inactive-wpc/evidence01/source-authority.json",
-        "sha256": "f59ccfec24ec521faedc8fca69befecc1e57fbc0702f1847546e50f867529e2e",
-        "bytes": 17760
+        "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/evidence02/source-authority.json",
+        "sha256": "285b4a1a6a3e01172510c05630a8eddf46cd58d461fe71a48ef5c5b37ab63b17",
+        "bytes": 35860
       },
       "latest_input_contracts": {
-        "AUTHORED_OUTDOOR_AIR_NODE_INACTIVE_WPC_FIELDS": {
-          "path": ".runtime/porting/authored-outdoor-air-node-inactive-wpc/corrected01/runtime01/case-config.json",
-          "sha256": "ebb1f5b54555c1040f8741bc01ab99dd0c4b53c78aed9f0aaac7f53c045e2823",
-          "bytes": 110722
+        "AUTHORED_OUTDOOR_AIR_MULTIPLE_SINGLES_AND_LISTS": {
+          "path": ".runtime/porting/authored-outdoor-air-multiple-singles-and-lists/runtime01/case-config.json",
+          "sha256": "5778bca119b184469712ddad7757f19ca87b142a42a677938c6b69cb06e90afe",
+          "bytes": 115715
         }
       },
       "latest_retained_evidence": {
@@ -84684,7 +84986,7 @@
         "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
         "bytes": 2919
       },
-      "scope": "81 bounded Source B Scheduled/NodeList pairs retain 5,986,800 values. The unused Source A pair adds59,520, giving 82 pairs and 6,046,320 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
+      "scope": "82 bounded Source B Scheduled/NodeList pairs retain 6,061,920 values. The unused Source A pair adds59,520, giving 83 pairs and 6,121,440 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
       "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",

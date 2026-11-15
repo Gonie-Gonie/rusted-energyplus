@@ -20,6 +20,7 @@ pub(super) fn is_family(family: &str) -> bool {
             | "ZoneControl:Humidistat"
             | "DesignSpecification:OutdoorAir"
             | "OutdoorAir:Node"
+            | "OutdoorAir:NodeList"
             | "ZoneHVAC:EquipmentConnections"
             | "ZoneHVAC:EquipmentList"
             | "ZoneHVAC:IdealLoadsAirSystem"
@@ -28,6 +29,16 @@ pub(super) fn is_family(family: &str) -> bool {
 // Retain the ordered raw input-bound predicates without changing admission logic.
 #[allow(clippy::manual_range_contains)]
 pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
+    // This nameless family reaches only the direct-epJSON positive-OA route.
+    // Its instance schema has only the optional nodes array; all other fields
+    // (including IDF bookkeeping) are unconsumed JSON metadata on that route.
+    if family == "OutdoorAir:NodeList" {
+        return name != "nodes"
+            || matches!(value, RawValue::Array(members) if members.iter().all(|member| {
+                matches!(member, RawValue::Object(fields)
+                    if matches!(fields.get(&FieldName("node_or_nodelist_name".into())), Some(RawValue::String(_))))
+            }));
+    }
     if matches!(
         name,
         "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"

@@ -111,13 +111,14 @@ impl OrdinaryEquipment {
         Ok(())
     }
 
-    /// Native GetOutAirNodesInput270-282 registers the authored A1 name on
-    /// the same physical NodeOwner used by the later PurchasedAir consumer.
+    /// Native GetOutAirNodesInput213/270 registers each actual list member or
+    /// single A1 on the same NodeOwner used by the later PurchasedAir consumer.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn get_source_authored_outdoor_air_node_nums(
         &mut self,
         input: &mut SelectedInputProcessor,
         branch: &mut SourceBranchNodeConnections,
+        object_type: SourceNodeObjectType,
         name: &str,
         field_name: &str,
         stream: i32,
@@ -127,6 +128,12 @@ impl OrdinaryEquipment {
         backend: &mut SourceErrorBackend<'_>,
         flags: Option<SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
+        if !matches!(
+            object_type,
+            SourceNodeObjectType::OutdoorAirNode | SourceNodeObjectType::OutdoorAirNodeList
+        ) {
+            return Err(Error::Unavailable("actual authored OutdoorAir object kind"));
+        }
         self.nodes
             .get_source_node_nums(
                 input,
@@ -138,8 +145,8 @@ impl OrdinaryEquipment {
                 node_numbers,
                 errors_found,
                 SourceNodeFluidType::Air,
-                SourceNodeObjectType::OutdoorAirNode,
-                "OutdoorAir:Node",
+                object_type,
+                object_type.source_name()?,
                 SourceNodeConnectionType::OutsideAir,
                 SourceCompFluidStream::source_positive(stream)?,
                 false,

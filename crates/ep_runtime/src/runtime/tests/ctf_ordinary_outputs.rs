@@ -477,7 +477,16 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         }
         let mut input = SelectedInputProcessor::from_admitted_input(
             definitions,
-            std::collections::BTreeMap::from([("OutdoorAir:Node".into(),
+            std::collections::BTreeMap::from([
+                ("OutdoorAir:NodeList".into(), crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(vec![
+                    crate::heat_balance::selected_input_processor::SourceObjectShape {
+                        object_name: String::new(), field_sizes: Default::default(),
+                    },
+                    crate::heat_balance::selected_input_processor::SourceObjectShape {
+                        object_name: "\t ".into(), field_sizes: std::collections::BTreeMap::from([("nodes".into(), 0)]),
+                    },
+                ])),
+                ("OutdoorAir:Node".into(),
                 crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(vec![
                     crate::heat_balance::selected_input_processor::SourceObjectShape {
                         object_name: "CTF wind inlet".into(),
@@ -492,7 +501,12 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             )]),
         )?;
         input.retain_source_input_statistics(crate::heat_balance::selected_input_processor::SourceInputStatisticsInput {
-            objects: std::collections::BTreeMap::from([("OutdoorAir:Node".into(), std::collections::BTreeMap::from([
+            objects: std::collections::BTreeMap::from([
+                ("OutdoorAir:NodeList".into(), std::collections::BTreeMap::from([
+                    (String::new(), std::collections::BTreeMap::new()),
+                    ("\t ".into(), std::collections::BTreeMap::from([("nodes".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::Array(Vec::new()))])),
+                ])),
+                ("OutdoorAir:Node".into(), std::collections::BTreeMap::from([
                 ("CTF wind inlet".into(), std::collections::BTreeMap::from([
                     ("wind_speed_schedule_name".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String(String::new())),
                     ("wind_direction_schedule_name".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String(String::new())),
@@ -501,7 +515,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                     ("wind_angle_type".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Relative".into())),
                 ])),
             ]))]),
-            object_order: std::collections::BTreeMap::from([("OutdoorAir:Node".into(), vec!["CTF wind inlet".into()])]),
+            object_order: std::collections::BTreeMap::from([
+                ("OutdoorAir:NodeList".into(), vec![String::new(), "\t ".into()]),
+                ("OutdoorAir:Node".into(), vec!["CTF wind inlet".into()])]),
         })?;
         let mut shortcut = SourceInputProcessorShortCut::default();
         let mut control = SelectedHeatBalanceInputState {
@@ -552,6 +568,12 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             .and_then(|rows| rows.first()).ok_or("same exact-empty wind OA registry")?;
         assert_eq!(wind_nodes.source_outdoor_air_wind_schedule_pointers(wind_node_number)?, (None, None));
         assert!(!input.is_object_unused("OutdoorAir:Node", "CTF wind inlet"));
+        assert!(!input.is_object_unused("OutdoorAir:NodeList", ""));
+        assert!(!input.is_object_unused("OutdoorAir:NodeList", "\t "));
+        assert!(input.source_raw_object_fields("OutdoorAir:NodeList", "")?.is_empty());
+        assert_eq!(input.source_raw_object_fields("OutdoorAir:NodeList", "\t ")?.get("nodes"),
+            Some(&crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::Array(Vec::new())));
+        assert_eq!(input.get_object_def_max_args("OutdoorAir:NodeList")?.alphas, 0);
         let wpc_raw = input.source_raw_object_fields("OutdoorAir:Node", "CTF wind inlet")
             .expect("same actual retained inactive WPC fields");
         assert_eq!(wpc_raw.get("wind_pressure_coefficient_curve_name"), Some(&crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Unused no-AFN curve 각".into())));

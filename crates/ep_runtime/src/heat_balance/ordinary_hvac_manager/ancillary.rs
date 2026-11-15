@@ -253,6 +253,7 @@ impl SourceOutdoorAirNodes {
     ) -> Result<(), Error> {
         use crate::heat_balance::selected_input_processor::SourceInputStatisticsValue as Value;
         const FAMILY: &str = "OutdoorAir:Node";
+        const LIST_FAMILY: &str = "OutdoorAir:NodeList";
         const FIELDS: [&str; 9] = [
             "name",
             "height_above_ground",
@@ -264,7 +265,7 @@ impl SourceOutdoorAirNodes {
             "symmetric_wind_pressure_coefficient_curve",
             "wind_angle_type",
         ];
-        let number_lists = input.get_num_objects_found("OutdoorAir:NodeList");
+        let number_lists = input.get_num_objects_found(LIST_FAMILY);
         let number_singles = input.get_num_objects_found(FAMILY);
         self.number_outside_air_nodes = 0;
         let mut next_fluid_stream_number = 1_i32;
@@ -293,30 +294,119 @@ impl SourceOutdoorAirNodes {
         let mut numbers = vec![0.0; maximum_numbers];
         let mut alpha_blanks = vec![true; maximum_alphas];
         let mut numeric_blanks = vec![true; maximum_numbers];
-        if number_lists > 0 {
+        if (number_lists > 0 || number_singles > 0) && !source_is_epjson {
             return Err(Error::Unavailable(
-                "actual positive outdoor-air list getObjectItem197",
+                "authored outdoor-air original-IDF getter order",
             ));
         }
-        if number_singles > 0 {
-            if !source_is_epjson || number_singles != 1 {
-                return Err(Error::Unavailable(
-                    "authored outdoor-air single original-IDF/multiple-object getter",
-                ));
+        // Native197: these objects have no Name alpha. The retained map key
+        // identifies only the real IP row/usage; nodes are the extensible A1+.
+        for ordinal in 0..number_lists {
+            let order = input
+                .source_raw_object_names(LIST_FAMILY)
+                .map_err(|_| Error::Unavailable("actual outdoor-air list retained order"))?;
+            if order.len() != number_lists {
+                return Err(Error::Unavailable("actual outdoor-air list raw/IP count"));
             }
+            let object = order
+                .get(ordinal)
+                .cloned()
+                .ok_or(Error::Unavailable("actual outdoor-air list IP ordinal"))?;
+            alphas.fill(String::new());
+            numbers.fill(0.0);
+            alpha_blanks.fill(true);
+            numeric_blanks.fill(true);
+            alpha_fields.fill(String::new());
+            numeric_fields.fill(String::new());
+            input.mark_object_as_used(LIST_FAMILY, &object);
+            let num_alphas;
+            {
+                let fields = input
+                    .source_raw_object_fields(LIST_FAMILY, &object)
+                    .map_err(|_| Error::Unavailable("actual outdoor-air list raw fields"))?;
+                let members = match fields.get("nodes") {
+                    None => &[][..],
+                    Some(Value::Array(members)) => members.as_slice(),
+                    _ => return Err(Error::Unavailable("actual outdoor-air list extension type")),
+                };
+                num_alphas = members.len();
+                if num_alphas > alphas.len() {
+                    return Err(Error::Unavailable(
+                        "actual outdoor-air list alpha allocation",
+                    ));
+                }
+                for (alpha, member) in members.iter().enumerate() {
+                    let Value::Object(fields) = member else {
+                        return Err(Error::Unavailable("actual outdoor-air list member type"));
+                    };
+                    let Some(Value::String(value)) = fields.get("node_or_nodelist_name") else {
+                        return Err(Error::Unavailable("actual outdoor-air list member alpha"));
+                    };
+                    alphas[alpha] = value.to_ascii_uppercase();
+                    alpha_blanks[alpha] = value.is_empty();
+                    alpha_fields[alpha] = "node_or_nodelist_name".into();
+                }
+            }
+            // This nameless schema has zero numeric/default fields. Omitted
+            // nodes and [] leave NumAlphas/NumNums zero, with reset scratch.
+            for (name, field_name) in alphas.iter().zip(&alpha_fields).take(num_alphas) {
+                let mut num_nodes = 0;
+                let mut err_in_list = false;
+                equipment.get_source_authored_outdoor_air_node_nums(
+                    input,
+                    branch,
+                    super::super::startup_integrity::SourceNodeObjectType::OutdoorAirNodeList,
+                    name,
+                    field_name,
+                    next_fluid_stream_number,
+                    &mut num_nodes,
+                    &mut node_numbers,
+                    &mut err_in_list,
+                    backend,
+                    flags,
+                )?;
+                next_fluid_stream_number = next_fluid_stream_number
+                    .checked_add(i32::try_from(num_nodes).map_err(|_| {
+                        Error::Unavailable("actual outdoor-air list fluid stream NumNodes integer")
+                    })?)
+                    .ok_or(Error::Unavailable(
+                        "actual outdoor-air list next fluid stream integer",
+                    ))?;
+                if err_in_list {
+                    // The diagnostic/fatal composition remains held. Never
+                    // process singles after a failed list-phase prefix.
+                    return Err(Error::Unavailable("actual outdoor-air list error phase240"));
+                }
+                for &node_number in node_numbers.iter().take(num_nodes) {
+                    // Registration/references/stream increments already took
+                    // place for every membership; only registry dedupes.
+                    if temporary_numbers.contains(&node_number) {
+                        continue;
+                    }
+                    list_size += 1;
+                    if list_size > current_size {
+                        current_size += 100;
+                        temporary_numbers.resize(current_size, 0);
+                    }
+                    temporary_numbers[list_size - 1] = node_number;
+                }
+            }
+        }
+        for ordinal in 0..number_singles {
             if alphas.len() < 8 || numbers.is_empty() {
                 return Err(Error::Unavailable(
                     "actual outdoor-air local getter allocation",
                 ));
             }
-            let object = input
+            let order = input
                 .source_raw_object_names(FAMILY)
-                .map_err(|_| Error::Unavailable("actual outdoor-air retained instance order"))?
-                .first()
-                .cloned()
-                .ok_or(Error::Unavailable(
-                    "actual outdoor-air single instance ordinal",
-                ))?;
+                .map_err(|_| Error::Unavailable("actual outdoor-air retained instance order"))?;
+            if order.len() != number_singles {
+                return Err(Error::Unavailable("actual outdoor-air single raw/IP count"));
+            }
+            let object = order.get(ordinal).cloned().ok_or(Error::Unavailable(
+                "actual outdoor-air single instance ordinal",
+            ))?;
             alphas.fill(String::new());
             numbers.fill(0.0);
             alpha_blanks.fill(true);
@@ -379,6 +469,7 @@ impl SourceOutdoorAirNodes {
             equipment.get_source_authored_outdoor_air_node_nums(
                 input,
                 branch,
+                super::super::startup_integrity::SourceNodeObjectType::OutdoorAirNode,
                 &alphas[0],
                 &alpha_fields[0],
                 next_fluid_stream_number,
