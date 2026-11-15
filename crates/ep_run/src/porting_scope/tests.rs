@@ -3197,7 +3197,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     } else if flow > 0.0 && method == "Flow/Zone" && limit == "LimitCapacity" {
                         hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": -0.0, "wind_speed_schedule_name":"", "wind_direction_schedule_name":"", "wetbulb_temperature_schedule_name":"", "drybulb_temperature_schedule_name":""}});
                     } else if flow > 0.0 && method == "Flow/Area" && limit == "LimitCapacity" {
-                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": 10.0, "wind_direction_schedule_name":"OA wind compact", "wetbulb_temperature_schedule_name":"OA wind compact"}});
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": 10.0, "wind_direction_schedule_name":"OA wind compact", "wetbulb_temperature_schedule_name":"OA wind compact", "drybulb_temperature_schedule_name":"On"}});
                     }
                     if flow > 0.0 && method == "Flow/Area" && limit == "LimitCapacity" {
                         // One necessary schedule extension of this same admission cell.
@@ -3294,6 +3294,10 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 Some(&OaRaw::String(String::new()))
                             );
                         } else if method == "Flow/Area" {
+                            assert_eq!(
+                                oa.get("drybulb_temperature_schedule_name"),
+                                Some(&OaRaw::String("On".into()))
+                            );
                             assert!(!oa.contains_key("wind_speed_schedule_name"));
                             assert_eq!(
                                 oa.get("wind_direction_schedule_name"),
@@ -3804,7 +3808,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             "Flow/Person" => json!({"Outside 각":{"height_above_ground":"0"}}),
                             "Flow/Zone" => json!({"Outside 각":{"height_above_ground":null}}),
                             "Flow/Area" => {
-                                json!({"Outside 각":{"drybulb_temperature_schedule_name":"On","wetbulb_temperature_schedule_name":"On"}})
+                                json!({"Outside 각":{"drybulb_temperature_schedule_name":"On","wetbulb_temperature_schedule_name":"Missing"}})
                             }
                             "AirChanges/Hour" => {
                                 json!({"Outside 각":{"symmetric_wind_pressure_coefficient_curve":"No"}})

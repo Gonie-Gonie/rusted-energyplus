@@ -438,7 +438,7 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
         return None;
     }
     let error = || {
-        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, owned DB-only/WB-only and wind schedule references, and absent WPC alpha fields".into())
+        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, owned DB/WB and wind schedule references, and absent WPC alpha fields".into())
     };
     if objects.len() != 1 {
         return error();
@@ -472,13 +472,6 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
                 if reference.is_empty() || has_source_schedule_reference(raw, reference) => {}
             _ => return error(),
         }
-    }
-    if matches!(field(object, "drybulb_temperature_schedule_name"), Some(RawValue::String(reference)) if !reference.is_empty())
-        && field(object, "wetbulb_temperature_schedule_name").is_some_and(
-            |value| !matches!(value, RawValue::String(reference) if reference.is_empty()),
-        )
-    {
-        return error();
     }
     None
 }
