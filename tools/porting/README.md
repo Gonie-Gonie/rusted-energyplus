@@ -61,6 +61,14 @@ the v1 numerical policy, clock, scientific constants and engine gates. Invoke
 v1/v2 bindings and retained proofs cannot authorize this profile. Publishing
 the tooling alone establishes no new physical comparison or object support.
 
+`paired/v4` keeps the v3 scientific profile and adds authenticated Source
+file additions/deletions and a reviewed QA descriptor. Its required tests must
+exist in the baseline and current source; every execution binds its own plan,
+reviews and recorded inputs. Required-body reuse is disabled. Use
+`tools/porting/paired/v4/__main__.py` and the matching `source_production.py`,
+`coordinate.py` and `publish.py` tools for new work. Older releases remain
+immutable for their historical evidence.
+
 Record `precheck` and `verify` with the trusted `record_command.py`, declaring
 every Context pin plus the Native launch (and Source launch for `verify`) as
 explicit inputs. Source `act` also requires `--native-precheck-receipt PATH#SHA256`.
