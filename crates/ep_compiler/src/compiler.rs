@@ -706,9 +706,9 @@ impl<'a> Compiler<'a> {
             model.space_list_names = NameMap::source_exact_namespace();
             model.node_names = NameMap::source_exact_namespace();
             model.node_list_names = NameMap::source_exact_namespace();
-            // The selected named-Gas Source route shares Native's exact
-            // material namespace with its opaque dependencies. Legacy,
-            // no-Gas, Custom-only and invalid-only inputs keep their policy.
+            // Selected single-Gas Source declarations share Native's exact
+            // material namespace with opaque dependencies. Legacy/no-Gas/
+            // invalid-only inputs retain their policy; unused Custom is independent.
             if self.raw_model.is_epjson()
                 && self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| {
@@ -737,7 +737,7 @@ impl<'a> Compiler<'a> {
                                         _ => true,
                                     })
                         });
-                        name_valid && named && thickness && supplied
+                        name_valid && (named || self.source_unused_custom_window_gas(&name.0, object)) && thickness && supplied
                     }))
             {
                 model.material_names = NameMap::source_exact_namespace();
@@ -5136,6 +5136,86 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Declaration-only selection for the actual unused Custom Source owner.
+    // Do not infer this from the shared SourceExact namespace: Named rows may
+    // select that map while a Custom row is used or schema-invalid.
+    fn source_unused_custom_window_gas(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            || !matches!(field_value(object, "gas_type"), Some(RawValue::String(value)) if value == "Custom")
+        {
+            return false;
+        }
+        if !matches!(field_value(object, "thickness"), Some(RawValue::Number(token))
+            if ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| value.is_finite() && value > 0.0))
+        {
+            return false;
+        }
+        if !object.fields.iter().all(|(field, value)| {
+            if !matches!(
+                field.0.as_str(),
+                "thickness"
+                    | "conductivity_coefficient_a"
+                    | "conductivity_coefficient_b"
+                    | "conductivity_coefficient_c"
+                    | "viscosity_coefficient_a"
+                    | "viscosity_coefficient_b"
+                    | "viscosity_coefficient_c"
+                    | "specific_heat_coefficient_a"
+                    | "specific_heat_coefficient_b"
+                    | "specific_heat_coefficient_c"
+                    | "molecular_weight"
+                    | "specific_heat_ratio"
+            ) {
+                return true;
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match field.0.as_str() {
+                            "thickness"
+                            | "viscosity_coefficient_a"
+                            | "specific_heat_coefficient_a" => value > 0.0,
+                            "molecular_weight" => (20.0..=200.0).contains(&value),
+                            "specific_heat_ratio" => value > 1.0,
+                            _ => true,
+                        }
+                })
+        }) {
+            return false;
+        }
+        let Some(gases) = self
+            .raw_model
+            .objects
+            .get(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
+        else {
+            return false;
+        };
+        !self
+            .raw_model
+            .objects
+            .get(&ep_raw_model::ObjectType("Construction".into()))
+            .is_some_and(|rows| {
+                rows.values().any(|row| {
+                    row.fields.iter().any(|(field, value)| {
+                        let layer = field.0 == "outside_layer"
+                            || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                        layer
+                            && matches!(value, RawValue::String(reference)
+                    if gases.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+                    })
+                })
+            })
+    }
+
     fn parse_window_gas_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Gas";
         const CUSTOM_COEFFICIENT_FIELDS: [&str; 9] = [
@@ -5164,6 +5244,8 @@ impl<'a> Compiler<'a> {
                 continue;
             };
 
+            let source_unused_custom = gas_type == WindowGasType::Custom
+                && self.source_unused_custom_window_gas(&name, &object);
             let conductivity_a =
                 self.optional_number(OBJECT_TYPE, &name, &object, CUSTOM_COEFFICIENT_FIELDS[0]);
             let conductivity_b =
@@ -5236,7 +5318,10 @@ impl<'a> Compiler<'a> {
                     (CUSTOM_COEFFICIENT_FIELDS[6], specific_heat_a),
                     ("molecular_weight", molecular_weight_g_per_mol),
                 ] {
-                    if value.is_none() && field_value(&object, field).is_none() {
+                    if !source_unused_custom
+                        && value.is_none()
+                        && field_value(&object, field).is_none()
+                    {
                         self.error(
                             "MissingCustomWindowGasProperty",
                             OBJECT_TYPE,
@@ -5280,7 +5365,8 @@ impl<'a> Compiler<'a> {
                 .iter()
                 .all(|(field, value)| field_value(&object, field).is_none() || value.is_some());
                 let conductivity_at_300_k = properties.conductivity.at_300_k();
-                if properties_valid
+                if !source_unused_custom
+                    && properties_valid
                     && conductivity_fields_well_typed
                     && conductivity_at_300_k <= 0.0
                 {
@@ -5311,7 +5397,7 @@ impl<'a> Compiler<'a> {
             };
             if self.source_file_declarations
                 && self.raw_model.is_epjson()
-                && gas_type != WindowGasType::Custom
+                && (gas_type != WindowGasType::Custom || source_unused_custom)
             {
                 model
                     .ctf_report_names

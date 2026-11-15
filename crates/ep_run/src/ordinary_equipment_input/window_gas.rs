@@ -1,4 +1,4 @@
-//! Pure unused named-Gas Source prerequisite; no runtime property calculation.
+//! Pure unused single-Gas Source prerequisite; actual properties belong to the getter.
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
 
 pub(super) fn valid_name(name: &str) -> bool {
@@ -31,13 +31,13 @@ pub(crate) fn known_field(name: &str) -> bool {
 
 pub(super) fn admitted_field(name: &str, value: &RawValue) -> bool {
     // Native's instance schema permits unknown members. This predicate is
-    // called only for the direct-epJSON, unused named-Gas Source family.
+    // called only for the direct-epJSON, unused single-Gas Source family.
     if !known_field(name) {
         return true;
     }
     if name == "gas_type" {
         return matches!(value, RawValue::String(value)
-            if matches!(value.as_str(), "Air" | "Argon" | "Krypton" | "Xenon"));
+            if matches!(value.as_str(), "Air" | "Argon" | "Custom" | "Krypton" | "Xenon"));
     }
     let RawValue::Number(token) = value else {
         return false;
@@ -68,11 +68,11 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
         return Ok(());
     }
     if !raw.is_epjson() {
-        return Err("Source unused named WindowMaterial:Gas requires direct epJSON".into());
+        return Err("Source unused WindowMaterial:Gas requires direct epJSON".into());
     }
     for (name, object) in rows {
         if !valid_name(&name.0) {
-            return Err("Source named Gas requires an actual material name".into());
+            return Err("Source Gas requires an actual material name".into());
         }
         for required in ["gas_type", "thickness"] {
             if object
@@ -80,7 +80,7 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
                 .get(&FieldName(required.into()))
                 .is_none_or(|value| !admitted_field(required, value))
             {
-                return Err(format!("Source named Gas requires schema-valid {required}"));
+                return Err(format!("Source Gas requires schema-valid {required}"));
             }
         }
         if object
@@ -88,9 +88,7 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
             .iter()
             .any(|(field, value)| !admitted_field(&field.0, value))
         {
-            return Err(
-                "Source named Gas requires every supplied schema field to remain valid".into(),
-            );
+            return Err("Source Gas requires every supplied schema field to remain valid".into());
         }
     }
     if raw
@@ -108,7 +106,7 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
             })
         })
     {
-        return Err("Source unused named Gas excludes every Construction reference".into());
+        return Err("Source unused Gas excludes every Construction reference".into());
     }
     Ok(())
 }

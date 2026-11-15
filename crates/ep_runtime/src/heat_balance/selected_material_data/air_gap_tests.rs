@@ -739,6 +739,184 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             .source_window_gas_surface_properties(5, MaterialId(5))
             .is_ok()
     );
+    // One additional genuine getter context, AFTER every Named/SGS assertion.
+    // Two Custom rows cover omitted ratio0 and a legal raw-unsigned effective
+    // negative ratio/Thickness; no actual runtime material row is seeded.
+    let wrapped = ep_model::classify_source_json_number("18446744073709551615")
+        .unwrap()
+        .as_f64();
+    let mut custom_ids = Vec::new();
+    for (name, thickness, ratio) in [
+        ("E CUSTOM", 0.012, None),
+        ("F CUSTOM", wrapped, Some(wrapped)),
+    ] {
+        let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+        let mut advisory = ep_model::WindowGasType::Air.standard_properties().unwrap();
+        advisory.conductivity.coefficient_a = 99.0;
+        model.materials.push(Material {
+            id,
+            name: NormalizedName::new(name),
+            definition: MaterialDefinition::WindowGas(ep_model::WindowGasMaterial {
+                gas_type: ep_model::WindowGasType::Custom,
+                thickness_m: if thickness < 0.0 {
+                    "18446744073709551615".parse().unwrap()
+                } else {
+                    thickness
+                },
+                properties: advisory,
+            }),
+        });
+        model.ctf_report_names.materials.push((id, name.into()));
+        let mut fields = BTreeMap::from([
+            ("gas_type".into(), Value::String("Custom".into())),
+            ("thickness".into(), Value::Number(thickness)),
+            ("conductivity_coefficient_a".into(), Value::Number(0.02)),
+            ("viscosity_coefficient_a".into(), Value::Number(0.00001)),
+            ("specific_heat_coefficient_a".into(), Value::Number(1000.0)),
+            ("molecular_weight".into(), Value::Number(28.0)),
+        ]);
+        if name == "E CUSTOM" {
+            fields.extend([
+                ("conductivity_coefficient_b".into(), Value::Number(0.00001)),
+                (
+                    "conductivity_coefficient_c".into(),
+                    Value::Number(0.00000001),
+                ),
+                (
+                    "viscosity_coefficient_b".into(),
+                    Value::Number(-0.000000002),
+                ),
+                (
+                    "viscosity_coefficient_c".into(),
+                    Value::Number(0.00000000001),
+                ),
+                ("specific_heat_coefficient_b".into(), Value::Number(0.1)),
+                ("specific_heat_coefficient_c".into(), Value::Number(-0.0001)),
+            ]);
+        }
+        if let Some(value) = ratio {
+            fields.insert("specific_heat_ratio".into(), Value::Number(value));
+        }
+        raw.window_gas.push(ProjectInputObject {
+            object_name: name.into(),
+            idf_max_fields: None,
+            fields,
+        });
+        custom_ids.push(id);
+    }
+    let (customs, custom_input, _) =
+        get_materials(&model, &raw).expect("actual Custom getter, no property/denom error");
+    assert_eq!(customs.num_w5_gases, 6);
+    assert_eq!(customs.materials.len(), 10);
+    for (offset, name) in ["E CUSTOM", "F CUSTOM"].into_iter().enumerate() {
+        let id = custom_ids[offset];
+        let row = &customs.window_gas[&id];
+        assert_eq!(row.gases[0].gas_type, ep_model::WindowGasType::Custom);
+        assert_eq!(row.gases[0].properties.conductivity.coefficient_a, 0.02);
+        assert_eq!(row.gases[0].properties.viscosity.coefficient_a, 0.00001);
+        assert_eq!(row.gases[0].properties.specific_heat.coefficient_a, 1000.0);
+        assert_eq!(row.gases[0].properties.molecular_weight_g_per_mol, 28.0);
+        assert_eq!(
+            [
+                row.gases[0].properties.conductivity.coefficient_b,
+                row.gases[0].properties.conductivity.coefficient_c,
+                row.gases[0].properties.viscosity.coefficient_b,
+                row.gases[0].properties.viscosity.coefficient_c,
+                row.gases[0].properties.specific_heat.coefficient_b,
+                row.gases[0].properties.specific_heat.coefficient_c
+            ],
+            if offset == 0 {
+                [
+                    0.00001,
+                    0.00000001,
+                    -0.000000002,
+                    0.00000000001,
+                    0.1,
+                    -0.0001,
+                ]
+            } else {
+                [0.0; 6]
+            }
+        );
+        assert_eq!(
+            row.gases[0].properties.specific_heat_ratio.to_bits(),
+            if offset == 0 {
+                0.0_f64.to_bits()
+            } else {
+                wrapped.to_bits()
+            }
+        );
+        assert_eq!(
+            row.thickness.to_bits(),
+            if offset == 0 {
+                0.012_f64.to_bits()
+            } else {
+                wrapped.to_bits()
+            }
+        );
+        let number = customs.material_map[name];
+        assert_eq!(number, 8 + i32::try_from(offset).unwrap());
+        let nominal = customs.nominal_r[usize::try_from(number - 1).unwrap()];
+        assert_eq!(nominal.is_sign_negative(), offset == 1);
+        assert_ne!(nominal, 0.0);
+        assert_eq!(
+            [
+                row.resistance,
+                row.conductivity,
+                row.density,
+                row.specific_heat,
+                row.thermal_absorptance,
+                row.solar_absorptance,
+                row.visible_absorptance
+            ],
+            [0.0; 7]
+        );
+        assert_eq!(row.num_gases, 1);
+        assert_eq!(row.gas_fractions, [1.0, 0.0, 0.0, 0.0, 0.0]);
+        assert_eq!(row.gap_vent_type, ep_model::WindowGapVentType::Sealed);
+        assert!(
+            model
+                .materials
+                .iter()
+                .find(|row| row.id == id)
+                .unwrap()
+                .surface_properties()
+                .is_none()
+        );
+        let (roughness, surface) = customs
+            .source_window_gas_surface_properties(number, id)
+            .unwrap();
+        assert_eq!(Some(roughness), row.roughness);
+        assert_eq!(
+            [
+                surface.thermal_absorptance,
+                surface.solar_absorptance,
+                surface.visible_absorptance
+            ],
+            [0.0; 3]
+        );
+        assert!(!custom_input.is_object_unused("WindowMaterial:Gas", name));
+    }
+    assert_eq!(customs.material_map["SIMPLE"], 10);
+    let mut custom_eio = Vec::new();
+    customs
+        .write_material_reports(&model, &mut custom_eio)
+        .unwrap();
+    let text = std::str::from_utf8(&custom_eio).unwrap();
+    for name in ["E CUSTOM", "F CUSTOM"] {
+        let prefix = format!(" Material Details,{name},0.0000,MediumRough,");
+        let at = text
+            .find(&prefix)
+            .expect("actual Custom baseR0 common report");
+        assert!(at < text.find(" Material Details,SIMPLE,").unwrap());
+        assert!(
+            text[at..]
+                .lines()
+                .next()
+                .unwrap()
+                .ends_with(",0.000,0.000,0.000,0.0000,0.0000,0.0000")
+        );
+    }
 }
 
 #[test]
@@ -1346,6 +1524,283 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
             let text = std::str::from_utf8(&text).unwrap();
             assert_eq!(text.matches(message).count(), 1);
             assert!(!text.contains(" **   ~~~   **"));
+        }
+    }
+    // The only new local type: two mandatory Write trait methods, no test or
+    // fixture function. Real Severe bytes succeed; real Continue bytes fail.
+    struct FailContinue {
+        bytes: Vec<u8>,
+    }
+    impl std::io::Write for FailContinue {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            if bytes.starts_with(b" **   ~~~   ** ") {
+                return Err(std::io::Error::other("actual Continue sink failure"));
+            }
+            self.bytes.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    // Exactly four fresh actual IP/Data/backend contexts. The original named
+    // duplicate contexts and all their assertions execute above unchanged.
+    for (missing_properties, failure) in
+        [(true, false), (true, true), (false, false), (false, true)]
+    {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        for (name, gas_type) in [
+            ("C CUSTOM", ep_model::WindowGasType::Custom),
+            ("Z AFTER", ep_model::WindowGasType::Air),
+        ] {
+            let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(name),
+                definition: MaterialDefinition::WindowGas(ep_model::WindowGasMaterial {
+                    gas_type,
+                    thickness_m: 0.012,
+                    properties: ep_model::WindowGasType::Air.standard_properties().unwrap(),
+                }),
+            });
+            model.ctf_report_names.materials.push((id, name.into()));
+        }
+        let mut fields = BTreeMap::from([
+            ("gas_type".into(), Value::String("Custom".into())),
+            ("thickness".into(), Value::Number(0.012)),
+            (
+                "conductivity_coefficient_a".into(),
+                Value::Number(if missing_properties { 0.02 } else { 0.0 }),
+            ),
+        ]);
+        let effective_viscosity = if missing_properties && !failure {
+            Some(
+                ep_model::classify_source_json_number("18446744073709551615")
+                    .unwrap()
+                    .as_f64(),
+            )
+        } else {
+            None
+        };
+        if let Some(value) = effective_viscosity {
+            fields.insert("viscosity_coefficient_a".into(), Value::Number(value));
+        }
+        if !missing_properties {
+            fields.insert("viscosity_coefficient_a".into(), Value::Number(0.00001));
+            fields.insert("specific_heat_coefficient_a".into(), Value::Number(1000.0));
+            fields.insert("molecular_weight".into(), Value::Number(28.0));
+        }
+        raw.window_gas = vec![
+            ProjectInputObject {
+                object_name: "C CUSTOM".into(),
+                idf_max_fields: None,
+                fields,
+            },
+            ProjectInputObject {
+                object_name: "Z AFTER".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("gas_type".into(), Value::String("Air".into())),
+                    ("thickness".into(), Value::Number(0.012)),
+                ]),
+            },
+        ];
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            (
+                "Material:InfraredTransparent",
+                &raw.infrared_transparent,
+                1,
+                0,
+            ),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            (
+                "WindowMaterial:SimpleGlazingSystem",
+                &raw.simple_glazing,
+                1,
+                3,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(name, _, a, n)| SourceObjectDefinition {
+                object_type: (*name).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(name, rows, _, _)| {
+                (
+                    name.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|name| (name.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let mut scan = ReportScanState::default();
+        let mut state = error_state();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut broken = BrokenDiagnostic;
+        let mut continue_sink = FailContinue { bytes: Vec::new() };
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let outcome = {
+            let stream: &mut dyn std::io::Write = if !failure {
+                &mut text
+            } else if missing_properties {
+                &mut broken
+            } else {
+                &mut continue_sink
+            };
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+            let result = data.get_material_data(&raw, &mut owners);
+            if effective_viscosity.is_some() {
+                assert_eq!(
+                    raw.get_window_gas_item(&raw.window_gas[0], &mut owners)
+                        .unwrap(),
+                    (2, 5)
+                );
+                assert_eq!(
+                    owners.shortcut.numeric_args[4].to_bits(),
+                    (-1.0_f64).to_bits()
+                );
+                assert!(!owners.shortcut.numeric_field_blanks[4]);
+                assert!(
+                    owners.shortcut.numeric_field_blanks[7]
+                        && owners.shortcut.numeric_field_blanks[10]
+                );
+            }
+            result
+        };
+        let row = &data.window_gas[&MaterialId(3)];
+        assert_eq!(row.gases[0].gas_type, ep_model::WindowGasType::Custom);
+        assert_eq!(row.thickness, 0.012);
+        assert_eq!(
+            row.gases[0].properties.conductivity.coefficient_a,
+            if missing_properties { 0.02 } else { 0.0 }
+        );
+        assert_eq!(
+            row.gases[0].properties.viscosity.coefficient_a,
+            if missing_properties {
+                effective_viscosity.unwrap_or(0.0)
+            } else {
+                0.00001
+            }
+        );
+        assert_eq!(
+            row.gases[0].properties.specific_heat.coefficient_a,
+            if missing_properties { 0.0 } else { 1000.0 }
+        );
+        assert_eq!(
+            row.gases[0].properties.molecular_weight_g_per_mol,
+            if missing_properties { 0.0 } else { 28.0 }
+        );
+        assert_eq!(row.gases[0].properties.specific_heat_ratio, 0.0);
+        assert_eq!(row.resistance, 0.0);
+        assert_eq!(data.nominal_r[3], 0.0);
+        assert_eq!(data.material_map["C CUSTOM"], 4);
+        assert!(!input.is_object_unused("WindowMaterial:Gas", "C CUSTOM"));
+        if failure {
+            assert!(outcome.is_err());
+            assert_eq!(
+                data.materials.len(),
+                4,
+                "allocation and all Custom writes precede diagnostic stop"
+            );
+            assert!(input.is_object_unused("WindowMaterial:Gas", "Z AFTER"));
+            assert_eq!(state.tracking.total_severe_errors, 1);
+            assert_eq!(
+                errors_found, missing_properties,
+                "property flag BEFORE IO; denominator flag only AFTER Continue"
+            );
+            if missing_properties {
+                assert!(state.tracking.last_severe_error.is_empty());
+            } else {
+                let bytes = std::str::from_utf8(&continue_sink.bytes).unwrap();
+                assert!(bytes.contains("WindowMaterial:Gas=\"C CUSTOM\", Illegal value."));
+                assert!(!bytes.contains(" **   ~~~   ** "));
+                assert_eq!(
+                    state.tracking.last_severe_error,
+                    "WindowMaterial:Gas=\"C CUSTOM\", Illegal value."
+                );
+            }
+        } else {
+            outcome.expect("real Custom diagnostic continues, no invented Gas-local Fatal");
+            assert!(errors_found);
+            assert_eq!(data.materials.len(), 5);
+            assert_eq!(
+                data.nominal_r[4], 0.0,
+                "shared actual error suppresses later Named NominalR"
+            );
+            assert!(!input.is_object_unused("WindowMaterial:Gas", "Z AFTER"));
+            let text = std::str::from_utf8(&text).unwrap();
+            if missing_properties {
+                assert_eq!(state.tracking.total_severe_errors, 3);
+                assert_eq!(
+                    text.matches("GetMaterialData: WindowMaterial:Gas = C CUSTOM")
+                        .count(),
+                    2
+                );
+                let vis = text.find("viscosity_coefficient_a not > 0.0").unwrap();
+                let cp = text.find("specific_heat_coefficient_a not > 0.0").unwrap();
+                let mw = text.find("molecular_weight not > 0.0").unwrap();
+                assert!(vis < cp && cp < mw);
+                assert!(!text.contains("Nominal resistance of gap"));
+            } else {
+                assert_eq!(state.tracking.total_severe_errors, 1);
+                assert_eq!(
+                    text.matches("WindowMaterial:Gas=\"C CUSTOM\", Illegal value.")
+                        .count(),
+                    1
+                );
+                assert!(text.contains("Nominal resistance of gap at room temperature calculated at a negative Conductivity=[0.000]."));
+            }
         }
     }
 }

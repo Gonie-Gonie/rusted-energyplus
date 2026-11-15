@@ -518,6 +518,7 @@ mod infrared;
 mod simple_glazing;
 pub(crate) use simple_glazing::validate as source_b_validate_unused_simple_glazing;
 mod window_gas;
+// Historical internal aliases: the same pure unused single-Gas schema owner now includes Custom.
 pub(crate) use window_gas::{
     known_field as source_b_named_gas_known_field, validate as source_b_validate_unused_named_gas,
 };

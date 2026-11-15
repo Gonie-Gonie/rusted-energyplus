@@ -2,10 +2,12 @@
 //! This token never bypasses an input getter or provides Native runtime state.
 use crate::porting_scope::{PortingScope, PortingScopeTrace};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 pub(crate) struct SourceSupportAdmission {
     covered_objects: BTreeSet<&'static str>,
+    /// Validated Raw uppercase loader names/types only, never material properties.
+    window_gas_bindings: BTreeMap<String, ep_model::WindowGasType>,
     /// Exact local alpha fields consumed by genuine GetZoneData and the live
     /// owning-Zone dispatchers. This is not a general Zone-feature exemption.
     zone_convection_overrides_consumed: bool,
@@ -173,6 +175,7 @@ impl SourceSupportAdmission {
         {
             covered_objects.insert("WindowMaterial:SimpleGlazingSystem");
         }
+        let mut window_gas_bindings = BTreeMap::new();
         if trace.scope == PortingScope::B
             && raw
                 .objects
@@ -180,10 +183,24 @@ impl SourceSupportAdmission {
                 .is_some_and(|rows| !rows.is_empty())
             && crate::ordinary_equipment_input::source_b_validate_unused_named_gas(raw).is_ok()
         {
+            let rows = raw.objects.get(&ObjectType("WindowMaterial:Gas".into()))?;
+            for (name, row) in rows {
+                let RawValue::String(value) = row.fields.get(&FieldName("gas_type".into()))? else {
+                    return None;
+                };
+                let gas_type = ep_model::WindowGasType::from_energyplus_name(value)?;
+                if window_gas_bindings
+                    .insert(name.0.to_ascii_uppercase(), gas_type)
+                    .is_some()
+                {
+                    return None; // Existing global duplicate-name partition stays held.
+                }
+            }
             covered_objects.insert("WindowMaterial:Gas");
         }
         Some(Self {
             covered_objects,
+            window_gas_bindings,
             zone_convection_overrides_consumed,
             ideal_loads_consumed: trace.scope == PortingScope::B
                 && raw
@@ -224,6 +241,83 @@ impl SourceSupportAdmission {
                         .get(&ObjectType("ElectricEquipment".into()))
                         .is_some_and(|rows| !rows.is_empty())),
         })
+    }
+
+    // Classification only: exact validated Raw names/types bind the actual
+    // Source compiler loader IDs. No coefficients or Native state are copied.
+    pub(super) fn consumes_window_gas_materials(&self, model: &ep_model::TypedModel) -> bool {
+        use ep_model::MaterialKind;
+        if !self.consumes("WindowMaterial:Gas") || !model.material_names.is_source_exact_namespace()
+        {
+            return false;
+        }
+        let all_ids: BTreeSet<_> = model.materials.iter().map(|row| row.id).collect();
+        if all_ids.len() != model.materials.len() {
+            return false;
+        }
+        let mut gas_rows = BTreeMap::new();
+        for row in &model.materials {
+            if row.kind() == MaterialKind::WindowGas && gas_rows.insert(row.id, row).is_some() {
+                return false;
+            }
+        }
+        if gas_rows.len() != self.window_gas_bindings.len() {
+            return false;
+        }
+        // Audit the actual NameMap in reverse too: resolving the expected
+        // names alone would miss an extra alias added for an existing Gas ID.
+        let mut material_map_names: BTreeMap<ep_model::MaterialId, &str> = BTreeMap::new();
+        for name in model.material_names.names() {
+            let id = model.material_names.resolve(&name.0);
+            if id.is_some_and(|id| gas_rows.contains_key(&id))
+                || self.window_gas_bindings.contains_key(&name.0)
+            {
+                let Some(id) = id else {
+                    return false;
+                };
+                if !gas_rows.contains_key(&id)
+                    || !self.window_gas_bindings.contains_key(&name.0)
+                    || material_map_names.insert(id, name.0.as_str()).is_some()
+                {
+                    return false;
+                }
+            }
+        }
+        let mut by_name: BTreeMap<&str, Vec<ep_model::MaterialId>> = BTreeMap::new();
+        let mut by_id: BTreeMap<ep_model::MaterialId, Vec<&str>> = BTreeMap::new();
+        for (id, name) in &model.ctf_report_names.materials {
+            if !all_ids.contains(id) {
+                return false;
+            }
+            if gas_rows.contains_key(id) || self.window_gas_bindings.contains_key(name) {
+                by_name.entry(name.as_str()).or_default().push(*id);
+                by_id.entry(*id).or_default().push(name.as_str());
+            }
+        }
+        for (name, expected_type) in &self.window_gas_bindings {
+            let Some(ids) = by_name.get(name.as_str()) else {
+                return false;
+            };
+            if ids.len() != 1 {
+                return false;
+            }
+            let id = ids[0];
+            let Some(row) = gas_rows.get(&id) else {
+                return false;
+            };
+            let Some(gas) = row.as_window_gas() else {
+                return false;
+            };
+            if row.name.0 != *name
+                || gas.gas_type != *expected_type
+                || model.material_names.resolve(name) != Some(id)
+                || material_map_names.get(&id).copied() != Some(name.as_str())
+                || by_id.get(&id).is_none_or(|names| names.len() != 1)
+            {
+                return false;
+            }
+        }
+        true
     }
 
     pub(super) fn consumes_ideal_loads(&self) -> bool {

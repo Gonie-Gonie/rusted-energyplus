@@ -7379,7 +7379,7 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(-1.0)
     );
     for (field, invalid) in [
-        ("gas_type", json!("Custom")),
+        ("gas_type", json!("Steam")),
         ("gas_type", json!("air")),
         ("gas_type", json!(null)),
         ("thickness", json!("0.012")),
@@ -7420,6 +7420,289 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         let raw = parse_epjson_str(&used.to_string()).unwrap();
         assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
     }
+    // Authentic Custom-only Source declaration/IP/admission, after old Named
+    // cases. Missing optional values and wrapped operands stay raw-owned.
+    let mut custom_value = gas_value.clone();
+    custom_value[GAS] = json!({
+        "C Custom":{"gas_type":"Custom","thickness":0.012,"conductivity_coefficient_a":0.02,
+            "viscosity_coefficient_a":0.00001,"specific_heat_coefficient_a":1000.0,"molecular_weight":28.0,
+            "name":{"ignored":[true,null]},"idf_order":false},
+        "F Effective":{"gas_type":"Custom","thickness":u64::MAX,"conductivity_coefficient_a":0.03,
+            "viscosity_coefficient_a":0.00001,"specific_heat_coefficient_a":900.0,"molecular_weight":30.0,
+            "specific_heat_ratio":u64::MAX}
+    });
+    let custom_raw = parse_epjson_str(&custom_value.to_string()).unwrap();
+    let custom_compiled = ep_compiler::compile_raw_model_for_source(&custom_raw);
+    assert!(
+        !custom_compiled.has_errors(),
+        "{:?}",
+        custom_compiled.report.diagnostics
+    );
+    let custom_model = custom_compiled.model.as_ref().unwrap();
+    assert!(custom_model.material_names.is_source_exact_namespace());
+    let custom_id = custom_model.material_names.resolve("C Custom").unwrap();
+    assert!(
+        custom_model
+            .ctf_report_names
+            .materials
+            .contains(&(custom_id, "C CUSTOM".into()))
+    );
+    let custom_ip = crate::ordinary_input_processor::resolve_source_b(&custom_raw).unwrap();
+    let custom_input =
+        crate::ordinary_material_input::resolve_source(&custom_raw, &custom_ip).unwrap();
+    let omitted = custom_input
+        .window_gas
+        .iter()
+        .find(|row| row.object_name == "C Custom")
+        .unwrap();
+    assert!(!omitted.fields.contains_key("specific_heat_ratio"));
+    assert!(!omitted.fields.contains_key("name"));
+    assert!(!omitted.fields.contains_key("idf_order"));
+    let effective = custom_input
+        .window_gas
+        .iter()
+        .find(|row| row.object_name == "F Effective")
+        .unwrap();
+    assert_eq!(
+        effective.fields["thickness"],
+        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(-1.0)
+    );
+    assert_eq!(
+        effective.fields["specific_heat_ratio"],
+        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(-1.0)
+    );
+    let mut custom_trace = inspect_porting_scope(
+        &custom_raw,
+        &custom_compiled.report,
+        Some(custom_model),
+        PortingScope::B,
+    );
+    assert!(custom_trace.admissible, "{:?}", custom_trace.violations);
+    custom_trace.environment = Some(
+        super::environment::environment_from_weather(
+            custom_model,
+            &weather,
+            "existing Custom material weather",
+        )
+        .unwrap(),
+    );
+    let custom_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&custom_raw, &custom_trace)
+            .unwrap();
+    let actual = crate::support::assess_support_with_source_admission(
+        &custom_raw,
+        &custom_compiled.report,
+        Some(custom_model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&custom_admission),
+    );
+    assert!(actual.allows_rust_runtime(), "{:?}", actual.diagnostics);
+    assert!(crate::ordinary_equipment_input::resolve(&custom_raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&custom_raw).is_err());
+    assert!(
+        !assess_support(
+            &custom_raw,
+            &custom_compiled.report,
+            Some(custom_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal
+        )
+        .allows_rust_runtime()
+    );
+    // Mutate genuine compiled models only to test classification closure.
+    let mut bad_models = Vec::new();
+    let mut alias = custom_model.clone();
+    assert!(
+        alias
+            .material_names
+            .insert("EXTRA ALIAS", custom_id)
+            .is_none()
+    );
+    bad_models.push(alias);
+    let mut duplicate_alias = custom_model.clone();
+    duplicate_alias
+        .material_names
+        .insert_instance("C CUSTOM", custom_id);
+    bad_models.push(duplicate_alias);
+    let mut loader_alias = custom_model.clone();
+    loader_alias
+        .ctf_report_names
+        .materials
+        .push((custom_id, "EXTRA LOADER".into()));
+    bad_models.push(loader_alias);
+    let mut missing_loader = custom_model.clone();
+    missing_loader
+        .ctf_report_names
+        .materials
+        .retain(|(id, _)| *id != custom_id);
+    bad_models.push(missing_loader);
+    let mut wrong_type = custom_model.clone();
+    let row = wrong_type
+        .materials
+        .iter_mut()
+        .find(|row| row.id == custom_id)
+        .unwrap();
+    assert!(matches!(
+        &row.definition,
+        ep_model::MaterialDefinition::WindowGas(_)
+    ));
+    if let ep_model::MaterialDefinition::WindowGas(gas) = &mut row.definition {
+        gas.gas_type = ep_model::WindowGasType::Air;
+    }
+    bad_models.push(wrong_type);
+    let mut wrong_name = custom_model.clone();
+    wrong_name
+        .materials
+        .iter_mut()
+        .find(|row| row.id == custom_id)
+        .unwrap()
+        .name
+        .0 = "WRONG ARENA NAME".into();
+    bad_models.push(wrong_name);
+    let mut extra_typed = custom_model.clone();
+    let mut extra_row = extra_typed
+        .materials
+        .iter()
+        .find(|row| row.id == custom_id)
+        .unwrap()
+        .clone();
+    extra_row.id = ep_model::MaterialId(u32::try_from(extra_typed.materials.len()).unwrap());
+    extra_row.name.0 = "EXTRA TYPED".into();
+    extra_typed.materials.push(extra_row);
+    bad_models.push(extra_typed);
+    let mut used_fallback = custom_model.clone();
+    used_fallback.constructions[0].layers.clear();
+    used_fallback.constructions[0].outside_layer = Some(custom_id);
+    bad_models.push(used_fallback);
+    for bad_model in &bad_models {
+        assert!(
+            !crate::support::assess_support_with_source_admission(
+                &custom_raw,
+                &custom_compiled.report,
+                Some(bad_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&custom_admission)
+            )
+            .allows_rust_runtime()
+        );
+    }
+    let mut extra_raw = custom_raw.clone();
+    let row = extra_raw.objects[&ep_raw_model::ObjectType(GAS.into())]
+        [&ep_raw_model::ObjectName("C Custom".into())]
+        .clone();
+    extra_raw
+        .objects
+        .get_mut(&ep_raw_model::ObjectType(GAS.into()))
+        .unwrap()
+        .insert(ep_raw_model::ObjectName("Z EXTRA".into()), row);
+    let extra_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&extra_raw, &custom_trace)
+            .unwrap();
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &extra_raw,
+            &custom_compiled.report,
+            Some(custom_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&extra_admission)
+        )
+        .allows_rust_runtime()
+    );
+    let mut without_custom = custom_raw.clone();
+    without_custom
+        .objects
+        .remove(&ep_raw_model::ObjectType(GAS.into()));
+    let absent_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+        &without_custom,
+        &custom_trace,
+    )
+    .unwrap();
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &without_custom,
+            &custom_compiled.report,
+            Some(custom_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&absent_admission)
+        )
+        .allows_rust_runtime()
+    );
+    // Original-schema-valid missing/derived failures declare Source IDs so the
+    // actual runtime owner can diagnose; legacy validation stays distinct.
+    let mut missing_value = custom_value.clone();
+    for field in [
+        "viscosity_coefficient_a",
+        "specific_heat_coefficient_a",
+        "molecular_weight",
+    ] {
+        missing_value[GAS]["C Custom"]
+            .as_object_mut()
+            .unwrap()
+            .remove(field);
+    }
+    let missing_raw = parse_epjson_str(&missing_value.to_string()).unwrap();
+    assert!(crate::ordinary_input_processor::resolve_source_b(&missing_raw).is_ok());
+    let source_missing = ep_compiler::compile_raw_model_for_source(&missing_raw);
+    assert!(
+        !source_missing.has_errors(),
+        "{:?}",
+        source_missing.report.diagnostics
+    );
+    assert!(
+        compile_raw_model(&missing_raw)
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "MissingCustomWindowGasProperty")
+    );
+    let mut zero_value = custom_value.clone();
+    zero_value[GAS]["C Custom"]["conductivity_coefficient_a"] = json!(0.0);
+    let zero_raw = parse_epjson_str(&zero_value.to_string()).unwrap();
+    assert!(!ep_compiler::compile_raw_model_for_source(&zero_raw).has_errors());
+    assert!(
+        compile_raw_model(&zero_raw)
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "InvalidWindowGasConductivityAt300K")
+    );
+    for (field, invalid) in [
+        ("gas_type", json!("custom")),
+        ("viscosity_coefficient_a", json!(0.0)),
+        ("specific_heat_coefficient_a", json!(null)),
+        ("molecular_weight", json!(201.0)),
+        ("specific_heat_ratio", json!(1.0)),
+    ] {
+        let mut bad = custom_value.clone();
+        bad[GAS]["C Custom"][field] = invalid;
+        assert!(
+            crate::ordinary_input_processor::resolve_source_b(
+                &parse_epjson_str(&bad.to_string()).unwrap()
+            )
+            .is_err()
+        );
+    }
+    custom_value["Construction"]["Unused Custom Window"] = json!({"outside_layer":"C Custom"});
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &parse_epjson_str(&custom_value.to_string()).unwrap()
+        )
+        .is_err()
+    );
 }
 
 #[test]

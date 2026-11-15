@@ -178,11 +178,10 @@ impl SelectedMaterialData {
             ))?;
         if row.num_gases != 1
             || row.gas_fractions != [1.0, 0.0, 0.0, 0.0, 0.0]
-            || row.gases[0].gas_type == ep_model::WindowGasType::Custom
             || row.gap_vent_type != ep_model::WindowGapVentType::Sealed
         {
             return Err(HeatBalanceInputError::Unavailable(
-                "actual named single Gas mixture identity",
+                "actual single Gas mixture identity",
             ));
         }
         let roughness = row.roughness.ok_or(HeatBalanceInputError::Unavailable(

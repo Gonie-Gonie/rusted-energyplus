@@ -1,4 +1,4 @@
-//! Material.cc950-1052: actual named MaterialGasMix/base rows, not typed nominal data.
+//! Material.cc950-1052: actual single-Gas MaterialGasMix/base rows, not typed nominal data.
 use super::{MaterialDataOwners, SelectedMaterialData, SourceMaterialGroup, typed_id, unavailable};
 use crate::error::RuntimeError;
 use ep_model::{
@@ -112,9 +112,89 @@ impl SelectedMaterialData {
             material.roughness = Some(MaterialSurfaceRoughness::MediumRough);
             material.thickness = owners.shortcut.numeric_args[0];
             self.resistance_only.insert(id, true);
-            material.gases[0].properties = gas_type.standard_properties().ok_or_else(|| {
-                unavailable("Custom Gas diagnostic owner remains outside named scope")
-            })?;
+            if gas_type == WindowGasType::Custom {
+                // Native1011-1021 writes every actual Custom field before any
+                // diagnostic. Missing optional fields are the IP's real0.
+                material.gases[0].properties.conductivity.coefficient_a =
+                    owners.shortcut.numeric_args[1];
+                material.gases[0].properties.conductivity.coefficient_b =
+                    owners.shortcut.numeric_args[2];
+                material.gases[0].properties.conductivity.coefficient_c =
+                    owners.shortcut.numeric_args[3];
+                material.gases[0].properties.viscosity.coefficient_a =
+                    owners.shortcut.numeric_args[4];
+                material.gases[0].properties.viscosity.coefficient_b =
+                    owners.shortcut.numeric_args[5];
+                material.gases[0].properties.viscosity.coefficient_c =
+                    owners.shortcut.numeric_args[6];
+                material.gases[0].properties.specific_heat.coefficient_a =
+                    owners.shortcut.numeric_args[7];
+                material.gases[0].properties.specific_heat.coefficient_b =
+                    owners.shortcut.numeric_args[8];
+                material.gases[0].properties.specific_heat.coefficient_c =
+                    owners.shortcut.numeric_args[9];
+                material.gases[0].properties.molecular_weight_g_per_mol =
+                    owners.shortcut.numeric_args[10];
+                material.gases[0].properties.specific_heat_ratio = owners.shortcut.numeric_args[11];
+                if material.gases[0].properties.viscosity.coefficient_a <= 0.0 {
+                    *owners.errors_found = true;
+                    let flags = owners
+                        .diagnostic_flags
+                        .as_ref()
+                        .ok_or_else(|| unavailable("actual Custom Gas diagnostic phase owners"))?;
+                    owners
+                        .backend
+                        .show_source_severe_error(
+                            &format!("GetMaterialData: WindowMaterial:Gas = {name}"),
+                            flags,
+                        )
+                        .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                    owners.backend.show_continue_error(
+                        &format!("{} not > 0.0", owners.shortcut.numeric_field_names[4]),
+                    ).map_err(|error| RuntimeError::HeatBalanceInput(Box::new(
+                        crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(error))))?;
+                }
+                if material.gases[0].properties.specific_heat.coefficient_a <= 0.0 {
+                    *owners.errors_found = true;
+                    let flags = owners
+                        .diagnostic_flags
+                        .as_ref()
+                        .ok_or_else(|| unavailable("actual Custom Gas diagnostic phase owners"))?;
+                    owners
+                        .backend
+                        .show_source_severe_error(
+                            &format!("GetMaterialData: WindowMaterial:Gas = {name}"),
+                            flags,
+                        )
+                        .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                    owners.backend.show_continue_error(
+                        &format!("{} not > 0.0", owners.shortcut.numeric_field_names[7]),
+                    ).map_err(|error| RuntimeError::HeatBalanceInput(Box::new(
+                        crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(error))))?;
+                }
+                if material.gases[0].properties.molecular_weight_g_per_mol <= 0.0 {
+                    *owners.errors_found = true;
+                    let flags = owners
+                        .diagnostic_flags
+                        .as_ref()
+                        .ok_or_else(|| unavailable("actual Custom Gas diagnostic phase owners"))?;
+                    owners
+                        .backend
+                        .show_source_severe_error(
+                            &format!("WindowMaterial:Gas=\"{name}\", Illegal value."),
+                            flags,
+                        )
+                        .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                    owners.backend.show_continue_error(
+                        &format!("{} not > 0.0", owners.shortcut.numeric_field_names[10]),
+                    ).map_err(|error| RuntimeError::HeatBalanceInput(Box::new(
+                        crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(error))))?;
+                }
+            } else {
+                material.gases[0].properties = gas_type.standard_properties().ok_or_else(|| {
+                    unavailable("Custom Gas diagnostic owner remains outside named scope")
+                })?;
+            }
             if !*owners.errors_found {
                 let denominator = material.gases[0].properties.conductivity.at_300_k();
                 if denominator > 0.0 {
@@ -122,11 +202,23 @@ impl SelectedMaterialData {
                     // predicate exists here in Native. Base Resistance stays0.
                     self.nominal_r[position] = material.thickness / denominator;
                 } else {
-                    // All four admitted fixed records have a positive k300.
-                    // The reachable Custom denominator diagnostic is held.
-                    return Err(unavailable(
-                        "nonpositive named Gas conductivity outside fixed records",
-                    ));
+                    let flags = owners.diagnostic_flags.as_ref().ok_or_else(|| {
+                        unavailable("actual Gas conductivity diagnostic phase owners")
+                    })?;
+                    owners
+                        .backend
+                        .show_source_severe_error(
+                            &format!("WindowMaterial:Gas=\"{name}\", Illegal value."),
+                            flags,
+                        )
+                        .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                    let formatted = crate::heat_balance::source_round_format::round(denominator, 3)
+                        .map_err(|_| unavailable("actual Gas denominator .3R formatter"))?;
+                    owners.backend.show_continue_error(&format!(
+                        "Nominal resistance of gap at room temperature calculated at a negative Conductivity=[{formatted}]."
+                    )).map_err(|error| RuntimeError::HeatBalanceInput(Box::new(
+                        crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(error))))?;
+                    *owners.errors_found = true;
                 }
             }
         }

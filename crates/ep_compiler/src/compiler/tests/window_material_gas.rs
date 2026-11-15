@@ -678,7 +678,7 @@ fn window_gas_follows_material_source_order_reports_typed_coverage_and_shares_na
         custom_result.report.diagnostics
     );
     assert!(
-        !custom_result
+        custom_result
             .model
             .as_ref()
             .unwrap()
@@ -699,6 +699,183 @@ fn window_gas_follows_material_source_order_reports_typed_coverage_and_shares_na
         gas_rows.insert(ep_raw_model::ObjectName(name.into()), row);
         assert!(super::super::compile_raw_model_for_source(&bad).has_errors());
     }
+    // Qualified Custom-only Source namespace/loader, while Legacy stays default.
+    let source_custom = custom_result.model.as_ref().unwrap();
+    let custom_id = source_custom.material_names.resolve("Custom Gap").unwrap();
+    assert!(
+        source_custom
+            .ctf_report_names
+            .materials
+            .contains(&(custom_id, "CUSTOM GAP".into()))
+    );
+    let legacy_custom = compile_raw_model(&custom);
+    assert!(!legacy_custom.has_errors());
+    assert!(
+        !legacy_custom
+            .model
+            .as_ref()
+            .unwrap()
+            .material_names
+            .is_source_exact_namespace()
+    );
+    let mut custom_names = custom.clone();
+    let rows = custom_names
+        .objects
+        .get_mut(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
+        .unwrap();
+    let row = rows
+        .remove(&ep_raw_model::ObjectName("Custom Gap".into()))
+        .unwrap();
+    for name in [" Custom Gap ", "Custom Gap", "\u{a0}", "\u{b}"] {
+        rows.insert(ep_raw_model::ObjectName(name.into()), row.clone());
+    }
+    let custom_names_result = super::super::compile_raw_model_for_source(&custom_names);
+    assert!(
+        !custom_names_result.has_errors(),
+        "{:?}",
+        custom_names_result.report.diagnostics
+    );
+    let named = custom_names_result.model.as_ref().unwrap();
+    assert!(named.material_names.is_source_exact_namespace());
+    assert_ne!(
+        named.material_names.resolve(" Custom Gap "),
+        named.material_names.resolve("Custom Gap")
+    );
+    for name in [" Custom Gap ", "Custom Gap", "\u{a0}", "\u{b}"] {
+        let id = named.material_names.resolve(name).unwrap();
+        assert!(
+            named
+                .ctf_report_names
+                .materials
+                .contains(&(id, name.to_ascii_uppercase()))
+        );
+        assert_eq!(
+            named
+                .materials
+                .iter()
+                .find(|row| row.id == id)
+                .unwrap()
+                .name
+                .0,
+            name.to_ascii_uppercase()
+        );
+    }
+    let mut missing_custom = custom.clone();
+    let object = missing_custom
+        .objects
+        .get_mut(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
+        .unwrap()
+        .get_mut(&ep_raw_model::ObjectName("Custom Gap".into()))
+        .unwrap();
+    for field in [
+        "viscosity_coefficient_a",
+        "specific_heat_coefficient_a",
+        "molecular_weight",
+    ] {
+        object.fields.remove(&ep_raw_model::FieldName(field.into()));
+    }
+    let missing_source = super::super::compile_raw_model_for_source(&missing_custom);
+    assert!(
+        !missing_source.has_errors(),
+        "{:?}",
+        missing_source.report.diagnostics
+    );
+    let missing_model = missing_source.model.as_ref().unwrap();
+    let id = missing_model.material_names.resolve("Custom Gap").unwrap();
+    assert!(
+        missing_model
+            .ctf_report_names
+            .materials
+            .contains(&(id, "CUSTOM GAP".into()))
+    );
+    let row = missing_model
+        .materials
+        .iter()
+        .find(|row| row.id == id)
+        .unwrap()
+        .as_window_gas()
+        .unwrap();
+    assert_eq!(
+        [
+            row.properties.viscosity.coefficient_a,
+            row.properties.specific_heat.coefficient_a,
+            row.properties.molecular_weight_g_per_mol,
+            row.properties.specific_heat_ratio
+        ],
+        [0.0; 4]
+    );
+    assert_eq!(
+        compile_raw_model(&missing_custom)
+            .report
+            .diagnostics
+            .iter()
+            .filter(|row| row.code == "MissingCustomWindowGasProperty")
+            .count(),
+        3
+    );
+    let mut zero_custom = custom.clone();
+    zero_custom
+        .objects
+        .get_mut(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
+        .unwrap()
+        .get_mut(&ep_raw_model::ObjectName("Custom Gap".into()))
+        .unwrap()
+        .fields
+        .insert(
+            ep_raw_model::FieldName("conductivity_coefficient_a".into()),
+            ep_raw_model::RawValue::Number("0.0".into()),
+        );
+    let zero_source = super::super::compile_raw_model_for_source(&zero_custom);
+    assert!(!zero_source.has_errors());
+    assert!(zero_source.model.is_some());
+    assert!(
+        compile_raw_model(&zero_custom)
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "InvalidWindowGasConductivityAt300K")
+    );
+    // A Named row selecting SourceExact is NOT authorization to defer a used
+    // Custom row. The independent original-schema/unused predicate still fails.
+    let mut used_custom = missing_custom.clone();
+    let named_row = raw_model.objects[&ep_raw_model::ObjectType("WindowMaterial:Gas".into())]
+        [&ep_raw_model::ObjectName("Gas Gap".into())]
+        .clone();
+    used_custom
+        .objects
+        .get_mut(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
+        .unwrap()
+        .insert(ep_raw_model::ObjectName("Named Trigger".into()), named_row);
+    let converted =
+        parse_epjson_str(r#"{"Construction":{"Used":{"outside_layer":"Custom Gap"}}}"#)?;
+    used_custom.objects.insert(
+        ep_raw_model::ObjectType("Construction".into()),
+        converted.objects[&ep_raw_model::ObjectType("Construction".into())].clone(),
+    );
+    let used_source = super::super::compile_raw_model_for_source(&used_custom);
+    assert!(
+        used_source
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "MissingCustomWindowGasProperty")
+    );
+    let invalid_custom = parse_epjson_str(
+        r#"{"WindowMaterial:Gas":{"Invalid":{"gas_type":"Custom","thickness":0.012,"viscosity_coefficient_a":0.0}}}"#,
+    )?;
+    assert!(super::super::compile_raw_model_for_source(&invalid_custom).has_errors());
+    let idf_missing = ep_raw_model::parse_epjson_str_with_idf_order(
+        r#"{"WindowMaterial:Gas":{"IDF Custom":{"gas_type":"Custom","thickness":0.012,"conductivity_coefficient_a":0.02}}}"#,
+        "WindowMaterial:Gas,IDF Custom,Custom,0.012,0.02;",
+    )?;
+    assert!(!idf_missing.is_epjson());
+    assert!(
+        super::super::compile_raw_model_for_source(&idf_missing)
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "MissingCustomWindowGasProperty")
+    );
     Ok(())
 }
 

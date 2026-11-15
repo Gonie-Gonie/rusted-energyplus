@@ -367,7 +367,8 @@
       "One fixed unused SGS UNUSED NORMAL definition uses U-factor4.2, SHGC0.57 and omitted VT, with an explicit new Output:Constructions Materials request. The unchanged158-series/75120-value profile, original twelve engine/eight paired/two export gates, nine-role OA/mixed witnesses and complete EIO comparison remain mandatory. Root separately observes actual Material Details row presence; equal EIO alone is not a presence proof. Material Details does not expose optical SHGC/VT, window physics or private runtime properties. Existing typed classification and historical diagnostic addendum remain unchanged."
     ],
     "WindowMaterial:Gas": [
-      "Bounded Source B direct epJSON admits unused WindowMaterial:Gas definitions of Air, Argon, Krypton or Xenon only. Native-required names, exact gas-type enums, positive raw thickness and every supplied schema-known optional numeric field remain validated; unknown body metadata is retained by Raw/IP and ignored as getter operands. Original JSON schema values and Native signed-i64-effective numeric operands remain distinct. The actual ordered getter owns scratch/default/blank/used state, the per-MaterialId Gas row, constructor-zero base properties, standard species constants and the separate 300K NominalR write under Native K>0/error ordering. Materials reporting and checked geometry properties read that same runtime row; typed derived properties are not substituted. Source-exact material names retain Native case/space identity and real loader IDs. Every Construction reference, Custom Gas, active window physics, Source A/IDF, Legacy changes and full-object completion remain held. Existing owner tests, compile-only integration and one fixed unused-Argon comparison have separate scope; whole EIO equality requires an independently observed Material Details row and proves no gas coefficients, optics or window heat transfer."
+      "Bounded Source B direct epJSON admits unused WindowMaterial:Gas definitions of Air, Argon, Krypton or Xenon only. Native-required names, exact gas-type enums, positive raw thickness and every supplied schema-known optional numeric field remain validated; unknown body metadata is retained by Raw/IP and ignored as getter operands. Original JSON schema values and Native signed-i64-effective numeric operands remain distinct. The actual ordered getter owns scratch/default/blank/used state, the per-MaterialId Gas row, constructor-zero base properties, standard species constants and the separate 300K NominalR write under Native K>0/error ordering. Materials reporting and checked geometry properties read that same runtime row; typed derived properties are not substituted. Source-exact material names retain Native case/space identity and real loader IDs. Every Construction reference, Custom Gas, active window physics, Source A/IDF, Legacy changes and full-object completion remain held. Existing owner tests, compile-only integration and one fixed unused-Argon comparison have separate scope; whole EIO equality requires an independently observed Material Details row and proves no gas coefficients, optics or window heat transfer.",
+      "The additional bounded Source B direct-epJSON route admits unused Custom Gas alongside the named route recorded by the preceding Source174 item. All original schema-known fields and Native names remain validated while unknown body metadata stays Raw/IP custody; actual signed-i64-effective operands are separate. The same ordered getter writes all eleven Custom properties, including six B/C coefficients and omitted numeric zero for the ratio, before its Native viscosity-A, specific-heat-A and molecular-weight diagnostics. Those checks set shared ErrorsFound before their diagnostic IO; the conductivity-denominator failure sets it only after Severe, formatting and Continue return. The actual conditional 300K NominalR remains separate from constructor-zero base Resistance and Materials properties. Source-only compiler deferral and total Raw-name/type/count, exact NameMap and loader-ID bijections do not replace the real Raw/IP runtime row with typed advisory coefficients. Existing same-row owner checks, connected admission and the fixed unused-Custom comparison have distinct scope. Whole EIO and geometry-export requirements remain mandatory; the public Material Details row does not expose Custom coefficients or private NominalR and proves no active window behavior. Every Construction reference, Source A/IDF, Legacy changes and arbitrary/full-object completion remain held."
     ],
     "OutdoorAir:Node": [
       "Bounded ordinary no-AFN Source B direct epJSON only: coherent authored OutdoorAir:Node singles and nameless OutdoorAir:NodeList objects use actual DSOA and every existing positive-OA prerequisite. The selected IdealLoads OA node may already be a list or single registry member; the real CheckAndAdd owner appends only a genuinely absent node. Height is omitted/default or finite after Native numeric conversion. DB, WB and wind fields are omitted, exact-empty Strings or existing supported schedule references, including both named temperature schedules. On the ordinary no-AFN path, wind_pressure_coefficient_curve_name permits any String, symmetric_wind_pressure_coefficient_curve exactly empty/No/Yes, and wind_angle_type exactly empty/Absolute/Relative. These direct epJSON enums do not trim or case-fold; null, numeric, boolean, container and unknown-enum values stay held. OutdoorAir:NodeList instance keys are input-order and used-object identities, never an A1 node name. Omitted or empty member arrays perform the real zero-alpha input fill; each nodes array member is an Object with a required String node_or_nodelist_name field. An exact-empty field value returns zero nodes, while whitespace remains a real name. All OA-list objects are filled before all singles in actual IP order. Every returned membership preserves the exact Native allocation/reference effects: newly assigned names begin at ref0 and references to existing names increment. OutsideAir registrations and advancing fluid streams are retained per membership; only the final outdoor-node registry deduplicates node numbers. Single registration still precedes Height and schedule writes. Success alone commits the final list/count and clears the consumed input flag. The selected IdealLoads member consumer uses the existing registry path without invented reference or registration effects. Actual A2 then A3 lookup/null assignment/used state and ordered registration remain owners. AnyLocal is positional; IsLocal follows actual temperature pointers. All eight alpha slots, default/blank distinctions, object-used state, highest-field counts and counted N1 default remain genuine. Late-field presence can set AnyLocal; it does not make a local-temperature pointer. Ordinary GetInput never consumes A6-A8 into curve/AFN properties. No AirflowNetwork:SimulationControl, default multizone conjunction or duct-loss route may enter this boundary; positive AFN/Curve/Table families remain held. True InitCall retains global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. Any present WB pointer selects existing real W(Tdb,Twb,P), including both named schedules. DB-only instead writes global W before cached Twb and nested TsatPb/Psat, preserving live pressure, diagnostics, iteration order and default interpolation=false. Computed Twb replaces WB only on child success; earlier weather/clamp writes remain and H/P/Quality stay later. No additional outer clamp follows the computed Twb result; the psychrometric owner retains its own Native final clamp. False/local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. Three cold callers/HB transport actual owners without copied state or resets. The selected coherent scene preserves the inherited active OA climate, all numeric inputs and original output requests. Its complete BND prediction is derived and reviewed before actors from genuine empty owner state through general-list allocation, Zone equipment, OA lists and singles, Scheduled managers, PurchasedAir and the real reporting cutoff. Whole-body comparison covers node/reference identities, connection order, streams, registry order and conditional report blocks; complete general-list and Scheduled-manager exports cover their actual public raw/order custody. Original numeric science, clocks, ancillary and nine-report OA/mixed gates remain mandatory. A selected member consumer and existing owner tests provide distinct evidence; no physical absent-node autoappend or private getter-state witness is inferred. The one combined scene uses distinct real temperature schedule names with equal values; separate existing owner tests cover their declared non-equal clamp effects. Direct private DB/WB/Height/wind/call counts, active WPC/AFN curve validity or pressure physics, arbitrary schedule/value compositions, interpolation/statistics variants, EMS, other consumers, Source A/IDF, TypedModel completion and full-object conformance remain unestablished. Exact-empty OA-list entries are the defined zero-node route. Safe general-NodeList trailing blanks and unreferenced warning-only definitions remain separate from an expanded interior-blank zero prefix, whose Native one-based Node(0)/NodeRef(0) access is undefined or assertion-dependent; the Source checked stop does not claim completion of that partition. On direct epJSON OutdoorAir:Node singles, schema-legally ignored fields outside the eight declared body properties may have any JSON kind, including body name and idf_* members; their exact Raw/IP custody remains intact. They are not getter operands: A1 still comes from the actual map key, and ignored bookkeeping does not alter direct-JSON order, positional counts, defaults or AnyLocal. All known Height, schedule and WPC fields retain their strict type, numeric, enum and reference checks. The fixed child holds every755 parent numeric record and adds only two ignored Float metadata records. It changes no runtime/weather math, node registration/topology, report request, complete export or scientific criterion. Source A/IDF/Legacy, AFN, Native-fatal invalid combinations, unreviewed metadata in other families and broad list/consumer combinations have no new completion or exact fatal-prefix claim.",
@@ -11805,6 +11806,50 @@
           "path": ".runtime/porting/unused-named-window-gas/evidence01/source-evidence.json",
           "sha256": "76bfff89f848a1be7f0ca9db75ad8d6d3dfa849b463d7d100b8b74e715880e8b",
           "bytes": 41151
+        }
+      },
+      "unused_custom_window_material_gas_source175": {
+        "actual_quality": {
+          "path": ".runtime/porting/unused-custom-window-gas/quality01/summary.json",
+          "sha256": "353c2cf78ec4e2fbdc6b0f825e1bfdf1aad7a9ae3dbbf2b4c9321ded2dc32b39",
+          "bytes": 2351
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/unused-custom-window-gas/evidence01/quality-ledger.json",
+          "sha256": "4b0d92718114b936601ec5757464801ceff81902eb10023066a208db38f7df02",
+          "bytes": 4915
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-custom-window-gas/quality01/quality-preparation.json",
+          "sha256": "977251a25ff57162436e7570878c9fcf7a29e7c457efbd078a684b8c9cbaaa3c",
+          "bytes": 14530
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-custom-window-gas/evidence01/source-authority.json",
+          "sha256": "13581634362a5cc8c6d6a955d8e5cd977fe0eaf68238790fc5edf02abd6b83f0",
+          "bytes": 46850
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/object-expansion/unit159-prep/independent-actual-unused-Custom-WindowMaterial-Gas-Source-authority-static-review01.json",
+          "sha256": "08d36f9ddaf121449040bfbb8940f45365ce0e5450a82e8ac1ce8ce1da05790a",
+          "bytes": 3582
+        },
+        "total_actual_QA_commands": 7,
+        "current_QA_commands": 7,
+        "failed_QA_attempts": 0,
+        "current_test_body_executions": 4,
+        "historical_test_body_executions": 0,
+        "total_actual_test_body_executions": 4,
+        "distinct_existing_test_functions": 4,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "correction_reviews": [],
+        "actual_test_execution_evidence": {
+          "path": ".runtime/porting/unused-custom-window-gas/evidence01/source-evidence.json",
+          "sha256": "cf3b2976dd1e72ced13d11ccd6de790f103fc0e28f8e5be688350881b30b9185",
+          "bytes": 22329
         }
       }
     },
@@ -77366,12 +77411,343 @@
           "Material_Details_presence": true,
           "geometry_export_identity": true
         }
+      },
+      {
+        "id": "ideal-loads-unused-custom-window-gas",
+        "case_kind": "UNUSED_CUSTOM_WINDOW_MATERIAL_GAS",
+        "group": "WindowMaterial:Gas",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-unused-custom-window-gas",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/unused-Custom-WindowMaterial-Gas-CLOSED-input-data-proposal01/input.epJSON",
+          "sha256": "7b9f7d9d88c0b83e66fa0899f80dd0a1f826a0eb10484816a2010d13f9873ef5",
+          "bytes": 104404
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/native/command/receipt.json",
+          "sha256": "a140f169dbb57b40ad1c1d8a88412bf6a4b81f8a420e32c392cd5760c906813b",
+          "bytes": 283445
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/source/command/receipt.json",
+          "sha256": "13a89c493ed91d61214e33c2cc5bc3082899b9e30bfca1c6dc7012558e6257c3",
+          "bytes": 284769
+        },
+        "source_summary": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/source/output/run-summary.json",
+          "sha256": "14e71c381917e9f7943c2942e9f17016fd41f984aa2164e140bcb2acff288ee0",
+          "bytes": 64313
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e1/e1df32296821171b14b13ed4885a002c9bbac612f82d064a33edac3075a8803c",
+          "sha256": "e1df32296821171b14b13ed4885a002c9bbac612f82d064a33edac3075a8803c"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/unused-custom-window-gas/build01/frozen/eplus-rs.exe",
+          "sha256": "41c0d93dc5d56eb6f8c228fb668759985f5431ef392ffdbe087eb2cd4b0886e7",
+          "bytes": 81598521
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/unused-custom-window-gas/build01/build/receipt.json",
+          "sha256": "9e0ec127dec16cf0b3d69d0b6cb7392f37c7fddbaf74a663d2f85b517c105923",
+          "bytes": 49376
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/readback.json",
+          "sha256": "9420e5fbf44fc0694e0c928ef98f49d83e16a5adf3749b87370fdd182a66fdc3",
+          "bytes": 540355
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/Root-scientific-review.json",
+          "sha256": "a5258ae76b31fc1bc558438c3ed44bfe405a5d0e168f055b2b788d1849bdaf25",
+          "bytes": 15524
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/case-config.json",
+          "sha256": "b326ea33ef2fad5faa2c7676aafc895c3821257bbe06a7d7f9a775906e194775",
+          "bytes": 109815
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse_delta": 2.039620483986755e-08
+        },
+        "coverage_kind": "unused_custom_window_material_gas_source175",
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false,
+          "new_report_requests": 0
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v5/release.json",
+            "sha256": "89aabe3af3993118c4f0f38c073648d746e424ed4d4a27ccdfcde78a8c5953ea",
+            "bytes": 8924
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/binding.json",
+            "sha256": "e307467a6b7f74b595cc6276a97d74b8b4187c0d75154b08a7c56499cb94c1a1",
+            "bytes": 1139
+          },
+          "case_config": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/case-config.json",
+            "sha256": "b326ea33ef2fad5faa2c7676aafc895c3821257bbe06a7d7f9a775906e194775",
+            "bytes": 109815
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/unused-custom-window-gas/evidence01/source-authority.json",
+            "sha256": "13581634362a5cc8c6d6a955d8e5cd977fe0eaf68238790fc5edf02abd6b83f0",
+            "bytes": 46850
+          },
+          "completion": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/completed.json",
+            "sha256": "567476a987c63722d682918795b34ce7654674309ce74b49f55e4ce1231e6890",
+            "bytes": 2249
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/verify-command/receipt.json",
+            "sha256": "3d27f7bac86ee1c44a811c95870544287367029145f53320505965a01e42f9be",
+            "bytes": 284489
+          },
+          "Native_precheck": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/native-precheck.json",
+            "sha256": "b13a3bf951697329823b9e2f57f11c570d43c0207f7a3d155037726f4335623b",
+            "bytes": 21654
+          },
+          "Native_precheck_receipt": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/precheck-command/receipt.json",
+            "sha256": "15e1c86befe0a9e00089827e71208d1a433b12104705172998d0bc01b39b405f",
+            "bytes": 283761
+          },
+          "actual_build": {
+            "path": ".runtime/porting/unused-custom-window-gas/build01/build-row.json",
+            "sha256": "fa5e970b17f60271269ee5af991470efb0608a288543641bd30193ebf47884b2",
+            "bytes": 1363
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/unused-custom-window-gas/quality01/summary.json",
+            "sha256": "353c2cf78ec4e2fbdc6b0f825e1bfdf1aad7a9ae3dbbf2b4c9321ded2dc32b39",
+            "bytes": 2351
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/unused-custom-window-gas/evidence01/source-authority.json",
+            "sha256": "13581634362a5cc8c6d6a955d8e5cd977fe0eaf68238790fc5edf02abd6b83f0",
+            "bytes": 46850
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "profile": "ideal_loads.oa_topology.v1",
+          "topology_prediction": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/prediction-actual-Source.json",
+            "sha256": "d5af4b123bfc8e3e346a1a4aa41cba46924c45f16e94633900c3020601149ba1",
+            "bytes": 32526
+          },
+          "topology_derivation": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/derivation-actual-Source.json",
+            "sha256": "0f67155202cf469a4f873604a12e9505d6471bc56bb395afa24ceb5d16299b23",
+            "bytes": 113301
+          },
+          "topology_prediction_reviews": {
+            "Root": {
+              "path": ".runtime/porting/unused-custom-window-gas/runtime01/Root-prediction-review.json",
+              "sha256": "309a466692a4aa1bbcc2b9eff01750cccf7b00af0ebc6bb67ff16ce6cd3f964c",
+              "bytes": 2283
+            },
+            "independent": {
+              "path": ".runtime/object-expansion/unit159-prep/independent-unused-Custom-Gas-actual-Source-prediction-review01.json",
+              "sha256": "309a466692a4aa1bbcc2b9eff01750cccf7b00af0ebc6bb67ff16ce6cd3f964c",
+              "bytes": 2283
+            }
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/porting/unused-custom-window-gas/runtime01/Root-runtime-review.json",
+            "sha256": "5c767fc6b6de2ccae645940d8a098311e84868b08018d3a02c1e372e469852a5",
+            "bytes": 2632
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-unused-Custom-WindowMaterial-Gas-CLOSED-input-topology-data-static-review01.json",
+            "sha256": "ec92784f064f8772c475ee962aa2eb5e7902fd92ff82e6b0ad0d48dc9a01f5d4",
+            "bytes": 4090
+          },
+          "QA_profile": {
+            "path": ".runtime/object-expansion/unit159-prep/Custom-WindowMaterial-Gas-QA-profile-data-proposal01/QA-profile.json",
+            "sha256": "3ae141e7b54b7e856cd29e074e5b00fb60023a42fde4109618affd17f5eb543f",
+            "bytes": 6051
+          },
+          "QA_profile_binding": {
+            "path": ".runtime/porting/unused-custom-window-gas/QA-profile-binding01.json",
+            "sha256": "b1c8884f074e085bb020ff6e636c88df0cab6cc0a3033fa0c7007d061ee6e069",
+            "bytes": 2051
+          },
+          "documentation_actual_facts": {
+            "path": ".runtime/porting/unused-custom-window-gas/Root-documentation-facts01.json",
+            "sha256": "c0c50a9ea12bd788a262f662ac67beaf5b4c014fe320ad3303d7038afbbd4928",
+            "bytes": 1487
+          }
+        },
+        "scientific_gate_counts": {
+          "engine": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "public_response_summary": {
+          "Native": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.03148489327319126,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          },
+          "Source": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.031484893273194814,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          }
+        },
+        "effective_state": "One ordinary SourceB direct-epJSON scene adds one unused Custom WindowMaterial:Gas with thickness0.012, conductivityA0.02, viscosityA0.00001, specificHeatA1000.0 and molecularWeight28.0; optional B/C coefficients and ratio are omitted. The accepted named Argon definition remains present, and no Construction references either. All758 parent numeric records and all752 canonical numeric records are held, with5 new Float records. Actual Native and Source public Material Details rows agree; the actual Source geometry export retains the same typed Gas identity and observed Source-only NominalR. The Native public row does not expose its private coefficients or NominalR. All158/75120 original numerical, clock, diagnostics, topology and ancillary gates remain mandatory. The actual4 existing owner/compiler/caller test bodies separately check Custom writes, omitted and signed-effective operands and Native error/IO ordering; public fixed-input equality grants no additional private Native state observation. Active window/construction transport, SourceA/IDF/Legacy and arbitrary/full-object completion remain unestablished.",
+        "authored_height": {
+          "JSON_kind": "Float",
+          "value": 12.5,
+          "bits": "4029000000000000"
+        },
+        "unused_custom_gas": {
+          "fixed_input_manifest": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-Custom-WindowMaterial-Gas-CLOSED-input-data-proposal01/prepared-manifest.json",
+            "sha256": "c1085fb075a75c0afd4cab166f66b4143b5952a9b3c64158c5c55360b0d1f4be",
+            "bytes": 9541
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-unused-Custom-WindowMaterial-Gas-CLOSED-input-topology-data-static-review01.json",
+            "sha256": "ec92784f064f8772c475ee962aa2eb5e7902fd92ff82e6b0ad0d48dc9a01f5d4",
+            "bytes": 4090
+          },
+          "parent_numeric_records": 758,
+          "current_numeric_records": 763,
+          "added_numeric_records": [
+            {
+              "JSON_path": "/WindowMaterial:Gas/GAS UNUSED CUSTOM NORMAL/conductivity_coefficient_a",
+              "JSON_kind": "float",
+              "token": "0.02",
+              "parsed_binary64_bits": "3f947ae147ae147b",
+              "parsed_binary64_hex": "0x1.47ae147ae147bp-6"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Gas/GAS UNUSED CUSTOM NORMAL/molecular_weight",
+              "JSON_kind": "float",
+              "token": "28.0",
+              "parsed_binary64_bits": "403c000000000000",
+              "parsed_binary64_hex": "0x1.c000000000000p+4"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Gas/GAS UNUSED CUSTOM NORMAL/specific_heat_coefficient_a",
+              "JSON_kind": "float",
+              "token": "1000.0",
+              "parsed_binary64_bits": "408f400000000000",
+              "parsed_binary64_hex": "0x1.f400000000000p+9"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Gas/GAS UNUSED CUSTOM NORMAL/thickness",
+              "JSON_kind": "float",
+              "token": "0.012",
+              "parsed_binary64_bits": "3f889374bc6a7efa",
+              "parsed_binary64_hex": "0x1.89374bc6a7efap-7"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Gas/GAS UNUSED CUSTOM NORMAL/viscosity_coefficient_a",
+              "JSON_kind": "float",
+              "token": "1e-05",
+              "parsed_binary64_bits": "3ee4f8b588e368f1",
+              "parsed_binary64_hex": "0x1.4f8b588e368f1p-17"
+            }
+          ],
+          "Gas_map_before": {
+            "GAS UNUSED ARGON": {
+              "gas_type": "Argon",
+              "thickness": 0.012
+            }
+          },
+          "Gas_map_after": {
+            "GAS UNUSED ARGON": {
+              "gas_type": "Argon",
+              "thickness": 0.012
+            },
+            "GAS UNUSED CUSTOM NORMAL": {
+              "gas_type": "Custom",
+              "thickness": 0.012,
+              "conductivity_coefficient_a": 0.02,
+              "viscosity_coefficient_a": 1e-05,
+              "specific_heat_coefficient_a": 1000.0,
+              "molecular_weight": 28.0
+            }
+          },
+          "added_Raw_Gas": {
+            "path": [
+              "WindowMaterial:Gas",
+              "GAS UNUSED CUSTOM NORMAL"
+            ],
+            "body": {
+              "gas_type": "Custom",
+              "thickness": 0.012,
+              "conductivity_coefficient_a": 0.02,
+              "viscosity_coefficient_a": 1e-05,
+              "specific_heat_coefficient_a": 1000.0,
+              "molecular_weight": 28.0
+            }
+          },
+          "Material_Details_presence": true,
+          "geometry_export_identity": true
+        }
       }
     ],
     "totals": {
-      "paired_cases": 256,
-      "reported_samples": 11172856,
-      "raw_operand_unequal": 2831354,
+      "paired_cases": 257,
+      "reported_samples": 11247976,
+      "raw_operand_unequal": 2854422,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -80467,6 +80843,38 @@
           "sha256": "1b21699dd77b7239d935118595aed75907315ef35f68aac6b9f8aeac43cabce3",
           "bytes": 64955
         }
+      },
+      {
+        "id": "source-unused-custom-window-gas",
+        "receipt": {
+          "path": ".runtime/porting/unused-custom-window-gas/build01/build/receipt.json",
+          "sha256": "9e0ec127dec16cf0b3d69d0b6cb7392f37c7fddbaf74a663d2f85b517c105923",
+          "bytes": 49376
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/e1/e1df32296821171b14b13ed4885a002c9bbac612f82d064a33edac3075a8803c",
+          "sha256": "e1df32296821171b14b13ed4885a002c9bbac612f82d064a33edac3075a8803c"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-custom-window-gas/build01/frozen/eplus-rs.exe",
+          "sha256": "41c0d93dc5d56eb6f8c228fb668759985f5431ef392ffdbe087eb2cd4b0886e7",
+          "bytes": 81598521
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-custom-window-gas/build01/frozen/build-receipt.json",
+          "sha256": "f602cd99449c299fbd8c533ef80d61bedfbcc55184958c565dd1fc0919ff69cb",
+          "bytes": 1645411
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-custom-window-gas/quality01/quality-preparation.json",
+          "sha256": "977251a25ff57162436e7570878c9fcf7a29e7c457efbd078a684b8c9cbaaa3c",
+          "bytes": 14530
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-custom-window-gas/build01/freeze/receipt.json",
+          "sha256": "11e58e608c9b512834f86b62e8def6046da5ce4ffa8f0f5ea902353f85dd2eb3",
+          "bytes": 48370
+        }
       }
     ],
     "focused_since_workspace": {
@@ -80913,14 +81321,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 174,
-      "builds_with_accepted_paired_cases": 152,
+      "actual_recorded_builds": 175,
+      "builds_with_accepted_paired_cases": 153,
       "builds_with_only_retained_failed_Source_attempts": 8,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 14,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "174 recorded Source builds: 152 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "175 recorded Source builds: 153 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -85619,47 +86027,48 @@
         "ideal-loads-authored-outdoor-air-node-inactive-wpc-recorded-after-disk-recovery",
         "ideal-loads-coherent-outdoor-air-multiple-singles-and-lists",
         "ideal-loads-outdoor-air-node-ignored-metadata",
-        "ideal-loads-unused-named-window-gas"
+        "ideal-loads-unused-named-window-gas",
+        "ideal-loads-unused-custom-window-gas"
       ],
-      "accepted_paired_cases": 85,
-      "accepted_samples": 6271680,
-      "retained_Scheduled_B_pairs": 84,
-      "retained_Scheduled_B_samples": 6212160,
+      "accepted_paired_cases": 86,
+      "accepted_samples": 6346800,
+      "retained_Scheduled_B_pairs": 85,
+      "retained_Scheduled_B_samples": 6287280,
       "unused_NodeList_A_pairs": 1,
       "unused_NodeList_A_samples": 59520,
       "latest_complete_comparisons": {
-        "UNUSED_NAMED_WINDOW_MATERIAL_GAS": {
-          "path": ".runtime/porting/unused-named-window-gas/runtime01/readback.json",
-          "sha256": "38655261ce0381a1d31b34e33ab1bd5080b7a0c10f9c370dcbfa7efe8c61f563",
-          "bytes": 540310
+        "UNUSED_CUSTOM_WINDOW_MATERIAL_GAS": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/readback.json",
+          "sha256": "9420e5fbf44fc0694e0c928ef98f49d83e16a5adf3749b87370fdd182a66fdc3",
+          "bytes": 540355
         }
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/porting/unused-named-window-gas/runtime01/Root-scientific-review.json",
-        "sha256": "684feb0909d15eb236465826cb60146a411c321e0ab9e9a97936022b63da030a",
-        "bytes": 15034
+        "path": ".runtime/porting/unused-custom-window-gas/runtime01/Root-scientific-review.json",
+        "sha256": "a5258ae76b31fc1bc558438c3ed44bfe405a5d0e168f055b2b788d1849bdaf25",
+        "bytes": 15524
       },
-      "latest_source_build": "source174-unused-named-window-gas",
+      "latest_source_build": "source-unused-custom-window-gas",
       "latest_actual_Source_build": {
-        "path": ".runtime/porting/unused-named-window-gas/build01/build-row.json",
-        "sha256": "3223878d58c1b48dbe7f7c9dcc7bad98dde66a667af0e6b47dc69a8427f3111c",
-        "bytes": 1360
+        "path": ".runtime/porting/unused-custom-window-gas/build01/build-row.json",
+        "sha256": "fa5e970b17f60271269ee5af991470efb0608a288543641bd30193ebf47884b2",
+        "bytes": 1363
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/unused-named-window-gas/quality02/summary.json",
-        "sha256": "d4366c89a923c78c0c22ea9a068a6adbbcf13be5c7c67888f8c7eb924b72ca7b",
-        "bytes": 2687
+        "path": ".runtime/porting/unused-custom-window-gas/quality01/summary.json",
+        "sha256": "353c2cf78ec4e2fbdc6b0f825e1bfdf1aad7a9ae3dbbf2b4c9321ded2dc32b39",
+        "bytes": 2351
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/porting/unused-named-window-gas/evidence01/source-authority.json",
-        "sha256": "5817a27239fa1cd72ba656700d65161e200fb828eb861a5b990aa03242365d3f",
-        "bytes": 77010
+        "path": ".runtime/porting/unused-custom-window-gas/evidence01/source-authority.json",
+        "sha256": "13581634362a5cc8c6d6a955d8e5cd977fe0eaf68238790fc5edf02abd6b83f0",
+        "bytes": 46850
       },
       "latest_input_contracts": {
-        "UNUSED_NAMED_WINDOW_MATERIAL_GAS": {
-          "path": ".runtime/porting/unused-named-window-gas/runtime01/case-config.json",
-          "sha256": "c135083ba778d844298cb8a80be79ce2a226549f01fd186abfebd32629c3e16a",
-          "bytes": 109236
+        "UNUSED_CUSTOM_WINDOW_MATERIAL_GAS": {
+          "path": ".runtime/porting/unused-custom-window-gas/runtime01/case-config.json",
+          "sha256": "b326ea33ef2fad5faa2c7676aafc895c3821257bbe06a7d7f9a775906e194775",
+          "bytes": 109815
         }
       },
       "latest_retained_evidence": {
@@ -85672,7 +86081,7 @@
         "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
         "bytes": 2919
       },
-      "scope": "84 bounded Source B Scheduled/NodeList pairs retain 6,212,160 values. The unused Source A pair adds59,520, giving 85 pairs and 6,271,680 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
+      "scope": "85 bounded Source B Scheduled/NodeList pairs retain 6,287,280 values. The unused Source A pair adds59,520, giving 86 pairs and 6,346,800 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
       "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
