@@ -327,6 +327,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                     | "ZoneControl:Thermostat"
                     | "ZoneControl:Humidistat"
                     | "DesignSpecification:OutdoorAir"
+                    | "OutdoorAir:Node"
                     | "ThermostatSetpoint:DualSetpoint"
                     | "ZoneHVAC:EquipmentConnections"
                     | "ZoneHVAC:EquipmentList"

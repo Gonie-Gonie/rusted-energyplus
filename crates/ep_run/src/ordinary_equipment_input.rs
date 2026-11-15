@@ -131,6 +131,7 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
         .objects
         .get(&ObjectType("ZoneHVAC:IdealLoadsAirSystem".into()));
     let selected = positive("DesignSpecification:OutdoorAir")
+        || positive("OutdoorAir:Node")
         || units.is_some_and(|rows| {
             rows.values().any(|unit| {
                 text(unit, "design_specification_outdoor_air_object_name").is_some()
@@ -189,7 +190,6 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
             .is_none_or(|rows| rows.len() != 1)
         || [
             "ZoneControl:Humidistat",
-            "OutdoorAir:Node",
             "OutdoorAir:NodeList",
             "DesignSpecification:OutdoorAir:SpaceList",
             "AirLoopHVAC",
@@ -206,6 +206,9 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     let Some(oa_name) = text(unit, "outdoor_air_inlet_node_name") else {
         return error();
     };
+    if let Some(error) = source_b_authored_outdoor_air_node_prerequisite_error(raw, oa_name) {
+        return Some(error);
+    }
     // Omission uses Native's named defaults. Exact-empty ventilation selectors
     // retain actual Invalid, distinct from the typed admission defaults.
     // Only exact empty is admitted here; no generic blank or unknown waiver.
@@ -417,6 +420,46 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
                     .any(|name| text(connection, name).is_some_and(collides))
                 })
             })
+    {
+        return error();
+    }
+    None
+}
+
+/// Local authored-object prerequisites only. The existing full positive-OA
+/// validator calls this leaf after proving both real references; no reverse edge.
+fn source_b_authored_outdoor_air_node_prerequisite_error(
+    raw: &RawModel,
+    outdoor_air_name: &str,
+) -> Option<String> {
+    let objects = raw.objects.get(&ObjectType("OutdoorAir:Node".into()))?;
+    if objects.is_empty() {
+        return None;
+    }
+    let error = || {
+        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or negative Native height, and absent local alpha fields".into())
+    };
+    if objects.len() != 1 {
+        return error();
+    }
+    let (name, object) = objects.iter().next()?;
+    if !name.0.eq_ignore_ascii_case(outdoor_air_name)
+        || [
+            "drybulb_temperature_schedule_name",
+            "wetbulb_temperature_schedule_name",
+            "wind_speed_schedule_name",
+            "wind_direction_schedule_name",
+            "wind_pressure_coefficient_curve_name",
+            "symmetric_wind_pressure_coefficient_curve",
+            "wind_angle_type",
+        ]
+        .iter()
+        .any(|name| field(object, name).is_some())
+        || field(object, "height_above_ground").is_some_and(|value| {
+            !matches!(value, RawValue::Number(token) if ep_model::classify_source_json_number(token)
+                .map(ep_model::SourceJsonNumber::as_f64)
+                .is_ok_and(|height| height.is_finite() && height < 0.0))
+        })
     {
         return error();
     }

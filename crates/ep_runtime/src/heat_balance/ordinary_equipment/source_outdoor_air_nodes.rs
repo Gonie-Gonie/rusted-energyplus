@@ -59,6 +59,66 @@ impl OrdinaryEquipment {
         Ok(())
     }
 
+    /// Native GetOutAirNodesInput270-282 registers the authored A1 name on
+    /// the same physical NodeOwner used by the later PurchasedAir consumer.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn get_source_authored_outdoor_air_node_nums(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        branch: &mut SourceBranchNodeConnections,
+        name: &str,
+        field_name: &str,
+        stream: i32,
+        number_nodes: &mut usize,
+        node_numbers: &mut [usize],
+        errors_found: &mut bool,
+        backend: &mut SourceErrorBackend<'_>,
+        flags: Option<SourceDiagnosticFlags<'_>>,
+    ) -> Result<(), Error> {
+        self.nodes
+            .get_source_node_nums(
+                input,
+                backend,
+                flags,
+                branch,
+                name,
+                number_nodes,
+                node_numbers,
+                errors_found,
+                SourceNodeFluidType::Air,
+                SourceNodeObjectType::OutdoorAirNode,
+                "OutdoorAir:Node",
+                SourceNodeConnectionType::OutsideAir,
+                SourceCompFluidStream::source_positive(stream)?,
+                false,
+                true,
+                field_name,
+            )
+            .map_err(|_| Error::Unavailable("actual authored OutdoorAir GetNodeNums270"))?;
+        Ok(())
+    }
+
+    /// Native313: only a physically counted N1 writes Height, after the real
+    /// registration/membership checks. Omission retains the Node constructor.
+    pub(crate) fn set_source_authored_outdoor_air_node_height(
+        &mut self,
+        node_number: usize,
+        height: f64,
+    ) -> Result<(), Error> {
+        let index = node_number.checked_sub(1).ok_or(Error::Unavailable(
+            "actual authored outdoor-air positive physical Node ordinal",
+        ))?;
+        self.nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
+            .ok_or(Error::Unavailable(
+                "actual authored outdoor-air Height physical Node",
+            ))?
+            .height = height;
+        Ok(())
+    }
+
     pub(crate) fn set_source_outdoor_air_node_values(
         &mut self,
         node_number: i32,

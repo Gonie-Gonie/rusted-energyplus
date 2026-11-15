@@ -17,15 +17,20 @@ impl Default for SourceOutdoorAirNodes {
     }
 }
 impl SourceOutdoorAirNodes {
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn set_source_outdoor_air_nodes(
         &mut self,
         input: &mut SelectedInputProcessor,
         equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
         environment: &crate::weather::day::WeatherEnvironmentState,
         control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
+        branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
+        source_is_epjson: bool,
+        backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
+        flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
         if self.get_input_flag {
-            self.get_source_input(input)?;
+            self.get_source_input(input, equipment, branch, source_is_epjson, backend, flags)?;
             self.get_input_flag = false;
         }
         for ordinal in 1..=self.number_outside_air_nodes {
@@ -58,11 +63,21 @@ impl SourceOutdoorAirNodes {
         control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
         backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
         flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
+        source_is_epjson: bool,
     ) -> Result<(), Error> {
         if self.get_input_flag {
-            self.get_source_input(input)?;
+            self.get_source_input(input, equipment, branch, source_is_epjson, backend, flags)?;
             self.get_input_flag = false;
-            self.set_source_outdoor_air_nodes(input, equipment, environment, control)?;
+            self.set_source_outdoor_air_nodes(
+                input,
+                equipment,
+                environment,
+                control,
+                branch,
+                source_is_epjson,
+                backend,
+                flags,
+            )?;
         }
         *okay = false;
         if self.number_outside_air_nodes > 0 {
@@ -110,19 +125,40 @@ impl SourceOutdoorAirNodes {
         }
         Ok(())
     }
-    fn get_source_input(&mut self, input: &mut SelectedInputProcessor) -> Result<(), Error> {
+    #[allow(clippy::too_many_arguments)]
+    fn get_source_input(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
+        branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
+        source_is_epjson: bool,
+        backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
+        flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
+    ) -> Result<(), Error> {
+        use crate::heat_balance::selected_input_processor::SourceInputStatisticsValue as Value;
+        const FAMILY: &str = "OutdoorAir:Node";
+        const FIELDS: [&str; 9] = [
+            "name",
+            "height_above_ground",
+            "drybulb_temperature_schedule_name",
+            "wetbulb_temperature_schedule_name",
+            "wind_speed_schedule_name",
+            "wind_direction_schedule_name",
+            "wind_pressure_coefficient_curve_name",
+            "symmetric_wind_pressure_coefficient_curve",
+            "wind_angle_type",
+        ];
         let number_lists = input.get_num_objects_found("OutdoorAir:NodeList");
-        let number_singles = input.get_num_objects_found("OutdoorAir:Node");
+        let number_singles = input.get_num_objects_found(FAMILY);
         self.number_outside_air_nodes = 0;
-        let _errors_found = false;
-        let _next_fluid_stream_number = 1;
-        let list_size = 0;
-        let current_size = 100;
-        let _temporary_numbers = vec![0; current_size];
+        let mut next_fluid_stream_number = 1_i32;
+        let mut list_size = 0_usize;
+        let mut current_size = 100_usize;
+        let mut temporary_numbers = vec![0_usize; current_size];
         let nodes = input
             .get_object_def_max_args("NodeList")
             .map_err(|_| Error::Unavailable("actual NodeList getObjectDefMaxArgs176"))?;
-        let _node_numbers = vec![0; nodes.alphas + nodes.numerics];
+        let mut node_numbers = vec![0_usize; nodes.alphas + nodes.numerics];
         let mut maximum_numbers = 0;
         let mut maximum_alphas = 0;
         let definition = input
@@ -131,33 +167,166 @@ impl SourceOutdoorAirNodes {
         maximum_numbers = maximum_numbers.max(definition.numerics);
         maximum_alphas = maximum_alphas.max(definition.alphas);
         let definition = input
-            .get_object_def_max_args("OutdoorAir:Node")
+            .get_object_def_max_args(FAMILY)
             .map_err(|_| Error::Unavailable("actual OutdoorAir:Node definition182"))?;
         maximum_numbers = maximum_numbers.max(definition.numerics);
         maximum_alphas = maximum_alphas.max(definition.alphas);
-        let _alphas = vec![String::new(); maximum_alphas];
-        let _alpha_fields = vec![String::new(); maximum_alphas];
-        let _numeric_fields = vec![String::new(); maximum_numbers];
-        let _numbers = vec![0.0; maximum_numbers];
-        let _alpha_blanks = vec![true; maximum_alphas];
-        let _numeric_blanks = vec![true; maximum_numbers];
+        let mut alphas = vec![String::new(); maximum_alphas];
+        let mut alpha_fields = vec![String::new(); maximum_alphas];
+        let mut numeric_fields = vec![String::new(); maximum_numbers];
+        let mut numbers = vec![0.0; maximum_numbers];
+        let mut alpha_blanks = vec![true; maximum_alphas];
+        let mut numeric_blanks = vec![true; maximum_numbers];
         if number_lists > 0 {
-            let _current_module_object = "OutdoorAir:NodeList";
             return Err(Error::Unavailable(
                 "actual positive outdoor-air list getObjectItem197",
             ));
         }
         if number_singles > 0 {
-            let _current_module_object = "OutdoorAir:Node";
-            return Err(Error::Unavailable(
-                "actual positive outdoor-air single getObjectItem261",
-            ));
+            if !source_is_epjson || number_singles != 1 {
+                return Err(Error::Unavailable(
+                    "authored outdoor-air single original-IDF/multiple-object getter",
+                ));
+            }
+            if alphas.len() < 8 || numbers.is_empty() {
+                return Err(Error::Unavailable(
+                    "actual outdoor-air local getter allocation",
+                ));
+            }
+            let object = input
+                .source_raw_object_names(FAMILY)
+                .map_err(|_| Error::Unavailable("actual outdoor-air retained instance order"))?
+                .first()
+                .cloned()
+                .ok_or(Error::Unavailable(
+                    "actual outdoor-air single instance ordinal",
+                ))?;
+            alphas.fill(String::new());
+            numbers.fill(0.0);
+            alpha_blanks.fill(true);
+            numeric_blanks.fill(true);
+            alpha_fields.fill(String::new());
+            numeric_fields.fill(String::new());
+            input.mark_object_as_used(FAMILY, &object);
+            let mut maximum = 0_usize;
+            let mut num_alphas = 1_usize;
+            let num_numbers;
+            {
+                let fields = input
+                    .source_raw_object_fields(FAMILY, &object)
+                    .map_err(|_| {
+                        Error::Unavailable("actual outdoor-air getObjectItem raw fields")
+                    })?;
+                for (index, field) in FIELDS.iter().enumerate() {
+                    if fields.contains_key(*field) {
+                        maximum = maximum.max(index + 1);
+                    }
+                }
+                alphas[0] = object.to_ascii_uppercase();
+                alpha_blanks[0] = object.is_empty();
+                alpha_fields[0] = "name".into();
+                numeric_fields[0] = "height_above_ground".into();
+                numbers[0] = match fields.get("height_above_ground") {
+                    None => -1.0,
+                    Some(Value::Number(token)) => ep_model::classify_source_json_number(token)
+                        .map(ep_model::SourceJsonNumber::as_f64)
+                        .map_err(|_| {
+                            Error::Unavailable("actual outdoor-air JSON numeric array scalar")
+                        })?,
+                    _ => return Err(Error::Unavailable("actual outdoor-air numeric field type")),
+                };
+                numeric_blanks[0] = !fields.contains_key("height_above_ground");
+                num_numbers = usize::from(maximum >= 2);
+                for index in 1..8 {
+                    let field = FIELDS[index + 1];
+                    let default = match index {
+                        6 => "No",
+                        7 => "Absolute",
+                        _ => "",
+                    };
+                    let (value, blank) = match fields.get(field) {
+                        None => (default, true),
+                        Some(Value::String(value)) if value.is_empty() => (default, true),
+                        Some(Value::String(value)) => (value.as_str(), false),
+                        _ => return Err(Error::Unavailable("actual outdoor-air alpha field type")),
+                    };
+                    alphas[index] = value.to_ascii_uppercase();
+                    alpha_blanks[index] = blank;
+                    alpha_fields[index] = field.into();
+                    if index + 1 < maximum {
+                        num_alphas = index + 1;
+                    }
+                }
+            }
+            let mut num_nodes = 0;
+            let mut err_in_list = false;
+            equipment.get_source_authored_outdoor_air_node_nums(
+                input,
+                branch,
+                &alphas[0],
+                &alpha_fields[0],
+                next_fluid_stream_number,
+                &mut num_nodes,
+                &mut node_numbers,
+                &mut err_in_list,
+                backend,
+                flags,
+            )?;
+            next_fluid_stream_number = next_fluid_stream_number
+                .checked_add(i32::try_from(num_nodes).map_err(|_| {
+                    Error::Unavailable("actual outdoor-air fluid stream NumNodes integer")
+                })?)
+                .ok_or(Error::Unavailable(
+                    "actual outdoor-air next fluid stream integer",
+                ))?;
+            if err_in_list {
+                return Err(Error::Unavailable(
+                    "actual outdoor-air GetNodeNums continuation284",
+                ));
+            }
+            if num_nodes > 1 {
+                return Err(Error::Unavailable(
+                    "actual outdoor-air single NodeList severe290",
+                ));
+            }
+            let node_number = *node_numbers.first().ok_or(Error::Unavailable(
+                "actual outdoor-air NodeNums first ordinal",
+            ))?;
+            if temporary_numbers.contains(&node_number) {
+                return Err(Error::Unavailable(
+                    "actual duplicate authored outdoor-air node305",
+                ));
+            }
+            list_size += 1;
+            if list_size > current_size {
+                current_size += 100;
+                temporary_numbers.resize(current_size, 0);
+            }
+            temporary_numbers[list_size - 1] = node_number;
+            if num_numbers > 0 {
+                equipment.set_source_authored_outdoor_air_node_height(node_number, numbers[0])?;
+            }
+            if num_alphas > 1 {
+                return Err(Error::Unavailable(
+                    "actual outdoor-air AnyLocalEnvironmentsInModel write316",
+                ));
+            }
+            // The admitted single has NumAlphas1: all schedule, WPC and local
+            // alpha children are absent, and its physical IsLocalNode stays false.
         }
         if list_size > 0 {
-            return Err(Error::Unavailable(
-                "actual positive outside-air list assignment360",
-            ));
+            self.number_outside_air_nodes = list_size;
+            self.outside_air_node_list = Some(
+                temporary_numbers[..list_size]
+                    .iter()
+                    .map(|&node| i32::try_from(node))
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|_| {
+                        Error::Unavailable("actual outside-air node list int assignment360")
+                    })?,
+            );
         }
+        let _ = next_fluid_stream_number; // Native local increment precedes all validation.
         Ok(())
     }
 }

@@ -1165,6 +1165,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             ]),
                         )]),
                     );
+                    let authored_oa_fields = if explicit_empty {
+                        BTreeMap::from([("height_above_ground".into(), V::Number("-1.25".into()))])
+                    } else {
+                        BTreeMap::new()
+                    };
+                    oa_objects.insert(
+                        "OutdoorAir:Node".into(),
+                        BTreeMap::from([(oa_name.into(), authored_oa_fields)]),
+                    );
                     let fields = oa_objects
                         .get_mut("ZoneHVAC:IdealLoadsAirSystem")
                         .and_then(|rows| rows.get_mut(unit_name))
@@ -1287,6 +1296,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         );
                     let mut oa_registration = SourceOutputRegistration::default();
                     let mut oa_prescan = SourceOutputPreScan::default();
+                    oa_ip.report_source_idf_records_stats(&mut oa_prescan)?;
                     let mut oa_state = error_state.clone();
                     let (mut oa_error, mut oa_console, mut oa_eio, mut oa_eso) =
                         (Vec::new(), Vec::new(), Vec::new(), Vec::new());
@@ -1337,6 +1347,23 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                 ),
                             },
                         )?;
+                        if !explicit_empty {
+                            oa_registry.set_source_outdoor_air_nodes(
+                                &mut oa_ip,
+                                &mut oa_equipment,
+                                &probe_environment,
+                                &control,
+                                &mut oa_branch,
+                                true,
+                                &mut backend,
+                                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                    kickoff: &globals.kickoff_simulation,
+                                    developer: &developer,
+                                    warmup: &clock.warmup_flag,
+                                    doing_sizing: &globals.doing_sizing,
+                                }),
+                            )?;
+                        }
                         oa_prescan.add_record(unit_name, variable, &mut backend)?;
                         let mut dictionary = SourceOutputDictionaryStreams {
                             eso: Some(&mut oa_eso),
@@ -1450,6 +1477,28 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             Some(&V::Number("10000000000000000000000".into())),
                         );
                     }
+                    assert!(!oa_ip.is_object_unused("OutdoorAir:Node", oa_name));
+                    let physical_oa = &oa_equipment
+                        .nodes
+                        .physical
+                        .as_ref()
+                        .ok_or("actual authored OA Node")?[oa_node - 1];
+                    assert_eq!(
+                        physical_oa.height.to_bits(),
+                        if explicit_empty {
+                            (-1.25_f64).to_bits()
+                        } else {
+                            (-1.0_f64).to_bits()
+                        }
+                    );
+                    assert_eq!(
+                        oa_equipment
+                            .nodes
+                            .node_references
+                            .as_ref()
+                            .ok_or("actual authored OA NodeRef")?[oa_node - 1],
+                        1
+                    );
                     assert!(!oa_ip.is_object_unused("DesignSpecification:OutdoorAir", dsoa_name));
                     assert!(!oa_ip.is_object_unused("ZoneHVAC:IdealLoadsAirSystem", unit_name));
                     assert!(!oa_ip.is_object_unused("NodeList", alias));
@@ -1461,6 +1510,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     }
                     let mut connections = Vec::new();
                     oa_branch.report_source_node_connections(&oa_equipment, &mut connections)?;
+                    let mut oa_connection_positions = Vec::new();
                     for expected in [
                         format!(
                             " Non-Parent Node Connection,{},ZONEHVAC:IDEALLOADSAIRSYSTEM,{},Outlet,1\n",
@@ -1472,12 +1522,18 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             oa_name.to_ascii_uppercase()
                         ),
                     ] {
-                        assert!(
+                        oa_connection_positions.push(
                             connections
                                 .windows(expected.len())
-                                .any(|bytes| bytes == expected.as_bytes())
+                                .position(|bytes| bytes == expected.as_bytes())
+                                .ok_or("actual authored OA BND registration")?,
                         );
                     }
+                    assert!(if explicit_empty {
+                        oa_connection_positions[0] < oa_connection_positions[1]
+                    } else {
+                        oa_connection_positions[1] < oa_connection_positions[0]
+                    });
                     assert!(oa_console.is_empty() && oa_eio.is_empty());
                     assert_eq!(oa_state.tracking.total_severe_errors, 0);
                     assert_eq!(oa_state.tracking.total_warning_errors_during_warmup, 0);
@@ -1768,6 +1824,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &control,
                     &mut backend,
                     flags,
+                    true,
                 )?;
                 assert!(!okay && !outdoor.get_input_flag);
                 assert_eq!(outdoor.number_outside_air_nodes, 0);
@@ -1782,6 +1839,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &control,
                     &mut backend,
                     flags,
+                    true,
                 )?;
                 assert!(!okay);
                 assert_eq!(
@@ -1841,6 +1899,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &control,
                     &mut backend,
                     flags,
+                    true,
                 )?;
                 assert!(okay);
                 assert_eq!(*connections.source_number_node_connections(), 1);
@@ -1865,6 +1924,10 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut actual_nodes,
                     &environment,
                     &control,
+                    &mut connections,
+                    true,
+                    &mut backend,
+                    flags,
                 )?;
                 let updated = &actual_nodes
                     .nodes

@@ -3186,6 +3186,12 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 json!(4_294_967_297_u64);
                         }
                     }
+                    if flow > 0.0 && method == "Flow/Person" && limit == "LimitCapacity" {
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {}});
+                    } else if flow > 0.0 && method == "Sum" && limit == "LimitFlowRate" {
+                        hard["OutdoorAir:Node"] =
+                            json!({"Outside 각": {"height_above_ground": -1.25}});
+                    }
                     let hard_raw = parse_epjson_str(&hard.to_string())
                         .expect("actual OA hard-limit raw input");
                     let retained_hard = hard_raw.clone();
@@ -3245,6 +3251,25 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     hard_ip
                         .report_source_idf_records_stats(&mut statistics)
                         .expect("actual hard-limit statistics owner");
+                    if hard.get("OutdoorAir:Node").is_some() {
+                        assert!(
+                            support
+                                .source_consumed_objects
+                                .iter()
+                                .any(|row| row.object_type == "OutdoorAir:Node" && row.count == 1)
+                        );
+                        let oa = hard_ip
+                            .source_raw_object_fields("OutdoorAir:Node", "Outside 각")
+                            .expect("actual authored OA raw custody");
+                        if method == "Sum" {
+                            assert_eq!(
+                                oa.get("height_above_ground"),
+                                Some(&OaRaw::Number("-1.25".into()))
+                            );
+                        } else {
+                            assert!(!oa.contains_key("height_above_ground"));
+                        }
+                    }
                     let actual = hard_ip
                         .source_raw_object_fields("ZoneHVAC:IdealLoadsAirSystem", "Ideal")
                         .expect("retained hard-limit raw alpha/numeric fields");
@@ -3691,7 +3716,31 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         bad["ZoneHVAC:EquipmentConnections"]["Connection"]["zone_return_air_node_or_nodelist_name"] =
                             json!("Real Returns");
                     }
-                    16 => bad["OutdoorAir:Node"] = json!({"Authored OA":{"height_above_ground":0}}),
+                    16 => {
+                        bad["OutdoorAir:Node"] = match method {
+                            "Flow/Person" => json!({"Outside 각":{"height_above_ground":0}}),
+                            "Flow/Zone" => json!({"Outside 각":{"height_above_ground":-0.0}}),
+                            "Flow/Area" => {
+                                json!({"Outside 각":{"drybulb_temperature_schedule_name":""}})
+                            }
+                            "AirChanges/Hour" => {
+                                json!({"Outside 각":{"symmetric_wind_pressure_coefficient_curve":"No"}})
+                            }
+                            "Sum" => json!({"Outside 각":{}}),
+                            "Maximum" => json!({"Mismatched OA":{}}),
+                            _ => unreachable!(),
+                        };
+                        if method == "Sum" {
+                            bad.as_object_mut()
+                                .expect("root")
+                                .remove("DesignSpecification:OutdoorAir");
+                            let unit = bad["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]
+                                .as_object_mut()
+                                .expect("unit");
+                            unit.remove("design_specification_outdoor_air_object_name");
+                            unit.remove("outdoor_air_inlet_node_name");
+                        }
+                    }
                     17 => {
                         bad["OutdoorAir:NodeList"] = json!({"Authored OA":{"nodes":[{"node_or_nodelist_name":"Outside 각"}]}})
                     }

@@ -695,6 +695,7 @@ impl OrdinaryEquipment {
                         control,
                         backend,
                         output.environment.diagnostic_flags,
+                        source_is_epjson,
                     )?;
                     if !listed && globals.display_extra_warnings {
                         return Err(Error::Unavailable(

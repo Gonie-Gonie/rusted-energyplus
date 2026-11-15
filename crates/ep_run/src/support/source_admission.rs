@@ -121,6 +121,9 @@ impl SourceSupportAdmission {
             // Actual comfort initialization consumes all declared lists through
             // its shared IP getter; this remains compiler RawOnly.
             "ComfortViewFactorAngles",
+            // One real authored global-weather OA Node, after the same B-only
+            // Raw/Scope prerequisites and actual GetOutAirNodesInput owner.
+            "OutdoorAir:Node",
             // Actual local getters populate the same retained Day/Week/Detailed
             // graph. Typed legacy schedules alone do not grant this token.
             "Schedule:Day:Hourly",
@@ -133,9 +136,11 @@ impl SourceSupportAdmission {
         ]
         .into_iter()
         .filter(|family| {
-            raw.objects
-                .get(&ObjectType((*family).into()))
-                .is_some_and(|objects| !objects.is_empty())
+            (*family != "OutdoorAir:Node" || trace.scope == PortingScope::B)
+                && raw
+                    .objects
+                    .get(&ObjectType((*family).into()))
+                    .is_some_and(|objects| !objects.is_empty())
         })
         .collect();
         // Scope and the same raw resolver already check every effective enum

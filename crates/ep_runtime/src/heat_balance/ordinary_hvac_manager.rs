@@ -125,7 +125,21 @@ impl SourceHvacManager {
         )?;
         self.ancillary
             .outdoor_air_nodes
-            .set_source_outdoor_air_nodes(o.input, o.equipment, o.environment, o.control)?;
+            .set_source_outdoor_air_nodes(
+                o.input,
+                o.equipment,
+                o.environment,
+                o.control,
+                &mut self.ancillary.branch_node_connections,
+                *o.source_is_epjson,
+                o.backend,
+                Some(super::error_backend::SourceDiagnosticFlags {
+                    kickoff: &o.globals.kickoff_simulation,
+                    developer: &o.project.system.developer_flag,
+                    warmup: &o.clock.warmup_flag,
+                    doing_sizing: &o.globals.doing_sizing,
+                }),
+            )?;
         self.manage_source_refrigerated_case_racks(o)?;
         o.zone_air_update(
             &self.ancillary.availability,

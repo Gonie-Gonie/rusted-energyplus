@@ -19,6 +19,7 @@ pub(super) fn is_family(family: &str) -> bool {
             | "ZoneControl:Thermostat"
             | "ZoneControl:Humidistat"
             | "DesignSpecification:OutdoorAir"
+            | "OutdoorAir:Node"
             | "ZoneHVAC:EquipmentConnections"
             | "ZoneHVAC:EquipmentList"
             | "ZoneHVAC:IdealLoadsAirSystem"
@@ -34,6 +35,11 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
+        ("OutdoorAir:Node", "height_above_ground") => {
+            matches!(value, RawValue::Number(token) if ep_model::classify_source_json_number(token)
+                .map(ep_model::SourceJsonNumber::as_f64)
+                .is_ok_and(|height| height.is_finite() && height < 0.0))
+        }
         ("DesignSpecification:OutdoorAir", "outdoor_air_method") => text_is(
             value,
             &[
