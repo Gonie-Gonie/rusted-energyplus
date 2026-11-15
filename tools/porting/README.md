@@ -33,3 +33,34 @@ through `validation_paths.py` to the current validation directory.
 Use a fresh output folder under `.runtime/porting/<area>/` for an affected check.
 Keep the accepted result and the command needed to reproduce it, rather than
 accumulating task-card progress logs or rerunning unchanged annual cohorts.
+
+## Frozen paired release
+
+`paired/v1` runs the reviewed basic positive-OA profile from data-only
+`paired.CaseConfig.v1` and `paired.SourceAuthority.v1` records. Invoke the file
+directly so no parent package initializer runs:
+
+```text
+python -X utf8 -B tools/porting/paired/v1/__main__.py validate --bindings PATH#SHA256 --case ID --mode fresh
+```
+
+The external binding pins the noncircular `release.json`, every local Python
+module, the case, Source authority and independent reviews. Normalize actual
+Source evidence with `authority --release PATH#SHA256 --evidence PATH#SHA256
+--mode fresh --output PATH`. Then use `act` for Native, `precheck`, `act` for
+Source with that proof, `verify`, and `complete`. Outputs must be fresh paths;
+Source launch requires a finite Native structural proof. Numerical comparisons
+finish before all twelve engine gates, eight paired gates and two full exports.
+
+Record `precheck` and `verify` with the trusted `record_command.py`, declaring
+every Context pin plus the Native launch (and Source launch for `verify`) as
+explicit inputs. Source `act` also requires `--native-precheck-receipt PATH#SHA256`.
+`complete` requires `--verification-receipt PATH#SHA256`; the command, full input
+custody and captured output pin must match the actual precheck or readback.
+Shaped JSON without recorded execution cannot authorize Source or gain credit.
+
+`--mode retained` validates explicit historical archives and original custody,
+executes no actors and grants no new physical credit. Only Units158/159 have
+full migration adapters; Unit155 is ledger/shared-kernel-only because its extra
+humidity gate is outside this profile. Failed numeric, science and QA history
+remain evidence. Unknown profiles and incomplete recorder execution fail.

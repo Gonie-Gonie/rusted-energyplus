@@ -107,6 +107,7 @@ def main() -> None:
     require(execution["source_bytes_match_before_and_after"] is True, "Build source bytes changed during recorded command")
     if args.cli:
         expected = ["cargo", "build", "-p", "ep_cli", "--bin", "eplus-rs", "-j", "2", "--message-format=json-render-diagnostics"]
+        canonical_default_cli = ["cargo", "build", "--locked", "--offline", "-p", "ep_cli", "--bin", "eplus-rs", "--message-format=json-render-diagnostics"]
         target_name, cargo_kind, package = "eplus-rs", "bin", "ep_cli"
         target_source = ROOT / "crates/ep_cli/src/main.rs"
         target_kind = "cli"
@@ -116,7 +117,7 @@ def main() -> None:
         target_name, cargo_kind, package = args.example, "example", "ep_runtime"
         target_source = ROOT / f"crates/ep_runtime/examples/{args.example}.rs"
         target_kind = "example"
-    require(execution["command"] == expected, "Recorded Cargo target/arguments differ")
+    require(execution["command"] == expected or (args.cli and execution["command"] == canonical_default_cli), "Recorded Cargo target/arguments differ")
     capture = execution["cargo_compiler_artifacts_capture"]
     require(capture["requested"] is True and capture["status"] == "pass", "Cargo executable identity was not captured after the command")
     candidates = [row for row in capture["rows"] if
@@ -126,6 +127,8 @@ def main() -> None:
                   Path(row["cargo_message"]["target"]["src_path"]).resolve() == target_source]
     require(len(candidates) == 1, "Expected exactly one Cargo-emitted executable for this package/source/target")
     artifact = candidates[0]
+    if args.cli and execution["command"] == canonical_default_cli:
+        require(artifact["cargo_message"]["features"] == [] and artifact["cargo_message"]["profile"]["test"] is False, "Canonical default CLI features/profile differ")
     binary = contained(ROOT / artifact["executable"]["historical_path"], ROOT)
     require(Path(artifact["cargo_message"]["executable"]).resolve() == binary, "Cargo-emitted executable path differs")
     require(ref(binary)["sha256"] == artifact["executable"]["sha256"], "Executable bytes changed since the command's artifact capture")
