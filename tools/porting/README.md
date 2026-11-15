@@ -75,6 +75,13 @@ tools for new work. Exact frozen v4 QA plans retain their original recorded
 inputs; new v5 plans also record the frozen v4 release. This Python-only
 optimization adds no object support or physical comparison.
 
+`paired/v6` validates Source snapshot paths without duplicate resolution.
+It keeps fresh path and archive checks, the v5 lexer and all scientific/QA
+rules, and adds no metadata cache. Use its matching tools for new work. Exact
+frozen v5 QA plans keep their recorded inputs; new v6 plans additionally
+record the frozen v5 release, while both retain the frozen v4 release. This
+Python-only optimization adds no object support or physical comparison.
+
 Record `precheck` and `verify` with the trusted `record_command.py`, declaring
 every Context pin plus the Native launch (and Source launch for `verify`) as
 explicit inputs. Source `act` also requires `--native-precheck-receipt PATH#SHA256`.
