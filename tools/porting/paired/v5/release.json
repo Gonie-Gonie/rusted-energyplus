@@ -1,0 +1,284 @@
+{
+  "schema": "paired.Release.v5",
+  "version": 5,
+  "profile": "ideal_loads.oa_topology.v1",
+  "files": {
+    "__main__.py": {
+      "path": "tools/porting/paired/v5/__main__.py",
+      "sha256": "f5fbcfe573a7c1cdbce4fc2c6ec00c4440ed079410e304c9295ccb1e1722a0a5",
+      "bytes": 6239
+    },
+    "contracts.py": {
+      "path": "tools/porting/paired/v5/contracts.py",
+      "sha256": "1a052376a0c48604a922ff85e63ea4ba53a6ad105c6c1a4e4bbfa7b34c398ecd",
+      "bytes": 114837
+    },
+    "catalogue.py": {
+      "path": "tools/porting/paired/v4/catalogue.py",
+      "sha256": "6890d94d49b00b5e25a563bd83cfd0d22f5b2235b2d9d341cde7a8053cc95569",
+      "bytes": 71637
+    },
+    "runner.py": {
+      "path": "tools/porting/paired/v5/runner.py",
+      "sha256": "f0cb54a00230e821099c0ca36bca4282fe88f6fdba8147963f99bcd73ded6014",
+      "bytes": 29556
+    },
+    "common116.py": {
+      "path": "tools/porting/paired/v1/common116.py",
+      "sha256": "684f119b048917f36aec70288990b9c1ef2500b4c72c5490b83828e1c448caec",
+      "bytes": 23372
+    }
+  },
+  "recorder": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "3dbaf8f78af809a6c11e195800c9a04d5ef961ff6ff49d567fc05cd4c4ee0c32",
+    "bytes": 11614
+  },
+  "scientific_fields": [
+    "controls",
+    "additional_output_controls",
+    "new_exhaust_node",
+    "new_target_list",
+    "nodelist_order",
+    "new_return_node",
+    "new_return_list",
+    "original_return_node",
+    "return_nodes_original_order",
+    "new_basis_name",
+    "new_basis_members",
+    "raw_basis_members",
+    "return_fraction_schedule",
+    "public_return_flow_gate",
+    "physical_inlet_raw_name",
+    "physical_inlet_public_name",
+    "IdealLoads_raw_name",
+    "IdealLoads_public_name",
+    "selected_supply_list_raw_name",
+    "current_Source_primary_review",
+    "new_schedule_name",
+    "new_output_name",
+    "cooling_public_gates",
+    "heating_availability_public_gates",
+    "winter_weather_activation_supplement",
+    "actual_summary_contract",
+    "full_clock_and_activation_contract",
+    "ordered_environment_clock_basis",
+    "warning_phase_contract",
+    "heating_efficiency_policy_index",
+    "heating_availability_policy_index",
+    "new_heating_availability_schedule",
+    "new_heating_efficiency_schedule",
+    "heating_fuel_public_gates",
+    "structural_prediction",
+    "outdoor_air_method",
+    "outdoor_air_node_name",
+    "DSOA_name",
+    "public_outdoor_air_mixing_gate",
+    "physical_output_requests",
+    "primary_pins",
+    "psychrometric_primary",
+    "primary"
+  ],
+  "constant_scientific_fields": [
+    "controls",
+    "additional_output_controls",
+    "new_exhaust_node",
+    "new_target_list",
+    "nodelist_order",
+    "new_return_node",
+    "new_return_list",
+    "original_return_node",
+    "return_nodes_original_order",
+    "new_basis_name",
+    "new_basis_members",
+    "raw_basis_members",
+    "return_fraction_schedule",
+    "public_return_flow_gate",
+    "physical_inlet_raw_name",
+    "physical_inlet_public_name",
+    "IdealLoads_raw_name",
+    "IdealLoads_public_name",
+    "selected_supply_list_raw_name",
+    "new_schedule_name",
+    "new_output_name",
+    "cooling_public_gates",
+    "heating_availability_public_gates",
+    "winter_weather_activation_supplement",
+    "actual_summary_contract",
+    "full_clock_and_activation_contract",
+    "ordered_environment_clock_basis",
+    "warning_phase_contract",
+    "heating_efficiency_policy_index",
+    "heating_availability_policy_index",
+    "new_heating_availability_schedule",
+    "new_heating_efficiency_schedule",
+    "heating_fuel_public_gates",
+    "outdoor_air_method",
+    "outdoor_air_node_name",
+    "DSOA_name",
+    "public_outdoor_air_mixing_gate",
+    "physical_output_requests"
+  ],
+  "constant_scientific_sha256": "5001fea5f9aa3b6b98d6bd3df47dcd6b72da725f249f2f3d98f3efd6a7be5536",
+  "retained_scientific_fields": [
+    "controls",
+    "additional_output_controls",
+    "new_exhaust_node",
+    "new_target_list",
+    "nodelist_order",
+    "new_return_node",
+    "new_return_list",
+    "original_return_node",
+    "return_nodes_original_order",
+    "new_basis_name",
+    "new_basis_members",
+    "raw_basis_members",
+    "return_fraction_schedule",
+    "public_return_flow_gate",
+    "physical_inlet_raw_name",
+    "physical_inlet_public_name",
+    "IdealLoads_raw_name",
+    "IdealLoads_public_name",
+    "selected_supply_list_raw_name",
+    "current_Source_primary_review",
+    "new_schedule_name",
+    "new_output_name",
+    "cooling_public_gates",
+    "heating_availability_public_gates",
+    "winter_weather_activation_supplement",
+    "actual_summary_contract",
+    "full_clock_and_activation_contract",
+    "ordered_environment_clock_basis",
+    "warning_phase_contract",
+    "heating_efficiency_policy_index",
+    "heating_availability_policy_index",
+    "new_heating_availability_schedule",
+    "new_heating_efficiency_schedule",
+    "heating_fuel_public_gates",
+    "structural_prediction",
+    "outdoor_air_method",
+    "outdoor_air_node_name",
+    "DSOA_name",
+    "public_outdoor_air_mixing_gate",
+    "physical_output_requests"
+  ],
+  "policy": {
+    "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+    "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+    "bytes": 43660
+  },
+  "baseline_input": {
+    "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/SUM/input.epJSON",
+    "sha256": "77ef04a141fd87bdb12bb600accfcfad7c5f25d297d8023013d7578e75359615",
+    "bytes": 101674
+  },
+  "original_exhaust_recipe": {
+    "path": ".runtime/object-expansion/unit130-prep/science-final01/POSITIVE.recipe.json",
+    "sha256": "80248e6cc3e798f6229265859fa291ef0e9cdaa7db72e9b99e0ccc7626cd2f20",
+    "bytes": 46157
+  },
+  "counts": {
+    "output_variable_requests": 151,
+    "meter_file_only_requests": 2,
+    "ESO_series": 156,
+    "MTR_series": 2,
+    "total_series": 158,
+    "variable_values": 74880,
+    "meter_values": 240,
+    "total_values": 75120,
+    "DesignDays": 5,
+    "reporting_hours": 120,
+    "zone_steps_per_variable": 480,
+    "meter_hour_samples": 120,
+    "batch_cases": 1,
+    "batch_values": 75120
+  },
+  "gate_counts": {
+    "engine": 12,
+    "paired": 8,
+    "exports": 2
+  },
+  "full_retained_migration_units": [],
+  "partial_shared_kernel_units": [],
+  "release_self_hash_in_inventory": false,
+  "gate_ids": {
+    "engine": [
+      "actual_status",
+      "actual_cen",
+      "scheduled_setpoint",
+      "actual_exhaust",
+      "public_return_flow",
+      "public_cooling_availability",
+      "public_heating_availability",
+      "public_heating_fuel_efficiency",
+      "winter_weather_activation",
+      "adaptive_summary",
+      "error_diagnostics",
+      "public_outdoor_air_mixing"
+    ],
+    "paired": [
+      "status_arrays_exact",
+      "warmup_days_exact",
+      "whole_BND_body_exact",
+      "whole_table_exact",
+      "warning_semantics_exact",
+      "ancillary",
+      "actual_Source_epJSON_input_projection",
+      "Source_scope_and_run_summary"
+    ],
+    "exports": [
+      "eso",
+      "mtr"
+    ]
+  },
+  "frozen_v1_release": {
+    "path": "tools/porting/paired/v1/release.json",
+    "sha256": "bc74f5e874b22bfb373ff2bcda55c8961ab078c284f774fe85276b64332cff61",
+    "bytes": 7167
+  },
+  "structure_schema": "paired.OATopologyStructure.v1",
+  "Source_metadata_schema": 2,
+  "Source_evidence_schema": 3,
+  "QA_descriptor_schema": "paired.SourceQAProfile.v1",
+  "QA_binding_schema": "paired.SourceQAProfileBinding.v1",
+  "qa_reuse_mode": "disabled",
+  "compatible_parent_releases": [
+    {
+      "path": "tools/porting/paired/v4/release.json",
+      "sha256": "a68819407a41647cb506cc9a959242e0b592073e7b043c9c68bfdeb7ce4eb8f5",
+      "bytes": 8742
+    }
+  ],
+  "frozen_v2_release": {
+    "path": "tools/porting/paired/v2/release.json",
+    "sha256": "9de2f4016a3081c070dacc8144788444ce817c2d23ed84f051405ef95563c3fa",
+    "bytes": 8007
+  },
+  "frozen_v3_release": {
+    "path": "tools/porting/paired/v3/release.json",
+    "sha256": "7db47ee8c24d7742e8f69317876135515602b37bd059d6b529de42b7278adfd0",
+    "bytes": 7398
+  },
+  "tools": {
+    "source_production.py": {
+      "path": "tools/porting/paired/v5/source_production.py",
+      "sha256": "bb0ab4b92dc5a9657da2555cd68f3c1783f68159cde265c6fff58e327603fb5b",
+      "bytes": 17925
+    },
+    "coordinate.py": {
+      "path": "tools/porting/paired/v5/coordinate.py",
+      "sha256": "2b24a777fbeffc5253df74a1b67352911e176bf67dfbfb3d21914884200991ea",
+      "bytes": 5950
+    },
+    "publish.py": {
+      "path": "tools/porting/paired/v5/publish.py",
+      "sha256": "f18b0893cf3659253edd4a471500923c6dda38ecb5265b1aff6778d4df1903f5",
+      "bytes": 23188
+    }
+  },
+  "frozen_v4_release": {
+    "path": "tools/porting/paired/v4/release.json",
+    "sha256": "a68819407a41647cb506cc9a959242e0b592073e7b043c9c68bfdeb7ce4eb8f5",
+    "bytes": 8742
+  }
+}

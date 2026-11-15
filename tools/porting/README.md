@@ -66,8 +66,14 @@ file additions/deletions and a reviewed QA descriptor. Its required tests must
 exist in the baseline and current source; every execution binds its own plan,
 reviews and recorded inputs. Required-body reuse is disabled. Use
 `tools/porting/paired/v4/__main__.py` and the matching `source_production.py`,
-`coordinate.py` and `publish.py` tools for new work. Older releases remain
-immutable for their historical evidence.
+`coordinate.py` and `publish.py` tools with their recorded release. Older
+releases remain immutable for their historical evidence.
+
+`paired/v5` preserves the v4 scientific and QA rules while removing repeated
+string suffix copies during Rust test-declaration scanning. Use its matching
+tools for new work. Exact frozen v4 QA plans retain their original recorded
+inputs; new v5 plans also record the frozen v4 release. This Python-only
+optimization adds no object support or physical comparison.
 
 Record `precheck` and `verify` with the trusted `record_command.py`, declaring
 every Context pin plus the Native launch (and Source launch for `verify`) as
