@@ -438,24 +438,46 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
         return None;
     }
     let error = || {
-        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, owned DB/WB and wind schedule references, and absent WPC alpha fields".into())
+        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, owned DB/WB and wind schedule references, and schema-legal inactive no-AFN WPC alpha fields".into())
     };
     if objects.len() != 1 {
         return error();
     }
     let (name, object) = objects.iter().next()?;
     if !name.0.eq_ignore_ascii_case(outdoor_air_name)
-        || [
-            "wind_pressure_coefficient_curve_name",
-            "symmetric_wind_pressure_coefficient_curve",
-            "wind_angle_type",
-        ]
-        .iter()
-        .any(|name| field(object, name).is_some())
         || field(object, "height_above_ground").is_some_and(|value| {
             !matches!(value, RawValue::Number(token) if ep_model::classify_source_json_number(token)
                 .map(ep_model::SourceJsonNumber::as_f64)
                 .is_ok_and(|height| height.is_finite()))
+        })
+    {
+        return error();
+    }
+    let inactive_wpc_fields = [
+        "wind_pressure_coefficient_curve_name",
+        "symmetric_wind_pressure_coefficient_curve",
+        "wind_angle_type",
+    ]
+    .iter()
+    .any(|name| field(object, name).is_some());
+    if inactive_wpc_fields
+        && raw.objects.iter().any(|(family, objects)| {
+            !objects.is_empty()
+                && (family.0.starts_with("AirflowNetwork:")
+                    || family.0.starts_with("Duct:Loss:")
+                    || family.0.starts_with("Curve:")
+                    || family.0.starts_with("Table:"))
+        })
+    {
+        return error();
+    }
+    if field(object, "wind_pressure_coefficient_curve_name")
+        .is_some_and(|value| !matches!(value, RawValue::String(_)))
+        || field(object, "symmetric_wind_pressure_coefficient_curve").is_some_and(|value| {
+            !matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"))
+        })
+        || field(object, "wind_angle_type").is_some_and(|value| {
+            !matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "Absolute" | "Relative"))
         })
     {
         return error();

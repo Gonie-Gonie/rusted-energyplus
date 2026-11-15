@@ -483,6 +483,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                         object_name: "CTF wind inlet".into(),
                         field_sizes: std::collections::BTreeMap::from([
                             ("wind_speed_schedule_name".into(), 1), ("wind_direction_schedule_name".into(), 1),
+                            ("wind_pressure_coefficient_curve_name".into(), 1),
+                            ("symmetric_wind_pressure_coefficient_curve".into(), 1),
+                            ("wind_angle_type".into(), 1),
                         ]),
                     },
                 ]),
@@ -493,6 +496,9 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 ("CTF wind inlet".into(), std::collections::BTreeMap::from([
                     ("wind_speed_schedule_name".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String(String::new())),
                     ("wind_direction_schedule_name".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String(String::new())),
+                    ("wind_pressure_coefficient_curve_name".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Unused no-AFN curve 각".into())),
+                    ("symmetric_wind_pressure_coefficient_curve".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Yes".into())),
+                    ("wind_angle_type".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Relative".into())),
                 ])),
             ]))]),
             object_order: std::collections::BTreeMap::from([("OutdoorAir:Node".into(), vec!["CTF wind inlet".into()])]),
@@ -545,6 +551,12 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         let wind_node_number = *wind_registry.outside_air_node_list.as_ref()
             .and_then(|rows| rows.first()).ok_or("same exact-empty wind OA registry")?;
         assert_eq!(wind_nodes.source_outdoor_air_wind_schedule_pointers(wind_node_number)?, (None, None));
+        assert!(!input.is_object_unused("OutdoorAir:Node", "CTF wind inlet"));
+        let wpc_raw = input.source_raw_object_fields("OutdoorAir:Node", "CTF wind inlet")
+            .expect("same actual retained inactive WPC fields");
+        assert_eq!(wpc_raw.get("wind_pressure_coefficient_curve_name"), Some(&crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Unused no-AFN curve 각".into())));
+        assert_eq!(wpc_raw.get("symmetric_wind_pressure_coefficient_curve"), Some(&crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Yes".into())));
+        assert_eq!(wpc_raw.get("wind_angle_type"), Some(&crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String("Relative".into())));
         // Authored helper guard operand, not an observed phase-latch transition.
         crate::heat_balance::ordinary_surface_initialization::initialize_source_surface_property_view_factors(&raw, &globals, false)?;
         let mut owners = SurfaceGetterOwners {

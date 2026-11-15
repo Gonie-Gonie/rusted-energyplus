@@ -3187,17 +3187,16 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         }
                     }
                     if flow > 0.0 && method == "Flow/Person" && limit == "LimitCapacity" {
-                        hard["OutdoorAir:Node"] =
-                            json!({"Outside 각": {"drybulb_temperature_schedule_name":"On"}});
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"drybulb_temperature_schedule_name":"On", "wind_pressure_coefficient_curve_name":"", "symmetric_wind_pressure_coefficient_curve":"", "wind_angle_type":""}});
                     } else if flow > 0.0 && method == "Sum" && limit == "LimitFlowRate" {
                         hard["OutdoorAir:Node"] =
                             json!({"Outside 각": {"height_above_ground": -1.25}});
                     } else if flow > 0.0 && method == "Flow/Person" && limit == "LimitFlowRate" {
                         hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": 0.0, "wind_speed_schedule_name":"On", "wind_direction_schedule_name":"", "wetbulb_temperature_schedule_name":"On"}});
                     } else if flow > 0.0 && method == "Flow/Zone" && limit == "LimitCapacity" {
-                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": -0.0, "wind_speed_schedule_name":"", "wind_direction_schedule_name":"", "wetbulb_temperature_schedule_name":"", "drybulb_temperature_schedule_name":""}});
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": -0.0, "wind_speed_schedule_name":"", "wind_direction_schedule_name":"", "wetbulb_temperature_schedule_name":"", "drybulb_temperature_schedule_name":"", "wind_pressure_coefficient_curve_name":"  ", "symmetric_wind_pressure_coefficient_curve":"No", "wind_angle_type":"Absolute"}});
                     } else if flow > 0.0 && method == "Flow/Area" && limit == "LimitCapacity" {
-                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": 10.0, "wind_direction_schedule_name":"OA wind compact", "wetbulb_temperature_schedule_name":"OA wind compact", "drybulb_temperature_schedule_name":"On"}});
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": 10.0, "wind_direction_schedule_name":"OA wind compact", "wetbulb_temperature_schedule_name":"OA wind compact", "drybulb_temperature_schedule_name":"On", "wind_pressure_coefficient_curve_name":"Unused no-AFN curve 각", "symmetric_wind_pressure_coefficient_curve":"Yes", "wind_angle_type":"Relative"}});
                     }
                     if flow > 0.0 && method == "Flow/Area" && limit == "LimitCapacity" {
                         // One necessary schedule extension of this same admission cell.
@@ -3335,6 +3334,33 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                             assert_eq!(
                                 oa.get("drybulb_temperature_schedule_name"),
                                 Some(&OaRaw::String(String::new()))
+                            );
+                        }
+                        let (curve_name, symmetric, angle) =
+                            if method == "Flow/Person" && limit == "LimitCapacity" {
+                                ("", "", "")
+                            } else if method == "Flow/Zone" {
+                                ("  ", "No", "Absolute")
+                            } else if method == "Flow/Area" {
+                                ("Unused no-AFN curve 각", "Yes", "Relative")
+                            } else {
+                                ("", "", "")
+                            };
+                        if method == "Flow/Area"
+                            || method == "Flow/Zone"
+                            || (method == "Flow/Person" && limit == "LimitCapacity")
+                        {
+                            assert_eq!(
+                                oa.get("wind_pressure_coefficient_curve_name"),
+                                Some(&OaRaw::String(curve_name.into()))
+                            );
+                            assert_eq!(
+                                oa.get("symmetric_wind_pressure_coefficient_curve"),
+                                Some(&OaRaw::String(symmetric.into()))
+                            );
+                            assert_eq!(
+                                oa.get("wind_angle_type"),
+                                Some(&OaRaw::String(angle.into()))
                             );
                         }
                         let height_token = if method == "Sum" {
@@ -3811,7 +3837,7 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                                 json!({"Outside 각":{"drybulb_temperature_schedule_name":"On","wetbulb_temperature_schedule_name":"Missing"}})
                             }
                             "AirChanges/Hour" => {
-                                json!({"Outside 각":{"symmetric_wind_pressure_coefficient_curve":"No"}})
+                                json!({"Outside 각":{"symmetric_wind_pressure_coefficient_curve":"no"}})
                             }
                             "Sum" => json!({"Outside 각":{}}),
                             "Maximum" => json!({"Mismatched OA":{}}),

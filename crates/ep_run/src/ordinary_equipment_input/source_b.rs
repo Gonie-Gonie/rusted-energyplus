@@ -40,9 +40,16 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
             "drybulb_temperature_schedule_name"
             | "wetbulb_temperature_schedule_name"
             | "wind_speed_schedule_name"
-            | "wind_direction_schedule_name",
+            | "wind_direction_schedule_name"
+            | "wind_pressure_coefficient_curve_name",
         ) => {
             matches!(value, RawValue::String(_))
+        }
+        ("OutdoorAir:Node", "symmetric_wind_pressure_coefficient_curve") => {
+            matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"))
+        }
+        ("OutdoorAir:Node", "wind_angle_type") => {
+            matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "Absolute" | "Relative"))
         }
         ("OutdoorAir:Node", "height_above_ground") => {
             matches!(value, RawValue::Number(token) if ep_model::classify_source_json_number(token)
