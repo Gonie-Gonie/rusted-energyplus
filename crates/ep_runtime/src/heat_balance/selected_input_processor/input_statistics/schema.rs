@@ -4189,6 +4189,84 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "WindowMaterial:Gas" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "gas_type",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "thickness",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "conductivity_coefficient_a",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "conductivity_coefficient_b",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "conductivity_coefficient_c",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "viscosity_coefficient_a",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "viscosity_coefficient_b",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "viscosity_coefficient_c",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "specific_heat_coefficient_a",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "specific_heat_coefficient_b",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "specific_heat_coefficient_c",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "molecular_weight",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "specific_heat_ratio",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "WindowMaterial:SimpleGlazingSystem" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

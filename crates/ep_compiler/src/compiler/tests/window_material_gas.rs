@@ -524,6 +524,181 @@ fn window_gas_follows_material_source_order_reports_typed_coverage_and_shares_na
                     && diagnostic.object_name.as_deref() == Some("shared")
             })
     );
+    // The exact Source namespace is selected only by a valid named Gas owner.
+    // The original Legacy order, coverage and duplicate assertions above remain.
+    let source_result = super::super::compile_raw_model_for_source(&raw_model);
+    assert!(
+        !source_result.has_errors(),
+        "{:?}",
+        source_result.report.diagnostics
+    );
+    let source_model = source_result.model.as_ref().unwrap();
+    assert!(source_model.material_names.is_source_exact_namespace());
+    assert!(!model.material_names.is_source_exact_namespace());
+    assert!(
+        source_model
+            .ctf_report_names
+            .materials
+            .contains(&(MaterialId(7), "GAS GAP".into()))
+    );
+    assert!(
+        !model
+            .ctf_report_names
+            .materials
+            .iter()
+            .any(|(id, _)| *id == MaterialId(7))
+    );
+    let exact_raw = parse_epjson_str(
+        r#"{
+        "Material": {
+            " Solid ": {"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000,"specific_heat":1000},
+            "Solid": {"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000,"specific_heat":1000},
+            "M\u00a0": {"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000,"specific_heat":1000},
+            "\u000bV": {"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000,"specific_heat":1000}
+        },
+        "WindowMaterial:Gas": {
+            " Air ": {"gas_type":"Air","thickness":0.012},
+            "Air": {"gas_type":"Argon","thickness":0.013},
+            "\u00a0": {"gas_type":"Krypton","thickness":0.014},
+            "\u000b": {"gas_type":"Xenon","thickness":0.015}
+        },
+        "Construction": {
+            "C1":{"outside_layer":" solid "}, "C2":{"outside_layer":"SOLID"},
+            "C3":{"outside_layer":"m\u00a0"}, "C4":{"outside_layer":"\u000bv"}
+        }
+    }"#,
+    )?;
+    let exact = super::super::compile_raw_model_for_source(&exact_raw);
+    assert!(!exact.has_errors(), "{:?}", exact.report.diagnostics);
+    let exact_model = exact.model.as_ref().unwrap();
+    assert!(exact_model.material_names.is_source_exact_namespace());
+    assert_ne!(
+        exact_model.material_names.resolve(" Air "),
+        exact_model.material_names.resolve("Air")
+    );
+    assert_ne!(
+        exact_model.material_names.resolve(" Solid "),
+        exact_model.material_names.resolve("Solid")
+    );
+    for name in [" Air ", "Air", "\u{a0}", "\u{b}"] {
+        let id = exact_model.material_names.resolve(name).unwrap();
+        let row = exact_model
+            .materials
+            .iter()
+            .find(|row| row.id == id)
+            .unwrap();
+        assert_eq!(row.name.0, name.to_ascii_uppercase());
+        assert_eq!(row.kind(), MaterialKind::WindowGas);
+        assert!(
+            exact_model
+                .ctf_report_names
+                .materials
+                .contains(&(id, name.to_ascii_uppercase()))
+        );
+    }
+    for (construction, raw_reference) in [
+        ("C1", " Solid "),
+        ("C2", "Solid"),
+        ("C3", "M\u{a0}"),
+        ("C4", "\u{b}V"),
+    ] {
+        let id = exact_model.material_names.resolve(raw_reference).unwrap();
+        let row = exact_model
+            .constructions
+            .iter()
+            .find(|row| row.name.0 == construction)
+            .unwrap();
+        assert_eq!(row.effective_layers(), [id]);
+        assert_eq!(
+            exact_model
+                .materials
+                .iter()
+                .find(|row| row.id == id)
+                .unwrap()
+                .name
+                .0,
+            raw_reference.to_ascii_uppercase()
+        );
+    }
+    let mut missing_raw = exact_raw.clone();
+    missing_raw
+        .objects
+        .get_mut(&ep_raw_model::ObjectType("Construction".into()))
+        .unwrap()
+        .get_mut(&ep_raw_model::ObjectName("C1".into()))
+        .unwrap()
+        .fields
+        .insert(
+            ep_raw_model::FieldName("outside_layer".into()),
+            ep_raw_model::RawValue::String("Solid ".into()),
+        );
+    let missing = super::super::compile_raw_model_for_source(&missing_raw);
+    assert!(missing.has_errors());
+    assert!(
+        missing
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "MissingReference"
+                && row.object_type == "Construction"
+                && row.object_name.as_deref() == Some("C1"))
+    );
+    let source_duplicate = super::super::compile_raw_model_for_source(&duplicate);
+    assert!(
+        source_duplicate
+            .report
+            .diagnostics
+            .iter()
+            .any(|row| row.code == "DuplicateName" && row.object_type == "WindowMaterial:Gas")
+    );
+    let mut no_gas = raw_model.clone();
+    no_gas
+        .objects
+        .remove(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()));
+    let no_gas_result = super::super::compile_raw_model_for_source(&no_gas);
+    assert!(!no_gas_result.has_errors());
+    assert!(
+        !no_gas_result
+            .model
+            .as_ref()
+            .unwrap()
+            .material_names
+            .is_source_exact_namespace()
+    );
+    let custom = parse_epjson_str(
+        r#"{"WindowMaterial:Gas":{"Custom Gap":{
+        "gas_type":"Custom","thickness":0.012,"conductivity_coefficient_a":0.01,
+        "viscosity_coefficient_a":0.01,"specific_heat_coefficient_a":1000,"molecular_weight":28
+    }}}"#,
+    )?;
+    let custom_result = super::super::compile_raw_model_for_source(&custom);
+    assert!(
+        !custom_result.has_errors(),
+        "{:?}",
+        custom_result.report.diagnostics
+    );
+    assert!(
+        !custom_result
+            .model
+            .as_ref()
+            .unwrap()
+            .material_names
+            .is_source_exact_namespace()
+    );
+    let invalid = parse_epjson_str(r#"{"WindowMaterial:Gas":{"Bad":{"gas_type":"Air"}}}"#)?;
+    assert!(super::super::compile_raw_model_for_source(&invalid).has_errors());
+    for name in ["", " ", "\t", "\n"] {
+        let mut bad = raw_model.clone();
+        let gas_rows = bad
+            .objects
+            .get_mut(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
+            .unwrap();
+        let row = gas_rows
+            .remove(&ep_raw_model::ObjectName("Gas Gap".into()))
+            .unwrap();
+        gas_rows.insert(ep_raw_model::ObjectName(name.into()), row);
+        assert!(super::super::compile_raw_model_for_source(&bad).has_errors());
+    }
     Ok(())
 }
 

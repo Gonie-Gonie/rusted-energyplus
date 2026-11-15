@@ -23,6 +23,7 @@ mod air_gap_tests;
 mod report;
 mod simple_glazing;
 mod type_group;
+mod window_gas;
 pub(crate) use type_group::SourceMaterialGroup;
 
 pub(super) fn unavailable(message: &str) -> RuntimeError {
@@ -61,6 +62,8 @@ pub(crate) struct SelectedMaterialData {
     pub(crate) nominal_r: Vec<f64>,
     /// Actual mutable GlassSimple properties; typed derivations are advisory.
     simple_glazing: BTreeMap<MaterialId, simple_glazing::SourceSimpleGlazingMaterial>,
+    /// Actual named MaterialGasMix/base rows; typed gas properties are advisory.
+    window_gas: BTreeMap<MaterialId, window_gas::SourceWindowGasMaterial>,
     pub(crate) num_no_masses: i32,
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
@@ -148,6 +151,53 @@ fn typed_id(
 }
 
 impl SelectedMaterialData {
+    /// Same retained Gas row for common reports and post-runtime geometry.
+    pub(crate) fn source_window_gas_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native Gas MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::Gas)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Gas Source order/group/physical identity",
+            ));
+        }
+        let row = self
+            .window_gas
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained Gas runtime row",
+            ))?;
+        if row.num_gases != 1
+            || row.gas_fractions != [1.0, 0.0, 0.0, 0.0, 0.0]
+            || row.gases[0].gas_type == ep_model::WindowGasType::Custom
+            || row.gap_vent_type != ep_model::WindowGapVentType::Sealed
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual named single Gas mixture identity",
+            ));
+        }
+        let roughness = row.roughness.ok_or(HeatBalanceInputError::Unavailable(
+            "actual Gas getter roughness",
+        ))?;
+        Ok((
+            roughness,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
     /// Read the actual retained GlassSimple row through its Source order/physical ID.
     pub(crate) fn source_simple_glazing_surface_properties(
         &self,
@@ -421,7 +471,7 @@ impl SelectedMaterialData {
             "WindowMaterial:Glazing:RefractionExtinctionMethod"
         );
         empty!(num_eql_glazings, "WindowMaterial:Glazing:EquivalentLayer");
-        empty!(num_w5_gases, "WindowMaterial:Gas");
+        self.get_named_window_gas_data(raw, o)?;
         empty!(num_eql_gaps, "WindowMaterial:Gap:EquivalentLayer");
         empty!(num_w5_gas_mixtures, "WindowMaterial:GasMixture");
         empty!(num_shades, "WindowMaterial:Shade");

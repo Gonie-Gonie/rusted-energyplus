@@ -706,6 +706,42 @@ impl<'a> Compiler<'a> {
             model.space_list_names = NameMap::source_exact_namespace();
             model.node_names = NameMap::source_exact_namespace();
             model.node_list_names = NameMap::source_exact_namespace();
+            // The selected named-Gas Source route shares Native's exact
+            // material namespace with its opaque dependencies. Legacy,
+            // no-Gas, Custom-only and invalid-only inputs keep their policy.
+            if self.raw_model.is_epjson()
+                && self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| {
+                        let name_valid = !name.0.contains('\n')
+                            && name.0.bytes().any(|byte| !matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '));
+                        let named = matches!(object.fields.get(&ep_raw_model::FieldName("gas_type".into())),
+                            Some(RawValue::String(value)) if matches!(value.as_str(), "Air" | "Argon" | "Krypton" | "Xenon"));
+                        let thickness = matches!(object.fields.get(&ep_raw_model::FieldName("thickness".into())),
+                            Some(RawValue::Number(token)) if ep_model::classify_source_json_number(token).is_ok()
+                                && token.parse::<f64>().ok().is_some_and(|value| value.is_finite() && value > 0.0));
+                        let supplied = object.fields.iter().all(|(field, value)| {
+                            if !matches!(field.0.as_str(), "thickness" | "conductivity_coefficient_a"
+                                | "conductivity_coefficient_b" | "conductivity_coefficient_c"
+                                | "viscosity_coefficient_a" | "viscosity_coefficient_b" | "viscosity_coefficient_c"
+                                | "specific_heat_coefficient_a" | "specific_heat_coefficient_b" | "specific_heat_coefficient_c"
+                                | "molecular_weight" | "specific_heat_ratio") {
+                                return true;
+                            }
+                            let RawValue::Number(token) = value else { return false; };
+                            ep_model::classify_source_json_number(token).is_ok()
+                                && token.parse::<f64>().ok().is_some_and(|value| value.is_finite()
+                                    && match field.0.as_str() {
+                                        "thickness" | "viscosity_coefficient_a" | "specific_heat_coefficient_a" => value > 0.0,
+                                        "molecular_weight" => (20.0..=200.0).contains(&value),
+                                        "specific_heat_ratio" => value > 1.0,
+                                        _ => true,
+                                    })
+                        });
+                        name_valid && named && thickness && supplied
+                    }))
+            {
+                model.material_names = NameMap::source_exact_namespace();
+            }
         }
 
         self.parse_building(&mut model);
@@ -5273,6 +5309,15 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if self.source_file_declarations
+                && self.raw_model.is_epjson()
+                && gas_type != WindowGasType::Custom
+            {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -8816,7 +8861,19 @@ impl<'a> Compiler<'a> {
         object_type: &str,
         name: &str,
     ) -> Option<(MaterialId, NormalizedName)> {
-        if name.trim().is_empty() {
+        let blank_name = if self.source_file_declarations
+            && self.raw_model.is_epjson()
+            && object_type == "WindowMaterial:Gas"
+            && model.material_names.is_source_exact_namespace()
+        {
+            name.contains('\n')
+                || name
+                    .bytes()
+                    .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        } else {
+            name.trim().is_empty()
+        };
+        if blank_name {
             self.error(
                 "MissingRequiredField",
                 object_type,
@@ -8843,7 +8900,7 @@ impl<'a> Compiler<'a> {
             self.duplicate_name(object_type, name);
             return None;
         }
-        Some((id, NormalizedName::new(name)))
+        Some((id, model.material_names.normalized_name(name)))
     }
 
     fn is_reserved_fc_factor_material_name(&self, name: &str) -> bool {

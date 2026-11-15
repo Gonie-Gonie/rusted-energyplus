@@ -378,17 +378,44 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowGlazingEquivalentLayer)
             .count(),
     );
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Gas",
-        typed_model
-            .materials
-            .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowGas)
-            .count(),
-    );
+    let named_gas_consumed =
+        source_admission.is_some_and(|admission| admission.consumes("WindowMaterial:Gas"));
+    let named_gas_used = typed_model.constructions.iter().any(|construction| {
+        construction.layers.iter().any(|id| {
+            typed_model
+                .materials
+                .iter()
+                .any(|material| material.id == *id && material.kind() == MaterialKind::WindowGas)
+        })
+    });
+    let only_named_gases = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowGas)
+        .all(|material| {
+            material.as_window_gas().is_some_and(|gas| {
+                matches!(
+                    gas.gas_type,
+                    ep_model::WindowGasType::Air
+                        | ep_model::WindowGasType::Argon
+                        | ep_model::WindowGasType::Krypton
+                        | ep_model::WindowGasType::Xenon
+                )
+            })
+        });
+    if !named_gas_consumed || named_gas_used || !only_named_gases {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Gas",
+            typed_model
+                .materials
+                .iter()
+                .filter(|material| material.kind() == MaterialKind::WindowGas)
+                .count(),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

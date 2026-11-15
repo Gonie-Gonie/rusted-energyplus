@@ -517,6 +517,10 @@ mod fields;
 mod infrared;
 mod simple_glazing;
 pub(crate) use simple_glazing::validate as source_b_validate_unused_simple_glazing;
+mod window_gas;
+pub(crate) use window_gas::{
+    known_field as source_b_named_gas_known_field, validate as source_b_validate_unused_named_gas,
+};
 mod multizone;
 mod people;
 pub(crate) use people::has_instantiated_adaptive_comfort;
@@ -582,6 +586,7 @@ fn resolve_raw(
     }
     if source_b_ingress {
         simple_glazing::validate(raw)?;
+        window_gas::validate(raw)?;
     }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
@@ -597,6 +602,7 @@ fn resolve_raw(
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
         let source_simple_glazing_family =
             source_b_ingress && family.0 == "WindowMaterial:SimpleGlazingSystem";
+        let source_named_gas_family = source_b_ingress && family.0 == "WindowMaterial:Gas";
         let source_people_family = source_calendar_ingress && family.0 == "People";
         let source_electric_family =
             source_calendar_ingress && !source_b_ingress && family.0 == "ElectricEquipment";
@@ -663,6 +669,7 @@ fn resolve_raw(
             && !source_node_list_family
             && !source_irt_family
             && !source_simple_glazing_family
+            && !source_named_gas_family
             && !source_calendar_family
             && !source_compact_family
             && !source_people_family
@@ -716,7 +723,9 @@ fn resolve_raw(
             // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
             // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
             // or Unicode whitespace. Other families keep their old boundary.
-            let blank_name = if source_design_day_family
+            let blank_name = if source_named_gas_family {
+                !window_gas::valid_name(&name.0)
+            } else if source_design_day_family
                 || source_calendar_ingress
                     && matches!(
                         family.0.as_str(),
@@ -740,7 +749,8 @@ fn resolve_raw(
                             | "Schedule:Week:Daily"
                             | "Schedule:Week:Compact"
                             | "Schedule:Year"
-                    ) {
+                    )
+            {
                 name.0.contains('\n')
                     || name
                         .0
@@ -804,6 +814,8 @@ fn resolve_raw(
                     && !(source_angle_family && people::admitted_angle_field(&field.0, value))
                     && !(source_simple_glazing_family
                         && simple_glazing::admitted_field(&field.0, value))
+                    && !(source_named_gas_family
+                        && window_gas::admitted_field(&field.0, value))
                 {
                     // The connected schedule and OtherEquipment instance schemas
                     // allow additional members. Only an unconsumed top-level member
@@ -1135,6 +1147,7 @@ fn resolve_raw(
                 }
                 "Material:InfraredTransparent" => source_irt_family,
                 "WindowMaterial:SimpleGlazingSystem" => source_simple_glazing_family,
+                "WindowMaterial:Gas" => source_named_gas_family,
                 "People" => {
                     source_people_family
                         && people::admitted_object(raw, object, source_gain_collections)

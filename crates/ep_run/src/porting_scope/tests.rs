@@ -7128,6 +7128,298 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         json!(0.0);
     let zero = parse_epjson_str(&value.to_string()).expect("zero is not omission");
     assert!(crate::ordinary_equipment_input::resolve_source_b(&zero).is_err());
+    // Source compilation, retained raw/IP operands and actual support share the
+    // same named-unused Gas input. Every pre-existing material case above stays.
+    const GAS: &str = "WindowMaterial:Gas";
+    let mut gas_value = input(PortingScope::B);
+    gas_value[GAS] = json!({
+        " Air ": {"gas_type":"Air", "thickness":0.012,
+            "conductivity_coefficient_a":-1.0,"conductivity_coefficient_b":-2.0,
+            "conductivity_coefficient_c":0.0,"viscosity_coefficient_a":1.0,
+            "viscosity_coefficient_b":-3.0,"viscosity_coefficient_c":0.0,
+            "specific_heat_coefficient_a":1.0,"specific_heat_coefficient_b":-4.0,
+            "specific_heat_coefficient_c":0.0,"molecular_weight":20.0,
+            "specific_heat_ratio":1.5,"name":"ignored body identity",
+            "idf_order":{"nested":[null,true]},"idf_max_fields":[],
+            "metadata":null},
+        "Air": {"gas_type":"Argon", "thickness":0.013},
+        "\u{a0}": {"gas_type":"Krypton", "thickness":0.014},
+        "\u{b}": {"gas_type":"Xenon", "thickness":0.015}
+    });
+    let gas_raw = parse_epjson_str(&gas_value.to_string()).expect("same legal named Gas Raw");
+    // This public Source entry sets source_file_declarations; a Legacy compile
+    // cannot establish the newly required actual loader-name/ID association.
+    let gas_compiled = ep_compiler::compile_raw_model_for_source(&gas_raw);
+    assert!(
+        !gas_compiled.has_errors(),
+        "{:?}",
+        gas_compiled.report.diagnostics
+    );
+    let gas_model = gas_compiled
+        .model
+        .as_ref()
+        .expect("actual Source Gas identities");
+    assert!(gas_model.material_names.is_source_exact_namespace());
+    assert_ne!(
+        gas_model.material_names.resolve(" Air "),
+        gas_model.material_names.resolve("Air")
+    );
+    for name in [" Air ", "Air", "\u{a0}", "\u{b}"] {
+        let id = gas_model
+            .material_names
+            .resolve(name)
+            .expect("same named Gas ID");
+        assert!(
+            gas_model
+                .ctf_report_names
+                .materials
+                .contains(&(id, name.to_ascii_uppercase()))
+        );
+    }
+    let mut gas_ip = crate::ordinary_input_processor::resolve_source_b(&gas_raw)
+        .expect("all known fields validated on original Raw");
+    assert_eq!(gas_ip.get_num_objects_found(GAS), 4);
+    let gas_args = gas_ip
+        .get_object_def_max_args(GAS)
+        .expect("real Gas schema definition");
+    assert_eq!(
+        (
+            gas_args.alphas,
+            gas_args.numerics,
+            gas_args.total().unwrap()
+        ),
+        (2, 12, 14)
+    );
+    let original = gas_ip.source_raw_object_fields(GAS, " Air ").unwrap();
+    assert!(
+        matches!(original.get("name"), Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::String(value)) if value == "ignored body identity")
+    );
+    assert!(matches!(
+        original.get("idf_order"),
+        Some(
+            ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Object(
+                _
+            )
+        )
+    ));
+    assert!(
+        matches!(original.get("idf_max_fields"), Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Array(rows)) if rows.is_empty())
+    );
+    assert!(matches!(
+        original.get("metadata"),
+        Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Null)
+    ));
+    let gas_input = crate::ordinary_material_input::resolve_source(&gas_raw, &gas_ip)
+        .expect("same real Gas operand projection");
+    assert_eq!(gas_input.window_gas.len(), 4);
+    let gas_row = gas_input
+        .window_gas
+        .iter()
+        .find(|row| row.object_name == " Air ")
+        .unwrap();
+    assert_eq!(gas_row.fields.len(), 13);
+    assert!(gas_row.idf_max_fields.is_none());
+    assert!(gas_row.fields.contains_key("specific_heat_ratio"));
+    for ignored in ["name", "idf_order", "idf_max_fields", "metadata"] {
+        assert!(!gas_row.fields.contains_key(ignored));
+    }
+    let mut stats = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+    gas_ip
+        .report_source_idf_records_stats(&mut stats)
+        .expect("genuine complete input statistics");
+    let all_records: usize = gas_raw.objects.values().map(|objects| objects.len()).sum();
+    assert_eq!(
+        usize::try_from(stats.number_input_records).unwrap(),
+        all_records
+    );
+    assert!(
+        gas_ip.is_object_unused(GAS, " Air "),
+        "projection/statistics do not run GetObjectItem"
+    );
+    let mut gas_trace = inspect_porting_scope(
+        &gas_raw,
+        &gas_compiled.report,
+        Some(gas_model),
+        PortingScope::B,
+    );
+    assert!(gas_trace.admissible, "{:?}", gas_trace.violations);
+    let gas_environment = super::environment::environment_from_weather(
+        gas_model,
+        &weather,
+        "existing Gas caller weather",
+    )
+    .unwrap();
+    assert!(validate_porting_environment(&gas_environment).is_empty());
+    gas_trace.environment = Some(gas_environment);
+    let gas_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&gas_raw, &gas_trace).unwrap();
+    let gas_support = crate::support::assess_support_with_source_admission(
+        &gas_raw,
+        &gas_compiled.report,
+        Some(gas_model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&gas_admission),
+    );
+    assert!(
+        gas_support.allows_rust_runtime(),
+        "{:?}",
+        gas_support.diagnostics
+    );
+    assert!(
+        !assess_support(
+            &gas_raw,
+            &gas_compiled.report,
+            Some(gas_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal
+        )
+        .allows_rust_runtime()
+    );
+    assert!(crate::ordinary_equipment_input::resolve(&gas_raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&gas_raw).is_err());
+    let mut no_gas_raw = gas_raw.clone();
+    no_gas_raw
+        .objects
+        .remove(&ep_raw_model::ObjectType(GAS.into()));
+    let no_gas_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&no_gas_raw, &gas_trace)
+            .unwrap();
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &no_gas_raw,
+            &gas_compiled.report,
+            Some(gas_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&no_gas_admission)
+        )
+        .allows_rust_runtime()
+    );
+    let gas_id = gas_model.material_names.resolve("Air").unwrap();
+    let mut custom_typed = gas_model.clone();
+    let custom_row = custom_typed
+        .materials
+        .iter_mut()
+        .find(|row| row.id == gas_id)
+        .unwrap();
+    assert!(
+        matches!(
+            &custom_row.definition,
+            ep_model::MaterialDefinition::WindowGas(_)
+        ),
+        "same actual Gas kind"
+    );
+    if let ep_model::MaterialDefinition::WindowGas(custom) = &mut custom_row.definition {
+        custom.gas_type = ep_model::WindowGasType::Custom;
+    }
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &gas_raw,
+            &gas_compiled.report,
+            Some(&custom_typed),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&gas_admission)
+        )
+        .allows_rust_runtime()
+    );
+    let mut used_typed = gas_model.clone();
+    used_typed.constructions[0].layers.push(gas_id);
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &gas_raw,
+            &gas_compiled.report,
+            Some(&used_typed),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&gas_admission)
+        )
+        .allows_rust_runtime()
+    );
+    // Original schema bounds precede the signed-i64-effective Native operand.
+    let mut wrapped_value = gas_value.clone();
+    wrapped_value[GAS]["Air"]["thickness"] = json!(u64::MAX);
+    let wrapped_raw = parse_epjson_str(&wrapped_value.to_string()).unwrap();
+    let wrapped_compiled = ep_compiler::compile_raw_model_for_source(&wrapped_raw);
+    assert!(!wrapped_compiled.has_errors());
+    let wrapped_model = wrapped_compiled.model.as_ref().unwrap();
+    let wrapped_id = wrapped_model.material_names.resolve("Air").unwrap();
+    assert!(
+        wrapped_model
+            .materials
+            .iter()
+            .find(|row| row.id == wrapped_id)
+            .unwrap()
+            .as_window_gas()
+            .unwrap()
+            .thickness_m
+            > 0.0
+    );
+    let wrapped_ip = crate::ordinary_input_processor::resolve_source_b(&wrapped_raw).unwrap();
+    let wrapped_input =
+        crate::ordinary_material_input::resolve_source(&wrapped_raw, &wrapped_ip).unwrap();
+    assert_eq!(
+        wrapped_input
+            .window_gas
+            .iter()
+            .find(|row| row.object_name == "Air")
+            .unwrap()
+            .fields["thickness"],
+        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(-1.0)
+    );
+    for (field, invalid) in [
+        ("gas_type", json!("Custom")),
+        ("gas_type", json!("air")),
+        ("gas_type", json!(null)),
+        ("thickness", json!("0.012")),
+        ("thickness", json!(0.0)),
+        ("conductivity_coefficient_a", json!([])),
+        ("viscosity_coefficient_a", json!(0.0)),
+        ("specific_heat_coefficient_a", json!(0.0)),
+        ("molecular_weight", json!(19.0)),
+        ("molecular_weight", json!(201.0)),
+        ("specific_heat_ratio", json!(1.0)),
+    ] {
+        let mut bad = gas_value.clone();
+        bad[GAS]["Air"][field] = invalid;
+        let raw = parse_epjson_str(&bad.to_string()).unwrap();
+        assert!(
+            crate::ordinary_input_processor::resolve_source_b(&raw).is_err(),
+            "{field}"
+        );
+    }
+    let mut missing = gas_value.clone();
+    missing[GAS]["Air"]
+        .as_object_mut()
+        .unwrap()
+        .remove("thickness");
+    assert!(
+        crate::ordinary_input_processor::resolve_source_b(
+            &parse_epjson_str(&missing.to_string()).unwrap()
+        )
+        .is_err()
+    );
+    for field in ["outside_layer", "layer_2"] {
+        let mut used = gas_value.clone();
+        used["Construction"]["Unused Gas Window"] = if field == "outside_layer" {
+            json!({"outside_layer":"Air"})
+        } else {
+            json!({"outside_layer":"Opaque", "layer_2":"Air"})
+        };
+        let raw = parse_epjson_str(&used.to_string()).unwrap();
+        assert!(crate::ordinary_equipment_input::resolve_source_b(&raw).is_err());
+    }
 }
 
 #[test]

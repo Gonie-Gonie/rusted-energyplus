@@ -173,6 +173,15 @@ impl SourceSupportAdmission {
         {
             covered_objects.insert("WindowMaterial:SimpleGlazingSystem");
         }
+        if trace.scope == PortingScope::B
+            && raw
+                .objects
+                .get(&ObjectType("WindowMaterial:Gas".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            && crate::ordinary_equipment_input::source_b_validate_unused_named_gas(raw).is_ok()
+        {
+            covered_objects.insert("WindowMaterial:Gas");
+        }
         Some(Self {
             covered_objects,
             zone_convection_overrides_consumed,

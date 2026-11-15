@@ -83,6 +83,31 @@ impl SelectedMaterialData {
                     [0.0; 4],
                     value.surface,
                 ),
+                MaterialDefinition::WindowGas(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::Gas) {
+                        return Err(unavailable("reported Gas actual group"));
+                    }
+                    let value = self.window_gas.get(id).ok_or_else(|| {
+                        unavailable("reported actual Gas runtime base properties")
+                    })?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("Gas getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
                 MaterialDefinition::WindowSimpleGlazing(_) => {
                     if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassSimple) {
                         return Err(unavailable("reported SimpleGlazing actual group"));

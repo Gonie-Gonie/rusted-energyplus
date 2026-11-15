@@ -34,8 +34,13 @@ fn resolve_ordered(
         "Material:AirGap",
         "Material:InfraredTransparent",
         "WindowMaterial:SimpleGlazingSystem",
+        "WindowMaterial:Gas",
     ] {
-        if family == "WindowMaterial:SimpleGlazingSystem" && !source_order {
+        if matches!(
+            family,
+            "WindowMaterial:SimpleGlazingSystem" | "WindowMaterial:Gas"
+        ) && !source_order
+        {
             // No new Legacy or Source A admission is granted by this projection.
             continue;
         }
@@ -59,6 +64,14 @@ fn resolve_ordered(
             let mut fields = BTreeMap::new();
             let mut idf_max_fields = None;
             for (field, value) in &row.fields {
+                // Native's direct-JSON named Gas getter reads only declared
+                // fields; Raw/IP retain every ignored member, including idf_*.
+                if source_order
+                    && family == "WindowMaterial:Gas"
+                    && !crate::ordinary_equipment_input::source_b_named_gas_known_field(&field.0)
+                {
+                    continue;
+                }
                 if field.0 == "idf_max_fields" {
                     let RawValue::Number(text) = value else {
                         return Err("Material idf_max_fields numeric custody".into());
@@ -80,15 +93,18 @@ fn resolve_ordered(
                 let value = match value {
                     RawValue::String(value) => ProjectInputValue::String(value.clone()),
                     RawValue::Number(text) => {
-                        let value =
-                            if source_order && family == "WindowMaterial:SimpleGlazingSystem" {
-                                ep_model::classify_source_json_number(text)
-                                    .map_err(|_| "SimpleGlazing stored JSON numeric kind")?
-                                    .as_f64()
-                            } else {
-                                text.parse::<f64>()
-                                    .map_err(|_| "Material raw binary64 parse")?
-                            };
+                        let value = if source_order
+                            && matches!(
+                                family,
+                                "WindowMaterial:SimpleGlazingSystem" | "WindowMaterial:Gas"
+                            ) {
+                            ep_model::classify_source_json_number(text)
+                                .map_err(|_| "SimpleGlazing stored JSON numeric kind")?
+                                .as_f64()
+                        } else {
+                            text.parse::<f64>()
+                                .map_err(|_| "Material raw binary64 parse")?
+                        };
                         if !value.is_finite() {
                             return Err("Material nonfinite JSON number".into());
                         }
@@ -124,6 +140,7 @@ fn resolve_ordered(
             "Material:AirGap" => result.air_gaps = values,
             "Material:InfraredTransparent" => result.infrared_transparent = values,
             "WindowMaterial:SimpleGlazingSystem" => result.simple_glazing = values,
+            "WindowMaterial:Gas" => result.window_gas = values,
             _ => unreachable!("literal selected material family"),
         }
     }
