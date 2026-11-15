@@ -330,6 +330,13 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             Ok(&mut self.1)
         }
     }
+    // Same existing three parameter-owner constructors, now once for this
+    // whole table and the unchanged later flow-error block. No cache reset.
+    let phase_hvac =
+        crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals::default();
+    let mut psychrometrics = crate::psychrometrics::SourcePsychrometricAccess;
+    let mut recurring =
+        crate::heat_balance::source_initialization::SourceRecurringErrorState::default();
     for total in [1_usize, 2, 3] {
         let control = SelectedHeatBalanceInputState::default();
         let mut model = ep_model::TypedModel::default();
@@ -720,13 +727,13 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
             cool_name,
         ) in fuel_cases
         {
+            use super::source_purchased_air::SourcePurchasedAirInputOutputContext;
             use crate::heat_balance::selected_input_processor::{
                 SourceInputStatisticsInput, SourceInputStatisticsValue as V,
             };
             use crate::heat_balance::source_output_registration::{
                 SourceOutputDictionaryStreams, SourcePurchasedAirOutputField,
-                SourcePurchasedAirReportingOutputContext, SourceRealOutputTarget,
-                SourceReportVariableEnvironment,
+                SourceRealOutputTarget,
             };
             let alias = "ZONE one inlets 가";
             let physical = "Zone one inlet 가";
@@ -921,30 +928,21 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut probe_shortcut,
                     true,
                     &mut probe_schedules,
-                    globals.num_of_zones,
                     &mut probe_branch,
-                    false,
                     &probe_sizing,
                     &mut probe_outdoor_air_nodes,
-                    &probe_environment,
                     &control,
-                    &globals.display_extra_warnings,
-                    &mut globals.any_local_environments_in_model,
-                    &mut backend,
-                    &mut SourcePurchasedAirReportingOutputContext {
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
+                    &mut SourcePurchasedAirInputOutputContext {
                         registration: &mut probe_registration,
                         input: &mut probe_ip,
                         prescan: &probe_prescan,
                         reports: &probe_reports,
-                        environment: SourceReportVariableEnvironment::new(
-                            "",
-                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                                kickoff: &globals.kickoff_simulation,
-                                developer: &developer,
-                                warmup: &clock.warmup_flag,
-                                doing_sizing: &globals.doing_sizing,
-                            }),
-                        ),
+                        minimum_report_frequency: "",
                         minutes_in_time_step: clock.minutes_in_time_step,
                         host: &mut files,
                         dictionary_host: &mut dictionary,
@@ -1290,6 +1288,12 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             .into(),
                         ),
                     );
+                    outdoor_fields.insert(
+                        "wetbulb_temperature_schedule_name".into(),
+                        V::String(if explicit_empty { "Constant-1.0" } else { "" }.into()),
+                    );
+                    // Genuine public environment input before any true WB call.
+                    probe_environment.current_weather.out_baro_press = 101325.0;
                     let mut oa_definitions = definitions.clone();
                     oa_definitions.extend([
                         SourceObjectDefinition {
@@ -1487,19 +1491,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             oa_registry.set_source_outdoor_air_nodes(
                                 &mut oa_ip,
                                 &mut oa_equipment,
-                                &probe_environment,
                                 &control,
                                 &mut oa_branch,
                                 true,
-                                &mut backend,
-                                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                                    kickoff: &globals.kickoff_simulation,
-                                    developer: &developer,
-                                    warmup: &clock.warmup_flag,
-                                    doing_sizing: &globals.doing_sizing,
-                                }),
                                 &mut oa_schedules,
-                                &mut globals.any_local_environments_in_model,
+                                &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                             )?;
                         }
                         oa_prescan.add_record(unit_name, variable, &mut backend)?;
@@ -1512,33 +1512,22 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             &mut oa_shortcut,
                             true,
                             &mut oa_schedules,
-                            globals.num_of_zones,
                             &mut oa_branch,
-                            false,
                             &oa_sizing,
                             &mut oa_registry,
-                            &probe_environment,
                             &control,
-                            &globals.display_extra_warnings,
-                            &mut globals.any_local_environments_in_model,
-                            &mut backend,
-                            &mut SourcePurchasedAirReportingOutputContext {
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
+                            &mut SourcePurchasedAirInputOutputContext {
                                 registration: &mut oa_registration,
                                 input: &mut oa_ip,
                                 prescan: &oa_prescan,
                                 reports: &probe_reports,
-                                environment: SourceReportVariableEnvironment::new(
-                                    "",
-                                    Some(
-                                        crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                                            kickoff: &globals.kickoff_simulation,
-                                            developer: &developer,
-                                            warmup: &clock.warmup_flag,
-                                            doing_sizing: &globals.doing_sizing,
-                                        },
-                                    ),
-                                ),
-                                minutes_in_time_step: clock.minutes_in_time_step,
+                                minimum_report_frequency: "",
+                        minutes_in_time_step: clock.minutes_in_time_step,
                                 host: &mut oa_files,
                                 dictionary_host: &mut dictionary,
                                 eio: &mut oa_eio,
@@ -1561,33 +1550,59 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             .and_then(|rows| rows.first())
                             .ok_or("same wind OA registry")?;
                         let node_at = usize::try_from(node_number - 1)?;
-                        assert!(
-                            !oa_equipment
-                                .nodes
-                                .physical
-                                .as_ref()
-                                .ok_or("same wind physical Nodes")?[node_at]
-                                .is_local_node
+                        if explicit_empty {
+                            assert!(
+                                oa_equipment
+                                    .nodes
+                                    .physical
+                                    .as_ref()
+                                    .ok_or("same owned WB physical Node")?[node_at]
+                                    .is_local_node
+                            );
+                        } else {
+                            assert!(
+                                !oa_equipment
+                                    .nodes
+                                    .physical
+                                    .as_ref()
+                                    .ok_or("same wind physical Nodes")?[node_at]
+                                    .is_local_node
+                            );
+                        }
+                        let wb_pointer = oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("actual WB pointer owner")?[node_at]
+                            .outdoor_air_wet_bulb_schedule;
+                        assert_eq!(wb_pointer.is_some(), explicit_empty);
+                        if let Some(pointer) = wb_pointer {
+                            assert_eq!(oa_schedules.schedules[pointer.0].name, "Constant-1.0");
+                            assert!(oa_schedules.schedules[pointer.0].is_used);
+                            assert_eq!(oa_schedules.source_current_schedule_value(pointer)?, 1.0);
+                        }
+                        assert_eq!(
+                            oa_ip
+                                .source_raw_object_fields("OutdoorAir:Node", oa_name)?
+                                .get("wetbulb_temperature_schedule_name"),
+                            Some(&V::String(
+                                if explicit_empty { "Constant-1.0" } else { "" }.into()
+                            ))
                         );
                         assert_eq!(oa_schedules.source_current_schedule_value(wind_index)?, 3.0);
                         oa_registry.apply_source_zone_outdoor_environment(
                             &mut oa_ip,
                             &mut oa_equipment,
-                            &probe_environment,
                             &control,
                             &mut oa_branch,
                             true,
-                            &mut backend,
-                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                                kickoff: &globals.kickoff_simulation,
-                                developer: &developer,
-                                warmup: &clock.warmup_flag,
-                                doing_sizing: &globals.doing_sizing,
-                            }),
                             &mut oa_schedules,
-                            &mut globals.any_local_environments_in_model,
                             &oa_zones,
-                            globals.num_of_zones,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                         )?;
                         let first_wind = &oa_equipment
                             .nodes
@@ -1613,27 +1628,31 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                 (3.0, 1.0)
                             }
                         );
+                        if explicit_empty {
+                            assert_eq!(first_wind.outdoor_air_dry_bulb, 0.0);
+                            assert_eq!(first_wind.outdoor_air_wet_bulb, 0.0);
+                            assert_eq!(first_wind.temperature, 0.0);
+                            assert!(
+                                first_wind.humidity_ratio.is_finite()
+                                    && first_wind.humidity_ratio > 0.0
+                            );
+                        }
                         clock.hour_of_day = 13;
                         oa_schedules.update_source_schedule_values(&clock, &probe_environment)?;
                         assert_eq!(oa_schedules.source_current_schedule_value(wind_index)?, 7.0);
                         oa_registry.apply_source_zone_outdoor_environment(
                             &mut oa_ip,
                             &mut oa_equipment,
-                            &probe_environment,
                             &control,
                             &mut oa_branch,
                             true,
-                            &mut backend,
-                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                                kickoff: &globals.kickoff_simulation,
-                                developer: &developer,
-                                warmup: &clock.warmup_flag,
-                                doing_sizing: &globals.doing_sizing,
-                            }),
                             &mut oa_schedules,
-                            &mut globals.any_local_environments_in_model,
                             &oa_zones,
-                            globals.num_of_zones,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                         )?;
                         let second_wind = &oa_equipment
                             .nodes
@@ -1651,19 +1670,20 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                 (7.0, 1.0)
                             }
                         );
+                        if explicit_empty {
+                            probe_environment.current_weather.out_dry_bulb_temp = 20.0;
+                            probe_environment.current_weather.out_wet_bulb_temp = 20.005;
+                        }
                         oa_equipment.set_source_outdoor_air_node_values(
                             node_number,
                             false,
-                            &probe_environment,
                             &control,
-                            &mut backend,
-                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                                kickoff: &globals.kickoff_simulation,
-                                developer: &developer,
-                                warmup: &clock.warmup_flag,
-                                doing_sizing: &globals.doing_sizing,
-                            }),
                             &oa_schedules,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                         )?;
                         let false_wind = &oa_equipment
                             .nodes
@@ -1680,6 +1700,17 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                 probe_environment.current_weather.wind_dir
                             )
                         );
+                        if explicit_empty {
+                            assert_eq!(false_wind.temperature, 20.0);
+                            assert_eq!(
+                                false_wind.outdoor_air_wet_bulb.to_bits(),
+                                20.005_f64.to_bits()
+                            );
+                            assert!(
+                                false_wind.humidity_ratio.is_finite()
+                                    && false_wind.humidity_ratio > 0.0
+                            );
+                        }
                     }
                     let unit = &oa_equipment
                         .purchased_air
@@ -2087,12 +2118,6 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     error_callback: None,
                     sqlite: None,
                 };
-                let flags = Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                    kickoff: &globals.kickoff_simulation,
-                    developer: &developer,
-                    warmup: &clock.warmup_flag,
-                    doing_sizing: &globals.doing_sizing,
-                });
                 let mut okay = true;
                 outdoor.check_and_add_source_air_node_number(
                     &mut positive_ip,
@@ -2100,13 +2125,14 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut connections,
                     0,
                     &mut okay,
-                    &environment,
                     &control,
-                    &mut backend,
-                    flags,
                     true,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 assert!(!okay && !outdoor.get_input_flag);
                 assert_eq!(outdoor.number_outside_air_nodes, 0);
@@ -2117,13 +2143,14 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut connections,
                     node_number,
                     &mut okay,
-                    &environment,
                     &control,
-                    &mut backend,
-                    flags,
                     true,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 assert!(!okay);
                 assert_eq!(
@@ -2179,13 +2206,14 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut connections,
                     node_number,
                     &mut okay,
-                    &environment,
                     &control,
-                    &mut backend,
-                    flags,
                     true,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 assert!(okay);
                 assert_eq!(*connections.source_number_node_connections(), 1);
@@ -2208,14 +2236,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 outdoor.set_source_outdoor_air_nodes(
                     &mut positive_ip,
                     &mut actual_nodes,
-                    &environment,
                     &control,
                     &mut connections,
                     true,
-                    &mut backend,
-                    flags,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 let updated = &actual_nodes
                     .nodes
@@ -2250,14 +2279,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 outdoor.set_source_outdoor_air_nodes(
                     &mut positive_ip,
                     &mut actual_nodes,
-                    &environment,
                     &control,
                     &mut connections,
                     true,
-                    &mut backend,
-                    flags,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 let zero = &actual_nodes.nodes.physical.as_ref().ok_or("zero OA Node")?[at];
                 assert_eq!(
@@ -2272,14 +2302,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 outdoor.set_source_outdoor_air_nodes(
                     &mut positive_ip,
                     &mut actual_nodes,
-                    &environment,
                     &control,
                     &mut connections,
                     true,
-                    &mut backend,
-                    flags,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 let negative_zero = &actual_nodes
                     .nodes
@@ -2301,11 +2332,13 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 actual_nodes.set_source_outdoor_air_node_values(
                     node_number,
                     false,
-                    &environment,
                     &control,
-                    &mut backend,
-                    flags,
                     &schedules,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 assert_eq!(
                     actual_nodes
@@ -2326,14 +2359,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 outdoor.set_source_outdoor_air_nodes(
                     &mut positive_ip,
                     &mut actual_nodes,
-                    &environment,
                     &control,
                     &mut connections,
                     true,
-                    &mut backend,
-                    flags,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 let no_gradient = &actual_nodes
                     .nodes
@@ -2366,14 +2400,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 outdoor.set_source_outdoor_air_nodes(
                     &mut positive_ip,
                     &mut actual_nodes,
-                    &environment,
                     &control,
                     &mut connections,
                     true,
-                    &mut backend,
-                    flags,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 let point = &actual_nodes
                     .nodes
@@ -2393,14 +2428,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 outdoor.set_source_outdoor_air_nodes(
                     &mut positive_ip,
                     &mut actual_nodes,
-                    &environment,
                     &control,
                     &mut connections,
                     true,
-                    &mut backend,
-                    flags,
                     &mut schedules,
-                    &mut globals.any_local_environments_in_model,
+                    &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                 )?;
                 let accepted_threshold =
                     actual_nodes.nodes.physical.as_ref().ok_or("threshold OA")?[at].clone();
@@ -2411,14 +2447,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     .set_source_outdoor_air_nodes(
                         &mut positive_ip,
                         &mut actual_nodes,
-                        &environment,
                         &control,
                         &mut connections,
                         true,
-                        &mut backend,
-                        flags,
                         &mut schedules,
-                        &mut globals.any_local_environments_in_model,
+                        &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                     )
                     .expect_err("actual dry point severe/fatal");
                 assert!(matches!(
@@ -2447,14 +2484,15 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     .set_source_outdoor_air_nodes(
                         &mut positive_ip,
                         &mut actual_nodes,
-                        &environment,
                         &control,
                         &mut connections,
                         true,
-                        &mut backend,
-                        flags,
                         &mut schedules,
-                        &mut globals.any_local_environments_in_model,
+                        &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut globals, clock: &clock, environment: &environment,
+                hvac: &phase_hvac, developer: &developer,
+                psychrometrics: &mut psychrometrics, recurring: &mut recurring, backend: &mut backend,
+            },
                     )
                     .expect_err("actual wet point severe/fatal");
                 assert!(matches!(
@@ -2695,11 +2733,6 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 std_rho_air: 10.0,
                 ..environment.clone()
             };
-            let phase_hvac =
-                crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals::default();
-            let mut psychrometrics = crate::psychrometrics::SourcePsychrometricAccess;
-            let mut recurring =
-                crate::heat_balance::source_initialization::SourceRecurringErrorState::default();
             let mut diagnostic_state = error_state.clone();
             diagnostic_state.output_error_header = false;
             diagnostic_state.tracking.total_warning_errors = 0;

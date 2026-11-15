@@ -27,10 +27,42 @@ use crate::heat_balance::startup_integrity::{
     SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType,
     SourceNodeObjectType,
 };
-use crate::weather::day::WeatherEnvironmentState;
 pub(super) use calculation::SourcePurchasedAirCalcOwners;
 pub(super) use initialization::SourcePurchasedAirInitOwners;
 use owners::*;
+
+/// Native GetInput owns these existing output/input loans, without retaining
+/// any globals/phase borrow across the actual OA getter and property calls.
+pub(super) struct SourcePurchasedAirInputOutputContext<'a, H, D> {
+    pub(super) registration:
+        &'a mut crate::heat_balance::source_output_registration::SourceOutputRegistration,
+    pub(super) input: &'a mut crate::heat_balance::selected_input_processor::SelectedInputProcessor,
+    pub(super) prescan: &'a crate::heat_balance::source_output_prescan::SourceOutputPreScan,
+    pub(super) reports: &'a ep_model::ReportInputs,
+    pub(super) minimum_report_frequency: &'a str,
+    pub(super) minutes_in_time_step: i32,
+    pub(super) host: &'a mut H,
+    pub(super) dictionary_host: &'a mut D,
+    pub(super) eio: &'a mut dyn std::io::Write,
+}
+impl<H, D> SourcePurchasedAirInputOutputContext<'_, H, D> {
+    fn reporting<'call>(
+        &'call mut self,
+        environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment<'call>,
+    ) -> SourcePurchasedAirReportingOutputContext<'call, H, D> {
+        SourcePurchasedAirReportingOutputContext {
+            registration: &mut *self.registration,
+            input: &mut *self.input,
+            prescan: self.prescan,
+            reports: self.reports,
+            environment,
+            minutes_in_time_step: self.minutes_in_time_step,
+            host: &mut *self.host,
+            dictionary_host: &mut *self.dictionary_host,
+            eio: &mut *self.eio,
+        }
+    }
+}
 
 // UtilityRoutines1564-1568: the live header/value are getter inputs, not output fixtures.
 fn purchased_air_item_not_found(
@@ -174,33 +206,26 @@ impl OrdinaryEquipment {
         shortcut: &mut SourceInputProcessorShortCut,
         source_is_epjson: bool,
         schedules: &mut SelectedScheduleManager,
-        number_zones: i32,
         branch: &mut SourceBranchNodeConnections,
-        any_ems: bool,
         sizing: &SelectedSizingManager,
         outdoor_air_nodes: &mut SourceOutdoorAirNodes,
-        environment: &WeatherEnvironmentState,
         control: &SelectedHeatBalanceInputState,
-        display_extra_warnings: &bool,
-        any_local: &mut bool,
-        backend: &mut SourceErrorBackend<'_>,
-        output: &mut SourcePurchasedAirReportingOutputContext<'_, H, D>,
+        o: &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners<
+            '_,
+            '_,
+        >,
+        output: &mut SourcePurchasedAirInputOutputContext<'_, H, D>,
     ) -> Result<(), Error> {
         if self.purchased_air.get_purchased_air_input {
             self.get_source_purchased_air(
                 shortcut,
                 source_is_epjson,
                 schedules,
-                number_zones,
                 branch,
-                any_ems,
                 sizing,
                 outdoor_air_nodes,
-                environment,
                 control,
-                display_extra_warnings,
-                any_local,
-                backend,
+                o,
                 output,
             )?;
             self.purchased_air.get_purchased_air_input = false;
@@ -345,17 +370,15 @@ impl OrdinaryEquipment {
         shortcut: &mut SourceInputProcessorShortCut,
         source_is_epjson: bool,
         schedules: &mut SelectedScheduleManager,
-        number_zones: i32,
         branch: &mut SourceBranchNodeConnections,
-        any_ems: bool,
         sizing: &SelectedSizingManager,
         outdoor_air_nodes: &mut SourceOutdoorAirNodes,
-        environment: &WeatherEnvironmentState,
         control: &SelectedHeatBalanceInputState,
-        display_extra_warnings: &bool,
-        any_local: &mut bool,
-        backend: &mut SourceErrorBackend<'_>,
-        output: &mut SourcePurchasedAirReportingOutputContext<'_, H, D>,
+        o: &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners<
+            '_,
+            '_,
+        >,
+        output: &mut SourcePurchasedAirInputOutputContext<'_, H, D>,
     ) -> Result<(), Error> {
         let mut errors_found = false;
         shortcut.current_module_object = getter::FAMILY.into();
@@ -395,8 +418,13 @@ impl OrdinaryEquipment {
                 .init_unique_check_source(
                     getter::FAMILY,
                     output.input,
-                    backend,
-                    output.environment.diagnostic_flags,
+                    o.backend,
+                    Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff: &o.globals.kickoff_simulation,
+                        developer: o.developer,
+                        warmup: &o.clock.warmup_flag,
+                        doing_sizing: &o.globals.doing_sizing,
+                    }),
                 )
                 .map_err(|_| Error::Unavailable("actual PurchasedAir InitUniqueNodeCheck257"))?;
             // Exact installed/pinned schema is compiled into schema.rs; the
@@ -450,7 +478,7 @@ impl OrdinaryEquipment {
                 self.purchased_unit_mut(number)?.avail_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.avail_sched.is_none() {
                     purchased_air_item_not_found(
-                        backend,
+                        o.backend,
                         &shortcut.current_module_object,
                         object,
                         "Availability Schedule Name",
@@ -463,8 +491,13 @@ impl OrdinaryEquipment {
                     .nodes
                     .get_source_only_single_node(
                         output.input,
-                        backend,
-                        output.environment.diagnostic_flags,
+                        o.backend,
+                        Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                            kickoff: &o.globals.kickoff_simulation,
+                            developer: o.developer,
+                            warmup: &o.clock.warmup_flag,
+                            doing_sizing: &o.globals.doing_sizing,
+                        }),
                         branch,
                         &supply,
                         &mut errors_found,
@@ -509,8 +542,13 @@ impl OrdinaryEquipment {
                         .nodes
                         .get_source_only_single_node(
                             output.input,
-                            backend,
-                            output.environment.diagnostic_flags,
+                            o.backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &o.globals.kickoff_simulation,
+                                developer: o.developer,
+                                warmup: &o.clock.warmup_flag,
+                                doing_sizing: &o.globals.doing_sizing,
+                            }),
                             branch,
                             &exhaust,
                             &mut errors_found,
@@ -551,8 +589,13 @@ impl OrdinaryEquipment {
                         .nodes
                         .get_source_only_single_node(
                             output.input,
-                            backend,
-                            output.environment.diagnostic_flags,
+                            o.backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &o.globals.kickoff_simulation,
+                                developer: o.developer,
+                                warmup: &o.clock.warmup_flag,
+                                doing_sizing: &o.globals.doing_sizing,
+                            }),
                             branch,
                             &inlet,
                             &mut errors_found,
@@ -609,7 +652,7 @@ impl OrdinaryEquipment {
                 self.purchased_unit_mut(number)?.heat_avail_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.heat_avail_sched.is_none() {
                     purchased_air_item_not_found(
-                        backend,
+                        o.backend,
                         &shortcut.current_module_object,
                         object,
                         "Heating Availability Schedule Name",
@@ -622,7 +665,7 @@ impl OrdinaryEquipment {
                 self.purchased_unit_mut(number)?.cool_avail_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.cool_avail_sched.is_none() {
                     purchased_air_item_not_found(
-                        backend,
+                        o.backend,
                         &shortcut.current_module_object,
                         object,
                         "Cooling Availability Schedule Name",
@@ -664,7 +707,7 @@ impl OrdinaryEquipment {
                     self.purchased_unit_mut(number)?.oa_requirements_ptr = pointer;
                     if pointer == 0 {
                         purchased_air_item_not_found(
-                            backend,
+                            o.backend,
                             &shortcut.current_module_object,
                             object,
                             "Design Specification Outdoor Air Object Name",
@@ -690,8 +733,13 @@ impl OrdinaryEquipment {
                         .nodes
                         .get_source_only_single_node(
                             output.input,
-                            backend,
-                            output.environment.diagnostic_flags,
+                            o.backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &o.globals.kickoff_simulation,
+                                developer: o.developer,
+                                warmup: &o.clock.warmup_flag,
+                                doing_sizing: &o.globals.doing_sizing,
+                            }),
                             branch,
                             &oa_name,
                             &mut errors_found,
@@ -717,15 +765,12 @@ impl OrdinaryEquipment {
                         branch,
                         node,
                         &mut listed,
-                        environment,
                         control,
-                        backend,
-                        output.environment.diagnostic_flags,
                         source_is_epjson,
                         schedules,
-                        any_local,
+                        o,
                     )?;
-                    if !listed && *display_extra_warnings {
+                    if !listed && o.globals.display_extra_warnings {
                         return Err(Error::Unavailable(
                             "actual PurchasedAir implicit OA-node warning437",
                         ));
@@ -754,25 +799,26 @@ impl OrdinaryEquipment {
                         && !control.carbon_dioxide_simulation
                     {
                         self.purchased_unit_mut(number)?.dcv_type = SourcePurchasedAirDcv::None;
-                        let flags = output.environment.diagnostic_flags.as_ref().ok_or(
-                            Error::Unavailable(
-                                "actual PurchasedAir CO2 warning live phase owners453",
-                            ),
-                        )?;
-                        backend.show_source_warning_error(
+                        let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                            kickoff: &o.globals.kickoff_simulation,
+                            developer: o.developer,
+                            warmup: &o.clock.warmup_flag,
+                            doing_sizing: &o.globals.doing_sizing,
+                        };
+                        o.backend.show_source_warning_error(
                             &format!(
                                 "GetPurchasedAir: {}=\"{} invalid data",
                                 shortcut.current_module_object, name
                             ),
-                            flags,
+                            &flags,
                         )?;
-                        backend.show_continue_error(&format!(
+                        o.backend.show_continue_error(&format!(
                             "Demand Controlled Ventilation Type={value} but CO2 simulation is not active."
                         ))?;
-                        backend.show_continue_error(
+                        o.backend.show_continue_error(
                             "Resetting Demand Controlled Ventilation Type to NoDCV",
                         )?;
-                        backend.show_continue_error(
+                        o.backend.show_continue_error(
                             "To activate CO2 simulation, use ZoneAirContaminantBalance object and specify \"Carbon Dioxide Concentration\"=\"Yes\".",
                         )?;
                     }
@@ -796,7 +842,7 @@ impl OrdinaryEquipment {
                     getter::real(output.input, object, "sensible_heat_recovery_effectiveness")?;
                 self.purchased_unit_mut(number)?.ht_rec_lat_eff =
                     getter::real(output.input, object, "latent_heat_recovery_effectiveness")?;
-                for zone in 1..=number_zones {
+                for zone in 1..=o.globals.num_of_zones {
                     let config = self
                         .zone_config
                         .as_ref()
@@ -842,7 +888,7 @@ impl OrdinaryEquipment {
                 self.purchased_unit_mut(number)?.heat_fuel_eff_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.heat_fuel_eff_sched.is_none() {
                     purchased_air_item_not_found(
-                        backend,
+                        o.backend,
                         &shortcut.current_module_object,
                         object,
                         "Heating Fuel Efficiency Schedule Name",
@@ -860,7 +906,7 @@ impl OrdinaryEquipment {
                 self.purchased_unit_mut(number)?.cool_fuel_eff_sched = schedule(schedules, &value)?;
                 if self.purchased_unit(number)?.cool_fuel_eff_sched.is_none() {
                     purchased_air_item_not_found(
-                        backend,
+                        o.backend,
                         &shortcut.current_module_object,
                         object,
                         "Cooling Fuel Efficiency Schedule Name",
@@ -876,8 +922,20 @@ impl OrdinaryEquipment {
                 .map_err(|_| Error::Unavailable("actual PurchasedAir EndUniqueNodeCheck520"))?;
         }
         for number in 1..=self.purchased_air.number_purchased_air {
-            registration::register_unit(self, number, backend, output)?;
-            if any_ems {
+            {
+                let environment = crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                    output.minimum_report_frequency,
+                    Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &o.globals.kickoff_simulation,
+                developer: o.developer,
+                warmup: &o.clock.warmup_flag,
+                doing_sizing: &o.globals.doing_sizing,
+            }),
+                );
+                let mut reporting = output.reporting(environment);
+                registration::register_unit(self, number, o.backend, &mut reporting)?;
+            }
+            if o.globals.any_energy_management_system_in_model {
                 return Err(Error::Unavailable(
                     "actual PurchasedAir SetupEMSActuator1018",
                 ));
@@ -885,7 +943,7 @@ impl OrdinaryEquipment {
         }
         if errors_found {
             return Err(purchased_air_fatal(
-                backend,
+                o.backend,
                 "GetPurchasedAir: Errors found in input. Preceding conditions cause termination.",
             ));
         }

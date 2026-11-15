@@ -1102,20 +1102,12 @@ impl Factory {
                 sqlite_present: false,
                 results_framework_output_variables: &mut self.rf,
             };
-            let mut input_output = SourcePurchasedAirReportingOutputContext {
+            let mut input_output = SourcePurchasedAirInputOutputContext {
                 registration: &mut self.registration,
                 input: &mut self.input,
                 prescan: &self.prescan,
                 reports: &self.report,
-                environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
-                    &self.project.system.minimum_report_frequency,
-                    Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-                        kickoff: &self.globals.kickoff_simulation,
-                        developer: &self.project.system.developer_flag,
-                        warmup: &self.weather.global.warmup_flag,
-                        doing_sizing: &self.globals.doing_sizing,
-                    }),
-                ),
+                minimum_report_frequency: &self.project.system.minimum_report_frequency,
                 minutes_in_time_step: self.weather.global.minutes_in_time_step,
                 host: &mut self.files,
                 dictionary_host: &mut input_dictionary,
@@ -1125,16 +1117,15 @@ impl Factory {
                 &mut self.shortcut,
                 false,
                 &mut self.schedules,
-                self.globals.num_of_zones,
                 &mut self.hvac_manager.ancillary.branch_node_connections,
-                self.globals.any_energy_management_system_in_model,
                 &self.sizing,
                 &mut self.hvac_manager.ancillary.outdoor_air_nodes,
-                &self.weather.environment,
                 &self.control,
-                &self.globals.display_extra_warnings,
-                &mut self.globals.any_local_environments_in_model,
-                &mut backend,
+                &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: &mut self.globals, clock: &self.weather.global, environment: &self.weather.environment,
+                hvac: &self.startup.hvac_globals, developer: &self.project.system.developer_flag,
+                psychrometrics: &mut self.psych, recurring: &mut self.ancillary.source_recurring_errors, backend: &mut backend,
+            },
                 &mut input_output,
             )?;
         }

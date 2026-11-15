@@ -16,22 +16,36 @@ impl Default for SourceOutdoorAirNodes {
         }
     }
 }
+/// Short live loans for the actual OA input/property call; no state or cache.
+pub(crate) struct SourceOutdoorAirNodeRuntimeOwners<'a, 'backend> {
+    pub(crate) globals:
+        &'a mut crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals,
+    pub(crate) clock: &'a crate::weather::day::WeatherGlobalState,
+    pub(crate) environment: &'a crate::weather::day::WeatherEnvironmentState,
+    pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
+    pub(crate) developer: &'a bool,
+    pub(crate) psychrometrics: &'a mut crate::psychrometrics::SourcePsychrometricAccess,
+    pub(crate) recurring:
+        &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
+    pub(crate) backend: &'a mut crate::heat_balance::error_backend::SourceErrorBackend<'backend>,
+}
 impl SourceOutdoorAirNodes {
+    /// Same actual lazy-input branch, shared by SetOut/CheckAndAdd.
+    /// The return is only the original branch entry; no state/readiness is added.
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn set_source_outdoor_air_nodes(
+    pub(crate) fn prepare_source_outdoor_air_nodes_input(
         &mut self,
         input: &mut SelectedInputProcessor,
         equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
-        environment: &crate::weather::day::WeatherEnvironmentState,
-        control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
         branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
         source_is_epjson: bool,
         backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
         flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
         schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
         any_local: &mut bool,
-    ) -> Result<(), Error> {
-        if self.get_input_flag {
+    ) -> Result<bool, Error> {
+        let cold = self.get_input_flag;
+        if cold {
             self.get_source_input(
                 input,
                 equipment,
@@ -44,6 +58,38 @@ impl SourceOutdoorAirNodes {
             )?;
             self.get_input_flag = false;
         }
+        Ok(cold)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn set_source_outdoor_air_nodes(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
+        control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
+        branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
+        source_is_epjson: bool,
+        schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
+        o: &mut SourceOutdoorAirNodeRuntimeOwners<'_, '_>,
+    ) -> Result<(), Error> {
+        {
+            let flags = Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &o.globals.kickoff_simulation,
+                developer: o.developer,
+                warmup: &o.clock.warmup_flag,
+                doing_sizing: &o.globals.doing_sizing,
+            });
+            self.prepare_source_outdoor_air_nodes_input(
+                input,
+                equipment,
+                branch,
+                source_is_epjson,
+                o.backend,
+                flags,
+                schedules,
+                &mut o.globals.any_local_environments_in_model,
+            )?;
+        }
         for ordinal in 1..=self.number_outside_air_nodes {
             let node = *self
                 .outside_air_node_list
@@ -52,15 +98,7 @@ impl SourceOutdoorAirNodes {
                 .ok_or(Error::Unavailable(
                     "actual outside-air node list ordinal381",
                 ))?;
-            equipment.set_source_outdoor_air_node_values(
-                node,
-                true,
-                environment,
-                control,
-                backend,
-                flags,
-                schedules,
-            )?;
+            equipment.set_source_outdoor_air_node_values(node, true, control, schedules, o)?;
         }
         Ok(())
     }
@@ -78,37 +116,38 @@ impl SourceOutdoorAirNodes {
         branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
         node_number: i32,
         okay: &mut bool,
-        environment: &crate::weather::day::WeatherEnvironmentState,
         control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
-        backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
-        flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
         source_is_epjson: bool,
         schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
-        any_local: &mut bool,
+        o: &mut SourceOutdoorAirNodeRuntimeOwners<'_, '_>,
     ) -> Result<(), Error> {
-        if self.get_input_flag {
-            self.get_source_input(
+        let cold = {
+            let flags = Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                kickoff: &o.globals.kickoff_simulation,
+                developer: o.developer,
+                warmup: &o.clock.warmup_flag,
+                doing_sizing: &o.globals.doing_sizing,
+            });
+            self.prepare_source_outdoor_air_nodes_input(
                 input,
                 equipment,
                 branch,
                 source_is_epjson,
-                backend,
+                o.backend,
                 flags,
                 schedules,
-                any_local,
-            )?;
-            self.get_input_flag = false;
+                &mut o.globals.any_local_environments_in_model,
+            )?
+        };
+        if cold {
             self.set_source_outdoor_air_nodes(
                 input,
                 equipment,
-                environment,
                 control,
                 branch,
                 source_is_epjson,
-                backend,
-                flags,
                 schedules,
-                any_local,
+                o,
             )?;
         }
         *okay = false;
@@ -145,17 +184,20 @@ impl SourceOutdoorAirNodes {
                 node_number,
                 self.number_outside_air_nodes,
                 &mut temporary,
-                backend,
-                flags,
+                o.backend,
+                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &o.globals.kickoff_simulation,
+                    developer: o.developer,
+                    warmup: &o.clock.warmup_flag,
+                    doing_sizing: &o.globals.doing_sizing,
+                }),
             )?;
             equipment.set_source_outdoor_air_node_values(
                 node_number,
                 false,
-                environment,
                 control,
-                backend,
-                flags,
                 schedules,
+                o,
             )?;
         }
         Ok(())
@@ -166,30 +208,23 @@ impl SourceOutdoorAirNodes {
         &mut self,
         input: &mut SelectedInputProcessor,
         equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
-        environment: &crate::weather::day::WeatherEnvironmentState,
         control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
         branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
         source_is_epjson: bool,
-        backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
-        flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
         schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
-        any_local: &mut bool,
         zones: &super::super::selected_heat_balance_input::zone::SelectedZoneInputOwners,
-        number_zones: i32,
+        o: &mut SourceOutdoorAirNodeRuntimeOwners<'_, '_>,
     ) -> Result<(), Error> {
         self.set_source_outdoor_air_nodes(
             input,
             equipment,
-            environment,
             control,
             branch,
             source_is_epjson,
-            backend,
-            flags,
             schedules,
-            any_local,
+            o,
         )?;
-        for number in 1..=number_zones {
+        for number in 1..=o.globals.num_of_zones {
             let row = zones
                 .zones
                 .as_ref()
@@ -396,9 +431,14 @@ impl SourceOutdoorAirNodes {
                 ));
             }
             if num_alphas > 2 && !alpha_blanks[2] {
-                return Err(Error::Unavailable(
-                    "actual outdoor-air wet-bulb schedule lookup326",
-                ));
+                let schedule = schedules.get_source_schedule(&alphas[2])?;
+                equipment
+                    .set_source_authored_outdoor_air_wet_bulb_schedule(node_number, schedule)?;
+                if schedule.is_none() {
+                    return Err(Error::Unavailable(
+                        "actual outdoor-air wet-bulb schedule missing-item diagnostic326",
+                    ));
+                }
             }
             if num_alphas > 3 && !alpha_blanks[3] {
                 let schedule = schedules.get_source_schedule(&alphas[3])?;
@@ -427,8 +467,7 @@ impl SourceOutdoorAirNodes {
                     "actual outdoor-air excess alpha diagnostic344",
                 ));
             }
-            // Both actual DB/WB pointers remain null on this admitted route.
-            // Native's conditional IsLocalNode write is therefore not reached.
+            equipment.set_source_authored_outdoor_air_local_if_temperature_schedule(node_number)?;
         }
         if list_size > 0 {
             self.number_outside_air_nodes = list_size;

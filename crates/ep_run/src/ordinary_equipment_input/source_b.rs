@@ -35,7 +35,12 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
-        ("OutdoorAir:Node", "wind_speed_schedule_name" | "wind_direction_schedule_name") => {
+        (
+            "OutdoorAir:Node",
+            "wetbulb_temperature_schedule_name"
+            | "wind_speed_schedule_name"
+            | "wind_direction_schedule_name",
+        ) => {
             matches!(value, RawValue::String(_))
         }
         ("OutdoorAir:Node", "height_above_ground") => {

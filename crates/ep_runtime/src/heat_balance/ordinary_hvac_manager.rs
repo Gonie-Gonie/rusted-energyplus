@@ -17,7 +17,9 @@ mod simple_airflow;
 pub(crate) mod simulation;
 mod state;
 pub(crate) mod water_manager;
-pub(crate) use ancillary::{SourceHvacAncillaryModules, SourceOutdoorAirNodes};
+pub(crate) use ancillary::{
+    SourceHvacAncillaryModules, SourceOutdoorAirNodeRuntimeOwners, SourceOutdoorAirNodes,
+};
 pub(crate) use owners::SourceHvacOwners;
 pub(crate) use providers::{SourceHvacChild, SourceHvacChildren};
 pub(crate) use state::SourceHvacManager;
@@ -126,22 +128,23 @@ impl SourceHvacManager {
         self.ancillary
             .outdoor_air_nodes
             .set_source_outdoor_air_nodes(
-                o.input,
-                o.equipment,
-                o.environment,
-                o.control,
-                &mut self.ancillary.branch_node_connections,
-                *o.source_is_epjson,
-                o.backend,
-                Some(super::error_backend::SourceDiagnosticFlags {
-                    kickoff: &o.globals.kickoff_simulation,
-                    developer: &o.project.system.developer_flag,
-                    warmup: &o.clock.warmup_flag,
-                    doing_sizing: &o.globals.doing_sizing,
-                }),
-                o.schedules,
-                &mut o.globals.any_local_environments_in_model,
-            )?;
+            o.input,
+            o.equipment,
+            o.control,
+            &mut self.ancillary.branch_node_connections,
+            *o.source_is_epjson,
+            o.schedules,
+            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: o.globals,
+                clock: &*o.clock,
+                environment: &*o.environment,
+                hvac: &*o.hvac,
+                developer: &o.project.system.developer_flag,
+                psychrometrics: o.psychrometrics,
+                recurring: o.recurring_errors,
+                backend: o.backend,
+            },
+        )?;
         self.manage_source_refrigerated_case_racks(o)?;
         o.zone_air_update(
             &self.ancillary.availability,

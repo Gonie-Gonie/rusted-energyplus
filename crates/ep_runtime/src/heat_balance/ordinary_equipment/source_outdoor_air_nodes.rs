@@ -9,7 +9,6 @@ use crate::heat_balance::startup_integrity::{
     SourceBranchNodeConnections, SourceCompFluidStream, SourceNodeConnectionType,
     SourceNodeObjectType,
 };
-use crate::weather::day::WeatherEnvironmentState;
 
 // Native DataEnvironment71-163 point getter, distinct from the surface setters.
 fn source_outdoor_air_bulb_temperature_at(
@@ -172,6 +171,23 @@ impl OrdinaryEquipment {
         Ok(())
     }
 
+    pub(crate) fn set_source_authored_outdoor_air_wet_bulb_schedule(
+        &mut self,
+        node_number: usize,
+        schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    ) -> Result<(), Error> {
+        let index = node_number
+            .checked_sub(1)
+            .ok_or(Error::Unavailable("actual OA wet-bulb Node ordinal"))?;
+        self.nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
+            .ok_or(Error::Unavailable("actual OA wet-bulb physical Node"))?
+            .outdoor_air_wet_bulb_schedule = schedule;
+        Ok(())
+    }
+
     pub(crate) fn set_source_authored_outdoor_air_wind_speed_schedule(
         &mut self,
         node_number: usize,
@@ -203,6 +219,28 @@ impl OrdinaryEquipment {
             .and_then(|rows| rows.get_mut(index))
             .ok_or(Error::Unavailable("actual OA wind-direction physical Node"))?
             .outdoor_air_wind_direction_schedule = schedule;
+        Ok(())
+    }
+
+    /// Native post-lookup conditional write; raw presence never fabricates local state.
+    pub(crate) fn set_source_authored_outdoor_air_local_if_temperature_schedule(
+        &mut self,
+        node_number: usize,
+    ) -> Result<(), Error> {
+        let at = node_number
+            .checked_sub(1)
+            .ok_or(Error::Unavailable("actual local OA positive Node ordinal"))?;
+        let node = self
+            .nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(at))
+            .ok_or(Error::Unavailable("actual local OA physical Node"))?;
+        if node.outdoor_air_dry_bulb_schedule.is_some()
+            || node.outdoor_air_wet_bulb_schedule.is_some()
+        {
+            node.is_local_node = true;
+        }
         Ok(())
     }
 
@@ -241,11 +279,12 @@ impl OrdinaryEquipment {
         &mut self,
         node_number: i32,
         init_call: bool,
-        environment: &WeatherEnvironmentState,
         control: &SelectedHeatBalanceInputState,
-        backend: &mut SourceErrorBackend<'_>,
-        flags: Option<SourceDiagnosticFlags<'_>>,
         schedules: &crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
+        o: &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners<
+            '_,
+            '_,
+        >,
     ) -> Result<(), Error> {
         let ordinal = node_number
             .checked_sub(1)
@@ -260,46 +299,56 @@ impl OrdinaryEquipment {
             .and_then(|v| v.get_mut(ordinal))
             .ok_or(Error::Unavailable("actual SetOANodeValues physical Node"))?;
         if node.height < 0.0 {
-            node.outdoor_air_dry_bulb = environment.current_weather.out_dry_bulb_temp;
-            node.outdoor_air_wet_bulb = environment.current_weather.out_wet_bulb_temp;
+            node.outdoor_air_dry_bulb = o.environment.current_weather.out_dry_bulb_temp;
+            node.outdoor_air_wet_bulb = o.environment.current_weather.out_wet_bulb_temp;
             if init_call {
-                node.outdoor_air_wind_speed = environment.current_weather.wind_speed;
+                node.outdoor_air_wind_speed = o.environment.current_weather.wind_speed;
             }
         } else {
             node.outdoor_air_dry_bulb = source_outdoor_air_bulb_temperature_at(
-                environment.current_weather.out_dry_bulb_temp,
+                o.environment.current_weather.out_dry_bulb_temp,
                 node.height,
-                &environment.outdoor_environment_parameters,
+                &o.environment.outdoor_environment_parameters,
                 "OutDryBulbTempAt: outdoor drybulb temperature < -100 C",
-                backend,
-                flags,
+                o.backend,
+                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &o.globals.kickoff_simulation,
+                    developer: o.developer,
+                    warmup: &o.clock.warmup_flag,
+                    doing_sizing: &o.globals.doing_sizing,
+                }),
             )?;
             node.outdoor_air_wet_bulb = source_outdoor_air_bulb_temperature_at(
-                environment.current_weather.out_wet_bulb_temp,
+                o.environment.current_weather.out_wet_bulb_temp,
                 node.height,
-                &environment.outdoor_environment_parameters,
+                &o.environment.outdoor_environment_parameters,
                 "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C",
-                backend,
-                flags,
+                o.backend,
+                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &o.globals.kickoff_simulation,
+                    developer: o.developer,
+                    warmup: &o.clock.warmup_flag,
+                    doing_sizing: &o.globals.doing_sizing,
+                }),
             )?;
             if init_call {
                 node.outdoor_air_wind_speed = source_outdoor_air_wind_speed_at(
-                    environment.current_weather.wind_speed,
+                    o.environment.current_weather.wind_speed,
                     node.height,
-                    &environment.outdoor_environment_parameters,
+                    &o.environment.outdoor_environment_parameters,
                 );
             }
         }
         if !init_call {
-            node.outdoor_air_wind_speed = environment.current_weather.wind_speed;
+            node.outdoor_air_wind_speed = o.environment.current_weather.wind_speed;
         }
-        node.outdoor_air_wind_direction = environment.current_weather.wind_dir;
+        node.outdoor_air_wind_direction = o.environment.current_weather.wind_dir;
         if init_call {
             if node.outdoor_air_dry_bulb_schedule.is_some() {
                 return Err(Error::Unavailable("actual local OA dry-bulb schedule559"));
             }
-            if node.outdoor_air_wet_bulb_schedule.is_some() {
-                return Err(Error::Unavailable("actual local OA wet-bulb schedule562"));
+            if let Some(schedule) = node.outdoor_air_wet_bulb_schedule {
+                node.outdoor_air_wet_bulb = schedules.source_current_schedule_value(schedule)?;
             }
             if let Some(schedule) = node.outdoor_air_wind_speed_schedule {
                 node.outdoor_air_wind_speed = schedules.source_current_schedule_value(schedule)?;
@@ -326,17 +375,39 @@ impl OrdinaryEquipment {
             if init_call && node.outdoor_air_wet_bulb > node.outdoor_air_dry_bulb {
                 node.outdoor_air_wet_bulb = node.outdoor_air_dry_bulb;
             }
-            return Err(Error::Unavailable(
-                "actual local OA Twb/W property owner592",
-            ));
+            if init_call
+                && node.outdoor_air_wet_bulb_schedule.is_none()
+                && !node.ems_override_outdoor_air_wet_bulb
+                && (node.ems_override_outdoor_air_dry_bulb
+                    || node.outdoor_air_dry_bulb_schedule.is_some())
+            {
+                node.humidity_ratio = o.environment.current_weather.out_hum_rat;
+                return Err(Error::Unavailable(
+                    "actual local OA DB-only cached Twb property owner598",
+                ));
+            }
+            node.humidity_ratio = o.psychrometrics.source_humidity_ratio_from_wet_bulb(
+                node.outdoor_air_dry_bulb,
+                node.outdoor_air_wet_bulb,
+                o.environment.current_weather.out_baro_press,
+                "",
+                &mut crate::psychrometrics::SourcePsychrometricOwners {
+                    clock: o.clock,
+                    globals: &*o.globals,
+                    environment: o.environment,
+                    hvac: o.hvac,
+                    recurring: &mut *o.recurring,
+                    backend: &mut *o.backend,
+                },
+            )?;
         } else {
-            node.humidity_ratio = environment.current_weather.out_hum_rat;
+            node.humidity_ratio = o.environment.current_weather.out_hum_rat;
         }
         node.enthalpy = crate::psychrometrics::energyplus_psy_h_fn_tdb_w(
             node.outdoor_air_dry_bulb,
             node.humidity_ratio,
         );
-        node.pressure = environment.current_weather.out_baro_press;
+        node.pressure = o.environment.current_weather.out_baro_press;
         node.quality = 0.0;
         if control.carbon_dioxide_simulation {
             return Err(Error::Unavailable(

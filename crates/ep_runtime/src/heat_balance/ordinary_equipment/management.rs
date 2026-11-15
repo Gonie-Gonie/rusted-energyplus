@@ -445,6 +445,35 @@ impl SourceHvacManager {
                             .ok_or(Error::Unavailable("actual PurchasedAir priority name3872"))?
                             .equipment_name
                             .clone();
+                        {
+                            let mut purchased_input_output =
+                                super::source_purchased_air::SourcePurchasedAirInputOutputContext {
+                                    registration: output.registration,
+                                    input: o.input,
+                                    prescan: output.prescan,
+                                    reports: output.reports,
+                                    minimum_report_frequency: output.minimum_report_frequency,
+                                    minutes_in_time_step: o.clock.minutes_in_time_step,
+                                    host: output.host,
+                                    dictionary_host: output.dictionary_host,
+                                    eio: &mut *eio,
+                                };
+                            o.equipment.prepare_source_purchased_air_input(
+                            o.shortcut,
+                            *o.source_is_epjson,
+                            o.schedules,
+                            &mut self.ancillary.branch_node_connections,
+                            &*o.sizing,
+                            &mut self.ancillary.outdoor_air_nodes,
+                            o.control,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: o.globals, clock: &*o.clock, environment: &*o.environment,
+                hvac: &*o.hvac, developer: &o.project.system.developer_flag,
+                psychrometrics: o.psychrometrics, recurring: o.recurring_errors, backend: o.backend,
+            },
+                            &mut purchased_input_output,
+                        )?;
+                        }
                         let mut purchased_output = SourcePurchasedAirReportingOutputContext {
                             registration: output.registration,
                             input: o.input,
@@ -461,22 +490,6 @@ impl SourceHvacManager {
                             dictionary_host: output.dictionary_host,
                             eio: &mut *eio,
                         };
-                        o.equipment.prepare_source_purchased_air_input(
-                            o.shortcut,
-                            *o.source_is_epjson,
-                            o.schedules,
-                            o.globals.num_of_zones,
-                            &mut self.ancillary.branch_node_connections,
-                            o.globals.any_energy_management_system_in_model,
-                            &*o.sizing,
-                            &mut self.ancillary.outdoor_air_nodes,
-                            &*o.environment,
-                            o.control,
-                            &o.globals.display_extra_warnings,
-                            &mut o.globals.any_local_environments_in_model,
-                            o.backend,
-                            &mut purchased_output,
-                        )?;
                         let mut purchased_initialization =
                             super::source_purchased_air::SourcePurchasedAirInitOwners {
                                 sizing: o.sizing,

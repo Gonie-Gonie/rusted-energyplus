@@ -531,9 +531,15 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         let mut wind_registry = crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes::default();
         let mut wind_branch = crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
         assert!(!globals.any_local_environments_in_model);
-        wind_registry.set_source_outdoor_air_nodes(
-            &mut input, &mut wind_nodes, &environment, &control, &mut wind_branch, true,
-            &mut context.backend, None, &mut wind_schedules, &mut globals.any_local_environments_in_model,
+        wind_registry.prepare_source_outdoor_air_nodes_input(
+            &mut input,
+            &mut wind_nodes,
+            &mut wind_branch,
+            true,
+            &mut context.backend,
+            None,
+            &mut wind_schedules,
+            &mut globals.any_local_environments_in_model,
         )?;
         assert!(globals.any_local_environments_in_model);
         let wind_node_number = *wind_registry.outside_air_node_list.as_ref()

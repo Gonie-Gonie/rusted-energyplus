@@ -27,6 +27,10 @@ pub(crate) struct SourceInitHeatBalanceOutdoorAirOwners<'a> {
         &'a mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes,
     pub(crate) branch: &'a mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
     pub(crate) source_is_epjson: &'a bool,
+    pub(crate) psychrometrics: &'a mut crate::psychrometrics::SourcePsychrometricAccess,
+    pub(crate) recurring:
+        &'a mut crate::heat_balance::source_initialization::SourceRecurringErrorState,
+    pub(crate) hvac: &'a crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals,
 }
 
 /// Persistent numerical state stays in its original owner. These references
@@ -242,28 +246,27 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitHeatBalan
         let outdoor = self.outdoor_air.as_mut().ok_or(Error::Unavailable(
             "actual InitHeatBalance2754 outdoor-air interface loans",
         ))?;
-        let flags = Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
-            kickoff: &owners.globals.kickoff_simulation,
-            developer: &owners.project.system.developer_flag,
-            warmup: &owners.clock.warmup_flag,
-            doing_sizing: &owners.globals.doing_sizing,
-        });
         outdoor
             .outdoor_air_nodes
             .apply_source_zone_outdoor_environment(
-                owners.input,
-                outdoor.equipment,
-                owners.environment,
-                owners.control,
-                outdoor.branch,
-                *outdoor.source_is_epjson,
-                owners.backend,
-                flags,
-                outdoor.schedules,
-                &mut owners.globals.any_local_environments_in_model,
-                owners.zones,
-                owners.globals.num_of_zones,
-            )
+            owners.input,
+            outdoor.equipment,
+            owners.control,
+            outdoor.branch,
+            *outdoor.source_is_epjson,
+            outdoor.schedules,
+            owners.zones,
+            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                globals: owners.globals,
+                clock: owners.clock,
+                environment: owners.environment,
+                hvac: outdoor.hvac,
+                developer: &owners.project.system.developer_flag,
+                psychrometrics: outdoor.psychrometrics,
+                recurring: outdoor.recurring,
+                backend: owners.backend,
+            },
+        )
     }
     unavailable_child!(
         apply_zone_ems_overrides,
