@@ -437,7 +437,7 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
         return None;
     }
     let error = || {
-        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or negative Native height, and absent local alpha fields".into())
+        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, and absent local alpha fields".into())
     };
     if objects.len() != 1 {
         return error();
@@ -458,7 +458,7 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
         || field(object, "height_above_ground").is_some_and(|value| {
             !matches!(value, RawValue::Number(token) if ep_model::classify_source_json_number(token)
                 .map(ep_model::SourceJsonNumber::as_f64)
-                .is_ok_and(|height| height.is_finite() && height < 0.0))
+                .is_ok_and(|height| height.is_finite()))
         })
     {
         return error();

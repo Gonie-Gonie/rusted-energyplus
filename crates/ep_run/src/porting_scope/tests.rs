@@ -3191,6 +3191,15 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     } else if flow > 0.0 && method == "Sum" && limit == "LimitFlowRate" {
                         hard["OutdoorAir:Node"] =
                             json!({"Outside 각": {"height_above_ground": -1.25}});
+                    } else if flow > 0.0 && method == "Flow/Person" && limit == "LimitFlowRate" {
+                        hard["OutdoorAir:Node"] =
+                            json!({"Outside 각": {"height_above_ground": 0.0}});
+                    } else if flow > 0.0 && method == "Flow/Zone" && limit == "LimitCapacity" {
+                        hard["OutdoorAir:Node"] =
+                            json!({"Outside 각": {"height_above_ground": -0.0}});
+                    } else if flow > 0.0 && method == "Flow/Area" && limit == "LimitCapacity" {
+                        hard["OutdoorAir:Node"] =
+                            json!({"Outside 각": {"height_above_ground": 10.0}});
                     }
                     let hard_raw = parse_epjson_str(&hard.to_string())
                         .expect("actual OA hard-limit raw input");
@@ -3261,10 +3270,21 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         let oa = hard_ip
                             .source_raw_object_fields("OutdoorAir:Node", "Outside 각")
                             .expect("actual authored OA raw custody");
-                        if method == "Sum" {
+                        let height_token = if method == "Sum" {
+                            Some("-1.25")
+                        } else if method == "Flow/Person" && limit == "LimitCapacity" {
+                            None
+                        } else if method == "Flow/Person" {
+                            Some("0.0")
+                        } else if method == "Flow/Zone" {
+                            Some("-0.0")
+                        } else {
+                            Some("10.0")
+                        };
+                        if let Some(token) = height_token {
                             assert_eq!(
                                 oa.get("height_above_ground"),
-                                Some(&OaRaw::Number("-1.25".into()))
+                                Some(&OaRaw::Number(token.into()))
                             );
                         } else {
                             assert!(!oa.contains_key("height_above_ground"));
@@ -3718,8 +3738,8 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                     }
                     16 => {
                         bad["OutdoorAir:Node"] = match method {
-                            "Flow/Person" => json!({"Outside 각":{"height_above_ground":0}}),
-                            "Flow/Zone" => json!({"Outside 각":{"height_above_ground":-0.0}}),
+                            "Flow/Person" => json!({"Outside 각":{"height_above_ground":"0"}}),
+                            "Flow/Zone" => json!({"Outside 각":{"height_above_ground":null}}),
                             "Flow/Area" => {
                                 json!({"Outside 각":{"drybulb_temperature_schedule_name":""}})
                             }

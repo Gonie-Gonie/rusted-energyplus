@@ -11,6 +11,59 @@ use crate::heat_balance::startup_integrity::{
 };
 use crate::weather::day::WeatherEnvironmentState;
 
+// Native DataEnvironment71-163 point getter, distinct from the surface setters.
+fn source_outdoor_air_bulb_temperature_at(
+    global_bulb: f64,
+    height: f64,
+    parameters: &crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters,
+    headline: &'static str,
+    backend: &mut SourceErrorBackend<'_>,
+    flags: Option<SourceDiagnosticFlags<'_>>,
+) -> Result<f64, Error> {
+    let base = global_bulb + parameters.weather_file_temperature_modifier_c;
+    let value = if parameters.site_temperature_gradient_k_per_m == 0.0 {
+        global_bulb
+    } else if height <= 0.0 {
+        base
+    } else {
+        base - parameters.site_temperature_gradient_k_per_m * 6_356_000.0 * height
+            / (6_356_000.0 + height)
+    };
+    if value < -100.0 {
+        let flags = flags.ok_or(Error::Unavailable(
+            "actual outdoor-air point-temperature live diagnostic owners",
+        ))?;
+        backend.show_source_severe_error(headline, &flags)?;
+        let height = crate::heat_balance::source_round_format::round(height, 0)
+            .map_err(|error| Error::Format(format!("outdoor-air point height .0R: {error:?}")))?;
+        backend.show_continue_error(&format!("...check heights, this height=[{height}]."))?;
+        return match backend
+            .show_source_fatal_error("Program terminates due to preceding condition(s).", &flags)
+        {
+            Ok(never) => match never {},
+            Err(error) => Err(error),
+        };
+    }
+    Ok(value)
+}
+
+// Native DataEnvironment166-190: zero height precedes the zero exponent branch.
+fn source_outdoor_air_wind_speed_at(
+    wind: f64,
+    height: f64,
+    parameters: &crate::heat_balance::convection::surface_environment::SurfaceOutdoorEnvironmentParameters,
+) -> f64 {
+    if height <= 0.0 {
+        return 0.0;
+    }
+    if parameters.site_wind_exponent == 0.0 {
+        return wind;
+    }
+    wind * parameters.weather_file_wind_modifier
+        * (height / parameters.site_wind_boundary_layer_height_m)
+            .powf(parameters.site_wind_exponent)
+}
+
 impl OrdinaryEquipment {
     #[allow(
         dead_code,
@@ -125,6 +178,8 @@ impl OrdinaryEquipment {
         init_call: bool,
         environment: &WeatherEnvironmentState,
         control: &SelectedHeatBalanceInputState,
+        backend: &mut SourceErrorBackend<'_>,
+        flags: Option<SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
         let ordinal = node_number
             .checked_sub(1)
@@ -145,9 +200,29 @@ impl OrdinaryEquipment {
                 node.outdoor_air_wind_speed = environment.current_weather.wind_speed;
             }
         } else {
-            return Err(Error::Unavailable(
-                "actual positive OutDryBulbTempAt height548",
-            ));
+            node.outdoor_air_dry_bulb = source_outdoor_air_bulb_temperature_at(
+                environment.current_weather.out_dry_bulb_temp,
+                node.height,
+                &environment.outdoor_environment_parameters,
+                "OutDryBulbTempAt: outdoor drybulb temperature < -100 C",
+                backend,
+                flags,
+            )?;
+            node.outdoor_air_wet_bulb = source_outdoor_air_bulb_temperature_at(
+                environment.current_weather.out_wet_bulb_temp,
+                node.height,
+                &environment.outdoor_environment_parameters,
+                "OutWetBulbTempAt: outdoor wetbulb temperature < -100 C",
+                backend,
+                flags,
+            )?;
+            if init_call {
+                node.outdoor_air_wind_speed = source_outdoor_air_wind_speed_at(
+                    environment.current_weather.wind_speed,
+                    node.height,
+                    &environment.outdoor_environment_parameters,
+                );
+            }
         }
         if !init_call {
             node.outdoor_air_wind_speed = environment.current_weather.wind_speed;

@@ -1947,6 +1947,275 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     first.mass_flow_rate.to_bits()
                 );
                 assert_eq!(outdoor.number_outside_air_nodes, 1);
+                // Same genuine Node/registry/environment owners; these are
+                // authored point-API operands, not copied model observations.
+                actual_nodes.set_source_authored_outdoor_air_node_height(
+                    usize::try_from(node_number)?,
+                    0.0,
+                )?;
+                environment
+                    .outdoor_environment_parameters
+                    .weather_file_temperature_modifier_c = 7.0;
+                environment
+                    .outdoor_environment_parameters
+                    .site_wind_exponent = 0.0;
+                outdoor.set_source_outdoor_air_nodes(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &environment,
+                    &control,
+                    &mut connections,
+                    true,
+                    &mut backend,
+                    flags,
+                )?;
+                let zero = &actual_nodes.nodes.physical.as_ref().ok_or("zero OA Node")?[at];
+                assert_eq!(
+                    (zero.outdoor_air_dry_bulb, zero.outdoor_air_wet_bulb),
+                    (27.0, 15.0)
+                );
+                assert_eq!(zero.outdoor_air_wind_speed.to_bits(), 0.0_f64.to_bits());
+                actual_nodes.set_source_authored_outdoor_air_node_height(
+                    usize::try_from(node_number)?,
+                    -0.0,
+                )?;
+                outdoor.set_source_outdoor_air_nodes(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &environment,
+                    &control,
+                    &mut connections,
+                    true,
+                    &mut backend,
+                    flags,
+                )?;
+                let negative_zero = &actual_nodes
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .ok_or("negative-zero OA")?[at];
+                assert_eq!(negative_zero.height.to_bits(), (-0.0_f64).to_bits());
+                assert_eq!(
+                    (
+                        negative_zero.outdoor_air_dry_bulb,
+                        negative_zero.outdoor_air_wet_bulb
+                    ),
+                    (27.0, 15.0)
+                );
+                assert_eq!(
+                    negative_zero.outdoor_air_wind_speed.to_bits(),
+                    0.0_f64.to_bits()
+                );
+                actual_nodes.set_source_outdoor_air_node_values(
+                    node_number,
+                    false,
+                    &environment,
+                    &control,
+                    &mut backend,
+                    flags,
+                )?;
+                assert_eq!(
+                    actual_nodes
+                        .nodes
+                        .physical
+                        .as_ref()
+                        .ok_or("false-init OA")?[at]
+                        .outdoor_air_wind_speed,
+                    5.0
+                );
+                actual_nodes.set_source_authored_outdoor_air_node_height(
+                    usize::try_from(node_number)?,
+                    4.0,
+                )?;
+                environment
+                    .outdoor_environment_parameters
+                    .site_temperature_gradient_k_per_m = 0.0;
+                outdoor.set_source_outdoor_air_nodes(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &environment,
+                    &control,
+                    &mut connections,
+                    true,
+                    &mut backend,
+                    flags,
+                )?;
+                let no_gradient = &actual_nodes
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .ok_or("zero-gradient OA")?[at];
+                assert_eq!(
+                    (
+                        no_gradient.outdoor_air_dry_bulb,
+                        no_gradient.outdoor_air_wet_bulb
+                    ),
+                    (20.0, 8.0)
+                );
+                assert_eq!(no_gradient.outdoor_air_wind_speed, 5.0);
+                environment
+                    .outdoor_environment_parameters
+                    .site_temperature_gradient_k_per_m = 0.0065;
+                environment
+                    .outdoor_environment_parameters
+                    .weather_file_temperature_modifier_c = 0.0;
+                environment
+                    .outdoor_environment_parameters
+                    .site_wind_exponent = 0.5;
+                environment
+                    .outdoor_environment_parameters
+                    .site_wind_boundary_layer_height_m = 1.0;
+                environment
+                    .outdoor_environment_parameters
+                    .weather_file_wind_modifier = 2.0;
+                outdoor.set_source_outdoor_air_nodes(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &environment,
+                    &control,
+                    &mut connections,
+                    true,
+                    &mut backend,
+                    flags,
+                )?;
+                let point = &actual_nodes
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .ok_or("positive-height OA")?[at];
+                assert!(point.outdoor_air_dry_bulb < 20.0 && point.outdoor_air_wet_bulb < 8.0);
+                assert_eq!(point.outdoor_air_wind_speed, 20.0);
+                assert_eq!(
+                    (point.humidity_ratio, point.pressure, point.quality),
+                    (0.005, 101325.0, 0.0)
+                );
+                environment
+                    .outdoor_environment_parameters
+                    .site_temperature_gradient_k_per_m = 0.0;
+                environment.current_weather.out_dry_bulb_temp = -100.0;
+                outdoor.set_source_outdoor_air_nodes(
+                    &mut positive_ip,
+                    &mut actual_nodes,
+                    &environment,
+                    &control,
+                    &mut connections,
+                    true,
+                    &mut backend,
+                    flags,
+                )?;
+                let accepted_threshold =
+                    actual_nodes.nodes.physical.as_ref().ok_or("threshold OA")?[at].clone();
+                assert_eq!(accepted_threshold.outdoor_air_dry_bulb, -100.0);
+                let severe_before = backend.state.tracking.total_severe_errors;
+                environment.current_weather.out_dry_bulb_temp = -101.0;
+                let dry_error = outdoor
+                    .set_source_outdoor_air_nodes(
+                        &mut positive_ip,
+                        &mut actual_nodes,
+                        &environment,
+                        &control,
+                        &mut connections,
+                        true,
+                        &mut backend,
+                        flags,
+                    )
+                    .expect_err("actual dry point severe/fatal");
+                assert!(matches!(
+                    dry_error,
+                    crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Fatal(
+                        _
+                    )
+                ));
+                assert_eq!(
+                    actual_nodes
+                        .nodes
+                        .physical
+                        .as_ref()
+                        .ok_or("dry fatal prefix")?[at],
+                    accepted_threshold
+                );
+                environment.current_weather.out_dry_bulb_temp = 20.0;
+                environment.current_weather.out_wet_bulb_temp = -101.0;
+                let before_wet = actual_nodes
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .ok_or("before wet fatal")?[at]
+                    .clone();
+                let wet_error = outdoor
+                    .set_source_outdoor_air_nodes(
+                        &mut positive_ip,
+                        &mut actual_nodes,
+                        &environment,
+                        &control,
+                        &mut connections,
+                        true,
+                        &mut backend,
+                        flags,
+                    )
+                    .expect_err("actual wet point severe/fatal");
+                assert!(matches!(
+                    wet_error,
+                    crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Fatal(
+                        _
+                    )
+                ));
+                let after_wet = &actual_nodes
+                    .nodes
+                    .physical
+                    .as_ref()
+                    .ok_or("wet fatal prefix")?[at];
+                assert_eq!(after_wet.outdoor_air_dry_bulb, 20.0);
+                assert_eq!(
+                    (
+                        after_wet.outdoor_air_wet_bulb,
+                        after_wet.outdoor_air_wind_speed,
+                        after_wet.outdoor_air_wind_direction,
+                        after_wet.temperature,
+                        after_wet.humidity_ratio,
+                        after_wet.enthalpy,
+                        after_wet.pressure,
+                        after_wet.quality
+                    ),
+                    (
+                        before_wet.outdoor_air_wet_bulb,
+                        before_wet.outdoor_air_wind_speed,
+                        before_wet.outdoor_air_wind_direction,
+                        before_wet.temperature,
+                        before_wet.humidity_ratio,
+                        before_wet.enthalpy,
+                        before_wet.pressure,
+                        before_wet.quality
+                    )
+                );
+                assert_eq!(
+                    backend.state.tracking.total_severe_errors,
+                    severe_before + 2
+                );
+                let error_text = std::str::from_utf8(&errors)?;
+                let dry_at = error_text
+                    .find("OutDryBulbTempAt: outdoor drybulb temperature < -100 C")
+                    .ok_or("dry point severe")?;
+                let wet_at = error_text
+                    .find("OutWetBulbTempAt: outdoor wetbulb temperature < -100 C")
+                    .ok_or("wet point severe")?;
+                let dry_text = &error_text[dry_at..wet_at];
+                let wet_text = &error_text[wet_at..];
+                let continuation = "...check heights, this height=[4].";
+                let fatal = " **  Fatal  ** Program terminates due to preceding condition(s).";
+                assert!(
+                    dry_at < wet_at
+                        && dry_text
+                            .find(continuation)
+                            .ok_or("dry height continuation")?
+                            < dry_text.find(fatal).ok_or("dry fatal")?
+                );
+                assert!(
+                    wet_text
+                        .find(continuation)
+                        .ok_or("wet height continuation")?
+                        < wet_text.find(fatal).ok_or("wet fatal")?
+                );
             }
             let mut inconsistent = positive.clone();
             inconsistent

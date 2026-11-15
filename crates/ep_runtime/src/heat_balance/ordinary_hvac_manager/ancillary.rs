@@ -41,7 +41,14 @@ impl SourceOutdoorAirNodes {
                 .ok_or(Error::Unavailable(
                     "actual outside-air node list ordinal381",
                 ))?;
-            equipment.set_source_outdoor_air_node_values(node, true, environment, control)?;
+            equipment.set_source_outdoor_air_node_values(
+                node,
+                true,
+                environment,
+                control,
+                backend,
+                flags,
+            )?;
         }
         Ok(())
     }
@@ -121,6 +128,8 @@ impl SourceOutdoorAirNodes {
                 false,
                 environment,
                 control,
+                backend,
+                flags,
             )?;
         }
         Ok(())

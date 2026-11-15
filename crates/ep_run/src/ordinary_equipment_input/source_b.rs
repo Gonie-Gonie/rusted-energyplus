@@ -38,7 +38,7 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
         ("OutdoorAir:Node", "height_above_ground") => {
             matches!(value, RawValue::Number(token) if ep_model::classify_source_json_number(token)
                 .map(ep_model::SourceJsonNumber::as_f64)
-                .is_ok_and(|height| height.is_finite() && height < 0.0))
+                .is_ok_and(|height| height.is_finite()))
         }
         ("DesignSpecification:OutdoorAir", "outdoor_air_method") => text_is(
             value,

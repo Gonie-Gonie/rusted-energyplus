@@ -356,15 +356,15 @@
     ],
     "ZoneHVAC:IdealLoadsAirSystem": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open.",
-      "Bounded Source B direct epJSON retains its established outdoor-air, hard-limit, DCV/economizer/recovery and non-Humidistat humidity evidence. On basic positive-OA paths, owned named or present exact-empty humidity choices remain subject to both actual OA references and every existing prerequisite. One authored OutdoorAir:Node is admitted only on that positive-OA route, with omitted/default or finite Native-effective negative height and all seven optional alpha controls absent. Real GetInput/GetNodeNums registration and the physical Node/global DesignDay weather owners remain authoritative. One fixed Float -1.25 SUM/NoLimit comparison qualifies under all unchanged158-series numeric policies, original nonhumidity science, full clocks, exports and ancillary checks; each engine independently shows the original nine-report OA/mixed response. This does not establish local positive/zero-height weather, optional schedules, pressure curves/angle controls, EMS, multiple nodes or broader compositions. Existing getter/default distinctions, Legacy and independent numeric/type/topology guards remain unchanged. Positive-OA Humidistat, Source A/IDF, active CO2/IAQ, Space/airloop/sizing, private-state or averaged mixing laws and full-object completion remain open.",
+      "Bounded Source B direct epJSON retains its established outdoor-air, hard-limit, DCV/economizer/recovery and non-Humidistat humidity evidence. On basic positive-OA paths, owned named or present exact-empty humidity choices remain subject to both actual OA references and every existing prerequisite. One authored OutdoorAir:Node on that route admits omitted/default height or any finite Native-effective height, with all seven optional alpha controls absent. Negative height retains global DesignDay weather; signed zero and positive height use the literal DataEnvironment point dry-bulb, wet-bulb and wind owners, including Severe/Fatal prefix-write order. Two fixed Float -1.25 and 12.5 SUM/NoLimit comparisons pass the unchanged158-series numeric policies, original nonhumidity science, full clocks, exports and ancillary checks; each engine independently shows the original nine-report OA/mixed response. Signed-zero and error branches have existing owner-test evidence, not extra physical cases. Direct private Height or OA-wind observation, optional schedules, pressure curves/angle controls, EMS, multiple nodes and broader compositions remain unestablished. Existing getter/default distinctions, Legacy and independent numeric/type/topology guards remain unchanged. Positive-OA Humidistat, Source A/IDF, active CO2/IAQ, Space/airloop/sizing, averaged mixing laws and full-object completion remain open.",
       "Without selected outdoor air, the getter ignores DCV, economizer and recovery selectors. All27 named combinations share that Source path; schema-valid omission and exact-empty strings retain raw custody and reach the same defaults. Both fixed scenes meet every original155-series sensible, numeric and ancillary criterion at authored effectiveness0/1 boundaries. These are inactive-selector comparisons. With positive outdoor air and no CO2 simulation, authored CO2Setpoint issues the Native warning and resets to None. The NoLimit SUM comparison retains the exact Native warning/reset and every unchanged158-series positive-OA criterion. This is the no-simulation fallback; active CO2/IAQ remains unsupported, and no private effective enum or phase flag is observed."
     ],
     "ZoneControl:Thermostat": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
     ],
     "OutdoorAir:Node": [
-      "Bounded Source B direct epJSON only: exactly one authored OutdoorAir:Node matched to the selected IdealLoads OA reference, with an actual DSOA reference and every existing basic positive-OA prerequisite. Height may be omitted/default or convert through Native numeric-getter semantics to a finite value below zero; all seven optional alpha fields must be absent. Actual GetInput/GetNodeNums, used-input state, physical Node height/identity/reference count and ordered OutsideAir registration feed global DesignDay weather. One fixed Float -1.25 SUM/NoLimit comparison passes unchanged158/75120 numeric and all12 engine/8 paired/2 export criteria, including independent nine-report OA/mixed response. This is a raw getter and bounded field path, not a TypedModel or full-object completion. Zero/positive-height local weather, dry/wet-bulb or wind schedules, wind-pressure curve/symmetry/angle controls, EMS, multiple nodes/OutdoorAir:NodeList, other consumers, Source A/IDF and remaining compositions stay outside the claim.",
-      "The original110-type corpus already contains OutdoorAir:Node (12 original occurrences); this bounded accepted route changes no corpus count and leaves the combined116-type inventory unchanged. Only the fixed authored global-weather case is numerical evidence; no private height/weather telemetry or universal averaged law is inferred."
+      "Bounded Source B direct epJSON only: exactly one authored OutdoorAir:Node matched to the selected IdealLoads OA reference, with an actual DSOA reference and every existing basic positive-OA prerequisite. Height may be omitted/default or convert through Native numeric-getter semantics to any finite value; all seven optional alpha fields must be absent. Actual GetInput/GetNodeNums, used-input state, physical Node height/identity/reference count and ordered OutsideAir registration remain authoritative. Negative effective height retains global DesignDay weather. Signed zero and positive height follow the exact DataEnvironment point dry-bulb, wet-bulb and wind branches and Severe/Fatal prefix-write order. Two fixed Float -1.25 and 12.5 SUM/NoLimit comparisons pass unchanged158/75120 numeric and all12 engine/8 paired/2 export criteria, including independent nine-report OA/mixed response. Existing owner tests separately cover signed zero, InitCall, gradients and error-prefix writes. This bounded raw getter path establishes neither direct private Height/OA-wind telemetry nor every finite-height state. Dry/wet-bulb or wind schedules, wind-pressure curve/symmetry/angle controls, EMS, multiple nodes/OutdoorAir:NodeList, other consumers, Source A/IDF, remaining compositions, TypedModel completion and full-object conformance stay outside the claim.",
+      "The original110-type corpus already contains OutdoorAir:Node (12 original occurrences); the bounded route changes no corpus count and leaves the combined116-type inventory unchanged. Only the two fixed authored negative-global and positive-point cases are numerical evidence; signed-zero/error branches remain owner-test evidence. No private height/weather telemetry or universal averaged law is inferred."
     ]
   },
   "verification": {
@@ -11250,6 +11250,54 @@
           "path": ".runtime/object-expansion/unit159-prep/Root-generic-producer-reference-resume01.json",
           "sha256": "b6957f4b3f41a7c24e04b09b3cd346fa175f75cfbe4f1bf7f3f78530471c0a27",
           "bytes": 1746
+        }
+      },
+      "authored_OutdoorAir_Node_point_weather": {
+        "actual_quality": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/quality02/summary.json",
+          "sha256": "ad015829228e85a282d336ac261a266fd44f9ad368825e3ca99267cb9b19eb76",
+          "bytes": 1733
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/evidence01/quality-ledger.json",
+          "sha256": "d08575f413e4486e378bed6b1f477ed5c5c10f55551b24fa018b69f211abc21e",
+          "bytes": 5604
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/quality02/quality-preparation.json",
+          "sha256": "1ac72e9811e4f975eedcee50f268f1b58c325783280197435f648ac0e3eb5600",
+          "bytes": 12458
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/evidence02/source-authority.json",
+          "sha256": "80f8b19ca417bb7ddbf0f1a3d54a2d6ff992ac3da558d1b7c568ee8b71e7aae0",
+          "bytes": 25798
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/object-expansion/unit159-prep/independent-actual-authored-OutdoorAir-Node-point-weather-Source-authority-static-review01.json",
+          "sha256": "faf108d601ac58aec2ca2262879270822b77db0ecca221d6cce5074feb935961",
+          "bytes": 4374
+        },
+        "total_actual_QA_commands": 10,
+        "current_QA_commands": 5,
+        "failed_QA_attempts": 1,
+        "current_test_body_executions": 2,
+        "historical_test_body_executions": 2,
+        "total_actual_test_body_executions": 4,
+        "distinct_existing_test_functions": 2,
+        "new_test_functions": 0,
+        "current_getter_execution": true,
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "test_only_correction": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/correction01/receipt.json",
+          "sha256": "c5bc8df3751165fe6cf182bc66308f6abbb6e8bff727102e4747bfecdc2ca867",
+          "bytes": 1912
+        },
+        "historical_execution_accounting": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/evidence02/Root-historical-QA-accounting.json",
+          "sha256": "ba7ea44c4360051826f06d873b0a3240ef5c265ae9ef654bd29a0d5daf40f99a",
+          "bytes": 1921
         }
       }
     },
@@ -74641,12 +74689,212 @@
           }
         },
         "effective_state": "Single authored SourceB OutdoorAir:Node; all7optional alpha members absent; omitted or finite effective Native-negative Height; all existing positive IdealLoads/DSOA/other scope bounds retained."
+      },
+      {
+        "id": "ideal-loads-authored-outdoor-air-node-positive-height",
+        "case_kind": "AUTHORED_OUTDOOR_AIR_NODE_POSITIVE_HEIGHT",
+        "group": "OutdoorAir:Node",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-authored-outdoor-air-node-point-weather",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/authored-OutdoorAir-Node-positive-height-input-adapter-proposal01/input.epJSON",
+          "sha256": "f9b9d38d60764eea21e37a75b9c8abc9d3575fdbf4120db4ce8461b40521ed30",
+          "bytes": 101794
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/native/command/receipt.json",
+          "sha256": "bde84ca372c7a08a15021d59af8301c1664507e9c5e12103e76434ba759da9a0",
+          "bytes": 168676
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/source/command/receipt.json",
+          "sha256": "0aafcaa2805b884448476598155f31e4fef1cbbd071c63575945ed9c16e762fc",
+          "bytes": 170105
+        },
+        "source_summary": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/source/output/run-summary.json",
+          "sha256": "a30047d8be93cd13dbf119aaffa9dbdb11082290a23380a5dfd2d19d3d2127e0",
+          "bytes": 64711
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3c/3c0ab609691b60e52de29573817caefc29b8acb710c39e13face80d7b08569da",
+          "sha256": "3c0ab609691b60e52de29573817caefc29b8acb710c39e13face80d7b08569da"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/build01/frozen/eplus-rs.exe",
+          "sha256": "f2b1b0d61f4d9b90b7099ecb6f68cca9ce870b2d42c16b05eb52a804f101ca97",
+          "bytes": 81093780
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/build01/build/receipt.json",
+          "sha256": "60a7fbdce1d22c3a1260cf2bc89175a9077b069b2bd4cf205933f6350899fedb",
+          "bytes": 10404
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/readback.json",
+          "sha256": "a76ba985d6f7314ad1e28ae5b4d4e996f1729440a5d4b4d7de38c88c9c21bcd4",
+          "bytes": 543233
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/Root-scientific-review.json",
+          "sha256": "a0016e0c4b1f8ed4fde7bb620c5af050127dcf954284b9f990e82028402b3253",
+          "bytes": 3307
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/case-config.json",
+          "sha256": "3b31966357274812c0dcea330eb902efe7a8b3183a9078852a663a9f26d44bd8",
+          "bytes": 78088
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 24416,
+          "parsed_binary64_unequal": 24416,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1816231310367584e-07,
+          "max_rmse_delta": 1.6948029398788846e-08
+        },
+        "coverage_kind": "authored_OutdoorAir_Node_positive_height",
+        "authored_height": {
+          "JSON_kind": "Float",
+          "value": 12.5,
+          "bits": "4029000000000000"
+        },
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v1/release.json",
+            "sha256": "bc74f5e874b22bfb373ff2bcda55c8961ab078c284f774fe85276b64332cff61",
+            "bytes": 7167
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/binding.json",
+            "sha256": "13caca0902131cbed7c0277d8906c862e98d44cbd87f76e7364e9dbe17240142",
+            "bytes": 1190
+          },
+          "case_config": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/case-config.json",
+            "sha256": "3b31966357274812c0dcea330eb902efe7a8b3183a9078852a663a9f26d44bd8",
+            "bytes": 78088
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/evidence02/source-authority.json",
+            "sha256": "80f8b19ca417bb7ddbf0f1a3d54a2d6ff992ac3da558d1b7c568ee8b71e7aae0",
+            "bytes": 25798
+          },
+          "completion": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/completed.json",
+            "sha256": "2b5a3d8088af568d255966acd69e7631981c6fee756d464032613e6827fd49af",
+            "bytes": 2370
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/verify-command/receipt.json",
+            "sha256": "79ff4547e016884ecaa31e7c6f63219493ba83ae4d54969a7c8554a2c229d199",
+            "bytes": 169825
+          },
+          "Native_precheck": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/native-precheck.json",
+            "sha256": "24e8ca7a79f8540b3adf1d8d0b10e19c80aebe23f68056faf361fca2b212ba0a",
+            "bytes": 23327
+          },
+          "Native_precheck_receipt": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/precheck-command/receipt.json",
+            "sha256": "6c4b01d16c365595acb843458dd097a81cac6e5d6ac233213c578aed1347ee91",
+            "bytes": 169036
+          },
+          "actual_build": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/build01/build-row.json",
+            "sha256": "6754e04fb21d388a127689cd986f7ca0e57af66fe3266f9da02c32eab11efbd6",
+            "bytes": 1223
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/quality02/summary.json",
+            "sha256": "ad015829228e85a282d336ac261a266fd44f9ad368825e3ca99267cb9b19eb76",
+            "bytes": 1733
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/authored-outdoor-air-node-point-weather/evidence02/source-authority.json",
+            "sha256": "80f8b19ca417bb7ddbf0f1a3d54a2d6ff992ac3da558d1b7c568ee8b71e7aae0",
+            "bytes": 25798
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-authored-OutdoorAir-Node-positive-height-input-adapter-static-review01.json",
+            "sha256": "c1f791828af60c91327b72e955ff6be60aa7560bb9891f205e79ffa6f0fe16b8",
+            "bytes": 4469
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "scientific_gate_counts": {
+          "engine": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "public_response_summary": {
+          "Native": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.5101075913959647,
+            "max_abs_candidate_humidity_difference": 5.2451572829308526e-05,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          },
+          "Source": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 360,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.5101075913959718,
+            "max_abs_candidate_humidity_difference": 5.2451572829308526e-05,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          }
+        },
+        "effective_state": "Single authored SourceB OutdoorAir:Node; all7optional alphas absent; omitted or finite Native-effective Height. Negative branch global weather; nonnegative exact point math/error order. One physical positive12.5 witness; signed-zero/fatal branches remain genuine existing-owner test evidence, not private physical telemetry."
       }
     ],
     "totals": {
-      "paired_cases": 246,
-      "reported_samples": 10421656,
-      "raw_operand_unequal": 2603883,
+      "paired_cases": 247,
+      "reported_samples": 10496776,
+      "raw_operand_unequal": 2628299,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -77440,6 +77688,33 @@
           "sha256": "02d0ef15c992097d2c332137b6312ff5da38da8adebe8e40f3bf0894e12a284f",
           "bytes": 14194
         }
+      },
+      {
+        "id": "source-authored-outdoor-air-node-point-weather",
+        "receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/build01/build/receipt.json",
+          "sha256": "60a7fbdce1d22c3a1260cf2bc89175a9077b069b2bd4cf205933f6350899fedb",
+          "bytes": 10404
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/3c/3c0ab609691b60e52de29573817caefc29b8acb710c39e13face80d7b08569da",
+          "sha256": "3c0ab609691b60e52de29573817caefc29b8acb710c39e13face80d7b08569da"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/build01/frozen/eplus-rs.exe",
+          "sha256": "f2b1b0d61f4d9b90b7099ecb6f68cca9ce870b2d42c16b05eb52a804f101ca97",
+          "bytes": 81093780
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/build01/frozen/build-receipt.json",
+          "sha256": "d41455ad93ffb24bc08eb8af99962ebcde1aa1042a4ca57642a9b30255babb6a",
+          "bytes": 1644316
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/quality02/quality-preparation.json",
+          "sha256": "1ac72e9811e4f975eedcee50f268f1b58c325783280197435f648ac0e3eb5600",
+          "bytes": 12458
+        }
       }
     ],
     "focused_since_workspace": {
@@ -77839,14 +78114,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 163,
-      "builds_with_accepted_paired_cases": 142,
+      "actual_recorded_builds": 164,
+      "builds_with_accepted_paired_cases": 143,
       "builds_with_only_retained_failed_Source_attempts": 7,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 13,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "163 recorded Source builds: 142 retain accepted pairs and 21 have none, including 8 without Source execution. The one strict authored OutdoorAir:Node global-weather case adds one case/75120 values; all earlier history remains unchanged. Generic retained migrations add zero actors, builds or physical credit.",
+      "qualification": "164 recorded Source builds: 143 retain accepted pairs and 21 have none, including 8 without Source execution. Only the strict positive-height authored-node pair adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -82535,47 +82810,48 @@
         "source-NoOA-exact-empty-dehumidification",
         "source-positive-OA-exact-empty-dehumidification",
         "source-positive-OA-both-exact-empty-humidity",
-        "ideal-loads-authored-outdoor-air-node-global-weather"
+        "ideal-loads-authored-outdoor-air-node-global-weather",
+        "ideal-loads-authored-outdoor-air-node-positive-height"
       ],
-      "accepted_paired_cases": 75,
-      "accepted_samples": 5520480,
-      "retained_Scheduled_B_pairs": 74,
-      "retained_Scheduled_B_samples": 5460960,
+      "accepted_paired_cases": 76,
+      "accepted_samples": 5595600,
+      "retained_Scheduled_B_pairs": 75,
+      "retained_Scheduled_B_samples": 5536080,
       "unused_NodeList_A_pairs": 1,
       "unused_NodeList_A_samples": 59520,
       "latest_complete_comparisons": {
-        "AUTHORED_OUTDOOR_AIR_NODE_GLOBAL_WEATHER": {
-          "path": ".runtime/porting/authored-outdoor-air-node-global-weather/runtime01/readback.json",
-          "sha256": "eb358c66155089e94300234741fffa3193152d96ce2ed6bf8ecf0e26793de2e2",
-          "bytes": 543071
+        "AUTHORED_OUTDOOR_AIR_NODE_POSITIVE_HEIGHT": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/readback.json",
+          "sha256": "a76ba985d6f7314ad1e28ae5b4d4e996f1729440a5d4b4d7de38c88c9c21bcd4",
+          "bytes": 543233
         }
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/porting/authored-outdoor-air-node-global-weather/runtime01/Root-scientific-review.json",
-        "sha256": "39c00aaa420980f40a551a4487a47a235b00806f2495710864330894de3b9c62",
-        "bytes": 2620
+        "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/Root-scientific-review.json",
+        "sha256": "a0016e0c4b1f8ed4fde7bb620c5af050127dcf954284b9f990e82028402b3253",
+        "bytes": 3307
       },
-      "latest_source_build": "source-authored-outdoor-air-node-global-weather",
+      "latest_source_build": "source-authored-outdoor-air-node-point-weather",
       "latest_actual_Source_build": {
-        "path": ".runtime/porting/authored-outdoor-air-node-global-weather/build01/build-row.json",
-        "sha256": "abc286c66f44091cbbb31441eb94e23306f8870d67bfc41d9a24854f8212e3b9",
-        "bytes": 1228
+        "path": ".runtime/porting/authored-outdoor-air-node-point-weather/build01/build-row.json",
+        "sha256": "6754e04fb21d388a127689cd986f7ca0e57af66fe3266f9da02c32eab11efbd6",
+        "bytes": 1223
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/authored-outdoor-air-node-global-weather/quality01/summary.json",
-        "sha256": "d1489d049459977d2724a8296fba94c4ed16d7cadb69b13112ffbf3202337a67",
-        "bytes": 1738
+        "path": ".runtime/porting/authored-outdoor-air-node-point-weather/quality02/summary.json",
+        "sha256": "ad015829228e85a282d336ac261a266fd44f9ad368825e3ca99267cb9b19eb76",
+        "bytes": 1733
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/porting/authored-outdoor-air-node-global-weather/evidence01/source-authority.json",
-        "sha256": "cf6b50641d2a8010db12942f3f8d948b653384d83b635da9e153de73627b7cee",
-        "bytes": 24414
+        "path": ".runtime/porting/authored-outdoor-air-node-point-weather/evidence02/source-authority.json",
+        "sha256": "80f8b19ca417bb7ddbf0f1a3d54a2d6ff992ac3da558d1b7c568ee8b71e7aae0",
+        "bytes": 25798
       },
       "latest_input_contracts": {
-        "AUTHORED_OUTDOOR_AIR_NODE_GLOBAL_WEATHER": {
-          "path": ".runtime/porting/authored-outdoor-air-node-global-weather/runtime01/case-config.json",
-          "sha256": "0adccc65b3d3f36045c860cfd70307c2b3a200fdd8bb247b8e08b03a2120f549",
-          "bytes": 74038
+        "AUTHORED_OUTDOOR_AIR_NODE_POSITIVE_HEIGHT": {
+          "path": ".runtime/porting/authored-outdoor-air-node-point-weather/runtime01/case-config.json",
+          "sha256": "3b31966357274812c0dcea330eb902efe7a8b3183a9078852a663a9f26d44bd8",
+          "bytes": 78088
         }
       },
       "latest_retained_evidence": {
@@ -82588,7 +82864,7 @@
         "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
         "bytes": 2919
       },
-      "scope": "74 bounded Source B Scheduled/NodeList pairs retain 5,460,960 values. The unused Source A pair adds59,520, giving 75 pairs and 5,520,480 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
+      "scope": "75 bounded Source B Scheduled/NodeList pairs retain 5,536,080 values. The unused Source A pair adds59,520, giving 76 pairs and 5,595,600 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
       "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",
