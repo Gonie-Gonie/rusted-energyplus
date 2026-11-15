@@ -675,6 +675,105 @@ impl EnergyPlusPsychrometricsState {
     }
 }
 
+pub(super) enum SourceTwbLookup {
+    Hit(f64),
+    Miss {
+        index: usize,
+        temperature: f64,
+        humidity: f64,
+        pressure: f64,
+    },
+}
+pub(super) enum SourceTsatPressureLookup {
+    Hit(f64),
+    Miss { index: usize },
+}
+
+impl EnergyPlusPsychrometricsState {
+    // The existing singleton's actual scalar members, borrowed only within a
+    // with_state statement. No reference may cross a backend/nested call.
+    pub(super) fn source_scalar_state(&mut self) -> &mut EnergyPlusPsychrometricStateSnapshot {
+        &mut self.state
+    }
+
+    pub(super) fn begin_source_twb(&mut self, t: f64, w: f64, p: f64) -> SourceTwbLookup {
+        let tt = t.to_bits() >> 32;
+        let wt = w.to_bits() >> 32;
+        let pt = p.to_bits() >> 32;
+        let index = (tt ^ (wt ^ pt)) as usize & (ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        let EnergyPlusPsychrometricCacheSlot::Twb {
+            i_tdb,
+            i_w,
+            i_pb,
+            value,
+            ..
+        } = self.slot(0, index)
+        else {
+            unreachable!()
+        };
+        if i_tdb == tt && i_w == wt && i_pb == pt {
+            return SourceTwbLookup::Hit(value);
+        }
+        self.slots[0].insert(
+            index,
+            EnergyPlusPsychrometricCacheSlot::Twb {
+                index,
+                i_tdb: tt,
+                i_w: wt,
+                i_pb: pt,
+                value,
+            },
+        );
+        SourceTwbLookup::Miss {
+            index,
+            temperature: f64::from_bits(tt << 32),
+            humidity: f64::from_bits(wt << 32),
+            pressure: f64::from_bits(pt << 32),
+        }
+    }
+    pub(super) fn finish_source_twb(&mut self, index: usize, result: f64) {
+        let slot = self.slots[0]
+            .entry(index)
+            .or_insert_with(|| default_slot(0, index));
+        let EnergyPlusPsychrometricCacheSlot::Twb { value, .. } = slot else {
+            unreachable!()
+        };
+        *value = result;
+    }
+    pub(super) fn begin_source_tsat_pressure(&mut self, p: f64) -> SourceTsatPressureLookup {
+        let tag = signed_tag(p, 28);
+        let index = tag as usize & (ENERGYPLUS_PSY_CACHE_SIZE - 1);
+        let EnergyPlusPsychrometricCacheSlot::TsatPb {
+            i_h, i_pb, value, ..
+        } = self.slot(2, index)
+        else {
+            unreachable!()
+        };
+        if i_pb == tag {
+            return SourceTsatPressureLookup::Hit(value);
+        }
+        self.slots[2].insert(
+            index,
+            EnergyPlusPsychrometricCacheSlot::TsatPb {
+                index,
+                i_h,
+                i_pb: tag,
+                value,
+            },
+        );
+        SourceTsatPressureLookup::Miss { index }
+    }
+    pub(super) fn finish_source_tsat_pressure(&mut self, index: usize, result: f64) {
+        let slot = self.slots[2]
+            .entry(index)
+            .or_insert_with(|| default_slot(2, index));
+        let EnergyPlusPsychrometricCacheSlot::TsatPb { value, .. } = slot else {
+            unreachable!()
+        };
+        *value = result;
+    }
+}
+
 fn signed_tag(value: f64, shift: u32) -> i64 {
     (value.to_bits() as i64) >> shift
 }

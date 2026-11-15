@@ -426,9 +426,14 @@ impl SourceOutdoorAirNodes {
                 *any_local = true;
             }
             if num_alphas > 1 && !alpha_blanks[1] {
-                return Err(Error::Unavailable(
-                    "actual outdoor-air dry-bulb schedule lookup320",
-                ));
+                let schedule = schedules.get_source_schedule(&alphas[1])?;
+                equipment
+                    .set_source_authored_outdoor_air_dry_bulb_schedule(node_number, schedule)?;
+                if schedule.is_none() {
+                    return Err(Error::Unavailable(
+                        "actual outdoor-air dry-bulb schedule missing-item diagnostic320",
+                    ));
+                }
             }
             if num_alphas > 2 && !alpha_blanks[2] {
                 let schedule = schedules.get_source_schedule(&alphas[2])?;

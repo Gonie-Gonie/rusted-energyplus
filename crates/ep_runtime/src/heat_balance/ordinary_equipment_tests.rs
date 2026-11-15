@@ -1292,6 +1292,14 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         "wetbulb_temperature_schedule_name".into(),
                         V::String(if explicit_empty { "Constant-1.0" } else { "" }.into()),
                     );
+                    // A2's genuine builtin pointer preserves the existing WB clamp
+                    // operands; the later DB-only operations use these same owners.
+                    if explicit_empty {
+                        outdoor_fields.insert(
+                            "drybulb_temperature_schedule_name".into(),
+                            V::String("Constant-0.0".into()),
+                        );
+                    }
                     // Genuine public environment input before any true WB call.
                     probe_environment.current_weather.out_baro_press = 101325.0;
                     let mut oa_definitions = definitions.clone();
@@ -1576,6 +1584,24 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             .ok_or("actual WB pointer owner")?[node_at]
                             .outdoor_air_wet_bulb_schedule;
                         assert_eq!(wb_pointer.is_some(), explicit_empty);
+                        if explicit_empty {
+                            let db = oa_equipment
+                                .nodes
+                                .physical
+                                .as_ref()
+                                .ok_or("same actual A2 Node")?[node_at]
+                                .outdoor_air_dry_bulb_schedule
+                                .ok_or("actual A2 builtin pointer")?;
+                            assert_eq!(oa_schedules.schedules[db.0].name, "Constant-0.0");
+                            assert_eq!(oa_schedules.source_current_schedule_value(db)?, 0.0);
+                            assert!(oa_schedules.schedules[db.0].is_used);
+                            assert_eq!(
+                                oa_ip
+                                    .source_raw_object_fields("OutdoorAir:Node", oa_name)?
+                                    .get("drybulb_temperature_schedule_name"),
+                                Some(&V::String("Constant-0.0".into()))
+                            );
+                        }
                         if let Some(pointer) = wb_pointer {
                             assert_eq!(oa_schedules.schedules[pointer.0].name, "Constant-1.0");
                             assert!(oa_schedules.schedules[pointer.0].is_used);
@@ -1867,6 +1893,141 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                 unit_name.to_ascii_uppercase(),
                             )
                         );
+                    }
+                    if explicit_empty {
+                        // Owner-operation coverage after every original assertion.
+                        // The Raw caller separately keeps two named DB/WB held.
+                        let node_number = oa_registry
+                            .outside_air_node_list
+                            .as_ref()
+                            .and_then(|rows| rows.first())
+                            .copied()
+                            .ok_or("same DB-only Node")?;
+                        let node_at = usize::try_from(node_number - 1)?;
+                        let node_ordinal = usize::try_from(node_number)?;
+                        let db = oa_schedules
+                            .get_source_schedule(&wind_name.to_ascii_uppercase())?
+                            .ok_or("same real Detailed schedule")?;
+                        oa_equipment.set_source_authored_outdoor_air_wet_bulb_schedule(
+                            node_ordinal,
+                            None,
+                        )?;
+                        oa_equipment.set_source_authored_outdoor_air_dry_bulb_schedule(
+                            node_ordinal,
+                            Some(db),
+                        )?;
+                        oa_equipment
+                            .set_source_authored_outdoor_air_local_if_temperature_schedule(
+                                node_ordinal,
+                            )?;
+                        let old_w = probe_environment.current_weather.out_hum_rat;
+                        let old_p = probe_environment.current_weather.out_baro_press;
+                        probe_environment.current_weather.out_hum_rat = 0.001;
+                        let mut backend = SourceErrorBackend {
+                            state: &mut oa_state,
+                            error_stream: Some(&mut oa_error),
+                            console: &mut oa_console,
+                            out_unit1: None,
+                            out_unit2: None,
+                            f_message: None,
+                            message_callback: None,
+                            error_callback: None,
+                            sqlite: None,
+                        };
+                        clock.hour_of_day = 1;
+                        oa_schedules.update_source_schedule_values(&clock, &probe_environment)?;
+                        oa_equipment.set_source_outdoor_air_node_values(node_number, true, &control, &oa_schedules,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                                hvac: &phase_hvac, developer: &developer, psychrometrics: &mut psychrometrics,
+                                recurring: &mut recurring, backend: &mut backend,
+                            })?;
+                        let first = &oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("first DB-only Node")?[node_at];
+                        assert!(first.is_local_node);
+                        assert_eq!(
+                            (
+                                first.temperature,
+                                first.outdoor_air_dry_bulb,
+                                first.humidity_ratio
+                            ),
+                            (3.0, 3.0, 0.001)
+                        );
+                        assert!(
+                            first.outdoor_air_wet_bulb.is_finite()
+                                && first.outdoor_air_wet_bulb < 3.0
+                        );
+                        clock.hour_of_day = 13;
+                        oa_schedules.update_source_schedule_values(&clock, &probe_environment)?;
+                        oa_equipment.set_source_outdoor_air_node_values(node_number, true, &control, &oa_schedules,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                                hvac: &phase_hvac, developer: &developer, psychrometrics: &mut psychrometrics,
+                                recurring: &mut recurring, backend: &mut backend,
+                            })?;
+                        let second = &oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("updated DB-only Node")?[node_at];
+                        assert_eq!((second.temperature, second.humidity_ratio), (7.0, 0.001));
+                        assert!(
+                            second.outdoor_air_wet_bulb.is_finite()
+                                && second.outdoor_air_wet_bulb < 7.0
+                        );
+                        oa_equipment.set_source_outdoor_air_node_values(node_number, false, &control, &oa_schedules,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                                hvac: &phase_hvac, developer: &developer, psychrometrics: &mut psychrometrics,
+                                recurring: &mut recurring, backend: &mut backend,
+                            })?;
+                        let before = oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("false DB owner")?[node_at]
+                            .clone();
+                        assert_eq!(before.temperature, 20.0);
+                        assert_eq!(before.outdoor_air_wet_bulb.to_bits(), 20.005_f64.to_bits());
+                        assert_ne!(before.humidity_ratio.to_bits(), 0.001_f64.to_bits());
+                        // Genuine out-of-range public pressure reaches the child warning.
+                        // An empty ordinary Write sink fails before any fake cache seed.
+                        probe_environment.current_weather.out_baro_press = 0.0017;
+                        let mut empty: &mut [u8] = &mut [];
+                        backend.error_stream = Some(&mut empty);
+                        let failure = oa_equipment.set_source_outdoor_air_node_values(node_number, true, &control, &oa_schedules,
+                            &mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodeRuntimeOwners {
+                                globals: &mut globals, clock: &clock, environment: &probe_environment,
+                                hvac: &phase_hvac, developer: &developer, psychrometrics: &mut psychrometrics,
+                                recurring: &mut recurring, backend: &mut backend,
+                            });
+                        assert!(matches!(failure, Err(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(_))));
+                        let after = &oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("failed DB-only Node")?[node_at];
+                        assert_eq!(
+                            (
+                                after.temperature,
+                                after.outdoor_air_dry_bulb,
+                                after.humidity_ratio
+                            ),
+                            (7.0, 7.0, 0.001)
+                        );
+                        assert_eq!(
+                            after.outdoor_air_wet_bulb, 7.0,
+                            "outer clamp committed before Twb child failure"
+                        );
+                        assert_eq!(
+                            (after.enthalpy, after.pressure, after.quality),
+                            (before.enthalpy, before.pressure, before.quality)
+                        );
+                        probe_environment.current_weather.out_hum_rat = old_w;
+                        probe_environment.current_weather.out_baro_press = old_p;
                     }
                 }
             }

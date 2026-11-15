@@ -171,6 +171,23 @@ impl OrdinaryEquipment {
         Ok(())
     }
 
+    pub(crate) fn set_source_authored_outdoor_air_dry_bulb_schedule(
+        &mut self,
+        node_number: usize,
+        schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    ) -> Result<(), Error> {
+        let index = node_number
+            .checked_sub(1)
+            .ok_or(Error::Unavailable("actual OA dry-bulb Node ordinal"))?;
+        self.nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
+            .ok_or(Error::Unavailable("actual OA dry-bulb physical Node"))?
+            .outdoor_air_dry_bulb_schedule = schedule;
+        Ok(())
+    }
+
     pub(crate) fn set_source_authored_outdoor_air_wet_bulb_schedule(
         &mut self,
         node_number: usize,
@@ -344,8 +361,8 @@ impl OrdinaryEquipment {
         }
         node.outdoor_air_wind_direction = o.environment.current_weather.wind_dir;
         if init_call {
-            if node.outdoor_air_dry_bulb_schedule.is_some() {
-                return Err(Error::Unavailable("actual local OA dry-bulb schedule559"));
+            if let Some(schedule) = node.outdoor_air_dry_bulb_schedule {
+                node.outdoor_air_dry_bulb = schedules.source_current_schedule_value(schedule)?;
             }
             if let Some(schedule) = node.outdoor_air_wet_bulb_schedule {
                 node.outdoor_air_wet_bulb = schedules.source_current_schedule_value(schedule)?;
@@ -382,24 +399,36 @@ impl OrdinaryEquipment {
                     || node.outdoor_air_dry_bulb_schedule.is_some())
             {
                 node.humidity_ratio = o.environment.current_weather.out_hum_rat;
-                return Err(Error::Unavailable(
-                    "actual local OA DB-only cached Twb property owner598",
-                ));
+                node.outdoor_air_wet_bulb = o.psychrometrics.source_wet_bulb_temperature(
+                    node.outdoor_air_dry_bulb,
+                    node.humidity_ratio,
+                    o.environment.current_weather.out_baro_press,
+                    "",
+                    &mut crate::psychrometrics::SourcePsychrometricOwners {
+                        clock: o.clock,
+                        globals: &*o.globals,
+                        environment: o.environment,
+                        hvac: o.hvac,
+                        recurring: &mut *o.recurring,
+                        backend: &mut *o.backend,
+                    },
+                )?;
+            } else {
+                node.humidity_ratio = o.psychrometrics.source_humidity_ratio_from_wet_bulb(
+                    node.outdoor_air_dry_bulb,
+                    node.outdoor_air_wet_bulb,
+                    o.environment.current_weather.out_baro_press,
+                    "",
+                    &mut crate::psychrometrics::SourcePsychrometricOwners {
+                        clock: o.clock,
+                        globals: &*o.globals,
+                        environment: o.environment,
+                        hvac: o.hvac,
+                        recurring: &mut *o.recurring,
+                        backend: &mut *o.backend,
+                    },
+                )?;
             }
-            node.humidity_ratio = o.psychrometrics.source_humidity_ratio_from_wet_bulb(
-                node.outdoor_air_dry_bulb,
-                node.outdoor_air_wet_bulb,
-                o.environment.current_weather.out_baro_press,
-                "",
-                &mut crate::psychrometrics::SourcePsychrometricOwners {
-                    clock: o.clock,
-                    globals: &*o.globals,
-                    environment: o.environment,
-                    hvac: o.hvac,
-                    recurring: &mut *o.recurring,
-                    backend: &mut *o.backend,
-                },
-            )?;
         } else {
             node.humidity_ratio = o.environment.current_weather.out_hum_rat;
         }

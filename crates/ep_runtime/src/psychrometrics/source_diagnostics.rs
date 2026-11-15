@@ -1,7 +1,10 @@
 //! Actual backend-aware property calls over the sole psychrometric state.
 //! Numeric-only callers retain their established API without a diagnostic claim.
 use super::SourcePsychrometricAccess;
-use super::psy02_state::{SourcePsatLookup, SourceTsatEnthalpyLookup, with_state};
+use super::psy02_state::{
+    SourcePsatLookup, SourceTsatEnthalpyLookup, SourceTsatPressureLookup, SourceTwbLookup,
+    with_state,
+};
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
@@ -11,6 +14,11 @@ use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 
 // Exact zero-based PsychCacheData.hh PsychrometricFunction identities.
 const RELATIVE_HUMIDITY: usize = 1;
+const WET_BULB_TEMPERATURE: usize = 2;
+const TSAT_FROM_PRESSURE: usize = 10;
+const WET_BULB_HUMIDITY: usize = 13;
+const WET_BULB_ITERATIONS: usize = 14;
+const TSAT_PRESSURE_ITERATIONS: usize = 16;
 const W_FROM_DEW_POINT: usize = 4;
 const W_FROM_ENTHALPY: usize = 5;
 const W_FROM_WET_BULB: usize = 6;
@@ -710,6 +718,309 @@ impl SourcePsychrometricAccess {
             return Ok(w1);
         }
         Ok(w)
+    }
+}
+
+impl SourcePsychrometricOwners<'_, '_> {
+    fn recurring_without_values(&mut self, kind: usize, message: &str) -> Result<(), Error> {
+        let mut index = with_state(|state| state.source_error_indices[kind]);
+        let result = self.backend.show_source_recurring_warning_at_end(
+            message,
+            &mut index,
+            self.recurring,
+            self.clock,
+            self.globals,
+            None,
+            None,
+            None,
+            "",
+            "",
+            "",
+        );
+        with_state(|state| state.source_error_indices[kind] = index);
+        result
+    }
+}
+
+impl SourcePsychrometricAccess {
+    /// Native unsigned-tag Twb cache: representatives on miss, tags before raw.
+    pub(crate) fn source_wet_bulb_temperature(
+        &mut self,
+        temperature: f64,
+        humidity: f64,
+        pressure: f64,
+        called_from: &str,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let (index, temperature, humidity, pressure) =
+            match with_state(|state| state.begin_source_twb(temperature, humidity, pressure)) {
+                SourceTwbLookup::Hit(value) => return Ok(value),
+                SourceTwbLookup::Miss {
+                    index,
+                    temperature,
+                    humidity,
+                    pressure,
+                } => (index, temperature, humidity, pressure),
+            };
+        let value = self.source_wet_bulb_temperature_raw(
+            temperature,
+            humidity,
+            pressure,
+            called_from,
+            owners,
+        )?;
+        with_state(|state| state.finish_source_twb(index, value));
+        Ok(value)
+    }
+
+    /// Native PsyTwbFnTdbWPb_raw: genuine diagnostics interleave with properties.
+    pub(super) fn source_wet_bulb_temperature_raw(
+        &mut self,
+        temperature: f64,
+        humidity: f64,
+        pressure: f64,
+        called_from: &str,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let mut flag_error = false;
+        if (temperature <= -100.0 || temperature >= 200.0) && !owners.clock.warmup_flag {
+            if first(WET_BULB_TEMPERATURE) {
+                owners.backend.show_warning_message(
+                    "Temperature out of range [-100. to 200.] (PsyTwbFnTdbWPb)",
+                )?;
+                owners.timestamp_without_comma(called_from)?;
+                owners.backend.show_continue_error(&format!(
+                    " Input Temperature={}",
+                    trimmed(temperature, 2)?
+                ))?;
+                flag_error = true;
+            }
+            owners.recurring(
+                WET_BULB_TEMPERATURE,
+                "Temperature out of range [-100. to 200.] (PsyTwbFnTdbWPb)",
+                temperature,
+                "C",
+            )?;
+        }
+        let mut humidity = humidity;
+        if humidity < 0.0 {
+            if humidity <= -0.0001 && !owners.clock.warmup_flag {
+                if first(WET_BULB_HUMIDITY) {
+                    set_string(format!(
+                        " Dry-Bulb= {} Humidity Ratio= {} Pressure= {}",
+                        trimmed(temperature, 2)?,
+                        trimmed(humidity, 3)?,
+                        trimmed(pressure, 2)?
+                    ));
+                    owners
+                        .backend
+                        .show_warning_message("Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)")?;
+                    owners.timestamp_without_comma(called_from)?;
+                    owners.backend.show_continue_error(&string())?;
+                    set_string(format!("Humidity Ratio= {}", trimmed(humidity, 4)?));
+                    owners.backend.show_continue_error(&format!(
+                        "{} ... Humidity Ratio set to .00001",
+                        string()
+                    ))?;
+                }
+                owners.recurring(
+                    WET_BULB_HUMIDITY,
+                    "Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)",
+                    humidity,
+                    "[]",
+                )?;
+            }
+            humidity = 1.0e-5;
+        }
+        let nested_from = if called_from.is_empty() {
+            "PsyTwbFnTdbWPb"
+        } else {
+            called_from
+        };
+        let boiling = if pressure != with_state(|state| state.source_scalar_state().last_patm) {
+            let boiling =
+                self.source_saturation_temperature_from_pressure(pressure, nested_from, owners)?;
+            with_state(|state| {
+                let parameters = state.source_scalar_state();
+                parameters.last_patm = pressure;
+                parameters.last_t_boil = boiling;
+            });
+            boiling
+        } else {
+            with_state(|state| state.source_scalar_state().last_t_boil)
+        };
+        let (mut wet, mut x1, mut y1) = (temperature, 0.0, 0.0);
+        let mut iterations = super::ENERGYPLUS_WET_BULB_MAX_ITERATIONS + 1;
+        for iteration in 1..=super::ENERGYPLUS_WET_BULB_MAX_ITERATIONS {
+            if wet >= boiling - 0.09 {
+                wet = boiling - 0.1;
+            }
+            let saturation = self.source_saturation_pressure(wet, nested_from, owners)?;
+            let star = 0.62198 * saturation / (pressure - saturation);
+            let new_humidity = if wet >= 0.0 {
+                ((2501.0 - 2.326 * wet) * star - 1.006 * (temperature - wet))
+                    / (2501.0 + 1.86 * temperature - 4.186 * wet)
+            } else {
+                ((2830.0 - 0.24 * wet) * star - 1.006 * (temperature - wet))
+                    / (2830.0 + 1.86 * temperature - 2.1 * wet)
+            };
+            let tolerance = with_state(|state| state.source_scalar_state().iconv_tol);
+            let (next, converged) = super::energyplus_general_iterate(
+                wet,
+                humidity - new_humidity,
+                &mut x1,
+                &mut y1,
+                iteration,
+                tolerance,
+            );
+            wet = next;
+            if converged {
+                iterations = iteration;
+                break;
+            }
+        }
+        if iterations > super::ENERGYPLUS_WET_BULB_MAX_ITERATIONS && !owners.clock.warmup_flag {
+            if first(WET_BULB_ITERATIONS) {
+                owners.backend.show_warning_message(&format!(
+                    "WetBulb not converged after {iterations} iterations(PsyTwbFnTdbWPb)"
+                ))?;
+                owners.timestamp(called_from)?;
+                owners.backend.show_continue_error(&format!(
+                    " Input Temperature = {}",
+                    trimmed(temperature, 2)?
+                ))?;
+                owners.backend.show_continue_error(&format!(
+                    " Input Humidity Ratio= {}",
+                    trimmed(humidity, 6)?
+                ))?;
+                owners
+                    .backend
+                    .show_continue_error(&format!(" Input Pressure = {}", trimmed(pressure, 2)?))?;
+                flag_error = true;
+            }
+            owners.recurring_without_values(
+                WET_BULB_ITERATIONS,
+                "WetBulb not converged after max iterations(PsyTwbFnTdbWPb)",
+            )?;
+        }
+        if flag_error {
+            owners
+                .backend
+                .show_continue_error(&format!(" Resultant Temperature= {}", trimmed(wet, 2)?))?;
+        }
+        Ok(if wet > temperature { temperature } else { wet })
+    }
+
+    /// Native signed-tag cache; raw receives original pressure, not representative.
+    pub(crate) fn source_saturation_temperature_from_pressure(
+        &mut self,
+        pressure: f64,
+        called_from: &str,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let index = match with_state(|state| state.begin_source_tsat_pressure(pressure)) {
+            SourceTsatPressureLookup::Hit(value) => return Ok(value),
+            SourceTsatPressureLookup::Miss { index } => index,
+        };
+        let value =
+            self.source_saturation_temperature_from_pressure_raw(pressure, called_from, owners)?;
+        with_state(|state| state.finish_source_tsat_pressure(index, value));
+        Ok(value)
+    }
+
+    pub(super) fn source_saturation_temperature_from_pressure_raw(
+        &mut self,
+        pressure: f64,
+        called_from: &str,
+        owners: &mut SourcePsychrometricOwners<'_, '_>,
+    ) -> Result<f64, Error> {
+        let mut flag_error = false;
+        if !owners.clock.warmup_flag && (pressure <= 0.0017 || pressure >= 1555000.0) {
+            if first(TSAT_FROM_PRESSURE) {
+                owners
+                    .backend
+                    .show_warning_message("Pressure out of range (PsyTsatFnPb)")?;
+                owners.timestamp_without_comma(called_from)?;
+                owners
+                    .backend
+                    .show_continue_error(&format!(" Input Pressure= {}", trimmed(pressure, 2)?))?;
+                flag_error = true;
+            }
+            owners.recurring(
+                TSAT_FROM_PRESSURE,
+                "Pressure out of range (PsyTsatFnPb)",
+                pressure,
+                "Pa",
+            )?;
+        }
+        if pressure == with_state(|state| state.source_scalar_state().press_save) {
+            return Ok(with_state(|state| state.source_scalar_state().t_sat_save));
+        }
+        with_state(|state| state.source_scalar_state().press_save = pressure);
+        if with_state(|state| state.source_scalar_state().use_interpolation) {
+            return Err(Error::Unavailable(
+                "actual Source PsyTsatFnPb interpolation branch",
+            ));
+        }
+        let mut iterations = 0;
+        let temperature = if pressure >= 1555000.0 {
+            200.0
+        } else if pressure <= 0.0017 {
+            -100.0
+        } else if pressure > 611.0 && pressure < 611.25 {
+            0.0
+        } else {
+            let (mut temperature, mut x1, mut y1) = (100.0, 0.0, 0.0);
+            let nested_from = if called_from.is_empty() {
+                "PsyTsatFnPb"
+            } else {
+                called_from
+            };
+            iterations = super::ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS + 1;
+            for iteration in 1..=super::ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS {
+                let saturation =
+                    self.source_saturation_pressure(temperature, nested_from, owners)?;
+                let (next, converged) = super::energyplus_general_iterate(
+                    temperature,
+                    pressure - saturation,
+                    &mut x1,
+                    &mut y1,
+                    iteration,
+                    super::ENERGYPLUS_PSYCHROMETRIC_ITERATION_TOLERANCE,
+                );
+                temperature = next;
+                if converged {
+                    iterations = iteration;
+                    break;
+                }
+            }
+            temperature
+        };
+        if iterations > super::ENERGYPLUS_TSAT_PRESSURE_MAX_ITERATIONS && !owners.clock.warmup_flag
+        {
+            if first(TSAT_PRESSURE_ITERATIONS) {
+                owners.backend.show_warning_message(&format!("Saturation Temperature not converged after {iterations} iterations (PsyTsatFnPb)"))?;
+                owners.timestamp_without_comma(called_from)?;
+                owners
+                    .backend
+                    .show_continue_error(&format!(" Input Pressure= {}", trimmed(pressure, 2)?))?;
+                flag_error = true;
+            }
+            owners.recurring(
+                TSAT_PRESSURE_ITERATIONS,
+                "Saturation Temperature not converged after max iterations (PsyTsatFnPb)",
+                temperature,
+                "C",
+            )?;
+        }
+        with_state(|state| state.source_scalar_state().t_sat_save = temperature);
+        if flag_error {
+            owners.backend.show_continue_error(&format!(
+                " Resultant Temperature= {}",
+                trimmed(temperature, 2)?
+            ))?;
+        }
+        Ok(temperature)
     }
 }
 
