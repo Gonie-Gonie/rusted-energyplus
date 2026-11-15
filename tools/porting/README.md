@@ -52,6 +52,15 @@ Source with that proof, `verify`, and `complete`. Outputs must be fresh paths;
 Source launch requires a finite Native structural proof. Numerical comparisons
 finish before all twelve engine gates, eight paired gates and two full exports.
 
+`paired/v3` provides the fresh-only `ideal_loads.oa_topology.v1` profile for
+explicit outdoor-node topology changes. It requires a complete BND prediction
+derived from the input and source before either engine runs, independent
+prediction reviews, and complete NodeList/SPM export contracts. It preserves
+the v1 numerical policy, clock, scientific constants and engine gates. Invoke
+`tools/porting/paired/v3/__main__.py` with the same recorded workflow below;
+v1/v2 bindings and retained proofs cannot authorize this profile. Publishing
+the tooling alone establishes no new physical comparison or object support.
+
 Record `precheck` and `verify` with the trusted `record_command.py`, declaring
 every Context pin plus the Native launch (and Source launch for `verify`) as
 explicit inputs. Source `act` also requires `--native-precheck-receipt PATH#SHA256`.
