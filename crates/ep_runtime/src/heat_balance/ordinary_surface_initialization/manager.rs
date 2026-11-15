@@ -163,7 +163,7 @@ impl OrdinarySurfaceInitialization {
             providers.evaluate_outside_movable_insulation(owners)?;
             providers.evaluate_inside_movable_insulation(owners)?;
         }
-        prefix::get_source_ground_surface_reflectance_average(owners.globals)?;
+        super::get_source_ground_surface_reflectance_average(owners.globals, owners.geometry)?;
         prefix::timestep_source_complex_fenestration(owners.geometry)?;
         if owners.environment.current_weather.sun_is_up
             && owners.environment.current_weather.dif_solar_rad > 0.0

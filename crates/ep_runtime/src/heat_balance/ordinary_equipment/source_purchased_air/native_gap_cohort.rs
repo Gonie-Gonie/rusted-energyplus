@@ -1095,6 +1095,49 @@ impl Factory {
             error_callback: None,
             sqlite: None,
         };
+        // Same cold GetInput position, before the shared Init/Calc phase loans.
+        if operation == "simulate" {
+            let mut input_dictionary = SourceOutputDictionaryStreams {
+                eso: Some(&mut self.eso),
+                sqlite_present: false,
+                results_framework_output_variables: &mut self.rf,
+            };
+            let mut input_output = SourcePurchasedAirReportingOutputContext {
+                registration: &mut self.registration,
+                input: &mut self.input,
+                prescan: &self.prescan,
+                reports: &self.report,
+                environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                    &self.project.system.minimum_report_frequency,
+                    Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                        kickoff: &self.globals.kickoff_simulation,
+                        developer: &self.project.system.developer_flag,
+                        warmup: &self.weather.global.warmup_flag,
+                        doing_sizing: &self.globals.doing_sizing,
+                    }),
+                ),
+                minutes_in_time_step: self.weather.global.minutes_in_time_step,
+                host: &mut self.files,
+                dictionary_host: &mut input_dictionary,
+                eio: &mut self.eio,
+            };
+            self.equipment.prepare_source_purchased_air_input(
+                &mut self.shortcut,
+                false,
+                &mut self.schedules,
+                self.globals.num_of_zones,
+                &mut self.hvac_manager.ancillary.branch_node_connections,
+                self.globals.any_energy_management_system_in_model,
+                &self.sizing,
+                &mut self.hvac_manager.ancillary.outdoor_air_nodes,
+                &self.weather.environment,
+                &self.control,
+                &self.globals.display_extra_warnings,
+                &mut self.globals.any_local_environments_in_model,
+                &mut backend,
+                &mut input_output,
+            )?;
+        }
         let mut init = SourcePurchasedAirInitOwners {
             sizing: &mut self.sizing,
             fan: &self.fan,
@@ -1154,15 +1197,9 @@ impl Factory {
                     self.list,
                     self.pointer,
                     self.zone,
-                    &mut self.shortcut,
-                    false,
                     &mut self.schedules,
-                    self.globals.num_of_zones,
-                    &mut self.hvac_manager.ancillary.branch_node_connections,
-                    &mut self.hvac_manager.ancillary.outdoor_air_nodes,
                     &self.zones,
                     &self.ancillary.selected_internal_heat_gains,
-                    self.globals.any_energy_management_system_in_model,
                     &mut output,
                     &mut init,
                     &mut calc,

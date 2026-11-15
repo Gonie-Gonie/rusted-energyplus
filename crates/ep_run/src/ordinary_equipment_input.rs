@@ -361,26 +361,13 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     }) {
         return error();
     }
-    let has_schedule = |reference: &str| {
-        ["Constant-0.0", "Constant-1.0"]
-            .iter()
-            .any(|name| name.eq_ignore_ascii_case(reference))
-            || raw
-                .objects
-                .get(&ObjectType("Schedule:Constant".into()))
-                .is_some_and(|rows| {
-                    rows.keys()
-                        .any(|name| name.0.eq_ignore_ascii_case(reference))
-                })
-            || source_b::has_source_detailed_reference(raw, reference)
-    };
     for name in [
         "outdoor_air_schedule_name",
         "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
     ] {
         match field(requirement, name) {
             None => {},
-            Some(RawValue::String(reference)) if reference.is_empty() || has_schedule(reference) => {},
+            Some(RawValue::String(reference)) if reference.is_empty() || has_source_schedule_reference(raw, reference) => {},
             _ => return Some("SourceB DSOA schedule requires an actual supported schedule reference; the getter retains its 0..1 contract".into()),
         }
     }
@@ -426,6 +413,20 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     None
 }
 
+fn has_source_schedule_reference(raw: &RawModel, reference: &str) -> bool {
+    ["Constant-0.0", "Constant-1.0"]
+        .iter()
+        .any(|name| name.eq_ignore_ascii_case(reference))
+        || raw
+            .objects
+            .get(&ObjectType("Schedule:Constant".into()))
+            .is_some_and(|rows| {
+                rows.keys()
+                    .any(|name| name.0.eq_ignore_ascii_case(reference))
+            })
+        || source_b::has_source_detailed_reference(raw, reference)
+}
+
 /// Local authored-object prerequisites only. The existing full positive-OA
 /// validator calls this leaf after proving both real references; no reverse edge.
 fn source_b_authored_outdoor_air_node_prerequisite_error(
@@ -437,7 +438,7 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
         return None;
     }
     let error = || {
-        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, and absent local alpha fields".into())
+        Some("SourceB authored OutdoorAir:Node requires one matching bare OA name, omitted or finite Native height, owned wind schedule references, and absent DB/WB/WPC alpha fields".into())
     };
     if objects.len() != 1 {
         return error();
@@ -447,8 +448,6 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
         || [
             "drybulb_temperature_schedule_name",
             "wetbulb_temperature_schedule_name",
-            "wind_speed_schedule_name",
-            "wind_direction_schedule_name",
             "wind_pressure_coefficient_curve_name",
             "symmetric_wind_pressure_coefficient_curve",
             "wind_angle_type",
@@ -462,6 +461,14 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(
         })
     {
         return error();
+    }
+    for name in ["wind_speed_schedule_name", "wind_direction_schedule_name"] {
+        match field(object, name) {
+            None => {}
+            Some(RawValue::String(reference))
+                if reference.is_empty() || has_source_schedule_reference(raw, reference) => {}
+            _ => return error(),
+        }
     }
     None
 }

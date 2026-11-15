@@ -172,6 +172,71 @@ impl OrdinaryEquipment {
         Ok(())
     }
 
+    pub(crate) fn set_source_authored_outdoor_air_wind_speed_schedule(
+        &mut self,
+        node_number: usize,
+        schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    ) -> Result<(), Error> {
+        let index = node_number
+            .checked_sub(1)
+            .ok_or(Error::Unavailable("actual OA wind-speed Node ordinal"))?;
+        self.nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
+            .ok_or(Error::Unavailable("actual OA wind-speed physical Node"))?
+            .outdoor_air_wind_speed_schedule = schedule;
+        Ok(())
+    }
+
+    pub(crate) fn set_source_authored_outdoor_air_wind_direction_schedule(
+        &mut self,
+        node_number: usize,
+        schedule: Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+    ) -> Result<(), Error> {
+        let index = node_number
+            .checked_sub(1)
+            .ok_or(Error::Unavailable("actual OA wind-direction Node ordinal"))?;
+        self.nodes
+            .physical
+            .as_mut()
+            .and_then(|rows| rows.get_mut(index))
+            .ok_or(Error::Unavailable("actual OA wind-direction physical Node"))?
+            .outdoor_air_wind_direction_schedule = schedule;
+        Ok(())
+    }
+
+    /// Read the actual pointers for cross-module owner tests without exposing the arena.
+    #[cfg(test)]
+    pub(crate) fn source_outdoor_air_wind_schedule_pointers(
+        &self,
+        node_number: i32,
+    ) -> Result<
+        (
+            Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+            Option<crate::heat_balance::selected_schedule_manager::SourceScheduleIndex>,
+        ),
+        Error,
+    > {
+        let at = node_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(Error::Unavailable(
+                "actual test outdoor-air positive Node ordinal",
+            ))?;
+        let node = self
+            .nodes
+            .physical
+            .as_deref()
+            .and_then(|rows| rows.get(at))
+            .ok_or(Error::Unavailable("actual test outdoor-air physical Node"))?;
+        Ok((
+            node.outdoor_air_wind_speed_schedule,
+            node.outdoor_air_wind_direction_schedule,
+        ))
+    }
+
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn set_source_outdoor_air_node_values(
         &mut self,
         node_number: i32,
@@ -180,6 +245,7 @@ impl OrdinaryEquipment {
         control: &SelectedHeatBalanceInputState,
         backend: &mut SourceErrorBackend<'_>,
         flags: Option<SourceDiagnosticFlags<'_>>,
+        schedules: &crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
     ) -> Result<(), Error> {
         let ordinal = node_number
             .checked_sub(1)
@@ -235,13 +301,12 @@ impl OrdinaryEquipment {
             if node.outdoor_air_wet_bulb_schedule.is_some() {
                 return Err(Error::Unavailable("actual local OA wet-bulb schedule562"));
             }
-            if node.outdoor_air_wind_speed_schedule.is_some() {
-                return Err(Error::Unavailable("actual local OA wind-speed schedule565"));
+            if let Some(schedule) = node.outdoor_air_wind_speed_schedule {
+                node.outdoor_air_wind_speed = schedules.source_current_schedule_value(schedule)?;
             }
-            if node.outdoor_air_wind_direction_schedule.is_some() {
-                return Err(Error::Unavailable(
-                    "actual local OA wind-direction schedule568",
-                ));
+            if let Some(schedule) = node.outdoor_air_wind_direction_schedule {
+                node.outdoor_air_wind_direction =
+                    schedules.source_current_schedule_value(schedule)?;
             }
             if node.ems_override_outdoor_air_dry_bulb {
                 return Err(Error::Unavailable("actual local OA EMS dry-bulb574"));

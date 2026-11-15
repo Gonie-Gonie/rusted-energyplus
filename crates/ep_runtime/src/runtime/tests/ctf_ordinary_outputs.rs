@@ -455,6 +455,8 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             },
         ];
         for (name, a, n, ae, ne, extension) in [
+            ("OutdoorAir:Node", 8, 1, 0, 0, None),
+            ("OutdoorAir:NodeList", 0, 0, 1, 0, Some("nodes")),
             ("NodeList", 1, 0, 1, 0, Some("nodes")),
             ("ZoneHVAC:EquipmentList", 2, 0, 4, 2, Some("equipment")),
             ("ZoneHVAC:EquipmentConnections", 8, 0, 0, 0, None),
@@ -475,8 +477,26 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         }
         let mut input = SelectedInputProcessor::from_admitted_input(
             definitions,
-            std::collections::BTreeMap::new(),
+            std::collections::BTreeMap::from([("OutdoorAir:Node".into(),
+                crate::heat_balance::selected_input_processor::SourceInputFamily::Objects(vec![
+                    crate::heat_balance::selected_input_processor::SourceObjectShape {
+                        object_name: "CTF wind inlet".into(),
+                        field_sizes: std::collections::BTreeMap::from([
+                            ("wind_speed_schedule_name".into(), 1), ("wind_direction_schedule_name".into(), 1),
+                        ]),
+                    },
+                ]),
+            )]),
         )?;
+        input.retain_source_input_statistics(crate::heat_balance::selected_input_processor::SourceInputStatisticsInput {
+            objects: std::collections::BTreeMap::from([("OutdoorAir:Node".into(), std::collections::BTreeMap::from([
+                ("CTF wind inlet".into(), std::collections::BTreeMap::from([
+                    ("wind_speed_schedule_name".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String(String::new())),
+                    ("wind_direction_schedule_name".into(), crate::heat_balance::selected_input_processor::SourceInputStatisticsValue::String(String::new())),
+                ])),
+            ]))]),
+            object_order: std::collections::BTreeMap::from([("OutdoorAir:Node".into(), vec!["CTF wind inlet".into()])]),
+        })?;
         let mut shortcut = SourceInputProcessorShortCut::default();
         let mut control = SelectedHeatBalanceInputState {
             any_ctf: true,
@@ -484,13 +504,43 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             construction_usage: vec![Default::default()],
             ..Default::default()
         };
-        let globals =
+        let mut globals =
             crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals {
                 num_spaces: 1,
                 num_of_zones: 1,
                 ..Default::default()
             };
         let environment = crate::weather::day::WeatherEnvironmentState::default();
+        // One necessary interface extension of this same six-surface context.
+        // The pre-final geometry has no final allocation; false-global guards
+        // must return before any row read, without seeding local flags.
+        crate::heat_balance::ordinary_surface_initialization::initialize_source_surface_property_view_factors(&raw, &globals, true)?;
+        crate::heat_balance::ordinary_surface_initialization::apply_source_linked_outdoor_nodes(&raw, &globals)?;
+        crate::heat_balance::ordinary_surface_initialization::get_source_ground_surface_reflectance_average(&globals, &raw)?;
+        let wind_steps = usize::try_from(model.typed.timestep.number_of_timesteps_per_hour)?;
+        let wind_clock = crate::heat_balance::ordinary_equipment::OrdinaryEquipmentInput::from_source_family_inventory(
+            [("NodeList", input.get_num_objects_found("NodeList"))], wind_steps,
+        )?;
+        let wind_zone_ids = model.typed.zones.iter().map(|row| row.id).collect::<Vec<_>>();
+        let wind_space_ids = model.typed.spaces.iter().map(|row| row.id).collect::<Vec<_>>();
+        let mut wind_nodes = crate::heat_balance::ordinary_equipment::OrdinaryEquipment::new_for_source_ordered(
+            &model.typed, wind_clock, &wind_zone_ids, &wind_space_ids,
+        )?;
+        let mut wind_schedules = crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+        wind_schedules.init_constant_state(wind_steps)?;
+        let mut wind_registry = crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes::default();
+        let mut wind_branch = crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
+        assert!(!globals.any_local_environments_in_model);
+        wind_registry.set_source_outdoor_air_nodes(
+            &mut input, &mut wind_nodes, &environment, &control, &mut wind_branch, true,
+            &mut context.backend, None, &mut wind_schedules, &mut globals.any_local_environments_in_model,
+        )?;
+        assert!(globals.any_local_environments_in_model);
+        let wind_node_number = *wind_registry.outside_air_node_list.as_ref()
+            .and_then(|rows| rows.first()).ok_or("same exact-empty wind OA registry")?;
+        assert_eq!(wind_nodes.source_outdoor_air_wind_schedule_pointers(wind_node_number)?, (None, None));
+        // Authored helper guard operand, not an observed phase-latch transition.
+        crate::heat_balance::ordinary_surface_initialization::initialize_source_surface_property_view_factors(&raw, &globals, false)?;
         let mut owners = SurfaceGetterOwners {
             model: &model.typed,
             input: &mut input,
@@ -613,6 +663,14 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         assert!(cen_surface_input_checkpoint.surface_tmp.is_some());
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None, None)?;
         raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
+        let wind_surfaces = raw.final_surfaces.as_ref().ok_or("same mapped wind Surface owner")?;
+        assert_eq!(wind_surfaces.len(), 6);
+        assert!(wind_surfaces.iter().all(|row| row.linked_outdoor_air_node == 0
+            && !row.has_surrounding_surface_property && !row.is_ground_surface_property_defined));
+        crate::heat_balance::ordinary_surface_initialization::initialize_source_surface_property_view_factors(&raw, owners.globals, true)?;
+        crate::heat_balance::ordinary_surface_initialization::apply_source_linked_outdoor_nodes(&raw, owners.globals)?;
+        crate::heat_balance::ordinary_surface_initialization::get_source_ground_surface_reflectance_average(owners.globals, &raw)?;
+
         // Authored child diagnostic inputs, not a completed Native material or
         // geometry certificate. Real IRT property/getter owners are tested in
         // selected_material_data; these rows isolate warning prefix custody.

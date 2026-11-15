@@ -83,6 +83,15 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
         let o = &mut self.owners;
         let mut providers = SourceOrdinaryInitHeatBalanceHost {
             model: self.model,
+            outdoor_air: Some(
+                super::provider_host::SourceInitHeatBalanceOutdoorAirOwners {
+                    equipment: o.equipment,
+                    schedules: o.schedules,
+                    outdoor_air_nodes: &mut self.hvac.ancillary.outdoor_air_nodes,
+                    branch: &mut self.hvac.ancillary.branch_node_connections,
+                    source_is_epjson: o.source_is_epjson,
+                },
+            ),
             ctf: o.ctf,
             registry: o.predefined_registry,
             table: o.predefined_table,

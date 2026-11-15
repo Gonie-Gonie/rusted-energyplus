@@ -298,6 +298,7 @@ impl WarmupFactory {
             results_framework_output_variables: &mut self.rf,
         };
         let mut providers = SourceOrdinaryInitHeatBalanceHost {
+            outdoor_air: None,
             model: &self.model,
             ctf: &mut self.session.ctf,
             registry: &self.reports.registry,
@@ -328,7 +329,7 @@ impl WarmupFactory {
                     gain_modules: &mut self.session.gain_modules,
                     daylighting: &mut self.session.daylighting,
                     window: &mut self.session.window,
-                    globals: &self.globals,
+                    globals: &mut self.globals,
                     clock: &self.weather.global,
                     environment: &mut self.weather.environment,
                     weather_owner: &self.weather.weather,

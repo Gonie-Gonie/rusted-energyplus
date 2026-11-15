@@ -17,10 +17,23 @@ use crate::heat_balance::source_output_registration::{
 use ep_model::TypedModel;
 use std::{io::Write, path::Path};
 
+/// Only the additional live loans needed by Native InitHeatBalance2754.
+/// Allocation-only hosts do not carry these; no Native state/readiness is stored.
+pub(crate) struct SourceInitHeatBalanceOutdoorAirOwners<'a> {
+    pub(crate) equipment: &'a mut crate::heat_balance::ordinary_equipment::OrdinaryEquipment,
+    pub(crate) schedules:
+        &'a mut crate::heat_balance::selected_schedule_manager::SelectedScheduleManager,
+    pub(crate) outdoor_air_nodes:
+        &'a mut crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes,
+    pub(crate) branch: &'a mut crate::heat_balance::startup_integrity::SourceBranchNodeConnections,
+    pub(crate) source_is_epjson: &'a bool,
+}
+
 /// Persistent numerical state stays in its original owner. These references
 /// exist only for the enclosing genuine InitHeatBalance call.
 pub(crate) struct SourceOrdinaryInitHeatBalanceHost<'a, H, D> {
     pub(crate) model: &'a TypedModel,
+    pub(crate) outdoor_air: Option<SourceInitHeatBalanceOutdoorAirOwners<'a>>,
     pub(crate) ctf: &'a mut SourceCtfInitialization,
     pub(crate) registry: &'a PredefinedRegistry,
     pub(crate) table: &'a mut PredefinedStringTable,
@@ -167,10 +180,14 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitHeatBalan
             &diagnostic_flags,
         )
     }
-    unavailable_child!(
-        initialize_positive_surface_property_view_factors,
-        "InitHeatBalance2625 positive surface-property view factors"
-    );
+    fn initialize_positive_surface_property_view_factors(
+        &mut self,
+        owners: &mut SourceInitHeatBalanceOwners<'_, '_>,
+    ) -> Result<(), Error> {
+        crate::heat_balance::ordinary_surface_initialization::initialize_source_surface_property_view_factors(
+            owners.geometry, owners.globals, owners.surface.first_time,
+        )
+    }
     unavailable_child!(
         initialize_positive_equivalent_layer_windows,
         "InitHeatBalance2629 positive equivalent-layer windows"
@@ -218,10 +235,36 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitHeatBalan
         report_external_sunlit_fractions,
         "InitHeatBalance2715 external-sunlit fraction reporting"
     );
-    unavailable_child!(
-        apply_zone_local_environments,
-        "InitHeatBalance2744 positive linked Zone outdoor node"
-    );
+    fn apply_zone_local_environments(
+        &mut self,
+        owners: &mut SourceInitHeatBalanceOwners<'_, '_>,
+    ) -> Result<(), Error> {
+        let outdoor = self.outdoor_air.as_mut().ok_or(Error::Unavailable(
+            "actual InitHeatBalance2754 outdoor-air interface loans",
+        ))?;
+        let flags = Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+            kickoff: &owners.globals.kickoff_simulation,
+            developer: &owners.project.system.developer_flag,
+            warmup: &owners.clock.warmup_flag,
+            doing_sizing: &owners.globals.doing_sizing,
+        });
+        outdoor
+            .outdoor_air_nodes
+            .apply_source_zone_outdoor_environment(
+                owners.input,
+                outdoor.equipment,
+                owners.environment,
+                owners.control,
+                outdoor.branch,
+                *outdoor.source_is_epjson,
+                owners.backend,
+                flags,
+                outdoor.schedules,
+                &mut owners.globals.any_local_environments_in_model,
+                owners.zones,
+                owners.globals.num_of_zones,
+            )
+    }
     unavailable_child!(
         apply_zone_ems_overrides,
         "InitHeatBalance2774 positive Zone EMS overrides"

@@ -9,7 +9,6 @@ use super::{OrdinaryEquipment, source_nodes::SourceNodeFluidType};
 use crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains;
 use crate::heat_balance::error_backend::SourceErrorBackend;
 use crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes;
-use crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
 use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
 use crate::heat_balance::selected_heat_balance_input::{
     SelectedHeatBalanceInputState, zone::SelectedZoneInputOwners,
@@ -164,6 +163,51 @@ impl OrdinaryEquipment {
                 "actual PurchasedAir same passed EquipIndex cell",
             ))
     }
+    /// Native SimPurchasedAir168 GetInput prefix, before immutable Init/Calc loans.
+    /// Every actual caller invokes this at the original cold-call position.
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn prepare_source_purchased_air_input<
+        H: SourceOutputFileHost,
+        D: SourceOutputDictionaryHost,
+    >(
+        &mut self,
+        shortcut: &mut SourceInputProcessorShortCut,
+        source_is_epjson: bool,
+        schedules: &mut SelectedScheduleManager,
+        number_zones: i32,
+        branch: &mut SourceBranchNodeConnections,
+        any_ems: bool,
+        sizing: &SelectedSizingManager,
+        outdoor_air_nodes: &mut SourceOutdoorAirNodes,
+        environment: &WeatherEnvironmentState,
+        control: &SelectedHeatBalanceInputState,
+        display_extra_warnings: &bool,
+        any_local: &mut bool,
+        backend: &mut SourceErrorBackend<'_>,
+        output: &mut SourcePurchasedAirReportingOutputContext<'_, H, D>,
+    ) -> Result<(), Error> {
+        if self.purchased_air.get_purchased_air_input {
+            self.get_source_purchased_air(
+                shortcut,
+                source_is_epjson,
+                schedules,
+                number_zones,
+                branch,
+                any_ems,
+                sizing,
+                outdoor_air_nodes,
+                environment,
+                control,
+                display_extra_warnings,
+                any_local,
+                backend,
+                output,
+            )?;
+            self.purchased_air.get_purchased_air_input = false;
+        }
+        Ok(())
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn simulate_source_purchased_air<
         H: SourceOutputFileHost,
@@ -174,15 +218,9 @@ impl OrdinaryEquipment {
         current_equipment_zone: i32,
         equipment_pointer: i32,
         controlled_zone: i32,
-        shortcut: &mut SourceInputProcessorShortCut,
-        source_is_epjson: bool,
         schedules: &mut SelectedScheduleManager,
-        number_zones: i32,
-        branch: &mut SourceBranchNodeConnections,
-        outdoor_air_nodes: &mut SourceOutdoorAirNodes,
         zones: &SelectedZoneInputOwners,
         gains: &SelectedInternalHeatGains,
-        any_ems: bool,
         output: &mut SourcePurchasedAirReportingOutputContext<'_, H, D>,
         initialization: &mut SourcePurchasedAirInitOwners<'_>,
         calculation: &mut SourcePurchasedAirCalcOwners<'_, '_>,
@@ -192,22 +230,9 @@ impl OrdinaryEquipment {
         moisture_output: &mut f64,
     ) -> Result<(), Error> {
         if self.purchased_air.get_purchased_air_input {
-            self.get_source_purchased_air(
-                shortcut,
-                source_is_epjson,
-                schedules,
-                number_zones,
-                branch,
-                any_ems,
-                &*initialization.sizing,
-                outdoor_air_nodes,
-                &*calculation.environment,
-                calculation.control,
-                calculation.globals,
-                calculation.backend,
-                output,
-            )?;
-            self.purchased_air.get_purchased_air_input = false;
+            return Err(Error::Unavailable(
+                "actual PurchasedAir GetInput prefix before shared Init/Calc borrows",
+            ));
         }
         // Native passes the actual equipment-list cell by reference. This
         // ordinal transport reborrows that same cell at each read/write, so
@@ -327,7 +352,8 @@ impl OrdinaryEquipment {
         outdoor_air_nodes: &mut SourceOutdoorAirNodes,
         environment: &WeatherEnvironmentState,
         control: &SelectedHeatBalanceInputState,
-        globals: &SelectedHeatBalanceGlobals,
+        display_extra_warnings: &bool,
+        any_local: &mut bool,
         backend: &mut SourceErrorBackend<'_>,
         output: &mut SourcePurchasedAirReportingOutputContext<'_, H, D>,
     ) -> Result<(), Error> {
@@ -696,8 +722,10 @@ impl OrdinaryEquipment {
                         backend,
                         output.environment.diagnostic_flags,
                         source_is_epjson,
+                        schedules,
+                        any_local,
                     )?;
-                    if !listed && globals.display_extra_warnings {
+                    if !listed && *display_extra_warnings {
                         return Err(Error::Unavailable(
                             "actual PurchasedAir implicit OA-node warning437",
                         ));

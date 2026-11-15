@@ -222,13 +222,27 @@ pub(crate) fn update_source_variable_absorptances(
 /// HBSM10037-10046 retains the actual early return before any surface read.
 pub(crate) fn get_source_ground_surface_reflectance_average(
     globals: &SelectedHeatBalanceGlobals,
+    geometry: &SurfaceGeometryInputState,
 ) -> Result<(), Error> {
     if !globals.any_local_environments_in_model {
         return Ok(());
     }
-    Err(Error::Unavailable(
-        "positive actual ground/local-environment reflectance owner",
-    ))
+    for number in 1..=geometry.total_surfaces {
+        let row = geometry
+            .final_surfaces
+            .as_ref()
+            .and_then(|rows| usize::try_from(number - 1).ok().and_then(|at| rows.get(at)))
+            .ok_or(Error::Unavailable(
+                "actual ground reflectance Surface ordinal",
+            ))?;
+        if !row.is_ground_surface_property_defined {
+            continue;
+        }
+        return Err(Error::Unavailable(
+            "positive actual ground/local-environment reflectance owner",
+        ));
+    }
+    Ok(())
 }
 
 /// SolarShading13071-13111. WindowModel::BSDF is the pinned enum value1;
@@ -289,6 +303,55 @@ pub(crate) fn window_source_shading_manager(
                     "positive WindowShadingManager first shade-status write",
                 ));
             }
+        }
+    }
+    Ok(())
+}
+
+/// Native InitSurfacePropertyViewFactors9893-9913; real constructor flags select the empty child.
+pub(crate) fn initialize_source_surface_property_view_factors(
+    geometry: &SurfaceGeometryInputState,
+    globals: &SelectedHeatBalanceGlobals,
+    first_time: bool,
+) -> Result<(), Error> {
+    if !globals.any_local_environments_in_model || !first_time {
+        return Ok(());
+    }
+    for number in 1..=geometry.total_surfaces {
+        let row = geometry
+            .final_surfaces
+            .as_ref()
+            .and_then(|rows| usize::try_from(number - 1).ok().and_then(|at| rows.get(at)))
+            .ok_or(Error::Unavailable(
+                "actual property-view-factor Surface ordinal",
+            ))?;
+        if row.has_surrounding_surface_property || row.is_ground_surface_property_defined {
+            return Err(Error::Unavailable(
+                "InitSurfacePropertyViewFactors9912 actual positive property child",
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// Native InitSurfaceHeatBalance316-324; positive linked values remain a separate owner.
+pub(crate) fn apply_source_linked_outdoor_nodes(
+    geometry: &SurfaceGeometryInputState,
+    globals: &SelectedHeatBalanceGlobals,
+) -> Result<(), Error> {
+    if !globals.any_local_environments_in_model {
+        return Ok(());
+    }
+    for number in 1..=geometry.total_surfaces {
+        let row = geometry
+            .final_surfaces
+            .as_ref()
+            .and_then(|rows| usize::try_from(number - 1).ok().and_then(|at| rows.get(at)))
+            .ok_or(Error::Unavailable("actual linked-outdoor Surface ordinal"))?;
+        if row.linked_outdoor_air_node > 0 {
+            return Err(Error::Unavailable(
+                "actual positive linked outdoor-air Surface/Node branch317-324",
+            ));
         }
     }
     Ok(())

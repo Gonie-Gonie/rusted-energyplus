@@ -28,9 +28,20 @@ impl SourceOutdoorAirNodes {
         source_is_epjson: bool,
         backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
         flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
+        schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
+        any_local: &mut bool,
     ) -> Result<(), Error> {
         if self.get_input_flag {
-            self.get_source_input(input, equipment, branch, source_is_epjson, backend, flags)?;
+            self.get_source_input(
+                input,
+                equipment,
+                branch,
+                source_is_epjson,
+                backend,
+                flags,
+                schedules,
+                any_local,
+            )?;
             self.get_input_flag = false;
         }
         for ordinal in 1..=self.number_outside_air_nodes {
@@ -48,6 +59,7 @@ impl SourceOutdoorAirNodes {
                 control,
                 backend,
                 flags,
+                schedules,
             )?;
         }
         Ok(())
@@ -71,9 +83,20 @@ impl SourceOutdoorAirNodes {
         backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
         flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
         source_is_epjson: bool,
+        schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
+        any_local: &mut bool,
     ) -> Result<(), Error> {
         if self.get_input_flag {
-            self.get_source_input(input, equipment, branch, source_is_epjson, backend, flags)?;
+            self.get_source_input(
+                input,
+                equipment,
+                branch,
+                source_is_epjson,
+                backend,
+                flags,
+                schedules,
+                any_local,
+            )?;
             self.get_input_flag = false;
             self.set_source_outdoor_air_nodes(
                 input,
@@ -84,6 +107,8 @@ impl SourceOutdoorAirNodes {
                 source_is_epjson,
                 backend,
                 flags,
+                schedules,
+                any_local,
             )?;
         }
         *okay = false;
@@ -130,10 +155,55 @@ impl SourceOutdoorAirNodes {
                 control,
                 backend,
                 flags,
+                schedules,
             )?;
         }
         Ok(())
     }
+    /// Same Native InitHeatBalance2754 operation: SetOut precedes even an empty-link traversal.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn apply_source_zone_outdoor_environment(
+        &mut self,
+        input: &mut SelectedInputProcessor,
+        equipment: &mut super::super::ordinary_equipment::OrdinaryEquipment,
+        environment: &crate::weather::day::WeatherEnvironmentState,
+        control: &super::super::selected_heat_balance_input::SelectedHeatBalanceInputState,
+        branch: &mut super::super::startup_integrity::SourceBranchNodeConnections,
+        source_is_epjson: bool,
+        backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
+        flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
+        schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
+        any_local: &mut bool,
+        zones: &super::super::selected_heat_balance_input::zone::SelectedZoneInputOwners,
+        number_zones: i32,
+    ) -> Result<(), Error> {
+        self.set_source_outdoor_air_nodes(
+            input,
+            equipment,
+            environment,
+            control,
+            branch,
+            source_is_epjson,
+            backend,
+            flags,
+            schedules,
+            any_local,
+        )?;
+        for number in 1..=number_zones {
+            let row = zones
+                .zones
+                .as_ref()
+                .and_then(|rows| usize::try_from(number - 1).ok().and_then(|at| rows.get(at)))
+                .ok_or(Error::Unavailable("actual linked-Zone traversal ordinal"))?;
+            if row.linked_outdoor_air_node > 0 {
+                return Err(Error::Unavailable(
+                    "InitHeatBalance2756 actual positive linked Zone outdoor node",
+                ));
+            }
+        }
+        Ok(())
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn get_source_input(
         &mut self,
@@ -143,6 +213,8 @@ impl SourceOutdoorAirNodes {
         source_is_epjson: bool,
         backend: &mut super::super::error_backend::SourceErrorBackend<'_>,
         flags: Option<super::super::error_backend::SourceDiagnosticFlags<'_>>,
+        schedules: &mut super::super::selected_schedule_manager::SelectedScheduleManager,
+        any_local: &mut bool,
     ) -> Result<(), Error> {
         use crate::heat_balance::selected_input_processor::SourceInputStatisticsValue as Value;
         const FAMILY: &str = "OutdoorAir:Node";
@@ -316,12 +388,47 @@ impl SourceOutdoorAirNodes {
                 equipment.set_source_authored_outdoor_air_node_height(node_number, numbers[0])?;
             }
             if num_alphas > 1 {
+                *any_local = true;
+            }
+            if num_alphas > 1 && !alpha_blanks[1] {
                 return Err(Error::Unavailable(
-                    "actual outdoor-air AnyLocalEnvironmentsInModel write316",
+                    "actual outdoor-air dry-bulb schedule lookup320",
                 ));
             }
-            // The admitted single has NumAlphas1: all schedule, WPC and local
-            // alpha children are absent, and its physical IsLocalNode stays false.
+            if num_alphas > 2 && !alpha_blanks[2] {
+                return Err(Error::Unavailable(
+                    "actual outdoor-air wet-bulb schedule lookup326",
+                ));
+            }
+            if num_alphas > 3 && !alpha_blanks[3] {
+                let schedule = schedules.get_source_schedule(&alphas[3])?;
+                equipment
+                    .set_source_authored_outdoor_air_wind_speed_schedule(node_number, schedule)?;
+                if schedule.is_none() {
+                    return Err(Error::Unavailable(
+                        "actual outdoor-air wind-speed schedule missing-item diagnostic332",
+                    ));
+                }
+            }
+            if num_alphas > 4 && !alpha_blanks[4] {
+                let schedule = schedules.get_source_schedule(&alphas[4])?;
+                equipment.set_source_authored_outdoor_air_wind_direction_schedule(
+                    node_number,
+                    schedule,
+                )?;
+                if schedule.is_none() {
+                    return Err(Error::Unavailable(
+                        "actual outdoor-air wind-direction schedule missing-item diagnostic338",
+                    ));
+                }
+            }
+            if num_alphas > 8 {
+                return Err(Error::Unavailable(
+                    "actual outdoor-air excess alpha diagnostic344",
+                ));
+            }
+            // Both actual DB/WB pointers remain null on this admitted route.
+            // Native's conditional IsLocalNode write is therefore not reached.
         }
         if list_size > 0 {
             self.number_outside_air_nodes = list_size;

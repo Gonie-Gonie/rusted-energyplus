@@ -248,6 +248,49 @@ fn simulate(source: &mut Factory, name: &str) -> std::result::Result<(), Error> 
         &mut source.error,
         &mut source.console,
     );
+    // Same cold GetInput position, before the shared Init/Calc phase loans.
+    {
+        let mut input_dictionary = SourceOutputDictionaryStreams {
+            eso: Some(&mut source.eso),
+            sqlite_present: false,
+            results_framework_output_variables: &mut source.rf,
+        };
+        let mut input_output = SourcePurchasedAirReportingOutputContext {
+            registration: &mut source.registration,
+            input: &mut source.input,
+            prescan: &source.prescan,
+            reports: &source.report,
+            environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(
+                &source.project.system.minimum_report_frequency,
+                Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                    kickoff: &source.globals.kickoff_simulation,
+                    developer: &source.project.system.developer_flag,
+                    warmup: &source.weather.global.warmup_flag,
+                    doing_sizing: &source.globals.doing_sizing,
+                }),
+            ),
+            minutes_in_time_step: source.weather.global.minutes_in_time_step,
+            host: &mut source.files,
+            dictionary_host: &mut input_dictionary,
+            eio: &mut source.eio,
+        };
+        source.equipment.prepare_source_purchased_air_input(
+            &mut source.shortcut,
+            false,
+            &mut source.schedules,
+            source.globals.num_of_zones,
+            &mut source.hvac_manager.ancillary.branch_node_connections,
+            source.globals.any_energy_management_system_in_model,
+            &source.sizing,
+            &mut source.hvac_manager.ancillary.outdoor_air_nodes,
+            &source.weather.environment,
+            &source.control,
+            &source.globals.display_extra_warnings,
+            &mut source.globals.any_local_environments_in_model,
+            &mut backend,
+            &mut input_output,
+        )?;
+    }
     let mut initialization = SourcePurchasedAirInitOwners {
         sizing: &mut source.sizing,
         fan: &source.fan,
@@ -293,15 +336,9 @@ fn simulate(source: &mut Factory, name: &str) -> std::result::Result<(), Error> 
         source.list,
         source.pointer,
         source.zone,
-        &mut source.shortcut,
-        false,
         &mut source.schedules,
-        source.globals.num_of_zones,
-        &mut source.hvac_manager.ancillary.branch_node_connections,
-        &mut source.hvac_manager.ancillary.outdoor_air_nodes,
         &source.zones,
         &source.ancillary.selected_internal_heat_gains,
-        source.globals.any_energy_management_system_in_model,
         &mut output,
         &mut initialization,
         &mut calculation,

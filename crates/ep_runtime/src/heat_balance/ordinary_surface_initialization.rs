@@ -520,3 +520,8 @@ impl SourceSurfaceHeatBalanceArrays {
         Ok(())
     }
 }
+
+pub(crate) use prefix::{
+    apply_source_linked_outdoor_nodes, get_source_ground_surface_reflectance_average,
+    initialize_source_surface_property_view_factors,
+};

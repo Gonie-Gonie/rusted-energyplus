@@ -315,11 +315,19 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
         SourceOutputFileHost, SourceOutputRegistration,
     };
     use std::collections::BTreeMap;
-    struct MemoryMtd(Option<Vec<u8>>);
+    struct MemoryMtd(Option<Vec<u8>>, Vec<u8>);
     impl SourceOutputFileHost for MemoryMtd {
         fn ensure_mtd_open(&mut self) -> std::io::Result<()> {
             self.0.get_or_insert_with(Vec::new);
             Ok(())
+        }
+    }
+    impl crate::heat_balance::source_initialization::ScheduleAuditFileHost for MemoryMtd {
+        fn audit_path(&self) -> &std::path::Path {
+            std::path::Path::new("authored-equipment.audit")
+        }
+        fn ensure_audit_open(&mut self) -> std::io::Result<&mut dyn std::io::Write> {
+            Ok(&mut self.1)
         }
     }
     for total in [1_usize, 2, 3] {
@@ -434,12 +442,12 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
         let mut output = SourceOutputRegistration::default();
         let prescan = SourceOutputPreScan::default();
         let report_input = ep_model::ReportInputs::default();
-        let clock = crate::weather::day::WeatherGlobalState {
+        let mut clock = crate::weather::day::WeatherGlobalState {
             minutes_in_time_step: i32::try_from(60 / timesteps)?,
             ..Default::default()
         };
         let developer = false;
-        let mut files = MemoryMtd(None);
+        let mut files = MemoryMtd(None, Vec::new());
         let (mut error, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
         let mut error_state = SourceErrorState {
             output_error_header: true,
@@ -843,7 +851,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                 crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
             let mut probe_outdoor_air_nodes =
                 crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes::default();
-            let probe_environment = crate::weather::day::WeatherEnvironmentState::default();
+            let mut probe_environment = crate::weather::day::WeatherEnvironmentState::default();
             let mut probe_registration = SourceOutputRegistration::default();
             let mut probe_prescan = SourceOutputPreScan::default();
             let probe_reports = ep_model::ReportInputs {
@@ -920,18 +928,22 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut probe_outdoor_air_nodes,
                     &probe_environment,
                     &control,
-                    &globals,
+                    &globals.display_extra_warnings,
+                    &mut globals.any_local_environments_in_model,
                     &mut backend,
                     &mut SourcePurchasedAirReportingOutputContext {
                         registration: &mut probe_registration,
                         input: &mut probe_ip,
                         prescan: &probe_prescan,
                         reports: &probe_reports,
-                        environment: SourceReportVariableEnvironment::from_owners(
+                        environment: SourceReportVariableEnvironment::new(
                             "",
-                            &globals,
-                            &developer,
-                            Some(&clock),
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &developer,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            }),
                         ),
                         minutes_in_time_step: clock.minutes_in_time_step,
                         host: &mut files,
@@ -1217,8 +1229,101 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             fields.insert(field.into(), V::String(String::new()));
                         }
                     }
+                    let wind_name = "OA wind detail";
+                    let wind_type = "OA wind units";
+                    oa_objects.insert(
+                        "ScheduleTypeLimits".into(),
+                        BTreeMap::from([(
+                            wind_type.into(),
+                            BTreeMap::from([("unit_type".into(), V::String("Velocity".into()))]),
+                        )]),
+                    );
+                    oa_objects.insert(
+                        "Schedule:Compact".into(),
+                        BTreeMap::from([(
+                            wind_name.into(),
+                            BTreeMap::from([
+                                (
+                                    "schedule_type_limits_name".into(),
+                                    V::String(wind_type.into()),
+                                ),
+                                (
+                                    "data".into(),
+                                    V::Array(
+                                        [
+                                            "Through: 12/31",
+                                            "For: AllDays",
+                                            "Until: 12:00",
+                                            "3.0",
+                                            "Until: 24:00",
+                                            "7.0",
+                                        ]
+                                        .into_iter()
+                                        .map(|value| {
+                                            V::Object(BTreeMap::from([(
+                                                "field".into(),
+                                                V::String(value.into()),
+                                            )]))
+                                        })
+                                        .collect(),
+                                    ),
+                                ),
+                            ]),
+                        )]),
+                    );
+                    let outdoor_fields = oa_objects
+                        .get_mut("OutdoorAir:Node")
+                        .and_then(|rows| rows.get_mut(oa_name))
+                        .ok_or("same authored wind Node fields")?;
+                    outdoor_fields.insert(
+                        "wind_speed_schedule_name".into(),
+                        V::String(if explicit_empty { "" } else { wind_name }.into()),
+                    );
+                    outdoor_fields.insert(
+                        "wind_direction_schedule_name".into(),
+                        V::String(
+                            if explicit_empty {
+                                wind_name
+                            } else {
+                                "Constant-1.0"
+                            }
+                            .into(),
+                        ),
+                    );
                     let mut oa_definitions = definitions.clone();
                     oa_definitions.extend([
+                        SourceObjectDefinition {
+                            object_type: "ScheduleTypeLimits".into(),
+                            alpha_fields: 3,
+                            numeric_fields: 2,
+                            alpha_extensions: 0,
+                            numeric_extensions: 0,
+                            extension: None,
+                        },
+                        SourceObjectDefinition {
+                            object_type: "Schedule:Compact".into(),
+                            alpha_fields: 2,
+                            numeric_fields: 0,
+                            alpha_extensions: 1,
+                            numeric_extensions: 0,
+                            extension: Some("data".into()),
+                        },
+                        SourceObjectDefinition {
+                            object_type: "Output:Schedules".into(),
+                            alpha_fields: 1,
+                            numeric_fields: 0,
+                            alpha_extensions: 0,
+                            numeric_extensions: 0,
+                            extension: None,
+                        },
+                        SourceObjectDefinition {
+                            object_type: "Schedule:Constant".into(),
+                            alpha_fields: 2,
+                            numeric_fields: 1,
+                            alpha_extensions: 0,
+                            numeric_extensions: 0,
+                            extension: None,
+                        },
                         SourceObjectDefinition {
                             object_type: "ZoneHVAC:IdealLoadsAirSystem".into(),
                             alpha_fields: 21,
@@ -1301,7 +1406,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     let (mut oa_error, mut oa_console, mut oa_eio, mut oa_eso) =
                         (Vec::new(), Vec::new(), Vec::new(), Vec::new());
                     let mut oa_results = Vec::new();
-                    let mut oa_files = MemoryMtd(None);
+                    let mut oa_files = MemoryMtd(None, Vec::new());
                     {
                         let mut backend = SourceErrorBackend {
                             state: &mut oa_state,
@@ -1314,6 +1419,37 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             error_callback: None,
                             sqlite: None,
                         };
+                        clock.hour_of_day = 1;
+                        clock.time_step = 1;
+                        clock.time_steps_in_hour = i32::try_from(timesteps)?;
+                        probe_environment.day_of_year_schedule = 1;
+                        probe_environment.day_of_week = 2;
+                        oa_schedules.process_schedule_input_with_live_backend_and_clock(
+                            &mut oa_ip,
+                            &crate::heat_balance::selected_schedule_manager::SelectedScheduleInput {
+                                source_is_epjson: Some(true),
+                                types: vec![crate::heat_balance::selected_schedule_manager::SourceScheduleTypeInput {
+                                    object_name: wind_type.into(), name: wind_type.to_ascii_uppercase(),
+                                    lower: None, upper: None, numeric_type: None,
+                                    unit: ep_model::ScheduleUnitType::Velocity,
+                                }],
+                                constants: Vec::new(),
+                            },
+                            timesteps, &mut oa_files, &mut backend,
+                            &crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation, developer: &developer,
+                                warmup: &clock.warmup_flag, doing_sizing: &globals.doing_sizing,
+                            },
+                            &clock,
+                        )?;
+                        let wind_index = oa_schedules
+                            .schedules
+                            .iter()
+                            .find(|row| row.name == wind_name.to_ascii_uppercase())
+                            .ok_or("actual Compact wind schedule")?
+                            .number;
+                        assert!(!oa_schedules.schedules[wind_index.0].is_used);
+                        oa_schedules.update_source_schedule_values(&clock, &probe_environment)?;
                         oa_sizing.get_oa_requirements(
                             &mut oa_ip,
                             &mut oa_schedules,
@@ -1362,6 +1498,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                     warmup: &clock.warmup_flag,
                                     doing_sizing: &globals.doing_sizing,
                                 }),
+                                &mut oa_schedules,
+                                &mut globals.any_local_environments_in_model,
                             )?;
                         }
                         oa_prescan.add_record(unit_name, variable, &mut backend)?;
@@ -1381,18 +1519,24 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             &mut oa_registry,
                             &probe_environment,
                             &control,
-                            &globals,
+                            &globals.display_extra_warnings,
+                            &mut globals.any_local_environments_in_model,
                             &mut backend,
                             &mut SourcePurchasedAirReportingOutputContext {
                                 registration: &mut oa_registration,
                                 input: &mut oa_ip,
                                 prescan: &oa_prescan,
                                 reports: &probe_reports,
-                                environment: SourceReportVariableEnvironment::from_owners(
+                                environment: SourceReportVariableEnvironment::new(
                                     "",
-                                    &globals,
-                                    &developer,
-                                    Some(&clock),
+                                    Some(
+                                        crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                            kickoff: &globals.kickoff_simulation,
+                                            developer: &developer,
+                                            warmup: &clock.warmup_flag,
+                                            doing_sizing: &globals.doing_sizing,
+                                        },
+                                    ),
                                 ),
                                 minutes_in_time_step: clock.minutes_in_time_step,
                                 host: &mut oa_files,
@@ -1400,6 +1544,142 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                                 eio: &mut oa_eio,
                             },
                         )?;
+                        assert!(globals.any_local_environments_in_model);
+                        assert!(oa_schedules.schedules[wind_index.0].is_used);
+                        let crate::heat_balance::selected_schedule_manager::SelectedScheduleData::Detailed(detail) =
+                            &oa_schedules.schedules[wind_index.0].data else { return Err("real Detailed wind schedule".into()); };
+                        let week = detail.week_schedules[1].ok_or("real selected wind week")?;
+                        let day = oa_schedules.week_schedules[week].day_schedules[2]
+                            .ok_or("real selected wind day")?;
+                        assert!(
+                            oa_schedules.week_schedules[week].is_used
+                                && oa_schedules.day_schedules[day].is_used
+                        );
+                        let node_number = *oa_registry
+                            .outside_air_node_list
+                            .as_ref()
+                            .and_then(|rows| rows.first())
+                            .ok_or("same wind OA registry")?;
+                        let node_at = usize::try_from(node_number - 1)?;
+                        assert!(
+                            !oa_equipment
+                                .nodes
+                                .physical
+                                .as_ref()
+                                .ok_or("same wind physical Nodes")?[node_at]
+                                .is_local_node
+                        );
+                        assert_eq!(oa_schedules.source_current_schedule_value(wind_index)?, 3.0);
+                        oa_registry.apply_source_zone_outdoor_environment(
+                            &mut oa_ip,
+                            &mut oa_equipment,
+                            &probe_environment,
+                            &control,
+                            &mut oa_branch,
+                            true,
+                            &mut backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &developer,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            }),
+                            &mut oa_schedules,
+                            &mut globals.any_local_environments_in_model,
+                            &oa_zones,
+                            globals.num_of_zones,
+                        )?;
+                        let first_wind = &oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("first provider wind Node")?[node_at];
+                        assert_eq!(
+                            first_wind.outdoor_air_wind_speed_schedule,
+                            if explicit_empty {
+                                None
+                            } else {
+                                Some(wind_index)
+                            }
+                        );
+                        assert_eq!(
+                            (
+                                first_wind.outdoor_air_wind_speed,
+                                first_wind.outdoor_air_wind_direction
+                            ),
+                            if explicit_empty {
+                                (probe_environment.current_weather.wind_speed, 3.0)
+                            } else {
+                                (3.0, 1.0)
+                            }
+                        );
+                        clock.hour_of_day = 13;
+                        oa_schedules.update_source_schedule_values(&clock, &probe_environment)?;
+                        assert_eq!(oa_schedules.source_current_schedule_value(wind_index)?, 7.0);
+                        oa_registry.apply_source_zone_outdoor_environment(
+                            &mut oa_ip,
+                            &mut oa_equipment,
+                            &probe_environment,
+                            &control,
+                            &mut oa_branch,
+                            true,
+                            &mut backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &developer,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            }),
+                            &mut oa_schedules,
+                            &mut globals.any_local_environments_in_model,
+                            &oa_zones,
+                            globals.num_of_zones,
+                        )?;
+                        let second_wind = &oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("second provider wind Node")?[node_at];
+                        assert_eq!(
+                            (
+                                second_wind.outdoor_air_wind_speed,
+                                second_wind.outdoor_air_wind_direction
+                            ),
+                            if explicit_empty {
+                                (probe_environment.current_weather.wind_speed, 7.0)
+                            } else {
+                                (7.0, 1.0)
+                            }
+                        );
+                        oa_equipment.set_source_outdoor_air_node_values(
+                            node_number,
+                            false,
+                            &probe_environment,
+                            &control,
+                            &mut backend,
+                            Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &globals.kickoff_simulation,
+                                developer: &developer,
+                                warmup: &clock.warmup_flag,
+                                doing_sizing: &globals.doing_sizing,
+                            }),
+                            &oa_schedules,
+                        )?;
+                        let false_wind = &oa_equipment
+                            .nodes
+                            .physical
+                            .as_ref()
+                            .ok_or("false-init wind Node")?[node_at];
+                        assert_eq!(
+                            (
+                                false_wind.outdoor_air_wind_speed,
+                                false_wind.outdoor_air_wind_direction
+                            ),
+                            (
+                                probe_environment.current_weather.wind_speed,
+                                probe_environment.current_weather.wind_dir
+                            )
+                        );
                     }
                     let unit = &oa_equipment
                         .purchased_air
@@ -1825,6 +2105,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut backend,
                     flags,
                     true,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 assert!(!okay && !outdoor.get_input_flag);
                 assert_eq!(outdoor.number_outside_air_nodes, 0);
@@ -1840,6 +2122,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut backend,
                     flags,
                     true,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 assert!(!okay);
                 assert_eq!(
@@ -1900,6 +2184,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &mut backend,
                     flags,
                     true,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 assert!(okay);
                 assert_eq!(*connections.source_number_node_connections(), 1);
@@ -1928,6 +2214,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     true,
                     &mut backend,
                     flags,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 let updated = &actual_nodes
                     .nodes
@@ -1968,6 +2256,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     true,
                     &mut backend,
                     flags,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 let zero = &actual_nodes.nodes.physical.as_ref().ok_or("zero OA Node")?[at];
                 assert_eq!(
@@ -1988,6 +2278,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     true,
                     &mut backend,
                     flags,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 let negative_zero = &actual_nodes
                     .nodes
@@ -2013,6 +2305,7 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     &control,
                     &mut backend,
                     flags,
+                    &schedules,
                 )?;
                 assert_eq!(
                     actual_nodes
@@ -2039,6 +2332,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     true,
                     &mut backend,
                     flags,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 let no_gradient = &actual_nodes
                     .nodes
@@ -2077,6 +2372,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     true,
                     &mut backend,
                     flags,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 let point = &actual_nodes
                     .nodes
@@ -2102,6 +2399,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                     true,
                     &mut backend,
                     flags,
+                    &mut schedules,
+                    &mut globals.any_local_environments_in_model,
                 )?;
                 let accepted_threshold =
                     actual_nodes.nodes.physical.as_ref().ok_or("threshold OA")?[at].clone();
@@ -2118,6 +2417,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         true,
                         &mut backend,
                         flags,
+                        &mut schedules,
+                        &mut globals.any_local_environments_in_model,
                     )
                     .expect_err("actual dry point severe/fatal");
                 assert!(matches!(
@@ -2152,6 +2453,8 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                         true,
                         &mut backend,
                         flags,
+                        &mut schedules,
+                        &mut globals.any_local_environments_in_model,
                     )
                     .expect_err("actual wet point severe/fatal");
                 assert!(matches!(

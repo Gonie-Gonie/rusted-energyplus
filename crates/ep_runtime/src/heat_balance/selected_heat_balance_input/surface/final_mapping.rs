@@ -47,6 +47,8 @@ pub(crate) struct FinalSurface {
     pub(crate) surrounding_surface_view_factor: f64,
     /// Actual SurfaceData.hh840/843/844 constructor fields.
     pub(crate) oscm_ptr: i32,
+    /// Actual Native SurfaceData.hh824/845 ctor0; positive local getter stays held.
+    pub(crate) linked_outdoor_air_node: i32,
     pub(crate) is_ground_surface_property_defined: bool,
     pub(crate) use_ground_surface_temperature: bool,
 }
@@ -69,6 +71,7 @@ impl Default for FinalSurface {
             has_surrounding_surface_property: false,
             surrounding_surface_view_factor: 0.0,
             oscm_ptr: 0,
+            linked_outdoor_air_node: 0,
             is_ground_surface_property_defined: false,
             use_ground_surface_temperature: false,
         }

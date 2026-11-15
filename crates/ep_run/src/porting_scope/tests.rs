@@ -3192,14 +3192,18 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         hard["OutdoorAir:Node"] =
                             json!({"Outside 각": {"height_above_ground": -1.25}});
                     } else if flow > 0.0 && method == "Flow/Person" && limit == "LimitFlowRate" {
-                        hard["OutdoorAir:Node"] =
-                            json!({"Outside 각": {"height_above_ground": 0.0}});
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": 0.0, "wind_speed_schedule_name":"On", "wind_direction_schedule_name":""}});
                     } else if flow > 0.0 && method == "Flow/Zone" && limit == "LimitCapacity" {
-                        hard["OutdoorAir:Node"] =
-                            json!({"Outside 각": {"height_above_ground": -0.0}});
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": -0.0, "wind_speed_schedule_name":"", "wind_direction_schedule_name":""}});
                     } else if flow > 0.0 && method == "Flow/Area" && limit == "LimitCapacity" {
-                        hard["OutdoorAir:Node"] =
-                            json!({"Outside 각": {"height_above_ground": 10.0}});
+                        hard["OutdoorAir:Node"] = json!({"Outside 각": {"height_above_ground": 10.0, "wind_direction_schedule_name":"OA wind compact"}});
+                    }
+                    if flow > 0.0 && method == "Flow/Area" && limit == "LimitCapacity" {
+                        // One necessary schedule extension of this same admission cell.
+                        hard["Schedule:Compact"] = json!({"OA wind compact":{"data":[
+                            {"field":"Through: 12/31"},{"field":"For: AllDays"},
+                            {"field":"Until: 24:00"},{"field":1.0}
+                        ]}});
                     }
                     let hard_raw = parse_epjson_str(&hard.to_string())
                         .expect("actual OA hard-limit raw input");
@@ -3270,6 +3274,36 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         let oa = hard_ip
                             .source_raw_object_fields("OutdoorAir:Node", "Outside 각")
                             .expect("actual authored OA raw custody");
+                        if method == "Flow/Person" && limit == "LimitFlowRate" {
+                            assert_eq!(
+                                oa.get("wind_speed_schedule_name"),
+                                Some(&OaRaw::String("On".into()))
+                            );
+                            assert_eq!(
+                                oa.get("wind_direction_schedule_name"),
+                                Some(&OaRaw::String(String::new()))
+                            );
+                        } else if method == "Flow/Zone" {
+                            assert_eq!(
+                                oa.get("wind_speed_schedule_name"),
+                                Some(&OaRaw::String(String::new()))
+                            );
+                            assert_eq!(
+                                oa.get("wind_direction_schedule_name"),
+                                Some(&OaRaw::String(String::new()))
+                            );
+                        } else if method == "Flow/Area" {
+                            assert!(!oa.contains_key("wind_speed_schedule_name"));
+                            assert_eq!(
+                                oa.get("wind_direction_schedule_name"),
+                                Some(&OaRaw::String("OA wind compact".into()))
+                            );
+                            assert!(
+                                hard_ip
+                                    .source_raw_object_fields("Schedule:Compact", "OA wind compact")
+                                    .is_ok()
+                            );
+                        }
                         let height_token = if method == "Sum" {
                             Some("-1.25")
                         } else if method == "Flow/Person" && limit == "LimitCapacity" {
@@ -3768,12 +3802,27 @@ fn bounded_controls_do_not_change_ordinary_support_assessment() {
                         bad["ZoneControl:Humidistat"] = json!({"Uncomposed control":{"zone_name":"Zone","humidifying_relative_humidity_setpoint_schedule_name":"On"}})
                     }
                     19 => {
-                        bad["DesignSpecification:OutdoorAir"]["Actual OA"]["outdoor_air_schedule_name"] =
-                            json!("Missing")
+                        if method == "Flow/Person" {
+                            bad["OutdoorAir:Node"] =
+                                json!({"Outside 각":{"wind_speed_schedule_name":"Missing"}});
+                        } else {
+                            bad["DesignSpecification:OutdoorAir"]["Actual OA"]["outdoor_air_schedule_name"] =
+                                json!("Missing");
+                        }
                     }
                     20 => {
-                        bad["DesignSpecification:OutdoorAir"]["Actual OA"]["proportional_control_minimum_outdoor_air_flow_rate_schedule_name"] =
-                            json!("Missing")
+                        if method == "Flow/Zone" {
+                            bad["OutdoorAir:Node"] =
+                                json!({"Outside 각":{"wind_direction_schedule_name":null}});
+                        } else if method == "Flow/Area" {
+                            bad["OutdoorAir:Node"] =
+                                json!({"Outside 각":{"wind_speed_schedule_name":1.0}});
+                        } else if method == "AirChanges/Hour" {
+                            bad["OutdoorAir:Node"] = json!({"Outside 각":{"wind_direction_schedule_name":" Constant-1.0 "}});
+                        } else {
+                            bad["DesignSpecification:OutdoorAir"]["Actual OA"]["proportional_control_minimum_outdoor_air_flow_rate_schedule_name"] =
+                                json!("Missing");
+                        }
                     }
                     21 => bad["AirLoopHVAC"] = json!({"Uncomposed airloop":{}}),
                     _ => unreachable!(),

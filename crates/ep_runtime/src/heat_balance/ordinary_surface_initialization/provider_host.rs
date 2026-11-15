@@ -75,12 +75,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost> SourceInitSurfacePr
     }
     fn apply_linked_outdoor_nodes(
         &mut self,
-        _owners: &mut SourceInitSurfaceOwners<'_, '_, H, D>,
+        owners: &mut SourceInitSurfaceOwners<'_, '_, H, D>,
     ) -> Result<(), Error> {
-        // Parent316 is true only outside current raw local-environment admission.
-        Err(Error::Unavailable(
-            "actual positive linked outdoor-air Surface/Node branch317-324",
-        ))
+        super::apply_source_linked_outdoor_nodes(owners.geometry, owners.globals)
     }
     fn apply_outdoor_ems_overrides(
         &mut self,

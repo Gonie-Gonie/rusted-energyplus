@@ -450,12 +450,33 @@ impl SourceHvacManager {
                             input: o.input,
                             prescan: output.prescan,
                             reports: output.reports,
-                            environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::from_owners(output.minimum_report_frequency, &*o.globals, &o.project.system.developer_flag, Some(&*o.clock)),
+                            environment: crate::heat_balance::source_output_registration::SourceReportVariableEnvironment::new(output.minimum_report_frequency, Some(crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                kickoff: &o.globals.kickoff_simulation,
+                                developer: &o.project.system.developer_flag,
+                                warmup: &o.clock.warmup_flag,
+                                doing_sizing: &o.globals.doing_sizing,
+                            })),
                             minutes_in_time_step: o.clock.minutes_in_time_step,
                             host: output.host,
                             dictionary_host: output.dictionary_host,
                             eio: &mut *eio,
                         };
+                        o.equipment.prepare_source_purchased_air_input(
+                            o.shortcut,
+                            *o.source_is_epjson,
+                            o.schedules,
+                            o.globals.num_of_zones,
+                            &mut self.ancillary.branch_node_connections,
+                            o.globals.any_energy_management_system_in_model,
+                            &*o.sizing,
+                            &mut self.ancillary.outdoor_air_nodes,
+                            &*o.environment,
+                            o.control,
+                            &o.globals.display_extra_warnings,
+                            &mut o.globals.any_local_environments_in_model,
+                            o.backend,
+                            &mut purchased_output,
+                        )?;
                         let mut purchased_initialization =
                             super::source_purchased_air::SourcePurchasedAirInitOwners {
                                 sizing: o.sizing,
@@ -489,17 +510,9 @@ impl SourceHvacManager {
                             current_equipment_zone,
                             equipment_pointer,
                             number,
-                            o.shortcut,
-                            *o.source_is_epjson,
                             o.schedules,
-                            purchased_initialization.globals.num_of_zones,
-                            &mut self.ancillary.branch_node_connections,
-                            &mut self.ancillary.outdoor_air_nodes,
                             &*o.zones,
                             &*o.gains,
-                            purchased_initialization
-                                .globals
-                                .any_energy_management_system_in_model,
                             &mut purchased_output,
                             &mut purchased_initialization,
                             &mut purchased_calculation,

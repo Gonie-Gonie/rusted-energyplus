@@ -25,7 +25,7 @@ pub(crate) struct SourceInitHeatBalanceOwners<'a, 'b> {
     pub(crate) gain_modules: &'a mut SourceGainModules,
     pub(crate) daylighting: &'a mut SourceDaylighting,
     pub(crate) window: &'a mut SourceWindowOpticalInitialization,
-    pub(crate) globals: &'a SelectedHeatBalanceGlobals,
+    pub(crate) globals: &'a mut SelectedHeatBalanceGlobals,
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) environment: &'a mut WeatherEnvironmentState,
     pub(crate) weather_owner: &'a WeatherOwnerState,

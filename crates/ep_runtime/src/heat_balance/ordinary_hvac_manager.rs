@@ -139,6 +139,8 @@ impl SourceHvacManager {
                     warmup: &o.clock.warmup_flag,
                     doing_sizing: &o.globals.doing_sizing,
                 }),
+                o.schedules,
+                &mut o.globals.any_local_environments_in_model,
             )?;
         self.manage_source_refrigerated_case_racks(o)?;
         o.zone_air_update(

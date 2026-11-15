@@ -396,6 +396,7 @@ fn allocate(
         results_framework_output_variables: &mut f.rf,
     };
     let mut providers = SourceOrdinaryInitHeatBalanceHost {
+        outdoor_air: None,
         model: &model,
         ctf: &mut ctf,
         registry: &f.registry,
@@ -424,7 +425,7 @@ fn allocate(
             gain_modules: &mut f.gain_modules,
             daylighting: &mut daylighting,
             window: &mut f.ancillary.window_optical_initialization,
-            globals: &f.globals,
+            globals: &mut f.globals,
             clock: &f.weather.global,
             environment: &mut f.weather.environment,
             weather_owner: &f.weather.weather,
