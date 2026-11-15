@@ -533,16 +533,24 @@ impl CtfInitializationReports {
                         "unique Source Material physical identity",
                     ));
                 }
-                let surface = material.surface_properties().ok_or(Error::Unavailable(
-                    "actual validated opaque Material properties",
-                ))?;
-                let roughness = match material.roughness() {
-                    Some(value) => roughness_code(value),
-                    None if material_owner.source_group_at(source_number)?
-                        == crate::heat_balance::selected_material_data::SourceMaterialGroup::IrTransparent
-                        && material.kind() == ep_model::MaterialKind::InfraredTransparent => -1,
-                    None => return Err(Error::Unavailable("actual validated Material roughness")),
-                };
+                let (roughness, surface) =
+                    if material.kind() == ep_model::MaterialKind::WindowSimpleGlazing {
+                        let (roughness, surface) = material_owner
+                            .source_simple_glazing_surface_properties(source_number, *id)?;
+                        (roughness_code(roughness), surface)
+                    } else {
+                        let surface = material.surface_properties().ok_or(Error::Unavailable(
+                            "actual validated opaque Material properties",
+                        ))?;
+                        let roughness = match material.roughness() {
+                            Some(value) => roughness_code(value),
+                            None if material_owner.source_group_at(source_number)?
+                                == crate::heat_balance::selected_material_data::SourceMaterialGroup::IrTransparent
+                                && material.kind() == ep_model::MaterialKind::InfraredTransparent => -1,
+                            None => return Err(Error::Unavailable("actual validated Material roughness")),
+                        };
+                        (roughness, *surface)
+                    };
                 Ok(OrdinaryGeometryMaterial {
                     source_number,
                     typed_id: *id,

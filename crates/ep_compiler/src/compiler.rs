@@ -8226,6 +8226,35 @@ impl<'a> Compiler<'a> {
                 continue;
             };
 
+            // Native validates raw schema numbers separately from real-field i64 retrieval.
+            // Keep this Source-only: Legacy numeric behavior is unchanged.
+            if self.source_file_declarations {
+                let raw_schema_valid = [
+                    (U_FACTOR_FIELD, false),
+                    (SHGC_FIELD, true),
+                    (VISIBLE_TRANSMITTANCE_FIELD, true),
+                ]
+                .iter()
+                .all(|(field, below_one)| match field_value(&object, field) {
+                    None => *field == VISIBLE_TRANSMITTANCE_FIELD,
+                    Some(RawValue::Number(token)) => {
+                        token.parse::<f64>().ok().is_some_and(|value| {
+                            value.is_finite() && value > 0.0 && (!*below_one || value < 1.0)
+                        })
+                    }
+                    Some(_) => false,
+                });
+                if !raw_schema_valid {
+                    self.error(
+                        "InvalidNumericRange",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        None,
+                        format!("{OBJECT_TYPE}/{name} violates the raw schema numeric bounds"),
+                    );
+                    continue;
+                }
+            }
             let material = WindowSimpleGlazingMaterial::from_performance_indices(
                 u_factor_with_film_coefficients_w_per_m2_k,
                 solar_heat_gain_coefficient,
@@ -8249,6 +8278,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if self.source_file_declarations {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             if material.film_resistance_clamped {
                 self.warning(
                     "SimpleGlazingFilmResistanceClamped",
@@ -16739,8 +16774,10 @@ impl<'a> Compiler<'a> {
                 // Other families retain their existing numeric projection.
                 let parsed = if matches!(object_type, "OtherEquipment" | "People")
                     || (self.source_file_declarations
-                        && matches!(object_type, "Space" | "ElectricEquipment"))
-                {
+                        && matches!(
+                            object_type,
+                            "Space" | "ElectricEquipment" | "WindowMaterial:SimpleGlazingSystem"
+                        )) {
                     ep_model::classify_source_json_number(text)
                         .ok()
                         .map(ep_model::SourceJsonNumber::as_f64)

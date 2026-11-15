@@ -6850,6 +6850,126 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
             );
         }
     }
+    // Same real Source B material/IP/support owner chain. SGS is unused by EVERY
+    // Construction, including declarations that no current Surface consumes.
+    let mut value = input(PortingScope::B);
+    value["WindowMaterial:SimpleGlazingSystem"] =
+        json!({"MiXeD Simple":{"u_factor":4.2,"solar_heat_gain_coefficient":0.57}});
+    let raw = parse_epjson_str(&value.to_string()).expect("one unused Source SGS");
+    let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+    let model = compiled.model.as_ref().expect("actual Source SGS material");
+    let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+        .expect("real Source B/raw SGS admission");
+    assert_eq!(
+        ip.get_num_objects_found("WindowMaterial:SimpleGlazingSystem"),
+        1
+    );
+    let projected =
+        crate::ordinary_material_input::resolve_source(&raw, &ip).expect("same raw material owner");
+    assert_eq!(projected.simple_glazing.len(), 1);
+    assert_eq!(projected.simple_glazing[0].object_name, "MiXeD Simple");
+    assert!(
+        !projected.simple_glazing[0]
+            .fields
+            .contains_key("visible_transmittance")
+    );
+    assert_eq!(
+        projected.simple_glazing[0].fields["u_factor"],
+        ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(4.2)
+    );
+    let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B);
+    assert!(admitted.admissible, "{:?}", admitted.violations);
+    admitted.environment = Some(
+        super::environment::environment_from_weather(
+            model,
+            &weather,
+            "existing material-owner weather",
+        )
+        .expect("actual calendar/environment"),
+    );
+    let admission = crate::support::SourceSupportAdmission::from_validated_scope(&raw, &admitted)
+        .expect("complete unused-SGS Source prerequisites");
+    let selected = crate::support::assess_support_with_source_admission(
+        &raw,
+        &compiled.report,
+        Some(model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&admission),
+    );
+    assert!(selected.allows_rust_runtime(), "{:?}", selected.diagnostics);
+    let mut without_raw = raw.clone();
+    without_raw.objects.remove(&ep_raw_model::ObjectType(
+        "WindowMaterial:SimpleGlazingSystem".into(),
+    ));
+    let no_raw_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&without_raw, &admitted)
+            .expect("remaining B raw still validates, without an SGS token");
+    let no_raw = crate::support::assess_support_with_source_admission(
+        &without_raw,
+        &compiled.report,
+        Some(model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&no_raw_admission),
+    );
+    assert!(
+        !no_raw.allows_rust_runtime(),
+        "absent Raw SGS cannot waive an independently supplied typed SGS"
+    );
+    let legacy = assess_support(
+        &raw,
+        &compiled.report,
+        Some(model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+    );
+    assert!(
+        !legacy.allows_rust_runtime(),
+        "no unscoped SGS compatibility waiver"
+    );
+    assert!(crate::ordinary_equipment_input::resolve(&raw).is_err());
+    assert!(crate::ordinary_equipment_input::resolve_source_a(&raw).is_err());
+    assert!(
+        !inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::A).admissible
+    );
+    value["Construction"]["Unused Window"] = json!({"outside_layer":"MiXeD Simple"});
+    let consumed =
+        parse_epjson_str(&value.to_string()).expect("unused construction still references SGS");
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&consumed).is_err());
+    let consumed_model = ep_compiler::compile_raw_model_for_source(&consumed);
+    assert!(
+        !consumed_model.has_errors(),
+        "the typed graph still retains the held window construction"
+    );
+    assert!(
+        !inspect_porting_scope(
+            &consumed,
+            &consumed_model.report,
+            consumed_model.model.as_ref(),
+            PortingScope::B
+        )
+        .admissible
+    );
+    value["Construction"]
+        .as_object_mut()
+        .expect("same construction map")
+        .remove("Unused Window");
+    value["WindowMaterial:SimpleGlazingSystem"]["MiXeD Simple"]["visible_transmittance"] =
+        json!("");
+    let blank = parse_epjson_str(&value.to_string()).expect("explicit invalid VT stays authored");
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&blank).is_err());
+    value["WindowMaterial:SimpleGlazingSystem"]["MiXeD Simple"]["visible_transmittance"] =
+        json!(0.0);
+    let zero = parse_epjson_str(&value.to_string()).expect("zero is not omission");
+    assert!(crate::ordinary_equipment_input::resolve_source_b(&zero).is_err());
 }
 
 #[test]

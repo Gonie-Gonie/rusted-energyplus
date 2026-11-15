@@ -510,17 +510,28 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowGlazingThermochromicGroup)
             .count(),
     );
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:SimpleGlazingSystem",
-        typed_model
-            .materials
-            .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowSimpleGlazing)
-            .count(),
-    );
+    let simple_glazing_consumed = source_admission
+        .is_some_and(|admission| admission.consumes("WindowMaterial:SimpleGlazingSystem"));
+    let simple_glazing_used = typed_model.constructions.iter().any(|construction| {
+        construction.layers.iter().any(|id| {
+            typed_model.materials.iter().any(|material| {
+                material.id == *id && material.kind() == MaterialKind::WindowSimpleGlazing
+            })
+        })
+    });
+    if !simple_glazing_consumed || simple_glazing_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:SimpleGlazingSystem",
+            typed_model
+                .materials
+                .iter()
+                .filter(|material| material.kind() == MaterialKind::WindowSimpleGlazing)
+                .count(),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

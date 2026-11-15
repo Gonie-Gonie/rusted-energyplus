@@ -88,7 +88,7 @@ impl SourceSupportAdmission {
                 }
             }
         }
-        let covered_objects = [
+        let mut covered_objects: BTreeSet<_> = [
             // The same raw resolver and validated Source scope admit only the
             // implemented Scheduled control/reference route. This token lets
             // the typed guard distinguish it from legacy/broad HVAC semantics.
@@ -162,6 +162,15 @@ impl SourceSupportAdmission {
                     })
                 })
             });
+        if trace.scope == PortingScope::B
+            && raw
+                .objects
+                .get(&ObjectType("WindowMaterial:SimpleGlazingSystem".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            && crate::ordinary_equipment_input::source_b_validate_unused_simple_glazing(raw).is_ok()
+        {
+            covered_objects.insert("WindowMaterial:SimpleGlazingSystem");
+        }
         Some(Self {
             covered_objects,
             zone_convection_overrides_consumed,

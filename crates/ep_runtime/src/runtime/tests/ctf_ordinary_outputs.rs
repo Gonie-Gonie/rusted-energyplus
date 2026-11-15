@@ -2597,15 +2597,19 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             SelectedMaterialData, SourceMaterialGroup,
         };
         use crate::heat_balance::selected_project_data::{ProjectInputObject, ProjectInputValue};
-        let materials = SelectedMaterialData {
-            materials: vec![MaterialId(0)],
-            nominal_r: vec![1.0],
-            material_map: std::collections::BTreeMap::from([("R1".into(), 1)]),
-            material_groups: std::collections::BTreeMap::from([(
+        // Default owns private runtime fields; this fixture assigns only its
+        // four existing public checkpoints. A struct update cannot name private fields.
+        #[allow(clippy::field_reassign_with_default)]
+        let materials = {
+            let mut materials = SelectedMaterialData::default();
+            materials.materials = vec![MaterialId(0)];
+            materials.nominal_r = vec![1.0];
+            materials.material_map = std::collections::BTreeMap::from([("R1".into(), 1)]);
+            materials.material_groups = std::collections::BTreeMap::from([(
                 MaterialId(0),
                 SourceMaterialGroup::Regular,
-            )]),
-            ..Default::default()
+            )]);
+            materials
         };
         let mut layered = model.typed.clone();
         layered.constructions[0].layers.push(MaterialId(0));

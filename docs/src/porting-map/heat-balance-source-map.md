@@ -501,7 +501,7 @@ inactive_branches:
 
 unsupported_active_branches:
 - every typed thermochromic parent remains an all-definition runtime blocker through its existing parent-material capability rule, including an unused parent and a parent consumed by a valid ordinary `Construction`; direct-index structural lookup and the later immutable child projection do not weaken that block
-- every typed SimpleGlazingSystem definition remains an all-definition runtime blocker, including an unused definition and one consumed by a valid sole-layer ordinary `Construction`
+- every Construction-referenced SimpleGlazingSystem definition remains a runtime blocker, including a valid sole-layer ordinary `Construction`; only unused definitions on the bounded Source B direct-epJSON route reach the actual ordered getter, Setup, per-MaterialId property row and Materials report. Raw schema and Native signed-i64 operand projection remain separate, and missing VT is preserved. The fixed unused-material comparison retains the existing numerical/science and whole-EIO criteria; it grants no window/surface runtime, Source A/IDF or full-object completion.
 - valid bounded fenestration constructions remain typed graph state only and do not enter the opaque runtime thermal cache or acquire window execution
 - every valid `ConstructionProperty:InternalHeatSource` definition, including one attached only to an otherwise unused construction, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked` with `RuntimeClass::None`; a `BuildingSurface:Detailed` may retain the still-ordinary opaque target identity, but no partial or compatibility runtime is admitted
 - every valid `Construction:WindowEquivalentLayer` definition, including every unused definition, is reported as `UnsupportedSurfaceBoundary` and `RunBlocked` with `RuntimeClass::None`; supported equivalent-layer materials and graph edges do not admit surface binding, reporting, or partial window runtime
@@ -1487,7 +1487,7 @@ Bounded Source A/B adds DesignDay-only AdaptiveCEN15251 alongside AdaptiveASH55.
 
 ## Scheduled setpoint manager
 
-77 bounded Source B Scheduled/NodeList pairs retain 5,686,320 values. The unused Source A pair adds59,520, giving 78 pairs and 5,745,840 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.
+78 bounded Source B Scheduled/NodeList pairs retain 5,761,440 values. The unused Source A pair adds59,520, giving 79 pairs and 5,820,960 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.
 
 Reported setpoint state does not establish private histories or IdealLoads load-control effects.
 Current evidence is in [object input domains](../../validation/evidence/object-input-domains.json).

@@ -484,6 +484,8 @@ mod design_days;
 mod electric;
 mod fields;
 mod infrared;
+mod simple_glazing;
+pub(crate) use simple_glazing::validate as source_b_validate_unused_simple_glazing;
 mod multizone;
 mod people;
 pub(crate) use people::has_instantiated_adaptive_comfort;
@@ -547,6 +549,9 @@ fn resolve_raw(
     if source_space_list_ingress {
         space_lists::validate(raw)?;
     }
+    if source_b_ingress {
+        simple_glazing::validate(raw)?;
+    }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
             continue;
@@ -559,6 +564,8 @@ fn resolve_raw(
             source_calendar_ingress && family.0 == "SizingPeriod:DesignDay";
         let source_irt_family =
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
+        let source_simple_glazing_family =
+            source_b_ingress && family.0 == "WindowMaterial:SimpleGlazingSystem";
         let source_people_family = source_calendar_ingress && family.0 == "People";
         let source_electric_family =
             source_calendar_ingress && !source_b_ingress && family.0 == "ElectricEquipment";
@@ -624,6 +631,7 @@ fn resolve_raw(
             && !source_b_family
             && !source_node_list_family
             && !source_irt_family
+            && !source_simple_glazing_family
             && !source_calendar_family
             && !source_compact_family
             && !source_people_family
@@ -745,6 +753,8 @@ fn resolve_raw(
                         && source_node_lists::admitted_field(&field.0, value, raw.is_epjson()))
                     && !(source_people_family && people::admitted_field(&field.0, value))
                     && !(source_angle_family && people::admitted_angle_field(&field.0, value))
+                    && !(source_simple_glazing_family
+                        && simple_glazing::admitted_field(&field.0, value))
                 {
                     // The connected schedule and OtherEquipment instance schemas
                     // allow additional members. Only an unconsumed top-level member
@@ -1075,6 +1085,7 @@ fn resolve_raw(
                         .is_some_and(|value| value >= 0.0)
                 }
                 "Material:InfraredTransparent" => source_irt_family,
+                "WindowMaterial:SimpleGlazingSystem" => source_simple_glazing_family,
                 "People" => {
                     source_people_family
                         && people::admitted_object(raw, object, source_gain_collections)

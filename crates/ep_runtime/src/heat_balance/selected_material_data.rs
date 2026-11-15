@@ -1,15 +1,17 @@
-//! Actual selected GetMaterialData, with borrowed sole physical properties.
+//! Actual selected GetMaterialData: borrowed opaque properties and owned GlassSimple rows.
 use super::ctf_initialization_context::CtfInitializationContext;
 use super::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use super::report_scan::{
     ReportScanFailure, ReportScanState, SourceReportScanInput, try_scan_for_reports_with_input,
 };
 use super::selected_heat_balance_globals::SelectedHeatBalanceGlobals;
+use super::selected_heat_balance_input::HeatBalanceInputError;
 use super::selected_input_processor::{SelectedInputProcessor, SourceInputProcessorShortCut};
 use super::selected_project_data::ProjectInputObject;
 use crate::error::{RuntimeError, WarmupOutputError};
 use ep_model::{
-    MaterialDefinition, MaterialId, MaterialKind, MaterialSurfaceRoughness, TypedModel,
+    MaterialDefinition, MaterialId, MaterialKind, MaterialSurfaceRoughness,
+    OpaqueSurfaceProperties, TypedModel,
 };
 use std::collections::BTreeMap;
 use std::io::Write;
@@ -19,6 +21,7 @@ pub use input::SelectedMaterialInput;
 #[cfg(test)]
 mod air_gap_tests;
 mod report;
+mod simple_glazing;
 mod type_group;
 pub(crate) use type_group::SourceMaterialGroup;
 
@@ -56,6 +59,8 @@ pub(crate) struct SelectedMaterialData {
     pub(crate) resistance_only: BTreeMap<MaterialId, bool>,
     /// MaterialBase NominalR ctor0 and getter writes, aligned with actual MaterialNum.
     pub(crate) nominal_r: Vec<f64>,
+    /// Actual mutable GlassSimple properties; typed derivations are advisory.
+    simple_glazing: BTreeMap<MaterialId, simple_glazing::SourceSimpleGlazingMaterial>,
     pub(crate) num_no_masses: i32,
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
@@ -143,6 +148,46 @@ fn typed_id(
 }
 
 impl SelectedMaterialData {
+    /// Read the actual retained GlassSimple row through its Source order/physical ID.
+    pub(crate) fn source_simple_glazing_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::GlassSimple)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual SimpleGlazing Source order/group/physical identity",
+            ));
+        }
+        let material =
+            self.simple_glazing
+                .get(&typed_id)
+                .ok_or(HeatBalanceInputError::Unavailable(
+                    "actual SimpleGlazing runtime properties",
+                ))?;
+        let roughness = material
+            .roughness
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual SimpleGlazing Setup roughness",
+            ))?;
+        Ok((
+            roughness,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: material.thermal_absorptance,
+                solar_absorptance: material.solar_absorptance,
+                visible_absorptance: material.visible_absorptance,
+            },
+        ))
+    }
+
     fn insert(
         &mut self,
         name: &str,
@@ -388,7 +433,7 @@ impl SelectedMaterialData {
         empty!(num_eql_blinds, "WindowMaterial:Blind:EquivalentLayer");
         empty!(num_eco_roofs, "Material:RoofVegetation");
         empty!(num_tc_glazings, "WindowMaterial:GlazingGroup:Thermochromic");
-        empty!(num_simple_windows, "WindowMaterial:SimpleGlazingSystem");
+        self.get_simple_glazing_data(raw, o)?;
         empty!(num_w7_gaps, "WindowMaterial:Gap");
         o.shortcut.current_module_object = "WindowMaterial:ComplexShade".into();
         require_zero(

@@ -73,6 +73,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
             ]),
         }],
         infrared_transparent: Vec::new(),
+        simple_glazing: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -136,6 +137,12 @@ fn get_materials(
             &raw.infrared_transparent,
             1,
             0,
+        ),
+        (
+            "WindowMaterial:SimpleGlazingSystem",
+            &raw.simple_glazing,
+            1,
+            3,
         ),
     ];
     let definitions = families
@@ -422,6 +429,128 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
         assert_eq!(layers[0].resistance.to_bits(), data.nominal_r[3].to_bits());
         assert_eq!(layers[0].resistance_only, data.resistance_only[&id]);
     }
+    // Same material fixture/IP/getter/report owner, now with one UNUSED real SGS row.
+    let (mut model, mut raw) = fixture(true, 0.15);
+    let id = MaterialId(3);
+    model.materials.push(Material {
+        id,
+        name: NormalizedName::new("Simple"),
+        definition: MaterialDefinition::WindowSimpleGlazing(
+            ep_model::WindowSimpleGlazingMaterial::from_performance_indices(4.2, 0.57, None),
+        ),
+    });
+    model.ctf_report_names.materials.push((id, "SIMPLE".into()));
+    raw.simple_glazing.push(ProjectInputObject {
+        object_name: "SiMpLe".into(),
+        idf_max_fields: None,
+        fields: BTreeMap::from([
+            ("u_factor".into(), Value::Number(4.2)),
+            ("solar_heat_gain_coefficient".into(), Value::Number(0.57)),
+        ]),
+    });
+    let (data, input, shortcut) = get_materials(&model, &raw).expect("actual SGS getter");
+    assert_eq!(data.num_simple_windows, 1);
+    assert_eq!(data.material_map["SIMPLE"], 4);
+    assert_eq!(data.material_groups[&id], SourceMaterialGroup::GlassSimple);
+    assert!(!data.resistance_only[&id]);
+    assert!(!input.is_object_unused("WindowMaterial:SimpleGlazingSystem", "SiMpLe"));
+    assert_eq!(shortcut.alpha_args, ["SIMPLE", ""]);
+    assert_eq!(&shortcut.numeric_args[..3], &[4.2, 0.57, 0.0]);
+    assert_eq!(&shortcut.numeric_field_blanks[..3], &[false, false, true]);
+    assert_eq!(
+        &shortcut.numeric_field_names[..3],
+        &[
+            "u_factor",
+            "solar_heat_gain_coefficient",
+            "visible_transmittance"
+        ]
+    );
+    let material = &data.simple_glazing[&id];
+    assert!(!material.visible_input_by_user);
+    assert_eq!(material.visible_input.to_bits(), 0.0_f64.to_bits());
+    assert_eq!(
+        material.visible_transmittance.to_bits(),
+        material.transmittance.to_bits()
+    );
+    assert_eq!(
+        material.visible_reflectance_back.to_bits(),
+        material.solar_reflectance_back.to_bits()
+    );
+    assert_eq!(
+        material.visible_reflectance_front.to_bits(),
+        material.solar_reflectance_front.to_bits()
+    );
+    assert_eq!(
+        material.roughness,
+        Some(MaterialSurfaceRoughness::VerySmooth)
+    );
+    assert_eq!(
+        [
+            material.density,
+            material.specific_heat,
+            material.solar_absorptance,
+            material.visible_absorptance,
+            material.thermal_transmittance
+        ],
+        [0.0; 5]
+    );
+    assert_eq!(
+        [
+            material.thermal_absorptance,
+            material.thermal_back,
+            material.thermal_front
+        ],
+        [0.84; 3]
+    );
+    assert_eq!(material.spectral_data_pointer, 0);
+    assert!(!material.solar_diffusing);
+    assert_eq!(material.dirt_factor, 1.0);
+    assert_eq!(data.nominal_r[3].to_bits(), material.resistance.to_bits());
+    // This same checked path is consumed by post-runtime geometry. The
+    // typed SGS intentionally has no opaque properties; read the real row.
+    assert!(model.materials[3].surface_properties().is_none());
+    let (roughness, surface) = data
+        .source_simple_glazing_surface_properties(4, id)
+        .expect("actual retained SGS geometry properties");
+    assert_eq!(Some(roughness), material.roughness);
+    assert_eq!(
+        [
+            surface.thermal_absorptance,
+            surface.solar_absorptance,
+            surface.visible_absorptance,
+        ],
+        [
+            material.thermal_absorptance,
+            material.solar_absorptance,
+            material.visible_absorptance,
+        ]
+    );
+    assert!(
+        data.source_simple_glazing_surface_properties(3, id)
+            .is_err()
+    );
+    let mut eio = Vec::new();
+    data.write_material_reports(&model, &mut eio)
+        .expect("real SGS Details row");
+    let text = std::str::from_utf8(&eio).expect("actual EIO UTF8");
+    let details = text
+        .lines()
+        .find(|line| line.starts_with(" Material Details,SIMPLE,"))
+        .expect("actual material order includes the unused SGS row");
+    assert!(details.contains(",VerySmooth,"));
+    assert!(details.ends_with(",0.000,0.000,0.8400,0.0000,0.0000"));
+    raw.simple_glazing[0]
+        .fields
+        .insert("visible_transmittance".into(), Value::Number(0.61));
+    model.materials[3].definition = MaterialDefinition::WindowSimpleGlazing(
+        ep_model::WindowSimpleGlazingMaterial::from_performance_indices(4.2, 0.57, Some(0.61)),
+    );
+    let (provided, _, args) = get_materials(&model, &raw).expect("same getter explicit VT");
+    let material = &provided.simple_glazing[&id];
+    assert!(material.visible_input_by_user);
+    assert_eq!(material.visible_input.to_bits(), 0.61_f64.to_bits());
+    assert_eq!(material.visible_transmittance.to_bits(), 0.61_f64.to_bits());
+    assert!(!args.numeric_field_blanks[2]);
 }
 
 #[test]
@@ -626,4 +755,202 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
             );
         }
     }
+    // One focused real material/IP/backend setup exercises the SGS diagnostic
+    // prefixes; it grants no successful run credit to the fatal input.
+    let (mut model, mut raw) = fixture(true, 0.15);
+    // The same actual EPJSON family order is lexical A/B/C, including the duplicate.
+    model.materials[1].name = NormalizedName::new("A DUPLICATE");
+    model.ctf_report_names.materials[1].1 = "A DUPLICATE".into();
+    raw.no_mass[0].object_name = "A DUPLICATE".into();
+    let film_id = MaterialId(3);
+    let fatal_id = MaterialId(4);
+    model.materials.push(Material {
+        id: film_id,
+        name: NormalizedName::new("B FILM"),
+        definition: MaterialDefinition::WindowSimpleGlazing(
+            ep_model::WindowSimpleGlazingMaterial::from_performance_indices(99.0, 0.5, None),
+        ),
+    });
+    model.materials.push(Material {
+        id: fatal_id,
+        name: NormalizedName::new("C FATAL"),
+        definition: MaterialDefinition::WindowSimpleGlazing(
+            ep_model::WindowSimpleGlazingMaterial::from_performance_indices(1.0e-320, 0.5, None),
+        ),
+    });
+    model
+        .ctf_report_names
+        .materials
+        .extend([(film_id, "B FILM".into()), (fatal_id, "C FATAL".into())]);
+    raw.simple_glazing = [
+        ("A DUPLICATE", 2.7),
+        ("B FILM", 99.0),
+        ("C FATAL", 1.0e-320),
+    ]
+    .into_iter()
+    .map(|(name, u)| ProjectInputObject {
+        object_name: name.into(),
+        idf_max_fields: None,
+        fields: BTreeMap::from([
+            ("u_factor".into(), Value::Number(u)),
+            ("solar_heat_gain_coefficient".into(), Value::Number(0.5)),
+        ]),
+    })
+    .collect();
+    let families = [
+        ("Material", &raw.regular, 2, 7),
+        ("Material:NoMass", &raw.no_mass, 2, 4),
+        ("Material:AirGap", &raw.air_gaps, 1, 1),
+        (
+            "Material:InfraredTransparent",
+            &raw.infrared_transparent,
+            1,
+            0,
+        ),
+        (
+            "WindowMaterial:SimpleGlazingSystem",
+            &raw.simple_glazing,
+            1,
+            3,
+        ),
+    ];
+    let definitions = families
+        .iter()
+        .map(|(name, _, alphas, numerics)| SourceObjectDefinition {
+            object_type: (*name).into(),
+            alpha_fields: *alphas,
+            numeric_fields: *numerics,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        })
+        .collect();
+    let shapes = families
+        .into_iter()
+        .map(|(name, rows, _, _)| {
+            (
+                name.into(),
+                SourceInputFamily::Objects(
+                    rows.iter()
+                        .map(|row| SourceObjectShape {
+                            object_name: row.object_name.clone(),
+                            field_sizes: row.fields.keys().map(|name| (name.clone(), 1)).collect(),
+                        })
+                        .collect(),
+                ),
+            )
+        })
+        .collect();
+    let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes)
+        .expect("actual SGS raw/IP families");
+    let mut shortcut = SourceInputProcessorShortCut::default();
+    shortcut
+        .allocate_from_input(&input)
+        .expect("same complete shared arrays");
+    let globals = SelectedHeatBalanceGlobals {
+        doing_sizing: true,
+        ..Default::default()
+    };
+    let clock = crate::weather::day::WeatherGlobalState {
+        warmup_flag: true,
+        ..Default::default()
+    };
+    let developer = false;
+    let flags = SourceDiagnosticFlags {
+        kickoff: &globals.kickoff_simulation,
+        developer: &developer,
+        warmup: &clock.warmup_flag,
+        doing_sizing: &globals.doing_sizing,
+    };
+    let mut state = error_state(); // Copied legacy phase flags remain false.
+    let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+    let mut scan = ReportScanState::default();
+    let mut errors_found = false;
+    let mut data = SelectedMaterialData::default();
+    let outcome = {
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut text),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        data.get_material_data(
+            &raw,
+            &mut MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            },
+        )
+    };
+    assert!(
+        matches!(&outcome, Err(RuntimeError::HeatBalanceInput(error))
+        if matches!(error.as_ref(), crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Fatal(_)))
+    );
+    assert!(
+        errors_found,
+        "duplicate sets the actual outer input error owner"
+    );
+    assert_eq!(data.num_simple_windows, 3);
+    assert_eq!(
+        data.material_map["A DUPLICATE"], 2,
+        "duplicate never replaces the earlier owner"
+    );
+    assert_eq!(data.materials.len(), 5, "duplicate does not allocate a row");
+    let film = &data.simple_glazing[&film_id];
+    assert_eq!(
+        [film.thickness, film.conductivity, film.resistance],
+        [0.002, 2.0, 0.001]
+    );
+    assert_eq!(data.nominal_r[3].to_bits(), 0.001_f64.to_bits());
+    let failed = &data.simple_glazing[&fatal_id];
+    assert_eq!(failed.u_factor.to_bits(), 1.0e-320_f64.to_bits());
+    assert_eq!(failed.conductivity.to_bits(), 0.0_f64.to_bits());
+    assert_eq!(failed.resistance.to_bits(), 0.0_f64.to_bits());
+    assert_eq!(data.nominal_r[4].to_bits(), 0.0_f64.to_bits());
+    assert_eq!(failed.thermal_absorptance.to_bits(), 0.84_f64.to_bits());
+    assert!(
+        failed.transmittance > 0.0,
+        "solar writes follow the conductivity Severe"
+    );
+    assert_eq!(
+        failed.visible_transmittance.to_bits(),
+        failed.transmittance.to_bits()
+    );
+    assert_eq!(state.tracking.total_warning_errors, 1);
+    assert_eq!(state.tracking.total_warning_errors_during_sizing, 1);
+    assert_eq!(state.tracking.total_severe_errors, 2);
+    assert_eq!(state.tracking.total_severe_errors_during_sizing, 2);
+    assert_eq!(state.tracking.total_severe_errors_during_warmup, 0);
+    assert!(!input.is_object_unused("WindowMaterial:SimpleGlazingSystem", "A DUPLICATE"));
+    assert!(!input.is_object_unused("WindowMaterial:SimpleGlazingSystem", "B FILM"));
+    assert!(!input.is_object_unused("WindowMaterial:SimpleGlazingSystem", "C FATAL"));
+    assert!(
+        eio.is_empty(),
+        "Setup Fatal precedes the Materials Scan/report suffix"
+    );
+    let text = std::str::from_utf8(&text).expect("actual diagnostic bytes");
+    let duplicate =
+        "GetMaterialData: WindowMaterial:SimpleGlazingSystem = A DUPLICATE, duplicate name.";
+    let warning = "WindowMaterial:SimpleGlazingSystem: B FILM has U-factor higher than that provided by surface film resistances, Check value of U-factor";
+    let severe = "WindowMaterial:SimpleGlazingSystem: C FATAL has Conductivity <= 0.0, must be >0.0, Check value of U-factor";
+    let fatal = "Program halted because of input problem(s) in WindowMaterial:SimpleGlazingSystem";
+    assert_eq!(text.matches(duplicate).count(), 1);
+    assert_eq!(text.matches(warning).count(), 1);
+    assert_eq!(text.matches(&format!(" ** Severe  ** {severe}")).count(), 1);
+    assert_eq!(text.matches(fatal).count(), 1);
+    assert!(text.find(duplicate) < text.find(warning));
+    assert!(text.find(warning) < text.find(severe));
+    assert!(text.find(severe) < text.find(fatal));
 }

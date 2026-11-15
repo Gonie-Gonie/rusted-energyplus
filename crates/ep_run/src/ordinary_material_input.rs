@@ -33,7 +33,12 @@ fn resolve_ordered(
         "Material:NoMass",
         "Material:AirGap",
         "Material:InfraredTransparent",
+        "WindowMaterial:SimpleGlazingSystem",
     ] {
+        if family == "WindowMaterial:SimpleGlazingSystem" && !source_order {
+            // No new Legacy or Source A admission is granted by this projection.
+            continue;
+        }
         let rows = if source_order {
             raw.source_ordered_instances(family)?
         } else {
@@ -75,9 +80,15 @@ fn resolve_ordered(
                 let value = match value {
                     RawValue::String(value) => ProjectInputValue::String(value.clone()),
                     RawValue::Number(text) => {
-                        let value = text
-                            .parse::<f64>()
-                            .map_err(|_| "Material raw binary64 parse")?;
+                        let value =
+                            if source_order && family == "WindowMaterial:SimpleGlazingSystem" {
+                                ep_model::classify_source_json_number(text)
+                                    .map_err(|_| "SimpleGlazing stored JSON numeric kind")?
+                                    .as_f64()
+                            } else {
+                                text.parse::<f64>()
+                                    .map_err(|_| "Material raw binary64 parse")?
+                            };
                         if !value.is_finite() {
                             return Err("Material nonfinite JSON number".into());
                         }
@@ -112,6 +123,7 @@ fn resolve_ordered(
             "Material:NoMass" => result.no_mass = values,
             "Material:AirGap" => result.air_gaps = values,
             "Material:InfraredTransparent" => result.infrared_transparent = values,
+            "WindowMaterial:SimpleGlazingSystem" => result.simple_glazing = values,
             _ => unreachable!("literal selected material family"),
         }
     }

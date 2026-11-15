@@ -545,6 +545,65 @@ fn simple_glazing_system_rejects_nonpositive_source_derived_conductivity()
             .count(),
         1
     );
+    // Same raw model: Native integer storage retrieves u64 through signed i64.
+    // The decimal spelling instead stays a positive stored double.
+    let mut raw = raw;
+    raw.objects
+        .get_mut(&ep_raw_model::ObjectType(OBJECT_TYPE.into()))
+        .expect("same SGS family")
+        .get_mut(&ep_raw_model::ObjectName("Subnormal U".into()))
+        .expect("same actual material")
+        .fields
+        .insert(
+            ep_raw_model::FieldName("u_factor".into()),
+            ep_raw_model::RawValue::Number("18446744073709551615".into()),
+        );
+    let source_integer = super::super::compile_raw_model_for_source(&raw);
+    assert!(source_integer.has_errors());
+    assert!(has_diagnostic(
+        &source_integer,
+        DiagnosticSeverity::Error,
+        "InvalidNumericRange",
+        OBJECT_TYPE,
+        "Subnormal U",
+        "u_factor"
+    ));
+    assert!(
+        !compile_raw_model(&raw).has_errors(),
+        "Legacy keeps its literal double projection"
+    );
+    raw.objects
+        .get_mut(&ep_raw_model::ObjectType(OBJECT_TYPE.into()))
+        .expect("same SGS family")
+        .get_mut(&ep_raw_model::ObjectName("Subnormal U".into()))
+        .expect("same actual material")
+        .fields
+        .insert(
+            ep_raw_model::FieldName("u_factor".into()),
+            ep_raw_model::RawValue::Number("18446744073709551615.0".into()),
+        );
+    let source_float = super::super::compile_raw_model_for_source(&raw);
+    assert!(
+        !source_float.has_errors(),
+        "{:?}",
+        source_float.report.diagnostics
+    );
+    let model = source_float
+        .model
+        .as_ref()
+        .expect("positive stored-double material");
+    let row = simple_glazing_material(model, "SUBNORMAL U")?;
+    assert_eq!(
+        row.u_factor_with_film_coefficients_w_per_m2_k.to_bits(),
+        18446744073709551615.0_f64.to_bits()
+    );
+    assert!(
+        model
+            .ctf_report_names
+            .materials
+            .iter()
+            .any(|(_, name)| name == "SUBNORMAL U")
+    );
     Ok(())
 }
 

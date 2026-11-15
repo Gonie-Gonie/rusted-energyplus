@@ -471,6 +471,7 @@ impl GainFactory {
         reports.selected_material_input = Some(hb::selected_material_data::SelectedMaterialInput {
             source_is_epjson: false,
             infrared_transparent: Vec::new(),
+            simple_glazing: Vec::new(),
             regular: project_objects(factory, &["Material"])?
                 .remove("Material")
                 .unwrap_or_default(),

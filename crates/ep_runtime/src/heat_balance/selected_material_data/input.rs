@@ -1,4 +1,4 @@
-//! Raw selected material operands; properties remain the existing typed owners.
+//! Raw material operands; opaque properties stay typed, GlassSimple has actual runtime rows.
 use super::super::selected_project_data::{ProjectInputObject, ProjectInputValue};
 use super::{MaterialDataOwners, unavailable};
 use crate::error::RuntimeError;
@@ -16,6 +16,8 @@ pub struct SelectedMaterialInput {
     pub air_gaps: Vec<ProjectInputObject>,
     /// Actual name-only getObjectItem order for Material:InfraredTransparent.
     pub infrared_transparent: Vec<ProjectInputObject>,
+    /// Actual ordered Source epJSON SimpleGlazing getter operands.
+    pub simple_glazing: Vec<ProjectInputObject>,
 }
 
 pub(super) fn alpha<'a>(
@@ -47,6 +49,72 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_simple_glazing_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson {
+            return Err(unavailable(
+                "SimpleGlazing requires the owned Source epJSON getter",
+            ));
+        }
+        if !owners
+            .input
+            .has_object("WindowMaterial:SimpleGlazingSystem", &object.object_name)
+        {
+            return Err(unavailable("SimpleGlazing raw/IP identity"));
+        }
+        let s = &mut owners.shortcut;
+        if s.alpha_args.is_empty()
+            || s.alpha_field_blanks.is_empty()
+            || s.alpha_field_names.is_empty()
+            || s.numeric_args.len() < 3
+            || s.numeric_field_blanks.len() < 3
+            || s.numeric_field_names.len() < 3
+        {
+            return Err(unavailable(
+                "actual complete SimpleGlazing shared allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:SimpleGlazingSystem", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        for (index, field) in [
+            "u_factor",
+            "solar_heat_gain_coefficient",
+            "visible_transmittance",
+        ]
+        .iter()
+        .enumerate()
+        {
+            s.numeric_field_names[index] = (*field).into();
+        }
+        s.numeric_args[0] = numeric(object, "u_factor", None)?;
+        s.numeric_field_blanks[0] = false;
+        s.numeric_args[1] = numeric(object, "solar_heat_gain_coefficient", None)?;
+        s.numeric_field_blanks[1] = false;
+        let numerics = match object.fields.get("visible_transmittance") {
+            None => 2,
+            Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                s.numeric_args[2] = *value;
+                s.numeric_field_blanks[2] = false;
+                3
+            }
+            Some(_) => return Err(unavailable("SimpleGlazing optional VT numeric scalar")),
+        };
+        Ok((1, numerics))
+    }
+
     pub(super) fn get_infrared_item(
         &self,
         object: &ProjectInputObject,

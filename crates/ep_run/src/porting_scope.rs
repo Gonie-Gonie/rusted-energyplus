@@ -177,6 +177,12 @@ pub fn inspect_porting_scope(
     {
         violations.push(error);
     }
+    if scope == PortingScope::B
+        && let Err(error) =
+            crate::ordinary_equipment_input::source_b_validate_unused_simple_glazing(raw)
+    {
+        violations.push(error);
+    }
     validate_project_controls(raw, &settings, &mut violations);
     if object_counts.contains_key("SizingPeriod:DesignDay")
         && settings["simulation_control"]["run_simulation_for_sizing_periods"] == false
@@ -328,6 +334,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                     | "ZoneControl:Humidistat"
                     | "DesignSpecification:OutdoorAir"
                     | "OutdoorAir:Node"
+                    | "WindowMaterial:SimpleGlazingSystem"
                     | "ThermostatSetpoint:DualSetpoint"
                     | "ZoneHVAC:EquipmentConnections"
                     | "ZoneHVAC:EquipmentList"

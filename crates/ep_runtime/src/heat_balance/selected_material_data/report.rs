@@ -1,7 +1,7 @@
 //! Material.cc2767-2798 writes to the real EIO using existing Source R formatting.
 use super::{SelectedMaterialData, SourceMaterialGroup, unavailable};
 use crate::error::{RuntimeError, WarmupOutputError};
-use ep_model::{MaterialDefinition, MaterialSurfaceRoughness, TypedModel};
+use ep_model::{MaterialDefinition, MaterialSurfaceRoughness, OpaqueSurfaceProperties, TypedModel};
 use std::io::Write;
 
 fn rounded(value: f64, precision: usize) -> Result<String, RuntimeError> {
@@ -83,6 +83,32 @@ impl SelectedMaterialData {
                     [0.0; 4],
                     value.surface,
                 ),
+                MaterialDefinition::WindowSimpleGlazing(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassSimple) {
+                        return Err(unavailable("reported SimpleGlazing actual group"));
+                    }
+                    let value = self
+                        .simple_glazing
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported SimpleGlazing runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("SimpleGlazing Setup roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
                 _ => return Err(unavailable("reported selected material family")),
             };
             let values = [
