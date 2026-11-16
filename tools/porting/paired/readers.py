@@ -8,7 +8,7 @@ if not __debug__:
     raise RuntimeError('Assertions are required before reader prototype activity')
 
 from pathlib import Path
-import argparse, hashlib, importlib.util, json, re, subprocess, sys, types
+import argparse, contextlib, hashlib, importlib.util, json, re, runpy, sys, types
 
 FROZEN6 = dict(path='tools/porting/paired/v6/release.json', sha256='fad05d195e3969372afbcbff8451aff70b70484e3b12683c1890c51ac5c01754', bytes=9106)
 R = Path.cwd().resolve()
@@ -189,13 +189,26 @@ def main(argv=None):
     stdout = home / (args.phase + '-recorder.stdout')
     stderr = home / (args.phase + '-recorder.stderr')
     assert not output.exists() and not command_dir.exists() and not stdout.exists() and not stderr.exists()
-    with stdout.open('xb') as out, stderr.open('xb') as err:
-        result = subprocess.run(recorder_argv, cwd=R, stdin=subprocess.DEVNULL, stdout=out, stderr=err)
+    # Dispatch the authenticated recorder CLI in process, as frozen coordinate
+    # does, so bulk --input arguments never cross Windows CreateProcess.
+    previous = sys.argv[:]
+    with stdout.open('x', encoding='utf8') as out, stderr.open('x', encoding='utf8') as err, contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        try:
+            sys.argv = recorder_argv[4:]  # recorder path and its actual CLI operands
+            try:
+                runpy.run_path(str(recorder), run_name='__main__')
+            except SystemExit as exc:
+                assert type(exc.code) is int
+                rc = exc.code
+            else:
+                raise RuntimeError('Trusted recorder returned without its CLI exit')
+        finally:
+            sys.argv = previous
     receipt = command_dir / 'receipt.json'
-    print(json.dumps(dict(phase=args.phase, exit_code=result.returncode,
+    print(json.dumps(dict(phase=args.phase, exit_code=rc,
                           output=ref(output) if output.exists() else None,
                           receipt=ref(receipt) if receipt.exists() else None)))
-    return result.returncode
+    return rc
 
 
 if __name__ == '__main__':

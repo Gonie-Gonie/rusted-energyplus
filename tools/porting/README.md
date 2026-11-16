@@ -85,7 +85,10 @@ Python-only optimization adds no object support or physical comparison.
 For v6 `precheck` and `verify`, `paired/readers.py` constructs the same ordered
 recorder inputs without repeating SourceAuthority normalization in the parent.
 The genuine frozen child still performs full validation, and the recorder keeps
-its before/after Source and input checks. Pass `--home` and the exact v6
+its before/after Source and input checks. The trusted recorder runs in the
+calling Python process so long input lists avoid the Windows command-line
+limit; it launches the unchanged frozen child as a subprocess. Invoke the
+wrapper with Python `-X utf8 -B`, with assertions enabled. Pass `--home` and the exact v6
 `--release PATH#SHA256` as with `coordinate.py`. Use the matching versioned tools
 for the other phases. Optional `--projection-output .runtime/...json` writes
 non-authorizing command/input metadata and starts no recorder or child.
