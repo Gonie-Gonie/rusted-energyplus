@@ -474,6 +474,7 @@ impl GainFactory {
             simple_glazing: Vec::new(),
             glazing: Vec::new(),
             refraction: Vec::new(),
+            spectral_data: Vec::new(),
             window_gas: Vec::new(),
             window_gas_mixture: Vec::new(),
             regular: project_objects(factory, &["Material"])?

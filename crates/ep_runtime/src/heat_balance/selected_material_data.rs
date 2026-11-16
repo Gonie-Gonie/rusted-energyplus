@@ -17,7 +17,7 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod input;
-pub use input::SelectedMaterialInput;
+pub use input::{SelectedMaterialInput, SourceGlazingSpectralInput};
 #[cfg(test)]
 mod air_gap_tests;
 mod report;
@@ -68,6 +68,7 @@ pub(crate) struct SelectedMaterialData {
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
     pub(crate) num_spectral_data: i32,
+    spectral_data: Option<Box<[simple_glazing::SourceGlazingSpectralData]>>,
     pub(crate) num_w5_glazings: i32,
     pub(crate) num_w5_alt_glazings: i32,
     pub(crate) num_eql_glazings: i32,
@@ -614,14 +615,10 @@ impl CtfInitializationContext<'_> {
             eio: self.eio,
             errors_found: &mut reports.heat_balance_input_errors_found,
         };
-        // HBM266: real zero-selected spectral getter, before GetMaterialData.
-        owners.shortcut.current_module_object = "MaterialProperty:GlazingSpectralData".into();
-        reports.selected_material_data.num_spectral_data =
-            count(owners.input, "MaterialProperty:GlazingSpectralData")?;
-        require_zero(
-            reports.selected_material_data.num_spectral_data,
-            "positive spectral material data",
-        )?;
+        // HBM266: same live owners/scratch/backend/shared error latch, before Material268.
+        reports
+            .selected_material_data
+            .get_glass_spectral_data(raw, &mut owners)?;
         reports
             .selected_material_data
             .get_material_data(raw, &mut owners)?;

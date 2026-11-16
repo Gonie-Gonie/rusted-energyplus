@@ -549,6 +549,29 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowGlazingThermochromicGroup)
             .count(),
     );
+    if source_admission.is_some_and(|admission| !admission.consumes_spectral_data(typed_model)) {
+        let raw_count = raw_model
+            .objects
+            .get(&ep_raw_model::ObjectType(
+                "MaterialProperty:GlazingSpectralData".into(),
+            ))
+            .map_or(0, |rows| rows.len());
+        // This Source-only custody guard has no legacy registry rule.
+        // A namespace-only mismatch must also block even when both row counts are zero.
+        push_typed_boundary(
+            unsupported_objects,
+            diagnostics,
+            "MaterialProperty:GlazingSpectralData",
+            typed_model
+                .glazing_spectral_data
+                .len()
+                .max(raw_count)
+                .max(typed_model.glazing_spectral_data_names.len())
+                .max(1),
+            "UnsupportedGlazingSpectralDataSourceAdmission",
+            "Glazing spectral data requires ordered Raw/typed name and ID custody from a validated Source input",
+        );
+    }
     let glazing_count = typed_model
         .materials
         .iter()
@@ -558,8 +581,8 @@ pub(super) fn assess_typed_runtime_boundaries(
         .objects
         .get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
         .map_or(0, |rows| rows.len());
-    let glazing_consumed = source_admission
-        .is_some_and(|admission| admission.consumes_unused_spectral_average(typed_model));
+    let glazing_consumed =
+        source_admission.is_some_and(|admission| admission.consumes_unused_glazing(typed_model));
     let glazing_used = typed_model.constructions.iter().any(|construction| {
         construction.effective_layers().iter().any(|id| {
             typed_model

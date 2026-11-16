@@ -11,6 +11,7 @@ use ep_model::{MaterialDefinition, MaterialKind, MaterialSurfaceRoughness};
 pub(super) enum SourceSimpleGlazingOpticalModel {
     #[default]
     SpectralAverage,
+    Spectral,
 }
 
 /// Sole runtime GlassSimple properties. Typed derived values remain advisory.
@@ -337,6 +338,283 @@ fn glazing_custom(
         })
 }
 
+// Same Native SpectralDataProperties owner. None is unallocated,Some(empty)
+// is the valid zero-wavelength allocation; invalid counts leave arraysNone.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub(super) struct SourceGlazingSpectralData {
+    pub name: String,
+    pub num_of_wavelengths: i32,
+    pub wavelengths: Option<Box<[f64]>>,
+    pub transmittance: Option<Box<[f64]>>,
+    pub front_reflectance: Option<Box<[f64]>>,
+    pub back_reflectance: Option<Box<[f64]>>,
+}
+
+fn spectral_severe(
+    owners: &mut MaterialDataOwners<'_, '_>,
+    message: &str,
+) -> Result<(), RuntimeError> {
+    let flags = owners
+        .diagnostic_flags
+        .as_ref()
+        .ok_or_else(|| unavailable("actual spectral diagnostic flags"))?;
+    owners
+        .backend
+        .show_source_severe_error(message, flags)
+        .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))
+}
+fn spectral_continue(
+    owners: &mut MaterialDataOwners<'_, '_>,
+    message: &str,
+) -> Result<(), RuntimeError> {
+    owners
+        .backend
+        .show_continue_error(message)
+        .map_err(|error| {
+            RuntimeError::HeatBalanceInput(Box::new(HeatBalanceInputError::Backend(error)))
+        })
+}
+fn spectral_custom(
+    owners: &mut MaterialDataOwners<'_, '_>,
+    name: &str,
+    message: &str,
+    warning: bool,
+) -> Result<(), RuntimeError> {
+    let header =
+        format!("GetWindowGlassSpectralData: MaterialProperty:GlazingSpectralData = {name}");
+    if warning {
+        let flags = owners
+            .diagnostic_flags
+            .as_ref()
+            .ok_or_else(|| unavailable("actual spectral warning flags"))?;
+        owners
+            .backend
+            .show_source_warning_error(&header, flags)
+            .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+    } else {
+        spectral_severe(owners, &header)?;
+    }
+    spectral_continue(owners, message)
+}
+fn spectral_t4(value: f64) -> Result<String, RuntimeError> {
+    crate::heat_balance::source_round_format::truncate(value, 4)
+        .map_err(|_| unavailable("actual spectral .4T formatter"))
+}
+impl SelectedMaterialData {
+    // HBM266/Material2946-3101, before the actual Material268 getter.
+    pub(super) fn get_glass_spectral_data(
+        &mut self,
+        raw: &super::SelectedMaterialInput,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(), RuntimeError> {
+        let family = "MaterialProperty:GlazingSpectralData";
+        owners.shortcut.current_module_object = family.into();
+        self.num_spectral_data = super::count(owners.input, family)?;
+        if self.num_spectral_data == 0 {
+            return Ok(());
+        }
+        let count = usize::try_from(self.num_spectral_data)
+            .map_err(|_| unavailable("actual spectral count"))?;
+        self.spectral_data =
+            Some(vec![SourceGlazingSpectralData::default(); count].into_boxed_slice());
+        if raw.spectral_data.len() != count {
+            return Err(unavailable("spectral raw/IP count"));
+        }
+        for (index, input) in raw.spectral_data.iter().enumerate() {
+            let (_, numbers) = raw.get_spectral_data_item(input, owners)?;
+            let name = owners.shortcut.alpha_args[0].clone();
+            let row = &mut self
+                .spectral_data
+                .as_mut()
+                .ok_or_else(|| unavailable("allocated spectral datasets"))?[index];
+            row.name = name.clone();
+            let total = numbers / 4;
+            if !numbers.is_multiple_of(4) {
+                spectral_custom(
+                    owners,
+                    &name,
+                    &format!(
+                        "{numbers} of items in data set is not a multiple of 4 (Wavelength,Trans,ReflFront,ReflBack), remainder items set to 0.0"
+                    ),
+                    true,
+                )?;
+                *owners.errors_found = true;
+                continue;
+            }
+            if total > 800 {
+                spectral_custom(
+                    owners,
+                    &name,
+                    &format!("More than 800 entries in set ({numbers})"),
+                    false,
+                )?;
+                *owners.errors_found = true;
+                continue;
+            }
+            row.num_of_wavelengths =
+                i32::try_from(total).map_err(|_| unavailable("spectral wavelength count"))?;
+            row.wavelengths = Some(vec![0.0; total].into_boxed_slice());
+            row.transmittance = Some(vec![0.0; total].into_boxed_slice());
+            row.front_reflectance = Some(vec![0.0; total].into_boxed_slice());
+            row.back_reflectance = Some(vec![0.0; total].into_boxed_slice());
+            for point in 0..total {
+                row.wavelengths
+                    .as_mut()
+                    .ok_or_else(|| unavailable("spectral wavelengths allocation"))?[point] =
+                    owners.shortcut.numeric_args[4 * point];
+                row.transmittance
+                    .as_mut()
+                    .ok_or_else(|| unavailable("spectral transmittance allocation"))?[point] =
+                    owners.shortcut.numeric_args[4 * point + 1];
+                if row
+                    .transmittance
+                    .as_ref()
+                    .ok_or_else(|| unavailable("spectral transmittance allocation"))?[point]
+                    < 0.001
+                {
+                    row.transmittance
+                        .as_mut()
+                        .ok_or_else(|| unavailable("spectral transmittance allocation"))?[point] =
+                        0.001;
+                }
+                row.front_reflectance
+                    .as_mut()
+                    .ok_or_else(|| unavailable("spectral front allocation"))?[point] =
+                    owners.shortcut.numeric_args[4 * point + 2];
+                row.back_reflectance
+                    .as_mut()
+                    .ok_or_else(|| unavailable("spectral back allocation"))?[point] =
+                    owners.shortcut.numeric_args[4 * point + 3];
+            }
+            for point in 0..total {
+                let number = point + 1;
+                let lam = row
+                    .wavelengths
+                    .as_ref()
+                    .ok_or_else(|| unavailable("spectral wavelengths allocation"))?[point];
+                let tau = row
+                    .transmittance
+                    .as_ref()
+                    .ok_or_else(|| unavailable("spectral transmittance allocation"))?[point];
+                let front = row
+                    .front_reflectance
+                    .as_ref()
+                    .ok_or_else(|| unavailable("spectral front allocation"))?[point];
+                let back = row
+                    .back_reflectance
+                    .as_ref()
+                    .ok_or_else(|| unavailable("spectral back allocation"))?[point];
+                if number < total
+                    && row
+                        .wavelengths
+                        .as_ref()
+                        .ok_or_else(|| unavailable("spectral wavelengths allocation"))?[point + 1]
+                        <= lam
+                {
+                    *owners.errors_found = true;
+                    spectral_severe(
+                        owners,
+                        &format!(
+                            "GetWindowGlassSpectralDataMaterialProperty:GlazingSpectralData=\"{name}\" invalid set."
+                        ),
+                    )?;
+                    let next = row
+                        .wavelengths
+                        .as_ref()
+                        .ok_or_else(|| unavailable("spectral wavelengths allocation"))?[point + 1];
+                    spectral_continue(
+                        owners,
+                        &format!(
+                            "... Wavelengths not in increasing order. at wavelength#={number}, value=[{}], next is [{}].",
+                            spectral_t4(lam)?,
+                            spectral_t4(next)?
+                        ),
+                    )?;
+                }
+                let low = lam < 0.1;
+                let high = lam > 4.0;
+                if low || high {
+                    *owners.errors_found = true;
+                    spectral_severe(
+                        owners,
+                        &format!(
+                            "GetWindowGlassSpectralDataMaterialProperty:GlazingSpectralData=\"{name}\" invalid value."
+                        ),
+                    )?;
+                    spectral_continue(
+                        owners,
+                        &format!(
+                            "... A wavelength is not in the range 0.1 to 4.0 microns; at wavelength#={number}, value=[{}].",
+                            spectral_t4(lam)?
+                        ),
+                    )?;
+                }
+                if tau > 1.01 {
+                    *owners.errors_found = true;
+                    spectral_severe(
+                        owners,
+                        &format!(
+                            "GetWindowGlassSpectralData: MaterialProperty:GlazingSpectralData=\"{name}\" invalid value."
+                        ),
+                    )?;
+                    spectral_continue(
+                        owners,
+                        &format!(
+                            "... A transmittance is > 1.0; at wavelength#={number}, value=[{}].",
+                            spectral_t4(tau)?
+                        ),
+                    )?;
+                }
+                let front_low = front < 0.0;
+                let front_high = front > 1.02;
+                let back_low = back < 0.0;
+                let back_high = back > 1.02;
+                if front_low || front_high || back_low || back_high {
+                    *owners.errors_found = true;
+                    spectral_severe(
+                        owners,
+                        &format!(
+                            "GetWindowGlassSpectralData: MaterialProperty:GlazingSpectralData=\"{name}\" invalid value."
+                        ),
+                    )?;
+                    spectral_continue(
+                        owners,
+                        &format!(
+                            "... A reflectance is < 0.0 or > 1.0; at wavelength#={number}, RhoF value=[{}].",
+                            spectral_t4(front)?
+                        ),
+                    )?;
+                    spectral_continue(
+                        owners,
+                        &format!(
+                            "... A reflectance is < 0.0 or > 1.0; at wavelength#={number}, RhoB value=[{}].",
+                            spectral_t4(back)?
+                        ),
+                    )?;
+                }
+                if tau + front > 1.03 || tau + back > 1.03 {
+                    *owners.errors_found = true;
+                    spectral_severe(
+                        owners,
+                        &format!(
+                            "GetWindowGlassSpectralData: MaterialProperty:GlazingSpectralData=\"{name}\" invalid value."
+                        ),
+                    )?;
+                    spectral_continue(
+                        owners,
+                        &format!(
+                            "... Transmittance + reflectance) > 1.0 for an entry; at wavelength#={number}, value(Tau+RhoF)=[{}], value(Tau+RhoB)=[{}].",
+                            spectral_t4(tau + front)?,
+                            spectral_t4(tau + back)?
+                        ),
+                    )?;
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 impl SelectedMaterialData {
     // Native Material.cc417-612: ordinary SpectralAverage. SGS Setup is never called.
     pub(super) fn get_glazing_data(
@@ -380,10 +658,15 @@ impl SelectedMaterialData {
             material.roughness = Some(MaterialSurfaceRoughness::VerySmooth);
             self.resistance_only.insert(id, true);
             material.thickness = owners.shortcut.numeric_args[0];
-            if owners.shortcut.alpha_args[1] != "SPECTRALAVERAGE" {
-                return Err(unavailable("ordinary Glazing optical owner beyond Average"));
-            }
-            material.optical_model = SourceSimpleGlazingOpticalModel::SpectralAverage;
+            material.optical_model = match owners.shortcut.alpha_args[1].as_str() {
+                "SPECTRALAVERAGE" => SourceSimpleGlazingOpticalModel::SpectralAverage,
+                "SPECTRAL" => SourceSimpleGlazingOpticalModel::Spectral,
+                _ => {
+                    return Err(unavailable(
+                        "ordinary Glazing optical owner beyond Average/Spectral",
+                    ));
+                }
+            };
             material.transmittance = owners.shortcut.numeric_args[1];
             material.solar_reflectance_front = owners.shortcut.numeric_args[2];
             material.solar_reflectance_back = owners.shortcut.numeric_args[3];
@@ -414,62 +697,97 @@ impl SelectedMaterialData {
                     .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
             }
             // This second actual enum read follows the conductivity IO.
-            if owners.shortcut.alpha_args[1] != "SPECTRALAVERAGE" {
-                return Err(unavailable("ordinary Glazing optical owner beyond Average"));
-            }
-            material.optical_model = SourceSimpleGlazingOpticalModel::SpectralAverage;
-            for (a, b) in [(1, 2), (1, 3), (4, 5), (4, 6), (7, 8), (7, 9)] {
-                if owners.shortcut.numeric_args[a] + owners.shortcut.numeric_args[b] > 1.0 {
-                    *owners.errors_found = true;
+            material.optical_model = match owners.shortcut.alpha_args[1].as_str() {
+                "SPECTRALAVERAGE" => SourceSimpleGlazingOpticalModel::SpectralAverage,
+                "SPECTRAL" => SourceSimpleGlazingOpticalModel::Spectral,
+                _ => {
+                    return Err(unavailable(
+                        "ordinary Glazing optical owner beyond Average/Spectral",
+                    ));
+                }
+            };
+            if material.optical_model == SourceSimpleGlazingOpticalModel::Spectral {
+                if owners.shortcut.alpha_field_blanks[2] {
                     let message = format!(
-                        "{} + {} not <= 1.0",
-                        owners.shortcut.numeric_field_names[a],
-                        owners.shortcut.numeric_field_names[b]
+                        "{} = Spectral but {} is blank.",
+                        owners.shortcut.alpha_field_names[1], owners.shortcut.alpha_field_names[2]
                     );
+                    glazing_custom(owners, &name, &message, false)?;
+                    *owners.errors_found = true;
+                } else {
+                    let pointer = self
+                        .spectral_data
+                        .as_ref()
+                        .and_then(|rows| {
+                            rows.iter()
+                                .position(|row| row.name == owners.shortcut.alpha_args[2])
+                        })
+                        .map_or(0, |position| position + 1);
+                    material.spectral_data_pointer = i32::try_from(pointer)
+                        .map_err(|_| unavailable("spectral dataset one-based pointer"))?;
+                    if pointer == 0 {
+                        let message = format!(
+                            "{} = {}, item not found.",
+                            owners.shortcut.alpha_field_names[2], owners.shortcut.alpha_args[2]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                        *owners.errors_found = true;
+                    }
+                }
+            } else {
+                for (a, b) in [(1, 2), (1, 3), (4, 5), (4, 6), (7, 8), (7, 9)] {
+                    if owners.shortcut.numeric_args[a] + owners.shortcut.numeric_args[b] > 1.0 {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} + {} not <= 1.0",
+                            owners.shortcut.numeric_field_names[a],
+                            owners.shortcut.numeric_field_names[b]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                    }
+                }
+                if owners.shortcut.numeric_args[1] < 0.0 {
+                    let message = format!("{} not >= 0.0", owners.shortcut.numeric_field_names[1]);
+                    glazing_custom(owners, &name, &message, false)?;
+                    *owners.errors_found = true;
+                }
+                if owners.shortcut.numeric_args[1] > 1.0 {
+                    *owners.errors_found = true;
+                    let message = format!("{} not <= 1.0", owners.shortcut.numeric_field_names[1]);
                     glazing_custom(owners, &name, &message, false)?;
                 }
-            }
-            if owners.shortcut.numeric_args[1] < 0.0 {
-                let message = format!("{} not >= 0.0", owners.shortcut.numeric_field_names[1]);
-                glazing_custom(owners, &name, &message, false)?;
-                *owners.errors_found = true;
-            }
-            if owners.shortcut.numeric_args[1] > 1.0 {
-                *owners.errors_found = true;
-                let message = format!("{} not <= 1.0", owners.shortcut.numeric_field_names[1]);
-                glazing_custom(owners, &name, &message, false)?;
-            }
-            for index in [2, 3] {
-                let below_lower = owners.shortcut.numeric_args[index] < 0.0;
-                let above_upper = owners.shortcut.numeric_args[index] > 1.0;
-                if below_lower || above_upper {
+                for index in [2, 3] {
+                    let below_lower = owners.shortcut.numeric_args[index] < 0.0;
+                    let above_upper = owners.shortcut.numeric_args[index] > 1.0;
+                    if below_lower || above_upper {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} not >= 0.0 and <= 1.0",
+                            owners.shortcut.numeric_field_names[index]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                    }
+                }
+                if owners.shortcut.numeric_args[4] < 0.0 {
+                    let message = format!("{} not >= 0.0", owners.shortcut.numeric_field_names[4]);
+                    glazing_custom(owners, &name, &message, true)?;
+                }
+                if owners.shortcut.numeric_args[4] > 1.0 {
                     *owners.errors_found = true;
-                    let message = format!(
-                        "{} not >= 0.0 and <= 1.0",
-                        owners.shortcut.numeric_field_names[index]
-                    );
+                    let message = format!("{} not <= 1.0", owners.shortcut.numeric_field_names[4]);
                     glazing_custom(owners, &name, &message, false)?;
                 }
-            }
-            if owners.shortcut.numeric_args[4] < 0.0 {
-                let message = format!("{} not >= 0.0", owners.shortcut.numeric_field_names[4]);
-                glazing_custom(owners, &name, &message, true)?;
-            }
-            if owners.shortcut.numeric_args[4] > 1.0 {
-                *owners.errors_found = true;
-                let message = format!("{} not <= 1.0", owners.shortcut.numeric_field_names[4]);
-                glazing_custom(owners, &name, &message, false)?;
-            }
-            for index in [5, 6] {
-                let below_lower = owners.shortcut.numeric_args[index] < 0.0;
-                let above_upper = owners.shortcut.numeric_args[index] > 1.0;
-                if below_lower || above_upper {
-                    *owners.errors_found = true;
-                    let message = format!(
-                        "{} not >= 0.0 and <= 1.0",
-                        owners.shortcut.numeric_field_names[index]
-                    );
-                    glazing_custom(owners, &name, &message, false)?;
+                for index in [5, 6] {
+                    let below_lower = owners.shortcut.numeric_args[index] < 0.0;
+                    let above_upper = owners.shortcut.numeric_args[index] > 1.0;
+                    if below_lower || above_upper {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} not >= 0.0 and <= 1.0",
+                            owners.shortcut.numeric_field_names[index]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                    }
                 }
             }
             if owners.shortcut.numeric_args[7] > 1.0 {

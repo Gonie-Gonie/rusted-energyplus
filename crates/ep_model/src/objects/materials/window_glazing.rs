@@ -35,6 +35,44 @@ pub struct WindowGlazingSpectralAverageMaterial {
     pub poissons_ratio: f64,
 }
 
+/// Original scalar declarations for unused ordinary Spectral Glass.
+/// No cached dataset optical calculation or runtime array is stored here.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowGlazingSpectralMaterial {
+    /// Glass thickness in meters.
+    pub thickness_m: f64,
+    /// Solar transmittance at normal incidence.
+    pub solar_transmittance_at_normal_incidence: f64,
+    /// Front-side solar reflectance at normal incidence.
+    pub front_side_solar_reflectance_at_normal_incidence: f64,
+    /// Back-side solar reflectance at normal incidence.
+    pub back_side_solar_reflectance_at_normal_incidence: f64,
+    /// Visible transmittance at normal incidence.
+    pub visible_transmittance_at_normal_incidence: f64,
+    /// Front-side visible reflectance at normal incidence.
+    pub front_side_visible_reflectance_at_normal_incidence: f64,
+    /// Back-side visible reflectance at normal incidence.
+    pub back_side_visible_reflectance_at_normal_incidence: f64,
+    /// Infrared transmittance at normal incidence.
+    pub infrared_transmittance_at_normal_incidence: f64,
+    /// Front-side infrared hemispherical emissivity.
+    pub front_side_infrared_hemispherical_emissivity: f64,
+    /// Back-side infrared hemispherical emissivity.
+    pub back_side_infrared_hemispherical_emissivity: f64,
+    /// Glass conductivity in W/m-K.
+    pub conductivity_w_per_m_k: f64,
+    /// Dirt correction factor for solar and visible transmittance.
+    pub dirt_correction_factor_for_solar_and_visible_transmittance: f64,
+    /// Whether the glazing is solar diffusing.
+    pub solar_diffusing: bool,
+    /// Young's modulus in Pa.
+    pub youngs_modulus_pa: f64,
+    /// Poisson's ratio.
+    pub poissons_ratio: f64,
+    /// Advisory first-match dataset ID; runtime resolves its own actual array.
+    pub spectral_data: Option<crate::GlazingSpectralDataId>,
+}
+
 /// Normal-incidence solar and visible properties derived by EnergyPlus from
 /// refraction indices and extinction coefficients.
 #[derive(Clone, Copy, Debug, PartialEq)]

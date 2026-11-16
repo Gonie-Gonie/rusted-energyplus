@@ -195,6 +195,14 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("Material:InfraredTransparent", 1, 0, 0, 0, None),
         ("WindowMaterial:Glazing", 7, 14, 0, 0, None),
         (
+            "MaterialProperty:GlazingSpectralData",
+            1,
+            16,
+            0,
+            4,
+            Some("extensions"),
+        ),
+        (
             "WindowMaterial:Glazing:RefractionExtinctionMethod",
             2,
             9,

@@ -8509,6 +8509,609 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         )
         .is_err()
     );
+    // Coherent Source-only Dataset + unused Spectral Glass. The dataset names
+    // are ordered instances: case-distinct map keys can share one uppercase Name.
+    const DATASET: &str = "MaterialProperty:GlazingSpectralData";
+    const SPECTRAL_GLASS: &str = "WindowMaterial:Glazing";
+    let mut spectral_value = input(PortingScope::B);
+    spectral_value[DATASET] = json!({
+        "A Shared":{"wavelength_1":0.5,"transmittance_1":u64::MAX,"front_reflectance_1":0.2,"back_reflectance_1":0.3,
+            "name":null,"idf_max_fields":false,"metadata":[null,1.25,{"x":true}]},
+        "a shared":{"wavelength_1":0.6,"transmittance_1":0.7,"front_reflectance_1":0.1,"back_reflectance_1":0.1},
+        "B EMPTY":{"extensions":[]},
+        "C EXT":{"extensions":[{},{"unknown":[null,{"retained":true}]},{"wavelength":0.7,"transmittance":0.4,"front_reflectance":0.2,"back_reflectance":0.3}]}
+    });
+    spectral_value[SPECTRAL_GLASS] = json!({
+        " LINK ":{"optical_data_type":"Spectral","thickness":0.003,"window_glass_spectral_data_set_name":"a ShArEd",
+            "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":"unresolved transmittance",
+            "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":"unresolved front",
+            "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"unresolved back",
+            "metadata":{"all":[null,true,[],{}]},"idf_order":{},"name":false},
+        "AVERAGE NEIGHBOUR":{"optical_data_type":"SpectralAverage","thickness":0.003},
+        "ZERO LINK":{"optical_data_type":"Spectral","thickness":0.003,"window_glass_spectral_data_set_name":"b empty"}
+    });
+    let spectral_raw =
+        ep_raw_model::parse_epjson_str_for_source(&spectral_value.to_string()).unwrap();
+    let compiled = ep_compiler::compile_raw_model_for_source(&spectral_raw);
+    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+    let model = compiled.model.as_ref().unwrap();
+    let first = model
+        .glazing_spectral_data_names
+        .resolve("a ShArEd")
+        .unwrap();
+    let glass_id = model.material_names.resolve(" LINK ").unwrap();
+    let average_id = model.material_names.resolve("AVERAGE NEIGHBOUR").unwrap();
+    let ordered = spectral_raw.source_ordered_instances(DATASET).unwrap();
+    assert!(
+        model
+            .glazing_spectral_data_names
+            .is_source_exact_namespace()
+            && model
+                .glazing_spectral_data_names
+                .names()
+                .iter()
+                .map(|name| name.0.as_str())
+                .collect::<Vec<_>>()
+                == ["A SHARED", "B EMPTY", "C EXT", "A SHARED"]
+            && ordered
+                .iter()
+                .map(|(name, _)| name.0.as_str())
+                .collect::<Vec<_>>()
+                == ["A Shared", "B EMPTY", "C EXT", "a shared"]
+            && first == model.glazing_spectral_data[0].id
+            && model.glazing_spectral_data[3].id != first
+    );
+    assert!(
+        matches!(model.materials.iter().find(|row|row.id==glass_id).unwrap().definition,
+        ep_model::MaterialDefinition::WindowGlazingSpectral(value) if value.spectral_data==Some(first))
+            && model
+                .ctf_report_names
+                .materials
+                .contains(&(glass_id, " LINK ".into()))
+    );
+    let mut ip = crate::ordinary_input_processor::resolve_source_b(&spectral_raw).unwrap();
+    let args = ip.get_object_def_max_args(DATASET).unwrap();
+    assert_eq!(
+        (args.alphas, args.numerics, args.total().unwrap()),
+        (1, 28, 29)
+    );
+    let original = ip.source_raw_object_fields(DATASET, "A Shared").unwrap();
+    assert!(
+        matches!(original.get("transmittance_1"),Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token=="18446744073709551615")
+            && original.contains_key("name")
+            && original.contains_key("idf_max_fields")
+            && original.contains_key("metadata")
+    );
+    let projected = crate::ordinary_material_input::resolve_source(&spectral_raw, &ip).unwrap();
+    let projected_first = projected
+        .spectral_data
+        .iter()
+        .find(|row| row.object.object_name == "A Shared")
+        .unwrap();
+    let projected_empty = projected
+        .spectral_data
+        .iter()
+        .find(|row| row.object.object_name == "B EMPTY")
+        .unwrap();
+    let projected_extensions = projected
+        .spectral_data
+        .iter()
+        .find(|row| row.object.object_name == "C EXT")
+        .unwrap();
+    assert_eq!(
+        (
+            projected.spectral_data.len(),
+            projected.glazing.len(),
+            projected_extensions.extensions.len()
+        ),
+        (4, 3, 3)
+    );
+    assert!(
+        projected_first.object.fields["transmittance_1"]
+            == ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(-1.0)
+            && !projected_first.object.fields.contains_key("metadata")
+            && projected_empty.extensions.is_empty()
+            && projected_extensions.extensions[0].is_empty()
+            && projected_extensions.extensions[1].is_empty()
+            && projected_extensions.extensions[2].len() == 4
+            && projected.glazing[0].fields.contains_key(
+                "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name"
+            )
+    );
+    let mut stats = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+    ip.report_source_idf_records_stats(&mut stats).unwrap();
+    assert_eq!(
+        usize::try_from(stats.number_input_records).unwrap(),
+        spectral_raw
+            .objects
+            .values()
+            .map(|rows| rows.len())
+            .sum::<usize>()
+    );
+    assert!(
+        ip.is_object_unused(DATASET, "A Shared")
+            && ip.is_object_unused(DATASET, "a shared")
+            && ip.is_object_unused(SPECTRAL_GLASS, " LINK ")
+    );
+    let mut trace = inspect_porting_scope(
+        &spectral_raw,
+        &compiled.report,
+        Some(model),
+        PortingScope::B,
+    );
+    assert!(trace.admissible, "{:?}", trace.violations);
+    trace.environment = Some(
+        super::environment::environment_from_weather(
+            model,
+            &weather,
+            "same Spectral caller weather",
+        )
+        .unwrap(),
+    );
+    let admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&spectral_raw, &trace)
+            .unwrap();
+    assert!(
+        crate::support::assess_support_with_source_admission(
+            &spectral_raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission)
+        )
+        .allows_rust_runtime()
+    );
+    assert!(
+        crate::ordinary_equipment_input::resolve(&spectral_raw).is_err()
+            && crate::ordinary_equipment_input::resolve_source_a(&spectral_raw).is_err()
+            && !assess_support(
+                &spectral_raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal
+            )
+            .allows_rust_runtime()
+    );
+
+    let mut models = Vec::new();
+    let mut absent = model.clone();
+    absent.glazing_spectral_data.clear();
+    models.push(absent);
+    let mut absent_glass = model.clone();
+    absent_glass
+        .materials
+        .retain(|row| row.kind() != ep_model::MaterialKind::WindowGlazing);
+    models.push(absent_glass);
+    let mut extra = model.clone();
+    extra
+        .glazing_spectral_data
+        .push(extra.glazing_spectral_data[0].clone());
+    models.push(extra);
+    let mut wrong_id = model.clone();
+    wrong_id.glazing_spectral_data[0].id = ep_model::GlazingSpectralDataId(u32::MAX);
+    models.push(wrong_id);
+    let mut wrong_name = model.clone();
+    wrong_name.glazing_spectral_data[0].name = ep_model::NormalizedName::new("WRONG");
+    models.push(wrong_name);
+    let mut wrong_order = model.clone();
+    wrong_order.glazing_spectral_data.swap(0, 1);
+    models.push(wrong_order);
+    let mut dataset_alias = model.clone();
+    dataset_alias
+        .glazing_spectral_data_names
+        .insert("EXTRA DATA ALIAS", first);
+    models.push(dataset_alias);
+    let mut wrong_first = model.clone();
+    wrong_first.glazing_spectral_data_names = ep_model::NameMap::source_exact_namespace();
+    wrong_first
+        .glazing_spectral_data
+        .iter()
+        .enumerate()
+        .for_each(|(index, row)| {
+            wrong_first.glazing_spectral_data_names.insert_instance(
+                &row.name.0,
+                if index == 0 {
+                    ep_model::GlazingSpectralDataId(1)
+                } else {
+                    row.id
+                },
+            );
+        });
+    models.push(wrong_first);
+    let mut wrong_link = model.clone();
+    if let ep_model::MaterialDefinition::WindowGlazingSpectral(ref mut value) = wrong_link
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .definition
+    {
+        value.spectral_data = Some(ep_model::GlazingSpectralDataId(1));
+    }
+    models.push(wrong_link);
+    let average = model
+        .materials
+        .iter()
+        .find(|row| row.id == average_id)
+        .unwrap()
+        .definition;
+    let spectral = model
+        .materials
+        .iter()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .definition;
+    let mut wrong_mode = model.clone();
+    wrong_mode
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .definition = average;
+    models.push(wrong_mode);
+    let mut wrong_average = model.clone();
+    wrong_average
+        .materials
+        .iter_mut()
+        .find(|row| row.id == average_id)
+        .unwrap()
+        .definition = spectral;
+    models.push(wrong_average);
+    let mut wrong_kind = model.clone();
+    let opaque_definition = wrong_kind
+        .materials
+        .iter()
+        .find(|row| row.kind() != ep_model::MaterialKind::WindowGlazing)
+        .unwrap()
+        .definition;
+    wrong_kind
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .definition = opaque_definition;
+    models.push(wrong_kind);
+    let mut glass_alias = model.clone();
+    glass_alias
+        .material_names
+        .insert("EXTRA GLASS ALIAS", glass_id);
+    models.push(glass_alias);
+    let mut duplicate_alias = model.clone();
+    duplicate_alias
+        .material_names
+        .insert_instance(" LINK ", glass_id);
+    models.push(duplicate_alias);
+    let mut loader = model.clone();
+    loader
+        .ctf_report_names
+        .materials
+        .push((glass_id, "EXTRA LOADER".into()));
+    models.push(loader);
+    let mut missing_loader = model.clone();
+    missing_loader
+        .ctf_report_names
+        .materials
+        .retain(|(id, _)| *id != glass_id);
+    models.push(missing_loader);
+    let mut bad_material_id = model.clone();
+    bad_material_id
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .id = ep_model::MaterialId(u32::MAX);
+    models.push(bad_material_id);
+    let mut bad_material_name = model.clone();
+    bad_material_name
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .name = ep_model::NormalizedName::new("WRONG GLASS");
+    models.push(bad_material_name);
+    let mut extra_glass = model.clone();
+    let mut row = extra_glass
+        .materials
+        .iter()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .clone();
+    row.id = ep_model::MaterialId(u32::try_from(extra_glass.materials.len()).unwrap());
+    extra_glass.materials.push(row);
+    models.push(extra_glass);
+    let mut outside = model.clone();
+    outside.constructions[0].layers.clear();
+    outside.constructions[0].outside_layer = Some(glass_id);
+    models.push(outside);
+    let mut nonfirst = model.clone();
+    let opaque = nonfirst.constructions[0].outside_layer.unwrap();
+    nonfirst.constructions[0].layers = vec![opaque, glass_id];
+    models.push(nonfirst);
+    for model in models {
+        assert!(
+            !crate::support::assess_support_with_source_admission(
+                &spectral_raw,
+                &compiled.report,
+                Some(&model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission)
+            )
+            .allows_rust_runtime()
+        );
+    }
+    let mut empty_value = spectral_value.clone();
+    empty_value.as_object_mut().unwrap().remove(DATASET);
+    empty_value[SPECTRAL_GLASS]
+        .as_object_mut()
+        .unwrap()
+        .remove(" LINK ");
+    empty_value[SPECTRAL_GLASS]
+        .as_object_mut()
+        .unwrap()
+        .remove("ZERO LINK");
+    let empty_raw = ep_raw_model::parse_epjson_str_for_source(&empty_value.to_string()).unwrap();
+    let empty_compiled = ep_compiler::compile_raw_model_for_source(&empty_raw);
+    let empty_model = empty_compiled.model.as_ref().unwrap();
+    let mut empty_trace = inspect_porting_scope(
+        &empty_raw,
+        &empty_compiled.report,
+        Some(empty_model),
+        PortingScope::B,
+    );
+    empty_trace.environment = Some(
+        super::environment::environment_from_weather(
+            empty_model,
+            &weather,
+            "same noDataset weather",
+        )
+        .unwrap(),
+    );
+    let empty_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&empty_raw, &empty_trace)
+            .unwrap();
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &empty_raw,
+            &empty_compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&empty_admission)
+        )
+        .allows_rust_runtime()
+    );
+
+    // Dataset custody must stand on its own: no Glass registry blocker may mask it.
+    let mut dataset_only_value = spectral_value.clone();
+    dataset_only_value
+        .as_object_mut()
+        .unwrap()
+        .remove(SPECTRAL_GLASS);
+    let dataset_only_raw =
+        ep_raw_model::parse_epjson_str_for_source(&dataset_only_value.to_string()).unwrap();
+    let dataset_only_compiled = ep_compiler::compile_raw_model_for_source(&dataset_only_raw);
+    let dataset_only_model = dataset_only_compiled.model.as_ref().unwrap();
+    let mut dataset_only_trace = inspect_porting_scope(
+        &dataset_only_raw,
+        &dataset_only_compiled.report,
+        Some(dataset_only_model),
+        PortingScope::B,
+    );
+    dataset_only_trace.environment = Some(
+        super::environment::environment_from_weather(
+            dataset_only_model,
+            &weather,
+            "same dataset-only caller weather",
+        )
+        .unwrap(),
+    );
+    let dataset_only_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+        &dataset_only_raw,
+        &dataset_only_trace,
+    )
+    .unwrap();
+    assert!(
+        crate::support::assess_support_with_source_admission(
+            &dataset_only_raw,
+            &dataset_only_compiled.report,
+            Some(dataset_only_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&dataset_only_admission),
+        )
+        .allows_rust_runtime()
+    );
+    let mut dataset_only_models = Vec::new();
+    let mut missing = dataset_only_model.clone();
+    missing.glazing_spectral_data.clear();
+    dataset_only_models.push(missing);
+    let mut extra = dataset_only_model.clone();
+    extra
+        .glazing_spectral_data
+        .push(extra.glazing_spectral_data[0].clone());
+    dataset_only_models.push(extra);
+    let mut wrong_id = dataset_only_model.clone();
+    wrong_id.glazing_spectral_data[0].id = ep_model::GlazingSpectralDataId(u32::MAX);
+    dataset_only_models.push(wrong_id);
+    let mut wrong_name = dataset_only_model.clone();
+    wrong_name.glazing_spectral_data[0].name = ep_model::NormalizedName::new("WRONG DATASET");
+    dataset_only_models.push(wrong_name);
+    let mut wrong_order = dataset_only_model.clone();
+    wrong_order.glazing_spectral_data.swap(0, 1);
+    dataset_only_models.push(wrong_order);
+    let mut alias = dataset_only_model.clone();
+    alias
+        .glazing_spectral_data_names
+        .insert("EXTRA DATASET ALIAS", first);
+    dataset_only_models.push(alias);
+    let mut wrong_first = dataset_only_model.clone();
+    wrong_first.glazing_spectral_data_names = ep_model::NameMap::source_exact_namespace();
+    wrong_first
+        .glazing_spectral_data
+        .iter()
+        .enumerate()
+        .for_each(|(index, row)| {
+            wrong_first.glazing_spectral_data_names.insert_instance(
+                &row.name.0,
+                if index == 0 {
+                    ep_model::GlazingSpectralDataId(1)
+                } else {
+                    row.id
+                },
+            );
+        });
+    dataset_only_models.push(wrong_first);
+    for malformed in dataset_only_models {
+        let support = crate::support::assess_support_with_source_admission(
+            &dataset_only_raw,
+            &dataset_only_compiled.report,
+            Some(&malformed),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&dataset_only_admission),
+        );
+        assert!(
+            !support.allows_rust_runtime()
+                && support
+                    .unsupported_objects
+                    .iter()
+                    .any(|row| row.object_type == DATASET)
+                && support.diagnostics.diagnostics.iter().any(|row| row.code
+                    == "UnsupportedGlazingSpectralDataSourceAdmission"
+                    && row.blocking)
+        );
+    }
+    // With no Raw or typed dataset rows, an extra namespace entry still breaks custody.
+    let mut namespace_only = empty_model.clone();
+    namespace_only
+        .glazing_spectral_data_names
+        .insert("UNBOUND DATASET", first);
+    let support = crate::support::assess_support_with_source_admission(
+        &empty_raw,
+        &empty_compiled.report,
+        Some(&namespace_only),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&empty_admission),
+    );
+    assert!(
+        !support.allows_rust_runtime()
+            && support
+                .unsupported_objects
+                .iter()
+                .any(|row| row.object_type == DATASET && row.count == 1)
+            && support.diagnostics.diagnostics.iter().any(|row| row.code
+                == "UnsupportedGlazingSpectralDataSourceAdmission"
+                && row.blocking)
+    );
+
+    // Each invalid row changes only one originally valid Raw field/shape.
+    for (family, name, field, value) in [
+        (DATASET, "A Shared", "wavelength_1", json!(null)),
+        (DATASET, "A Shared", "transmittance_1", json!("0.4")),
+        (DATASET, "A Shared", "front_reflectance_1", json!(true)),
+        (DATASET, "A Shared", "back_reflectance_1", json!([])),
+        (DATASET, "C EXT", "extensions", json!({})),
+        (DATASET, "C EXT", "extensions", json!(["wrong item"])),
+        (DATASET, "C EXT", "extensions", json!([{"wavelength":null}])),
+        (
+            DATASET,
+            "C EXT",
+            "extensions",
+            json!([{"transmittance":false}]),
+        ),
+        (
+            DATASET,
+            "C EXT",
+            "extensions",
+            json!([{"front_reflectance":[]}]),
+        ),
+        (
+            DATASET,
+            "C EXT",
+            "extensions",
+            json!([{"back_reflectance":{}}]),
+        ),
+        (
+            SPECTRAL_GLASS,
+            " LINK ",
+            "optical_data_type",
+            json!("spectral"),
+        ),
+        (
+            SPECTRAL_GLASS,
+            " LINK ",
+            "optical_data_type",
+            json!("SpectralAndAngle"),
+        ),
+        (SPECTRAL_GLASS, " LINK ", "thickness", json!(0.0)),
+        (
+            SPECTRAL_GLASS,
+            " LINK ",
+            "window_glass_spectral_data_set_name",
+            json!(false),
+        ),
+        (
+            SPECTRAL_GLASS,
+            " LINK ",
+            "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name",
+            json!({}),
+        ),
+    ] {
+        let mut invalid = spectral_value.clone();
+        invalid[family][name][field] = value;
+        assert!(
+            crate::ordinary_input_processor::resolve_source_b(
+                &ep_raw_model::parse_epjson_str_for_source(&invalid.to_string()).unwrap()
+            )
+            .is_err()
+        );
+    }
+    let mut missing = spectral_value.clone();
+    missing[SPECTRAL_GLASS][" LINK "]
+        .as_object_mut()
+        .unwrap()
+        .remove("thickness");
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &ep_raw_model::parse_epjson_str_for_source(&missing.to_string()).unwrap()
+        )
+        .is_err()
+    );
+    let mut used = spectral_value.clone();
+    used["Construction"]["Spectral Used"] = json!({"outside_layer":" LINK "});
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &ep_raw_model::parse_epjson_str_for_source(&used.to_string()).unwrap()
+        )
+        .is_err()
+    );
+    let converted = json!({"Zone":{"Zone":{}},
+        "MaterialProperty:GlazingSpectralData":spectral_value[DATASET].clone(),
+        "WindowMaterial:Glazing":spectral_value[SPECTRAL_GLASS].clone()});
+    let staged =
+        ep_raw_model::parse_epjson_str_with_idf_order(&converted.to_string(), "Zone,Zone;")
+            .unwrap();
+    assert!(
+        !staged.is_epjson() && crate::ordinary_equipment_input::resolve_source_b(&staged).is_err()
+    );
 }
 
 #[test]

@@ -76,6 +76,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         simple_glazing: Vec::new(),
         glazing: Vec::new(),
         refraction: Vec::new(),
+        spectral_data: Vec::new(),
         window_gas: Vec::new(),
         window_gas_mixture: Vec::new(),
         air_gaps: vec![ProjectInputObject {
@@ -1949,6 +1950,395 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                         "WindowMaterial:Glazing:RefractionExtinctionMethod",
                         name
                     ))
+        );
+    }
+    // One fresh Spectral context: actual HBM266 arrays precede Material268.
+    {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let fixed_names = [
+            "wavelength_1",
+            "transmittance_1",
+            "front_reflectance_1",
+            "back_reflectance_1",
+            "wavelength_2",
+            "transmittance_2",
+            "front_reflectance_2",
+            "back_reflectance_2",
+            "wavelength_3",
+            "transmittance_3",
+            "front_reflectance_3",
+            "back_reflectance_3",
+            "wavelength_4",
+            "transmittance_4",
+            "front_reflectance_4",
+            "back_reflectance_4",
+        ];
+        let wrapped = ep_model::classify_source_json_number("18446744073709551615")
+            .unwrap()
+            .as_f64();
+        let fixed: BTreeMap<String, Value> = fixed_names
+            .iter()
+            .zip([
+                0.1, 0.2, 0.3, 0.4, 0.2, 0.2, 0.3, 0.4, 0.3, 0.2, 0.3, 0.4, 0.4, 0.2, 0.3, 0.4,
+            ])
+            .map(|(name, value)| ((*name).into(), Value::Number(value)))
+            .collect();
+        let extensions: Vec<BTreeMap<String, Value>> = (4..800)
+            .map(|index| {
+                BTreeMap::from([
+                    (
+                        "wavelength".into(),
+                        Value::Number(0.1 + f64::from(index) * 0.004),
+                    ),
+                    ("transmittance".into(), Value::Number(0.2)),
+                    ("front_reflectance".into(), Value::Number(0.3)),
+                    ("back_reflectance".into(), Value::Number(0.4)),
+                ])
+            })
+            .collect();
+        let mut bulk_fixed = fixed.clone();
+        bulk_fixed.insert("wavelength_2".into(), Value::Number(0.104));
+        bulk_fixed.insert("wavelength_3".into(), Value::Number(0.108));
+        bulk_fixed.insert("wavelength_4".into(), Value::Number(0.112));
+        raw.spectral_data = [
+            ("A ZERO", BTreeMap::new(), Vec::new()),
+            (
+                "B FIXED EMPTY EXT",
+                fixed_names[..4]
+                    .iter()
+                    .zip([0.5, 0.4, 0.2, 0.3])
+                    .map(|(name, value)| ((*name).into(), Value::Number(value)))
+                    .collect(),
+                Vec::new(),
+            ),
+            (
+                "C Shared",
+                fixed_names[..4]
+                    .iter()
+                    .zip([0.5, wrapped, 0.2, 0.3])
+                    .map(|(name, value)| ((*name).into(), Value::Number(value)))
+                    .collect(),
+                Vec::new(),
+            ),
+            (
+                "c shared",
+                fixed_names[..4]
+                    .iter()
+                    .zip([0.6, 0.7, 0.1, 0.1])
+                    .map(|(name, value)| ((*name).into(), Value::Number(value)))
+                    .collect(),
+                Vec::new(),
+            ),
+            ("Z EIGHT HUNDRED", bulk_fixed, extensions),
+        ]
+        .map(|(name, fields, extensions)| SourceGlazingSpectralInput {
+            object: ProjectInputObject {
+                object_name: name.into(),
+                fields,
+                idf_max_fields: None,
+            },
+            extensions,
+        })
+        .into();
+
+        for (name, reference) in [("D LINK FIRST", "c ShArEd"), ("E LINK ZERO", "a zero")] {
+            let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(name),
+                definition: MaterialDefinition::WindowGlazingSpectral(
+                    ep_model::WindowGlazingSpectralMaterial {
+                        thickness_m: 0.003,
+                        solar_transmittance_at_normal_incidence: 0.0,
+                        front_side_solar_reflectance_at_normal_incidence: 0.0,
+                        back_side_solar_reflectance_at_normal_incidence: 0.0,
+                        visible_transmittance_at_normal_incidence: 0.0,
+                        front_side_visible_reflectance_at_normal_incidence: 0.0,
+                        back_side_visible_reflectance_at_normal_incidence: 0.0,
+                        infrared_transmittance_at_normal_incidence: 0.0,
+                        front_side_infrared_hemispherical_emissivity: 0.84,
+                        back_side_infrared_hemispherical_emissivity: 0.84,
+                        conductivity_w_per_m_k: 0.9,
+                        dirt_correction_factor_for_solar_and_visible_transmittance: 1.0,
+                        solar_diffusing: false,
+                        youngs_modulus_pa: 72_000_000_000.0,
+                        poissons_ratio: 0.22,
+                        spectral_data: None,
+                    },
+                ),
+            });
+            model.ctf_report_names.materials.push((id, name.into()));
+            raw.glazing.push(ProjectInputObject {
+                object_name: name.into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("optical_data_type".into(), Value::String("Spectral".into())),
+                    (
+                        "window_glass_spectral_data_set_name".into(),
+                        Value::String(reference.into()),
+                    ),
+                    ("thickness".into(), Value::Number(0.003)),
+                ]),
+            });
+        }
+
+        // Every context owns real family definitions, every extension position,
+        // input unused accounting and the same shared scratch/backend/Material owner.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+        ];
+        let mut definitions: Vec<_> = families
+            .iter()
+            .map(|(name, _, a, n)| SourceObjectDefinition {
+                object_type: (*name).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        definitions.push(SourceObjectDefinition {
+            object_type: "MaterialProperty:GlazingSpectralData".into(),
+            alpha_fields: 1,
+            numeric_fields: 16,
+            alpha_extensions: 0,
+            numeric_extensions: 4,
+            extension: Some("extensions".into()),
+        });
+        let mut shapes: BTreeMap<_, _> = families
+            .into_iter()
+            .map(|(name, rows, _, _)| {
+                (
+                    name.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|key| (key.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        shapes.insert(
+            "MaterialProperty:GlazingSpectralData".into(),
+            SourceInputFamily::Objects(
+                raw.spectral_data
+                    .iter()
+                    .map(|row| {
+                        let mut sizes: BTreeMap<_, _> = row
+                            .object
+                            .fields
+                            .keys()
+                            .map(|key| (key.clone(), 1))
+                            .collect();
+                        if !row.extensions.is_empty()
+                            || row.object.object_name == "B FIXED EMPTY EXT"
+                        {
+                            sizes.insert("extensions".into(), row.extensions.len());
+                        }
+                        SourceObjectShape {
+                            object_name: row.object.object_name.clone(),
+                            field_sizes: sizes,
+                        }
+                    })
+                    .collect(),
+            ),
+        );
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        assert!(data.spectral_data.is_none());
+        let args = input
+            .get_object_def_max_args("MaterialProperty:GlazingSpectralData")
+            .unwrap();
+        assert_eq!(
+            (args.alphas, args.numerics, args.total().unwrap()),
+            (1, 3200, 3201)
+        );
+        {
+            let stream: &mut dyn std::io::Write = &mut text;
+
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            for (index, expected) in [(0, 0), (1, 4), (4, 3200)] {
+                owners.shortcut.alpha_args.fill("stale".into());
+                owners.shortcut.numeric_args.fill(-123.0);
+                owners.shortcut.alpha_field_names.fill("stale".into());
+                owners.shortcut.numeric_field_names.fill("stale".into());
+                owners.shortcut.alpha_field_blanks.fill(false);
+                owners.shortcut.numeric_field_blanks.fill(false);
+                assert_eq!(
+                    raw.get_spectral_data_item(&raw.spectral_data[index], &mut owners)
+                        .unwrap(),
+                    (1, expected)
+                );
+                assert!(
+                    owners.shortcut.alpha_args[0]
+                        == raw.spectral_data[index]
+                            .object
+                            .object_name
+                            .to_ascii_uppercase()
+                        && owners.shortcut.alpha_field_names[0] == "name"
+                        && !owners.shortcut.alpha_field_blanks[0]
+                        && owners.shortcut.alpha_args[1..].iter().all(String::is_empty)
+                        && owners.shortcut.alpha_field_names[1..]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_blanks[1..]
+                            .iter()
+                            .all(|value| *value)
+                );
+                assert_eq!(&owners.shortcut.numeric_field_names[..16], &fixed_names);
+                assert!(
+                    owners.shortcut.numeric_args[expected..]
+                        .iter()
+                        .all(|value| *value == 0.0)
+                        && owners.shortcut.numeric_field_blanks[expected..]
+                            .iter()
+                            .all(|value| *value)
+                        && owners.shortcut.numeric_field_names
+                            [(16 + raw.spectral_data[index].extensions.len() * 4)..]
+                            .iter()
+                            .all(String::is_empty)
+                );
+            }
+            data.get_glass_spectral_data(&raw, &mut owners).unwrap();
+            data.get_material_data(&raw, &mut owners).unwrap();
+        }
+        let rows = data.spectral_data.as_ref().unwrap();
+        assert_eq!((data.num_spectral_data, rows.len()), (5, 5));
+        assert!(
+            rows[0].num_of_wavelengths == 0
+                && [
+                    &rows[0].wavelengths,
+                    &rows[0].transmittance,
+                    &rows[0].front_reflectance,
+                    &rows[0].back_reflectance
+                ]
+                .iter()
+                .all(|array| array.as_ref().is_some_and(|array| array.is_empty()))
+        );
+        assert_eq!(
+            (
+                rows[1].num_of_wavelengths,
+                rows[2].name.as_str(),
+                rows[3].name.as_str()
+            ),
+            (1, "C SHARED", "C SHARED")
+        );
+        assert_eq!(
+            (
+                wrapped,
+                rows[2].transmittance.as_ref().unwrap()[0],
+                rows[3].transmittance.as_ref().unwrap()[0]
+            ),
+            (-1.0, 0.001, 0.7)
+        );
+        assert!(
+            rows[4].num_of_wavelengths == 800
+                && [
+                    &rows[4].wavelengths,
+                    &rows[4].transmittance,
+                    &rows[4].front_reflectance,
+                    &rows[4].back_reflectance
+                ]
+                .iter()
+                .all(|array| array.as_ref().unwrap().len() == 800)
+        );
+        assert_eq!(
+            [
+                rows[4].transmittance.as_ref().unwrap()[799],
+                rows[4].front_reflectance.as_ref().unwrap()[799],
+                rows[4].back_reflectance.as_ref().unwrap()[799]
+            ],
+            [0.2, 0.3, 0.4]
+        );
+        let first = &data.simple_glazing[&MaterialId(3)];
+        let zero = &data.simple_glazing[&MaterialId(4)];
+        assert_eq!(
+            (first.spectral_data_pointer, zero.spectral_data_pointer),
+            (3, 1)
+        );
+        assert!(
+            first.optical_model == super::simple_glazing::SourceSimpleGlazingOpticalModel::Spectral
+                && first.thickness == 0.003
+                && first.transmittance == 0.0
+                && first.resistance > 0.0
+                && first.resistance.to_bits() == data.nominal_r[3].to_bits()
+        );
+        assert_eq!(
+            data.source_glazing_surface_properties(4, MaterialId(3))
+                .unwrap(),
+            (
+                MaterialSurfaceRoughness::VerySmooth,
+                OpaqueSurfaceProperties {
+                    thermal_absorptance: first.thermal_back,
+                    solar_absorptance: 0.0,
+                    visible_absorptance: 0.0
+                }
+            )
+        );
+        assert!(
+            data.source_glazing_surface_properties(5, MaterialId(3))
+                .is_err()
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        assert!(
+            std::str::from_utf8(&eio)
+                .unwrap()
+                .contains(" Material Details,D LINK FIRST,")
+                && data.material_groups[&MaterialId(3)] == SourceMaterialGroup::Glass
+                && !errors_found
+                && text.is_empty()
+                && raw.spectral_data.iter().all(|row| !input.is_object_unused(
+                    "MaterialProperty:GlazingSpectralData",
+                    &row.object.object_name
+                ))
         );
     }
 }
@@ -3838,5 +4228,528 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
         );
         let text = std::str::from_utf8(&text).unwrap();
         assert!(text.matches("GetMaterialData: WindowMaterial:Glazing:RefractionExtinctionMethod = NO MASS, duplicate name.").count()==1 && !text.contains("Conductivity") && ["No mass","WRAPPED K","Z NORMAL"].iter().all(|name|!input.is_object_unused("WindowMaterial:Glazing:RefractionExtinctionMethod",name)));
+    }
+
+    // One successful-IO context reaches both count errors and every integrity
+    // predicate, then continues into the SAME Material owners with prior errors.
+    {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let fixed_names = [
+            "wavelength_1",
+            "transmittance_1",
+            "front_reflectance_1",
+            "back_reflectance_1",
+            "wavelength_2",
+            "transmittance_2",
+            "front_reflectance_2",
+            "back_reflectance_2",
+            "wavelength_3",
+            "transmittance_3",
+            "front_reflectance_3",
+            "back_reflectance_3",
+            "wavelength_4",
+            "transmittance_4",
+            "front_reflectance_4",
+            "back_reflectance_4",
+        ];
+        let integrity: BTreeMap<_, _> = fixed_names
+            .iter()
+            .zip([
+                0.5, 1.1, -0.1, 1.1, 0.5, 0.5, 0.6, 0.6, 4.1, 0.2, 0.2, 0.2, 0.05, 0.2, 0.2, 0.2,
+            ])
+            .map(|(name, value)| ((*name).into(), Value::Number(value)))
+            .collect();
+        let bulk_fixed: BTreeMap<_, _> = fixed_names
+            .iter()
+            .zip([
+                0.1, 0.2, 0.3, 0.4, 0.2, 0.2, 0.3, 0.4, 0.3, 0.2, 0.3, 0.4, 0.4, 0.2, 0.3, 0.4,
+            ])
+            .map(|(name, value)| ((*name).into(), Value::Number(value)))
+            .collect();
+        let extensions = (4..801)
+            .map(|index| {
+                BTreeMap::from([
+                    (
+                        "wavelength".into(),
+                        Value::Number(0.1 + f64::from(index) * 0.004),
+                    ),
+                    ("transmittance".into(), Value::Number(0.2)),
+                    ("front_reflectance".into(), Value::Number(0.3)),
+                    ("back_reflectance".into(), Value::Number(0.4)),
+                ])
+            })
+            .collect();
+        raw.spectral_data = [
+            (
+                "A PARTIAL",
+                BTreeMap::from([("wavelength_1".into(), Value::Number(0.5))]),
+                Vec::new(),
+            ),
+            ("B OVER CAP", bulk_fixed, extensions),
+            ("C INTEGRITY", integrity, vec![BTreeMap::new()]),
+        ]
+        .map(|(name, fields, extensions)| SourceGlazingSpectralInput {
+            object: ProjectInputObject {
+                object_name: name.into(),
+                fields,
+                idf_max_fields: None,
+            },
+            extensions,
+        })
+        .into();
+
+        for (name, reference) in [
+            ("D BLANK", ""),
+            ("E MISSING", "not found"),
+            ("F NORMAL", "c integrity"),
+        ] {
+            let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(name),
+                definition: MaterialDefinition::WindowGlazingSpectral(
+                    ep_model::WindowGlazingSpectralMaterial {
+                        thickness_m: 0.003,
+                        solar_transmittance_at_normal_incidence: 0.0,
+                        front_side_solar_reflectance_at_normal_incidence: 0.0,
+                        back_side_solar_reflectance_at_normal_incidence: 0.0,
+                        visible_transmittance_at_normal_incidence: 0.0,
+                        front_side_visible_reflectance_at_normal_incidence: 0.0,
+                        back_side_visible_reflectance_at_normal_incidence: 0.0,
+                        infrared_transmittance_at_normal_incidence: 0.0,
+                        front_side_infrared_hemispherical_emissivity: 0.84,
+                        back_side_infrared_hemispherical_emissivity: 0.84,
+                        conductivity_w_per_m_k: 0.9,
+                        dirt_correction_factor_for_solar_and_visible_transmittance: 1.0,
+                        solar_diffusing: false,
+                        youngs_modulus_pa: 72_000_000_000.0,
+                        poissons_ratio: 0.22,
+                        spectral_data: None,
+                    },
+                ),
+            });
+            model.ctf_report_names.materials.push((id, name.into()));
+            raw.glazing.push(ProjectInputObject {
+                object_name: name.into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("optical_data_type".into(), Value::String("Spectral".into())),
+                    (
+                        "window_glass_spectral_data_set_name".into(),
+                        Value::String(reference.into()),
+                    ),
+                    ("thickness".into(), Value::Number(0.003)),
+                ]),
+            });
+        }
+
+        // Every context owns real family definitions, every extension position,
+        // input unused accounting and the same shared scratch/backend/Material owner.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+        ];
+        let mut definitions: Vec<_> = families
+            .iter()
+            .map(|(name, _, a, n)| SourceObjectDefinition {
+                object_type: (*name).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        definitions.push(SourceObjectDefinition {
+            object_type: "MaterialProperty:GlazingSpectralData".into(),
+            alpha_fields: 1,
+            numeric_fields: 16,
+            alpha_extensions: 0,
+            numeric_extensions: 4,
+            extension: Some("extensions".into()),
+        });
+        let mut shapes: BTreeMap<_, _> = families
+            .into_iter()
+            .map(|(name, rows, _, _)| {
+                (
+                    name.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|key| (key.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        shapes.insert(
+            "MaterialProperty:GlazingSpectralData".into(),
+            SourceInputFamily::Objects(
+                raw.spectral_data
+                    .iter()
+                    .map(|row| {
+                        let mut sizes: BTreeMap<_, _> = row
+                            .object
+                            .fields
+                            .keys()
+                            .map(|key| (key.clone(), 1))
+                            .collect();
+                        if !row.extensions.is_empty()
+                            || row.object.object_name == "B FIXED EMPTY EXT"
+                        {
+                            sizes.insert("extensions".into(), row.extensions.len());
+                        }
+                        SourceObjectShape {
+                            object_name: row.object.object_name.clone(),
+                            field_sizes: sizes,
+                        }
+                    })
+                    .collect(),
+            ),
+        );
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        {
+            let stream: &mut dyn std::io::Write = &mut text;
+
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            assert_eq!(
+                raw.get_spectral_data_item(&raw.spectral_data[2], &mut owners)
+                    .unwrap(),
+                (1, 20)
+            );
+            assert!(
+                owners.shortcut.numeric_args[16..20] == [0.0; 4]
+                    && owners.shortcut.numeric_field_blanks[16..20] == [true; 4]
+                    && owners.shortcut.numeric_field_names[16..20]
+                        == [
+                            "wavelength",
+                            "transmittance",
+                            "front_reflectance",
+                            "back_reflectance"
+                        ]
+            );
+            data.get_glass_spectral_data(&raw, &mut owners).unwrap();
+            data.get_material_data(&raw, &mut owners).unwrap();
+        }
+        let rows = data.spectral_data.as_ref().unwrap();
+        assert!(rows[..2].iter().all(|row| row.num_of_wavelengths == 0
+            && row.wavelengths.is_none()
+            && row.transmittance.is_none()
+            && row.front_reflectance.is_none()
+            && row.back_reflectance.is_none()));
+        assert_eq!(
+            (
+                rows[0].name.as_str(),
+                rows[1].name.as_str(),
+                rows[2].num_of_wavelengths
+            ),
+            ("A PARTIAL", "B OVER CAP", 5)
+        );
+        assert_eq!(
+            [
+                rows[2].wavelengths.as_ref().unwrap()[4],
+                rows[2].transmittance.as_ref().unwrap()[4],
+                rows[2].front_reflectance.as_ref().unwrap()[4],
+                rows[2].back_reflectance.as_ref().unwrap()[4]
+            ],
+            [0.0, 0.001, 0.0, 0.0]
+        );
+        let text = std::str::from_utf8(&text).unwrap();
+        assert!(
+            text.find("1 of items in data set is not a multiple of 4")
+                .zip(text.find("More than 800 entries in set (3204)"))
+                .is_some_and(|(a, b)| a < b)
+        );
+        assert!(
+            [
+                "Wavelengths not in increasing order",
+                "not in the range 0.1 to 4.0",
+                "A transmittance is > 1.0",
+                "RhoF value",
+                "RhoB value",
+                "Transmittance + reflectance) > 1.0"
+            ]
+            .iter()
+            .all(|message| text.contains(message))
+        );
+        assert!(
+            text.find("invalid set.")
+                .zip(text.find("Wavelengths not in increasing order"))
+                .is_some_and(|(a, b)| a < b)
+                && text.contains("window_glass_spectral_data_set_name is blank")
+                && text.contains("NOT FOUND, item not found")
+        );
+        assert_eq!(
+            [
+                data.simple_glazing[&MaterialId(3)].spectral_data_pointer,
+                data.simple_glazing[&MaterialId(4)].spectral_data_pointer,
+                data.simple_glazing[&MaterialId(5)].spectral_data_pointer
+            ],
+            [0, 0, 3]
+        );
+        assert!(
+            errors_found
+                && state.tracking.total_warning_errors == 1
+                && state.tracking.total_severe_errors > 1
+                && data.simple_glazing[&MaterialId(5)].resistance > 0.0
+                && data.nominal_r[5].to_bits()
+                    == data.simple_glazing[&MaterialId(5)].resistance.to_bits()
+                && raw.spectral_data.iter().all(|row| !input.is_object_unused(
+                    "MaterialProperty:GlazingSpectralData",
+                    &row.object.object_name
+                ))
+        );
+    }
+    // Two bounded fresh contexts: count-custom IO stops before its flag;
+    // integrity IO stops after full array fill and its genuine flag write.
+    for integrity_failure in [false, true] {
+        let (model, mut raw) = fixture(true, 0.15);
+        let fixed_names = [
+            "wavelength_1",
+            "transmittance_1",
+            "front_reflectance_1",
+            "back_reflectance_1",
+            "wavelength_2",
+            "transmittance_2",
+            "front_reflectance_2",
+            "back_reflectance_2",
+            "wavelength_3",
+            "transmittance_3",
+            "front_reflectance_3",
+            "back_reflectance_3",
+            "wavelength_4",
+            "transmittance_4",
+            "front_reflectance_4",
+            "back_reflectance_4",
+        ];
+        let fields = if integrity_failure {
+            fixed_names
+                .iter()
+                .zip([
+                    0.5, 0.2, 0.2, 0.2, 0.5, 0.3, 0.2, 0.2, 0.7, 0.4, 0.2, 0.2, 0.8, 0.5, 0.2, 0.2,
+                ])
+                .map(|(name, value)| ((*name).into(), Value::Number(value)))
+                .collect()
+        } else {
+            BTreeMap::from([("wavelength_1".into(), Value::Number(0.5))])
+        };
+        raw.spectral_data = vec![SourceGlazingSpectralInput {
+            object: ProjectInputObject {
+                object_name: "IO PREFIX".into(),
+                fields,
+                idf_max_fields: None,
+            },
+            extensions: if integrity_failure {
+                vec![BTreeMap::new()]
+            } else {
+                Vec::new()
+            },
+        }];
+
+        // Every context owns real family definitions, every extension position,
+        // input unused accounting and the same shared scratch/backend/Material owner.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+        ];
+        let mut definitions: Vec<_> = families
+            .iter()
+            .map(|(name, _, a, n)| SourceObjectDefinition {
+                object_type: (*name).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        definitions.push(SourceObjectDefinition {
+            object_type: "MaterialProperty:GlazingSpectralData".into(),
+            alpha_fields: 1,
+            numeric_fields: 16,
+            alpha_extensions: 0,
+            numeric_extensions: 4,
+            extension: Some("extensions".into()),
+        });
+        let mut shapes: BTreeMap<_, _> = families
+            .into_iter()
+            .map(|(name, rows, _, _)| {
+                (
+                    name.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|key| (key.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        shapes.insert(
+            "MaterialProperty:GlazingSpectralData".into(),
+            SourceInputFamily::Objects(
+                raw.spectral_data
+                    .iter()
+                    .map(|row| {
+                        let mut sizes: BTreeMap<_, _> = row
+                            .object
+                            .fields
+                            .keys()
+                            .map(|key| (key.clone(), 1))
+                            .collect();
+                        if !row.extensions.is_empty()
+                            || row.object.object_name == "B FIXED EMPTY EXT"
+                        {
+                            sizes.insert("extensions".into(), row.extensions.len());
+                        }
+                        SourceObjectShape {
+                            object_name: row.object.object_name.clone(),
+                            field_sizes: sizes,
+                        }
+                    })
+                    .collect(),
+            ),
+        );
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (text, mut console, mut eio) = (Vec::<u8>::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        let mut broken = BrokenDiagnostic;
+        let result;
+        {
+            let stream: &mut dyn std::io::Write = &mut broken;
+
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            result = data.get_glass_spectral_data(&raw, &mut owners);
+        }
+        let row = &data.spectral_data.as_ref().unwrap()[0];
+        assert!(
+            result.is_err()
+                && row.name == "IO PREFIX"
+                && text.is_empty()
+                && !input.is_object_unused("MaterialProperty:GlazingSpectralData", "IO PREFIX")
+        );
+        assert_eq!(
+            (errors_found, row.num_of_wavelengths),
+            (integrity_failure, if integrity_failure { 5 } else { 0 })
+        );
+        assert!(if integrity_failure {
+            [
+                &row.wavelengths,
+                &row.transmittance,
+                &row.front_reflectance,
+                &row.back_reflectance,
+            ]
+            .iter()
+            .all(|array| array.as_ref().is_some_and(|array| array.len() == 5))
+                && row.wavelengths.as_ref().unwrap()[4] == 0.0
+                && row.transmittance.as_ref().unwrap()[4] == 0.001
+                && row.transmittance.as_ref().unwrap()[3] == 0.5
+        } else {
+            [
+                &row.wavelengths,
+                &row.transmittance,
+                &row.front_reflectance,
+                &row.back_reflectance,
+            ]
+            .iter()
+            .all(|array| array.is_none())
+        });
+        assert_eq!(
+            (
+                state.tracking.total_warning_errors,
+                state.tracking.total_severe_errors
+            ),
+            if integrity_failure { (0, 1) } else { (1, 0) }
+        );
     }
 }

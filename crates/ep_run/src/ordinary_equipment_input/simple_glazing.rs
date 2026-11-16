@@ -97,7 +97,7 @@ pub(crate) fn glazing_known_field(field: &str) -> bool {
 
 pub(super) fn glazing_admitted_field(field: &str, value: &RawValue) -> bool {
     if field == "optical_data_type" {
-        return matches!(value, RawValue::String(value) if value == "SpectralAverage");
+        return matches!(value, RawValue::String(value) if matches!(value.as_str(),"SpectralAverage"|"Spectral"));
     }
     if field == "solar_diffusing" {
         return matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"));
@@ -177,7 +177,7 @@ pub(crate) fn validate_unused_spectral_average(raw: &RawModel) -> Result<(), Str
             .any(|(field, value)| !glazing_admitted_field(&field.0, value))
         {
             return Err(
-                "Source Glazing requires original schema-valid SpectralAverage operands".into(),
+                "Source Glazing requires original schema-valid SpectralAverage or Spectral operands".into(),
             );
         }
     }
@@ -287,5 +287,68 @@ pub(crate) fn validate_unused_refraction(raw: &RawModel) -> Result<(), String> {
             layer && matches!(value, RawValue::String(reference) if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
         }))
     }) { return Err("Source Refraction material-only route excludes every Construction reference".into()); }
+    Ok(())
+}
+
+pub(crate) fn spectral_data_known_field(field: &str) -> bool {
+    field == "extensions"
+        || (1..=4).any(|i| {
+            [
+                "wavelength",
+                "transmittance",
+                "front_reflectance",
+                "back_reflectance",
+            ]
+            .iter()
+            .any(|name| field == format!("{name}_{i}"))
+        })
+}
+pub(super) fn spectral_data_admitted_field(field: &str, value: &RawValue) -> bool {
+    let number = |value: &RawValue| {
+        matches!(value,RawValue::Number(token)
+        if ep_model::classify_source_json_number(token).is_ok()
+        && token.parse::<f64>().ok().is_some_and(f64::is_finite))
+    };
+    if field == "extensions" {
+        let RawValue::Array(rows) = value else {
+            return false;
+        };
+        return rows.iter().all(|row| {
+            let RawValue::Object(fields) = row else {
+                return false;
+            };
+            fields.iter().all(|(field, value)| {
+                !matches!(
+                    field.0.as_str(),
+                    "wavelength" | "transmittance" | "front_reflectance" | "back_reflectance"
+                ) || number(value)
+            })
+        });
+    }
+    !spectral_data_known_field(field) || number(value)
+}
+pub(crate) fn validate_spectral_data(raw: &RawModel) -> Result<(), String> {
+    let Some(rows) = raw
+        .objects
+        .get(&ObjectType("MaterialProperty:GlazingSpectralData".into()))
+    else {
+        return Ok(());
+    };
+    if rows.is_empty() {
+        return Ok(());
+    }
+    if !raw.is_epjson() {
+        return Err("Source spectral data requires direct epJSON".into());
+    }
+    for (name, object) in rows {
+        if !super::window_gas::valid_name(&name.0)
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !spectral_data_admitted_field(&field.0, value))
+        {
+            return Err("Source spectral data requires original schema names/numeric fields/extension objects".into());
+        }
+    }
     Ok(())
 }

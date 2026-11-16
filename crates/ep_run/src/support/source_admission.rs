@@ -8,6 +8,10 @@ pub(crate) struct SourceSupportAdmission {
     covered_objects: BTreeSet<&'static str>,
     /// Validated original Average names only; no advisory optical coefficients.
     glazing_bindings: BTreeSet<String>,
+    /// Exact Spectral-vs-Average tag and original A3 lookup text;no optical seed.
+    spectral_glazing_bindings: BTreeMap<String, Option<String>>,
+    /// Ordered effective dataset names,including duplicate uppercase names.
+    spectral_data_bindings: Vec<String>,
     /// Validated alternative Glass names only, never advisory optical values.
     refraction_bindings: BTreeSet<String>,
     /// Validated Raw uppercase loader names/types only, never material properties.
@@ -182,6 +186,8 @@ impl SourceSupportAdmission {
             covered_objects.insert("WindowMaterial:SimpleGlazingSystem");
         }
         let mut glazing_bindings = BTreeSet::new();
+        let mut spectral_glazing_bindings = BTreeMap::new();
+        let mut spectral_data_bindings = Vec::new();
         if trace.scope == PortingScope::B
             && raw
                 .objects
@@ -190,16 +196,40 @@ impl SourceSupportAdmission {
             && crate::ordinary_equipment_input::source_b_validate_unused_spectral_average(raw)
                 .is_ok()
         {
-            for name in raw
+            for (name, object) in raw
                 .objects
                 .get(&ObjectType("WindowMaterial:Glazing".into()))?
-                .keys()
             {
+                if matches!(object.fields.get(&FieldName("optical_data_type".into())),Some(RawValue::String(mode)) if mode=="Spectral")
+                {
+                    let reference = match object
+                        .fields
+                        .get(&FieldName("window_glass_spectral_data_set_name".into()))
+                    {
+                        Some(RawValue::String(name)) => Some(name.to_ascii_uppercase()),
+                        None => None,
+                        _ => return None,
+                    };
+                    spectral_glazing_bindings.insert(name.0.to_ascii_uppercase(), reference);
+                }
                 if !glazing_bindings.insert(name.0.to_ascii_uppercase()) {
                     return None;
                 }
             }
             covered_objects.insert("WindowMaterial:Glazing");
+        }
+        if trace.scope == PortingScope::B
+            && crate::ordinary_equipment_input::source_b_validate_spectral_data(raw).is_ok()
+        {
+            for (name, _) in raw
+                .source_ordered_instances("MaterialProperty:GlazingSpectralData")
+                .ok()?
+            {
+                spectral_data_bindings.push(name.0.to_ascii_uppercase());
+            }
+            if !spectral_data_bindings.is_empty() {
+                covered_objects.insert("MaterialProperty:GlazingSpectralData");
+            }
         }
         let mut refraction_bindings = BTreeSet::new();
         if trace.scope == PortingScope::B
@@ -291,6 +321,8 @@ impl SourceSupportAdmission {
         Some(Self {
             covered_objects,
             glazing_bindings,
+            spectral_glazing_bindings,
+            spectral_data_bindings,
             refraction_bindings,
             window_gas_bindings,
             window_gas_mixture_bindings,
@@ -336,7 +368,42 @@ impl SourceSupportAdmission {
         })
     }
 
-    pub(super) fn consumes_unused_spectral_average(&self, model: &ep_model::TypedModel) -> bool {
+    // Ordered per-instance custody,not a false unique-name bijection.
+    pub(super) fn consumes_spectral_data(&self, model: &ep_model::TypedModel) -> bool {
+        let expected = &self.spectral_data_bindings;
+        if expected.is_empty() {
+            return model.glazing_spectral_data.is_empty()
+                && model.glazing_spectral_data_names.is_empty();
+        }
+        if !self.consumes("MaterialProperty:GlazingSpectralData")
+            || !model
+                .glazing_spectral_data_names
+                .is_source_exact_namespace()
+            || model.glazing_spectral_data.len() != expected.len()
+            || model.glazing_spectral_data_names.len() != expected.len()
+        {
+            return false;
+        }
+        for (index, (row, name)) in model.glazing_spectral_data.iter().zip(expected).enumerate() {
+            if usize::try_from(row.id.0).ok() != Some(index)
+                || row.name.0 != *name
+                || model.glazing_spectral_data_names.names()[index].0 != *name
+            {
+                return false;
+            }
+            let Some(first) = expected.iter().position(|candidate| candidate == name) else {
+                return false;
+            };
+            if model.glazing_spectral_data_names.resolve(name)
+                != Some(model.glazing_spectral_data[first].id)
+            {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub(super) fn consumes_unused_glazing(&self, model: &ep_model::TypedModel) -> bool {
         use ep_model::MaterialKind;
         if !self.consumes("WindowMaterial:Glazing")
             || !model.material_names.is_source_exact_namespace()
@@ -405,11 +472,23 @@ impl SourceSupportAdmission {
             {
                 return false;
             }
-            if !matches!(
-                row.definition,
-                ep_model::MaterialDefinition::WindowGlazingSpectralAverage(_)
-            ) {
-                return false;
+            match (self.spectral_glazing_bindings.get(name), row.definition) {
+                (None, ep_model::MaterialDefinition::WindowGlazingSpectralAverage(_)) => {}
+                (
+                    Some(reference),
+                    ep_model::MaterialDefinition::WindowGlazingSpectral(material),
+                ) => {
+                    if !self.consumes_spectral_data(model) {
+                        return false;
+                    }
+                    let expected = reference
+                        .as_deref()
+                        .and_then(|name| model.glazing_spectral_data_names.resolve(name));
+                    if material.spectral_data != expected {
+                        return false;
+                    }
+                }
+                _ => return false,
             }
         }
         true

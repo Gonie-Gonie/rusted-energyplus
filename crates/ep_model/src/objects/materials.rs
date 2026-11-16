@@ -37,7 +37,8 @@ pub use window_glazing::{
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
     WindowGlazingRefractionExtinctionOpticalProperties, WindowGlazingSpectralAverageMaterial,
-    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState,
+    WindowGlazingSpectralMaterial, WindowGlazingThermochromicGroupMaterial,
+    WindowGlazingThermochromicState,
 };
 pub use window_screen::{
     WindowScreenBeamReflectanceModel, WindowScreenMaterial, WindowScreenTransmittanceMapResolution,
@@ -63,7 +64,7 @@ pub enum MaterialKind {
     AirGap,
     /// Material:InfraredTransparent object.
     InfraredTransparent,
-    /// WindowMaterial:Glazing object using the SpectralAverage optical-data branch.
+    /// WindowMaterial:Glazing object using an owned ordinary optical-data branch.
     WindowGlazing,
     /// WindowMaterial:Glazing:RefractionExtinctionMethod object.
     WindowGlazingRefractionExtinction,
@@ -243,6 +244,8 @@ pub enum MaterialDefinition {
     InfraredTransparent(InfraredTransparentMaterial),
     /// Window glazing whose optical properties use the bounded `SpectralAverage` branch.
     WindowGlazingSpectralAverage(WindowGlazingSpectralAverageMaterial),
+    /// Ordinary Spectral Glass with an independent dataset identity.
+    WindowGlazingSpectral(WindowGlazingSpectralMaterial),
     /// Window glazing whose optical properties are derived from refraction and
     /// extinction inputs.
     WindowGlazingRefractionExtinction(WindowGlazingRefractionExtinctionMaterial),
@@ -474,7 +477,8 @@ impl Material {
             MaterialDefinition::NoMass(_) => MaterialKind::NoMass,
             MaterialDefinition::AirGap(_) => MaterialKind::AirGap,
             MaterialDefinition::InfraredTransparent(_) => MaterialKind::InfraredTransparent,
-            MaterialDefinition::WindowGlazingSpectralAverage(_) => MaterialKind::WindowGlazing,
+            MaterialDefinition::WindowGlazingSpectral(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_) => MaterialKind::WindowGlazing,
             MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
                 MaterialKind::WindowGlazingRefractionExtinction
             }
@@ -520,7 +524,8 @@ impl Material {
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
             | MaterialDefinition::RoofVegetation(_) => MaterialFamily::Opaque,
-            MaterialDefinition::WindowGlazingSpectralAverage(_)
+            MaterialDefinition::WindowGlazingSpectral(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGas(_)
             | MaterialDefinition::WindowGasMixture(_)
@@ -556,7 +561,8 @@ impl Material {
             MaterialDefinition::RoofVegetation(material) => {
                 Some(OpaqueMaterialRef::RoofVegetation(material))
             }
-            MaterialDefinition::WindowGlazingSpectralAverage(_)
+            MaterialDefinition::WindowGlazingSpectral(_)
+            | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
@@ -585,6 +591,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -612,7 +619,8 @@ impl Material {
     ) -> Option<&WindowGlazingSpectralAverageMaterial> {
         match &self.definition {
             MaterialDefinition::WindowGlazingSpectralAverage(material) => Some(material),
-            MaterialDefinition::Regular(_)
+            MaterialDefinition::WindowGlazingSpectral(_)
+            | MaterialDefinition::Regular(_)
             | MaterialDefinition::RoofVegetation(_)
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
@@ -648,6 +656,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
@@ -679,6 +688,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingThermochromicGroup(_)
@@ -710,6 +720,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -739,6 +750,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -768,6 +780,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -797,6 +810,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -826,6 +840,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -857,6 +872,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -886,6 +902,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -915,6 +932,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -946,6 +964,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -977,6 +996,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -1006,6 +1026,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -1037,6 +1058,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -1066,6 +1088,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)
@@ -1097,6 +1120,7 @@ impl Material {
             | MaterialDefinition::NoMass(_)
             | MaterialDefinition::AirGap(_)
             | MaterialDefinition::InfraredTransparent(_)
+            | MaterialDefinition::WindowGlazingSpectral(_)
             | MaterialDefinition::WindowGlazingSpectralAverage(_)
             | MaterialDefinition::WindowGlazingRefractionExtinction(_)
             | MaterialDefinition::WindowGlazingEquivalentLayer(_)

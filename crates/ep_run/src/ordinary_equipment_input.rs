@@ -520,6 +520,8 @@ pub(crate) use simple_glazing::validate as source_b_validate_unused_simple_glazi
 pub(crate) use simple_glazing::{
     glazing_known_field as source_b_glazing_known_field,
     refraction_known_field as source_b_refraction_known_field,
+    spectral_data_known_field as source_b_spectral_data_known_field,
+    validate_spectral_data as source_b_validate_spectral_data,
     validate_unused_refraction as source_b_validate_unused_refraction,
     validate_unused_spectral_average as source_b_validate_unused_spectral_average,
 };
@@ -597,6 +599,7 @@ fn resolve_raw(
     if source_b_ingress {
         simple_glazing::validate(raw)?;
         simple_glazing::validate_unused_spectral_average(raw)?;
+        simple_glazing::validate_spectral_data(raw)?;
         simple_glazing::validate_unused_refraction(raw)?;
         window_gas::validate(raw)?;
         window_gas::validate_mixture(raw)?;
@@ -618,6 +621,8 @@ fn resolve_raw(
         let source_refraction_family =
             source_b_ingress && family.0 == "WindowMaterial:Glazing:RefractionExtinctionMethod";
         let source_glazing_family = source_b_ingress && family.0 == "WindowMaterial:Glazing";
+        let source_spectral_data_family =
+            source_b_ingress && family.0 == "MaterialProperty:GlazingSpectralData";
         let source_named_gas_family = source_b_ingress && family.0 == "WindowMaterial:Gas";
         let source_gas_mixture_family = source_b_ingress && family.0 == "WindowMaterial:GasMixture";
         let source_people_family = source_calendar_ingress && family.0 == "People";
@@ -687,6 +692,7 @@ fn resolve_raw(
             && !source_irt_family
             && !source_refraction_family
             && !source_glazing_family
+            && !source_spectral_data_family
             && !source_simple_glazing_family
             && !source_named_gas_family
             && !source_gas_mixture_family
@@ -743,7 +749,8 @@ fn resolve_raw(
             // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
             // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
             // or Unicode whitespace. Other families keep their old boundary.
-            let blank_name = if source_refraction_family
+            let blank_name = if source_spectral_data_family
+                || source_refraction_family
                 || source_glazing_family
                 || source_named_gas_family
                 || source_gas_mixture_family
@@ -839,6 +846,7 @@ fn resolve_raw(
                     && !(source_refraction_family && simple_glazing::refraction_admitted_field(&field.0,value))
                     && !(source_glazing_family
                         && simple_glazing::glazing_admitted_field(&field.0, value))
+                    && !(source_spectral_data_family && simple_glazing::spectral_data_admitted_field(&field.0,value))
                     && !(source_simple_glazing_family
                         && simple_glazing::admitted_field(&field.0, value))
                     && !(source_named_gas_family
@@ -1177,6 +1185,7 @@ fn resolve_raw(
                 "Material:InfraredTransparent" => source_irt_family,
                 "WindowMaterial:Glazing:RefractionExtinctionMethod" => source_refraction_family,
                 "WindowMaterial:Glazing" => source_glazing_family,
+                "MaterialProperty:GlazingSpectralData" => source_spectral_data_family,
                 "WindowMaterial:SimpleGlazingSystem" => source_simple_glazing_family,
                 "WindowMaterial:Gas" => source_named_gas_family,
                 "WindowMaterial:GasMixture" => source_gas_mixture_family,

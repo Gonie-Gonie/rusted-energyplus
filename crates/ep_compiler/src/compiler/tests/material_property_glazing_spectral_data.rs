@@ -508,6 +508,179 @@ fn glazing_spectral_data_duplicate_names_fail_closed_after_full_object_validatio
     assert_eq!(model.glazing_spectral_data.len(), 1);
     assert_eq!(model.glazing_spectral_data[0].name.0, "A INVALID SHARED");
     assert_eq!(model.glazing_spectral_data[0].id, GlazingSpectralDataId(0));
+
+    // Source declarations defer dataset count/integrity to the genuine getter;
+    // the typed points below remain advisory, including original u64 values.
+    let source_text = r#"{
+        "MaterialProperty:GlazingSpectralData": {
+            "A Shared":{"wavelength_1":0.5,"transmittance_1":18446744073709551615,"front_reflectance_1":0.2,"back_reflectance_1":0.3},
+            "a shared":{"wavelength_1":0.7,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1},
+            "B Zero":{},
+            "C Partial":{"wavelength_1":0.5},
+            "D Cap":{CAP_FIELDS},
+            " Exact ":{},"\u000b":{},"\u00a0":{},
+            "M Kept":{"wavelength_1":"overwritten"},
+            "M Kept\u0000suffix":{"wavelength_1":0.4,"transmittance_1":0.6,"front_reflectance_1":0.2,"back_reflectance_1":0.2}
+        },
+        "Material:NoMass":{"A Shared":{"roughness":"Rough","thermal_resistance":1.0}},
+        "WindowMaterial:Glazing":{"Glass":{"optical_data_type":"Spectral","thickness":0.003,"window_glass_spectral_data_set_name":"a shared"}}
+    }"#.replacen("CAP_FIELDS", &fields_for_point_count(801), 1);
+    let source_raw = ep_raw_model::parse_epjson_str_for_source(&source_text)?;
+    let source = super::super::compile_raw_model_for_source(&source_raw);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    let source_model = source
+        .model
+        .as_ref()
+        .ok_or_else(|| std::io::Error::other("Source spectral model"))?;
+    let ordered = source_raw.source_ordered_instances(OBJECT_TYPE)?;
+    assert!(
+        source_model
+            .glazing_spectral_data_names
+            .is_source_exact_namespace()
+            && source_model.glazing_spectral_data.len() == ordered.len()
+            && source_model.glazing_spectral_data_names.len() == ordered.len()
+            && source_model.material_names.resolve("A Shared").is_some()
+    );
+    for (index, (raw_name, _)) in ordered.iter().enumerate() {
+        let row = &source_model.glazing_spectral_data[index];
+        assert!(
+            row.id == GlazingSpectralDataId(u32::try_from(index)?)
+                && row.name.0 == raw_name.0.to_ascii_uppercase()
+                && source_model.glazing_spectral_data_names.names()[index] == row.name
+        );
+    }
+    let first = ordered
+        .iter()
+        .position(|(name, _)| name.0 == "A Shared")
+        .ok_or_else(|| std::io::Error::other("first dataset"))?;
+    let second = ordered
+        .iter()
+        .position(|(name, _)| name.0 == "a shared")
+        .ok_or_else(|| std::io::Error::other("second dataset"))?;
+    let first_id = source_model.glazing_spectral_data[first].id;
+    assert!(
+        source_model.glazing_spectral_data_names.resolve("a shared") == Some(first_id)
+            && source_model.glazing_spectral_data[first].name
+                == source_model.glazing_spectral_data[second].name
+            && first_id != source_model.glazing_spectral_data[second].id
+    );
+    assert!(
+        source_model
+            .glazing_spectral_data_names
+            .resolve(" Exact ")
+            .is_some()
+            && source_model
+                .glazing_spectral_data_names
+                .resolve("Exact")
+                .is_none()
+            && source_model
+                .glazing_spectral_data_names
+                .resolve("\u{b}")
+                .is_some()
+            && source_model
+                .glazing_spectral_data_names
+                .resolve("\u{a0}")
+                .is_some()
+    );
+    let kept = source_model
+        .glazing_spectral_data_names
+        .resolve("M Kept")
+        .ok_or_else(|| std::io::Error::other("retained comparator spelling"))?;
+    assert!(
+        ordered.len() == 9
+            && source_model
+                .glazing_spectral_data_names
+                .resolve("M Kept\0suffix")
+                .is_none()
+            && source_model.glazing_spectral_data[usize::try_from(kept.0)?]
+                .points
+                .len()
+                == 1
+            && source_model.glazing_spectral_data[usize::try_from(kept.0)?].points[0]
+                .wavelength_microns
+                == 0.4
+    );
+    assert!(
+        source_model
+            .glazing_spectral_data
+            .iter()
+            .find(|row| row.name.0 == "B ZERO")
+            .is_some_and(|row| row.points.is_empty())
+            && source_model
+                .glazing_spectral_data
+                .iter()
+                .find(|row| row.name.0 == "C PARTIAL")
+                .is_some_and(|row| row.points.is_empty())
+            && source_model
+                .glazing_spectral_data
+                .iter()
+                .find(|row| row.name.0 == "D CAP")
+                .is_some_and(|row| row.points.len() == 801)
+    );
+    let glass = source_model
+        .material_names
+        .resolve("Glass")
+        .ok_or_else(|| std::io::Error::other("Source Glass"))?;
+    let glass = source_model
+        .materials
+        .iter()
+        .find(|row| row.id == glass)
+        .ok_or_else(|| std::io::Error::other("Source Glass row"))?;
+    assert!(
+        glass.kind() == ep_model::MaterialKind::WindowGlazing
+            && glass.as_window_glazing_spectral_average().is_none()
+            && matches!(glass.definition, ep_model::MaterialDefinition::WindowGlazingSpectral(value) if value.spectral_data == Some(first_id))
+    );
+    let legacy = compile_raw_model(&source_raw);
+    assert!(
+        legacy.has_errors()
+            && legacy
+                .report
+                .diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.code == "UnsupportedWindowGlazingOpticalDataType")
+    );
+    let invalid = source_text.replacen(
+        "\"transmittance_1\":18446744073709551615",
+        "\"transmittance_1\":\"wrong scalar\"",
+        1,
+    );
+    let invalid = super::super::compile_raw_model_for_source(
+        &ep_raw_model::parse_epjson_str_for_source(&invalid)?,
+    );
+    assert!(
+        invalid
+            .report
+            .diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "InvalidFieldType"
+                && diagnostic.object_type == OBJECT_TYPE)
+    );
+    let used = source_text.replacen("\"MaterialProperty:GlazingSpectralData\":", "\"Construction\":{\"Used Glass\":{\"outside_layer\":\"Glass\"}},\"MaterialProperty:GlazingSpectralData\":", 1);
+    let used = super::super::compile_raw_model_for_source(
+        &ep_raw_model::parse_epjson_str_for_source(&used)?,
+    );
+    assert!(
+        used.report
+            .diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "UnsupportedWindowGlazingOpticalDataType")
+    );
+    let bad_mode = source_text.replacen(
+        "\"optical_data_type\":\"Spectral\"",
+        "\"optical_data_type\":\"spectral\"",
+        1,
+    );
+    let bad_mode = super::super::compile_raw_model_for_source(
+        &ep_raw_model::parse_epjson_str_for_source(&bad_mode)?,
+    );
+    assert!(
+        bad_mode
+            .report
+            .diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "UnsupportedWindowGlazingOpticalDataType")
+    );
     Ok(())
 }
 

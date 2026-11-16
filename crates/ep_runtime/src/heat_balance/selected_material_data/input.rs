@@ -22,10 +22,21 @@ pub struct SelectedMaterialInput {
     pub glazing: Vec<ProjectInputObject>,
     /// Actual ordered alternative MaterialGlass2A9N inputs.
     pub refraction: Vec<ProjectInputObject>,
+    /// Actual ordered spectral-data fixed fields and all extensible rows.
+    pub spectral_data: Vec<SourceGlazingSpectralInput>,
     /// Actual ordered Source epJSON named Gas getter operands.
     pub window_gas: Vec<ProjectInputObject>,
     /// Genuine ordered GasMixture getObjectItem operands, not typed properties.
     pub window_gas_mixture: Vec<ProjectInputObject>,
+}
+
+/// Genuine scalar projection; empty extension objects retain their array position.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SourceGlazingSpectralInput {
+    /// Actual object identity and declared fixed numeric fields.
+    pub object: ProjectInputObject,
+    /// Every real extension row;an empty map still occupies four numeric slots.
+    pub extensions: Vec<std::collections::BTreeMap<String, ProjectInputValue>>,
 }
 
 pub(super) fn alpha<'a>(
@@ -57,6 +68,100 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_spectral_data_item(
+        &self,
+        row: &SourceGlazingSpectralInput,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        let family = "MaterialProperty:GlazingSpectralData";
+        if !self.source_is_epjson || !owners.input.has_object(family, &row.object.object_name) {
+            return Err(unavailable("spectral data actual raw/IP identity"));
+        }
+        const FIXED: [&str; 16] = [
+            "wavelength_1",
+            "transmittance_1",
+            "front_reflectance_1",
+            "back_reflectance_1",
+            "wavelength_2",
+            "transmittance_2",
+            "front_reflectance_2",
+            "back_reflectance_2",
+            "wavelength_3",
+            "transmittance_3",
+            "front_reflectance_3",
+            "back_reflectance_3",
+            "wavelength_4",
+            "transmittance_4",
+            "front_reflectance_4",
+            "back_reflectance_4",
+        ];
+        const EXT: [&str; 4] = [
+            "wavelength",
+            "transmittance",
+            "front_reflectance",
+            "back_reflectance",
+        ];
+        let allocated = 16_usize
+            .checked_add(
+                row.extensions
+                    .len()
+                    .checked_mul(4)
+                    .ok_or_else(|| unavailable("spectral extension count"))?,
+            )
+            .ok_or_else(|| unavailable("spectral argument count"))?;
+        let s = &mut owners.shortcut;
+        if s.alpha_args.is_empty()
+            || s.alpha_field_names.is_empty()
+            || s.alpha_field_blanks.is_empty()
+            || s.numeric_args.len() < allocated
+            || s.numeric_field_names.len() < allocated
+            || s.numeric_field_blanks.len() < allocated
+        {
+            return Err(unavailable("actual complete spectral1A16N+4E allocation"));
+        }
+        s.alpha_args.fill(String::new());
+        s.alpha_field_names.fill(String::new());
+        s.alpha_field_blanks.fill(true);
+        s.numeric_args.fill(0.0);
+        s.numeric_field_names.fill(String::new());
+        s.numeric_field_blanks.fill(true);
+        owners
+            .input
+            .mark_object_as_used(family, &row.object.object_name);
+        s.alpha_args[0] = row.object.object_name.to_ascii_uppercase();
+        s.alpha_field_names[0] = "name".into();
+        s.alpha_field_blanks[0] = row.object.object_name.is_empty();
+        let mut maximum = 0;
+        for (index, field) in FIXED.iter().enumerate() {
+            s.numeric_field_names[index] = (*field).into();
+            if let Some(value) = row.object.fields.get(*field) {
+                let ProjectInputValue::Number(value) = value else {
+                    return Err(unavailable("admitted spectral numeric"));
+                };
+                s.numeric_args[index] = *value;
+                s.numeric_field_blanks[index] = false;
+                maximum = index + 1;
+            }
+        }
+        if !row.extensions.is_empty() {
+            maximum = allocated;
+        }
+        for (index, fields) in row.extensions.iter().enumerate() {
+            for (part, field) in EXT.iter().enumerate() {
+                let at = 16 + index * 4 + part;
+                s.numeric_field_names[at] = (*field).into();
+                if let Some(value) = fields.get(*field) {
+                    let ProjectInputValue::Number(value) = value else {
+                        return Err(unavailable("admitted spectral extension numeric"));
+                    };
+                    s.numeric_args[at] = *value;
+                    s.numeric_field_blanks[at] = false;
+                }
+            }
+        }
+        Ok((1, maximum))
+    }
+
     pub(super) fn get_refraction_item(
         &self,
         object: &ProjectInputObject,

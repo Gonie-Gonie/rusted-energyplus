@@ -1,7 +1,9 @@
 //! Purpose-specific Material raw custody, using the sole admitted IP and loader.
 use ep_raw_model::{RawModel, RawValue};
 use ep_runtime::heat_balance::selected_input_processor::SelectedInputProcessor;
-use ep_runtime::heat_balance::selected_material_data::SelectedMaterialInput;
+use ep_runtime::heat_balance::selected_material_data::{
+    SelectedMaterialInput, SourceGlazingSpectralInput,
+};
 use ep_runtime::heat_balance::selected_project_data::{ProjectInputObject, ProjectInputValue};
 use std::collections::BTreeMap;
 
@@ -28,6 +30,68 @@ fn resolve_ordered(
         source_is_epjson: raw.is_epjson(),
         ..SelectedMaterialInput::default()
     };
+    if source_order {
+        let family = "MaterialProperty:GlazingSpectralData";
+        let rows = raw.source_ordered_instances(family)?;
+        if rows.len() != input.get_num_objects_found(family) {
+            return Err("spectral raw/IP count".into());
+        }
+        let number = |value: &RawValue| -> Result<ProjectInputValue, String> {
+            let RawValue::Number(token) = value else {
+                return Err("spectral original schema numeric".into());
+            };
+            Ok(ProjectInputValue::Number(
+                ep_model::classify_source_json_number(token)
+                    .map_err(|_| "spectral stored JSON number")?
+                    .as_f64(),
+            ))
+        };
+        for (name, row) in rows {
+            if !input.has_object(family, &name.0) {
+                return Err("spectral raw/IP identity".into());
+            }
+            let mut fields = BTreeMap::new();
+            let mut extensions = Vec::new();
+            for (field, value) in &row.fields {
+                if !crate::ordinary_equipment_input::source_b_spectral_data_known_field(&field.0) {
+                    continue;
+                }
+                if field.0 == "extensions" {
+                    let RawValue::Array(rows) = value else {
+                        return Err("spectral extension array".into());
+                    };
+                    for row in rows {
+                        let RawValue::Object(row) = row else {
+                            return Err("spectral extension object".into());
+                        };
+                        let mut values = BTreeMap::new();
+                        for (field, value) in row {
+                            if matches!(
+                                field.0.as_str(),
+                                "wavelength"
+                                    | "transmittance"
+                                    | "front_reflectance"
+                                    | "back_reflectance"
+                            ) {
+                                values.insert(field.0.clone(), number(value)?);
+                            }
+                        }
+                        extensions.push(values);
+                    }
+                } else {
+                    fields.insert(field.0.clone(), number(value)?);
+                }
+            }
+            result.spectral_data.push(SourceGlazingSpectralInput {
+                object: ProjectInputObject {
+                    object_name: name.0.clone(),
+                    fields,
+                    idf_max_fields: None,
+                },
+                extensions,
+            });
+        }
+    }
     for family in [
         "Material",
         "Material:NoMass",
