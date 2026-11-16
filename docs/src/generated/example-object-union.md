@@ -4,7 +4,7 @@
 
 The selected corpus has **188 files** (176 IDF, 12 epJSON), **110 canonical object types**, and **9118 instances** of those types.
 
-Including the additional types in published [accepted domain expansions](../../validation/evidence/object-input-domains.json), the combined inventory contains **117 canonical object types**. The additional types are listed separately below; they do not change the original corpus occurrence counts.
+Including the additional types in published [accepted domain expansions](../../validation/evidence/object-input-domains.json), the combined inventory contains **122 canonical object types**. The additional types are listed separately below; they do not change the original corpus occurrence counts.
 
 Selection includes tracked and ordinary untracked input files under `data/` and `docs/validation/`, respecting Git ignores. It excludes runtime/reference trees and immutable `objects` stores. Invalid-field and negative fixtures remain included; embedded code literals and compressed artifacts are outside this file corpus.
 
@@ -136,6 +136,11 @@ These types occur in the retained domain-expansion inputs and have published rev
 | Object type | Compiler input typing | Source admission |
 |---|---|---|
 | `ComfortViewFactorAngles` | Raw only; Source getter | Bounded A/B |
+| `Curve:Bicubic` | Raw only; Source getter | Bounded B only |
+| `Curve:Biquadratic` | Raw only; Source getter | Bounded B only |
+| `Curve:CubicLinear` | Raw only; Source getter | Bounded B only |
+| `Curve:FanPressureRise` | Raw only; Source getter | Bounded B only |
+| `Curve:QuadraticLinear` | Raw only; Source getter | Bounded B only |
 | `ElectricEquipment` | Raw only; partial projection | Bounded A only |
 | `MaterialProperty:GlazingSpectralData` | Typed model | Bounded B only |
 | `Space` | Typed model | Bounded A only |

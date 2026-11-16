@@ -2,33 +2,220 @@
 //! Retains input operands for their actual Source getters and owners.
 use super::{blank, number, text_is};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
+/// Native getter order; this is schema/Raw custody, not a second Curve registry.
+pub(crate) const ANALYTIC_CURVE_FAMILIES: [&str; 5] = [
+    "Curve:Biquadratic",
+    "Curve:QuadraticLinear",
+    "Curve:CubicLinear",
+    "Curve:Bicubic",
+    "Curve:FanPressureRise",
+];
+pub(crate) fn is_analytic_curve_family(family: &str) -> bool {
+    ANALYTIC_CURVE_FAMILIES.contains(&family)
+}
+fn analytic_curve_numeric_fields(family: &str) -> &'static [&'static str] {
+    match family {
+        "Curve:Biquadratic" => &[
+            "coefficient1_constant",
+            "coefficient2_x",
+            "coefficient3_x_2",
+            "coefficient4_y",
+            "coefficient5_y_2",
+            "coefficient6_x_y",
+            "minimum_value_of_x",
+            "maximum_value_of_x",
+            "minimum_value_of_y",
+            "maximum_value_of_y",
+            "minimum_curve_output",
+            "maximum_curve_output",
+        ],
+        "Curve:QuadraticLinear" => &[
+            "coefficient1_constant",
+            "coefficient2_x",
+            "coefficient3_x_2",
+            "coefficient4_y",
+            "coefficient5_x_y",
+            "coefficient6_x_2_y",
+            "minimum_value_of_x",
+            "maximum_value_of_x",
+            "minimum_value_of_y",
+            "maximum_value_of_y",
+            "minimum_curve_output",
+            "maximum_curve_output",
+        ],
+        "Curve:CubicLinear" => &[
+            "coefficient1_constant",
+            "coefficient2_x",
+            "coefficient3_x_2",
+            "coefficient4_x_3",
+            "coefficient5_y",
+            "coefficient6_x_y",
+            "minimum_value_of_x",
+            "maximum_value_of_x",
+            "minimum_value_of_y",
+            "maximum_value_of_y",
+            "minimum_curve_output",
+            "maximum_curve_output",
+        ],
+        "Curve:Bicubic" => &[
+            "coefficient1_constant",
+            "coefficient2_x",
+            "coefficient3_x_2",
+            "coefficient4_y",
+            "coefficient5_y_2",
+            "coefficient6_x_y",
+            "coefficient7_x_3",
+            "coefficient8_y_3",
+            "coefficient9_x_2_y",
+            "coefficient10_x_y_2",
+            "minimum_value_of_x",
+            "maximum_value_of_x",
+            "minimum_value_of_y",
+            "maximum_value_of_y",
+            "minimum_curve_output",
+            "maximum_curve_output",
+        ],
+        "Curve:FanPressureRise" => &[
+            "coefficient1_c1",
+            "coefficient2_c2",
+            "coefficient3_c3",
+            "coefficient4_c4",
+            "minimum_value_of_qfan",
+            "maximum_value_of_qfan",
+            "minimum_value_of_psm",
+            "maximum_value_of_psm",
+            "minimum_curve_output",
+            "maximum_curve_output",
+        ],
+        _ => &[],
+    }
+}
+fn analytic_curve_required_fields(family: &str) -> &'static [&'static str] {
+    let fields = analytic_curve_numeric_fields(family);
+    &fields[..fields.len().saturating_sub(2)]
+}
+fn analytic_curve_admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
+    if analytic_curve_numeric_fields(family).contains(&name) {
+        return matches!(value, RawValue::Number(token)
+            if ep_model::classify_source_json_number(token).is_ok());
+    }
+    if family != "Curve:FanPressureRise" {
+        let choices: Option<&[&str]> = match name {
+            "input_unit_type_for_x" | "input_unit_type_for_y" if family == "Curve:CubicLinear" => {
+                Some(&["", "Dimensionless", "Temperature"])
+            }
+            "input_unit_type_for_x" | "input_unit_type_for_y" => Some(&[
+                "",
+                "Dimensionless",
+                "Distance",
+                "MassFlow",
+                "Power",
+                "Temperature",
+                "VolumetricFlow",
+            ]),
+            "output_unit_type" => Some(&[
+                "",
+                "Capacity",
+                "Dimensionless",
+                "Power",
+                "Pressure",
+                "Temperature",
+            ]),
+            _ => None,
+        };
+        if let Some(choices) = choices {
+            return matches!(value, RawValue::String(text) if choices.contains(&text.as_str()));
+        }
+    }
+    // Official direct-epJSON additional members,including name/idf_*,are not operands.
+    true
+}
+/// Original schema plus actual unused/no-AFN composition only; never derives Curve state.
+pub(crate) fn validate_unused_analytic_curves(raw: &RawModel) -> Result<(), String> {
+    let selected = raw
+        .objects
+        .iter()
+        .any(|(family, rows)| is_analytic_curve_family(&family.0) && !rows.is_empty());
+    if !selected {
+        return Ok(());
+    }
+    if !raw.is_epjson() {
+        return Err("Source unused analytic curves require direct epJSON".into());
+    }
+    if raw.objects.iter().any(|(family, rows)| {
+        !rows.is_empty()
+            && (family.0.starts_with("AirflowNetwork:")
+                || family.0.starts_with("Duct:Loss:")
+                || family.0.starts_with("EnergyManagementSystem:")
+                || family.0.starts_with("Table:")
+                || (family.0.starts_with("Curve:") && !is_analytic_curve_family(&family.0)))
+    }) {
+        return Err(
+            "Source unused analytic curves exclude AFN,duct loss,EMS,Table and other Curve owners"
+                .into(),
+        );
+    }
+    for family in ANALYTIC_CURVE_FAMILIES {
+        let Some(rows) = raw.objects.get(&ObjectType(family.into())) else {
+            continue;
+        };
+        for (name, object) in rows {
+            if !super::window_gas::valid_name(&name.0) {
+                return Err(format!("Source {family} requires its original schema name"));
+            }
+            for required in analytic_curve_required_fields(family) {
+                if object
+                    .fields
+                    .get(&FieldName((*required).into()))
+                    .is_none_or(|value| !analytic_curve_admitted_field(family, required, value))
+                {
+                    return Err(format!("Source {family} requires schema-valid {required}"));
+                }
+            }
+            if object
+                .fields
+                .iter()
+                .any(|(name, value)| !analytic_curve_admitted_field(family, &name.0, value))
+            {
+                return Err(format!(
+                    "Source {family} requires valid original known optional fields"
+                ));
+            }
+        }
+    }
+    Ok(())
+}
 pub(super) fn is_family(family: &str) -> bool {
-    matches!(
-        family,
-        "SetpointManager:Scheduled"
-            | "Output:Schedules"
-            | "Schedule:Compact"
-            | "Schedule:File"
-            | "Schedule:Day:Hourly"
-            | "Schedule:Day:Interval"
-            | "Schedule:Day:List"
-            | "Schedule:Week:Compact"
-            | "Schedule:Week:Daily"
-            | "Schedule:Year"
-            | "ThermostatSetpoint:DualSetpoint"
-            | "ZoneControl:Thermostat"
-            | "ZoneControl:Humidistat"
-            | "DesignSpecification:OutdoorAir"
-            | "OutdoorAir:Node"
-            | "OutdoorAir:NodeList"
-            | "ZoneHVAC:EquipmentConnections"
-            | "ZoneHVAC:EquipmentList"
-            | "ZoneHVAC:IdealLoadsAirSystem"
-    )
+    is_analytic_curve_family(family)
+        || matches!(
+            family,
+            "SetpointManager:Scheduled"
+                | "Output:Schedules"
+                | "Schedule:Compact"
+                | "Schedule:File"
+                | "Schedule:Day:Hourly"
+                | "Schedule:Day:Interval"
+                | "Schedule:Day:List"
+                | "Schedule:Week:Compact"
+                | "Schedule:Week:Daily"
+                | "Schedule:Year"
+                | "ThermostatSetpoint:DualSetpoint"
+                | "ZoneControl:Thermostat"
+                | "ZoneControl:Humidistat"
+                | "DesignSpecification:OutdoorAir"
+                | "OutdoorAir:Node"
+                | "OutdoorAir:NodeList"
+                | "ZoneHVAC:EquipmentConnections"
+                | "ZoneHVAC:EquipmentList"
+                | "ZoneHVAC:IdealLoadsAirSystem"
+        )
 }
 // Retain the ordered raw input-bound predicates without changing admission logic.
 #[allow(clippy::manual_range_contains)]
 pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
+    if is_analytic_curve_family(family) {
+        return analytic_curve_admitted_field(family, name, value);
+    }
     // This nameless family reaches only the direct-epJSON positive-OA route.
     // Its instance schema has only the optional nodes array; all other fields
     // (including IDF bookkeeping) are unconsumed JSON metadata on that route.
@@ -518,6 +705,9 @@ pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool
     }
 }
 pub(super) fn required_fields(family: &str) -> &'static [&'static str] {
+    if is_analytic_curve_family(family) {
+        return analytic_curve_required_fields(family);
+    }
     match family {
         "SetpointManager:Scheduled" => &[
             "control_variable",

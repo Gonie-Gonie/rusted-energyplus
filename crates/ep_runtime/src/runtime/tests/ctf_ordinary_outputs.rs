@@ -10113,6 +10113,90 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             "Surface Heat Transfer Algorithm, CTF - ConductionTransferFunction,200,0.10,1000.0\n"
         ));
     }
+
+    // Fifth and final fresh Curve owner. Real getter precedes actual CTF cache
+    // completion; direct report/System children are observed, not whole Setup/HVAC.
+    {
+        use std::collections::BTreeMap;
+        use crate::heat_balance::selected_input_processor::{SelectedInputProcessor,SourceInputFamily,SourceObjectDefinition,SourceObjectShape,SourceInputStatisticsInput,SourceInputStatisticsValue as S};
+        use crate::heat_balance::setup_postludes::{SelectedCurves,SourceCurveReportContext,SourceCurveOutputField as F};
+        use crate::heat_balance::source_output_registration::{SourceMtdFileHost,SourceOutputDictionaryStreams,SourceRealOutputTarget as T,SourceOutputStoreType,SourceOutputUnits,SourceReportFrequency,TimeStepKind,SourceOutputUpdateEnvironment,SourceOutputUpdateOwners};
+        use crate::heat_balance::source_initialization::{SourceInitializationFiles,SourceInitializationFilePaths};
+        let mut curve_model=ctf_ordinary_output_test_model();
+        let names=["Performance Curve Input Variable 1 Value","Performance Curve Input Variable 2 Value","Performance Curve Output Value"];
+        curve_model.report_inputs.output_variables=names.iter().enumerate().map(|(i,name)|ep_model::SourceOutputVariableInput {object_name:format!("CURVE VAR{i}"),key:"CURVE CTF".into(),variable_name:name.to_ascii_uppercase(),reporting_frequency:"HOURLY".into(),schedule_name:String::new(),alpha_blank:[false,false,false,true],default_applied:[false;4],num_alphas:3,is_epjson:true}).collect();
+        let fields:BTreeMap<String,S>=BTreeMap::from([
+            ("coefficient1_constant".into(),S::Number("1.0".into())),("coefficient2_x".into(),S::Number("0.2".into())),("coefficient3_x_2".into(),S::Number("0.3".into())),("coefficient4_y".into(),S::Number("0.4".into())),("coefficient5_y_2".into(),S::Number("0.5".into())),("coefficient6_x_y".into(),S::Number("0.6".into())),("minimum_value_of_x".into(),S::Number("-10.0".into())),("maximum_value_of_x".into(),S::Number("50.0".into())),("minimum_value_of_y".into(),S::Number("-5.0".into())),("maximum_value_of_y".into(),S::Number("25.0".into()))
+        ]);
+        let report_fields:BTreeMap<String,BTreeMap<String,S>>=curve_model.report_inputs.output_variables.iter().map(|v|(v.object_name.clone(),BTreeMap::from([("key_value".into(),S::String(v.key.clone())),("variable_name".into(),S::String(v.variable_name.clone())),("reporting_frequency".into(),S::String("Hourly".into()))]))).collect();
+        let objects:BTreeMap<String,BTreeMap<String,BTreeMap<String,S>>>=BTreeMap::from([("Curve:Biquadratic".into(),BTreeMap::from([("Curve CTF".into(),fields)])),("Output:Variable".into(),report_fields)]);
+        let mut input=SelectedInputProcessor::from_admitted_input([
+            SourceObjectDefinition {object_type:"Curve:Biquadratic".into(),alpha_fields:4,numeric_fields:12,alpha_extensions:0,numeric_extensions:0,extension:None},
+            SourceObjectDefinition {object_type:"Output:Variable".into(),alpha_fields:4,numeric_fields:0,alpha_extensions:0,numeric_extensions:0,extension:None}
+        ].into(),objects.iter().map(|(family,rows)|(family.clone(),SourceInputFamily::Objects(rows.iter().map(|(name,fields)|SourceObjectShape {object_name:name.clone(),field_sizes:fields.keys().map(|key|(key.clone(),1)).collect()}).collect()))).collect())?;
+        input.retain_source_input_statistics(SourceInputStatisticsInput {object_order:BTreeMap::from([("Curve:Biquadratic".into(),vec!["Curve CTF".into()]),("Output:Variable".into(),curve_model.report_inputs.output_variables.iter().map(|v|v.object_name.clone()).collect())]),objects})?;
+        let mut r=CtfInitializationReports::default();r.initialize_source_input_processor(input)?;
+        let globals=r.selected_heat_balance_globals.get_or_insert_with(Default::default);
+        let project=r.selected_project_data.get_or_insert_with(Default::default);
+        r.selected_schedule_manager.get_or_insert_with(Default::default);
+        let curves=r.selected_curves.get_or_insert_with(SelectedCurves::default);
+        let mut clock = crate::weather::day::WeatherGlobalState {
+            time_step_zone: 0.25,
+            minutes_in_time_step: 15,
+            hour_of_day: 1,
+            ..Default::default()
+        };
+        let flags=crate::heat_balance::error_backend::SourceDiagnosticFlags {kickoff:&globals.kickoff_simulation,developer:&project.system.developer_flag,warmup:&clock.warmup_flag,doing_sizing:&globals.doing_sizing};
+        let(mut state,mut error,mut console,mut eio,mut eso)=(ctf_ordinary_output_test_state(),Vec::new(),Vec::new(),Vec::new(),Vec::new());
+        {
+            let mut backend=SourceErrorBackend {state:&mut state,error_stream:Some(&mut error),console:&mut console,out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None};
+            curves.initialize_state(r.selected_input_processor.as_mut().ok_or("Curve IP")?,&mut r.input_processor_shortcut,&flags,&mut backend)?;
+        }
+        assert_eq!(r.selected_curves.as_ref().ok_or("Curve owner")?.get_curve_index("CURVE CTF"),1);
+        let curve_cache={
+            let mut context=CtfInitializationContext {reports:&mut r,eio:&mut eio,backend:SourceErrorBackend {state:&mut state,error_stream:Some(&mut error),console:&mut console,out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None}};
+            context.prepare_registry(&curve_model)?;
+            crate::heat_balance::surface_manager::ConstructionThermalDataCache::build_with_initialization_context(&curve_model,&BTreeMap::new(),&mut context)?
+        };
+        assert!(r.progress.postlude_returned && curve_cache.public_initialization().is_some());
+        let globals=r.selected_heat_balance_globals.as_ref().ok_or("Curve globals")?;
+        let project=r.selected_project_data.as_ref().ok_or("Curve project")?;
+        let flags=crate::heat_balance::error_backend::SourceDiagnosticFlags {kickoff:&globals.kickoff_simulation,developer:&project.system.developer_flag,warmup:&clock.warmup_flag,doing_sizing:&globals.doing_sizing};
+        let mut backend=SourceErrorBackend {state:&mut state,error_stream:Some(&mut error),console:&mut console,out_unit1:None,out_unit2:None,f_message:None,message_callback:None,error_callback:None,sqlite:None};
+        for name in names {r.output_prescan.add_record("CURVE CTF",name,&mut backend)?;}
+        let path=std::env::temp_dir().join(format!("rusted-curve-requested-{}-{}.mtd",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH)?.as_nanos()));
+        let mut host=SourceMtdFileHost::new(&path);
+        let mut dictionary=SourceOutputDictionaryStreams {eso:Some(&mut eso),sqlite_present:false,results_framework_output_variables:&mut r.source_results_output_variables};
+        let curves=r.selected_curves.as_ref().ok_or("same retained Curve owner")?;
+        curves.initialize_source_curve_reporting(&mut SourceCurveReportContext {globals,input:r.selected_input_processor.as_mut().ok_or("Curve IP")?,schedules:r.selected_schedule_manager.as_mut(),reports:&curve_model.report_inputs,registration:&mut r.output_registration,prescan:&r.output_prescan,minimum_report_frequency:Some(&project.system.minimum_report_frequency),minutes_in_time_step:15,diagnostic_flags:Some(flags),backend:&mut backend,host:&mut host,dictionary_host:&mut dictionary,eio:&mut eio})?;
+        assert_eq!((r.output_registration.num_real_variables_setup,r.output_registration.out_vars.len(),r.output_registration.dictionary_variables.len()),(3,3,3));
+        for (i,field) in [F::Input(1),F::Input(2),F::Output].into_iter().enumerate() {
+            let row=&r.output_registration.out_vars[i];
+            assert_eq!((row.which,row.time_step_type,row.store_type,row.units,row.frequency),(Some(T::Curve {field,index:1}),TimeStepKind::System,SourceOutputStoreType::Average,SourceOutputUnits::Dimensionless,SourceReportFrequency::Hour));
+            assert!(std::ptr::eq(r.output_registration.read_registered_real(i,curves)?,curves.read_curve_output(field,1).ok_or("actual Curve cell")?));
+        }
+        assert!(r.selected_input_processor.as_ref().ok_or("same IP")?.source_unused_objects().next().is_none());
+        r.output_registration.time_pointers.setup_time_pointer(TimeStepKind::System,&mut backend)?;
+        let hvac = crate::heat_balance::selected_simulation_startup::SelectedHvacGlobals {
+            time_step_sys: 0.25,
+            ..Default::default()
+        };
+        let manager=crate::heat_balance::ordinary_hvac_manager::SourceHvacManager::default();
+        let integers=crate::heat_balance::ordinary_hvac_manager::simulation::output_registration::SourceHvacOutputOwners {manager:&manager,control:&r.heat_balance_input_state};
+        let mut environment=crate::weather::day::WeatherEnvironmentState::default();
+        let mut output_count=0;let mut meter_count=0;
+        let files_path=std::env::temp_dir().join("rusted-curve-quiet-System-unopened");
+        let mut files=SourceInitializationFiles::new(SourceInitializationFilePaths {stat_input:files_path.with_extension("stat"),eso:files_path.with_extension("eso"),eio:files_path.with_extension("eio"),mtr:files_path.with_extension("mtr"),bnd:files_path.with_extension("bnd"),dxf:files_path.with_extension("dxf"),sln:files_path.with_extension("sln"),sci:files_path.with_extension("sci"),rdd:files_path.with_extension("rdd"),mdd:files_path.with_extension("mdd"),audit:files_path.with_extension("audit"),debug:files_path.with_extension("dbg"),end:files_path.with_extension("end"),error:files_path.with_extension("err"),dfs:files_path.with_extension("dfs"),tabular_csv:files_path.with_extension("csv"),tabular_tab:files_path.with_extension("tab"),tabular_fixed:files_path.with_extension("txt"),tabular_html:files_path.with_extension("html"),tabular_xml:files_path.with_extension("xml")});
+        let(mut streams,_unopened_eio,_unopened_debug)=files.source_report_streams_eio_debug(&r.source_sqlite,&mut r.source_results_output_variables);
+        r.output_registration.update_source_data_and_report(TimeStepKind::System,&mut SourceOutputUpdateOwners {clock:&mut clock,environment:SourceOutputUpdateEnvironment {month:&environment.month,day_of_month:&environment.day_of_month,day_of_week:&environment.day_of_week,holiday_index:&environment.holiday_index,dst_indicator:&environment.dst_indicator,end_month_flag:&mut environment.end_month_flag,end_year_flag:&environment.end_year_flag},hvac:&hvac,project,results:&mut r.source_results_framework,standard_output_record_count:&mut output_count,standard_meter_record_count:&mut meter_count,real:curves,integers:&integers},&mut streams)?;
+        assert!(r.output_registration.out_vars.iter().all(|v|v.stored&&v.this_time_step_stored&&v.time_step_stored&&v.this_time_step_count==1&&v.time_step_value.to_bits()==0) && r.output_registration.time_pointers.system.current_minute==15.0 && output_count==0 && meter_count==0);
+        assert!(curves.get_curve("CURVE CTF").ok_or("same Curve after read")?.inputs.iter().all(|v|v.to_bits()==0) && curves.get_curve("CURVE CTF").ok_or("same Curve output")?.output.to_bits()==0);
+        drop(host);
+        if path.exists() {std::fs::remove_file(path)?;}
+        assert!(error.is_empty() && std::str::from_utf8(&eso)?.contains("CURVE CTF,Performance Curve Output Value [] !Hourly"));
+        // This calls actual OutputProcessor System consumption. The upstream
+        // Surface/OutputContext/LiveReadFields HVAC chain remains static credit.
+    }
     check_setup_process_native_reference_if_requested()?;
     Ok(())
 }

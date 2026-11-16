@@ -2,7 +2,32 @@
 //! This token never bypasses an input getter or provides Native runtime state.
 use crate::porting_scope::{PortingScope, PortingScopeTrace};
 use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
+use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue;
 use std::collections::{BTreeMap, BTreeSet};
+
+// Custody comparison only; no projected values or runtime Curve state are created.
+fn retained_curve_value_matches(raw: &RawValue, retained: &SourceInputStatisticsValue) -> bool {
+    match (raw, retained) {
+        (RawValue::Null, SourceInputStatisticsValue::Null) => true,
+        (RawValue::Bool(a), SourceInputStatisticsValue::Bool(b)) => a == b,
+        (RawValue::Number(a), SourceInputStatisticsValue::Number(b))
+        | (RawValue::String(a), SourceInputStatisticsValue::String(b)) => a == b,
+        (RawValue::Array(a), SourceInputStatisticsValue::Array(b)) => {
+            a.len() == b.len()
+                && a.iter()
+                    .zip(b)
+                    .all(|(a, b)| retained_curve_value_matches(a, b))
+        }
+        (RawValue::Object(a), SourceInputStatisticsValue::Object(b)) => {
+            a.len() == b.len()
+                && a.iter().all(|(name, value)| {
+                    b.get(&name.0)
+                        .is_some_and(|retained| retained_curve_value_matches(value, retained))
+                })
+        }
+        _ => false,
+    }
+}
 
 pub(crate) struct SourceSupportAdmission {
     covered_objects: BTreeSet<&'static str>,
@@ -184,6 +209,47 @@ impl SourceSupportAdmission {
             && crate::ordinary_equipment_input::source_b_validate_unused_simple_glazing(raw).is_ok()
         {
             covered_objects.insert("WindowMaterial:SimpleGlazingSystem");
+        }
+        // Only validated SourceB custody can cover these genuinely read Curve families.
+        // The actual Curve array/map lives in runtime SelectedCurves,never in this token.
+        if trace.scope == PortingScope::B
+            && raw.objects.iter().any(|(family, rows)| {
+                crate::ordinary_equipment_input::SOURCE_B_ANALYTIC_CURVE_FAMILIES
+                    .contains(&family.0.as_str())
+                    && !rows.is_empty()
+            })
+            && crate::ordinary_equipment_input::source_b_validate_unused_analytic_curves(raw)
+                .is_ok()
+        {
+            let input = crate::ordinary_input_processor::resolve_source_b(raw).ok()?;
+            for family in crate::ordinary_equipment_input::SOURCE_B_ANALYTIC_CURVE_FAMILIES {
+                let ordered = raw.source_ordered_instances(family).ok()?;
+                if ordered.is_empty() {
+                    continue;
+                }
+                let names = input.source_raw_object_names(family).ok()?;
+                if names.len() != ordered.len()
+                    || !names
+                        .iter()
+                        .zip(&ordered)
+                        .all(|(name, (raw_name, _))| name == &raw_name.0)
+                {
+                    return None;
+                }
+                for (name, object) in &ordered {
+                    let fields = input.source_raw_object_fields(family, &name.0).ok()?;
+                    if fields.len() != object.fields.len()
+                        || object.fields.iter().any(|(field, value)| {
+                            fields.get(&field.0).is_none_or(|retained| {
+                                !retained_curve_value_matches(value, retained)
+                            })
+                        })
+                    {
+                        return None;
+                    }
+                }
+                covered_objects.insert(family);
+            }
         }
         let mut glazing_bindings = BTreeSet::new();
         let mut spectral_glazing_bindings = BTreeMap::new();

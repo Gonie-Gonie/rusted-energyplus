@@ -193,6 +193,11 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("Material:NoMass", 2, 4, 0, 0, None),
         ("Material:AirGap", 1, 1, 0, 0, None),
         ("Material:InfraredTransparent", 1, 0, 0, 0, None),
+        ("Curve:Biquadratic", 4, 12, 0, 0, None),
+        ("Curve:QuadraticLinear", 4, 12, 0, 0, None),
+        ("Curve:CubicLinear", 4, 12, 0, 0, None),
+        ("Curve:Bicubic", 4, 16, 0, 0, None),
+        ("Curve:FanPressureRise", 1, 10, 0, 0, None),
         ("WindowMaterial:Glazing", 7, 14, 0, 0, None),
         (
             "MaterialProperty:GlazingSpectralData",

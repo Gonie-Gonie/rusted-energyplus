@@ -9112,6 +9112,313 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
     assert!(
         !staged.is_epjson() && crate::ordinary_equipment_input::resolve_source_b(&staged).is_err()
     );
+    // Real Raw -> Source compiler/IP -> scope/weather -> source support. Curves
+    // have no typed arena; no advisory numeric projection or duplicate filter.
+    {
+        use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+        let curve_objects: serde_json::Value = serde_json::from_str(
+            r###"{
+  "Curve:Biquadratic": {
+    "CURVE UNUSED BIQUADRATIC": {
+      "coefficient1_constant": 18446744073709551615,
+      "coefficient2_x": 0.2,
+      "coefficient3_x_2": 0.3,
+      "coefficient4_y": 0.4,
+      "coefficient5_y_2": 0.5,
+      "coefficient6_x_y": 0.6,
+      "minimum_value_of_x": -10.0,
+      "maximum_value_of_x": 50.0,
+      "minimum_value_of_y": -5.0,
+      "maximum_value_of_y": 25.0
+    }
+  },
+  "Curve:QuadraticLinear": {
+    "CURVE UNUSED QUADRATIC LINEAR": {
+      "coefficient1_constant": 0.1,
+      "coefficient2_x": 0.2,
+      "coefficient3_x_2": 0.3,
+      "coefficient4_y": 0.4,
+      "coefficient5_x_y": 0.5,
+      "coefficient6_x_2_y": 0.6,
+      "minimum_value_of_x": -10.0,
+      "maximum_value_of_x": 50.0,
+      "minimum_value_of_y": -5.0,
+      "maximum_value_of_y": 25.0
+    }
+  },
+  "Curve:CubicLinear": {
+    "CURVE UNUSED CUBIC LINEAR": {
+      "coefficient1_constant": 0.1,
+      "coefficient2_x": 0.2,
+      "coefficient3_x_2": 0.3,
+      "coefficient4_x_3": 0.4,
+      "coefficient5_y": 0.5,
+      "coefficient6_x_y": 0.6,
+      "minimum_value_of_x": -10.0,
+      "maximum_value_of_x": 50.0,
+      "minimum_value_of_y": -5.0,
+      "maximum_value_of_y": 25.0
+    }
+  },
+  "Curve:Bicubic": {
+    "CURVE UNUSED BICUBIC": {
+      "coefficient1_constant": 0.1,
+      "coefficient2_x": 0.2,
+      "coefficient3_x_2": 0.3,
+      "coefficient4_y": 0.4,
+      "coefficient5_y_2": 0.5,
+      "coefficient6_x_y": 0.6,
+      "coefficient7_x_3": 0.7,
+      "coefficient8_y_3": 0.8,
+      "coefficient9_x_2_y": 0.9,
+      "coefficient10_x_y_2": 1.0,
+      "minimum_value_of_x": -10.0,
+      "maximum_value_of_x": 50.0,
+      "minimum_value_of_y": -5.0,
+      "maximum_value_of_y": 25.0
+    }
+  },
+  "Curve:FanPressureRise": {
+    "CURVE UNUSED FAN PRESSURE RISE": {
+      "coefficient1_c1": 0.1,
+      "coefficient2_c2": 0.2,
+      "coefficient3_c3": 0.3,
+      "coefficient4_c4": 0.4,
+      "minimum_value_of_qfan": 0.1,
+      "maximum_value_of_qfan": 2.0,
+      "minimum_value_of_psm": 50.0,
+      "maximum_value_of_psm": 500.0
+    }
+  }
+}"###,
+        )
+        .unwrap();
+        let mut curve_value = input(PortingScope::B);
+        for (family, objects) in curve_objects.as_object().unwrap() {
+            curve_value[family] = objects.clone();
+        }
+        let standard = curve_value["Curve:Biquadratic"]["CURVE UNUSED BIQUADRATIC"].clone();
+        curve_value["Curve:Biquadratic"] = json!({"B SECOND":standard.clone(),"a first":standard.clone(),"\u{000b}":standard.clone(),"\u{00a0}":standard.clone()});
+        curve_value["Curve:Biquadratic"]["a first"]["coefficient1_constant"] = json!(0.1);
+        curve_value["Curve:Biquadratic"]["B SECOND"]["name"] = json!(false);
+        curve_value["Curve:Biquadratic"]["B SECOND"]["idf_order"] = json!([null, "ignored"]);
+        curve_value["Curve:Biquadratic"]["B SECOND"]["idf_max_fields"] = json!({"ignored":true});
+        curve_value["Curve:Biquadratic"]["B SECOND"]["idf_max_extensible_fields"] = json!(false);
+        curve_value["Curve:Biquadratic"]["B SECOND"]["extra"] =
+            json!({"retained":[null,true,1.25,-1.25,{"large":u64::MAX}]});
+        curve_value["DesignSpecification:OutdoorAir"] = json!({"CURVE DSOA":{
+            "outdoor_air_method":"Flow/Zone", "outdoor_air_flow_per_zone":0.01
+        }});
+        curve_value["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["design_specification_outdoor_air_object_name"] =
+            json!("CURVE DSOA");
+        curve_value["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_inlet_node_name"] =
+            json!("CURVE OA");
+        curve_value["OutdoorAir:Node"] = json!({"CURVE OA":{"wind_pressure_coefficient_curve_name":"B SECOND","symmetric_wind_pressure_coefficient_curve":"Yes","wind_angle_type":"Relative"}});
+        let raw = ep_raw_model::parse_epjson_str_for_source(&curve_value.to_string()).unwrap();
+        let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+        let model = compiled.model.as_ref().unwrap();
+        let mut ip = crate::ordinary_input_processor::resolve_source_b(&raw).unwrap();
+        assert_eq!(
+            ip.source_raw_object_names("Curve:Biquadratic")
+                .unwrap()
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<_>>(),
+            ["\u{00a0}", "\u{000b}", "B SECOND", "a first"]
+        );
+        assert!(
+            matches!(ip.source_raw_object_fields("Curve:Biquadratic","B SECOND").unwrap().get("coefficient1_constant"),Some(S::Number(token))if token=="18446744073709551615")
+                && matches!(
+                    ip.source_raw_object_fields("Curve:Biquadratic", "B SECOND")
+                        .unwrap()
+                        .get("name"),
+                    Some(S::Bool(false))
+                )
+                && matches!(
+                    ip.source_raw_object_fields("Curve:Biquadratic", "B SECOND")
+                        .unwrap()
+                        .get("idf_order"),
+                    Some(S::Array(_))
+                )
+                && matches!(
+                    ip.source_raw_object_fields("Curve:Biquadratic", "B SECOND")
+                        .unwrap()
+                        .get("extra"),
+                    Some(S::Object(_))
+                )
+        );
+        assert_eq!(ip.get_num_objects_found("Curve:Biquadratic"), 4);
+        assert_eq!(
+            (
+                ip.get_object_def_max_args("Curve:Bicubic").unwrap().alphas,
+                ip.get_object_def_max_args("Curve:Bicubic")
+                    .unwrap()
+                    .numerics
+            ),
+            (4, 16)
+        );
+        let mut trace = inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B);
+        assert!(trace.admissible, "{:?}", trace.violations);
+        trace.environment = Some(
+            super::environment::environment_from_weather(
+                model,
+                &weather,
+                "same unused five-Curve weather",
+            )
+            .unwrap(),
+        );
+        let admission =
+            crate::support::SourceSupportAdmission::from_validated_scope(&raw, &trace).unwrap();
+        assert!(
+            crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission)
+            )
+            .allows_rust_runtime()
+        );
+        assert!(
+            !crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                None
+            )
+            .allows_rust_runtime()
+        );
+        let mut diagnostic = curve_value.clone();
+        diagnostic["Curve:Biquadratic"]["B SECOND"]["minimum_value_of_x"] = json!(2.0);
+        diagnostic["Curve:Biquadratic"]["B SECOND"]["maximum_value_of_x"] = json!(1.0);
+        diagnostic["Curve:QuadraticLinear"]["b second"] =
+            diagnostic["Curve:QuadraticLinear"]["CURVE UNUSED QUADRATIC LINEAR"].clone();
+        assert!(
+            crate::ordinary_input_processor::resolve_source_b(
+                &ep_raw_model::parse_epjson_str_for_source(&diagnostic.to_string()).unwrap()
+            )
+            .is_ok(),
+            "Native getter owns duplicate/range diagnostics"
+        );
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_a(&raw).is_err()
+                && crate::ordinary_equipment_input::resolve(&raw).is_err()
+        );
+        let staged_value = json!({"Zone":{"Zone":{}},"Curve:Biquadratic":curve_value["Curve:Biquadratic"].clone()});
+        let staged =
+            ep_raw_model::parse_epjson_str_with_idf_order(&staged_value.to_string(), "Zone,Zone;")
+                .unwrap();
+        assert!(
+            !staged.is_epjson()
+                && crate::ordinary_equipment_input::resolve_source_b(&staged).is_err()
+        );
+        for (family, name, field, bad) in [
+            (
+                "Curve:Biquadratic",
+                "B SECOND",
+                "coefficient1_constant",
+                json!("0.1"),
+            ),
+            (
+                "Curve:QuadraticLinear",
+                "CURVE UNUSED QUADRATIC LINEAR",
+                "coefficient5_x_y",
+                json!(null),
+            ),
+            (
+                "Curve:CubicLinear",
+                "CURVE UNUSED CUBIC LINEAR",
+                "coefficient4_x_3",
+                json!(false),
+            ),
+            (
+                "Curve:Bicubic",
+                "CURVE UNUSED BICUBIC",
+                "coefficient10_x_y_2",
+                json!([]),
+            ),
+            (
+                "Curve:FanPressureRise",
+                "CURVE UNUSED FAN PRESSURE RISE",
+                "minimum_value_of_qfan",
+                json!({}),
+            ),
+            (
+                "Curve:Biquadratic",
+                "B SECOND",
+                "input_unit_type_for_x",
+                json!("temperature"),
+            ),
+            (
+                "Curve:CubicLinear",
+                "CURVE UNUSED CUBIC LINEAR",
+                "input_unit_type_for_y",
+                json!("Pressure"),
+            ),
+            (
+                "Curve:Bicubic",
+                "CURVE UNUSED BICUBIC",
+                "output_unit_type",
+                json!(null),
+            ),
+        ] {
+            let mut bad_value = curve_value.clone();
+            bad_value[family][name][field] = bad;
+            assert!(
+                crate::ordinary_input_processor::resolve_source_b(
+                    &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string()).unwrap()
+                )
+                .is_err()
+            );
+        }
+        let mut missing = curve_value.clone();
+        missing["Curve:Bicubic"]["CURVE UNUSED BICUBIC"]
+            .as_object_mut()
+            .unwrap()
+            .remove("coefficient10_x_y_2");
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_b(
+                &ep_raw_model::parse_epjson_str_for_source(&missing.to_string()).unwrap()
+            )
+            .is_err()
+        );
+        let mut blank = curve_value.clone();
+        blank["Curve:Biquadratic"][" \t\r\u{000c}"] = standard;
+        assert!(
+            crate::ordinary_equipment_input::resolve_source_b(
+                &ep_raw_model::parse_epjson_str_for_source(&blank.to_string()).unwrap()
+            )
+            .is_err()
+        );
+        for (family, objects) in [
+            ("AirflowNetwork:SimulationControl", json!({"held":{}})),
+            ("Duct:Loss:Conduction", json!({"held":{}})),
+            ("EnergyManagementSystem:Program", json!({"held":{}})),
+            ("Table:Lookup", json!({"held":{}})),
+            ("Curve:Linear", json!({"held":{}})),
+            ("Curve:Functional:PressureDrop", json!({"held":{}})),
+            (
+                "WindowMaterial:Glazing",
+                json!({"held":{"optical_data_type":"SpectralAndAngle","thickness":0.003,"window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":"B SECOND","window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":"B SECOND","window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"B SECOND"}}),
+            ),
+        ] {
+            let mut held = curve_value.clone();
+            held[family] = objects;
+            assert!(
+                crate::ordinary_equipment_input::resolve_source_b(
+                    &ep_raw_model::parse_epjson_str_for_source(&held.to_string()).unwrap()
+                )
+                .is_err()
+            );
+        }
+    }
 }
 
 #[test]

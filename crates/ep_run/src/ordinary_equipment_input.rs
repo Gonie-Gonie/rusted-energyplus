@@ -448,6 +448,7 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(raw: &RawModel) -> Opti
             return error();
         }
     }
+    let owned_unused_analytic_curves = source_b::validate_unused_analytic_curves(raw).is_ok();
     for object in raw
         .objects
         .get(&ObjectType("OutdoorAir:Node".into()))
@@ -473,7 +474,9 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(raw: &RawModel) -> Opti
                 !objects.is_empty()
                     && (family.0.starts_with("AirflowNetwork:")
                         || family.0.starts_with("Duct:Loss:")
-                        || family.0.starts_with("Curve:")
+                        || (family.0.starts_with("Curve:")
+                            && !(source_b::is_analytic_curve_family(&family.0)
+                                && owned_unused_analytic_curves))
                         || family.0.starts_with("Table:"))
             })
         {
@@ -537,6 +540,10 @@ mod multizone;
 mod people;
 pub(crate) use people::has_instantiated_adaptive_comfort;
 mod source_b;
+pub(crate) use source_b::{
+    ANALYTIC_CURVE_FAMILIES as SOURCE_B_ANALYTIC_CURVE_FAMILIES,
+    validate_unused_analytic_curves as source_b_validate_unused_analytic_curves,
+};
 mod source_node_lists;
 mod space_lists;
 mod spaces;
@@ -597,6 +604,7 @@ fn resolve_raw(
         space_lists::validate(raw)?;
     }
     if source_b_ingress {
+        source_b::validate_unused_analytic_curves(raw)?;
         simple_glazing::validate(raw)?;
         simple_glazing::validate_unused_spectral_average(raw)?;
         simple_glazing::validate_spectral_data(raw)?;
@@ -611,6 +619,8 @@ fn resolve_raw(
         let source_space_family = source_space_ingress && family.0 == "Space";
         let source_space_list_family = source_space_list_ingress && family.0 == "SpaceList";
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
+        let source_analytic_curve_family =
+            source_b_ingress && raw.is_epjson() && source_b::is_analytic_curve_family(&family.0);
         let source_node_list_family = source_calendar_ingress && family.0 == "NodeList";
         let source_design_day_family =
             source_calendar_ingress && family.0 == "SizingPeriod:DesignDay";
@@ -749,7 +759,8 @@ fn resolve_raw(
             // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
             // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
             // or Unicode whitespace. Other families keep their old boundary.
-            let blank_name = if source_spectral_data_family
+            let blank_name = if source_analytic_curve_family
+                || source_spectral_data_family
                 || source_refraction_family
                 || source_glazing_family
                 || source_named_gas_family

@@ -93,6 +93,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
             standard_meter_record_count: o.standard_meter_record_count,
             prescan: o.prescan,
             reports: o.report_inputs,
+            curves: o.curves,
             minimum_report_frequency: o.minimum_report_frequency,
             host: o.output_host,
             dictionary_host: o.dictionary_host,

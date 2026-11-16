@@ -438,7 +438,17 @@ impl CtfInitializationReports {
                 }
                 result => result?,
             }
-            curves.initialize_state(input)?;
+            curves.initialize_state(
+                input,
+                &mut self.input_processor_shortcut,
+                &SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &project.system.developer_flag,
+                    warmup: &weather.global.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                },
+                backend,
+            )?;
             // Remaining243 direct input-state bodies are literal-empty.
         }
         Ok(())

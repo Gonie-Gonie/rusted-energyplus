@@ -56,7 +56,13 @@ impl SourceInitializationFiles {
                 backend,
                 shading_path,
             )?;
-            self.finish_source_kickoff_on_session(reports, weather, backend)?;
+            self.finish_source_kickoff_on_session(
+                reports,
+                weather,
+                &model.report_inputs,
+                output_host,
+                backend,
+            )?;
             self.source_primary_startup_on_session(
                 session,
                 reports,

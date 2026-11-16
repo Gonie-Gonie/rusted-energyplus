@@ -2341,6 +2341,445 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 ))
         );
     }
+    // One fresh genuine Curve/IP/backend owner; no Material helper or latch is reset.
+    // Local14A/10000N and returned NumA/NumN/IOStatus remain static fidelity only.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputProcessorShortCut, SourceInputStatisticsInput,
+            SourceInputStatisticsValue as S,
+        };
+        use crate::heat_balance::setup_postludes::{
+            SelectedCurves, SourceCurveOutputField as Field, SourceCurveReportContext,
+            SourceCurveType as Kind,
+        };
+        use crate::heat_balance::source_output_registration::{
+            SourceMtdFileHost, SourceOutputDictionaryStreams, SourceOutputRegistration,
+            SourceRealOutputOwners, SourceRealOutputTarget,
+        };
+        let rows = vec![
+            (
+                "Curve:Biquadratic",
+                "B SECOND",
+                BTreeMap::from([
+                    (
+                        "coefficient1_constant".into(),
+                        S::Number("18446744073709551615".into()),
+                    ),
+                    ("coefficient2_x".into(), S::Number("0.2".into())),
+                    ("coefficient3_x_2".into(), S::Number("0.3".into())),
+                    ("coefficient4_y".into(), S::Number("0.4".into())),
+                    ("coefficient5_y_2".into(), S::Number("0.5".into())),
+                    ("coefficient6_x_y".into(), S::Number("0.6".into())),
+                    ("minimum_value_of_x".into(), S::Number("-10.0".into())),
+                    ("maximum_value_of_x".into(), S::Number("50.0".into())),
+                    ("minimum_value_of_y".into(), S::Number("-5.0".into())),
+                    ("maximum_value_of_y".into(), S::Number("25.0".into())),
+                    ("minimum_curve_output".into(), S::Number("0.0".into())),
+                    ("input_unit_type_for_x".into(), S::String("".into())),
+                    (
+                        "input_unit_type_for_y".into(),
+                        S::String("Temperature".into()),
+                    ),
+                    ("output_unit_type".into(), S::String("Power".into())),
+                ]),
+                vec![-1.0, 0.2, 0.3, 0.4, 0.5, 0.6],
+                Kind::BiQuadratic,
+            ),
+            (
+                "Curve:Biquadratic",
+                "a first",
+                BTreeMap::from([
+                    ("coefficient1_constant".into(), S::Number("0.1".into())),
+                    ("coefficient2_x".into(), S::Number("0.2".into())),
+                    ("coefficient3_x_2".into(), S::Number("0.3".into())),
+                    ("coefficient4_y".into(), S::Number("0.4".into())),
+                    ("coefficient5_y_2".into(), S::Number("0.5".into())),
+                    ("coefficient6_x_y".into(), S::Number("0.6".into())),
+                    ("minimum_value_of_x".into(), S::Number("-10.0".into())),
+                    ("maximum_value_of_x".into(), S::Number("50.0".into())),
+                    ("minimum_value_of_y".into(), S::Number("-5.0".into())),
+                    ("maximum_value_of_y".into(), S::Number("25.0".into())),
+                ]),
+                vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+                Kind::BiQuadratic,
+            ),
+            (
+                "Curve:QuadraticLinear",
+                "QUADRATICLINEAR",
+                BTreeMap::from([
+                    ("coefficient1_constant".into(), S::Number("0.1".into())),
+                    ("coefficient2_x".into(), S::Number("0.2".into())),
+                    ("coefficient3_x_2".into(), S::Number("0.3".into())),
+                    ("coefficient4_y".into(), S::Number("0.4".into())),
+                    ("coefficient5_x_y".into(), S::Number("0.5".into())),
+                    ("coefficient6_x_2_y".into(), S::Number("0.6".into())),
+                    ("minimum_value_of_x".into(), S::Number("-10.0".into())),
+                    ("maximum_value_of_x".into(), S::Number("50.0".into())),
+                    ("minimum_value_of_y".into(), S::Number("-5.0".into())),
+                    ("maximum_value_of_y".into(), S::Number("25.0".into())),
+                ]),
+                vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+                Kind::QuadraticLinear,
+            ),
+            (
+                "Curve:CubicLinear",
+                "CUBICLINEAR",
+                BTreeMap::from([
+                    ("coefficient1_constant".into(), S::Number("0.1".into())),
+                    ("coefficient2_x".into(), S::Number("0.2".into())),
+                    ("coefficient3_x_2".into(), S::Number("0.3".into())),
+                    ("coefficient4_x_3".into(), S::Number("0.4".into())),
+                    ("coefficient5_y".into(), S::Number("0.5".into())),
+                    ("coefficient6_x_y".into(), S::Number("0.6".into())),
+                    ("minimum_value_of_x".into(), S::Number("-10.0".into())),
+                    ("maximum_value_of_x".into(), S::Number("50.0".into())),
+                    ("minimum_value_of_y".into(), S::Number("-5.0".into())),
+                    ("maximum_value_of_y".into(), S::Number("25.0".into())),
+                ]),
+                vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6],
+                Kind::CubicLinear,
+            ),
+            (
+                "Curve:Bicubic",
+                "BICUBIC",
+                BTreeMap::from([
+                    ("coefficient1_constant".into(), S::Number("0.1".into())),
+                    ("coefficient2_x".into(), S::Number("0.2".into())),
+                    ("coefficient3_x_2".into(), S::Number("0.3".into())),
+                    ("coefficient4_y".into(), S::Number("0.4".into())),
+                    ("coefficient5_y_2".into(), S::Number("0.5".into())),
+                    ("coefficient6_x_y".into(), S::Number("0.6".into())),
+                    ("coefficient7_x_3".into(), S::Number("0.7".into())),
+                    ("coefficient8_y_3".into(), S::Number("0.8".into())),
+                    ("coefficient9_x_2_y".into(), S::Number("0.9".into())),
+                    ("coefficient10_x_y_2".into(), S::Number("1.0".into())),
+                    ("minimum_value_of_x".into(), S::Number("-10.0".into())),
+                    ("maximum_value_of_x".into(), S::Number("50.0".into())),
+                    ("minimum_value_of_y".into(), S::Number("-5.0".into())),
+                    ("maximum_value_of_y".into(), S::Number("25.0".into())),
+                ]),
+                vec![0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+                Kind::BiCubic,
+            ),
+            (
+                "Curve:FanPressureRise",
+                "FANPRESSURERISE",
+                BTreeMap::from([
+                    ("coefficient1_c1".into(), S::Number("0.1".into())),
+                    ("coefficient2_c2".into(), S::Number("0.2".into())),
+                    ("coefficient3_c3".into(), S::Number("0.3".into())),
+                    ("coefficient4_c4".into(), S::Number("0.4".into())),
+                    ("minimum_value_of_qfan".into(), S::Number("0.1".into())),
+                    ("maximum_value_of_qfan".into(), S::Number("2.0".into())),
+                    ("minimum_value_of_psm".into(), S::Number("50.0".into())),
+                    ("maximum_value_of_psm".into(), S::Number("500.0".into())),
+                ]),
+                vec![0.1, 0.2, 0.3, 0.4],
+                Kind::FanPressureRise,
+            ),
+        ];
+        let definitions = [
+            ("Curve:Biquadratic", 4, 12),
+            ("Curve:QuadraticLinear", 4, 12),
+            ("Curve:CubicLinear", 4, 12),
+            ("Curve:Bicubic", 4, 16),
+            ("Curve:FanPressureRise", 1, 10),
+        ]
+        .into_iter()
+        .map(|(name, a, n)| SourceObjectDefinition {
+            object_type: name.into(),
+            alpha_fields: a,
+            numeric_fields: n,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        })
+        .collect();
+        let mut objects = BTreeMap::<String, BTreeMap<String, BTreeMap<String, S>>>::new();
+        let mut object_order = BTreeMap::<String, Vec<String>>::new();
+        let mut shapes = BTreeMap::<String, Vec<SourceObjectShape>>::new();
+        for (family, name, fields, _, _) in &rows {
+            objects
+                .entry((*family).into())
+                .or_default()
+                .insert((*name).into(), fields.clone());
+            object_order
+                .entry((*family).into())
+                .or_default()
+                .push((*name).into());
+            shapes
+                .entry((*family).into())
+                .or_default()
+                .push(SourceObjectShape {
+                    object_name: (*name).into(),
+                    field_sizes: fields.keys().map(|field| (field.clone(), 1)).collect(),
+                });
+        }
+        let mut input = SelectedInputProcessor::from_admitted_input(
+            definitions,
+            shapes
+                .into_iter()
+                .map(|(k, v)| (k, SourceInputFamily::Objects(v)))
+                .collect(),
+        )
+        .unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let maximum = input.get_max_schema_args().unwrap();
+        let bicubic = input.get_object_def_max_args("Curve:Bicubic").unwrap();
+        assert_eq!(
+            (
+                maximum.alphas,
+                maximum.numerics,
+                bicubic.alphas,
+                bicubic.numerics
+            ),
+            (4, 16, 4, 16)
+        );
+        let mut statistics =
+            crate::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+        input
+            .report_source_idf_records_stats(&mut statistics)
+            .unwrap();
+        assert_eq!(
+            (
+                statistics.number_input_records,
+                statistics.total_fields_with_defaults,
+                statistics.number_defaulted_fields
+            ),
+            (6, 15, 12)
+        );
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let unpassed = (
+            shortcut.alpha_args.clone(),
+            shortcut.numeric_args.clone(),
+            shortcut.alpha_field_blanks.clone(),
+            shortcut.current_module_object.clone(),
+        );
+        let globals =
+            crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default(
+            );
+        let project = crate::heat_balance::selected_project_data::SelectedProjectData::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &project.system.developer_flag,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut curves = SelectedCurves::default();
+        let (mut state, mut text, mut console, mut eio) =
+            (error_state(), Vec::new(), Vec::new(), Vec::new());
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut text),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        curves
+            .initialize_state(&mut input, &mut shortcut, &flags, &mut backend)
+            .unwrap();
+        for (at, (_, name, _, expected, kind)) in rows.iter().enumerate() {
+            let upper = name.to_ascii_uppercase();
+            let actual = curves.get_curve(&upper).unwrap();
+            assert_eq!(
+                (
+                    actual.name.as_str(),
+                    actual.num,
+                    actual.curve_type,
+                    actual.num_dims
+                ),
+                (upper.as_str(), i32::try_from(at + 1).unwrap(), *kind, 2)
+            );
+            assert_eq!(&actual.coeff[..expected.len()], expected.as_slice());
+            assert!(
+                actual.coeff[expected.len()..]
+                    .iter()
+                    .all(|v| v.to_bits() == 0)
+                    && actual.inputs.iter().all(|v| v.to_bits() == 0)
+                    && actual.output.to_bits() == 0
+            );
+            assert!(
+                actual
+                    .input_limits
+                    .iter()
+                    .all(|v| !v.min_present && !v.max_present)
+                    && actual.table_index == 0
+                    && actual.grid_value_index == 0
+                    && actual.context_string.is_empty()
+                    && !actual.ems_override_on
+                    && actual.ems_override_curve_value.to_bits() == 0
+            );
+            assert!(
+                std::ptr::eq(
+                    curves
+                        .real_output(SourceRealOutputTarget::Curve {
+                            field: Field::Input(1),
+                            index: actual.num
+                        })
+                        .unwrap(),
+                    &actual.inputs[0]
+                ) && std::ptr::eq(
+                    curves.read_curve_output(Field::Output, actual.num).unwrap(),
+                    &actual.output
+                )
+            );
+        }
+        assert_eq!(
+            (
+                curves.get_curve_index("B SECOND"),
+                curves.get_curve_index("A FIRST"),
+                curves.get_curve_index("a first")
+            ),
+            (1, 2, 0)
+        );
+        assert!(
+            curves.get_curve("MISSING").is_none()
+                && curves.read_curve_output(Field::Input(0), 1).is_none()
+                && curves.read_curve_output(Field::Input(3), 1).is_none()
+                && curves.read_curve_output(Field::Output, 0).is_none()
+        );
+        assert!(
+            curves
+                .get_curve("B SECOND")
+                .unwrap()
+                .output_limits
+                .min_present
+                && !curves
+                    .get_curve("B SECOND")
+                    .unwrap()
+                    .output_limits
+                    .max_present
+                && curves
+                    .get_curve("B SECOND")
+                    .unwrap()
+                    .output_limits
+                    .min
+                    .to_bits()
+                    == 0
+                && !curves
+                    .get_curve("A FIRST")
+                    .unwrap()
+                    .output_limits
+                    .min_present
+        );
+        assert_eq!(
+            (
+                shortcut.alpha_args.clone(),
+                shortcut.numeric_args.clone(),
+                shortcut.alpha_field_blanks.clone(),
+                shortcut.current_module_object.clone()
+            ),
+            unpassed
+        );
+        assert_eq!(
+            &shortcut.numeric_field_names[..10],
+            [
+                "coefficient1_c1",
+                "coefficient2_c2",
+                "coefficient3_c3",
+                "coefficient4_c4",
+                "minimum_value_of_qfan",
+                "maximum_value_of_qfan",
+                "minimum_value_of_psm",
+                "maximum_value_of_psm",
+                "minimum_curve_output",
+                "maximum_curve_output"
+            ]
+        );
+        assert!(
+            shortcut.numeric_field_blanks[..8]
+                .iter()
+                .all(|blank| !blank)
+                && shortcut.numeric_field_blanks[8..]
+                    .iter()
+                    .all(|blank| *blank)
+                && shortcut.alpha_field_names[0] == "name"
+                && shortcut.alpha_field_names[1..].iter().all(String::is_empty)
+        );
+        assert!(
+            rows.iter()
+                .all(|(family, name, _, _, _)| !input.is_object_unused(family, name))
+        );
+        let report_inputs = ep_model::ReportInputs::default();
+        let mut schedules =
+            crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+        let mut registration = SourceOutputRegistration::default();
+        let mut result_variables = Vec::new();
+        let mut eso = Vec::new();
+        let path = std::env::temp_dir().join(format!(
+            "rusted-curve-unrequested-{}-{}.mtd",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let mut host = SourceMtdFileHost::new(&path);
+        let mut dictionary = SourceOutputDictionaryStreams {
+            eso: Some(&mut eso),
+            sqlite_present: false,
+            results_framework_output_variables: &mut result_variables,
+        };
+        curves
+            .initialize_source_curve_reporting(&mut SourceCurveReportContext {
+                globals: &globals,
+                input: &mut input,
+                schedules: Some(&mut schedules),
+                reports: &report_inputs,
+                registration: &mut registration,
+                prescan: &statistics,
+                minimum_report_frequency: Some(&project.system.minimum_report_frequency),
+                minutes_in_time_step: 15,
+                diagnostic_flags: Some(flags),
+                backend: &mut backend,
+                host: &mut host,
+                dictionary_host: &mut dictionary,
+                eio: &mut eio,
+            })
+            .unwrap();
+        assert_eq!(
+            (
+                registration.num_real_variables_setup,
+                registration.dictionary_variables.len(),
+                registration.out_vars.len()
+            ),
+            (18, 3, 0)
+        );
+        assert_eq!(
+            registration
+                .dictionary_variables
+                .iter()
+                .map(|v| v.name.as_str())
+                .collect::<Vec<_>>(),
+            [
+                "Performance Curve Input Variable 1 Value",
+                "Performance Curve Input Variable 2 Value",
+                "Performance Curve Output Value"
+            ]
+        );
+        drop(host);
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        assert!(
+            state.tracking.total_severe_errors == 0
+                && state.tracking.total_warning_errors == 0
+                && text.is_empty()
+                && eio.is_empty()
+                && eso.is_empty()
+        );
+    }
 }
 
 #[test]
@@ -4751,5 +5190,205 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
             ),
             if integrity_failure { (0, 1) } else { (1, 0) }
         );
+    }
+    // Exactly three new Curve contexts: successful diagnostics/fatal, first Severe
+    // I/O failure, and late-flag Continue failure. Existing sinks/types are reused.
+    for mode in 0..3 {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputProcessorShortCut, SourceInputStatisticsInput,
+            SourceInputStatisticsValue as S,
+        };
+        use crate::heat_balance::setup_postludes::{
+            SelectedCurves, SelectedSetupServiceError, SourceCurveType,
+        };
+        let mut first = BTreeMap::from([
+            ("coefficient1_constant".into(), S::Number("0.1".into())),
+            ("coefficient2_x".into(), S::Number("0.2".into())),
+            ("coefficient3_x_2".into(), S::Number("0.3".into())),
+            ("coefficient4_y".into(), S::Number("0.4".into())),
+            ("coefficient5_y_2".into(), S::Number("0.5".into())),
+            ("coefficient6_x_y".into(), S::Number("0.6".into())),
+            ("minimum_value_of_x".into(), S::Number("-10.0".into())),
+            ("maximum_value_of_x".into(), S::Number("50.0".into())),
+            ("minimum_value_of_y".into(), S::Number("-5.0".into())),
+            ("maximum_value_of_y".into(), S::Number("25.0".into())),
+        ]);
+        if mode != 1 {
+            first.insert("minimum_value_of_x".into(), S::Number("2.0".into()));
+            first.insert("maximum_value_of_x".into(), S::Number("1.0".into()));
+            first.insert("minimum_curve_output".into(), S::Number("0.0".into()));
+        }
+        if mode == 0 {
+            first.insert("minimum_value_of_y".into(), S::Number("4.0".into()));
+            first.insert("maximum_value_of_y".into(), S::Number("3.0".into()));
+        }
+        let mut second = first.clone();
+        second.remove("coefficient5_y_2");
+        second.remove("coefficient6_x_y");
+        second.insert("coefficient5_x_y".into(), S::Number("0.5".into()));
+        second.insert("coefficient6_x_2_y".into(), S::Number("0.6".into()));
+        second.insert("minimum_value_of_x".into(), S::Number("-10.0".into()));
+        second.insert("maximum_value_of_x".into(), S::Number("50.0".into()));
+        second.insert("minimum_value_of_y".into(), S::Number("-5.0".into()));
+        second.insert("maximum_value_of_y".into(), S::Number("25.0".into()));
+        let raw_objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> =
+            BTreeMap::from([
+                (
+                    "Curve:Biquadratic".into(),
+                    BTreeMap::from([("A CURVE".into(), first)]),
+                ),
+                (
+                    "Curve:QuadraticLinear".into(),
+                    BTreeMap::from([("a curve".into(), second)]),
+                ),
+            ]);
+        let mut input = SelectedInputProcessor::from_admitted_input(
+            ["Curve:Biquadratic", "Curve:QuadraticLinear"]
+                .into_iter()
+                .map(|name| SourceObjectDefinition {
+                    object_type: name.into(),
+                    alpha_fields: 4,
+                    numeric_fields: 12,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                })
+                .collect(),
+            raw_objects
+                .iter()
+                .map(|(family, objects)| {
+                    (
+                        family.clone(),
+                        SourceInputFamily::Objects(
+                            objects
+                                .iter()
+                                .map(|(name, fields)| SourceObjectShape {
+                                    object_name: name.clone(),
+                                    field_sizes: fields
+                                        .keys()
+                                        .map(|field| (field.clone(), 1))
+                                        .collect(),
+                                })
+                                .collect(),
+                        ),
+                    )
+                })
+                .collect(),
+        )
+        .unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                object_order: BTreeMap::from([
+                    ("Curve:Biquadratic".into(), vec!["A CURVE".into()]),
+                    ("Curve:QuadraticLinear".into(), vec!["a curve".into()]),
+                ]),
+                objects: raw_objects,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals =
+            crate::heat_balance::selected_heat_balance_globals::SelectedHeatBalanceGlobals::default(
+            );
+        let project = crate::heat_balance::selected_project_data::SelectedProjectData::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &project.system.developer_flag,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut curves = SelectedCurves::default();
+        let (mut state, mut text, mut console) = (error_state(), Vec::new(), Vec::new());
+        let mut broken = BrokenDiagnostic;
+        let mut continue_sink = FailContinue { bytes: Vec::new() };
+        let error_stream: &mut dyn std::io::Write = match mode {
+            0 => &mut text,
+            1 => &mut broken,
+            _ => &mut continue_sink,
+        };
+        let result = curves.initialize_state(
+            &mut input,
+            &mut shortcut,
+            &flags,
+            &mut SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(error_stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            },
+        );
+        assert!(match mode {0=>matches!(&result,Err(SelectedSetupServiceError::Diagnostic(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Fatal(_)))),1=>matches!(&result,Err(SelectedSetupServiceError::Diagnostic(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(_)))),_=>matches!(&result,Err(SelectedSetupServiceError::Backend(_)))});
+        assert_eq!(
+            (
+                curves.get_curve_index("A CURVE"),
+                curves.get_curve_index("a curve")
+            ),
+            (if mode == 0 { 2 } else { 1 }, 0)
+        );
+        assert_eq!(
+            state.tracking.total_severe_errors,
+            if mode == 0 { 3 } else { 1 }
+        );
+        assert_eq!(
+            input.is_object_unused("Curve:QuadraticLinear", "a curve"),
+            mode == 2
+        );
+        let retained = curves.get_curve("A CURVE").unwrap();
+        assert!(
+            retained.num_dims == 2
+                && retained.coeff[..6] == [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
+                && retained
+                    .input_limits
+                    .iter()
+                    .all(|l| !l.min_present && !l.max_present)
+        );
+        assert_eq!(
+            (
+                retained.curve_type,
+                retained.input_limits[0].min,
+                retained.input_limits[0].max
+            ),
+            (
+                if mode == 0 {
+                    SourceCurveType::QuadraticLinear
+                } else {
+                    SourceCurveType::BiQuadratic
+                },
+                if mode == 2 { 2.0 } else { -10.0 },
+                if mode == 2 { 1.0 } else { 50.0 }
+            )
+        );
+        if mode == 0 {
+            let reached = std::str::from_utf8(&text).unwrap();
+            assert!(
+                reached
+                    .find("minimum_value_of_x")
+                    .zip(reached.find("minimum_value_of_y"))
+                    .is_some_and(|(a, b)| a < b)
+                    && reached
+                        .find("duplicate name.")
+                        .zip(reached.find("GetCurveInput: Errors found in getting Curve Objects."))
+                        .is_some_and(|(a, b)| a < b)
+            );
+        } else if mode == 1 {
+            assert!(text.is_empty() && console.is_empty() && !retained.output_limits.min_present);
+        } else {
+            assert!(
+                std::str::from_utf8(&continue_sink.bytes)
+                    .unwrap()
+                    .contains("GetCurveInput: For Curve:Biquadratic:")
+                    && !std::str::from_utf8(&continue_sink.bytes)
+                        .unwrap()
+                        .contains(" **   ~~~   ** ")
+                    && retained.output_limits.min_present
+                    && retained.output_limits.min.to_bits() == 0
+            );
+        }
     }
 }

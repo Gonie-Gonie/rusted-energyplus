@@ -80,7 +80,8 @@ impl SourceRealOutputOwners for SourceCombinedOutputOwners<'_> {
             SourceRealOutputTarget::Air { .. } => {
                 Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
             }
-            SourceRealOutputTarget::InternalGain { .. }
+            SourceRealOutputTarget::Curve { .. }
+            | SourceRealOutputTarget::InternalGain { .. }
             | SourceRealOutputTarget::PurchasedAir { .. }
             | SourceRealOutputTarget::Node { .. }
             | SourceRealOutputTarget::Weather { .. }

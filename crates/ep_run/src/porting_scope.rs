@@ -179,6 +179,12 @@ pub fn inspect_porting_scope(
     }
     if scope == PortingScope::B
         && let Err(error) =
+            crate::ordinary_equipment_input::source_b_validate_unused_analytic_curves(raw)
+    {
+        violations.push(error);
+    }
+    if scope == PortingScope::B
+        && let Err(error) =
             crate::ordinary_equipment_input::source_b_validate_unused_simple_glazing(raw)
     {
         violations.push(error);
@@ -348,6 +354,11 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                     | "WindowMaterial:Glazing:RefractionExtinctionMethod"
                     | "WindowMaterial:Glazing"
                     | "MaterialProperty:GlazingSpectralData"
+                    | "Curve:Biquadratic"
+                    | "Curve:QuadraticLinear"
+                    | "Curve:CubicLinear"
+                    | "Curve:Bicubic"
+                    | "Curve:FanPressureRise"
                     | "WindowMaterial:SimpleGlazingSystem"
                     | "WindowMaterial:Gas"
                     | "WindowMaterial:GasMixture"

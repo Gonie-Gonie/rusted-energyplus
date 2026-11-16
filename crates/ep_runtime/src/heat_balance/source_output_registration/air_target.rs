@@ -116,7 +116,8 @@ impl SourceRealOutputOwners for SourceAllOutputOwners<'_> {
             SourceRealOutputTarget::CohortReal { .. } => {
                 Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())
             }
-            SourceRealOutputTarget::InternalGain { .. }
+            SourceRealOutputTarget::Curve { .. }
+            | SourceRealOutputTarget::InternalGain { .. }
             | SourceRealOutputTarget::Node { .. }
             | SourceRealOutputTarget::PurchasedAir { .. } => {
                 Err(super::OrdinaryRadiationUnavailable::StorageDomain.into())

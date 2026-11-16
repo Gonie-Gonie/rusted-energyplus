@@ -62,6 +62,7 @@ pub(crate) struct SourceHvacOutputContext<'a, H, D> {
     pub(crate) standard_meter_record_count: &'a mut i64,
     pub(crate) prescan: &'a SourceOutputPreScan,
     pub(crate) reports: &'a ReportInputs,
+    pub(crate) curves: &'a crate::heat_balance::setup_postludes::SelectedCurves,
     pub(crate) minimum_report_frequency: &'a str,
     pub(crate) host: &'a mut H,
     pub(crate) dictionary_host: &'a mut D,

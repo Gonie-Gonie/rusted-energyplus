@@ -28,6 +28,10 @@ pub(crate) enum SourceSurfaceOutputField {
 /// Stable actual field identity; Source ordinals remain independent of typed IDs.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceRealOutputTarget {
+    Curve {
+        field: crate::heat_balance::setup_postludes::SourceCurveOutputField,
+        index: i32,
+    },
     #[cfg(all(test, feature = "native-controlled-air-cohort"))]
     CohortReal { slot: u8 },
     InternalGain {
