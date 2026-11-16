@@ -193,6 +193,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("Material:NoMass", 2, 4, 0, 0, None),
         ("Material:AirGap", 1, 1, 0, 0, None),
         ("Material:InfraredTransparent", 1, 0, 0, 0, None),
+        ("WindowMaterial:Glazing", 7, 14, 0, 0, None),
         ("WindowMaterial:SimpleGlazingSystem", 1, 3, 0, 0, None),
         ("WindowMaterial:Gas", 2, 12, 0, 0, None),
         ("WindowMaterial:GasMixture", 5, 6, 0, 0, None),

@@ -373,6 +373,9 @@
     "WindowMaterial:GasMixture": [
       "Bounded Source B direct epJSON admits unused WindowMaterial:GasMixture through the genuine MaterialGasMix getter and retained runtime row. Original-schema numeric kinds and Native signed-i64-effective operands remain separate: the active count is Integer1..4, Gas1/Gas2 type and fraction are required even at count1, all supplied inactive known fields remain validated, and unknown JSON body metadata stays Raw/IP custody. The real5-alpha6-numeric primitive retains min_fields7, full scratch/default/blank/count/name/used effects and exact loader identity. The getter resets all five type slots to Invalid, distinct from constructor Custom; fills the declared active named-species prefix and optional active fraction zero; and permits repeated species and non-unit fraction sums without normalization. Thickness diagnostics leave shared ErrorsFound unchanged, while first-gas-only300K NominalR is written unconditionally after successful diagnostic IO, even after an earlier shared error. Base Resistance and generic Materials properties remain constructor zero. Source-exact compiler names and total Raw/typed arena, loader and reverse NameMap bijections bind the same runtime report/geometry row. Missing active type retains an explicit hold for Native undefined record indexing. Every Construction reference, active window/thermal/optical consumers, Source A/IDF, Legacy changes and full-object completion remain held. Whole EIO, topology and export predicates remain mandatory; public Material Details does not expose private species/fractions/NominalR or prove active window behavior."
     ],
+    "WindowMaterial:Glazing": [
+      "Bounded Source B direct epJSON admits unused WindowMaterial:Glazing with exact SpectralAverage through the actual ordinary MaterialGlass getter, distinct GroupGlass and the same retained class as SGS without calling or changing SGS Setup. The actual map key is A1 under the official RE2 name rule; all20 known body fields retain their original schema types, ranges and exact enums, while unknown members of every JSON shape, including body name/idf_* metadata, remain Raw/IP custody and are not getter operands. One spectrum and three angle-table references remain arbitrary schema Strings under this inactive Average branch, without resolving or admitting positive spectral/Curve owners. Original numeric kinds and Native signed-i64-effective values remain separate. The real7A14N/min_fields14 primitive owns full scratch, defaults, blanks, names, returned counts and used state. All14 numeric writes, back-side base thermal absorptance, Young/Poisson and constructor-zero density/Cp/solar/visible absorptance come from this runtime row. Positive conductivity writes both Resistance and NominalR before the six ordered joint optical checks even after an earlier genuine shared error; wrapped conductivity/Young and diagnostic IO failures retain their exact state/error prefixes. The independently schema-valid unused compiler qualifier defers only those six sums, and total Raw/name/kind/count/loader/reverse-NameMap custody rejects missing-all-typed rows as well as aliases. Existing public Materials and checked Source geometry use the same row; they do not expose private Native optics or establish full geometry-unit traversal. Every Construction/window consumer, Source A/IDF, Legacy change, the other three optical modes, positive spectrum/Curve children and full-object completion remain held. A positive-infinite derived resistance reaches an unestablished Native report-formatter partition; no Raw/effective finiteness filter or formatter/diagnostic permission is added."
+    ],
     "OutdoorAir:Node": [
       "Bounded ordinary no-AFN Source B direct epJSON only: coherent authored OutdoorAir:Node singles and nameless OutdoorAir:NodeList objects use actual DSOA and every existing positive-OA prerequisite. The selected IdealLoads OA node may already be a list or single registry member; the real CheckAndAdd owner appends only a genuinely absent node. Height is omitted/default or finite after Native numeric conversion. DB, WB and wind fields are omitted, exact-empty Strings or existing supported schedule references, including both named temperature schedules. On the ordinary no-AFN path, wind_pressure_coefficient_curve_name permits any String, symmetric_wind_pressure_coefficient_curve exactly empty/No/Yes, and wind_angle_type exactly empty/Absolute/Relative. These direct epJSON enums do not trim or case-fold; null, numeric, boolean, container and unknown-enum values stay held. OutdoorAir:NodeList instance keys are input-order and used-object identities, never an A1 node name. Omitted or empty member arrays perform the real zero-alpha input fill; each nodes array member is an Object with a required String node_or_nodelist_name field. An exact-empty field value returns zero nodes, while whitespace remains a real name. All OA-list objects are filled before all singles in actual IP order. Every returned membership preserves the exact Native allocation/reference effects: newly assigned names begin at ref0 and references to existing names increment. OutsideAir registrations and advancing fluid streams are retained per membership; only the final outdoor-node registry deduplicates node numbers. Single registration still precedes Height and schedule writes. Success alone commits the final list/count and clears the consumed input flag. The selected IdealLoads member consumer uses the existing registry path without invented reference or registration effects. Actual A2 then A3 lookup/null assignment/used state and ordered registration remain owners. AnyLocal is positional; IsLocal follows actual temperature pointers. All eight alpha slots, default/blank distinctions, object-used state, highest-field counts and counted N1 default remain genuine. Late-field presence can set AnyLocal; it does not make a local-temperature pointer. Ordinary GetInput never consumes A6-A8 into curve/AFN properties. No AirflowNetwork:SimulationControl, default multizone conjunction or duct-loss route may enter this boundary; positive AFN/Curve/Table families remain held. True InitCall retains global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. Any present WB pointer selects existing real W(Tdb,Twb,P), including both named schedules. DB-only instead writes global W before cached Twb and nested TsatPb/Psat, preserving live pressure, diagnostics, iteration order and default interpolation=false. Computed Twb replaces WB only on child success; earlier weather/clamp writes remain and H/P/Quality stay later. No additional outer clamp follows the computed Twb result; the psychrometric owner retains its own Native final clamp. False/local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. Three cold callers/HB transport actual owners without copied state or resets. The selected coherent scene preserves the inherited active OA climate, all numeric inputs and original output requests. Its complete BND prediction is derived and reviewed before actors from genuine empty owner state through general-list allocation, Zone equipment, OA lists and singles, Scheduled managers, PurchasedAir and the real reporting cutoff. Whole-body comparison covers node/reference identities, connection order, streams, registry order and conditional report blocks; complete general-list and Scheduled-manager exports cover their actual public raw/order custody. Original numeric science, clocks, ancillary and nine-report OA/mixed gates remain mandatory. A selected member consumer and existing owner tests provide distinct evidence; no physical absent-node autoappend or private getter-state witness is inferred. The one combined scene uses distinct real temperature schedule names with equal values; separate existing owner tests cover their declared non-equal clamp effects. Direct private DB/WB/Height/wind/call counts, active WPC/AFN curve validity or pressure physics, arbitrary schedule/value compositions, interpolation/statistics variants, EMS, other consumers, Source A/IDF, TypedModel completion and full-object conformance remain unestablished. Exact-empty OA-list entries are the defined zero-node route. Safe general-NodeList trailing blanks and unreferenced warning-only definitions remain separate from an expanded interior-blank zero prefix, whose Native one-based Node(0)/NodeRef(0) access is undefined or assertion-dependent; the Source checked stop does not claim completion of that partition. On direct epJSON OutdoorAir:Node singles, schema-legally ignored fields outside the eight declared body properties may have any JSON kind, including body name and idf_* members; their exact Raw/IP custody remains intact. They are not getter operands: A1 still comes from the actual map key, and ignored bookkeeping does not alter direct-JSON order, positional counts, defaults or AnyLocal. All known Height, schedule and WPC fields retain their strict type, numeric, enum and reference checks. The fixed child holds every755 parent numeric record and adds only two ignored Float metadata records. It changes no runtime/weather math, node registration/topology, report request, complete export or scientific criterion. Source A/IDF/Legacy, AFN, Native-fatal invalid combinations, unreviewed metadata in other families and broad list/consumer combinations have no new completion or exact fatal-prefix claim.",
       "The original110-type corpus already contains OutdoorAir:Node (12 original occurrences); its raw_source_getter/raw_only/bounded_b category and all141 prior registry classifications remain unchanged. The additional bounded OutdoorAir:NodeList dependency row raises the current registry to142; it does not change the original116-type example union or establish full-domain support. Numerical evidence is limited to fixed negative-global, point, wind, WB-with-wind, DB-only, combined DB/WB, inactive-WPC and the selected coherent multi/list scenes. The latter adds genuine list/single getter and whole-topology/export custody while preserving the active climate and original science. The inactive fields pass the real getter and positional/default effects; their unused curve String establishes no active AFN reference validity or wind-pressure physics. Private Height/DB/WB/wind/call counts, universal averaged laws and arbitrary/full-object combinations remain unobserved. Existing owner tests and frozen full comparisons provide separate scoped evidence."
@@ -11903,6 +11906,56 @@
           "path": ".runtime/porting/unused-window-gas-mixture/evidence01/source-evidence.json",
           "sha256": "91d63102abbe08be80da8e2114380913b1c5a8192da1cef249f4d0d71bba90c2",
           "bytes": 42599
+        }
+      },
+      "unused_window_glazing_spectral_average_current_Source": {
+        "actual_quality": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/quality02/summary.json",
+          "sha256": "57a1ffd8bc35c9bbc6ce8f8d6e71a61276c3f29934482ec686cacca6a470b1ee",
+          "bytes": 2751
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/quality-ledger.json",
+          "sha256": "d5da6a7758d1f03f36d1437de8604d5e720b7a72913ce695b3ba49b58a823b36",
+          "bytes": 7627
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/quality02/quality-preparation.json",
+          "sha256": "2225e798c692ed50f2d5cec3008cd8f5f73eaff67f2f8e53642216fe2edc4cf8",
+          "bytes": 26997
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/source-authority.json",
+          "sha256": "5a034692e38daf55f52dbda4acb8893928576b42bdec7e421d477440b7411812",
+          "bytes": 77233
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/object-expansion/unit159-prep/independent-actual-unused-WindowMaterial-Glazing-SpectralAverage-Source-authority-static-review01.json",
+          "sha256": "888b2ead17ed2574ccbb6e0aa08e690960d10b9acaf1e9c6fb6ba9a65f735091",
+          "bytes": 3613
+        },
+        "total_actual_QA_commands": 13,
+        "current_QA_commands": 8,
+        "failed_QA_attempts": 1,
+        "current_test_body_executions": 4,
+        "historical_test_body_executions": 2,
+        "total_actual_test_body_executions": 6,
+        "distinct_existing_test_functions": 4,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "correction_reviews": [
+          {
+            "path": ".runtime/porting/unused-spectral-average-glazing/correction01.json",
+            "sha256": "449cbe4e22387f23db3b01be11830c698ea54908606ecac503a3022af2fa01c7",
+            "bytes": 2276
+          }
+        ],
+        "actual_test_execution_evidence": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/source-evidence.json",
+          "sha256": "449bd4d462bdb632441743e546e114ef23c5418ac3fb12a0fc5edd01d3a70c96",
+          "bytes": 40274
         }
       }
     },
@@ -78111,12 +78164,299 @@
           "Material_Details_presence": true,
           "geometry_export_identity": true
         }
+      },
+      {
+        "id": "ideal-loads-unused-spectral-average-window-glazing",
+        "case_kind": "UNUSED_WINDOW_MATERIAL_GLAZING_SPECTRAL_AVERAGE",
+        "group": "WindowMaterial:Glazing",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-unused-spectral-average-glazing",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/unused-WindowMaterial-Glazing-SpectralAverage-CLOSED-input-data-proposal01/input.epJSON",
+          "sha256": "c978ea856e44769731609318a1dfbef977fe2f87752500cb5a3e2371d247d72b",
+          "bytes": 104898
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/native/command/receipt.json",
+          "sha256": "1e3dd83e46e8fec37fa757c9a714646798f9adff9e12b7dedb72c94ecca17095",
+          "bytes": 332782
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/source/command/receipt.json",
+          "sha256": "8006cfe3d527d8841dc42b0724e11fd90e5e566a06ffb5cfdce3487c1fc423ff",
+          "bytes": 334155
+        },
+        "source_summary": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/source/output/run-summary.json",
+          "sha256": "ff5b702d894d0db36345e04a3b9b48d4dcaac3f1d17451263d62e6c34b19fca4",
+          "bytes": 64505
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/30/30ef1e805284f60c95f04ede3eb2efb57dca70a6586bf394348e756567d888fd",
+          "sha256": "30ef1e805284f60c95f04ede3eb2efb57dca70a6586bf394348e756567d888fd"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/build01/frozen/eplus-rs.exe",
+          "sha256": "c444c71d760e535dd64179fac84f3aa4b2b8e172f4fe10332da50e42448897b4",
+          "bytes": 81851245
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/build01/build/receipt.json",
+          "sha256": "e46e9fbc87c5f7d50f8364e54f35854c2d4a590a9728531b2437e96eaafdf00d",
+          "bytes": 70792
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/readback.json",
+          "sha256": "8c35112edbfd0ebbfe0df27ba326bea0e291e4ac758c7dc6cf209d054a1813c9",
+          "bytes": 540711
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/Root-scientific-review.json",
+          "sha256": "88f51234a5e121f732f589afbff29748689f95a5e9a8cf2c2cb6e47e0a68d6ae",
+          "bytes": 17797
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/case-config.json",
+          "sha256": "96e084fd68bb18fa25e4288404d3c6fbb84f71f679173599fe361691164b16dc",
+          "bytes": 110664
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse_delta": 2.039620483986755e-08
+        },
+        "coverage_kind": "unused_window_glazing_spectral_average_current_Source",
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false,
+          "new_report_requests": 0
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v6/release.json",
+            "sha256": "fad05d195e3969372afbcbff8451aff70b70484e3b12683c1890c51ac5c01754",
+            "bytes": 9106
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/binding.json",
+            "sha256": "c5f9a608bc32393928052f0b32bd804bdfc35d7a06e654a734bb978952e68531",
+            "bytes": 1172
+          },
+          "case_config": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/case-config.json",
+            "sha256": "96e084fd68bb18fa25e4288404d3c6fbb84f71f679173599fe361691164b16dc",
+            "bytes": 110664
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/source-authority.json",
+            "sha256": "5a034692e38daf55f52dbda4acb8893928576b42bdec7e421d477440b7411812",
+            "bytes": 77233
+          },
+          "completion": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/completed.json",
+            "sha256": "9141e6b990f0955f151371c5458e67ca390eb0a3cd1e298024d05c985d8678ca",
+            "bytes": 2312
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/verify-command/receipt.json",
+            "sha256": "917c06567daa0b0f7a0b2e77a4be334e4216069732adf62519e15f2232deb645",
+            "bytes": 333870
+          },
+          "Native_precheck": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/native-precheck.json",
+            "sha256": "a6d9621ac65d12b4b03999e3fd12ff8d14230696ea9df883f6694c17fe1808cb",
+            "bytes": 21724
+          },
+          "Native_precheck_receipt": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/precheck-command/receipt.json",
+            "sha256": "9eac45446ff42269866a95919140597f5fc3bc3f919f39f5ae65a63f03245fce",
+            "bytes": 333113
+          },
+          "actual_build": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/build01/build-row.json",
+            "sha256": "2d88f183084a783b2cdb4a0b2aa222c04f4fb54176c2d9fb8e9a6a6c04267ff6",
+            "bytes": 1405
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/quality02/summary.json",
+            "sha256": "57a1ffd8bc35c9bbc6ce8f8d6e71a61276c3f29934482ec686cacca6a470b1ee",
+            "bytes": 2751
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/source-authority.json",
+            "sha256": "5a034692e38daf55f52dbda4acb8893928576b42bdec7e421d477440b7411812",
+            "bytes": 77233
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "profile": "ideal_loads.oa_topology.v1",
+          "topology_prediction": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/prediction-actual-Source.json",
+            "sha256": "060048e05fcbb6cf34034e4b0a6d936f7e776caa029893af3936f8713a7bf231",
+            "bytes": 32566
+          },
+          "topology_derivation": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/derivation-actual-Source.json",
+            "sha256": "ff658f5d3613b939602fc8e002a6963d2d44eb789c3d5045748ca71bb618aee6",
+            "bytes": 113321
+          },
+          "topology_prediction_reviews": {
+            "Root": {
+              "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/Root-actual-prediction-review.json",
+              "sha256": "a3886939d75ce3b52a7a745eaed6720865dda781301dab52eb6ce536b90278c6",
+              "bytes": 2330
+            },
+            "independent": {
+              "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowMaterial-Glazing-SpectralAverage-actual-Source-prediction-review01.json",
+              "sha256": "11a39af61d24d07f3926cde2a2891400d2ab0439441602de8d7d272e7808ac71",
+              "bytes": 2385
+            }
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/Root-runtime-review.json",
+            "sha256": "58ffb777dd846433b6551c7c4785d5afda3f71c3928193757a0dc1f668561d25",
+            "bytes": 2702
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowMaterial-Glazing-SpectralAverage-CLOSED-input-topology-data-static-review01.json",
+            "sha256": "3bf8e5f9d545522f399db12deba531c87d4d9d57bb9c549a59732aa06d01c12f",
+            "bytes": 4843
+          },
+          "QA_profile": {
+            "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-Glazing-QA-profile-data-proposal01/QA-profile.json",
+            "sha256": "5e51c8abe013aa5bfb21ead17545d230542749a472ccb32f26eb3f68f941ea9b",
+            "bytes": 8177
+          },
+          "QA_profile_binding": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/QA-profile-binding02.json",
+            "sha256": "dfcc8d1d32ae4bcbaacda7f009bca9f1a352be14c1e11033750e4d6a7dd469cc",
+            "bytes": 3191
+          },
+          "documentation_actual_facts": {
+            "path": ".runtime/porting/unused-spectral-average-glazing/Root-actual-documentation-facts01.json",
+            "sha256": "df1e05724e3235606d2d93c9b56d58cf2018b70fa04a11a19cac50283dcf17ad",
+            "bytes": 1567
+          }
+        },
+        "scientific_gate_counts": {
+          "engine": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "public_response_summary": {
+          "Native": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.03148489327319126,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          },
+          "Source": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.031484893273194814,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          }
+        },
+        "effective_state": "One ordinary SourceB direct-epJSON scene adds one unused WindowMaterial:Glazing named GLASS UNUSED AVERAGE DEFAULT with exact SpectralAverage optical type and Float thickness0.003; all other fields remain omitted and use their actual schema/getter defaults. Existing SGS, named Gas, Custom Gas and GasMixture definitions remain present; no Construction references the new Glass. All767 parent numeric records and all752 canonical numeric records are held, with one added Float record and16 total canonical additions. Native and Source public11-column Material Details rows agree, including rounded base Resistance; this public field does not expose Native private NominalR or optical coefficients. Actual Source geometry retains the same real SourceNum/map/typed Glass identity, GroupGlass3,VerySmooth5,thermal-back absorptance0.84 and constructor-zero solar/visible absorptances, plus the Source-only NominalR field without a hardcoded R formula. Current/historical QA bodies and failed commands are copied from actual SourceAuthority metadata; the failed prior compiler command grants no body credit, and only the actual four required current bodies have current credit. All158/75120 original numerical,clock,diagnostics,topology and ancillary gates remain mandatory. Public fixed-input comparison establishes no private Native optical state,arbitrary legal-combination/full-object or active-window support. All Construction/window transport,Spectral/SpectralAndAngle/BSDF consumers,SourceA/IDF/Legacy and full MaterialGlass completion remain unestablished.",
+        "authored_height": {
+          "JSON_kind": "Float",
+          "value": 12.5,
+          "bits": "4029000000000000"
+        },
+        "unused_spectral_average_glazing": {
+          "fixed_input_manifest": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-WindowMaterial-Glazing-SpectralAverage-CLOSED-input-data-proposal01/prepared-manifest.json",
+            "sha256": "870e59efb300a72bb6932149499de3b62ccf263559090d6fb7557051a9e7ed2d",
+            "bytes": 10840
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowMaterial-Glazing-SpectralAverage-CLOSED-input-topology-data-static-review01.json",
+            "sha256": "3bf8e5f9d545522f399db12deba531c87d4d9d57bb9c549a59732aa06d01c12f",
+            "bytes": 4843
+          },
+          "parent_numeric_records": 767,
+          "current_numeric_records": 768,
+          "added_numeric_records": [
+            {
+              "JSON_path": "/WindowMaterial:Glazing/GLASS UNUSED AVERAGE DEFAULT/thickness",
+              "JSON_kind": "float",
+              "token": "0.003",
+              "parsed_binary64_bits": "3f689374bc6a7efa",
+              "parsed_binary64_hex": "0x1.89374bc6a7efap-9"
+            }
+          ],
+          "Glazing_family_present_in_parent": false,
+          "Glazing_map_before": {},
+          "Glazing_map_after": {
+            "GLASS UNUSED AVERAGE DEFAULT": {
+              "optical_data_type": "SpectralAverage",
+              "thickness": 0.003
+            }
+          },
+          "added_Raw_Glazing": {
+            "path": [
+              "WindowMaterial:Glazing",
+              "GLASS UNUSED AVERAGE DEFAULT"
+            ],
+            "body": {
+              "optical_data_type": "SpectralAverage",
+              "thickness": 0.003
+            }
+          },
+          "Material_Details_presence": true,
+          "geometry_export_identity": true
+        }
       }
     ],
     "totals": {
-      "paired_cases": 258,
-      "reported_samples": 11323096,
-      "raw_operand_unequal": 2877490,
+      "paired_cases": 259,
+      "reported_samples": 11398216,
+      "raw_operand_unequal": 2900558,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -81276,6 +81616,38 @@
           "sha256": "c4b4da9e852ca05cb79584d19fdfe8cd45d22e085be0e4223ad55a327f5aeded",
           "bytes": 68767
         }
+      },
+      {
+        "id": "source-unused-spectral-average-glazing",
+        "receipt": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/build01/build/receipt.json",
+          "sha256": "e46e9fbc87c5f7d50f8364e54f35854c2d4a590a9728531b2437e96eaafdf00d",
+          "bytes": 70792
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/30/30ef1e805284f60c95f04ede3eb2efb57dca70a6586bf394348e756567d888fd",
+          "sha256": "30ef1e805284f60c95f04ede3eb2efb57dca70a6586bf394348e756567d888fd"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/build01/frozen/eplus-rs.exe",
+          "sha256": "c444c71d760e535dd64179fac84f3aa4b2b8e172f4fe10332da50e42448897b4",
+          "bytes": 81851245
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/build01/frozen/build-receipt.json",
+          "sha256": "97ccca264d2633d4904b2a8ade3de05be0795eae8c168d16c2f3681b53b9c2cf",
+          "bytes": 1645474
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/quality02/quality-preparation.json",
+          "sha256": "2225e798c692ed50f2d5cec3008cd8f5f73eaff67f2f8e53642216fe2edc4cf8",
+          "bytes": 26997
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/build01/freeze/receipt.json",
+          "sha256": "4169235f5e3dc899ef0efa03cbb131824caae643fdfd066efae4d0081fd3bed2",
+          "bytes": 69800
+        }
       }
     ],
     "focused_since_workspace": {
@@ -81722,14 +82094,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 176,
-      "builds_with_accepted_paired_cases": 154,
+      "actual_recorded_builds": 177,
+      "builds_with_accepted_paired_cases": 155,
       "builds_with_only_retained_failed_Source_attempts": 8,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 14,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "176 recorded Source builds: 154 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "177 recorded Source builds: 155 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -86430,47 +86802,48 @@
         "ideal-loads-outdoor-air-node-ignored-metadata",
         "ideal-loads-unused-named-window-gas",
         "ideal-loads-unused-custom-window-gas",
-        "ideal-loads-unused-window-gas-mixture"
+        "ideal-loads-unused-window-gas-mixture",
+        "ideal-loads-unused-spectral-average-window-glazing"
       ],
-      "accepted_paired_cases": 87,
-      "accepted_samples": 6421920,
-      "retained_Scheduled_B_pairs": 86,
-      "retained_Scheduled_B_samples": 6362400,
+      "accepted_paired_cases": 88,
+      "accepted_samples": 6497040,
+      "retained_Scheduled_B_pairs": 87,
+      "retained_Scheduled_B_samples": 6437520,
       "unused_NodeList_A_pairs": 1,
       "unused_NodeList_A_samples": 59520,
       "latest_complete_comparisons": {
-        "UNUSED_WINDOW_MATERIAL_GAS_MIXTURE": {
-          "path": ".runtime/porting/unused-window-gas-mixture/runtime01/readback.json",
-          "sha256": "8e13bdf89d41547801b789785362002e0f74f745a981ba45a3bff1c7a5e945ac",
-          "bytes": 540398
+        "UNUSED_WINDOW_MATERIAL_GLAZING_SPECTRAL_AVERAGE": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/readback.json",
+          "sha256": "8c35112edbfd0ebbfe0df27ba326bea0e291e4ac758c7dc6cf209d054a1813c9",
+          "bytes": 540711
         }
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/porting/unused-window-gas-mixture/runtime01/Root-scientific-review.json",
-        "sha256": "9e59a367173088c99c0c1beb049a4e8555a3185da2721a90788e21fe489b357c",
-        "bytes": 15683
+        "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/Root-scientific-review.json",
+        "sha256": "88f51234a5e121f732f589afbff29748689f95a5e9a8cf2c2cb6e47e0a68d6ae",
+        "bytes": 17797
       },
-      "latest_source_build": "source-unused-window-gas-mixture",
+      "latest_source_build": "source-unused-spectral-average-glazing",
       "latest_actual_Source_build": {
-        "path": ".runtime/porting/unused-window-gas-mixture/build01/build-row.json",
-        "sha256": "407ab2ea17caeed34b0fdff9f0937f6caa050a666bc513cbbbeadf6d8861c263",
-        "bytes": 1369
+        "path": ".runtime/porting/unused-spectral-average-glazing/build01/build-row.json",
+        "sha256": "2d88f183084a783b2cdb4a0b2aa222c04f4fb54176c2d9fb8e9a6a6c04267ff6",
+        "bytes": 1405
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/unused-window-gas-mixture/quality02/summary.json",
-        "sha256": "4e2859ea04464ccaf83cc83a9c4d54995e19093d13dc79241e5e22485cf2d5db",
-        "bytes": 2703
+        "path": ".runtime/porting/unused-spectral-average-glazing/quality02/summary.json",
+        "sha256": "57a1ffd8bc35c9bbc6ce8f8d6e71a61276c3f29934482ec686cacca6a470b1ee",
+        "bytes": 2751
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/porting/unused-window-gas-mixture/evidence01/source-authority.json",
-        "sha256": "6b85700016b58d2b4ff2f0b1550511477a45ce2e8e85f38c06d6eed6c5b2569b",
-        "bytes": 79612
+        "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/source-authority.json",
+        "sha256": "5a034692e38daf55f52dbda4acb8893928576b42bdec7e421d477440b7411812",
+        "bytes": 77233
       },
       "latest_input_contracts": {
-        "UNUSED_WINDOW_MATERIAL_GAS_MIXTURE": {
-          "path": ".runtime/porting/unused-window-gas-mixture/runtime01/case-config.json",
-          "sha256": "302df8aeab2c3660e153efafe7a57a4a91422c8fdab67763f10d0e075275f6c0",
-          "bytes": 110300
+        "UNUSED_WINDOW_MATERIAL_GLAZING_SPECTRAL_AVERAGE": {
+          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/case-config.json",
+          "sha256": "96e084fd68bb18fa25e4288404d3c6fbb84f71f679173599fe361691164b16dc",
+          "bytes": 110664
         }
       },
       "latest_retained_evidence": {
@@ -86483,7 +86856,7 @@
         "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
         "bytes": 2919
       },
-      "scope": "86 bounded Source B Scheduled/NodeList pairs retain 6,362,400 values. The unused Source A pair adds59,520, giving 87 pairs and 6,421,920 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
+      "scope": "87 bounded Source B Scheduled/NodeList pairs retain 6,437,520 values. The unused Source A pair adds59,520, giving 88 pairs and 6,497,040 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
       "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",

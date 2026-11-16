@@ -517,6 +517,10 @@ mod fields;
 mod infrared;
 mod simple_glazing;
 pub(crate) use simple_glazing::validate as source_b_validate_unused_simple_glazing;
+pub(crate) use simple_glazing::{
+    glazing_known_field as source_b_glazing_known_field,
+    validate_unused_spectral_average as source_b_validate_unused_spectral_average,
+};
 mod window_gas;
 // Historical internal aliases: the same pure unused single-Gas schema owner now includes Custom.
 pub(crate) use window_gas::{
@@ -590,6 +594,7 @@ fn resolve_raw(
     }
     if source_b_ingress {
         simple_glazing::validate(raw)?;
+        simple_glazing::validate_unused_spectral_average(raw)?;
         window_gas::validate(raw)?;
         window_gas::validate_mixture(raw)?;
     }
@@ -607,6 +612,7 @@ fn resolve_raw(
             source_calendar_ingress && family.0 == "Material:InfraredTransparent";
         let source_simple_glazing_family =
             source_b_ingress && family.0 == "WindowMaterial:SimpleGlazingSystem";
+        let source_glazing_family = source_b_ingress && family.0 == "WindowMaterial:Glazing";
         let source_named_gas_family = source_b_ingress && family.0 == "WindowMaterial:Gas";
         let source_gas_mixture_family = source_b_ingress && family.0 == "WindowMaterial:GasMixture";
         let source_people_family = source_calendar_ingress && family.0 == "People";
@@ -674,6 +680,7 @@ fn resolve_raw(
             && !source_b_family
             && !source_node_list_family
             && !source_irt_family
+            && !source_glazing_family
             && !source_simple_glazing_family
             && !source_named_gas_family
             && !source_gas_mixture_family
@@ -730,42 +737,43 @@ fn resolve_raw(
             // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
             // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
             // or Unicode whitespace. Other families keep their old boundary.
-            let blank_name = if source_named_gas_family || source_gas_mixture_family {
-                !window_gas::valid_name(&name.0)
-            } else if source_design_day_family
-                || source_calendar_ingress
-                    && matches!(
-                        family.0.as_str(),
-                        "OtherEquipment"
-                            | "ElectricEquipment"
-                            | "People"
-                            | "ZoneList"
-                            | "ZoneGroup"
-                            | "Space"
-                            | "SpaceList"
-                            | "ScheduleTypeLimits"
-                            | "SetpointManager:Scheduled"
-                            | "ZoneControl:Humidistat"
-                            | "NodeList"
-                            | "Schedule:Constant"
-                            | "Schedule:Compact"
-                            | "Schedule:File"
-                            | "Schedule:Day:Hourly"
-                            | "Schedule:Day:Interval"
-                            | "Schedule:Day:List"
-                            | "Schedule:Week:Daily"
-                            | "Schedule:Week:Compact"
-                            | "Schedule:Year"
-                    )
-            {
-                name.0.contains('\n')
-                    || name
-                        .0
-                        .bytes()
-                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
-            } else {
-                name.0.trim().is_empty()
-            };
+            let blank_name =
+                if source_glazing_family || source_named_gas_family || source_gas_mixture_family {
+                    !window_gas::valid_name(&name.0)
+                } else if source_design_day_family
+                    || source_calendar_ingress
+                        && matches!(
+                            family.0.as_str(),
+                            "OtherEquipment"
+                                | "ElectricEquipment"
+                                | "People"
+                                | "ZoneList"
+                                | "ZoneGroup"
+                                | "Space"
+                                | "SpaceList"
+                                | "ScheduleTypeLimits"
+                                | "SetpointManager:Scheduled"
+                                | "ZoneControl:Humidistat"
+                                | "NodeList"
+                                | "Schedule:Constant"
+                                | "Schedule:Compact"
+                                | "Schedule:File"
+                                | "Schedule:Day:Hourly"
+                                | "Schedule:Day:Interval"
+                                | "Schedule:Day:List"
+                                | "Schedule:Week:Daily"
+                                | "Schedule:Week:Compact"
+                                | "Schedule:Year"
+                        )
+                {
+                    name.0.contains('\n')
+                        || name
+                            .0
+                            .bytes()
+                            .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+                } else {
+                    name.0.trim().is_empty()
+                };
             if blank_name
                 && !matches!(
                     family.0.as_str(),
@@ -819,6 +827,8 @@ fn resolve_raw(
                         ))
                     && !(source_people_family && people::admitted_field(&field.0, value))
                     && !(source_angle_family && people::admitted_angle_field(&field.0, value))
+                    && !(source_glazing_family
+                        && simple_glazing::glazing_admitted_field(&field.0, value))
                     && !(source_simple_glazing_family
                         && simple_glazing::admitted_field(&field.0, value))
                     && !(source_named_gas_family
@@ -1155,6 +1165,7 @@ fn resolve_raw(
                         .is_some_and(|value| value >= 0.0)
                 }
                 "Material:InfraredTransparent" => source_irt_family,
+                "WindowMaterial:Glazing" => source_glazing_family,
                 "WindowMaterial:SimpleGlazingSystem" => source_simple_glazing_family,
                 "WindowMaterial:Gas" => source_named_gas_family,
                 "WindowMaterial:GasMixture" => source_gas_mixture_family,

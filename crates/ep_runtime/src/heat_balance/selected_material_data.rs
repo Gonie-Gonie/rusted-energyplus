@@ -1,4 +1,4 @@
-//! Actual selected GetMaterialData: borrowed opaque properties and owned GlassSimple rows.
+//! Actual selected GetMaterialData: borrowed opaque properties and owned MaterialGlass rows.
 use super::ctf_initialization_context::CtfInitializationContext;
 use super::error_backend::{SourceDiagnosticFlags, SourceErrorBackend};
 use super::report_scan::{
@@ -60,7 +60,7 @@ pub(crate) struct SelectedMaterialData {
     pub(crate) resistance_only: BTreeMap<MaterialId, bool>,
     /// MaterialBase NominalR ctor0 and getter writes, aligned with actual MaterialNum.
     pub(crate) nominal_r: Vec<f64>,
-    /// Actual mutable GlassSimple properties; typed derivations are advisory.
+    /// Actual mutable ordinary Glass and GlassSimple properties; typed derivations are advisory.
     simple_glazing: BTreeMap<MaterialId, simple_glazing::SourceSimpleGlazingMaterial>,
     /// Actual named MaterialGasMix/base rows; typed gas properties are advisory.
     window_gas: BTreeMap<MaterialId, window_gas::SourceWindowGasMaterial>,
@@ -245,6 +245,43 @@ impl SelectedMaterialData {
                 thermal_absorptance: material.thermal_absorptance,
                 solar_absorptance: material.solar_absorptance,
                 visible_absorptance: material.visible_absorptance,
+            },
+        ))
+    }
+
+    /// Same actual ordinary Glass row for common report and geometry.
+    pub(crate) fn source_glazing_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native Glass MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::Glass)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Glass Source order/group/physical identity",
+            ));
+        }
+        let row = self
+            .simple_glazing
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained Glass runtime row",
+            ))?;
+        Ok((
+            row.roughness.ok_or(HeatBalanceInputError::Unavailable(
+                "actual Glass getter roughness",
+            ))?,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
             },
         ))
     }
@@ -476,7 +513,7 @@ impl SelectedMaterialData {
                 require_zero(self.$member, concat!("positive ", $family))?;
             }};
         }
-        empty!(num_w5_glazings, "WindowMaterial:Glazing");
+        self.get_glazing_data(raw, o)?;
         empty!(
             num_w5_alt_glazings,
             "WindowMaterial:Glazing:RefractionExtinctionMethod"

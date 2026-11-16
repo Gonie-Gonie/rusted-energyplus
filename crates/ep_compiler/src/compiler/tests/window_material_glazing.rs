@@ -308,6 +308,87 @@ fn glazing_shares_material_names_and_classifies_single_layer_constructions() {
             && diagnostic.object_type == "WindowMaterial:Glazing"
             && diagnostic.object_name.as_deref() == Some("shared")
     }));
+
+    // Genuine Source entry, with exact material names and ordinary opaque
+    // Construction references sharing that namespace; no new test context helper.
+    let mut source_value = r#"{
+        "Material":{" Opaque ":{"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000.0,"specific_heat":1000.0}},
+        "Construction":{"Opaque Ref":{"outside_layer":" OPAQUE "}},
+        "WindowMaterial:Glazing":{
+            " Glass ":{"optical_data_type":"SpectralAverage","thickness":0.003,
+                "solar_transmittance_at_normal_incidence":0.75,"front_side_solar_reflectance_at_normal_incidence":0.75,"back_side_solar_reflectance_at_normal_incidence":0.75,
+                "visible_transmittance_at_normal_incidence":0.75,"front_side_visible_reflectance_at_normal_incidence":0.75,"back_side_visible_reflectance_at_normal_incidence":0.75,
+                "infrared_transmittance_at_normal_incidence":0.75},
+            "\u00a0":{"optical_data_type":"SpectralAverage","thickness":0.003},
+            "\u000b":{"optical_data_type":"SpectralAverage","thickness":0.003}
+        }
+    }"#.to_string();
+    let raw = parse_epjson_str(&source_value).unwrap();
+    let source = super::super::compile_raw_model_for_source(&raw);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    let model = source.model.as_ref().unwrap();
+    assert!(
+        model.material_names.is_source_exact_namespace()
+            && model.material_names.resolve("Opaque").is_none()
+            && model.constructions[0].layers[0]
+                == model.material_names.resolve(" Opaque ").unwrap()
+    );
+    for name in [" Glass ", "\u{a0}", "\u{b}"] {
+        let id = model.material_names.resolve(name).unwrap();
+        assert!(
+            model
+                .ctf_report_names
+                .materials
+                .contains(&(id, name.to_ascii_uppercase()))
+                && model.materials.iter().any(|row| row.id == id
+                    && matches!(
+                        row.definition,
+                        MaterialDefinition::WindowGlazingSpectralAverage(_)
+                    ))
+        );
+    }
+    let legacy = compile_raw_model(&raw);
+    assert!(
+        legacy
+            .report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "InvalidWindowGlazingOpticalSum")
+    );
+    // A Named neighbour selects SourceExact, but is never a waiver for a
+    // used, schema-invalid or different optical-mode Glazing declaration.
+    source_value = source_value.replacen(
+        r#""Material":"#,
+        r#""WindowMaterial:Gas":{"Named":{"gas_type":"Air","thickness":0.012}},"Material":"#,
+        1,
+    );
+    let used = source_value.replacen(
+        r#""Opaque Ref":"#,
+        r#""Glass Used":{"outside_layer":" Glass "},"Opaque Ref":"#,
+        1,
+    );
+    let invalid = source_value.replacen(r#""thickness":0.003"#, r#""thickness":0.0"#, 1);
+    let spectral = source_value.replacen(
+        r#""optical_data_type":"SpectralAverage"#,
+        r#""optical_data_type":"Spectral"#,
+        1,
+    );
+    for (value, code) in [
+        (used, "InvalidWindowGlazingOpticalSum"),
+        (invalid, "InvalidNumericRange"),
+        (spectral, "UnsupportedWindowGlazingOpticalDataType"),
+    ] {
+        let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&value).unwrap());
+        assert!(result.report.diagnostics.iter().any(|d| d.code == code));
+    }
+    let no_glass = super::super::compile_raw_model_for_source(&parse_epjson_str(r#"{"Material":{" Opaque ":{"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000.0,"specific_heat":1000.0}}}"#).unwrap());
+    assert!(
+        !no_glass
+            .model
+            .unwrap()
+            .material_names
+            .is_source_exact_namespace()
+    );
 }
 
 #[test]

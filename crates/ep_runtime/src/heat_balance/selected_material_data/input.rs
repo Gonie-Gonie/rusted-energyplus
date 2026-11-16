@@ -18,6 +18,8 @@ pub struct SelectedMaterialInput {
     pub infrared_transparent: Vec<ProjectInputObject>,
     /// Actual ordered Source epJSON SimpleGlazing getter operands.
     pub simple_glazing: Vec<ProjectInputObject>,
+    /// Actual ordered direct-epJSON ordinary MaterialGlass operands.
+    pub glazing: Vec<ProjectInputObject>,
     /// Actual ordered Source epJSON named Gas getter operands.
     pub window_gas: Vec<ProjectInputObject>,
     /// Genuine ordered GasMixture getObjectItem operands, not typed properties.
@@ -53,6 +55,139 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_glazing_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:Glazing", &object.object_name)
+        {
+            return Err(unavailable("Glazing owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, bool); 21] = [
+            ("name", true),
+            ("optical_data_type", true),
+            ("window_glass_spectral_data_set_name", true),
+            ("thickness", false),
+            ("solar_transmittance_at_normal_incidence", false),
+            ("front_side_solar_reflectance_at_normal_incidence", false),
+            ("back_side_solar_reflectance_at_normal_incidence", false),
+            ("visible_transmittance_at_normal_incidence", false),
+            ("front_side_visible_reflectance_at_normal_incidence", false),
+            ("back_side_visible_reflectance_at_normal_incidence", false),
+            ("infrared_transmittance_at_normal_incidence", false),
+            ("front_side_infrared_hemispherical_emissivity", false),
+            ("back_side_infrared_hemispherical_emissivity", false),
+            ("conductivity", false),
+            (
+                "dirt_correction_factor_for_solar_and_visible_transmittance",
+                false,
+            ),
+            ("solar_diffusing", true),
+            ("young_s_modulus", false),
+            ("poisson_s_ratio", false),
+            (
+                "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name",
+                true,
+            ),
+            (
+                "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name",
+                true,
+            ),
+            (
+                "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name",
+                true,
+            ),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 7
+            || s.alpha_field_blanks.len() < 7
+            || s.alpha_field_names.len() < 7
+            || s.numeric_args.len() < 14
+            || s.numeric_field_blanks.len() < 14
+            || s.numeric_field_names.len() < 14
+        {
+            return Err(unavailable(
+                "actual complete Glazing7alpha14numeric allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Glazing", &object.object_name);
+        let maximum = FIELDS
+            .iter()
+            .enumerate()
+            .filter(|(_, (field, _))| object.fields.contains_key(*field))
+            .map(|(index, _)| index + 1)
+            .max()
+            .unwrap_or(0)
+            .max(14);
+        let (mut a, mut n, mut alphas, mut numerics) = (0, 0, 0, 0);
+        for (position, (field, is_alpha)) in FIELDS.iter().enumerate() {
+            if *is_alpha {
+                s.alpha_field_names[a] = (*field).into();
+                if position == 0 {
+                    s.alpha_args[a] = object.object_name.to_ascii_uppercase();
+                    s.alpha_field_blanks[a] = object.object_name.is_empty();
+                } else {
+                    let default = if *field == "solar_diffusing" {
+                        "No"
+                    } else {
+                        ""
+                    };
+                    match object.fields.get(*field) {
+                        Some(ProjectInputValue::String(value)) if !value.is_empty() => {
+                            s.alpha_args[a] = value.to_ascii_uppercase();
+                            s.alpha_field_blanks[a] = false;
+                        }
+                        None | Some(ProjectInputValue::String(_)) => {
+                            s.alpha_args[a] = default.to_ascii_uppercase()
+                        }
+                        _ => return Err(unavailable("admitted Glazing alpha scalar")),
+                    }
+                }
+                a += 1;
+                if position < maximum {
+                    alphas = a;
+                }
+            } else {
+                s.numeric_field_names[n] = (*field).into();
+                s.numeric_args[n] = match *field {
+                    "infrared_transmittance_at_normal_incidence" => 0.0,
+                    "front_side_infrared_hemispherical_emissivity" => 0.84,
+                    "back_side_infrared_hemispherical_emissivity" => 0.84,
+                    "conductivity" => 0.9,
+                    "dirt_correction_factor_for_solar_and_visible_transmittance" => 1.0,
+                    "young_s_modulus" => 72_000_000_000.0,
+                    "poisson_s_ratio" => 0.22,
+                    _ => 0.0,
+                };
+                match object.fields.get(*field) {
+                    Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                        s.numeric_args[n] = *value;
+                        s.numeric_field_blanks[n] = false;
+                    }
+                    None => {}
+                    _ => return Err(unavailable("admitted Glazing numeric scalar")),
+                }
+                n += 1;
+                if position < maximum {
+                    numerics = n;
+                }
+            }
+        }
+        Ok((alphas, numerics))
+    }
+
     pub(super) fn get_window_gas_mixture_item(
         &self,
         object: &ProjectInputObject,

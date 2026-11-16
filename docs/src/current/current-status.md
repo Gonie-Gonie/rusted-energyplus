@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 258 paired physical cases and 11,323,096 reported values with zero
+contains 259 paired physical cases and 11,398,216 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -50,6 +50,8 @@ Unused SimpleGlazing materials now have a bounded Source B direct-epJSON route: 
 Unused named and Custom Gas materials have a bounded Source B direct-epJSON route through the real input/getter and per-material runtime row. Original schema values, Native signed-i64-effective operands, separate NominalR and constructor-zero Materials properties remain distinct. Custom retains all eleven runtime writes, omitted ratio zero and Native diagnostic/IO ordering; Source-exact names and total Raw/typed loader identity remain checked. Same-row owner checks and the fixed unused-Argon and unused-Custom comparisons retain the unchanged numerical/science, whole EIO, topology and geometry-export requirements, with no new report request or time series. Every Construction reference, active window physics, Source A/IDF, Legacy changes and full-object completion remain held.
 
 Unused GasMixture materials have a bounded Source B direct-epJSON route through the actual five-slot MaterialGasMix owner, real5A6N/min7 input effects and exact compiler/raw/typed identities. Integer counts1..4, required Gas2 even at count1, optional active fraction zero, repeated species and non-unit sums retain Native behavior. First-gas-only NominalR is unconditional and separate from constructor-zero report Resistance; Thickness diagnostics retain their no-error-flag rule. The fixed unused Air/Argon comparison preserves the existing numerical/science, whole EIO, topology and geometry-export gates with no new output request or series. Missing active type with undefined Native indexing, every Construction/window consumer, Source A/IDF, Legacy changes and full-object completion remain held.
+
+Unused SpectralAverage Glazing has a bounded Source B direct-epJSON route through the real7A14N/min14 ordinary MaterialGlass getter and its own GroupGlass row, with SGS Setup unchanged and uninvoked. Original schema and signed-effective numeric operands, defaults/used state, six joint optical checks and their state/diagnostic IO prefixes remain distinct. The independently fixed Float0.003/default scene retains every inherited report,158-series/75120-value, whole-EIO, topology and export criterion with no new output request or series. Public Material Details and Source geometry can establish only the accepted unused-row scope; every Construction/window consumer, Source A/IDF, Legacy, other optical modes and full-object completion remain held.
 
 Direct Source epJSON retains the first comparator-equivalent member spelling
 and last whole subtree, checked by two Native convert-only observations and
@@ -131,8 +133,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 176 recorded Source builds,
-154 with accepted pairs and 22 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 177 recorded Source builds,
+155 with accepted pairs and 22 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -212,7 +214,7 @@ A separate passive diagnostic aligns all5,573 API-visible prediction frames by f
 
 The bounded Source no-outdoor-air owners retain heating-constant/cooling-capacity coupling and now implement constant sensible heat ratio (SHR) cooling. Eligibility permits named or omitted-default SHR (.7) with heating humidity explicitly None or ConstantSupplyHumidityRatio through the four cooling limit selectors, retaining all active numeric, topology, schedule and Legacy guards. Six prospectively frozen cases completed once under Source141; 6 meet every original numeric, export, clock, ancillary and science check plus their applicable public response witness. Qualifying cases: HEAT_CONST_COOL_NONE_CAPACITY_COUPLING, HEAT_CONST_COOL_NONE_FLOW_CAPACITY, HEAT_CONST_COOL_CONST_CAPACITY, HEAT_CONST_COOL_CONST_FLOW_CAPACITY, SHR_OMITTED_DEFAULTS_NO_LIMIT, SHR_NAMED_HEAT_CONST_FLOW_CAPACITY. The four prescribed heating-constant capacity/combined scenes include one designated Winter simultaneous heating/dehumidification witness; the two SHR scenes have their own Summer sensible/latent cooling witnesses. Those finite public interval responses imply no exact-quarter capacity, global SHR/humidity or private-mode law. Exact-empty humidity selectors now use the bounded Source B non-Humidistat NoOA/basic positive-OA paths described above; omitted defaults remain distinct. The four Source139 comparisons from Unit137 remain unaccepted. Broader HVAC Humidistat and OA/DCV/economizer/recovery compositions, sizing, remaining combinations and full-object conformance remain open.
 
-86 bounded Source B Scheduled/NodeList pairs retain 6,362,400 values. The unused Source A pair adds59,520, giving 87 pairs and 6,421,920 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.
+87 bounded Source B Scheduled/NodeList pairs retain 6,437,520 values. The unused Source A pair adds59,520, giving 88 pairs and 6,497,040 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

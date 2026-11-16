@@ -224,7 +224,7 @@ pub(super) fn projection(owners: OrdinarySurfaceGeometry<'_>) -> Value {
                     "AbsorpVisible":scalar(row.visible_absorptance),
                 },
             })).collect::<Vec<_>>(),
-            "property_origin":"unique Source MaterialNum/physical ID to actual retained Gas or SimpleGlazing runtime properties, otherwise the sole validated opaque typed owner; legacy validated_typed_properties label does not replace runtime rows; no physical cache reconstruction",
+            "property_origin":"unique Source MaterialNum/physical ID to actual retained Gas or MaterialGlass (ordinary Glass or GlassSimple) runtime properties, otherwise the sole validated opaque typed owner; legacy validated_typed_properties label does not replace runtime rows; no physical cache reconstruction",
             "unrepresented_Native_MaterialBase_members":[
                 "separate Name member", "ROnly", "Thickness", "Conductivity", "Resistance",
                 "AbsorpThermalInput", "AbsorpSolarInput", "AbsorpVisibleInput",

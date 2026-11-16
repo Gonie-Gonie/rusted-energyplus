@@ -45,6 +45,8 @@ pub(super) struct SourceSimpleGlazingMaterial {
     pub visible_transmittance: f64,
     pub visible_reflectance_back: f64,
     pub visible_reflectance_front: f64,
+    pub young_modulus: f64,
+    pub poissons_ratio: f64,
 }
 
 impl Default for SourceSimpleGlazingMaterial {
@@ -76,6 +78,8 @@ impl Default for SourceSimpleGlazingMaterial {
             visible_transmittance: 0.0,
             visible_reflectance_back: 0.0,
             visible_reflectance_front: 0.0,
+            young_modulus: 0.0,
+            poissons_ratio: 0.0,
         }
     }
 }
@@ -303,6 +307,262 @@ impl SelectedMaterialData {
                 _ => return Err(unavailable("SimpleGlazing optional VT input association")),
             }
             material.setup(&mut self.nominal_r[index], &name, owners)?;
+        }
+        Ok(())
+    }
+}
+
+fn glazing_custom(
+    owners: &mut MaterialDataOwners<'_, '_>,
+    name: &str,
+    message: &str,
+    warning: bool,
+) -> Result<(), RuntimeError> {
+    let flags = owners
+        .diagnostic_flags
+        .as_ref()
+        .ok_or_else(|| unavailable("actual Glazing diagnostic phase owners"))?;
+    let header = format!("GetMaterialData: WindowMaterial:Glazing = {name}");
+    if warning {
+        owners.backend.show_source_warning_error(&header, flags)
+    } else {
+        owners.backend.show_source_severe_error(&header, flags)
+    }
+    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+    owners
+        .backend
+        .show_continue_error(message)
+        .map_err(|error| {
+            RuntimeError::HeatBalanceInput(Box::new(HeatBalanceInputError::Backend(error)))
+        })
+}
+
+impl SelectedMaterialData {
+    // Native Material.cc417-612: ordinary SpectralAverage. SGS Setup is never called.
+    pub(super) fn get_glazing_data(
+        &mut self,
+        raw: &super::SelectedMaterialInput,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(), RuntimeError> {
+        owners.shortcut.current_module_object = "WindowMaterial:Glazing".into();
+        self.num_w5_glazings = super::count(owners.input, "WindowMaterial:Glazing")?;
+        if usize::try_from(self.num_w5_glazings).ok() != Some(raw.glazing.len()) {
+            return Err(unavailable("Glazing raw/IP count"));
+        }
+        for object in &raw.glazing {
+            raw.get_glazing_item(object, owners)?;
+            let name = owners.shortcut.alpha_args[0].clone();
+            if self.material_map.contains_key(&name) {
+                let flags = owners
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual Glazing duplicate phase owners"))?;
+                owners
+                    .backend
+                    .show_source_severe_error(
+                        &format!(
+                            "GetMaterialData: WindowMaterial:Glazing = {name}, duplicate name."
+                        ),
+                        flags,
+                    )
+                    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                *owners.errors_found = true;
+                continue;
+            }
+            let id = typed_id(owners.model, &name, MaterialKind::WindowGlazing)?;
+            let position = self.insert(&name, id, SourceMaterialGroup::Glass)?;
+            self.simple_glazing
+                .insert(id, SourceSimpleGlazingMaterial::default());
+            let material = self
+                .simple_glazing
+                .get_mut(&id)
+                .ok_or_else(|| unavailable("allocated ordinary Glass row"))?;
+            material.roughness = Some(MaterialSurfaceRoughness::VerySmooth);
+            self.resistance_only.insert(id, true);
+            material.thickness = owners.shortcut.numeric_args[0];
+            if owners.shortcut.alpha_args[1] != "SPECTRALAVERAGE" {
+                return Err(unavailable("ordinary Glazing optical owner beyond Average"));
+            }
+            material.optical_model = SourceSimpleGlazingOpticalModel::SpectralAverage;
+            material.transmittance = owners.shortcut.numeric_args[1];
+            material.solar_reflectance_front = owners.shortcut.numeric_args[2];
+            material.solar_reflectance_back = owners.shortcut.numeric_args[3];
+            material.visible_transmittance = owners.shortcut.numeric_args[4];
+            material.visible_reflectance_front = owners.shortcut.numeric_args[5];
+            material.visible_reflectance_back = owners.shortcut.numeric_args[6];
+            material.thermal_transmittance = owners.shortcut.numeric_args[7];
+            material.thermal_front = owners.shortcut.numeric_args[8];
+            material.thermal_back = owners.shortcut.numeric_args[9];
+            material.conductivity = owners.shortcut.numeric_args[10];
+            material.dirt_factor = owners.shortcut.numeric_args[11];
+            material.young_modulus = owners.shortcut.numeric_args[12];
+            material.poissons_ratio = owners.shortcut.numeric_args[13];
+            if owners.shortcut.numeric_args[11] == 0.0 {
+                material.dirt_factor = 1.0;
+            }
+            material.thermal_absorptance = material.thermal_back;
+            if material.conductivity > 0.0 {
+                material.resistance = material.thickness / material.conductivity;
+                self.nominal_r[position] = material.resistance;
+            } else {
+                *owners.errors_found = true;
+                let flags = owners
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual Glazing conductivity phase owners"))?;
+                owners.backend.show_source_severe_error(&format!("Window glass material {name} has Conductivity = 0.0, must be >0.0, default = .9"), flags)
+                    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+            }
+            // This second actual enum read follows the conductivity IO.
+            if owners.shortcut.alpha_args[1] != "SPECTRALAVERAGE" {
+                return Err(unavailable("ordinary Glazing optical owner beyond Average"));
+            }
+            material.optical_model = SourceSimpleGlazingOpticalModel::SpectralAverage;
+            for (a, b) in [(1, 2), (1, 3), (4, 5), (4, 6), (7, 8), (7, 9)] {
+                if owners.shortcut.numeric_args[a] + owners.shortcut.numeric_args[b] > 1.0 {
+                    *owners.errors_found = true;
+                    let message = format!(
+                        "{} + {} not <= 1.0",
+                        owners.shortcut.numeric_field_names[a],
+                        owners.shortcut.numeric_field_names[b]
+                    );
+                    glazing_custom(owners, &name, &message, false)?;
+                }
+            }
+            if owners.shortcut.numeric_args[1] < 0.0 {
+                let message = format!("{} not >= 0.0", owners.shortcut.numeric_field_names[1]);
+                glazing_custom(owners, &name, &message, false)?;
+                *owners.errors_found = true;
+            }
+            if owners.shortcut.numeric_args[1] > 1.0 {
+                *owners.errors_found = true;
+                let message = format!("{} not <= 1.0", owners.shortcut.numeric_field_names[1]);
+                glazing_custom(owners, &name, &message, false)?;
+            }
+            for index in [2, 3] {
+                let below_lower = owners.shortcut.numeric_args[index] < 0.0;
+                let above_upper = owners.shortcut.numeric_args[index] > 1.0;
+                if below_lower || above_upper {
+                    *owners.errors_found = true;
+                    let message = format!(
+                        "{} not >= 0.0 and <= 1.0",
+                        owners.shortcut.numeric_field_names[index]
+                    );
+                    glazing_custom(owners, &name, &message, false)?;
+                }
+            }
+            if owners.shortcut.numeric_args[4] < 0.0 {
+                let message = format!("{} not >= 0.0", owners.shortcut.numeric_field_names[4]);
+                glazing_custom(owners, &name, &message, true)?;
+            }
+            if owners.shortcut.numeric_args[4] > 1.0 {
+                *owners.errors_found = true;
+                let message = format!("{} not <= 1.0", owners.shortcut.numeric_field_names[4]);
+                glazing_custom(owners, &name, &message, false)?;
+            }
+            for index in [5, 6] {
+                let below_lower = owners.shortcut.numeric_args[index] < 0.0;
+                let above_upper = owners.shortcut.numeric_args[index] > 1.0;
+                if below_lower || above_upper {
+                    *owners.errors_found = true;
+                    let message = format!(
+                        "{} not >= 0.0 and <= 1.0",
+                        owners.shortcut.numeric_field_names[index]
+                    );
+                    glazing_custom(owners, &name, &message, false)?;
+                }
+            }
+            if owners.shortcut.numeric_args[7] > 1.0 {
+                *owners.errors_found = true;
+                let message = format!("{} not <= 1.0", owners.shortcut.numeric_field_names[7]);
+                glazing_custom(owners, &name, &message, false)?;
+            }
+            let below_lower = owners.shortcut.numeric_args[8] <= 0.0;
+            let above_upper = owners.shortcut.numeric_args[8] >= 1.0;
+            if below_lower || above_upper {
+                *owners.errors_found = true;
+                let message = format!(
+                    "{} not > 0.0 and < 1.0",
+                    owners.shortcut.numeric_field_names[8]
+                );
+                glazing_custom(owners, &name, &message, false)?;
+            }
+            let below_lower = owners.shortcut.numeric_args[9] <= 0.0;
+            let above_upper = owners.shortcut.numeric_args[9] >= 1.0;
+            if below_lower || above_upper {
+                *owners.errors_found = true;
+                let flags = owners
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual Glazing back emissivity phase owners"))?;
+                owners
+                    .backend
+                    .show_source_severe_error(
+                        &format!("WindowMaterial:Glazing=\"{name}\", Illegal value."),
+                        flags,
+                    )
+                    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                owners
+                    .backend
+                    .show_continue_error(&format!(
+                        "{} not > 0.0 and < 1.0",
+                        owners.shortcut.numeric_field_names[9]
+                    ))
+                    .map_err(|error| {
+                        RuntimeError::HeatBalanceInput(Box::new(HeatBalanceInputError::Backend(
+                            error,
+                        )))
+                    })?;
+            }
+            if owners.shortcut.numeric_args[10] <= 0.0 {
+                *owners.errors_found = true;
+                let message = format!("{} not > 0.0", owners.shortcut.numeric_field_names[10]);
+                glazing_custom(owners, &name, &message, false)?;
+            }
+            if owners.shortcut.numeric_args[12] < 0.0 {
+                *owners.errors_found = true;
+                let message = format!("{} not > 0.0", owners.shortcut.numeric_field_names[12]);
+                glazing_custom(owners, &name, &message, false)?;
+            }
+            let below_lower = owners.shortcut.numeric_args[13] < 0.0;
+            let above_upper = owners.shortcut.numeric_args[13] >= 1.0;
+            if below_lower || above_upper {
+                *owners.errors_found = true;
+                let message = format!(
+                    "{} not > 0.0 and < 1.0",
+                    owners.shortcut.numeric_field_names[13]
+                );
+                glazing_custom(owners, &name, &message, false)?;
+            }
+            if owners.shortcut.alpha_args[3].is_empty() {
+                material.solar_diffusing = false;
+            } else if matches!(owners.shortcut.alpha_args[3].as_str(), "YES" | "NO") {
+                material.solar_diffusing = owners.shortcut.alpha_args[3] == "YES";
+            } else {
+                *owners.errors_found = true;
+                let flags = owners
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual Glazing diffusing phase owners"))?;
+                owners
+                    .backend
+                    .show_source_severe_error(
+                        &format!("WindowMaterial:Glazing=\"{name}\", Illegal value."),
+                        flags,
+                    )
+                    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                owners
+                    .backend
+                    .show_continue_error(&format!(
+                        "{} must be Yes or No, entered value={}",
+                        owners.shortcut.numeric_field_names[3], owners.shortcut.alpha_args[3]
+                    ))
+                    .map_err(|error| {
+                        RuntimeError::HeatBalanceInput(Box::new(HeatBalanceInputError::Backend(
+                            error,
+                        )))
+                    })?;
+            }
         }
         Ok(())
     }

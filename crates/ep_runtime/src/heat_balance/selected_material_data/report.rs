@@ -65,85 +65,110 @@ impl SelectedMaterialData {
                 .map_err(io)?;
                 continue;
             }
-            let (resistance, rough, geometry, surface) = match material.definition {
-                MaterialDefinition::Regular(value) => (
-                    value.thermal_resistance_m2_k_per_w,
-                    value.roughness,
-                    [
-                        value.thickness_m,
-                        value.conductivity_w_per_m_k,
-                        value.density_kg_per_m3,
-                        value.specific_heat_j_per_kg_k,
-                    ],
-                    value.surface,
-                ),
-                MaterialDefinition::NoMass(value) => (
-                    value.thermal_resistance_m2_k_per_w,
-                    value.roughness,
-                    [0.0; 4],
-                    value.surface,
-                ),
-                MaterialDefinition::WindowGas(_) | MaterialDefinition::WindowGasMixture(_) => {
-                    let expected = if matches!(
-                        &material.definition,
-                        MaterialDefinition::WindowGasMixture(_)
-                    ) {
-                        SourceMaterialGroup::GasMixture
-                    } else {
-                        SourceMaterialGroup::Gas
-                    };
-                    if self.material_groups.get(id) != Some(&expected) {
-                        return Err(unavailable("reported Gas actual group"));
-                    }
-                    let value = self.window_gas.get(id).ok_or_else(|| {
-                        unavailable("reported actual Gas runtime base properties")
-                    })?;
-                    (
-                        value.resistance,
-                        value
-                            .roughness
-                            .ok_or_else(|| unavailable("Gas getter roughness"))?,
+            let (resistance, rough, geometry, surface) =
+                match material.definition {
+                    MaterialDefinition::Regular(value) => (
+                        value.thermal_resistance_m2_k_per_w,
+                        value.roughness,
                         [
-                            value.thickness,
-                            value.conductivity,
-                            value.density,
-                            value.specific_heat,
+                            value.thickness_m,
+                            value.conductivity_w_per_m_k,
+                            value.density_kg_per_m3,
+                            value.specific_heat_j_per_kg_k,
                         ],
-                        OpaqueSurfaceProperties {
-                            thermal_absorptance: value.thermal_absorptance,
-                            solar_absorptance: value.solar_absorptance,
-                            visible_absorptance: value.visible_absorptance,
-                        },
-                    )
-                }
-                MaterialDefinition::WindowSimpleGlazing(_) => {
-                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassSimple) {
-                        return Err(unavailable("reported SimpleGlazing actual group"));
+                        value.surface,
+                    ),
+                    MaterialDefinition::NoMass(value) => (
+                        value.thermal_resistance_m2_k_per_w,
+                        value.roughness,
+                        [0.0; 4],
+                        value.surface,
+                    ),
+                    MaterialDefinition::WindowGas(_) | MaterialDefinition::WindowGasMixture(_) => {
+                        let expected = if matches!(
+                            &material.definition,
+                            MaterialDefinition::WindowGasMixture(_)
+                        ) {
+                            SourceMaterialGroup::GasMixture
+                        } else {
+                            SourceMaterialGroup::Gas
+                        };
+                        if self.material_groups.get(id) != Some(&expected) {
+                            return Err(unavailable("reported Gas actual group"));
+                        }
+                        let value = self.window_gas.get(id).ok_or_else(|| {
+                            unavailable("reported actual Gas runtime base properties")
+                        })?;
+                        (
+                            value.resistance,
+                            value
+                                .roughness
+                                .ok_or_else(|| unavailable("Gas getter roughness"))?,
+                            [
+                                value.thickness,
+                                value.conductivity,
+                                value.density,
+                                value.specific_heat,
+                            ],
+                            OpaqueSurfaceProperties {
+                                thermal_absorptance: value.thermal_absorptance,
+                                solar_absorptance: value.solar_absorptance,
+                                visible_absorptance: value.visible_absorptance,
+                            },
+                        )
                     }
-                    let value = self
-                        .simple_glazing
-                        .get(id)
-                        .ok_or_else(|| unavailable("reported SimpleGlazing runtime properties"))?;
-                    (
-                        value.resistance,
-                        value
-                            .roughness
-                            .ok_or_else(|| unavailable("SimpleGlazing Setup roughness"))?,
-                        [
-                            value.thickness,
-                            value.conductivity,
-                            value.density,
-                            value.specific_heat,
-                        ],
-                        OpaqueSurfaceProperties {
-                            thermal_absorptance: value.thermal_absorptance,
-                            solar_absorptance: value.solar_absorptance,
-                            visible_absorptance: value.visible_absorptance,
-                        },
-                    )
-                }
-                _ => return Err(unavailable("reported selected material family")),
-            };
+                    MaterialDefinition::WindowGlazingSpectralAverage(_) => {
+                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::Glass) {
+                            return Err(unavailable("reported ordinary Glass actual group"));
+                        }
+                        let value = self.simple_glazing.get(id).ok_or_else(|| {
+                            unavailable("reported actual Glass runtime properties")
+                        })?;
+                        (
+                            value.resistance,
+                            value
+                                .roughness
+                                .ok_or_else(|| unavailable("Glass getter roughness"))?,
+                            [
+                                value.thickness,
+                                value.conductivity,
+                                value.density,
+                                value.specific_heat,
+                            ],
+                            OpaqueSurfaceProperties {
+                                thermal_absorptance: value.thermal_absorptance,
+                                solar_absorptance: value.solar_absorptance,
+                                visible_absorptance: value.visible_absorptance,
+                            },
+                        )
+                    }
+                    MaterialDefinition::WindowSimpleGlazing(_) => {
+                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassSimple) {
+                            return Err(unavailable("reported SimpleGlazing actual group"));
+                        }
+                        let value = self.simple_glazing.get(id).ok_or_else(|| {
+                            unavailable("reported SimpleGlazing runtime properties")
+                        })?;
+                        (
+                            value.resistance,
+                            value
+                                .roughness
+                                .ok_or_else(|| unavailable("SimpleGlazing Setup roughness"))?,
+                            [
+                                value.thickness,
+                                value.conductivity,
+                                value.density,
+                                value.specific_heat,
+                            ],
+                            OpaqueSurfaceProperties {
+                                thermal_absorptance: value.thermal_absorptance,
+                                solar_absorptance: value.solar_absorptance,
+                                visible_absorptance: value.visible_absorptance,
+                            },
+                        )
+                    }
+                    _ => return Err(unavailable("reported selected material family")),
+                };
             let values = [
                 rounded(resistance, 4)?,
                 rounded(geometry[0], 4)?,

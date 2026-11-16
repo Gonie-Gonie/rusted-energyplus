@@ -340,6 +340,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                     | "DesignSpecification:OutdoorAir"
                     | "OutdoorAir:Node"
                     | "OutdoorAir:NodeList"
+                    | "WindowMaterial:Glazing"
                     | "WindowMaterial:SimpleGlazingSystem"
                     | "WindowMaterial:Gas"
                     | "WindowMaterial:GasMixture"

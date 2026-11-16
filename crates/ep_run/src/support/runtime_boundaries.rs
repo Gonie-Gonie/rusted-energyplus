@@ -531,6 +531,36 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowGlazingThermochromicGroup)
             .count(),
     );
+    let glazing_count = typed_model
+        .materials
+        .iter()
+        .filter(|row| row.kind() == MaterialKind::WindowGlazing)
+        .count();
+    let glazing_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
+        .map_or(0, |rows| rows.len());
+    let glazing_consumed = source_admission
+        .is_some_and(|admission| admission.consumes_unused_spectral_average(typed_model));
+    let glazing_used = typed_model.constructions.iter().any(|construction| {
+        construction.effective_layers().iter().any(|id| {
+            typed_model
+                .materials
+                .iter()
+                .any(|row| row.id == *id && row.kind() == MaterialKind::WindowGlazing)
+        })
+    });
+    if !glazing_consumed || glazing_used {
+        // Raw presence must still reject a failed bijection when every typed
+        // Glass row is absent; the generic helper intentionally ignores count0.
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Glazing",
+            glazing_count.max(glazing_raw_count),
+        );
+    }
     let simple_glazing_consumed = source_admission
         .is_some_and(|admission| admission.consumes("WindowMaterial:SimpleGlazingSystem"));
     let simple_glazing_used = typed_model.constructions.iter().any(|construction| {

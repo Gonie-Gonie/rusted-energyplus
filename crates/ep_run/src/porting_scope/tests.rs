@@ -7936,6 +7936,288 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         )
         .is_err()
     );
+
+    // Actual Source Raw/IP/compile/weather/support, independent of the private
+    // runtime property tests. No new output or physical fixture is created.
+    const GLASS: &str = "WindowMaterial:Glazing";
+    let mut glass_value = input(PortingScope::B);
+    glass_value[GLASS] = json!({
+        " DEFAULT ":{"optical_data_type":"SpectralAverage","thickness":0.003,"solar_diffusing":""},
+        " WRAPPED ":{"optical_data_type":"SpectralAverage","thickness":u64::MAX,"conductivity":u64::MAX,"young_s_modulus":u64::MAX,
+            "window_glass_spectral_data_set_name":"unknown spectrum",
+            "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":"",
+            "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":" ",
+            "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"unused table 한",
+            "name":false,"idf_order":[],"idf_max_fields":null,"extra":{"values":[null,true,1.25]}}
+    });
+    let glass_raw = parse_epjson_str(&glass_value.to_string()).unwrap();
+    let glass_compiled = ep_compiler::compile_raw_model_for_source(&glass_raw);
+    assert!(
+        !glass_compiled.has_errors(),
+        "{:?}",
+        glass_compiled.report.diagnostics
+    );
+    let glass_model = glass_compiled.model.as_ref().unwrap();
+    let glass_id = glass_model.material_names.resolve(" WRAPPED ").unwrap();
+    assert!(
+        glass_model.material_names.is_source_exact_namespace()
+            && glass_model
+                .ctf_report_names
+                .materials
+                .contains(&(glass_id, " WRAPPED ".into()))
+    );
+    let mut glass_ip = crate::ordinary_input_processor::resolve_source_b(&glass_raw).unwrap();
+    let args = glass_ip.get_object_def_max_args(GLASS).unwrap();
+    assert_eq!(
+        (args.alphas, args.numerics, args.total().unwrap()),
+        (7, 14, 21)
+    );
+    let original = glass_ip
+        .source_raw_object_fields(GLASS, " WRAPPED ")
+        .unwrap();
+    assert!(
+        matches!(original.get("thickness"), Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == "18446744073709551615")
+            && original.contains_key("extra")
+            && original.contains_key("idf_max_fields")
+    );
+    let projected = crate::ordinary_material_input::resolve_source(&glass_raw, &glass_ip).unwrap();
+    assert_eq!(
+        (
+            projected.glazing.len(),
+            projected.glazing[0].fields.len(),
+            projected.glazing[1].fields.len()
+        ),
+        (2, 3, 8)
+    );
+    assert_eq!(
+        ["thickness", "conductivity", "young_s_modulus"]
+            .map(|field| projected.glazing[1].fields[field].clone()),
+        [-1.0; 3].map(ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number)
+    );
+    assert!(
+        matches!(&projected.glazing[1].fields["window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name"], ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(value) if value == " ")
+            && !projected.glazing[1].fields.contains_key("extra")
+    );
+    let mut stats = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+    glass_ip
+        .report_source_idf_records_stats(&mut stats)
+        .unwrap();
+    assert_eq!(
+        usize::try_from(stats.number_input_records).unwrap(),
+        glass_raw
+            .objects
+            .values()
+            .map(|rows| rows.len())
+            .sum::<usize>()
+    );
+    assert!(
+        glass_ip.is_object_unused(GLASS, " DEFAULT ")
+            && glass_ip.is_object_unused(GLASS, " WRAPPED ")
+    );
+    let mut glass_trace = inspect_porting_scope(
+        &glass_raw,
+        &glass_compiled.report,
+        Some(glass_model),
+        PortingScope::B,
+    );
+    assert!(glass_trace.admissible, "{:?}", glass_trace.violations);
+    glass_trace.environment = Some(
+        super::environment::environment_from_weather(
+            glass_model,
+            &weather,
+            "same existing Glass caller weather",
+        )
+        .unwrap(),
+    );
+    let glass_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&glass_raw, &glass_trace)
+            .unwrap();
+    let support = crate::support::assess_support_with_source_admission(
+        &glass_raw,
+        &glass_compiled.report,
+        Some(glass_model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&glass_admission),
+    );
+    assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+    assert!(
+        crate::ordinary_equipment_input::resolve(&glass_raw).is_err()
+            && crate::ordinary_equipment_input::resolve_source_a(&glass_raw).is_err()
+            && !assess_support(
+                &glass_raw,
+                &glass_compiled.report,
+                Some(glass_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal
+            )
+            .allows_rust_runtime()
+    );
+    let mut models = Vec::new();
+    let mut all_missing = glass_model.clone();
+    all_missing
+        .materials
+        .retain(|row| row.kind() != ep_model::MaterialKind::WindowGlazing);
+    models.push(all_missing);
+    let mut alias = glass_model.clone();
+    alias.material_names.insert("EXTRA GLASS ALIAS", glass_id);
+    models.push(alias);
+    let mut duplicate_alias = glass_model.clone();
+    duplicate_alias
+        .material_names
+        .insert_instance(" WRAPPED ", glass_id);
+    models.push(duplicate_alias);
+    let mut loader_alias = glass_model.clone();
+    loader_alias
+        .ctf_report_names
+        .materials
+        .push((glass_id, "EXTRA LOADER".into()));
+    models.push(loader_alias);
+    let mut missing_loader = glass_model.clone();
+    missing_loader
+        .ctf_report_names
+        .materials
+        .retain(|(id, _)| *id != glass_id);
+    models.push(missing_loader);
+    let mut wrong_id = glass_model.clone();
+    wrong_id
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .id = ep_model::MaterialId(u32::MAX);
+    models.push(wrong_id);
+    let mut wrong_name = glass_model.clone();
+    wrong_name
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .name = ep_model::NormalizedName::new("WRONG");
+    models.push(wrong_name);
+    let mut wrong_kind = glass_model.clone();
+    let other = wrong_kind
+        .materials
+        .iter()
+        .find(|row| row.kind() != ep_model::MaterialKind::WindowGlazing)
+        .unwrap()
+        .definition;
+    wrong_kind
+        .materials
+        .iter_mut()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .definition = other;
+    models.push(wrong_kind);
+    let mut extra = glass_model.clone();
+    let mut row = extra
+        .materials
+        .iter()
+        .find(|row| row.id == glass_id)
+        .unwrap()
+        .clone();
+    row.id = ep_model::MaterialId(u32::try_from(extra.materials.len()).unwrap());
+    extra.materials.push(row);
+    models.push(extra);
+    let mut used = glass_model.clone();
+    used.constructions[0].layers.clear();
+    used.constructions[0].outside_layer = Some(glass_id);
+    models.push(used);
+    for model in models {
+        assert!(
+            !crate::support::assess_support_with_source_admission(
+                &glass_raw,
+                &glass_compiled.report,
+                Some(&model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&glass_admission)
+            )
+            .allows_rust_runtime()
+        );
+    }
+    // A genuine no-Glass Raw/compile/trace token cannot cover an extra typed Glass.
+    let mut empty_value = glass_value.clone();
+    empty_value.as_object_mut().unwrap().remove(GLASS);
+    let empty_raw = parse_epjson_str(&empty_value.to_string()).unwrap();
+    let empty_compiled = ep_compiler::compile_raw_model_for_source(&empty_raw);
+    let empty_model = empty_compiled.model.as_ref().unwrap();
+    let mut empty_trace = inspect_porting_scope(
+        &empty_raw,
+        &empty_compiled.report,
+        Some(empty_model),
+        PortingScope::B,
+    );
+    empty_trace.environment = Some(
+        super::environment::environment_from_weather(
+            empty_model,
+            &weather,
+            "same existing no-Glass caller weather",
+        )
+        .unwrap(),
+    );
+    let empty_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&empty_raw, &empty_trace)
+            .unwrap();
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &empty_raw,
+            &empty_compiled.report,
+            Some(glass_model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&empty_admission)
+        )
+        .allows_rust_runtime()
+    );
+    for (field, value) in [
+        ("optical_data_type", json!("BSDF")),
+        ("optical_data_type", json!("spectralaverage")),
+        ("solar_diffusing", json!("no")),
+        ("solar_diffusing", json!(" ")),
+        ("thickness", json!(0.0)),
+        ("conductivity", json!(0.0)),
+        ("young_s_modulus", json!(-1.0)),
+        ("poisson_s_ratio", json!(1.0)),
+        ("solar_transmittance_at_normal_incidence", json!(1.1)),
+        ("window_glass_spectral_data_set_name", json!(null)),
+        (
+            "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name",
+            json!(false),
+        ),
+        (
+            "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name",
+            json!([]),
+        ),
+        (
+            "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name",
+            json!({}),
+        ),
+    ] {
+        let mut invalid = glass_value.clone();
+        invalid[GLASS][" DEFAULT "][field] = value;
+        assert!(
+            crate::ordinary_input_processor::resolve_source_b(
+                &parse_epjson_str(&invalid.to_string()).unwrap()
+            )
+            .is_err()
+        );
+    }
+    glass_value["Construction"]["Glass Used"] = json!({"outside_layer":" WRAPPED "});
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &parse_epjson_str(&glass_value.to_string()).unwrap()
+        )
+        .is_err()
+    );
 }
 
 #[test]
