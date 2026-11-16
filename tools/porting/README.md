@@ -93,6 +93,14 @@ wrapper with Python `-X utf8 -B`, with assertions enabled. Pass `--home` and the
 for the other phases. Optional `--projection-output .runtime/...json` writes
 non-authorizing command/input metadata and starts no recorder or child.
 
+For v6 Native and Source execution, `paired/actors.py` projects the parent
+inputs and calls the unchanged frozen actor. Its genuine record child still
+validates the complete context before any engine starts; all original Native
+proof and postlaunch custody checks remain. Pass `native` or `source`, `--home`,
+the exact `--release PATH#SHA256`, `--case ID` and `--mode fresh`. Optional
+`--projection-output .runtime/...json` starts no actor and grants no validation
+or scientific credit. Use Python `-X utf8 -B` with assertions enabled.
+
 Record `precheck` and `verify` with the trusted `record_command.py`, declaring
 every Context pin plus the Native launch (and Source launch for `verify`) as
 explicit inputs. Source `act` also requires `--native-precheck-receipt PATH#SHA256`.
