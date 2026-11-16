@@ -582,5 +582,101 @@ fn gas_mixture_follows_source_order_shares_names_and_validates_construction_laye
         }));
     }
 
+    // Exact Source identity is selected by an actual valid unused Mixture,
+    // independently of any single-Gas declaration or legacy namespace.
+    let exact = parse_epjson_str(
+        r#"{
+        "Material:NoMass":{
+            " Wall ":{"roughness":"MediumRough","thermal_resistance":0.2},
+            "Wall":{"roughness":"MediumRough","thermal_resistance":0.3}},
+        "Construction":{
+            "Spaced":{"outside_layer":" Wall "},"Bare":{"outside_layer":"Wall"}},
+        "WindowMaterial:GasMixture":{
+            " Mix ":{"thickness":0.012,"number_of_gases_in_mixture":1,
+                "gas_1_type":"Air","gas_1_fraction":0.4,"gas_2_type":"Argon","gas_2_fraction":0.8},
+            "Mix":{"thickness":0.012,"number_of_gases_in_mixture":3,
+                "gas_1_type":"Air","gas_1_fraction":0.4,"gas_2_type":"Air","gas_2_fraction":0.8,"gas_3_type":"Krypton"},
+            "\u00a0":{"thickness":0.012,"number_of_gases_in_mixture":1,
+                "gas_1_type":"Air","gas_1_fraction":1.0,"gas_2_type":"Argon","gas_2_fraction":1.0},
+            "\u000b":{"thickness":0.012,"number_of_gases_in_mixture":1,
+                "gas_1_type":"Air","gas_1_fraction":1.0,"gas_2_type":"Argon","gas_2_fraction":1.0}}
+    }"#,
+    )?;
+    let source = crate::compile_raw_model_for_source(&exact);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    let model = source.model.as_ref().unwrap();
+    assert!(model.material_names.is_source_exact_namespace());
+    assert_ne!(
+        model.material_names.resolve(" Mix "),
+        model.material_names.resolve("Mix")
+    );
+    for name in [" Mix ", "Mix", "\u{a0}", "\u{b}"] {
+        let id = model.material_names.resolve(name).unwrap();
+        assert!(
+            model
+                .ctf_report_names
+                .materials
+                .contains(&(id, name.to_ascii_uppercase()))
+        );
+    }
+    assert_eq!(
+        model.constructions[0].layers[0],
+        model.material_names.resolve("Wall").unwrap()
+    );
+    assert_eq!(
+        model.constructions[1].layers[0],
+        model.material_names.resolve(" Wall ").unwrap()
+    );
+    let mixture = model
+        .materials
+        .iter()
+        .find_map(|row| {
+            row.as_window_gas_mixture()
+                .filter(|value| value.gases.len() == 3)
+        })
+        .unwrap();
+    assert_eq!(mixture.gases.components()[2].fraction, 0.0);
+    assert!(
+        compile_raw_model(&exact).has_errors(),
+        "Legacy still trims duplicate spaced names"
+    );
+    let mut no_mixture = exact.clone();
+    no_mixture
+        .objects
+        .remove(&ep_raw_model::ObjectType(OBJECT_TYPE.into()));
+    assert!(crate::compile_raw_model_for_source(&no_mixture).has_errors());
+    let invalid_only = parse_epjson_str(
+        r#"{
+        "WindowMaterial:GasMixture":{"Bad":{"thickness":0.012,"number_of_gases_in_mixture":0,
+            "gas_1_type":"Air","gas_1_fraction":1.0,"gas_2_type":"Argon","gas_2_fraction":1.0}}
+    }"#,
+    )?;
+    let invalid = crate::compile_raw_model_for_source(&invalid_only);
+    assert!(invalid.has_errors());
+    let used = parse_epjson_str(
+        r#"{
+        "WindowMaterial:Glazing":{"Glass":{"optical_data_type":"SpectralAverage","thickness":0.006}},
+        "WindowMaterial:GasMixture":{"Mixture":{"thickness":0.012,"number_of_gases_in_mixture":1,
+            "gas_1_type":"Air","gas_1_fraction":1.0,"gas_2_type":"Argon","gas_2_fraction":1.0}},
+        "Construction":{"Window":{"outside_layer":"Glass","layer_2":"Mixture","layer_3":"Glass"}}
+    }"#,
+    )?;
+    for result in [
+        compile_raw_model(&used),
+        crate::compile_raw_model_for_source(&used),
+    ] {
+        assert!(!result.has_errors(), "{:?}", result.report.diagnostics);
+        let model = result.model.as_ref().unwrap();
+        assert!(!model.material_names.is_source_exact_namespace());
+        let id = model.material_names.resolve("Mixture").unwrap();
+        assert!(
+            !model
+                .ctf_report_names
+                .materials
+                .iter()
+                .any(|(loader, _)| *loader == id)
+        );
+    }
+
     Ok(())
 }

@@ -520,7 +520,10 @@ pub(crate) use simple_glazing::validate as source_b_validate_unused_simple_glazi
 mod window_gas;
 // Historical internal aliases: the same pure unused single-Gas schema owner now includes Custom.
 pub(crate) use window_gas::{
-    known_field as source_b_named_gas_known_field, validate as source_b_validate_unused_named_gas,
+    known_field as source_b_named_gas_known_field,
+    mixture_known_field as source_b_gas_mixture_known_field,
+    validate as source_b_validate_unused_named_gas,
+    validate_mixture as source_b_validate_unused_gas_mixture,
 };
 mod multizone;
 mod people;
@@ -588,6 +591,7 @@ fn resolve_raw(
     if source_b_ingress {
         simple_glazing::validate(raw)?;
         window_gas::validate(raw)?;
+        window_gas::validate_mixture(raw)?;
     }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
@@ -604,6 +608,7 @@ fn resolve_raw(
         let source_simple_glazing_family =
             source_b_ingress && family.0 == "WindowMaterial:SimpleGlazingSystem";
         let source_named_gas_family = source_b_ingress && family.0 == "WindowMaterial:Gas";
+        let source_gas_mixture_family = source_b_ingress && family.0 == "WindowMaterial:GasMixture";
         let source_people_family = source_calendar_ingress && family.0 == "People";
         let source_electric_family =
             source_calendar_ingress && !source_b_ingress && family.0 == "ElectricEquipment";
@@ -671,6 +676,7 @@ fn resolve_raw(
             && !source_irt_family
             && !source_simple_glazing_family
             && !source_named_gas_family
+            && !source_gas_mixture_family
             && !source_calendar_family
             && !source_compact_family
             && !source_people_family
@@ -724,7 +730,7 @@ fn resolve_raw(
             // Exact official schedule/OtherEquipment pattern ^.*\S.*$ under default RE2:
             // dot excludes LF; \s is HT/LF/FF/CR/space, deliberately not VT
             // or Unicode whitespace. Other families keep their old boundary.
-            let blank_name = if source_named_gas_family {
+            let blank_name = if source_named_gas_family || source_gas_mixture_family {
                 !window_gas::valid_name(&name.0)
             } else if source_design_day_family
                 || source_calendar_ingress
@@ -817,6 +823,8 @@ fn resolve_raw(
                         && simple_glazing::admitted_field(&field.0, value))
                     && !(source_named_gas_family
                         && window_gas::admitted_field(&field.0, value))
+                    && !(source_gas_mixture_family
+                        && window_gas::mixture_admitted_field(&field.0, value))
                 {
                     // The connected schedule and OtherEquipment instance schemas
                     // allow additional members. Only an unconsumed top-level member
@@ -1149,6 +1157,7 @@ fn resolve_raw(
                 "Material:InfraredTransparent" => source_irt_family,
                 "WindowMaterial:SimpleGlazingSystem" => source_simple_glazing_family,
                 "WindowMaterial:Gas" => source_named_gas_family,
+                "WindowMaterial:GasMixture" => source_gas_mixture_family,
                 "People" => {
                     source_people_family
                         && people::admitted_object(raw, object, source_gain_collections)

@@ -7703,6 +7703,239 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         )
         .is_err()
     );
+    // The same real Source compile/IP/environment/support chain now owns a
+    // Mixture together with genuine Named and Custom single-Gas neighbours.
+    const MIXTURE: &str = "WindowMaterial:GasMixture";
+    let mut mixture_value = input(PortingScope::B);
+    mixture_value[GAS] = json!({
+        "Named Neighbour":{"gas_type":"Air","thickness":0.012},
+        "Custom Neighbour":{"gas_type":"Custom","thickness":0.012,
+            "conductivity_coefficient_a":0.02,"viscosity_coefficient_a":0.00001,
+            "specific_heat_coefficient_a":1000.0,"molecular_weight":28.0}
+    });
+    mixture_value[MIXTURE] = json!({" Mix \u{a0}":{
+        "thickness":0.012,"number_of_gases_in_mixture":3,
+        "gas_1_type":"Air","gas_1_fraction":0.4,
+        "gas_2_type":"Air","gas_2_fraction":0.8,
+        "gas_3_type":"Krypton","gas_4_type":"Xenon","gas_4_fraction":0.7,
+        "name":false,"idf_order":[],"metadata":{"retained":[null,1.25]}
+    }});
+    let mixture_raw = parse_epjson_str(&mixture_value.to_string()).unwrap();
+    let mixture_compiled = ep_compiler::compile_raw_model_for_source(&mixture_raw);
+    assert!(
+        !mixture_compiled.has_errors(),
+        "{:?}",
+        mixture_compiled.report.diagnostics
+    );
+    let mixture_model = mixture_compiled.model.as_ref().unwrap();
+    let mixture_id = mixture_model.material_names.resolve(" Mix \u{a0}").unwrap();
+    assert!(
+        mixture_model
+            .ctf_report_names
+            .materials
+            .contains(&(mixture_id, " MIX \u{a0}".into()))
+    );
+    let mut mixture_ip = crate::ordinary_input_processor::resolve_source_b(&mixture_raw).unwrap();
+    let args = mixture_ip.get_object_def_max_args(MIXTURE).unwrap();
+    assert_eq!(
+        (args.alphas, args.numerics, args.total().unwrap()),
+        (5, 6, 11)
+    );
+    let original = mixture_ip
+        .source_raw_object_fields(MIXTURE, " Mix \u{a0}")
+        .unwrap();
+    assert!(
+        matches!(original.get("number_of_gases_in_mixture"), Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == "3")
+    );
+    assert!(matches!(
+        original.get("metadata"),
+        Some(
+            ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Object(
+                _
+            )
+        )
+    ));
+    let projected =
+        crate::ordinary_material_input::resolve_source(&mixture_raw, &mixture_ip).unwrap();
+    assert_eq!(
+        (
+            projected.window_gas.len(),
+            projected.window_gas_mixture.len()
+        ),
+        (2, 1)
+    );
+    assert_eq!(projected.window_gas_mixture[0].fields.len(), 9);
+    let mut stats = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+    mixture_ip
+        .report_source_idf_records_stats(&mut stats)
+        .unwrap();
+    assert_eq!(
+        usize::try_from(stats.number_input_records).unwrap(),
+        mixture_raw
+            .objects
+            .values()
+            .map(|rows| rows.len())
+            .sum::<usize>()
+    );
+    assert!(mixture_ip.is_object_unused(MIXTURE, " Mix \u{a0}"));
+    let mut mixture_trace = inspect_porting_scope(
+        &mixture_raw,
+        &mixture_compiled.report,
+        Some(mixture_model),
+        PortingScope::B,
+    );
+    assert!(mixture_trace.admissible, "{:?}", mixture_trace.violations);
+    mixture_trace.environment = Some(
+        super::environment::environment_from_weather(
+            mixture_model,
+            &weather,
+            "same existing Mixture caller weather",
+        )
+        .unwrap(),
+    );
+    let mixture_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&mixture_raw, &mixture_trace)
+            .unwrap();
+    let support = crate::support::assess_support_with_source_admission(
+        &mixture_raw,
+        &mixture_compiled.report,
+        Some(mixture_model),
+        RunMode::Compatibility,
+        PartialRunPolicy::Deny,
+        RunOutputFormat::RustNative,
+        TraceLevel::Normal,
+        Some(&mixture_admission),
+    );
+    assert!(support.allows_rust_runtime(), "{:?}", support.diagnostics);
+    assert!(
+        crate::ordinary_equipment_input::resolve(&mixture_raw).is_err()
+            && crate::ordinary_equipment_input::resolve_source_a(&mixture_raw).is_err()
+    );
+    let mut models = Vec::new();
+    let mut alias = mixture_model.clone();
+    alias
+        .material_names
+        .insert("EXTRA MIXTURE ALIAS", mixture_id);
+    models.push(alias);
+    let mut wrong_count = mixture_model.clone();
+    let row = wrong_count
+        .materials
+        .iter_mut()
+        .find(|row| row.id == mixture_id)
+        .unwrap();
+    if let ep_model::MaterialDefinition::WindowGasMixture(value) = &mut row.definition {
+        value.gases = ep_model::WindowGasMixture::One([value.gases.components()[0]]);
+    }
+    models.push(wrong_count);
+    let mut wrong_species = mixture_model.clone();
+    let row = wrong_species
+        .materials
+        .iter_mut()
+        .find(|row| row.id == mixture_id)
+        .unwrap();
+    if let ep_model::MaterialDefinition::WindowGasMixture(value) = &mut row.definition {
+        let active = value.gases.components();
+        value.gases = ep_model::WindowGasMixture::Three([active[0], active[1], active[0]]);
+    }
+    models.push(wrong_species);
+    let mut wrong_kind = mixture_model.clone();
+    let named = wrong_kind
+        .materials
+        .iter()
+        .find(|row| row.kind() == ep_model::MaterialKind::WindowGas)
+        .unwrap()
+        .definition;
+    wrong_kind
+        .materials
+        .iter_mut()
+        .find(|row| row.id == mixture_id)
+        .unwrap()
+        .definition = named;
+    models.push(wrong_kind);
+    let mut extra_row = mixture_model.clone();
+    let mut extra = extra_row
+        .materials
+        .iter()
+        .find(|row| row.id == mixture_id)
+        .unwrap()
+        .clone();
+    extra.id = ep_model::MaterialId(u32::try_from(extra_row.materials.len()).unwrap());
+    extra_row.materials.push(extra);
+    models.push(extra_row);
+    let mut missing_loader = mixture_model.clone();
+    missing_loader
+        .ctf_report_names
+        .materials
+        .retain(|(id, _)| *id != mixture_id);
+    models.push(missing_loader);
+    let mut used = mixture_model.clone();
+    used.constructions[0].layers.clear();
+    used.constructions[0].outside_layer = Some(mixture_id);
+    models.push(used);
+    for model in models {
+        assert!(
+            !crate::support::assess_support_with_source_admission(
+                &mixture_raw,
+                &mixture_compiled.report,
+                Some(&model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&mixture_admission)
+            )
+            .allows_rust_runtime()
+        );
+    }
+    for (field, value) in [
+        ("number_of_gases_in_mixture", json!(1.0)),
+        ("number_of_gases_in_mixture", json!(5)),
+        ("gas_1_type", json!("air")),
+        ("gas_2_type", json!("Custom")),
+        ("gas_2_fraction", json!(0.0)),
+        ("gas_4_fraction", json!(1.1)),
+        ("gas_4_type", json!(null)),
+        ("thickness", json!("0.012")),
+    ] {
+        let mut bad = mixture_value.clone();
+        bad[MIXTURE][" Mix \u{a0}"][field] = value;
+        assert!(
+            crate::ordinary_input_processor::resolve_source_b(
+                &parse_epjson_str(&bad.to_string()).unwrap()
+            )
+            .is_err()
+        );
+    }
+    let mut missing_active = mixture_value.clone();
+    missing_active[MIXTURE][" Mix \u{a0}"]
+        .as_object_mut()
+        .unwrap()
+        .remove("gas_3_type");
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &parse_epjson_str(&missing_active.to_string()).unwrap()
+        )
+        .is_err()
+    );
+    let mut missing_inactive = mixture_value.clone();
+    missing_inactive[MIXTURE][" Mix \u{a0}"]["number_of_gases_in_mixture"] = json!(1);
+    missing_inactive[MIXTURE][" Mix \u{a0}"]
+        .as_object_mut()
+        .unwrap()
+        .remove("gas_2_type");
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &parse_epjson_str(&missing_inactive.to_string()).unwrap()
+        )
+        .is_err()
+    );
+    mixture_value["Construction"]["Mixture Used"] = json!({"outside_layer":" Mix \u{a0}"});
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &parse_epjson_str(&mixture_value.to_string()).unwrap()
+        )
+        .is_err()
+    );
 }
 
 #[test]

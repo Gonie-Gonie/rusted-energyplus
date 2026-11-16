@@ -20,6 +20,8 @@ pub struct SelectedMaterialInput {
     pub simple_glazing: Vec<ProjectInputObject>,
     /// Actual ordered Source epJSON named Gas getter operands.
     pub window_gas: Vec<ProjectInputObject>,
+    /// Genuine ordered GasMixture getObjectItem operands, not typed properties.
+    pub window_gas_mixture: Vec<ProjectInputObject>,
 }
 
 pub(super) fn alpha<'a>(
@@ -51,6 +53,103 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_window_gas_mixture_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:GasMixture", &object.object_name)
+        {
+            return Err(unavailable(
+                "GasMixture owned direct-epJSON raw/IP identity",
+            ));
+        }
+        // Exact legacy order, including required Gas2 even for NumGases1.
+        const FIELDS: [(&str, bool); 11] = [
+            ("name", true),
+            ("thickness", false),
+            ("number_of_gases_in_mixture", false),
+            ("gas_1_type", true),
+            ("gas_1_fraction", false),
+            ("gas_2_type", true),
+            ("gas_2_fraction", false),
+            ("gas_3_type", true),
+            ("gas_3_fraction", false),
+            ("gas_4_type", true),
+            ("gas_4_fraction", false),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 5
+            || s.alpha_field_blanks.len() < 5
+            || s.alpha_field_names.len() < 5
+            || s.numeric_args.len() < 6
+            || s.numeric_field_blanks.len() < 6
+            || s.numeric_field_names.len() < 6
+        {
+            return Err(unavailable(
+                "actual complete shared GasMixture5alpha6numeric allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:GasMixture", &object.object_name);
+        let maximum = FIELDS
+            .iter()
+            .enumerate()
+            .filter(|(_, (field, _))| object.fields.contains_key(*field))
+            .map(|(index, _)| index + 1)
+            .max()
+            .unwrap_or(0)
+            .max(7);
+        let (mut a, mut n, mut alphas, mut numerics) = (0, 0, 0, 0);
+        for (position, (field, is_alpha)) in FIELDS.iter().enumerate() {
+            if *is_alpha {
+                s.alpha_field_names[a] = (*field).into();
+                if position == 0 {
+                    s.alpha_args[a] = object.object_name.to_ascii_uppercase();
+                    s.alpha_field_blanks[a] = object.object_name.is_empty();
+                } else {
+                    match object.fields.get(*field) {
+                        Some(ProjectInputValue::String(value)) => {
+                            s.alpha_args[a] = value.to_ascii_uppercase();
+                            s.alpha_field_blanks[a] = value.is_empty();
+                        }
+                        None => {}
+                        _ => return Err(unavailable("admitted GasMixture alpha scalar")),
+                    }
+                }
+                a += 1;
+                if position < maximum {
+                    alphas = a;
+                }
+            } else {
+                s.numeric_field_names[n] = (*field).into();
+                match object.fields.get(*field) {
+                    Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                        s.numeric_args[n] = *value;
+                        s.numeric_field_blanks[n] = false;
+                    }
+                    None => {}
+                    _ => return Err(unavailable("admitted GasMixture numeric scalar")),
+                }
+                n += 1;
+                if position < maximum {
+                    numerics = n;
+                }
+            }
+        }
+        Ok((alphas, numerics))
+    }
+
     pub(super) fn get_window_gas_item(
         &self,
         object: &ProjectInputObject,

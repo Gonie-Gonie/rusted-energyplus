@@ -75,6 +75,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         infrared_transparent: Vec::new(),
         simple_glazing: Vec::new(),
         window_gas: Vec::new(),
+        window_gas_mixture: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -636,13 +637,13 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
         assert_eq!(row.num_gases, 1);
         assert_eq!(row.gas_fractions, [1.0, 0.0, 0.0, 0.0, 0.0]);
         assert_eq!(row.gap_vent_type, ep_model::WindowGapVentType::Sealed);
-        assert_eq!(row.gases[0].gas_type, gas_type);
+        assert_eq!(row.gases[0].gas_type, Some(gas_type));
         assert_eq!(row.gases[0].properties.conductivity.coefficient_a, k0);
         assert_eq!(row.gases[0].properties.molecular_weight_g_per_mol, weight);
         assert!(
             row.gases[1..]
                 .iter()
-                .all(|gas| gas.gas_type == ep_model::WindowGasType::Custom
+                .all(|gas| gas.gas_type == Some(ep_model::WindowGasType::Custom)
                     && gas.properties.conductivity.coefficient_a == 0.0
                     && gas.properties.molecular_weight_g_per_mol == 0.0)
         );
@@ -811,7 +812,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
     for (offset, name) in ["E CUSTOM", "F CUSTOM"].into_iter().enumerate() {
         let id = custom_ids[offset];
         let row = &customs.window_gas[&id];
-        assert_eq!(row.gases[0].gas_type, ep_model::WindowGasType::Custom);
+        assert_eq!(row.gases[0].gas_type, Some(ep_model::WindowGasType::Custom));
         assert_eq!(row.gases[0].properties.conductivity.coefficient_a, 0.02);
         assert_eq!(row.gases[0].properties.viscosity.coefficient_a, 0.00001);
         assert_eq!(row.gases[0].properties.specific_heat.coefficient_a, 1000.0);
@@ -915,6 +916,289 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 .next()
                 .unwrap()
                 .ends_with(",0.000,0.000,0.000,0.0000,0.0000,0.0000")
+        );
+    }
+    // One genuinely fresh Material/IP/backend context; old Named/Custom/SGS
+    // assertions above have already run. Four real Mixture counts share it.
+    {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        for count in [1_usize, 2, 3, 4] {
+            let name = format!("MIX {count}");
+            let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+            let types = [
+                ep_model::WindowStandardGasType::Air,
+                if count == 2 {
+                    ep_model::WindowStandardGasType::Air
+                } else {
+                    ep_model::WindowStandardGasType::Argon
+                },
+                ep_model::WindowStandardGasType::Krypton,
+                ep_model::WindowStandardGasType::Xenon,
+            ];
+            let mut components = types.map(|gas_type| ep_model::WindowGasMixtureComponent {
+                gas_type,
+                fraction: 0.0,
+            });
+            components[0].fraction = 0.4;
+            components[1].fraction = 0.8;
+            let active = match count {
+                1 => ep_model::WindowGasMixture::One([components[0]]),
+                2 => ep_model::WindowGasMixture::Two([components[0], components[1]]),
+                3 => {
+                    ep_model::WindowGasMixture::Three([components[0], components[1], components[2]])
+                }
+                _ => ep_model::WindowGasMixture::Four(components),
+            };
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(&name),
+                definition: MaterialDefinition::WindowGasMixture(
+                    ep_model::WindowGasMixtureMaterial {
+                        thickness_m: 99.0,
+                        gases: active,
+                    },
+                ),
+            });
+            model.ctf_report_names.materials.push((id, name.clone()));
+            let mut fields = BTreeMap::from([
+                ("thickness".into(), Value::Number(0.012)),
+                (
+                    "number_of_gases_in_mixture".into(),
+                    Value::Number(f64::from(u32::try_from(count).unwrap())),
+                ),
+                ("gas_1_type".into(), Value::String("Air".into())),
+                ("gas_1_fraction".into(), Value::Number(0.4)),
+                (
+                    "gas_2_type".into(),
+                    Value::String(types[1].energyplus_name().into()),
+                ),
+                ("gas_2_fraction".into(), Value::Number(0.8)),
+            ]);
+            if count >= 3 {
+                fields.insert("gas_3_type".into(), Value::String("Krypton".into()));
+            }
+            if count == 4 {
+                fields.insert("gas_4_type".into(), Value::String("Xenon".into()));
+            }
+            if count == 1 {
+                fields.insert("gas_4_fraction".into(), Value::Number(0.6));
+            }
+            raw.window_gas_mixture.push(ProjectInputObject {
+                object_name: name,
+                fields,
+                idf_max_fields: None,
+            });
+        }
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:GasMixture", &raw.window_gas_mixture, 5, 6),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, a, n)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    family.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        {
+            let stream: &mut dyn std::io::Write = &mut text;
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            data.get_material_data(&raw, &mut owners).unwrap();
+            // Same real IP/scratch/owners, no new material context or latch reset.
+            owners.shortcut.alpha_args.fill("stale".into());
+            owners.shortcut.numeric_args.fill(-123.0);
+            assert_eq!(
+                raw.get_window_gas_mixture_item(&raw.window_gas_mixture[0], &mut owners)
+                    .unwrap(),
+                (5, 6)
+            );
+            assert!(owners.shortcut.alpha_field_blanks[3] && owners.shortcut.alpha_field_blanks[4]);
+            assert_eq!(owners.shortcut.numeric_args[5], 0.6);
+            assert!(owners.shortcut.numeric_field_blanks[4]);
+            assert_eq!(
+                raw.get_window_gas_mixture_item(&raw.window_gas_mixture[1], &mut owners)
+                    .unwrap(),
+                (3, 4)
+            );
+            assert!(owners.shortcut.alpha_args[3..].iter().all(String::is_empty));
+            assert!(
+                owners.shortcut.numeric_args[4..]
+                    .iter()
+                    .all(|value| *value == 0.0)
+            );
+            assert_eq!(
+                &owners.shortcut.numeric_field_names[..6],
+                [
+                    "thickness",
+                    "number_of_gases_in_mixture",
+                    "gas_1_fraction",
+                    "gas_2_fraction",
+                    "gas_3_fraction",
+                    "gas_4_fraction"
+                ]
+            );
+        }
+        assert!(!errors_found && text.is_empty());
+        assert_eq!((data.num_w5_gas_mixtures, data.materials.len()), (4, 7));
+        for (offset, count) in [1_usize, 2, 3, 4].into_iter().enumerate() {
+            let id = MaterialId(u32::try_from(3 + offset).unwrap());
+            let number = i32::try_from(4 + offset).unwrap();
+            let name = format!("MIX {count}");
+            let row = &data.window_gas[&id];
+            assert_eq!(data.material_map[&name], number);
+            assert_eq!(data.material_groups[&id], SourceMaterialGroup::GasMixture);
+            assert!(data.resistance_only[&id]);
+            assert_eq!(row.num_gases, i32::try_from(count).unwrap());
+            assert_eq!(row.thickness, 0.012);
+            assert_eq!(
+                row.gas_fractions,
+                if count == 1 {
+                    [0.4, 0.0, 0.0, 0.0, 0.0]
+                } else {
+                    [0.4, 0.8, 0.0, 0.0, 0.0]
+                }
+            );
+            assert_eq!(row.gap_vent_type, ep_model::WindowGapVentType::Sealed);
+            for (index, gas) in row.gases.iter().enumerate() {
+                if index < count {
+                    let expected = if index == 0 || count == 2 {
+                        ep_model::WindowGasType::Air
+                    } else if index == 1 {
+                        ep_model::WindowGasType::Argon
+                    } else if index == 2 {
+                        ep_model::WindowGasType::Krypton
+                    } else {
+                        ep_model::WindowGasType::Xenon
+                    };
+                    assert_eq!(gas.gas_type, Some(expected));
+                    let actual_named = gases
+                        .window_gas
+                        .values()
+                        .find(|row| row.gases[0].gas_type == Some(expected))
+                        .unwrap();
+                    assert_eq!(gas.properties, actual_named.gases[0].properties);
+                } else {
+                    assert_eq!(gas.gas_type, None);
+                    let p = gas.properties;
+                    assert_eq!(
+                        [
+                            p.conductivity.coefficient_a,
+                            p.conductivity.coefficient_b,
+                            p.conductivity.coefficient_c,
+                            p.viscosity.coefficient_a,
+                            p.viscosity.coefficient_b,
+                            p.viscosity.coefficient_c,
+                            p.specific_heat.coefficient_a,
+                            p.specific_heat.coefficient_b,
+                            p.specific_heat.coefficient_c,
+                            p.molecular_weight_g_per_mol,
+                            p.specific_heat_ratio
+                        ],
+                        [0.0; 11]
+                    );
+                }
+            }
+            assert_eq!(
+                data.nominal_r[3 + offset].to_bits(),
+                gases.nominal_r[3].to_bits(),
+                "same real first-Air owner, fractions do not enter NominalR"
+            );
+            assert_eq!(
+                [
+                    row.resistance,
+                    row.conductivity,
+                    row.density,
+                    row.specific_heat
+                ],
+                [0.0; 4]
+            );
+            let (roughness, surface) = data
+                .source_window_gas_surface_properties(number, id)
+                .unwrap();
+            assert_eq!(roughness, MaterialSurfaceRoughness::MediumRough);
+            assert_eq!(
+                [
+                    surface.thermal_absorptance,
+                    surface.solar_absorptance,
+                    surface.visible_absorptance
+                ],
+                [0.0; 3]
+            );
+            assert!(!input.is_object_unused("WindowMaterial:GasMixture", &name));
+        }
+        let mut report = Vec::new();
+        data.write_material_reports(&model, &mut report).unwrap();
+        assert_eq!(
+            std::str::from_utf8(&report)
+                .unwrap()
+                .matches(" Material Details,MIX ")
+                .count(),
+            4
         );
     }
 }
@@ -1719,7 +2003,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
             result
         };
         let row = &data.window_gas[&MaterialId(3)];
-        assert_eq!(row.gases[0].gas_type, ep_model::WindowGasType::Custom);
+        assert_eq!(row.gases[0].gas_type, Some(ep_model::WindowGasType::Custom));
         assert_eq!(row.thickness, 0.012);
         assert_eq!(
             row.gases[0].properties.conductivity.coefficient_a,
@@ -1802,5 +2086,298 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 assert!(text.contains("Nominal resistance of gap at room temperature calculated at a negative Conductivity=[0.000]."));
             }
         }
+    }
+    // Three fresh real contexts for the same wrapped Thickness: successful IO,
+    // first diagnostic IO failure, then Continue failure. Existing sinks reused.
+    for failure in [0, 1, 2] {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let id = MaterialId(3);
+        model.materials.push(Material {
+            id,
+            name: NormalizedName::new("M NEG"),
+            definition: MaterialDefinition::WindowGasMixture(ep_model::WindowGasMixtureMaterial {
+                thickness_m: 0.012,
+                gases: ep_model::WindowGasMixture::One([ep_model::WindowGasMixtureComponent {
+                    gas_type: ep_model::WindowStandardGasType::Air,
+                    fraction: 1.0,
+                }]),
+            }),
+        });
+        model.ctf_report_names.materials.push((id, "M NEG".into()));
+        let wrapped = ep_model::classify_source_json_number("18446744073709551615")
+            .unwrap()
+            .as_f64();
+        raw.window_gas_mixture.push(ProjectInputObject {
+            object_name: "M NEG".into(),
+            idf_max_fields: None,
+            fields: BTreeMap::from([
+                ("thickness".into(), Value::Number(wrapped)),
+                ("number_of_gases_in_mixture".into(), Value::Number(1.0)),
+                ("gas_1_type".into(), Value::String("Air".into())),
+                ("gas_1_fraction".into(), Value::Number(1.0)),
+                ("gas_2_type".into(), Value::String("Argon".into())),
+                ("gas_2_fraction".into(), Value::Number(1.0)),
+            ]),
+        });
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:GasMixture", &raw.window_gas_mixture, 5, 6),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, a, n)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    family.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        let mut broken = BrokenDiagnostic;
+        let mut continue_sink = FailContinue { bytes: Vec::new() };
+        let outcome = {
+            let stream: &mut dyn std::io::Write = match failure {
+                1 => &mut broken,
+                2 => &mut continue_sink,
+                _ => &mut text,
+            };
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            data.get_material_data(&raw, &mut owners)
+        };
+        let row = &data.window_gas[&id];
+        assert_eq!((data.materials.len(), data.num_w5_gas_mixtures), (4, 1));
+        assert_eq!(row.thickness.to_bits(), (-1.0_f64).to_bits());
+        assert_eq!(row.gases[0].gas_type, Some(ep_model::WindowGasType::Air));
+        assert!(
+            !errors_found,
+            "Thickness branch does not set the shared error flag, even after IO returns"
+        );
+        assert_eq!(state.tracking.total_severe_errors, 1);
+        assert!(!input.is_object_unused("WindowMaterial:GasMixture", "M NEG"));
+        if failure == 0 {
+            outcome.unwrap();
+            assert!(data.resistance_only[&id]);
+            assert_eq!(row.gas_fractions, [1.0, 0.0, 0.0, 0.0, 0.0]);
+            assert!(data.nominal_r[3] < 0.0);
+            let text = std::str::from_utf8(&text).unwrap();
+            assert!(
+                text.find("WindowMaterial:GasMixture=\"M NEG\", Illegal value.")
+                    .zip(text.find("thickness must be greater than 0."))
+                    .is_some_and(|(severe, continuation)| severe < continuation)
+            );
+        } else {
+            assert!(outcome.is_err());
+            assert!(!data.resistance_only[&id]);
+            assert_eq!(row.gas_fractions, [0.0; 5]);
+            assert_eq!(
+                (
+                    row.gases[0].properties.conductivity.coefficient_a,
+                    data.nominal_r[3]
+                ),
+                (0.0, 0.0)
+            );
+            if failure == 1 {
+                assert!(state.tracking.last_severe_error.is_empty());
+            } else {
+                let text = std::str::from_utf8(&continue_sink.bytes).unwrap();
+                assert!(
+                    text.contains("WindowMaterial:GasMixture=\"M NEG\", Illegal value.")
+                        && !text.contains(" **   ~~~   ** ")
+                );
+            }
+        }
+    }
+    // Fourth diagnostic context: a real earlier duplicate sets the shared flag;
+    // the subsequent valid Mixture still writes its unconditional NominalR.
+    {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let id = MaterialId(3);
+        model.materials.push(Material {
+            id,
+            name: NormalizedName::new("Z MIXTURE"),
+            definition: MaterialDefinition::WindowGasMixture(ep_model::WindowGasMixtureMaterial {
+                thickness_m: 0.012,
+                gases: ep_model::WindowGasMixture::One([ep_model::WindowGasMixtureComponent {
+                    gas_type: ep_model::WindowStandardGasType::Air,
+                    fraction: 1.0,
+                }]),
+            }),
+        });
+        model
+            .ctf_report_names
+            .materials
+            .push((id, "Z MIXTURE".into()));
+        raw.window_gas_mixture = ["No mass", "Z MIXTURE"]
+            .map(|name| ProjectInputObject {
+                object_name: name.into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("thickness".into(), Value::Number(0.012)),
+                    ("number_of_gases_in_mixture".into(), Value::Number(1.0)),
+                    ("gas_1_type".into(), Value::String("Air".into())),
+                    ("gas_1_fraction".into(), Value::Number(1.0)),
+                    ("gas_2_type".into(), Value::String("Argon".into())),
+                    ("gas_2_fraction".into(), Value::Number(1.0)),
+                ]),
+            })
+            .into();
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:GasMixture", &raw.window_gas_mixture, 5, 6),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, a, n)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    family.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        {
+            let stream: &mut dyn std::io::Write = &mut text;
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            data.get_material_data(&raw, &mut owners).unwrap();
+        }
+        assert!(errors_found);
+        assert_eq!((data.material_map["NO MASS"], data.materials.len()), (2, 4));
+        assert!(data.nominal_r[3] > 0.0 && data.resistance_only[&id]);
+        assert_eq!(state.tracking.total_severe_errors, 1);
+        assert!(
+            !input.is_object_unused("WindowMaterial:GasMixture", "No mass")
+                && !input.is_object_unused("WindowMaterial:GasMixture", "Z MIXTURE")
+        );
+        assert_eq!(
+            std::str::from_utf8(&text)
+                .unwrap()
+                .matches("GetMaterialData: WindowMaterial:GasMixture = NO MASS, duplicate name.")
+                .count(),
+            1
+        );
     }
 }

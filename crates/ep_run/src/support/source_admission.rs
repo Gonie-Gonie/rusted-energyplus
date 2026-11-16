@@ -8,6 +8,8 @@ pub(crate) struct SourceSupportAdmission {
     covered_objects: BTreeSet<&'static str>,
     /// Validated Raw uppercase loader names/types only, never material properties.
     window_gas_bindings: BTreeMap<String, ep_model::WindowGasType>,
+    /// Raw active species/count only, never mixture fractions or properties.
+    window_gas_mixture_bindings: BTreeMap<String, Vec<ep_model::WindowStandardGasType>>,
     /// Exact local alpha fields consumed by genuine GetZoneData and the live
     /// owning-Zone dispatchers. This is not a general Zone-feature exemption.
     zone_convection_overrides_consumed: bool,
@@ -198,9 +200,51 @@ impl SourceSupportAdmission {
             }
             covered_objects.insert("WindowMaterial:Gas");
         }
+        let mut window_gas_mixture_bindings = BTreeMap::new();
+        if trace.scope == PortingScope::B
+            && raw
+                .objects
+                .get(&ObjectType("WindowMaterial:GasMixture".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            && crate::ordinary_equipment_input::source_b_validate_unused_gas_mixture(raw).is_ok()
+        {
+            let rows = raw
+                .objects
+                .get(&ObjectType("WindowMaterial:GasMixture".into()))?;
+            for (name, row) in rows {
+                let RawValue::Number(token) = row
+                    .fields
+                    .get(&FieldName("number_of_gases_in_mixture".into()))?
+                else {
+                    return None;
+                };
+                let count = ep_model::classify_source_json_number(token)
+                    .ok()?
+                    .as_i32()?;
+                let mut active = Vec::new();
+                for index in 1..=count {
+                    let RawValue::String(value) =
+                        row.fields.get(&FieldName(format!("gas_{index}_type")))?
+                    else {
+                        return None;
+                    };
+                    active.push(ep_model::WindowStandardGasType::from_energyplus_name(
+                        value,
+                    )?);
+                }
+                if window_gas_mixture_bindings
+                    .insert(name.0.to_ascii_uppercase(), active)
+                    .is_some()
+                {
+                    return None;
+                }
+            }
+            covered_objects.insert("WindowMaterial:GasMixture");
+        }
         Some(Self {
             covered_objects,
             window_gas_bindings,
+            window_gas_mixture_bindings,
             zone_convection_overrides_consumed,
             ideal_loads_consumed: trace.scope == PortingScope::B
                 && raw
@@ -243,11 +287,11 @@ impl SourceSupportAdmission {
         })
     }
 
-    // Classification only: exact validated Raw names/types bind the actual
-    // Source compiler loader IDs. No coefficients or Native state are copied.
+    // A total Raw/typed loader bijection for both owned MaterialGasMix kinds.
     pub(super) fn consumes_window_gas_materials(&self, model: &ep_model::TypedModel) -> bool {
         use ep_model::MaterialKind;
-        if !self.consumes("WindowMaterial:Gas") || !model.material_names.is_source_exact_namespace()
+        if !(self.consumes("WindowMaterial:Gas") || self.consumes("WindowMaterial:GasMixture"))
+            || !model.material_names.is_source_exact_namespace()
         {
             return false;
         }
@@ -255,28 +299,39 @@ impl SourceSupportAdmission {
         if all_ids.len() != model.materials.len() {
             return false;
         }
+        let expected: BTreeSet<_> = self
+            .window_gas_bindings
+            .keys()
+            .chain(self.window_gas_mixture_bindings.keys())
+            .map(String::as_str)
+            .collect();
+        if expected.len() != self.window_gas_bindings.len() + self.window_gas_mixture_bindings.len()
+        {
+            return false;
+        }
         let mut gas_rows = BTreeMap::new();
         for row in &model.materials {
-            if row.kind() == MaterialKind::WindowGas && gas_rows.insert(row.id, row).is_some() {
+            if matches!(
+                row.kind(),
+                MaterialKind::WindowGas | MaterialKind::WindowGasMixture
+            ) && gas_rows.insert(row.id, row).is_some()
+            {
                 return false;
             }
         }
-        if gas_rows.len() != self.window_gas_bindings.len() {
+        if gas_rows.len() != expected.len() {
             return false;
         }
-        // Audit the actual NameMap in reverse too: resolving the expected
-        // names alone would miss an extra alias added for an existing Gas ID.
         let mut material_map_names: BTreeMap<ep_model::MaterialId, &str> = BTreeMap::new();
         for name in model.material_names.names() {
             let id = model.material_names.resolve(&name.0);
-            if id.is_some_and(|id| gas_rows.contains_key(&id))
-                || self.window_gas_bindings.contains_key(&name.0)
+            if id.is_some_and(|id| gas_rows.contains_key(&id)) || expected.contains(name.0.as_str())
             {
                 let Some(id) = id else {
                     return false;
                 };
                 if !gas_rows.contains_key(&id)
-                    || !self.window_gas_bindings.contains_key(&name.0)
+                    || !expected.contains(name.0.as_str())
                     || material_map_names.insert(id, name.0.as_str()).is_some()
                 {
                     return false;
@@ -289,13 +344,13 @@ impl SourceSupportAdmission {
             if !all_ids.contains(id) {
                 return false;
             }
-            if gas_rows.contains_key(id) || self.window_gas_bindings.contains_key(name) {
+            if gas_rows.contains_key(id) || expected.contains(name.as_str()) {
                 by_name.entry(name.as_str()).or_default().push(*id);
                 by_id.entry(*id).or_default().push(name.as_str());
             }
         }
-        for (name, expected_type) in &self.window_gas_bindings {
-            let Some(ids) = by_name.get(name.as_str()) else {
+        for name in expected {
+            let Some(ids) = by_name.get(name) else {
                 return false;
             };
             if ids.len() != 1 {
@@ -305,15 +360,34 @@ impl SourceSupportAdmission {
             let Some(row) = gas_rows.get(&id) else {
                 return false;
             };
-            let Some(gas) = row.as_window_gas() else {
-                return false;
-            };
-            if row.name.0 != *name
-                || gas.gas_type != *expected_type
+            if row.name.0 != name
                 || model.material_names.resolve(name) != Some(id)
-                || material_map_names.get(&id).copied() != Some(name.as_str())
+                || material_map_names.get(&id).copied() != Some(name)
                 || by_id.get(&id).is_none_or(|names| names.len() != 1)
             {
+                return false;
+            }
+            if let Some(expected_type) = self.window_gas_bindings.get(name) {
+                if row
+                    .as_window_gas()
+                    .is_none_or(|gas| gas.gas_type != *expected_type)
+                {
+                    return false;
+                }
+            } else if let Some(expected_types) = self.window_gas_mixture_bindings.get(name) {
+                let Some(mixture) = row.as_window_gas_mixture() else {
+                    return false;
+                };
+                let active = mixture.gases.components();
+                if active.len() != expected_types.len()
+                    || active
+                        .iter()
+                        .zip(expected_types)
+                        .any(|(gas, expected)| gas.gas_type != *expected)
+                {
+                    return false;
+                }
+            } else {
                 return false;
             }
         }

@@ -412,17 +412,26 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowGapEquivalentLayer)
             .count(),
     );
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:GasMixture",
-        typed_model
-            .materials
-            .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowGasMixture)
-            .count(),
-    );
+    let mixture_used = typed_model.constructions.iter().any(|construction| {
+        construction.effective_layers().iter().any(|id| {
+            typed_model.materials.iter().any(|material| {
+                material.id == *id && material.kind() == MaterialKind::WindowGasMixture
+            })
+        })
+    });
+    if !gas_consumed || mixture_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:GasMixture",
+            typed_model
+                .materials
+                .iter()
+                .filter(|material| material.kind() == MaterialKind::WindowGasMixture)
+                .count(),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

@@ -739,6 +739,8 @@ impl<'a> Compiler<'a> {
                         });
                         name_valid && (named || self.source_unused_custom_window_gas(&name.0, object)) && thickness && supplied
                     }))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:GasMixture".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_window_gas_mixture(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -5613,6 +5615,88 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Exact declaration selection only; properties remain the real IP/getter's.
+    fn source_unused_window_gas_mixture(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let count = match field_value(object, "number_of_gases_in_mixture") {
+            Some(RawValue::Number(token)) => ep_model::classify_source_json_number(token)
+                .ok()
+                .and_then(|value| value.as_i32()),
+            _ => None,
+        };
+        let Some(count) = count.filter(|value| (1..=4).contains(value)) else {
+            return false;
+        };
+        let valid = |field: &str, value: &RawValue| {
+            if matches!(
+                field,
+                "gas_1_type" | "gas_2_type" | "gas_3_type" | "gas_4_type"
+            ) {
+                return matches!(value, RawValue::String(value) if matches!(value.as_str(), "Air" | "Argon" | "Krypton" | "Xenon"));
+            }
+            if !matches!(
+                field,
+                "thickness"
+                    | "number_of_gases_in_mixture"
+                    | "gas_1_fraction"
+                    | "gas_2_fraction"
+                    | "gas_3_fraction"
+                    | "gas_4_fraction"
+            ) {
+                return true;
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            let Ok(effective) = ep_model::classify_source_json_number(token) else {
+                return false;
+            };
+            if field == "number_of_gases_in_mixture" {
+                return matches!(effective, ep_model::SourceJsonNumber::Integer(value) if (1..=4).contains(&value));
+            }
+            token.parse::<f64>().ok().is_some_and(|value| {
+                value.is_finite() && value > 0.0 && (field == "thickness" || value <= 1.0)
+            })
+        };
+        if [
+            "thickness",
+            "number_of_gases_in_mixture",
+            "gas_1_type",
+            "gas_1_fraction",
+            "gas_2_type",
+            "gas_2_fraction",
+        ]
+        .iter()
+        .any(|field| field_value(object, field).is_none_or(|value| !valid(field, value)))
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !valid(&field.0, value))
+            || (3..=count).any(|index| field_value(object, &format!("gas_{index}_type")).is_none())
+        {
+            return false;
+        }
+        let Some(mixtures) = self.raw_model.objects.get(&ep_raw_model::ObjectType(
+            "WindowMaterial:GasMixture".into(),
+        )) else {
+            return false;
+        };
+        !self.raw_model.objects.get(&ep_raw_model::ObjectType("Construction".into())).is_some_and(|rows| {
+            rows.values().any(|row| row.fields.iter().any(|(field, value)| {
+                let layer = field.0 == "outside_layer" || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                layer && matches!(value, RawValue::String(reference) if mixtures.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+            }))
+        })
+    }
+
     fn parse_window_gas_mixture_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:GasMixture";
 
@@ -5788,6 +5872,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if self.source_unused_window_gas_mixture(&name, &object) {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -8949,7 +9039,10 @@ impl<'a> Compiler<'a> {
     ) -> Option<(MaterialId, NormalizedName)> {
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
-            && object_type == "WindowMaterial:Gas"
+            && matches!(
+                object_type,
+                "WindowMaterial:Gas" | "WindowMaterial:GasMixture"
+            )
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')

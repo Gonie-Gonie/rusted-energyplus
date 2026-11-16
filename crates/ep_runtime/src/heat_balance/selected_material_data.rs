@@ -164,7 +164,10 @@ impl SelectedMaterialData {
                 "native Gas MaterialNum bounds",
             ))?;
         if self.materials.get(index) != Some(&typed_id)
-            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::Gas)
+            || !matches!(
+                self.material_groups.get(&typed_id),
+                Some(SourceMaterialGroup::Gas | SourceMaterialGroup::GasMixture)
+            )
         {
             return Err(HeatBalanceInputError::Unavailable(
                 "actual Gas Source order/group/physical identity",
@@ -176,10 +179,19 @@ impl SelectedMaterialData {
             .ok_or(HeatBalanceInputError::Unavailable(
                 "actual retained Gas runtime row",
             ))?;
-        if row.num_gases != 1
-            || row.gas_fractions != [1.0, 0.0, 0.0, 0.0, 0.0]
-            || row.gap_vent_type != ep_model::WindowGapVentType::Sealed
-        {
+        let mixture = self.material_groups.get(&typed_id) == Some(&SourceMaterialGroup::GasMixture);
+        let valid_signature = if mixture {
+            usize::try_from(row.num_gases).ok().filter(|count| (1..=4).contains(count))
+                .is_some_and(|count| row.gases.iter().enumerate().all(|(index, gas)| {
+                    if index < count { matches!(gas.gas_type, Some(value) if value != ep_model::WindowGasType::Custom) }
+                    else { gas.gas_type.is_none() && row.gas_fractions[index] == 0.0 }
+                }))
+        } else {
+            row.num_gases == 1
+                && row.gas_fractions == [1.0, 0.0, 0.0, 0.0, 0.0]
+                && row.gases[0].gas_type.is_some()
+        };
+        if !valid_signature || row.gap_vent_type != ep_model::WindowGapVentType::Sealed {
             return Err(HeatBalanceInputError::Unavailable(
                 "actual single Gas mixture identity",
             ));
@@ -472,7 +484,7 @@ impl SelectedMaterialData {
         empty!(num_eql_glazings, "WindowMaterial:Glazing:EquivalentLayer");
         self.get_named_window_gas_data(raw, o)?;
         empty!(num_eql_gaps, "WindowMaterial:Gap:EquivalentLayer");
-        empty!(num_w5_gas_mixtures, "WindowMaterial:GasMixture");
+        self.get_window_gas_mixture_data(raw, o)?;
         empty!(num_shades, "WindowMaterial:Shade");
         empty!(num_eql_shades, "WindowMaterial:Shade:EquivalentLayer");
         empty!(num_eql_drapes, "WindowMaterial:Drape:EquivalentLayer");

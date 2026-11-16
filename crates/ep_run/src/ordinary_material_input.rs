@@ -35,10 +35,13 @@ fn resolve_ordered(
         "Material:InfraredTransparent",
         "WindowMaterial:SimpleGlazingSystem",
         "WindowMaterial:Gas",
+        "WindowMaterial:GasMixture",
     ] {
         if matches!(
             family,
-            "WindowMaterial:SimpleGlazingSystem" | "WindowMaterial:Gas"
+            "WindowMaterial:SimpleGlazingSystem"
+                | "WindowMaterial:Gas"
+                | "WindowMaterial:GasMixture"
         ) && !source_order
         {
             // No new Legacy or Source A admission is granted by this projection.
@@ -72,6 +75,12 @@ fn resolve_ordered(
                 {
                     continue;
                 }
+                if source_order
+                    && family == "WindowMaterial:GasMixture"
+                    && !crate::ordinary_equipment_input::source_b_gas_mixture_known_field(&field.0)
+                {
+                    continue;
+                }
                 if field.0 == "idf_max_fields" {
                     let RawValue::Number(text) = value else {
                         return Err("Material idf_max_fields numeric custody".into());
@@ -96,7 +105,9 @@ fn resolve_ordered(
                         let value = if source_order
                             && matches!(
                                 family,
-                                "WindowMaterial:SimpleGlazingSystem" | "WindowMaterial:Gas"
+                                "WindowMaterial:SimpleGlazingSystem"
+                                    | "WindowMaterial:Gas"
+                                    | "WindowMaterial:GasMixture"
                             ) {
                             ep_model::classify_source_json_number(text)
                                 .map_err(|_| "SimpleGlazing stored JSON numeric kind")?
@@ -141,6 +152,7 @@ fn resolve_ordered(
             "Material:InfraredTransparent" => result.infrared_transparent = values,
             "WindowMaterial:SimpleGlazingSystem" => result.simple_glazing = values,
             "WindowMaterial:Gas" => result.window_gas = values,
+            "WindowMaterial:GasMixture" => result.window_gas_mixture = values,
             _ => unreachable!("literal selected material family"),
         }
     }

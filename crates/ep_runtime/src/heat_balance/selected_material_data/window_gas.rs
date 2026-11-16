@@ -8,13 +8,14 @@ use ep_model::{
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub(super) struct SourceGasRecord {
-    pub gas_type: WindowGasType,
+    /// None is Native Invalid; Some(Custom) is the distinct constructor state.
+    pub gas_type: Option<WindowGasType>,
     pub properties: WindowGasProperties,
 }
 impl Default for SourceGasRecord {
     fn default() -> Self {
         Self {
-            gas_type: WindowGasType::Custom,
+            gas_type: Some(WindowGasType::Custom),
             properties: WindowGasProperties {
                 conductivity: WindowGasPolynomialCoefficients::default(),
                 viscosity: WindowGasPolynomialCoefficients::default(),
@@ -66,6 +67,115 @@ impl Default for SourceWindowGasMaterial {
 }
 
 impl SelectedMaterialData {
+    pub(super) fn get_window_gas_mixture_data(
+        &mut self,
+        raw: &super::SelectedMaterialInput,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(), RuntimeError> {
+        owners.shortcut.current_module_object = "WindowMaterial:GasMixture".into();
+        self.num_w5_gas_mixtures = super::count(owners.input, "WindowMaterial:GasMixture")?;
+        if usize::try_from(self.num_w5_gas_mixtures).ok() != Some(raw.window_gas_mixture.len()) {
+            return Err(unavailable("WindowMaterial:GasMixture raw/IP count"));
+        }
+        for object in &raw.window_gas_mixture {
+            raw.get_window_gas_mixture_item(object, owners)?;
+            let name = owners.shortcut.alpha_args[0].clone();
+            if self.material_map.contains_key(&name) {
+                let flags = owners.diagnostic_flags.as_ref().ok_or_else(|| {
+                    unavailable("actual GasMixture duplicate diagnostic phase owners")
+                })?;
+                owners
+                    .backend
+                    .show_source_severe_error(
+                        &format!(
+                            "GetMaterialData: WindowMaterial:GasMixture = {name}, duplicate name."
+                        ),
+                        flags,
+                    )
+                    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                *owners.errors_found = true;
+                continue;
+            }
+            let id = typed_id(owners.model, &name, MaterialKind::WindowGasMixture)?;
+            let position = self.insert(&name, id, SourceMaterialGroup::GasMixture)?;
+            self.window_gas
+                .insert(id, SourceWindowGasMaterial::default());
+            let material = self
+                .window_gas
+                .get_mut(&id)
+                .ok_or_else(|| unavailable("allocated GasMixture runtime row"))?;
+            for gas in &mut material.gases {
+                gas.gas_type = None;
+            }
+            let count = match owners.shortcut.numeric_args[1] {
+                1.0 => 1,
+                2.0 => 2,
+                3.0 => 3,
+                4.0 => 4,
+                _ => return Err(unavailable("admitted GasMixture actual integer count")),
+            };
+            material.num_gases =
+                i32::try_from(count).map_err(|_| unavailable("GasMixture count i32"))?;
+            for index in 0..count {
+                material.gases[index].gas_type =
+                    WindowGasType::from_equivalent_layer_energyplus_name(
+                        &owners.shortcut.alpha_args[index + 1],
+                    )
+                    .filter(|value| *value != WindowGasType::Custom);
+                if material.gases[index].gas_type.is_none() {
+                    let flags = owners.diagnostic_flags.as_ref().ok_or_else(|| {
+                        unavailable("actual GasMixture invalid type diagnostic phase owners")
+                    })?;
+                    owners
+                        .backend
+                        .show_source_severe_error(
+                            &format!(
+                                "WindowMaterial:GasMixture=\"{}\", Illegal value.",
+                                owners.shortcut.alpha_args[index]
+                            ),
+                            flags,
+                        )
+                        .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                    *owners.errors_found = true;
+                }
+            }
+            material.roughness = Some(MaterialSurfaceRoughness::MediumRough);
+            material.thickness = owners.shortcut.numeric_args[0];
+            if material.thickness <= 0.0 {
+                let flags = owners.diagnostic_flags.as_ref().ok_or_else(|| {
+                    unavailable("actual GasMixture Thickness diagnostic phase owners")
+                })?;
+                owners
+                    .backend
+                    .show_source_severe_error(
+                        &format!("WindowMaterial:GasMixture=\"{name}\", Illegal value."),
+                        flags,
+                    )
+                    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                owners.backend.show_continue_error(&format!("{} must be greater than 0.", owners.shortcut.numeric_field_names[0]))
+                    .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(error))))?;
+                // Native deliberately does not set ErrorsFound for this branch.
+            }
+            self.resistance_only.insert(id, true);
+            for index in 0..count {
+                // Native's missing-active-type array index is undefined. Keep
+                // the explicit safe stop, not a fabricated GasType fallback.
+                let gas_type = material.gases[index].gas_type.ok_or_else(|| {
+                    unavailable("undefined Native GasMixture Invalid record index")
+                })?;
+                material.gas_fractions[index] = owners.shortcut.numeric_args[index + 2];
+                material.gases[index].properties = gas_type
+                    .standard_properties()
+                    .ok_or_else(|| unavailable("actual standard GasMixture record"))?;
+            }
+            // Unlike single Gas, this assignment is unconditional even when an
+            // earlier material has set the same genuine shared ErrorsFound.
+            self.nominal_r[position] =
+                material.thickness / material.gases[0].properties.conductivity.at_300_k();
+        }
+        Ok(())
+    }
+
     pub(super) fn get_named_window_gas_data(
         &mut self,
         raw: &super::SelectedMaterialInput,
@@ -108,7 +218,7 @@ impl SelectedMaterialData {
                 &owners.shortcut.alpha_args[1],
             )
             .ok_or_else(|| unavailable("admitted actual uppercase Gas Type"))?;
-            material.gases[0].gas_type = gas_type;
+            material.gases[0].gas_type = Some(gas_type);
             material.roughness = Some(MaterialSurfaceRoughness::MediumRough);
             material.thickness = owners.shortcut.numeric_args[0];
             self.resistance_only.insert(id, true);

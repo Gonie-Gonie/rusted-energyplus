@@ -83,8 +83,16 @@ impl SelectedMaterialData {
                     [0.0; 4],
                     value.surface,
                 ),
-                MaterialDefinition::WindowGas(_) => {
-                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::Gas) {
+                MaterialDefinition::WindowGas(_) | MaterialDefinition::WindowGasMixture(_) => {
+                    let expected = if matches!(
+                        &material.definition,
+                        MaterialDefinition::WindowGasMixture(_)
+                    ) {
+                        SourceMaterialGroup::GasMixture
+                    } else {
+                        SourceMaterialGroup::Gas
+                    };
+                    if self.material_groups.get(id) != Some(&expected) {
                         return Err(unavailable("reported Gas actual group"));
                     }
                     let value = self.window_gas.get(id).ok_or_else(|| {
