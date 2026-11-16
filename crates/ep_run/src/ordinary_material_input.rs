@@ -102,6 +102,7 @@ fn resolve_ordered(
         "WindowMaterial:SimpleGlazingSystem",
         "WindowMaterial:Gas",
         "WindowMaterial:GasMixture",
+        "WindowMaterial:Shade",
     ] {
         if matches!(
             family,
@@ -110,6 +111,7 @@ fn resolve_ordered(
                 | "WindowMaterial:SimpleGlazingSystem"
                 | "WindowMaterial:Gas"
                 | "WindowMaterial:GasMixture"
+                | "WindowMaterial:Shade"
         ) && !source_order
         {
             // No new Legacy or Source A admission is granted by this projection.
@@ -161,6 +163,12 @@ fn resolve_ordered(
                 {
                     continue;
                 }
+                if source_order
+                    && family == "WindowMaterial:Shade"
+                    && !crate::ordinary_equipment_input::source_b_shade_known_field(&field.0)
+                {
+                    continue;
+                }
                 if field.0 == "idf_max_fields" {
                     let RawValue::Number(text) = value else {
                         return Err("Material idf_max_fields numeric custody".into());
@@ -190,6 +198,7 @@ fn resolve_ordered(
                                     | "WindowMaterial:SimpleGlazingSystem"
                                     | "WindowMaterial:Gas"
                                     | "WindowMaterial:GasMixture"
+                                    | "WindowMaterial:Shade"
                             ) {
                             ep_model::classify_source_json_number(text)
                                 .map_err(|_| "SimpleGlazing stored JSON numeric kind")?
@@ -237,6 +246,7 @@ fn resolve_ordered(
             "WindowMaterial:SimpleGlazingSystem" => result.simple_glazing = values,
             "WindowMaterial:Gas" => result.window_gas = values,
             "WindowMaterial:GasMixture" => result.window_gas_mixture = values,
+            "WindowMaterial:Shade" => result.window_shade = values,
             _ => unreachable!("literal selected material family"),
         }
     }

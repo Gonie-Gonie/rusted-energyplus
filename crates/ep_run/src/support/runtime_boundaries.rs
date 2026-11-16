@@ -450,17 +450,37 @@ pub(super) fn assess_typed_runtime_boundaries(
                 .count(),
         );
     }
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Shade",
-        typed_model
-            .materials
+    let shade_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowShade)
+        .count();
+    let shade_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType("WindowMaterial:Shade".into()))
+        .map_or(0, |rows| rows.len());
+    let shade_consumed =
+        source_admission.is_some_and(|admission| admission.consumes_unused_shade(typed_model));
+    let shade_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowShade)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::WindowShade
+                })
+            })
+    });
+    if !shade_consumed || shade_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Shade",
+            shade_count.max(shade_raw_count),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

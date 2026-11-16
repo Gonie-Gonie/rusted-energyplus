@@ -24,6 +24,7 @@ mod report;
 mod simple_glazing;
 mod type_group;
 mod window_gas;
+mod window_shade;
 pub(crate) use type_group::SourceMaterialGroup;
 
 pub(super) fn unavailable(message: &str) -> RuntimeError {
@@ -65,6 +66,8 @@ pub(crate) struct SelectedMaterialData {
     simple_glazing: BTreeMap<MaterialId, simple_glazing::SourceSimpleGlazingMaterial>,
     /// Actual named MaterialGasMix/base rows; typed gas properties are advisory.
     window_gas: BTreeMap<MaterialId, window_gas::SourceWindowGasMaterial>,
+    /// Actual MaterialShade rows; typed optical derivations remain advisory.
+    window_shade: BTreeMap<MaterialId, window_shade::SourceShadeMaterial>,
     pub(crate) num_no_masses: i32,
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
@@ -203,6 +206,47 @@ impl SelectedMaterialData {
         ))?;
         Ok((
             roughness,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    /// Read the same ordinary MaterialShade row by actual Source order and typed ID.
+    pub(crate) fn source_shade_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native Shade MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::Shade)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Shade Source order/group/physical identity",
+            ));
+        }
+        let row = self
+            .window_shade
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained Shade runtime row",
+            ))?;
+        if row.roughness != Some(MaterialSurfaceRoughness::MediumRough) {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Shade getter roughness",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::MediumRough,
             OpaqueSurfaceProperties {
                 thermal_absorptance: row.thermal_absorptance,
                 solar_absorptance: row.solar_absorptance,
@@ -521,7 +565,7 @@ impl SelectedMaterialData {
         self.get_named_window_gas_data(raw, o)?;
         empty!(num_eql_gaps, "WindowMaterial:Gap:EquivalentLayer");
         self.get_window_gas_mixture_data(raw, o)?;
-        empty!(num_shades, "WindowMaterial:Shade");
+        self.get_window_shade_data(raw, o)?;
         empty!(num_eql_shades, "WindowMaterial:Shade:EquivalentLayer");
         empty!(num_eql_drapes, "WindowMaterial:Drape:EquivalentLayer");
         empty!(num_screens, "WindowMaterial:Screen");

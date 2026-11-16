@@ -362,6 +362,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                     | "WindowMaterial:SimpleGlazingSystem"
                     | "WindowMaterial:Gas"
                     | "WindowMaterial:GasMixture"
+                    | "WindowMaterial:Shade"
                     | "ThermostatSetpoint:DualSetpoint"
                     | "ZoneHVAC:EquipmentConnections"
                     | "ZoneHVAC:EquipmentList"

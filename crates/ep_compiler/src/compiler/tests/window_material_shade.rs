@@ -300,6 +300,83 @@ fn shade_follows_gas_mixture_in_family_order_and_shares_the_name_registry()
         "Shared",
         None
     ));
+    // Source-only unused Shade declaration; all preceding Legacy assertions remain literal.
+    {
+        use super::super::compile_raw_model_for_source;
+        let positive = format!(
+            r#"{{"WindowMaterial:GasMixture":{{"MIX BEFORE":{{"thickness":0.01,"number_of_gases_in_mixture":1,
+                "gas_1_type":"Air","gas_1_fraction":1.0,"gas_2_type":"Argon","gas_2_fraction":0.5}}}},
+                "WindowMaterial:Shade":{{" SHADE EXACT ":{{{SHADE_FIELDS},
+                    "name":null,"idf_max_fields":false,"future_metadata":[null,true,{{"kept":1}}]}}}}}}"#
+        );
+        let source = compile_raw_model_for_source(&parse_epjson_str(&positive)?);
+        assert!(
+            !source.has_errors()
+                && source
+                    .model
+                    .as_ref()
+                    .is_some_and(|model| model.material_names.is_source_exact_namespace())
+        );
+        let model = source.model.as_ref().expect("actual Source Shade model");
+        let id = model
+            .material_names
+            .resolve(" SHADE EXACT ")
+            .expect("untrimmed Source name");
+        assert!(
+            model.material_names.resolve("SHADE EXACT").is_none()
+                && model.materials.iter().any(|row| row.id == id
+                    && row.name.0 == " SHADE EXACT "
+                    && matches!(row.definition, ep_model::MaterialDefinition::WindowShade(_)))
+                && model
+                    .ctf_report_names
+                    .materials
+                    .iter()
+                    .any(|(loader, name)| *loader == id && name == " SHADE EXACT ")
+        );
+        assert_eq!(
+            model
+                .materials
+                .iter()
+                .map(|row| row.kind())
+                .collect::<Vec<_>>(),
+            [MaterialKind::WindowGasMixture, MaterialKind::WindowShade]
+        );
+        let equality = r#"{"WindowMaterial:Shade":{"SUMS":{
+            "solar_transmittance":0.5,"solar_reflectance":0.5,
+            "visible_transmittance":0.5,"visible_reflectance":0.5,
+            "infrared_hemispherical_emissivity":0.75,"infrared_transmittance":0.25,
+            "thickness":0.002,"conductivity":0.2}}}"#;
+        let sum_raw = parse_epjson_str(equality)?;
+        let source_sums = compile_raw_model_for_source(&sum_raw);
+        let legacy_sums = compile_raw_model(&sum_raw);
+        assert!(
+            !source_sums.has_errors()
+                && legacy_sums.has_errors()
+                && legacy_sums
+                    .report
+                    .diagnostics
+                    .iter()
+                    .filter(|d| d.code == "InvalidWindowShadeOpticalSum")
+                    .count()
+                    == 3
+        );
+        let used = equality.replace(
+            "\"conductivity\":0.2}}}",
+            "\"conductivity\":0.2}},\"Construction\":{\"USED\":{\"outside_layer\":\"SUMS\"}}}",
+        );
+        let wrong_type = positive.replace("\"conductivity\":0.20", "\"conductivity\":\"0.20\"");
+        for declaration in [
+            r#"{"WindowMaterial:Shade":{"MISSING":{}}}"#.to_owned(),
+            wrong_type,
+            used,
+        ] {
+            let invalid = compile_raw_model_for_source(&parse_epjson_str(&declaration)?);
+            assert!(
+                invalid.has_errors(),
+                "independent original-schema/unused qualifier: {declaration}"
+            );
+        }
+    }
     Ok(())
 }
 

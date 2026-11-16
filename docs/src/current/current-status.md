@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 263 paired physical cases and 11,698,696 reported values with zero
+contains 264 paired physical cases and 11,773,816 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -60,6 +60,8 @@ Positive glazing spectral datasets and linked unused Spectral Glass have an addi
 Five unused analytic2D Curve getters have a bounded Source B direct-epJSON route: Biquadratic,QuadraticLinear,CubicLinear,Bicubic and FanPressureRise retain original field/name/number custody and one actual SelectedCurves owner through post-Setup Curve reporting and live Which references. No typed compiler Curve arena or evaluator is substituted. One fixed required52-number input preserves all782 parent numeric records and every inherited158-series/75120-value,whole-EIO/BND,136-event topology,clock and export criterion with no new request or series. The five-owner existing-body plan distinguishes dynamic registration/read/System output from static upstream-adapter/initializer coverage. This qualifies earlier positive-Curve holds only for these unused definitions; CurveValue,evaluation,active consumers/pressure,AFN/Duct/EMS,Table,other Curve types,Source A/IDF,Legacy changes and full-object completion remain held. Every legal field/value combination is not yet demonstrated; evaluator and active-consumer ownership are the next gaps.
 
 Unused SpectralAndAngle Glazing has a bounded Source B direct-epJSON lookup route through the same real SelectedCurves owner and ordinary MaterialGlass GroupGlass row. Three genuine ordinal references and the Native N2..N8 skip, ordered diagnostics and BACK-reads-FRONT bounds are retained without a Curve evaluator or typed Curve arena. The fixed unused Glass/Biquadratic scene adds11 Float operands over834 held parent records with no new request or series; all inherited158/75120, full current MaterialDetails EIO, BND topology, clocks and exports remain mandatory. Four existing bodies with authored41 assertions,8 loops and4 runtime contexts provide bounded owner/lookup evidence only after actual reviewed QA and paired acceptance. Every active Construction/window consumer, CurveValue/Table/evaluation, Source A/IDF, Legacy change, private Native pointer/optics and full-object completion remain held.
+
+Unused WindowMaterial:Shade has a bounded Source B direct-epJSON route through the genuine ordered Shade constructor/getter and public material report. All14 numeric fields retain original schema, signed-effective number, default/blank/used and total Raw/IP/name/typed-ID/loader custody; scratch field names use the original JSON keys. ROnly, constructor state, conductivity-dependent NominalR and ordered diagnostic IO remain owner state. One unused Shade adds14 Float operands over845 held parent records, without a new request or series; all158-series/75120-value, whole-current MaterialDetails EIO, BND136-event topology, clock and export criteria stay mandatory. Four existing bodies provide authored42 assertion sites,5 for loops and4 runtime owners; those counts are static coverage, not a QA or paired-result claim. Every active Construction/window/shading consumer, Source A/IDF, Legacy change, private Native state and full-object/every-valid-combination completion remains held.
 
 Direct Source epJSON retains the first comparator-equivalent member spelling
 and last whole subtree, checked by two Native convert-only observations and
@@ -141,8 +143,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 181 recorded Source builds,
-159 with accepted pairs and 22 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 182 recorded Source builds,
+160 with accepted pairs and 22 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -222,7 +224,7 @@ A separate passive diagnostic aligns all5,573 API-visible prediction frames by f
 
 The bounded Source no-outdoor-air owners retain heating-constant/cooling-capacity coupling and now implement constant sensible heat ratio (SHR) cooling. Eligibility permits named or omitted-default SHR (.7) with heating humidity explicitly None or ConstantSupplyHumidityRatio through the four cooling limit selectors, retaining all active numeric, topology, schedule and Legacy guards. Six prospectively frozen cases completed once under Source141; 6 meet every original numeric, export, clock, ancillary and science check plus their applicable public response witness. Qualifying cases: HEAT_CONST_COOL_NONE_CAPACITY_COUPLING, HEAT_CONST_COOL_NONE_FLOW_CAPACITY, HEAT_CONST_COOL_CONST_CAPACITY, HEAT_CONST_COOL_CONST_FLOW_CAPACITY, SHR_OMITTED_DEFAULTS_NO_LIMIT, SHR_NAMED_HEAT_CONST_FLOW_CAPACITY. The four prescribed heating-constant capacity/combined scenes include one designated Winter simultaneous heating/dehumidification witness; the two SHR scenes have their own Summer sensible/latent cooling witnesses. Those finite public interval responses imply no exact-quarter capacity, global SHR/humidity or private-mode law. Exact-empty humidity selectors now use the bounded Source B non-Humidistat NoOA/basic positive-OA paths described above; omitted defaults remain distinct. The four Source139 comparisons from Unit137 remain unaccepted. Broader HVAC Humidistat and OA/DCV/economizer/recovery compositions, sizing, remaining combinations and full-object conformance remain open.
 
-91 bounded Source B Scheduled/NodeList pairs retain 6,738,000 values. The unused Source A pair adds59,520, giving 92 pairs and 6,797,520 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.
+92 bounded Source B Scheduled/NodeList pairs retain 6,813,120 values. The unused Source A pair adds59,520, giving 93 pairs and 6,872,640 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.
 
 All three Zone air solution algorithms now reach bounded Source A/B consumers
 with Space heat balance disabled. Four one-Zone Euler and Analytical cases

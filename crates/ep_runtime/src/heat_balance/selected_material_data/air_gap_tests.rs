@@ -79,6 +79,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         spectral_data: Vec::new(),
         window_gas: Vec::new(),
         window_gas_mixture: Vec::new(),
+        window_shade: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -3213,6 +3214,444 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             5
         );
     }
+    // One new Shade owner: defaults, optional reset, signed-K fallback and same-row reports.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        model.materials.push(Material {
+            id: MaterialId(3),
+            name: NormalizedName::new("M BEFORE"),
+            definition: MaterialDefinition::WindowGasMixture(ep_model::WindowGasMixtureMaterial {
+                thickness_m: 0.01,
+                gases: ep_model::WindowGasMixture::One([ep_model::WindowGasMixtureComponent {
+                    gas_type: ep_model::WindowStandardGasType::Air,
+                    fraction: 1.0,
+                }]),
+            }),
+        });
+        model
+            .ctf_report_names
+            .materials
+            .push((MaterialId(3), "M BEFORE".into()));
+        raw.window_gas_mixture.push(ProjectInputObject {
+            object_name: "M BEFORE".into(),
+            idf_max_fields: None,
+            fields: BTreeMap::from([
+                ("thickness".into(), Value::Number(0.01)),
+                ("number_of_gases_in_mixture".into(), Value::Number(1.0)),
+                ("gas_1_type".into(), Value::String("Air".into())),
+                ("gas_1_fraction".into(), Value::Number(1.0)),
+                ("gas_2_type".into(), Value::String("Argon".into())),
+                ("gas_2_fraction".into(), Value::Number(0.5)),
+            ]),
+        });
+        let wrapped_k = ep_model::classify_source_json_number(&u64::MAX.to_string())
+            .unwrap()
+            .as_f64();
+        model.materials.extend([
+            Material {
+                id: MaterialId(4),
+                name: NormalizedName::new("A SHADE DEFAULT"),
+                definition: MaterialDefinition::WindowShade(ep_model::WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance: 0.15,
+                    solar_reflectance: 0.35,
+                    visible_transmittance: 0.10,
+                    visible_reflectance: 0.40,
+                    infrared_hemispherical_emissivity: 0.80,
+                    infrared_transmittance: 0.10,
+                    thickness_m: 0.002,
+                    conductivity_w_per_m_k: 0.2,
+                    solar_absorptance: 0.5,
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m: 0.05,
+                    top_opening_multiplier: 0.5,
+                    bottom_opening_multiplier: 0.5,
+                    left_side_opening_multiplier: 0.5,
+                    right_side_opening_multiplier: 0.5,
+                    airflow_permeability: 0.0,
+                }),
+            },
+            Material {
+                id: MaterialId(5),
+                name: NormalizedName::new("B SHADE OPTIONAL"),
+                definition: MaterialDefinition::WindowShade(ep_model::WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance: 0.15,
+                    solar_reflectance: 0.35,
+                    visible_transmittance: 0.10,
+                    visible_reflectance: 0.40,
+                    infrared_hemispherical_emissivity: 0.80,
+                    infrared_transmittance: 0.10,
+                    thickness_m: 0.004,
+                    conductivity_w_per_m_k: 0.25,
+                    solar_absorptance: 0.5,
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m: 0.001,
+                    top_opening_multiplier: 0.0,
+                    bottom_opening_multiplier: 1.0,
+                    left_side_opening_multiplier: 0.25,
+                    right_side_opening_multiplier: 0.75,
+                    airflow_permeability: 0.8,
+                }),
+            },
+            Material {
+                id: MaterialId(6),
+                name: NormalizedName::new("C SHADE WRAPPED"),
+                definition: MaterialDefinition::WindowShade(ep_model::WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance: 0.15,
+                    solar_reflectance: 0.35,
+                    visible_transmittance: 0.10,
+                    visible_reflectance: 0.40,
+                    infrared_hemispherical_emissivity: 0.80,
+                    infrared_transmittance: 0.10,
+                    thickness_m: 0.002,
+                    conductivity_w_per_m_k: u64::MAX as f64,
+                    solar_absorptance: 0.5,
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m: 0.05,
+                    top_opening_multiplier: 0.5,
+                    bottom_opening_multiplier: 0.5,
+                    left_side_opening_multiplier: 0.5,
+                    right_side_opening_multiplier: 0.5,
+                    airflow_permeability: 0.0,
+                }),
+            },
+        ]);
+        model.ctf_report_names.materials.extend([
+            (MaterialId(4), "A SHADE DEFAULT".into()),
+            (MaterialId(5), "B SHADE OPTIONAL".into()),
+            (MaterialId(6), "C SHADE WRAPPED".into()),
+        ]);
+        raw.window_shade = vec![
+            ProjectInputObject {
+                object_name: "A SHADE DEFAULT".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("solar_transmittance".into(), Value::Number(0.15)),
+                    ("solar_reflectance".into(), Value::Number(0.35)),
+                    ("visible_transmittance".into(), Value::Number(0.10)),
+                    ("visible_reflectance".into(), Value::Number(0.40)),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.80),
+                    ),
+                    ("infrared_transmittance".into(), Value::Number(0.10)),
+                    ("thickness".into(), Value::Number(0.002)),
+                    ("conductivity".into(), Value::Number(0.2)),
+                ]),
+            },
+            ProjectInputObject {
+                object_name: "B SHADE OPTIONAL".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("solar_transmittance".into(), Value::Number(0.15)),
+                    ("solar_reflectance".into(), Value::Number(0.35)),
+                    ("visible_transmittance".into(), Value::Number(0.10)),
+                    ("visible_reflectance".into(), Value::Number(0.40)),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.80),
+                    ),
+                    ("infrared_transmittance".into(), Value::Number(0.10)),
+                    ("thickness".into(), Value::Number(0.004)),
+                    ("conductivity".into(), Value::Number(0.25)),
+                    ("shade_to_glass_distance".into(), Value::Number(0.001)),
+                    ("top_opening_multiplier".into(), Value::Number(0.0)),
+                    ("bottom_opening_multiplier".into(), Value::Number(1.0)),
+                    ("left_side_opening_multiplier".into(), Value::Number(0.25)),
+                    ("right_side_opening_multiplier".into(), Value::Number(0.75)),
+                    ("airflow_permeability".into(), Value::Number(0.8)),
+                ]),
+            },
+            ProjectInputObject {
+                object_name: "C SHADE WRAPPED".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("solar_transmittance".into(), Value::Number(0.15)),
+                    ("solar_reflectance".into(), Value::Number(0.35)),
+                    ("visible_transmittance".into(), Value::Number(0.10)),
+                    ("visible_reflectance".into(), Value::Number(0.40)),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.80),
+                    ),
+                    ("infrared_transmittance".into(), Value::Number(0.10)),
+                    ("thickness".into(), Value::Number(0.002)),
+                    ("conductivity".into(), Value::Number(wrapped_k)),
+                ]),
+            },
+        ];
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:GasMixture", &raw.window_gas_mixture, 5, 6),
+            ("WindowMaterial:Shade", &raw.window_shade, 1, 14),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        objects
+            .get_mut("WindowMaterial:Shade")
+            .unwrap()
+            .get_mut("C SHADE WRAPPED")
+            .unwrap()
+            .insert("conductivity".into(), S::Number(u64::MAX.to_string()));
+        objects
+            .get_mut("WindowMaterial:GasMixture")
+            .unwrap()
+            .get_mut("M BEFORE")
+            .unwrap()
+            .insert("number_of_gases_in_mixture".into(), S::Number("1".into()));
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(result.is_ok() && !errors_found && text.is_empty());
+        assert_eq!(
+            (
+                data.num_shades,
+                data.materials[3..].to_vec(),
+                data.material_map["M BEFORE"],
+                data.material_map["A SHADE DEFAULT"]
+            ),
+            (
+                3,
+                vec![MaterialId(3), MaterialId(4), MaterialId(5), MaterialId(6)],
+                4,
+                5
+            )
+        );
+        assert!(
+            [MaterialId(4), MaterialId(5), MaterialId(6)]
+                .iter()
+                .all(|id| data.material_groups[id] == SourceMaterialGroup::Shade
+                    && data.resistance_only[id])
+        );
+        let a = &data.window_shade[&MaterialId(4)];
+        let b = &data.window_shade[&MaterialId(5)];
+        let c = &data.window_shade[&MaterialId(6)];
+        assert_eq!(
+            (
+                [
+                    a.to_glass_distance,
+                    a.top_opening,
+                    a.bottom_opening,
+                    a.left_opening,
+                    a.right_opening,
+                    a.airflow_permeability
+                ],
+                [
+                    c.to_glass_distance,
+                    c.top_opening,
+                    c.bottom_opening,
+                    c.left_opening,
+                    c.right_opening,
+                    c.airflow_permeability
+                ]
+            ),
+            (
+                [0.05, 0.5, 0.5, 0.5, 0.5, 0.0],
+                [0.05, 0.5, 0.5, 0.5, 0.5, 0.0]
+            )
+        );
+        assert_eq!(
+            [
+                b.transmittance,
+                b.reflectance,
+                b.visible_transmittance,
+                b.visible_reflectance,
+                b.thermal_absorptance,
+                b.infrared_transmittance,
+                b.thickness,
+                b.conductivity,
+                b.to_glass_distance,
+                b.top_opening,
+                b.bottom_opening,
+                b.left_opening,
+                b.right_opening,
+                b.airflow_permeability
+            ],
+            [
+                0.15, 0.35, 0.10, 0.40, 0.80, 0.10, 0.004, 0.25, 0.001, 0.0, 1.0, 0.25, 0.75, 0.8
+            ]
+        );
+        assert!(
+            data.window_shade.values().all(|row| row.resistance == 0.0
+                && row.density == 0.0
+                && row.specific_heat == 0.0
+                && row.visible_absorptance == 0.0
+                && row.thermal_absorptance_input == 0.8
+                && row.solar_absorptance_input == 0.5)
+                && c.conductivity == -1.0
+                && c.solar_absorptance == 0.5
+        );
+        assert_eq!(&data.nominal_r[4..], &[0.01, 0.016, 1.0]);
+        let surface = data
+            .source_shade_surface_properties(5, MaterialId(4))
+            .unwrap();
+        assert!(
+            surface
+                == (
+                    MaterialSurfaceRoughness::MediumRough,
+                    OpaqueSurfaceProperties {
+                        thermal_absorptance: 0.8,
+                        solar_absorptance: 0.5,
+                        visible_absorptance: 0.0,
+                    }
+                )
+                && data
+                    .source_shade_surface_properties(5, MaterialId(3))
+                    .is_err()
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let details = std::str::from_utf8(&eio).unwrap();
+        let rows = details
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,") && line.contains("SHADE"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert!(
+            rows.len() == 3
+                && rows.iter().all(|row| row.len() == 11
+                    && row[2] == "0.0000"
+                    && row[3] == "MediumRough"
+                    && row[6] == "0.000"
+                    && row[7] == "0.000"
+                    && row[10] == "0.0000")
+        );
+        assert!(
+            ["A SHADE DEFAULT", "B SHADE OPTIONAL", "C SHADE WRAPPED"]
+                .iter()
+                .all(|name| !input.is_object_unused("WindowMaterial:Shade", name))
+                && shortcut.numeric_field_blanks[..14]
+                    == [
+                        false, false, false, false, false, false, false, false, true, true, true,
+                        true, true, true
+                    ]
+                && shortcut.numeric_field_names[8] == "shade_to_glass_distance"
+                && shortcut.alpha_field_names[0] == "name"
+        );
+    }
 }
 
 #[test]
@@ -6178,5 +6617,709 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 .all(|v| v.to_bits() == 0)
                 && curves.get_curve("BAD").unwrap().output.to_bits() == 0
         );
+    }
+    // Three additional Shade owners: complete diagnostics, first-sum IO, duplicate IO.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        model.materials.extend([
+            Material {
+                id: MaterialId(3),
+                name: NormalizedName::new("A SHADE SUMS"),
+                definition: MaterialDefinition::WindowShade(ep_model::WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance: 0.5,
+                    solar_reflectance: 0.5,
+                    visible_transmittance: 0.5,
+                    visible_reflectance: 0.5,
+                    infrared_hemispherical_emissivity: 0.75,
+                    infrared_transmittance: 0.25,
+                    thickness_m: 0.002,
+                    conductivity_w_per_m_k: 0.2,
+                    solar_absorptance: 0.0,
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m: 0.05,
+                    top_opening_multiplier: 0.5,
+                    bottom_opening_multiplier: 0.5,
+                    left_side_opening_multiplier: 0.5,
+                    right_side_opening_multiplier: 0.5,
+                    airflow_permeability: 0.0,
+                }),
+            },
+            Material {
+                id: MaterialId(4),
+                name: NormalizedName::new("B SHADE FOLLOWING"),
+                definition: MaterialDefinition::WindowShade(ep_model::WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance: 0.15,
+                    solar_reflectance: 0.35,
+                    visible_transmittance: 0.10,
+                    visible_reflectance: 0.40,
+                    infrared_hemispherical_emissivity: 0.80,
+                    infrared_transmittance: 0.10,
+                    thickness_m: 0.004,
+                    conductivity_w_per_m_k: 0.25,
+                    solar_absorptance: 0.5,
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m: 0.05,
+                    top_opening_multiplier: 0.5,
+                    bottom_opening_multiplier: 0.5,
+                    left_side_opening_multiplier: 0.5,
+                    right_side_opening_multiplier: 0.5,
+                    airflow_permeability: 0.0,
+                }),
+            },
+        ]);
+        model.ctf_report_names.materials.extend([
+            (MaterialId(3), "A SHADE SUMS".into()),
+            (MaterialId(4), "B SHADE FOLLOWING".into()),
+        ]);
+        raw.window_shade = vec![
+            ProjectInputObject {
+                object_name: "A SHADE SUMS".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("solar_transmittance".into(), Value::Number(0.5)),
+                    ("solar_reflectance".into(), Value::Number(0.5)),
+                    ("visible_transmittance".into(), Value::Number(0.5)),
+                    ("visible_reflectance".into(), Value::Number(0.5)),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.75),
+                    ),
+                    ("infrared_transmittance".into(), Value::Number(0.25)),
+                    ("thickness".into(), Value::Number(0.002)),
+                    ("conductivity".into(), Value::Number(0.2)),
+                ]),
+            },
+            ProjectInputObject {
+                object_name: "B SHADE FOLLOWING".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("solar_transmittance".into(), Value::Number(0.15)),
+                    ("solar_reflectance".into(), Value::Number(0.35)),
+                    ("visible_transmittance".into(), Value::Number(0.10)),
+                    ("visible_reflectance".into(), Value::Number(0.40)),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.80),
+                    ),
+                    ("infrared_transmittance".into(), Value::Number(0.10)),
+                    ("thickness".into(), Value::Number(0.004)),
+                    ("conductivity".into(), Value::Number(0.25)),
+                ]),
+            },
+        ];
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Shade", &raw.window_shade, 1, 14),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(
+            result.is_ok() && errors_found && data.num_shades == 2 && data.window_shade.len() == 2
+        );
+        let bad = &data.window_shade[&MaterialId(3)];
+        assert_eq!(
+            [
+                bad.transmittance,
+                bad.reflectance,
+                bad.visible_transmittance,
+                bad.visible_reflectance,
+                bad.thermal_absorptance,
+                bad.infrared_transmittance,
+                bad.thickness,
+                bad.conductivity,
+                bad.to_glass_distance,
+                bad.top_opening,
+                bad.bottom_opening,
+                bad.left_opening,
+                bad.right_opening,
+                bad.airflow_permeability,
+                bad.thermal_absorptance_input,
+                bad.solar_absorptance,
+                bad.solar_absorptance_input,
+                bad.visible_absorptance,
+                bad.resistance
+            ],
+            [
+                0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.002, 0.2, 0.05, 0.5, 0.5, 0.5, 0.5, 0.0, 0.75,
+                0.0, 0.0, 0.0, 0.0
+            ]
+        );
+        assert!(
+            data.nominal_r[3..] == [0.01, 0.016]
+                && data.resistance_only[&MaterialId(3)]
+                && data.window_shade[&MaterialId(4)].conductivity == 0.25
+                && !input.is_object_unused("WindowMaterial:Shade", "B SHADE FOLLOWING")
+        );
+        let reached = std::str::from_utf8(&text).unwrap();
+        assert!(
+            state.tracking.total_severe_errors == 3
+                && reached
+                    .matches("WindowMaterial:Shade=\"A SHADE SUMS\", Illegal value combination.")
+                    .count()
+                    == 3
+        );
+        let mut previous = None;
+        for label in [
+            "solar_transmittance + solar_reflectance not < 1.0",
+            "visible_transmittance + visible_reflectance not < 1.0",
+            "infrared_hemispherical_emissivity + infrared_transmittance not < 1.0",
+        ] {
+            let position = reached.find(label);
+            assert!(
+                position.is_some()
+                    && previous
+                        .zip(position)
+                        .is_none_or(|(before, after)| before < after)
+            );
+            previous = position;
+        }
+    }
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        model.materials.extend([
+            Material {
+                id: MaterialId(3),
+                name: NormalizedName::new("A SHADE FIRST IO"),
+                definition: MaterialDefinition::WindowShade(ep_model::WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance: 0.5,
+                    solar_reflectance: 0.5,
+                    visible_transmittance: 0.5,
+                    visible_reflectance: 0.5,
+                    infrared_hemispherical_emissivity: 0.75,
+                    infrared_transmittance: 0.25,
+                    thickness_m: 0.002,
+                    conductivity_w_per_m_k: 0.2,
+                    solar_absorptance: 0.0,
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m: 0.05,
+                    top_opening_multiplier: 0.5,
+                    bottom_opening_multiplier: 0.5,
+                    left_side_opening_multiplier: 0.5,
+                    right_side_opening_multiplier: 0.5,
+                    airflow_permeability: 0.0,
+                }),
+            },
+            Material {
+                id: MaterialId(4),
+                name: NormalizedName::new("B SHADE UNREACHED"),
+                definition: MaterialDefinition::WindowShade(ep_model::WindowShadeMaterial {
+                    roughness: MaterialSurfaceRoughness::MediumRough,
+                    solar_transmittance: 0.15,
+                    solar_reflectance: 0.35,
+                    visible_transmittance: 0.10,
+                    visible_reflectance: 0.40,
+                    infrared_hemispherical_emissivity: 0.80,
+                    infrared_transmittance: 0.10,
+                    thickness_m: 0.002,
+                    conductivity_w_per_m_k: 0.2,
+                    solar_absorptance: 0.5,
+                    visible_absorptance: 0.0,
+                    shade_to_glass_distance_m: 0.05,
+                    top_opening_multiplier: 0.5,
+                    bottom_opening_multiplier: 0.5,
+                    left_side_opening_multiplier: 0.5,
+                    right_side_opening_multiplier: 0.5,
+                    airflow_permeability: 0.0,
+                }),
+            },
+        ]);
+        model.ctf_report_names.materials.extend([
+            (MaterialId(3), "A SHADE FIRST IO".into()),
+            (MaterialId(4), "B SHADE UNREACHED".into()),
+        ]);
+        raw.window_shade = vec![
+            ProjectInputObject {
+                object_name: "A SHADE FIRST IO".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("solar_transmittance".into(), Value::Number(0.5)),
+                    ("solar_reflectance".into(), Value::Number(0.5)),
+                    ("visible_transmittance".into(), Value::Number(0.5)),
+                    ("visible_reflectance".into(), Value::Number(0.5)),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.75),
+                    ),
+                    ("infrared_transmittance".into(), Value::Number(0.25)),
+                    ("thickness".into(), Value::Number(0.002)),
+                    ("conductivity".into(), Value::Number(0.2)),
+                ]),
+            },
+            ProjectInputObject {
+                object_name: "B SHADE UNREACHED".into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("solar_transmittance".into(), Value::Number(0.15)),
+                    ("solar_reflectance".into(), Value::Number(0.35)),
+                    ("visible_transmittance".into(), Value::Number(0.10)),
+                    ("visible_reflectance".into(), Value::Number(0.40)),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.80),
+                    ),
+                    ("infrared_transmittance".into(), Value::Number(0.10)),
+                    ("thickness".into(), Value::Number(0.002)),
+                    ("conductivity".into(), Value::Number(0.2)),
+                ]),
+            },
+        ];
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Shade", &raw.window_shade, 1, 14),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(result.is_err() && errors_found && data.num_shades == 2);
+        let bad = &data.window_shade[&MaterialId(3)];
+        assert_eq!(
+            [
+                bad.transmittance,
+                bad.reflectance,
+                bad.visible_transmittance,
+                bad.visible_reflectance,
+                bad.thermal_absorptance,
+                bad.infrared_transmittance,
+                bad.thickness,
+                bad.conductivity,
+                bad.to_glass_distance,
+                bad.top_opening,
+                bad.bottom_opening,
+                bad.left_opening,
+                bad.right_opening,
+                bad.airflow_permeability
+            ],
+            [
+                0.5, 0.5, 0.5, 0.5, 0.75, 0.25, 0.002, 0.2, 0.05, 0.5, 0.5, 0.5, 0.5, 0.0
+            ]
+        );
+        assert!(
+            data.window_shade.len() == 1
+                && data.materials.last() == Some(&MaterialId(3))
+                && data.resistance_only[&MaterialId(3)]
+                && data.nominal_r[3] == 0.01
+        );
+        assert!(
+            !input.is_object_unused("WindowMaterial:Shade", "A SHADE FIRST IO")
+                && input.is_object_unused("WindowMaterial:Shade", "B SHADE UNREACHED")
+                && shortcut.current_module_object == "WindowMaterial:Shade"
+        );
+        assert!(format!("{result:?}").contains("authored IRT diagnostic failure"));
+    }
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (model, mut raw) = fixture(true, 0.15);
+        raw.window_shade = vec![ProjectInputObject {
+            object_name: "MASS".into(),
+            idf_max_fields: None,
+            fields: BTreeMap::from([
+                ("solar_transmittance".into(), Value::Number(0.15)),
+                ("solar_reflectance".into(), Value::Number(0.35)),
+                ("visible_transmittance".into(), Value::Number(0.10)),
+                ("visible_reflectance".into(), Value::Number(0.40)),
+                (
+                    "infrared_hemispherical_emissivity".into(),
+                    Value::Number(0.80),
+                ),
+                ("infrared_transmittance".into(), Value::Number(0.10)),
+                ("thickness".into(), Value::Number(0.002)),
+                ("conductivity".into(), Value::Number(0.2)),
+            ]),
+        }];
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Shade", &raw.window_shade, 1, 14),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(result.is_err() && !errors_found && data.num_shades == 1);
+        assert!(
+            data.materials == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.material_map["MASS"] == 1
+                && data.window_shade.is_empty()
+        );
+        assert_eq!(data.nominal_r, [0.05, 0.2, 0.15]);
+        assert!(
+            !input.is_object_unused("WindowMaterial:Shade", "MASS")
+                && shortcut.alpha_args[0] == "MASS"
+                && shortcut.numeric_args[7] == 0.2
+        );
+        assert!(format!("{result:?}").contains("authored IRT diagnostic failure"));
     }
 }

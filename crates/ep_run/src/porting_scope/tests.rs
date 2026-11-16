@@ -9604,6 +9604,376 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 .is_err()
             );
         }
+        // Unused Shade follows the same real DSOA/Ideal/OA SourceB route.
+        // Raw/IP retain unknown members; only the fourteen getter operands project.
+        {
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            let mut shade_value = curve_value.clone();
+            shade_value["WindowMaterial:Shade"] = json!({
+                " A SHADE ": {
+                    "solar_transmittance":0.15,"solar_reflectance":0.35,
+                    "visible_transmittance":0.1,"visible_reflectance":0.4,
+                    "infrared_hemispherical_emissivity":0.8,"infrared_transmittance":0.1,
+                    "thickness":0.002,"conductivity":0.2,
+                    "name":false,"idf_order":[],"metadata":null
+                },
+                " B SHADE ": {
+                    "solar_transmittance":0.15,"solar_reflectance":0.35,
+                    "visible_transmittance":0.1,"visible_reflectance":0.4,
+                    "infrared_hemispherical_emissivity":0.8,"infrared_transmittance":0.1,
+                    "thickness":0.004,"conductivity":u64::MAX,
+                    "shade_to_glass_distance":0.001,"top_opening_multiplier":0.0,
+                    "bottom_opening_multiplier":1.0,"left_side_opening_multiplier":0.25,
+                    "right_side_opening_multiplier":0.75,"airflow_permeability":0.8,
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},
+                    "idf_max_extensible_fields":null,"extra_string":"unconsumed",
+                    "metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}
+                }
+            });
+            let shade_raw =
+                ep_raw_model::parse_epjson_str_for_source(&shade_value.to_string()).unwrap();
+            let shade_compiled = ep_compiler::compile_raw_model_for_source(&shade_raw);
+            assert!(
+                !shade_compiled.has_errors(),
+                "{:?}",
+                shade_compiled.report.diagnostics
+            );
+            let shade_model = shade_compiled.model.as_ref().unwrap();
+            let shade_a = shade_model.material_names.resolve(" A SHADE ").unwrap();
+            let shade_b = shade_model.material_names.resolve(" B SHADE ").unwrap();
+            assert!(
+                shade_a != shade_b
+                    && shade_model.material_names.is_source_exact_namespace()
+                    && shade_model.material_names.resolve("A SHADE").is_none()
+                    && shade_model
+                        .materials
+                        .iter()
+                        .filter(|row| row.kind() == ep_model::MaterialKind::WindowShade)
+                        .count()
+                        == 2
+                    && shade_model.materials.iter().any(|row| row.id == shade_a
+                        && row.name.0 == " A SHADE "
+                        && matches!(row.definition, ep_model::MaterialDefinition::WindowShade(_)))
+                    && shade_model.materials.iter().any(|row| row.id == shade_b
+                        && row.name.0 == " B SHADE "
+                        && matches!(row.definition, ep_model::MaterialDefinition::WindowShade(_)))
+                    && shade_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(shade_a, " A SHADE ".into()))
+                    && shade_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(shade_b, " B SHADE ".into()))
+            );
+            let mut shade_ip =
+                crate::ordinary_input_processor::resolve_source_b(&shade_raw).unwrap();
+            let shade_args = shade_ip
+                .get_object_def_max_args("WindowMaterial:Shade")
+                .unwrap();
+            let mut shade_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            shade_ip
+                .report_source_idf_records_stats(&mut shade_stats)
+                .unwrap();
+            assert!(
+                (
+                    shade_args.alphas,
+                    shade_args.numerics,
+                    shade_args.total().unwrap()
+                ) == (1, 14, 15)
+                    && shade_ip.get_num_objects_found("WindowMaterial:Shade") == 2
+                    && shade_ip
+                        .source_raw_object_names("WindowMaterial:Shade")
+                        .unwrap()
+                        .iter()
+                        .map(String::as_str)
+                        .eq([" A SHADE ", " B SHADE "])
+                    && shade_ip.is_object_unused("WindowMaterial:Shade", " A SHADE ")
+                    && shade_ip.is_object_unused("WindowMaterial:Shade", " B SHADE ")
+                    && usize::try_from(shade_stats.number_input_records).unwrap()
+                        == shade_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let shade_original = shade_ip
+                .source_raw_object_fields("WindowMaterial:Shade", " B SHADE ")
+                .unwrap();
+            let shade_raw_fields = &shade_raw.objects
+                [&ep_raw_model::ObjectType("WindowMaterial:Shade".into())]
+                [&ep_raw_model::ObjectName(" B SHADE ".into())]
+                .fields;
+            assert!(
+                matches!(shade_raw_fields.get(&ep_raw_model::FieldName("conductivity".into())),
+                    Some(ep_raw_model::RawValue::Number(token)) if token == "18446744073709551615")
+                    && matches!(shade_original.get("conductivity"),
+                        Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(
+                        ep_model::classify_source_json_number("18446744073709551615"),
+                        Ok(ep_model::SourceJsonNumber::Integer(-1))
+                    )
+                    && matches!(shade_original.get("name"), Some(S::Bool(false)))
+                    && matches!(shade_original.get("idf_order"), Some(S::Number(token))
+                        if token == "18446744073709551615")
+                    && matches!(shade_original.get("idf_max_fields"), Some(S::Object(_)))
+                    && matches!(
+                        shade_original.get("idf_max_extensible_fields"),
+                        Some(S::Null)
+                    )
+                    && matches!(shade_original.get("extra_string"), Some(S::String(value))
+                        if value == "unconsumed")
+                    && matches!(shade_original.get("metadata"), Some(S::Object(fields))
+                        if matches!(fields.get("retained"), Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let shade_projection =
+                crate::ordinary_material_input::resolve_source(&shade_raw, &shade_ip).unwrap();
+            assert!(
+                shade_projection.window_shade.len() == 2
+                    && shade_projection.window_shade[0].object_name == " A SHADE "
+                    && shade_projection.window_shade[0].fields.len() == 8
+                    && shade_projection.window_shade[1].object_name == " B SHADE "
+                    && shade_projection.window_shade[1].fields.len() == 14
+                    && shade_projection
+                        .window_shade
+                        .iter()
+                        .all(|row| row.idf_max_fields.is_none()
+                            && row.fields.keys().all(|field| {
+                                crate::ordinary_equipment_input::source_b_shade_known_field(field)
+                            }))
+                    && matches!(shade_projection.window_shade[1].fields.get("conductivity"),
+                        Some(P::Number(value)) if value.to_bits() == (-1.0_f64).to_bits())
+            );
+            let mut shade_trace = inspect_porting_scope(
+                &shade_raw,
+                &shade_compiled.report,
+                Some(shade_model),
+                PortingScope::B,
+            );
+            assert!(shade_trace.admissible, "{:?}", shade_trace.violations);
+            shade_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    shade_model,
+                    &weather,
+                    "same Shade Source weather",
+                )
+                .unwrap(),
+            );
+            let shade_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &shade_raw,
+                &shade_trace,
+            )
+            .unwrap();
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &shade_raw,
+                    &shade_compiled.report,
+                    Some(shade_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&shade_admission),
+                )
+                .allows_rust_runtime()
+            );
+            let shade_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                &json!({
+                    "Zone":{"Zone":{}},
+                    "WindowMaterial:Shade":{"IDF SHADE":{
+                        "solar_transmittance":0.15,"solar_reflectance":0.35,
+                        "visible_transmittance":0.1,"visible_reflectance":0.4,
+                        "infrared_hemispherical_emissivity":0.8,"infrared_transmittance":0.1,
+                        "thickness":0.002,"conductivity":0.2
+                    }}
+                })
+                .to_string(),
+                "Zone,Zone;WindowMaterial:Shade,IDF SHADE,0.15,0.35,0.1,0.4,0.8,0.1,0.002,0.2;",
+            )
+            .unwrap();
+            let mut controlled_shade = shade_value.clone();
+            controlled_shade["WindowShadingControl"] = json!({"SHADE CONTROL":{
+                "shading_type":"InteriorShade","shading_device_material_name":" A SHADE "
+            }});
+            assert!(
+                !crate::support::assess_support_with_source_admission(
+                    &shade_raw,
+                    &shade_compiled.report,
+                    Some(shade_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    None,
+                )
+                .allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&shade_raw).is_err()
+                    && crate::ordinary_equipment_input::resolve(&shade_raw).is_err()
+                    && !shade_idf.is_epjson()
+                    && crate::ordinary_equipment_input::resolve_source_b(&shade_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&controlled_shade.to_string())
+                            .unwrap(),
+                    )
+                    .is_err()
+            );
+            for field in [
+                "solar_transmittance",
+                "solar_reflectance",
+                "visible_transmittance",
+                "visible_reflectance",
+                "infrared_hemispherical_emissivity",
+                "infrared_transmittance",
+                "thickness",
+                "conductivity",
+                "shade_to_glass_distance",
+                "top_opening_multiplier",
+                "bottom_opening_multiplier",
+                "left_side_opening_multiplier",
+                "right_side_opening_multiplier",
+                "airflow_permeability",
+            ] {
+                let mut bad_value = shade_value.clone();
+                bad_value["WindowMaterial:Shade"][" B SHADE "][field] = json!(false);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string()).unwrap(),
+                    )
+                    .is_err(),
+                    "wrong JSON kind for {field}"
+                );
+            }
+            let shade_position = shade_model
+                .materials
+                .iter()
+                .position(|row| row.id == shade_a)
+                .unwrap();
+            let opaque_material = shade_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowShade)
+                .unwrap();
+            for case in 0..12 {
+                let mut bad_model = shade_model.clone();
+                match case {
+                    0 => bad_model
+                        .materials
+                        .retain(|row| row.kind() != ep_model::MaterialKind::WindowShade),
+                    1 => {
+                        let mut extra = bad_model.materials[shade_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA SHADE".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[shade_position].id = opaque_material.id,
+                    3 => {
+                        bad_model.materials[shade_position].definition = opaque_material.definition
+                    }
+                    4 => {
+                        bad_model.materials[shade_position].name =
+                            ep_model::NormalizedName("WRONG SHADE".into())
+                    }
+                    5 => bad_model.materials[shade_position].id = ep_model::MaterialId(u32::MAX),
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != shade_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((shade_a, " A SHADE ".into())),
+                    8 => {
+                        let _ = bad_model
+                            .material_names
+                            .insert(" EXTRA SHADE ALIAS ", shade_a);
+                    }
+                    9 => {
+                        // Break name-to-ID association, not a valid arena/tuple permutation.
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == shade_a)
+                            .unwrap()
+                            .1 = " B SHADE ".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == shade_b)
+                            .unwrap()
+                            .1 = " A SHADE ".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => bad_model
+                        .material_names
+                        .insert_instance(" A SHADE ", shade_a),
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &shade_raw,
+                        &shade_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&shade_admission),
+                    )
+                    .allows_rust_runtime(),
+                    "Shade custody case {case}"
+                );
+            }
+            let mut used_shade_value = shade_value.clone();
+            used_shade_value["Construction"]["SHADE USED"] =
+                json!({"outside_layer":"Opaque","layer_2":" A SHADE "});
+            assert!(
+                crate::ordinary_equipment_input::resolve_source_b(
+                    &ep_raw_model::parse_epjson_str_for_source(&used_shade_value.to_string())
+                        .unwrap(),
+                )
+                .is_err()
+            );
+            let shade_construction = shade_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .unwrap();
+            for case in 0..3 {
+                let mut used_model = shade_model.clone();
+                let construction = &mut used_model.constructions[shade_construction];
+                match case {
+                    // These two keep the real opaque outside layer and use a nonfirst Shade.
+                    0 => construction.layers.push(shade_a),
+                    1 => construction.layers.push(shade_b),
+                    // Empty layers exercise the real outside-only effective_layers fallback.
+                    _ => {
+                        construction.layers.clear();
+                        construction.outside_layer = Some(shade_a);
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &shade_raw,
+                        &shade_compiled.report,
+                        Some(&used_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&shade_admission),
+                    )
+                    .allows_rust_runtime(),
+                    "active Shade layer case {case}"
+                );
+            }
+        }
     }
 }
 

@@ -477,6 +477,7 @@ impl GainFactory {
             spectral_data: Vec::new(),
             window_gas: Vec::new(),
             window_gas_mixture: Vec::new(),
+            window_shade: Vec::new(),
             regular: project_objects(factory, &["Material"])?
                 .remove("Material")
                 .unwrap_or_default(),

@@ -39,6 +39,8 @@ pub(crate) struct SourceSupportAdmission {
     angle_glazing_bindings: BTreeSet<String>,
     /// Ordered effective dataset names,including duplicate uppercase names.
     spectral_data_bindings: Vec<String>,
+    /// Validated unused Shade names only; runtime properties come from its getter.
+    shade_bindings: BTreeSet<String>,
     /// Validated alternative Glass names only, never advisory optical values.
     refraction_bindings: BTreeSet<String>,
     /// Validated Raw uppercase loader names/types only, never material properties.
@@ -304,6 +306,25 @@ impl SourceSupportAdmission {
                 covered_objects.insert("MaterialProperty:GlazingSpectralData");
             }
         }
+        let mut shade_bindings = BTreeSet::new();
+        if trace.scope == PortingScope::B
+            && raw
+                .objects
+                .get(&ObjectType("WindowMaterial:Shade".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            && crate::ordinary_equipment_input::source_b_validate_unused_shade(raw).is_ok()
+        {
+            for name in raw
+                .objects
+                .get(&ObjectType("WindowMaterial:Shade".into()))?
+                .keys()
+            {
+                if !shade_bindings.insert(name.0.to_ascii_uppercase()) {
+                    return None;
+                }
+            }
+            covered_objects.insert("WindowMaterial:Shade");
+        }
         let mut refraction_bindings = BTreeSet::new();
         if trace.scope == PortingScope::B
             && raw
@@ -397,6 +418,7 @@ impl SourceSupportAdmission {
             spectral_glazing_bindings,
             angle_glazing_bindings,
             spectral_data_bindings,
+            shade_bindings,
             refraction_bindings,
             window_gas_bindings,
             window_gas_mixture_bindings,
@@ -651,6 +673,82 @@ impl SourceSupportAdmission {
                 row.definition,
                 ep_model::MaterialDefinition::WindowGlazingRefractionExtinction(_)
             ) {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub(super) fn consumes_unused_shade(&self, model: &ep_model::TypedModel) -> bool {
+        use ep_model::MaterialKind;
+        if !self.consumes("WindowMaterial:Shade")
+            || !model.material_names.is_source_exact_namespace()
+        {
+            return false;
+        }
+        let all_ids: BTreeSet<_> = model.materials.iter().map(|row| row.id).collect();
+        if all_ids.len() != model.materials.len() {
+            return false;
+        }
+        let expected: BTreeSet<_> = self.shade_bindings.iter().map(String::as_str).collect();
+        let mut shade_rows = BTreeMap::new();
+        for row in &model.materials {
+            if matches!(row.kind(), MaterialKind::WindowShade)
+                && shade_rows.insert(row.id, row).is_some()
+            {
+                return false;
+            }
+        }
+        if shade_rows.len() != expected.len() {
+            return false;
+        }
+        let mut material_map_names: BTreeMap<ep_model::MaterialId, &str> = BTreeMap::new();
+        for name in model.material_names.names() {
+            let id = model.material_names.resolve(&name.0);
+            if id.is_some_and(|id| shade_rows.contains_key(&id))
+                || expected.contains(name.0.as_str())
+            {
+                let Some(id) = id else {
+                    return false;
+                };
+                if !shade_rows.contains_key(&id)
+                    || !expected.contains(name.0.as_str())
+                    || material_map_names.insert(id, name.0.as_str()).is_some()
+                {
+                    return false;
+                }
+            }
+        }
+        let mut by_name: BTreeMap<&str, Vec<ep_model::MaterialId>> = BTreeMap::new();
+        let mut by_id: BTreeMap<ep_model::MaterialId, Vec<&str>> = BTreeMap::new();
+        for (id, name) in &model.ctf_report_names.materials {
+            if !all_ids.contains(id) {
+                return false;
+            }
+            if shade_rows.contains_key(id) || expected.contains(name.as_str()) {
+                by_name.entry(name.as_str()).or_default().push(*id);
+                by_id.entry(*id).or_default().push(name.as_str());
+            }
+        }
+        for name in expected {
+            let Some(ids) = by_name.get(name) else {
+                return false;
+            };
+            if ids.len() != 1 {
+                return false;
+            }
+            let id = ids[0];
+            let Some(row) = shade_rows.get(&id) else {
+                return false;
+            };
+            if row.name.0 != name
+                || model.material_names.resolve(name) != Some(id)
+                || material_map_names.get(&id).copied() != Some(name)
+                || by_id.get(&id).is_none_or(|names| names.len() != 1)
+            {
+                return false;
+            }
+            if !matches!(row.definition, ep_model::MaterialDefinition::WindowShade(_)) {
                 return false;
             }
         }

@@ -28,6 +28,8 @@ pub struct SelectedMaterialInput {
     pub window_gas: Vec<ProjectInputObject>,
     /// Genuine ordered GasMixture getObjectItem operands, not typed properties.
     pub window_gas_mixture: Vec<ProjectInputObject>,
+    /// Genuine ordered ordinary MaterialShade getObjectItem operands.
+    pub window_shade: Vec<ProjectInputObject>,
 }
 
 /// Genuine scalar projection; empty extension objects retain their array position.
@@ -399,6 +401,90 @@ impl SelectedMaterialInput {
             }
         }
         Ok((alphas, numerics))
+    }
+
+    pub(super) fn get_window_shade_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:Shade", &object.object_name)
+        {
+            return Err(unavailable("Shade owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, &str, f64); 14] = [
+            ("solar_transmittance", "Solar Transmittance", 0.0),
+            ("solar_reflectance", "Solar Reflectance", 0.0),
+            ("visible_transmittance", "Visible Transmittance", 0.0),
+            ("visible_reflectance", "Visible Reflectance", 0.0),
+            (
+                "infrared_hemispherical_emissivity",
+                "Infrared Hemispherical Emissivity",
+                0.0,
+            ),
+            ("infrared_transmittance", "Infrared Transmittance", 0.0),
+            ("thickness", "Thickness", 0.0),
+            ("conductivity", "Conductivity", 0.0),
+            ("shade_to_glass_distance", "Shade to Glass Distance", 0.05),
+            ("top_opening_multiplier", "Top Opening Multiplier", 0.5),
+            (
+                "bottom_opening_multiplier",
+                "Bottom Opening Multiplier",
+                0.5,
+            ),
+            (
+                "left_side_opening_multiplier",
+                "Left-Side Opening Multiplier",
+                0.5,
+            ),
+            (
+                "right_side_opening_multiplier",
+                "Right-Side Opening Multiplier",
+                0.5,
+            ),
+            ("airflow_permeability", "Airflow Permeability", 0.0),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.is_empty()
+            || s.alpha_field_blanks.is_empty()
+            || s.alpha_field_names.is_empty()
+            || s.numeric_args.len() < 14
+            || s.numeric_field_blanks.len() < 14
+            || s.numeric_field_names.len() < 14
+        {
+            return Err(unavailable(
+                "actual complete Shade1alpha14numeric allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Shade", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        for (index, (name, _label, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                }
+                None => {}
+                _ => return Err(unavailable("admitted Shade numeric scalar")),
+            }
+        }
+        // Official min_fields15 includes Name: all14 numeric slots are returned.
+        Ok((1, 14))
     }
 
     pub(super) fn get_window_gas_mixture_item(

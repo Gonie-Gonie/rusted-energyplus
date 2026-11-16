@@ -545,6 +545,9 @@ impl CtfInitializationReports {
                         let (roughness, surface) = material_owner
                             .source_window_gas_surface_properties(source_number, *id)?;
                         (roughness_code(roughness), surface)
+                    } else if material.kind() == ep_model::MaterialKind::WindowShade {
+                        let (roughness, surface) = material_owner.source_shade_surface_properties(source_number, *id)?;
+                        (roughness_code(roughness), surface)
                     } else {
                         let surface = material.surface_properties().ok_or(Error::Unavailable(
                             "actual validated opaque Material properties",

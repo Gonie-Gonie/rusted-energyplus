@@ -4624,6 +4624,89 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "WindowMaterial:Shade" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "solar_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "visible_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "visible_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "infrared_hemispherical_emissivity",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "infrared_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "thickness",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "conductivity",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "shade_to_glass_distance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "top_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "bottom_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "left_side_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "right_side_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "airflow_permeability",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "WindowMaterial:GasMixture" => SchemaDefinition {
             has_name: true,
             name_has_default: false,
