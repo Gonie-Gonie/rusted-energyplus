@@ -4624,6 +4624,84 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "WindowMaterial:Screen" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "reflected_beam_transmittance_accounting_method",
+                    default: SchemaDefault::String("ModelAsDiffuse"),
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "diffuse_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "diffuse_visible_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "thermal_hemispherical_emissivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "conductivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "screen_material_spacing",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "screen_material_diameter",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "screen_to_glass_distance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "top_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "bottom_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "left_side_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "right_side_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "angle_of_resolution_for_screen_transmittance_output_map",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "WindowMaterial:Shade" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

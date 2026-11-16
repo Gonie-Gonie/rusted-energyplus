@@ -9974,6 +9974,378 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+        // Unused Screen follows the same real DSOA/Ideal/OA SourceB route.
+        // Raw/IP retain unknown members; only the thirteen consumed body keys project.
+        {
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            let mut screen_value = curve_value.clone();
+            screen_value["WindowMaterial:Screen"] = json!({
+                " A SCREEN ": {
+                    "diffuse_solar_reflectance":0.25,"diffuse_visible_reflectance":0.5,
+                    "screen_material_spacing":0.004,"screen_material_diameter":0.001,
+                    "name":false,"idf_order":[],"metadata":null
+                },
+                " B SCREEN ": {
+                    "reflected_beam_transmittance_accounting_method":"ModelAsDirectBeam",
+                    "diffuse_solar_reflectance":0.25,"diffuse_visible_reflectance":0.5,
+                    "thermal_hemispherical_emissivity":0.75,"conductivity":u64::MAX,
+                    "screen_material_spacing":0.004,"screen_material_diameter":0.001,
+                    "screen_to_glass_distance":0.04,"top_opening_multiplier":0.1,
+                    "bottom_opening_multiplier":0.2,"left_side_opening_multiplier":0.3,
+                    "right_side_opening_multiplier":0.4,
+                    "angle_of_resolution_for_screen_transmittance_output_map":5.0,
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},
+                    "idf_max_extensible_fields":null,"extra_string":"unconsumed",
+                    "metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}
+                }
+            });
+            let screen_raw =
+                ep_raw_model::parse_epjson_str_for_source(&screen_value.to_string()).unwrap();
+            let screen_compiled = ep_compiler::compile_raw_model_for_source(&screen_raw);
+            assert!(
+                !screen_compiled.has_errors(),
+                "{:?}",
+                screen_compiled.report.diagnostics
+            );
+            let screen_model = screen_compiled.model.as_ref().unwrap();
+            let screen_a = screen_model.material_names.resolve(" A SCREEN ").unwrap();
+            let screen_b = screen_model.material_names.resolve(" B SCREEN ").unwrap();
+            assert!(
+                screen_a != screen_b
+                    && screen_model.material_names.is_source_exact_namespace()
+                    && screen_model.material_names.resolve("A SCREEN").is_none()
+                    && screen_model
+                        .materials
+                        .iter()
+                        .filter(|row| row.kind() == ep_model::MaterialKind::WindowScreen)
+                        .count()
+                        == 2
+                    && screen_model.materials.iter().any(|row| row.id == screen_a
+                        && row.name.0 == " A SCREEN "
+                        && matches!(
+                            row.definition,
+                            ep_model::MaterialDefinition::WindowScreen(_)
+                        ))
+                    && screen_model.materials.iter().any(|row| row.id == screen_b
+                        && row.name.0 == " B SCREEN "
+                        && matches!(
+                            row.definition,
+                            ep_model::MaterialDefinition::WindowScreen(_)
+                        ))
+                    && screen_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(screen_a, " A SCREEN ".into()))
+                    && screen_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(screen_b, " B SCREEN ".into()))
+            );
+            let mut screen_ip =
+                crate::ordinary_input_processor::resolve_source_b(&screen_raw).unwrap();
+            let screen_args = screen_ip
+                .get_object_def_max_args("WindowMaterial:Screen")
+                .unwrap();
+            let mut screen_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            screen_ip
+                .report_source_idf_records_stats(&mut screen_stats)
+                .unwrap();
+            assert!(
+                (
+                    screen_args.alphas,
+                    screen_args.numerics,
+                    screen_args.total().unwrap()
+                ) == (2, 12, 14)
+                    && screen_ip.get_num_objects_found("WindowMaterial:Screen") == 2
+                    && screen_ip
+                        .source_raw_object_names("WindowMaterial:Screen")
+                        .unwrap()
+                        .iter()
+                        .map(String::as_str)
+                        .eq([" A SCREEN ", " B SCREEN "])
+                    && screen_ip.is_object_unused("WindowMaterial:Screen", " A SCREEN ")
+                    && screen_ip.is_object_unused("WindowMaterial:Screen", " B SCREEN ")
+                    && usize::try_from(screen_stats.number_input_records).unwrap()
+                        == screen_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let screen_original = screen_ip
+                .source_raw_object_fields("WindowMaterial:Screen", " B SCREEN ")
+                .unwrap();
+            let screen_raw_fields = &screen_raw.objects
+                [&ep_raw_model::ObjectType("WindowMaterial:Screen".into())]
+                [&ep_raw_model::ObjectName(" B SCREEN ".into())]
+                .fields;
+            assert!(
+                matches!(screen_raw_fields.get(&ep_raw_model::FieldName("conductivity".into())),
+                    Some(ep_raw_model::RawValue::Number(token)) if token == "18446744073709551615")
+                    && matches!(screen_original.get("conductivity"),
+                        Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(
+                        ep_model::classify_source_json_number("18446744073709551615"),
+                        Ok(ep_model::SourceJsonNumber::Integer(-1))
+                    )
+                    && matches!(screen_original.get("name"), Some(S::Bool(false)))
+                    && matches!(screen_original.get("idf_order"), Some(S::Number(token))
+                        if token == "18446744073709551615")
+                    && matches!(screen_original.get("idf_max_fields"), Some(S::Object(_)))
+                    && matches!(
+                        screen_original.get("idf_max_extensible_fields"),
+                        Some(S::Null)
+                    )
+                    && matches!(screen_original.get("extra_string"), Some(S::String(value))
+                        if value == "unconsumed")
+                    && matches!(screen_original.get("metadata"), Some(S::Object(fields))
+                        if matches!(fields.get("retained"), Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let screen_projection =
+                crate::ordinary_material_input::resolve_source(&screen_raw, &screen_ip).unwrap();
+            assert!(
+                screen_projection.window_screen.len() == 2
+                    && screen_projection.window_screen[0].object_name == " A SCREEN "
+                    && screen_projection.window_screen[0].fields.len() == 4
+                    && screen_projection.window_screen[1].object_name == " B SCREEN "
+                    && screen_projection.window_screen[1].fields.len() == 13
+                    && screen_projection.window_screen.iter().all(|row| row
+                        .idf_max_fields
+                        .is_none()
+                        && row.fields.keys().all(|field| {
+                            crate::ordinary_equipment_input::source_b_screen_known_field(field)
+                        }))
+                    && matches!(screen_projection.window_screen[1].fields.get("conductivity"),
+                        Some(P::Number(value)) if value.to_bits() == (-1.0_f64).to_bits())
+            );
+            let mut screen_trace = inspect_porting_scope(
+                &screen_raw,
+                &screen_compiled.report,
+                Some(screen_model),
+                PortingScope::B,
+            );
+            assert!(screen_trace.admissible, "{:?}", screen_trace.violations);
+            screen_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    screen_model,
+                    &weather,
+                    "same Screen Source weather",
+                )
+                .unwrap(),
+            );
+            let screen_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &screen_raw,
+                &screen_trace,
+            )
+            .unwrap();
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &screen_raw,
+                    &screen_compiled.report,
+                    Some(screen_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&screen_admission),
+                )
+                .allows_rust_runtime()
+            );
+            let screen_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                &json!({
+                    "Zone":{"Zone":{}},
+                    "WindowMaterial:Screen":{"IDF SCREEN":{
+                        "reflected_beam_transmittance_accounting_method":"ModelAsDiffuse",
+                        "diffuse_solar_reflectance":0.25,"diffuse_visible_reflectance":0.5,
+                        "thermal_hemispherical_emissivity":0.75,"conductivity":0.25,
+                        "screen_material_spacing":0.004,"screen_material_diameter":0.001,
+                        "screen_to_glass_distance":0.04
+                    }}
+                }).to_string(),
+                "Zone,Zone;WindowMaterial:Screen,IDF SCREEN,ModelAsDiffuse,0.25,0.5,0.75,0.25,0.004,0.001,0.04;",
+            ).unwrap();
+            let mut controlled_screen = screen_value.clone();
+            controlled_screen["WindowShadingControl"] = json!({"SCREEN CONTROL":{
+                "shading_type":"ExteriorScreen","shading_device_material_name":" A SCREEN "
+            }});
+            assert!(
+                !crate::support::assess_support_with_source_admission(
+                    &screen_raw,
+                    &screen_compiled.report,
+                    Some(screen_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    None,
+                )
+                .allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&screen_raw).is_err()
+                    && crate::ordinary_equipment_input::resolve(&screen_raw).is_err()
+                    && !screen_idf.is_epjson()
+                    && crate::ordinary_equipment_input::resolve_source_b(&screen_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&controlled_screen.to_string())
+                            .unwrap(),
+                    )
+                    .is_err()
+            );
+            for field in [
+                "reflected_beam_transmittance_accounting_method",
+                "diffuse_solar_reflectance",
+                "diffuse_visible_reflectance",
+                "thermal_hemispherical_emissivity",
+                "conductivity",
+                "screen_material_spacing",
+                "screen_material_diameter",
+                "screen_to_glass_distance",
+                "top_opening_multiplier",
+                "bottom_opening_multiplier",
+                "left_side_opening_multiplier",
+                "right_side_opening_multiplier",
+                "angle_of_resolution_for_screen_transmittance_output_map",
+            ] {
+                let mut bad_value = screen_value.clone();
+                bad_value["WindowMaterial:Screen"][" B SCREEN "][field] = json!(false);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string()).unwrap(),
+                    )
+                    .is_err(),
+                    "wrong JSON kind for {field}"
+                );
+            }
+            let screen_position = screen_model
+                .materials
+                .iter()
+                .position(|row| row.id == screen_a)
+                .unwrap();
+            let opaque_material = screen_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowScreen)
+                .unwrap();
+            for case in 0..12 {
+                let mut bad_model = screen_model.clone();
+                match case {
+                    0 => bad_model
+                        .materials
+                        .retain(|row| row.kind() != ep_model::MaterialKind::WindowScreen),
+                    1 => {
+                        let mut extra = bad_model.materials[screen_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA SCREEN".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[screen_position].id = opaque_material.id,
+                    3 => {
+                        bad_model.materials[screen_position].definition = opaque_material.definition
+                    }
+                    4 => {
+                        bad_model.materials[screen_position].name =
+                            ep_model::NormalizedName("WRONG SCREEN".into())
+                    }
+                    5 => bad_model.materials[screen_position].id = ep_model::MaterialId(u32::MAX),
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != screen_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((screen_a, " A SCREEN ".into())),
+                    8 => {
+                        let _ = bad_model
+                            .material_names
+                            .insert(" EXTRA SCREEN ALIAS ", screen_a);
+                    }
+                    9 => {
+                        // Break name-to-ID association, not a valid arena/tuple permutation.
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == screen_a)
+                            .unwrap()
+                            .1 = " B SCREEN ".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == screen_b)
+                            .unwrap()
+                            .1 = " A SCREEN ".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => bad_model
+                        .material_names
+                        .insert_instance(" A SCREEN ", screen_a),
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &screen_raw,
+                        &screen_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&screen_admission),
+                    )
+                    .allows_rust_runtime(),
+                    "Screen custody case {case}"
+                );
+            }
+            let mut used_screen_value = screen_value.clone();
+            used_screen_value["Construction"]["SCREEN USED"] =
+                json!({"outside_layer":"Opaque","layer_2":" A SCREEN "});
+            assert!(
+                crate::ordinary_equipment_input::resolve_source_b(
+                    &ep_raw_model::parse_epjson_str_for_source(&used_screen_value.to_string())
+                        .unwrap(),
+                )
+                .is_err()
+            );
+            let screen_construction = screen_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .unwrap();
+            for case in 0..3 {
+                let mut used_model = screen_model.clone();
+                let construction = &mut used_model.constructions[screen_construction];
+                match case {
+                    // These two keep the real opaque outside layer and use a nonfirst Screen.
+                    0 => construction.layers.push(screen_a),
+                    1 => construction.layers.push(screen_b),
+                    // Empty layers exercise the real outside-only effective_layers fallback.
+                    _ => {
+                        construction.layers.clear();
+                        construction.outside_layer = Some(screen_a);
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &screen_raw,
+                        &screen_compiled.report,
+                        Some(&used_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&screen_admission),
+                    )
+                    .allows_rust_runtime(),
+                    "active Screen layer case {case}"
+                );
+            }
+        }
     }
 }
 

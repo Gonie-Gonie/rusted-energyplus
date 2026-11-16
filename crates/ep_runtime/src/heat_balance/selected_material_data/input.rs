@@ -30,6 +30,8 @@ pub struct SelectedMaterialInput {
     pub window_gas_mixture: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialShade getObjectItem operands.
     pub window_shade: Vec<ProjectInputObject>,
+    /// Genuine ordered ordinary MaterialScreen2A12N operands.
+    pub window_screen: Vec<ProjectInputObject>,
 }
 
 /// Genuine scalar projection; empty extension objects retain their array position.
@@ -401,6 +403,126 @@ impl SelectedMaterialInput {
             }
         }
         Ok((alphas, numerics))
+    }
+
+    pub(super) fn get_window_screen_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:Screen", &object.object_name)
+        {
+            return Err(unavailable("Screen owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, &str, f64); 12] = [
+            (
+                "diffuse_solar_reflectance",
+                "Diffuse Solar Reflectance",
+                0.0,
+            ),
+            (
+                "diffuse_visible_reflectance",
+                "Diffuse Visible Reflectance",
+                0.0,
+            ),
+            (
+                "thermal_hemispherical_emissivity",
+                "Thermal Hemispherical Emissivity",
+                0.9,
+            ),
+            ("conductivity", "Conductivity", 221.0),
+            ("screen_material_spacing", "Screen Material Spacing", 0.0),
+            ("screen_material_diameter", "Screen Material Diameter", 0.0),
+            (
+                "screen_to_glass_distance",
+                "Screen to Glass Distance",
+                0.025,
+            ),
+            ("top_opening_multiplier", "Top Opening Multiplier", 0.0),
+            (
+                "bottom_opening_multiplier",
+                "Bottom Opening Multiplier",
+                0.0,
+            ),
+            (
+                "left_side_opening_multiplier",
+                "Left Side Opening Multiplier",
+                0.0,
+            ),
+            (
+                "right_side_opening_multiplier",
+                "Right Side Opening Multiplier",
+                0.0,
+            ),
+            (
+                "angle_of_resolution_for_screen_transmittance_output_map",
+                "Angle of Resolution for Screen Transmittance Output Map",
+                0.0,
+            ),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 2
+            || s.alpha_field_blanks.len() < 2
+            || s.alpha_field_names.len() < 2
+            || s.numeric_args.len() < 12
+            || s.numeric_field_blanks.len() < 12
+            || s.numeric_field_names.len() < 12
+        {
+            return Err(unavailable(
+                "actual complete Screen2alpha12numeric allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Screen", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        s.alpha_field_names[1] = "reflected_beam_transmittance_accounting_method".into();
+        match object
+            .fields
+            .get("reflected_beam_transmittance_accounting_method")
+        {
+            Some(ProjectInputValue::String(value)) if !value.is_empty() => {
+                s.alpha_args[1] = value.to_ascii_uppercase();
+                s.alpha_field_blanks[1] = false;
+            }
+            None | Some(ProjectInputValue::String(_)) => s.alpha_args[1] = "MODELASDIFFUSE".into(),
+            _ => return Err(unavailable("admitted Screen alpha scalar")),
+        }
+        let maximum = FIELDS
+            .iter()
+            .enumerate()
+            .filter(|(_, (name, _, _))| object.fields.contains_key(*name))
+            .map(|(index, _)| index + 3)
+            .max()
+            .unwrap_or(0)
+            .max(9);
+        for (index, (name, _label, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                }
+                Some(ProjectInputValue::String(value))
+                    if *name == "angle_of_resolution_for_screen_transmittance_output_map"
+                        && value.is_empty() => {}
+                None => {}
+                _ => return Err(unavailable("admitted Screen numeric scalar")),
+            }
+        }
+        Ok((2, maximum - 2))
     }
 
     pub(super) fn get_window_shade_item(

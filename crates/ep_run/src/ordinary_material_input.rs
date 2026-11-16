@@ -103,6 +103,7 @@ fn resolve_ordered(
         "WindowMaterial:Gas",
         "WindowMaterial:GasMixture",
         "WindowMaterial:Shade",
+        "WindowMaterial:Screen",
     ] {
         if matches!(
             family,
@@ -112,6 +113,7 @@ fn resolve_ordered(
                 | "WindowMaterial:Gas"
                 | "WindowMaterial:GasMixture"
                 | "WindowMaterial:Shade"
+                | "WindowMaterial:Screen"
         ) && !source_order
         {
             // No new Legacy or Source A admission is granted by this projection.
@@ -169,6 +171,12 @@ fn resolve_ordered(
                 {
                     continue;
                 }
+                if source_order
+                    && family == "WindowMaterial:Screen"
+                    && !crate::ordinary_equipment_input::source_b_screen_known_field(&field.0)
+                {
+                    continue;
+                }
                 if field.0 == "idf_max_fields" {
                     let RawValue::Number(text) = value else {
                         return Err("Material idf_max_fields numeric custody".into());
@@ -199,6 +207,7 @@ fn resolve_ordered(
                                     | "WindowMaterial:Gas"
                                     | "WindowMaterial:GasMixture"
                                     | "WindowMaterial:Shade"
+                                    | "WindowMaterial:Screen"
                             ) {
                             ep_model::classify_source_json_number(text)
                                 .map_err(|_| "SimpleGlazing stored JSON numeric kind")?
@@ -247,6 +256,7 @@ fn resolve_ordered(
             "WindowMaterial:Gas" => result.window_gas = values,
             "WindowMaterial:GasMixture" => result.window_gas_mixture = values,
             "WindowMaterial:Shade" => result.window_shade = values,
+            "WindowMaterial:Screen" => result.window_screen = values,
             _ => unreachable!("literal selected material family"),
         }
     }

@@ -80,6 +80,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         window_gas: Vec::new(),
         window_gas_mixture: Vec::new(),
         window_shade: Vec::new(),
+        window_screen: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -3650,6 +3651,415 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                     ]
                 && shortcut.numeric_field_names[8] == "shade_to_glass_distance"
                 && shortcut.alpha_field_names[0] == "name"
+        );
+    }
+    // One genuine Screen Material owner: real scalar writes, defaults and public-row custody.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let names = [
+            "A SCREEN DEFAULT",
+            "B SCREEN OPTIONAL",
+            "C SCREEN WRAPPED",
+            "D SCREEN DIRECT",
+            "E SCREEN DIFFUSE",
+            "F SCREEN BLANK",
+        ];
+        let typed_screen = ep_model::WindowScreenMaterial {
+            roughness: MaterialSurfaceRoughness::MediumRough,
+            beam_reflectance_model: ep_model::WindowScreenBeamReflectanceModel::ModelAsDiffuse,
+            diffuse_solar_reflectance_input: 0.25,
+            diffuse_visible_reflectance_input: 0.5,
+            thermal_hemispherical_emissivity_input: 0.75,
+            conductivity_w_per_m_k: 0.25,
+            screen_material_spacing_m: 0.004,
+            screen_material_diameter_m: 0.001,
+            screen_to_glass_distance_m: 0.04,
+            top_opening_multiplier: 0.1,
+            bottom_opening_multiplier: 0.2,
+            left_side_opening_multiplier: 0.3,
+            right_side_opening_multiplier: 0.4,
+            transmittance_map_resolution:
+                ep_model::WindowScreenTransmittanceMapResolution::Degrees5,
+            direct_normal_transmittance: 0.5625,
+            solar_reflectance: 0.109375,
+            visible_reflectance: 0.21875,
+            visible_transmittance: 0.5625,
+            thermal_transmittance: 0.5625,
+            airflow_permeability: 0.5625,
+            solar_absorptance: 0.328125,
+            visible_absorptance: 0.21875,
+            thermal_absorptance: 0.328125,
+        };
+        model
+            .materials
+            .extend(names.iter().enumerate().map(|(index, name)| Material {
+                id: MaterialId(3 + u32::try_from(index).unwrap()),
+                name: NormalizedName::new(name),
+                definition: MaterialDefinition::WindowScreen(typed_screen),
+            }));
+        model
+            .ctf_report_names
+            .materials
+            .extend(names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let wrapped_k = ep_model::classify_source_json_number(&u64::MAX.to_string())
+            .unwrap()
+            .as_f64();
+        raw.window_screen = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields = BTreeMap::from([
+                    ("diffuse_solar_reflectance".into(), Value::Number(0.25)),
+                    ("diffuse_visible_reflectance".into(), Value::Number(0.5)),
+                    ("screen_material_spacing".into(), Value::Number(0.004)),
+                    ("screen_material_diameter".into(), Value::Number(0.001)),
+                ]);
+                if index != 0 {
+                    fields.extend([
+                        (
+                            "reflected_beam_transmittance_accounting_method".into(),
+                            Value::String(
+                                [
+                                    "",
+                                    "ModelAsDiffuse",
+                                    "DoNotModel",
+                                    "ModelAsDirectBeam",
+                                    "ModelAsDiffuse",
+                                    "",
+                                ][index]
+                                    .into(),
+                            ),
+                        ),
+                        (
+                            "thermal_hemispherical_emissivity".into(),
+                            Value::Number(0.75),
+                        ),
+                        (
+                            "conductivity".into(),
+                            Value::Number(if index == 2 { wrapped_k } else { 0.25 }),
+                        ),
+                        ("screen_to_glass_distance".into(), Value::Number(0.04)),
+                        ("top_opening_multiplier".into(), Value::Number(0.1)),
+                        ("bottom_opening_multiplier".into(), Value::Number(0.2)),
+                        ("left_side_opening_multiplier".into(), Value::Number(0.3)),
+                        ("right_side_opening_multiplier".into(), Value::Number(0.4)),
+                        (
+                            "angle_of_resolution_for_screen_transmittance_output_map".into(),
+                            if index == 5 {
+                                Value::String(String::new())
+                            } else {
+                                Value::Number([0.0, 1.0, 2.0, 3.0, 5.0, 0.0][index])
+                            },
+                        ),
+                    ]);
+                }
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Screen", &raw.window_screen, 2, 12),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        objects
+            .get_mut("WindowMaterial:Screen")
+            .unwrap()
+            .get_mut("C SCREEN WRAPPED")
+            .unwrap()
+            .insert("conductivity".into(), S::Number(u64::MAX.to_string()));
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            let result = data.get_material_data(&raw, &mut owners);
+            let minimum = raw
+                .get_window_screen_item(&raw.window_screen[0], &mut owners)
+                .unwrap();
+            let minimum_blanks = owners.shortcut.numeric_field_blanks[..12].to_vec();
+            let blank = raw
+                .get_window_screen_item(&raw.window_screen[5], &mut owners)
+                .unwrap();
+            assert!(
+                minimum == (2, 7)
+                    && blank == (2, 12)
+                    && minimum_blanks
+                        == [
+                            false, false, true, true, false, false, true, true, true, true, true,
+                            true
+                        ]
+                    && owners.shortcut.alpha_args[1] == "MODELASDIFFUSE"
+                    && owners.shortcut.alpha_field_blanks[..2] == [false, true]
+                    && owners.shortcut.numeric_field_blanks[11]
+                    && owners.shortcut.alpha_field_names[..2]
+                        == ["name", "reflected_beam_transmittance_accounting_method"]
+                    && owners.shortcut.numeric_field_names[..12]
+                        == [
+                            "diffuse_solar_reflectance",
+                            "diffuse_visible_reflectance",
+                            "thermal_hemispherical_emissivity",
+                            "conductivity",
+                            "screen_material_spacing",
+                            "screen_material_diameter",
+                            "screen_to_glass_distance",
+                            "top_opening_multiplier",
+                            "bottom_opening_multiplier",
+                            "left_side_opening_multiplier",
+                            "right_side_opening_multiplier",
+                            "angle_of_resolution_for_screen_transmittance_output_map"
+                        ]
+            );
+            result
+        };
+        assert!(
+            result.is_ok()
+                && !errors_found
+                && state.tracking.total_severe_errors == 0
+                && state.tracking.total_warning_errors == 1
+                && std::str::from_utf8(&text)
+                    .unwrap()
+                    .contains("Nominal R is defaulted to 1")
+        );
+        assert!(
+            data.num_screens == 6
+                && names.iter().enumerate().all(|(index, name)| {
+                    let id = MaterialId(3 + u32::try_from(index).unwrap());
+                    data.materials[index + 3] == id
+                        && data.material_map[*name] == i32::try_from(index + 4).unwrap()
+                        && data.material_groups[&id] == SourceMaterialGroup::Screen
+                        && data.resistance_only[&id]
+                        && !input.is_object_unused("WindowMaterial:Screen", name)
+                })
+        );
+        let a = &data.window_screen[&MaterialId(3)];
+        let b = &data.window_screen[&MaterialId(4)];
+        let c = &data.window_screen[&MaterialId(5)];
+        assert_eq!(
+            [
+                a.to_glass_distance,
+                a.top_opening,
+                a.bottom_opening,
+                a.left_opening,
+                a.right_opening,
+                a.conductivity,
+                a.thermal_absorptance,
+                a.thermal_absorptance_input
+            ],
+            [0.025, 0.0, 0.0, 0.0, 0.0, 221.0, 0.9 * 0.4375, 0.9 * 0.4375]
+        );
+        assert_eq!(
+            [
+                b.transmittance,
+                b.visible_transmittance,
+                b.thermal_transmittance,
+                b.shade_reflectance,
+                b.shade_visible_reflectance,
+                b.solar_absorptance,
+                b.visible_absorptance,
+                b.thermal_absorptance,
+                b.thickness,
+                b.conductivity,
+                b.to_glass_distance,
+                b.top_opening,
+                b.bottom_opening,
+                b.left_opening,
+                b.right_opening,
+                b.airflow_permeability
+            ],
+            [
+                0.5625, 0.5625, 0.5625, 0.109375, 0.21875, 0.328125, 0.21875, 0.328125, 0.001,
+                0.25, 0.04, 0.1, 0.2, 0.3, 0.4, 0.5625
+            ]
+        );
+        assert!(data.window_screen.values().all(|row| row.roughness
+            == Some(MaterialSurfaceRoughness::MediumRough)
+            && row.resistance == 0.0
+            && row.density == 0.0
+            && row.specific_heat == 0.0
+            && row.diameter_to_spacing_ratio == 0.0
+            && row.diffuse_transmittance == 0.0
+            && row.diffuse_visible_transmittance == 0.0
+            && row.diffuse_reflectance == 0.0
+            && row.diffuse_visible_reflectance == 0.0
+            && row.diffuse_absorptance == 0.0
+            && row.cylinder_reflectance == 0.0
+            && row.cylinder_visible_reflectance == 0.0
+            && row.d_phi == 5.0 * (std::f64::consts::PI / 180.0)
+            && row.d_theta == row.d_phi
+            && !row.is_used
+            && row.solar_absorptance_input == row.solar_absorptance
+            && row.visible_absorptance_input == row.visible_absorptance
+            && row.thermal_absorptance_input == row.thermal_absorptance));
+        assert!(
+            c.conductivity == -1.0
+                && data.nominal_r[3] == 0.4375 * 0.001 / 221.0
+                && data.nominal_r[4] == 0.4375 * 0.001 / 0.25
+                && data.nominal_r[5] == 1.0
+        );
+        assert!(names.iter().enumerate().all(|(index, _)| {
+            let row = &data.window_screen[&MaterialId(3 + u32::try_from(index).unwrap())];
+            row.beam_reflectance_model == [2, 2, 0, 1, 2, 2][index]
+                && row.map_degree_resolution == [0, 1, 2, 3, 5, 0][index]
+        }));
+        assert!(
+            data.source_screen_surface_properties(5, MaterialId(4))
+                .unwrap()
+                == (
+                    MaterialSurfaceRoughness::MediumRough,
+                    OpaqueSurfaceProperties {
+                        thermal_absorptance: 0.328125,
+                        solar_absorptance: 0.328125,
+                        visible_absorptance: 0.21875
+                    }
+                )
+                && data
+                    .source_screen_surface_properties(5, MaterialId(3))
+                    .is_err()
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let rows = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,") && line.contains("SCREEN"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert!(
+            rows.len() == 6
+                && rows.iter().all(|row| row.len() == 11
+                    && row[2] == "0.0000"
+                    && row[3] == "MediumRough"
+                    && row[6] == "0.000"
+                    && row[7] == "0.000")
+        );
+        assert!(
+            matches!(input.source_raw_object_fields("WindowMaterial:Screen", "C SCREEN WRAPPED")
+            .unwrap().get("conductivity"), Some(S::Number(token)) if token == "18446744073709551615")
         );
     }
 }
@@ -7321,5 +7731,367 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 && shortcut.numeric_args[7] == 0.2
         );
         assert!(format!("{result:?}").contains("authored IRT diagnostic failure"));
+    }
+    // Three fresh Screen owners: rounded-open sums, first-sum IO, duplicate IO.
+    for screen_case in 0..3 {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let names = [
+            if screen_case == 2 {
+                "MASS"
+            } else {
+                "A SCREEN ROUNDED"
+            },
+            "B SCREEN FOLLOWING",
+        ];
+        let typed_screen = ep_model::WindowScreenMaterial {
+            roughness: MaterialSurfaceRoughness::MediumRough,
+            beam_reflectance_model: ep_model::WindowScreenBeamReflectanceModel::ModelAsDiffuse,
+            diffuse_solar_reflectance_input: 0.25,
+            diffuse_visible_reflectance_input: 0.5,
+            thermal_hemispherical_emissivity_input: 0.75,
+            conductivity_w_per_m_k: 0.25,
+            screen_material_spacing_m: 0.004,
+            screen_material_diameter_m: 0.001,
+            screen_to_glass_distance_m: 0.04,
+            top_opening_multiplier: 0.1,
+            bottom_opening_multiplier: 0.2,
+            left_side_opening_multiplier: 0.3,
+            right_side_opening_multiplier: 0.4,
+            transmittance_map_resolution:
+                ep_model::WindowScreenTransmittanceMapResolution::Degrees5,
+            direct_normal_transmittance: 0.5625,
+            solar_reflectance: 0.109375,
+            visible_reflectance: 0.21875,
+            visible_transmittance: 0.5625,
+            thermal_transmittance: 0.5625,
+            airflow_permeability: 0.5625,
+            solar_absorptance: 0.328125,
+            visible_absorptance: 0.21875,
+            thermal_absorptance: 0.328125,
+        };
+        model.materials.extend(
+            names
+                .iter()
+                .enumerate()
+                .filter(|(index, _)| screen_case != 2 || *index != 0)
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName::new(name),
+                    definition: MaterialDefinition::WindowScreen(typed_screen),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .enumerate()
+                .filter(|(index, _)| screen_case != 2 || *index != 0)
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        raw.window_screen = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| ProjectInputObject {
+                object_name: (*name).into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("diffuse_solar_reflectance".into(), Value::Number(0.25)),
+                    ("diffuse_visible_reflectance".into(), Value::Number(0.5)),
+                    (
+                        "thermal_hemispherical_emissivity".into(),
+                        Value::Number(0.75),
+                    ),
+                    ("conductivity".into(), Value::Number(0.25)),
+                    (
+                        "screen_material_spacing".into(),
+                        Value::Number(if index == 0 { 1.0e20 } else { 0.004 }),
+                    ),
+                    ("screen_material_diameter".into(), Value::Number(0.001)),
+                    ("screen_to_glass_distance".into(), Value::Number(0.04)),
+                    ("top_opening_multiplier".into(), Value::Number(0.1)),
+                    ("bottom_opening_multiplier".into(), Value::Number(0.2)),
+                    ("left_side_opening_multiplier".into(), Value::Number(0.3)),
+                    ("right_side_opening_multiplier".into(), Value::Number(0.4)),
+                    (
+                        "angle_of_resolution_for_screen_transmittance_output_map".into(),
+                        Value::Number(5.0),
+                    ),
+                ]),
+            })
+            .collect();
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Screen", &raw.window_screen, 2, 12),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let sink: &mut dyn std::io::Write = if screen_case == 0 {
+                &mut text
+            } else {
+                &mut broken
+            };
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(sink),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        if screen_case == 0 {
+            assert!(
+                result.is_ok()
+                    && errors_found
+                    && data.num_screens == 2
+                    && data.window_screen.len() == 2
+            );
+            let bad = &data.window_screen[&MaterialId(3)];
+            assert_eq!(
+                [
+                    bad.transmittance,
+                    bad.shade_reflectance,
+                    bad.shade_visible_reflectance,
+                    bad.thermal_absorptance,
+                    bad.solar_absorptance,
+                    bad.visible_absorptance,
+                    bad.conductivity,
+                    bad.thickness,
+                    bad.to_glass_distance,
+                    bad.top_opening,
+                    bad.bottom_opening,
+                    bad.left_opening,
+                    bad.right_opening,
+                    bad.airflow_permeability,
+                    bad.visible_transmittance,
+                    bad.thermal_transmittance,
+                    bad.resistance
+                ],
+                [
+                    1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.001, 0.04, 0.1, 0.2, 0.3, 0.4, 1.0, 1.0,
+                    1.0, 0.0
+                ]
+            );
+            assert!(
+                data.nominal_r[3] == 0.0
+                    && data.nominal_r[4] == 0.4375 * 0.001 / 0.25
+                    && data.resistance_only[&MaterialId(3)]
+                    && data.resistance_only[&MaterialId(4)]
+                    && !input.is_object_unused("WindowMaterial:Screen", "B SCREEN FOLLOWING")
+            );
+            let reached = std::str::from_utf8(&text).unwrap();
+            assert!(
+                state.tracking.total_severe_errors == 4
+                    && reached
+                        .matches(
+                            "WindowMaterial:Screen=\"A SCREEN ROUNDED\", Illegal value combination."
+                        )
+                        .count()
+                        == 3
+            );
+            let solar = reached
+                .find("Calculated solar transmittance + solar reflectance not < 1.0")
+                .unwrap();
+            let visible = reached
+                .find("Calculated visible transmittance + visible reflectance not < 1.0")
+                .unwrap();
+            let thermal = reached
+                .find("Thermal hemispherical emissivity plus open area fraction")
+                .unwrap();
+            assert!(solar < visible && visible < thermal
+                && reached.contains("See Engineering Reference for calculation procedure for solar transmittance.")
+                && reached.contains("See Engineering Reference for calculation procedure for visible solar transmittance."));
+            assert!(
+                bad.thermal_absorptance_input == bad.thermal_absorptance
+                    && bad.solar_absorptance_input == bad.solar_absorptance
+                    && bad.visible_absorptance_input == bad.visible_absorptance
+                    && bad.diameter_to_spacing_ratio == 0.0
+                    && !bad.is_used
+            );
+        } else if screen_case == 1 {
+            assert!(
+                result.is_err()
+                    && errors_found
+                    && data.num_screens == 2
+                    && data.window_screen.len() == 1
+            );
+            let bad = &data.window_screen[&MaterialId(3)];
+            assert_eq!(
+                [
+                    bad.transmittance,
+                    bad.shade_reflectance,
+                    bad.shade_visible_reflectance,
+                    bad.thermal_absorptance,
+                    bad.solar_absorptance,
+                    bad.visible_absorptance,
+                    bad.conductivity,
+                    bad.thickness,
+                    bad.to_glass_distance,
+                    bad.top_opening,
+                    bad.bottom_opening,
+                    bad.left_opening,
+                    bad.right_opening,
+                    bad.airflow_permeability,
+                    bad.visible_transmittance,
+                    bad.thermal_transmittance,
+                    bad.resistance
+                ],
+                [
+                    1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.001, 0.04, 0.1, 0.2, 0.3, 0.4, 1.0, 1.0,
+                    1.0, 0.0
+                ]
+            );
+            assert!(
+                data.materials.last() == Some(&MaterialId(3))
+                    && data.resistance_only[&MaterialId(3)]
+                    && data.nominal_r[3] == 0.0
+                    && bad.thermal_absorptance_input == 0.0
+                    && bad.solar_absorptance_input == 0.0
+                    && bad.visible_absorptance_input == 0.0
+            );
+            assert!(
+                !input.is_object_unused("WindowMaterial:Screen", "A SCREEN ROUNDED")
+                    && input.is_object_unused("WindowMaterial:Screen", "B SCREEN FOLLOWING")
+                    && shortcut.current_module_object == "WindowMaterial:Screen"
+                    && shortcut.numeric_field_names[0] == "diffuse_solar_reflectance"
+            );
+            assert!(format!("{result:?}").contains("authored IRT diagnostic failure"));
+        } else {
+            assert!(result.is_err() && !errors_found && data.num_screens == 2);
+            assert!(
+                data.materials == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                    && data.material_map["MASS"] == 1
+                    && data.window_screen.is_empty()
+            );
+            assert_eq!(data.nominal_r, [0.05, 0.2, 0.15]);
+            assert!(
+                !input.is_object_unused("WindowMaterial:Screen", "MASS")
+                    && input.is_object_unused("WindowMaterial:Screen", "B SCREEN FOLLOWING")
+                    && shortcut.alpha_args[0] == "MASS"
+                    && shortcut.numeric_args[3] == 0.25
+            );
+            assert!(format!("{result:?}").contains("authored IRT diagnostic failure"));
+        }
     }
 }

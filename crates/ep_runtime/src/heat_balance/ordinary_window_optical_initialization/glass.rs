@@ -15,9 +15,26 @@ impl SourceWindowOpticalInitialization {
             ));
         }
         if owners.materials.num_screens > 0 {
-            return Err(Error::Unavailable(
-                "InitGlass positive CalcWindowScreenProperties348",
-            ));
+            // WindowManager7490 visits actual final Surface ordinals. Its local
+            // trig/integration arrays have no persistent observer before a
+            // positive shading association; no Screen optics/map is fabricated.
+            let count = usize::try_from(owners.geometry.total_surfaces)
+                .map_err(|_| Error::Unavailable("Screen actual TotSurfaces"))?;
+            for number in 0..count {
+                let surface = owners
+                    .geometry
+                    .final_surfaces
+                    .as_deref()
+                    .and_then(|rows| rows.get(number))
+                    .ok_or(Error::Unavailable("Screen actual final Surface7491"))?;
+                if !surface.row.has_shade_control {
+                    continue;
+                }
+                // Stop BEFORE unported WindowShadingControl/ExtScreen lookup.
+                return Err(Error::Unavailable(
+                    "Screen positive shading-control association7497",
+                ));
+            }
         }
         for number in 0..owners.control.total_constructions {
             let row = owners

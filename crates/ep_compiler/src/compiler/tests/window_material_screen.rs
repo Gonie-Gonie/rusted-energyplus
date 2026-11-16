@@ -561,6 +561,193 @@ fn window_screen_follows_drape_source_order_and_shares_material_identity()
         "",
         Some("name")
     ));
+    // Source-only unused Screen declarations; all preceding Legacy evidence stays literal.
+    {
+        use super::super::compile_raw_model_for_source;
+        use ep_raw_model::{FieldName, ObjectName, ObjectType, RawValue};
+
+        let positive = format!(
+            r#"{{"WindowMaterial:Shade":{{"SHADE BEFORE":{{{SHADE_FIELDS}}}}},
+                "WindowMaterial:Screen":{{" SCREEN EXACT ":{{
+                    "reflected_beam_transmittance_accounting_method":"ModelAsDirectBeam",
+                    "diffuse_solar_reflectance":0.25,"diffuse_visible_reflectance":0.5,
+                    "thermal_hemispherical_emissivity":0.75,"conductivity":18446744073709551615,
+                    "screen_material_spacing":0.004,"screen_material_diameter":0.001,
+                    "screen_to_glass_distance":0.04,"top_opening_multiplier":0.1,
+                    "bottom_opening_multiplier":0.2,"left_side_opening_multiplier":0.3,
+                    "right_side_opening_multiplier":0.4,
+                    "angle_of_resolution_for_screen_transmittance_output_map":5.0,
+                    "name":null,"idf_max_fields":false,
+                    "future_metadata":[null,true,{{"retained":"opaque"}}]}}}}}}"#
+        );
+        let positive_raw = parse_epjson_str(&positive)?;
+        let source = compile_raw_model_for_source(&positive_raw);
+        assert!(
+            !source.has_errors()
+                && source
+                    .model
+                    .as_ref()
+                    .is_some_and(|model| model.material_names.is_source_exact_namespace()),
+            "{:?}",
+            source.report.diagnostics
+        );
+        let model = source.model.as_ref().expect("actual Source Screen model");
+        let id = model
+            .material_names
+            .resolve(" SCREEN EXACT ")
+            .expect("untrimmed Source Screen name");
+        let screen = model
+            .materials
+            .iter()
+            .find(|row| row.id == id)
+            .and_then(ep_model::Material::as_window_screen)
+            .expect("actual typed Screen payload");
+        assert!(
+            model.material_names.resolve("SCREEN EXACT").is_none()
+                && model
+                    .materials
+                    .iter()
+                    .any(|row| row.id == id && row.name.0 == " SCREEN EXACT ")
+                && model
+                    .ctf_report_names
+                    .materials
+                    .iter()
+                    .any(|(loader, name)| *loader == id && name == " SCREEN EXACT ")
+                && model
+                    .materials
+                    .iter()
+                    .map(|row| row.kind())
+                    .collect::<Vec<_>>()
+                    == [MaterialKind::WindowShade, MaterialKind::WindowScreen]
+                && screen.roughness == MaterialSurfaceRoughness::MediumRough
+                && screen.beam_reflectance_model
+                    == WindowScreenBeamReflectanceModel::ModelAsDirectBeam
+                && screen.transmittance_map_resolution
+                    == WindowScreenTransmittanceMapResolution::Degrees5
+                && [
+                    screen.diffuse_solar_reflectance_input,
+                    screen.diffuse_visible_reflectance_input,
+                    screen.thermal_hemispherical_emissivity_input,
+                    screen.conductivity_w_per_m_k,
+                    screen.screen_material_spacing_m,
+                    screen.screen_material_diameter_m,
+                    screen.screen_to_glass_distance_m,
+                    screen.top_opening_multiplier,
+                    screen.bottom_opening_multiplier,
+                    screen.left_side_opening_multiplier,
+                    screen.right_side_opening_multiplier,
+                ]
+                .map(f64::to_bits)
+                    == [
+                        0.25_f64,
+                        0.5,
+                        0.75,
+                        f64::from_bits(0x43f0_0000_0000_0000),
+                        0.004,
+                        0.001,
+                        0.04,
+                        0.1,
+                        0.2,
+                        0.3,
+                        0.4,
+                    ]
+                    .map(f64::to_bits)
+        );
+        let original = positive_raw
+            .objects
+            .get(&ObjectType("WindowMaterial:Screen".into()))
+            .and_then(|rows| rows.get(&ObjectName(" SCREEN EXACT ".into())))
+            .expect("original Screen declaration");
+        assert!(
+            original.fields.len() == 16
+                && matches!(
+                    original.fields.get(&FieldName("conductivity".into())),
+                    Some(RawValue::Number(token))
+                        if token == "18446744073709551615"
+                            && matches!(
+                                ep_model::classify_source_json_number(token),
+                                Ok(ep_model::SourceJsonNumber::Integer(-1))
+                            )
+                )
+                && original.fields.get(&FieldName("name".into())) == Some(&RawValue::Null)
+                && original.fields.get(&FieldName("idf_max_fields".into()))
+                    == Some(&RawValue::Bool(false))
+                && matches!(original.fields.get(&FieldName("future_metadata".into())), Some(RawValue::Array(items)) if items.len() == 3)
+        );
+
+        // These are legal original operands. Only the independent joint checks
+        // are deferred to the real Source getter; the Legacy diagnostics stay.
+        let rounded = r#"{"WindowMaterial:Screen":{"ROUND":{
+            "diffuse_solar_reflectance":0.2,"diffuse_visible_reflectance":0.3,
+            "screen_material_spacing":1.0,"screen_material_diameter":1e-20}}}"#;
+        let rounded_raw = parse_epjson_str(rounded)?;
+        let rounded_source = compile_raw_model_for_source(&rounded_raw);
+        let rounded_legacy = compile_raw_model(&rounded_raw);
+        assert!(
+            !rounded_source.has_errors()
+                && rounded_source.model.as_ref().is_some_and(|model| {
+                    model.material_names.is_source_exact_namespace()
+                        && model.material_names.resolve("ROUND") == Some(ep_model::MaterialId(0))
+                        && model.materials.len() == 1
+                        && model.materials.first().is_some_and(|material| {
+                            material.id == ep_model::MaterialId(0)
+                                && material.as_window_screen().is_some_and(|row| {
+                                    row.direct_normal_transmittance.to_bits() == 1.0_f64.to_bits()
+                                })
+                        })
+                        && model
+                            .ctf_report_names
+                            .materials
+                            .iter()
+                            .any(|(loader, name)| {
+                                *loader == ep_model::MaterialId(0) && name == "ROUND"
+                            })
+                })
+                && rounded_legacy
+                    .report
+                    .diagnostics
+                    .iter()
+                    .filter(|diagnostic| diagnostic.code == "InvalidWindowScreenOpticalSum")
+                    .count()
+                    == 3
+        );
+        let equal = rounded.replace(
+            "\"screen_material_diameter\":1e-20",
+            "\"screen_material_diameter\":1.0",
+        );
+        let equal_raw = parse_epjson_str(&equal)?;
+        assert!(
+            !compile_raw_model_for_source(&equal_raw).has_errors()
+                && has_diagnostic(
+                    &compile_raw_model(&equal_raw),
+                    "InvalidWindowScreenGeometry",
+                    "ROUND",
+                    Some("screen_material_diameter")
+                )
+        );
+        let used = rounded.replace(
+            "}}}",
+            "}},\"Construction\":{\"USED\":{\"outside_layer\":\"ROUND\"}}}",
+        );
+        for declaration in [
+            r#"{"WindowMaterial:Screen":{"MISSING":{}}}"#.to_owned(),
+            positive.replace(
+                "\"diffuse_solar_reflectance\":0.25",
+                "\"diffuse_solar_reflectance\":\"0.25\"",
+            ),
+            positive.replace("ModelAsDirectBeam", "Wrong"),
+            positive.replace(
+                "\"angle_of_resolution_for_screen_transmittance_output_map\":5.0",
+                "\"angle_of_resolution_for_screen_transmittance_output_map\":4.0",
+            ),
+            used,
+        ] {
+            assert!(
+                compile_raw_model_for_source(&parse_epjson_str(&declaration)?).has_errors(),
+                "original schema or unused qualifier: {declaration}"
+            );
+        }
+    }
     Ok(())
 }
 

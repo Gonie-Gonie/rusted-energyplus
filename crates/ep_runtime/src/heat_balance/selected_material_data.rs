@@ -24,6 +24,7 @@ mod report;
 mod simple_glazing;
 mod type_group;
 mod window_gas;
+mod window_screen;
 mod window_shade;
 pub(crate) use type_group::SourceMaterialGroup;
 
@@ -68,6 +69,8 @@ pub(crate) struct SelectedMaterialData {
     window_gas: BTreeMap<MaterialId, window_gas::SourceWindowGasMaterial>,
     /// Actual MaterialShade rows; typed optical derivations remain advisory.
     window_shade: BTreeMap<MaterialId, window_shade::SourceShadeMaterial>,
+    /// Actual ordinary MaterialScreen scalar rows;typed optical properties are advisory.
+    window_screen: BTreeMap<MaterialId, window_screen::SourceScreenMaterial>,
     pub(crate) num_no_masses: i32,
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
@@ -243,6 +246,46 @@ impl SelectedMaterialData {
         if row.roughness != Some(MaterialSurfaceRoughness::MediumRough) {
             return Err(HeatBalanceInputError::Unavailable(
                 "actual Shade getter roughness",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::MediumRough,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    pub(crate) fn source_screen_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native Screen MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::Screen)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Screen Source order/group/physical identity",
+            ));
+        }
+        let row = self
+            .window_screen
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained Screen runtime row",
+            ))?;
+        if row.roughness != Some(MaterialSurfaceRoughness::MediumRough) {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Screen getter roughness",
             ));
         }
         Ok((
@@ -568,7 +611,7 @@ impl SelectedMaterialData {
         self.get_window_shade_data(raw, o)?;
         empty!(num_eql_shades, "WindowMaterial:Shade:EquivalentLayer");
         empty!(num_eql_drapes, "WindowMaterial:Drape:EquivalentLayer");
-        empty!(num_screens, "WindowMaterial:Screen");
+        self.get_window_screen_data(raw, o)?;
         empty!(num_eql_screens, "WindowMaterial:Screen:EquivalentLayer");
         empty!(num_blinds, "WindowMaterial:Blind");
         empty!(num_eql_blinds, "WindowMaterial:Blind:EquivalentLayer");

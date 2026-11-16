@@ -503,17 +503,37 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowDrapeEquivalentLayer)
             .count(),
     );
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Screen",
-        typed_model
-            .materials
+    let screen_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowScreen)
+        .count();
+    let screen_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType("WindowMaterial:Screen".into()))
+        .map_or(0, |rows| rows.len());
+    let screen_consumed =
+        source_admission.is_some_and(|admission| admission.consumes_unused_screen(typed_model));
+    let screen_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowScreen)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::WindowScreen
+                })
+            })
+    });
+    if !screen_consumed || screen_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Screen",
+            screen_count.max(screen_raw_count),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

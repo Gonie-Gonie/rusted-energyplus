@@ -758,6 +758,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_refraction(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Shade".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_shade(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Screen".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_screen(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -7196,12 +7198,111 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn source_unused_screen(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let valid = |field: &str, value: &RawValue| {
+            if !matches!(
+                field,
+                "reflected_beam_transmittance_accounting_method"
+                    | "diffuse_solar_reflectance"
+                    | "diffuse_visible_reflectance"
+                    | "thermal_hemispherical_emissivity"
+                    | "conductivity"
+                    | "screen_material_spacing"
+                    | "screen_material_diameter"
+                    | "screen_to_glass_distance"
+                    | "top_opening_multiplier"
+                    | "bottom_opening_multiplier"
+                    | "left_side_opening_multiplier"
+                    | "right_side_opening_multiplier"
+                    | "angle_of_resolution_for_screen_transmittance_output_map"
+            ) {
+                return true; // All other members,including body name/idf_*,remain unconsumed Raw/IP metadata.
+            }
+            if field == "reflected_beam_transmittance_accounting_method" {
+                return matches!(value, RawValue::String(value) if matches!(value.as_str(),
+                "" | "DoNotModel" | "ModelAsDirectBeam" | "ModelAsDiffuse"));
+            }
+            if field == "angle_of_resolution_for_screen_transmittance_output_map" {
+                return matches!(value, RawValue::String(value) if value.is_empty())
+                    || matches!(value, RawValue::Number(token)
+                    if ep_model::classify_source_json_number(token).is_ok()
+                    && token.parse::<f64>().ok().is_some_and(|value| matches!(value, 0.0 | 1.0 | 2.0 | 3.0 | 5.0)));
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match field {
+                            "diffuse_solar_reflectance" | "diffuse_visible_reflectance" => {
+                                (0.0..1.0).contains(&value)
+                            }
+                            "thermal_hemispherical_emissivity" => value > 0.0 && value < 1.0,
+                            "conductivity"
+                            | "screen_material_spacing"
+                            | "screen_material_diameter" => value > 0.0,
+                            "screen_to_glass_distance" => (0.001..=1.0).contains(&value),
+                            _ => (0.0..=1.0).contains(&value),
+                        }
+                })
+        };
+        if [
+            "diffuse_solar_reflectance",
+            "diffuse_visible_reflectance",
+            "screen_material_spacing",
+            "screen_material_diameter",
+        ]
+        .iter()
+        .any(|field| field_value(object, field).is_none_or(|value| !valid(field, value)))
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !valid(&field.0, value))
+        {
+            return false;
+        }
+        let Some(rows) = self
+            .raw_model
+            .objects
+            .get(&ep_raw_model::ObjectType("WindowMaterial:Screen".into()))
+        else {
+            return false;
+        };
+        !self
+            .raw_model
+            .objects
+            .iter()
+            .filter(|(family, _)| family.0.starts_with("Construction"))
+            .any(|(_, constructions)| {
+                constructions.values().any(|construction| {
+                    construction.fields.iter().any(|(field, value)| {
+                        let layer = field.0 == "outside_layer"
+                            || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                        layer
+                            && matches!(value, RawValue::String(reference)
+                        if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+                    })
+                })
+            })
+    }
+
     fn parse_window_screen_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Screen";
         const MAP_RESOLUTION_FIELD: &str =
             "angle_of_resolution_for_screen_transmittance_output_map";
 
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let source_unused_screen = self.source_unused_screen(&name, &object);
             let beam_reflectance_model = self.enum_default(
                 OBJECT_TYPE,
                 &name,
@@ -7335,7 +7436,7 @@ impl<'a> Compiler<'a> {
             };
 
             let geometry_valid = match (screen_material_spacing_m, screen_material_diameter_m) {
-                (Some(spacing), Some(diameter)) if diameter >= spacing => {
+                (Some(spacing), Some(diameter)) if diameter >= spacing && !source_unused_screen => {
                     self.error(
                         "InvalidWindowScreenGeometry",
                         OBJECT_TYPE,
@@ -7394,7 +7495,7 @@ impl<'a> Compiler<'a> {
                 ),
             ] {
                 let sum = direct_normal_transmittance + effective_property;
-                if sum >= 1.0 {
+                if sum >= 1.0 && !source_unused_screen {
                     self.error(
                         "InvalidWindowScreenOpticalSum",
                         OBJECT_TYPE,
@@ -7416,6 +7517,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if source_unused_screen {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -9689,6 +9796,13 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_shade(name, object));
+        let source_screen_name = object_type == "WindowMaterial:Screen"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_screen(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
@@ -9696,7 +9810,8 @@ impl<'a> Compiler<'a> {
                 "WindowMaterial:Gas" | "WindowMaterial:GasMixture"
             ) || source_glazing_name
                 || source_refraction_name
-                || source_shade_name)
+                || source_shade_name
+                || source_screen_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')
