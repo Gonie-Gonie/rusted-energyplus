@@ -82,6 +82,14 @@ frozen v5 QA plans keep their recorded inputs; new v6 plans additionally
 record the frozen v5 release, while both retain the frozen v4 release. This
 Python-only optimization adds no object support or physical comparison.
 
+For v6 `precheck` and `verify`, `paired/readers.py` constructs the same ordered
+recorder inputs without repeating SourceAuthority normalization in the parent.
+The genuine frozen child still performs full validation, and the recorder keeps
+its before/after Source and input checks. Pass `--home` and the exact v6
+`--release PATH#SHA256` as with `coordinate.py`. Use the matching versioned tools
+for the other phases. Optional `--projection-output .runtime/...json` writes
+non-authorizing command/input metadata and starts no recorder or child.
+
 Record `precheck` and `verify` with the trusted `record_command.py`, declaring
 every Context pin plus the Native launch (and Source launch for `verify`) as
 explicit inputs. Source `act` also requires `--native-precheck-receipt PATH#SHA256`.
