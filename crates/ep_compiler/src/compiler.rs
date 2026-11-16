@@ -743,6 +743,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_window_gas_mixture(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_spectral_average(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing:RefractionExtinctionMethod".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_refraction(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -4791,9 +4793,90 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Independent original-schema-unused qualifier; SourceExact alone never
+    // defers the IR>=1 diagnostic to the actual Refraction getter.
+    fn source_unused_refraction(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let valid = |field: &str, value: &RawValue| {
+            if field == "solar_diffusing" {
+                return matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"));
+            }
+            if !matches!(
+                field,
+                "thickness"
+                    | "solar_index_of_refraction"
+                    | "solar_extinction_coefficient"
+                    | "visible_index_of_refraction"
+                    | "visible_extinction_coefficient"
+                    | "infrared_transmittance_at_normal_incidence"
+                    | "infrared_hemispherical_emissivity"
+                    | "conductivity"
+                    | "dirt_correction_factor_for_solar_and_visible_transmittance"
+            ) {
+                return true;
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|number| {
+                    number.is_finite()
+                        && match field {
+                            "solar_index_of_refraction" | "visible_index_of_refraction" => {
+                                number > 1.0
+                            }
+                            "infrared_transmittance_at_normal_incidence" => {
+                                (0.0..1.0).contains(&number)
+                            }
+                            "infrared_hemispherical_emissivity" => number > 0.0 && number < 1.0,
+                            "dirt_correction_factor_for_solar_and_visible_transmittance" => {
+                                number > 0.0 && number <= 1.0
+                            }
+                            _ => number > 0.0,
+                        }
+                })
+        };
+        if [
+            "thickness",
+            "solar_index_of_refraction",
+            "solar_extinction_coefficient",
+            "visible_index_of_refraction",
+            "visible_extinction_coefficient",
+        ]
+        .iter()
+        .any(|field| field_value(object, field).is_none_or(|value| !valid(field, value)))
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !valid(&field.0, value))
+        {
+            return false;
+        }
+        let Some(rows) = self.raw_model.objects.get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Glazing:RefractionExtinctionMethod".into(),
+        )) else {
+            return false;
+        };
+        !self.raw_model.objects.get(&ep_raw_model::ObjectType("Construction".into())).is_some_and(|constructions| {
+            constructions.values().any(|construction| construction.fields.iter().any(|(field,value)| {
+                let layer = field.0 == "outside_layer" || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                layer && matches!(value, RawValue::String(reference) if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+            }))
+        })
+    }
+
     fn parse_window_glazing_refraction_extinction_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Glazing:RefractionExtinctionMethod";
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let source_unused = self.source_unused_refraction(&name, &object);
             let thickness_m =
                 self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
             let solar_index_of_refraction = self.required_number_minimum(
@@ -4893,7 +4976,7 @@ impl<'a> Compiler<'a> {
 
             let infrared_sum =
                 infrared_transmittance_at_normal_incidence + infrared_hemispherical_emissivity;
-            if infrared_sum >= 1.0 {
+            if infrared_sum >= 1.0 && !source_unused {
                 self.error(
                     "InvalidWindowGlazingOpticalSum",
                     OBJECT_TYPE,
@@ -4911,6 +4994,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if source_unused {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -9143,12 +9232,21 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_spectral_average(name, object));
+        let source_refraction_name = object_type
+            == "WindowMaterial:Glazing:RefractionExtinctionMethod"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_refraction(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
                 object_type,
                 "WindowMaterial:Gas" | "WindowMaterial:GasMixture"
-            ) || source_glazing_name)
+            ) || source_glazing_name
+                || source_refraction_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')

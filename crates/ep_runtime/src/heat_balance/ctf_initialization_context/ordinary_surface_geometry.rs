@@ -538,7 +538,7 @@ impl CtfInitializationReports {
                         let (roughness, surface) = material_owner
                             .source_simple_glazing_surface_properties(source_number, *id)?;
                         (roughness_code(roughness), surface)
-                    } else if material.kind() == ep_model::MaterialKind::WindowGlazing {
+                    } else if matches!(material.kind(), ep_model::MaterialKind::WindowGlazing | ep_model::MaterialKind::WindowGlazingRefractionExtinction) {
                         let (roughness, surface) = material_owner.source_glazing_surface_properties(source_number, *id)?;
                         (roughness_code(roughness), surface)
                     } else if matches!(material.kind(), ep_model::MaterialKind::WindowGas | ep_model::MaterialKind::WindowGasMixture) {

@@ -514,10 +514,7 @@ impl SelectedMaterialData {
             }};
         }
         self.get_glazing_data(raw, o)?;
-        empty!(
-            num_w5_alt_glazings,
-            "WindowMaterial:Glazing:RefractionExtinctionMethod"
-        );
+        self.get_refraction_data(raw, o)?;
         empty!(num_eql_glazings, "WindowMaterial:Glazing:EquivalentLayer");
         self.get_named_window_gas_data(raw, o)?;
         empty!(num_eql_gaps, "WindowMaterial:Gap:EquivalentLayer");

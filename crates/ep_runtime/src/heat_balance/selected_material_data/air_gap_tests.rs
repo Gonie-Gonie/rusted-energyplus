@@ -75,6 +75,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         infrared_transparent: Vec::new(),
         simple_glazing: Vec::new(),
         glazing: Vec::new(),
+        refraction: Vec::new(),
         window_gas: Vec::new(),
         window_gas_mixture: Vec::new(),
         air_gaps: vec![ProjectInputObject {
@@ -1558,6 +1559,396 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 && text.is_empty()
                 && !input.is_object_unused("WindowMaterial:Glazing", "A DEFAULT")
                 && !input.is_object_unused("WindowMaterial:Glazing", "B EXPLICIT")
+        );
+    }
+
+    // One fresh actual alternative-Glass owner; all old owner assertions above
+    // remain on their original contexts. No SGS Setup/typed optical calculation.
+    {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let inputs = ep_model::WindowGlazingRefractionExtinctionMaterial {
+            thickness_m: 0.003,
+            solar_index_of_refraction: 1.5,
+            solar_extinction_coefficient_per_m: 20.0,
+            visible_index_of_refraction: 1.7,
+            visible_extinction_coefficient_per_m: 100.0,
+            infrared_transmittance_at_normal_incidence: 0.0,
+            infrared_hemispherical_emissivity: 0.84,
+            conductivity_w_per_m_k: 0.9,
+            dirt_correction_factor_for_solar_and_visible_transmittance: 1.0,
+            solar_diffusing: false,
+        };
+        let original = "18446744073709551615".parse::<f64>().unwrap();
+        let wrapped = ep_model::classify_source_json_number("18446744073709551615")
+            .unwrap()
+            .as_f64();
+        for (name, fields, typed) in [
+            (
+                "A DEFAULT",
+                BTreeMap::from([
+                    ("thickness".into(), Value::Number(0.003)),
+                    ("solar_index_of_refraction".into(), Value::Number(1.5)),
+                    ("solar_extinction_coefficient".into(), Value::Number(20.0)),
+                    ("visible_index_of_refraction".into(), Value::Number(1.7)),
+                    (
+                        "visible_extinction_coefficient".into(),
+                        Value::Number(100.0),
+                    ),
+                ]),
+                inputs,
+            ),
+            (
+                "B EXPLICIT",
+                BTreeMap::from([
+                    ("thickness".into(), Value::Number(0.003)),
+                    ("solar_index_of_refraction".into(), Value::Number(1.5)),
+                    ("solar_extinction_coefficient".into(), Value::Number(20.0)),
+                    ("visible_index_of_refraction".into(), Value::Number(1.7)),
+                    (
+                        "visible_extinction_coefficient".into(),
+                        Value::Number(100.0),
+                    ),
+                    (
+                        "infrared_transmittance_at_normal_incidence".into(),
+                        Value::Number(0.01),
+                    ),
+                    (
+                        "infrared_hemispherical_emissivity".into(),
+                        Value::Number(0.7),
+                    ),
+                    ("conductivity".into(), Value::Number(0.9)),
+                    (
+                        "dirt_correction_factor_for_solar_and_visible_transmittance".into(),
+                        Value::Number(0.95),
+                    ),
+                    ("solar_diffusing".into(), Value::String("Yes".into())),
+                ]),
+                ep_model::WindowGlazingRefractionExtinctionMaterial {
+                    infrared_transmittance_at_normal_incidence: 0.01,
+                    infrared_hemispherical_emissivity: 0.7,
+                    dirt_correction_factor_for_solar_and_visible_transmittance: 0.95,
+                    solar_diffusing: true,
+                    ..inputs
+                },
+            ),
+            (
+                "C WRAPPED",
+                BTreeMap::from([
+                    ("thickness".into(), Value::Number(wrapped)),
+                    ("solar_index_of_refraction".into(), Value::Number(wrapped)),
+                    (
+                        "solar_extinction_coefficient".into(),
+                        Value::Number(wrapped),
+                    ),
+                    ("visible_index_of_refraction".into(), Value::Number(wrapped)),
+                    (
+                        "visible_extinction_coefficient".into(),
+                        Value::Number(wrapped),
+                    ),
+                    ("conductivity".into(), Value::Number(wrapped)),
+                ]),
+                ep_model::WindowGlazingRefractionExtinctionMaterial {
+                    thickness_m: original,
+                    solar_index_of_refraction: original,
+                    solar_extinction_coefficient_per_m: original,
+                    visible_index_of_refraction: original,
+                    visible_extinction_coefficient_per_m: original,
+                    conductivity_w_per_m_k: original,
+                    ..inputs
+                },
+            ),
+        ] {
+            let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(name),
+                definition: MaterialDefinition::WindowGlazingRefractionExtinction(typed),
+            });
+            model.ctf_report_names.materials.push((id, name.into()));
+            raw.refraction.push(ProjectInputObject {
+                object_name: name.into(),
+                fields,
+                idf_max_fields: None,
+            });
+        }
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            (
+                "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                &raw.refraction,
+                2,
+                9,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, a, n)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    family.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        let args = input
+            .get_object_def_max_args("WindowMaterial:Glazing:RefractionExtinctionMethod")
+            .unwrap();
+        assert_eq!(
+            (args.alphas, args.numerics, args.total().unwrap()),
+            (2, 9, 11)
+        );
+        {
+            let stream: &mut dyn std::io::Write = &mut text;
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            data.get_material_data(&raw, &mut owners).unwrap();
+            // The only direct primitive probe uses these same actual owners.
+            owners.shortcut.alpha_args.fill("stale".into());
+            owners.shortcut.numeric_args.fill(-123.0);
+            owners.shortcut.alpha_field_names.fill("stale".into());
+            owners.shortcut.numeric_field_names.fill("stale".into());
+            assert_eq!(
+                raw.get_refraction_item(&raw.refraction[1], &mut owners)
+                    .unwrap(),
+                (2, 9)
+            );
+            assert_eq!(
+                &owners.shortcut.alpha_field_names[..2],
+                ["name", "solar_diffusing"]
+            );
+            assert_eq!(
+                &owners.shortcut.numeric_field_names[..9],
+                [
+                    "thickness",
+                    "solar_index_of_refraction",
+                    "solar_extinction_coefficient",
+                    "visible_index_of_refraction",
+                    "visible_extinction_coefficient",
+                    "infrared_transmittance_at_normal_incidence",
+                    "infrared_hemispherical_emissivity",
+                    "conductivity",
+                    "dirt_correction_factor_for_solar_and_visible_transmittance"
+                ]
+            );
+            assert_eq!(
+                raw.get_refraction_item(&raw.refraction[0], &mut owners)
+                    .unwrap(),
+                (1, 5)
+            );
+            assert!(
+                owners.shortcut.alpha_args[..2]
+                    .iter()
+                    .map(String::as_str)
+                    .eq(["A DEFAULT", "NO"])
+                    && owners.shortcut.alpha_field_blanks[..2] == [false, true]
+            );
+            assert_eq!(
+                &owners.shortcut.numeric_args[..9],
+                [0.003, 1.5, 20.0, 1.7, 100.0, 0.0, 0.84, 0.9, 1.0]
+            );
+            assert!(
+                owners.shortcut.numeric_field_blanks[..5]
+                    .iter()
+                    .all(|blank| !*blank)
+                    && owners.shortcut.numeric_field_blanks[5..9]
+                        .iter()
+                        .all(|blank| *blank)
+            );
+        }
+        let (a, b, c) = (
+            &data.simple_glazing[&MaterialId(3)],
+            &data.simple_glazing[&MaterialId(4)],
+            &data.simple_glazing[&MaterialId(5)],
+        );
+        assert_eq!(
+            (
+                data.num_w5_alt_glazings,
+                data.materials.len(),
+                data.material_map["A DEFAULT"],
+                data.material_map["C WRAPPED"]
+            ),
+            (3, 6, 4, 6)
+        );
+        assert!(
+            data.material_groups[&MaterialId(3)] == SourceMaterialGroup::Glass
+                && data.material_groups[&MaterialId(4)] == SourceMaterialGroup::Glass
+                && data.resistance_only[&MaterialId(3)]
+                && data.resistance_only[&MaterialId(5)]
+        );
+        assert_eq!(
+            [
+                a.thermal_transmittance,
+                a.thermal_front,
+                a.thermal_back,
+                a.conductivity,
+                a.dirt_factor
+            ],
+            [0.0, 0.84, 0.84, 0.9, 1.0]
+        );
+        assert_eq!(
+            [
+                b.thickness,
+                b.thermal_transmittance,
+                b.thermal_front,
+                b.thermal_back,
+                b.conductivity,
+                b.dirt_factor
+            ],
+            [0.003, 0.01, 0.7, 0.7, 0.9, 0.95]
+        );
+        assert!(
+            a.transmittance > 0.0
+                && a.transmittance < 1.0
+                && a.transmittance.to_bits() == b.transmittance.to_bits()
+                && a.visible_transmittance.to_bits() == b.visible_transmittance.to_bits()
+        );
+        assert!(
+            b.solar_reflectance_back.to_bits() == b.solar_reflectance_front.to_bits()
+                && b.visible_reflectance_back.to_bits() == b.solar_reflectance_front.to_bits()
+                && b.visible_reflectance_front.to_bits() != b.solar_reflectance_front.to_bits()
+        );
+        assert_eq!(
+            [
+                b.density,
+                b.specific_heat,
+                b.solar_absorptance,
+                b.visible_absorptance,
+                b.young_modulus,
+                b.poissons_ratio,
+                b.u_factor,
+                b.shgc,
+                b.visible_input
+            ],
+            [0.0; 9]
+        );
+        assert!(
+            b.solar_diffusing
+                && !a.solar_diffusing
+                && !b.visible_input_by_user
+                && b.thermal_absorptance == b.thermal_back
+                && b.spectral_data_pointer == 0
+                && b.optical_model
+                    == super::simple_glazing::SourceSimpleGlazingOpticalModel::SpectralAverage
+        );
+        assert!(
+            a.resistance > 0.0
+                && a.resistance.to_bits() == b.resistance.to_bits()
+                && a.resistance.to_bits() == data.nominal_r[3].to_bits()
+                && b.resistance.to_bits() == data.nominal_r[4].to_bits()
+        );
+        assert_eq!(
+            [c.thickness, c.conductivity, c.resistance, data.nominal_r[5]],
+            [-1.0, -1.0, 0.0, 0.0]
+        );
+        assert!(c.transmittance.is_nan() && c.visible_transmittance.is_nan());
+        assert!(
+            model.materials[4].surface_properties().is_none()
+                && data
+                    .source_simple_glazing_surface_properties(5, MaterialId(4))
+                    .is_err()
+                && data
+                    .source_glazing_surface_properties(4, MaterialId(4))
+                    .is_err()
+        );
+        assert_eq!(
+            data.source_glazing_surface_properties(5, MaterialId(4))
+                .unwrap(),
+            (
+                MaterialSurfaceRoughness::VerySmooth,
+                OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.7,
+                    solar_absorptance: 0.0,
+                    visible_absorptance: 0.0
+                }
+            )
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let fields: Vec<_> = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .find(|line| line.starts_with(" Material Details,B EXPLICIT,"))
+            .unwrap()
+            .split(',')
+            .collect();
+        assert!(
+            fields[3] == "VerySmooth"
+                && fields[4].parse::<f64>().unwrap() == b.thickness
+                && fields[5].parse::<f64>().unwrap() == b.conductivity
+                && fields[8].parse::<f64>().unwrap() == b.thermal_back
+                && fields[9] == "0.0000"
+                && fields[10] == "0.0000"
+        );
+        assert!(
+            !errors_found
+                && state.tracking.total_severe_errors == 0
+                && text.is_empty()
+                && ["A DEFAULT", "B EXPLICIT", "C WRAPPED"]
+                    .iter()
+                    .all(|name| !input.is_object_unused(
+                        "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                        name
+                    ))
         );
     }
 }
@@ -3097,5 +3488,355 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                     .iter()
                     .all(|name| !input.is_object_unused("WindowMaterial:Glazing", name))
         );
+    }
+
+    // Two fresh, fully bound Refraction contexts: exact IR equality succeeds
+    // through diagnostic IO, or stops at its first real Severe write.
+    let inputs = ep_model::WindowGlazingRefractionExtinctionMaterial {
+        thickness_m: 0.003,
+        solar_index_of_refraction: 1.5,
+        solar_extinction_coefficient_per_m: 20.0,
+        visible_index_of_refraction: 1.7,
+        visible_extinction_coefficient_per_m: 100.0,
+        infrared_transmittance_at_normal_incidence: 0.0,
+        infrared_hemispherical_emissivity: 0.84,
+        conductivity_w_per_m_k: 0.9,
+        dirt_correction_factor_for_solar_and_visible_transmittance: 1.0,
+        solar_diffusing: false,
+    };
+    for fail_first in [false, true] {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let id = MaterialId(3);
+        model.materials.push(Material {
+            id,
+            name: NormalizedName::new("IR EQUALITY"),
+            definition: MaterialDefinition::WindowGlazingRefractionExtinction(
+                ep_model::WindowGlazingRefractionExtinctionMaterial {
+                    infrared_transmittance_at_normal_incidence: 0.5,
+                    infrared_hemispherical_emissivity: 0.5,
+                    solar_diffusing: true,
+                    ..inputs
+                },
+            ),
+        });
+        model
+            .ctf_report_names
+            .materials
+            .push((id, "IR EQUALITY".into()));
+        raw.refraction.push(ProjectInputObject {
+            object_name: "IR EQUALITY".into(),
+            idf_max_fields: None,
+            fields: BTreeMap::from([
+                ("thickness".into(), Value::Number(0.003)),
+                ("solar_index_of_refraction".into(), Value::Number(1.5)),
+                ("solar_extinction_coefficient".into(), Value::Number(20.0)),
+                ("visible_index_of_refraction".into(), Value::Number(1.7)),
+                (
+                    "visible_extinction_coefficient".into(),
+                    Value::Number(100.0),
+                ),
+                (
+                    "infrared_transmittance_at_normal_incidence".into(),
+                    Value::Number(0.5),
+                ),
+                (
+                    "infrared_hemispherical_emissivity".into(),
+                    Value::Number(0.5),
+                ),
+                ("solar_diffusing".into(), Value::String("Yes".into())),
+            ]),
+        });
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            (
+                "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                &raw.refraction,
+                2,
+                9,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, a, n)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    family.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        let mut broken = BrokenDiagnostic;
+        let result;
+        {
+            let stream: &mut dyn std::io::Write = if fail_first { &mut broken } else { &mut text };
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            result = data.get_material_data(&raw, &mut owners);
+        }
+        let row = &data.simple_glazing[&id];
+        assert_eq!(
+            (
+                result.is_err(),
+                errors_found,
+                state.tracking.total_severe_errors,
+                state.tracking.total_warning_errors
+            ),
+            (fail_first, true, 1, 0)
+        );
+        assert!(
+            row.resistance > 0.0
+                && row.resistance.to_bits() == data.nominal_r[3].to_bits()
+                && row.transmittance > 0.0
+                && row.thermal_transmittance == 0.5
+                && row.thermal_back == 0.5
+                && data.resistance_only[&id]
+        );
+        assert_eq!(row.solar_diffusing, !fail_first);
+        let text = std::str::from_utf8(&text).unwrap();
+        assert!(if fail_first {
+            text.is_empty()
+        } else {
+            text.find("GetMaterialData: WindowMaterial:Glazing:RefractionExtinctionMethod = IR EQUALITY").zip(text.find("infrared_transmittance_at_normal_incidence + infrared_hemispherical_emissivity not < 1.0")).is_some_and(|(a,b)|a<b)
+        });
+        assert!(!input.is_object_unused(
+            "WindowMaterial:Glazing:RefractionExtinctionMethod",
+            "IR EQUALITY"
+        ));
+    }
+    // Fourth fresh, fully bound context. The duplicate itself creates the
+    // shared error; nonpositive K adds none, and later normal R still writes.
+    {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let original = "18446744073709551615".parse::<f64>().unwrap();
+        let wrapped = ep_model::classify_source_json_number("18446744073709551615")
+            .unwrap()
+            .as_f64();
+        model.materials.extend(
+            [
+                (
+                    "WRAPPED K",
+                    MaterialId(3),
+                    ep_model::WindowGlazingRefractionExtinctionMaterial {
+                        thickness_m: original,
+                        conductivity_w_per_m_k: original,
+                        ..inputs
+                    },
+                ),
+                ("Z NORMAL", MaterialId(4), inputs),
+            ]
+            .map(|(name, id, value)| Material {
+                id,
+                name: NormalizedName::new(name),
+                definition: MaterialDefinition::WindowGlazingRefractionExtinction(value),
+            }),
+        );
+        model.ctf_report_names.materials.extend([
+            (MaterialId(3), "WRAPPED K".into()),
+            (MaterialId(4), "Z NORMAL".into()),
+        ]);
+        raw.refraction = ["No mass", "WRAPPED K", "Z NORMAL"]
+            .map(|name| ProjectInputObject {
+                object_name: name.into(),
+                idf_max_fields: None,
+                fields: BTreeMap::from([
+                    ("thickness".into(), Value::Number(0.003)),
+                    ("solar_index_of_refraction".into(), Value::Number(1.5)),
+                    ("solar_extinction_coefficient".into(), Value::Number(20.0)),
+                    ("visible_index_of_refraction".into(), Value::Number(1.7)),
+                    (
+                        "visible_extinction_coefficient".into(),
+                        Value::Number(100.0),
+                    ),
+                ]),
+            })
+            .into();
+        raw.refraction[1]
+            .fields
+            .insert("thickness".into(), Value::Number(wrapped));
+        raw.refraction[1]
+            .fields
+            .insert("conductivity".into(), Value::Number(wrapped));
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            (
+                "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                &raw.refraction,
+                2,
+                9,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, a, n)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *a,
+                numeric_fields: *n,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .into_iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    family.into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let mut state = error_state();
+        let mut scan = ReportScanState::default();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+
+        {
+            let stream: &mut dyn std::io::Write = &mut text;
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(SourceDiagnosticFlags {
+                    kickoff: &globals.kickoff_simulation,
+                    developer: &developer,
+                    warmup: &clock.warmup_flag,
+                    doing_sizing: &globals.doing_sizing,
+                }),
+            };
+
+            data.get_material_data(&raw, &mut owners).unwrap();
+        }
+        assert_eq!(
+            (
+                errors_found,
+                state.tracking.total_severe_errors,
+                state.tracking.total_warning_errors
+            ),
+            (true, 1, 0)
+        );
+        assert_eq!(
+            (
+                data.material_map["NO MASS"],
+                data.material_map["WRAPPED K"],
+                data.material_map["Z NORMAL"],
+                data.materials.len()
+            ),
+            (2, 4, 5, 5)
+        );
+        let wrapped = &data.simple_glazing[&MaterialId(3)];
+        let normal = &data.simple_glazing[&MaterialId(4)];
+        assert_eq!(
+            [
+                wrapped.thickness,
+                wrapped.conductivity,
+                wrapped.resistance,
+                data.nominal_r[3]
+            ],
+            [-1.0, -1.0, 0.0, 0.0]
+        );
+        assert!(
+            normal.resistance > 0.0
+                && normal.resistance.to_bits() == data.nominal_r[4].to_bits()
+                && data.resistance_only[&MaterialId(4)]
+        );
+        let text = std::str::from_utf8(&text).unwrap();
+        assert!(text.matches("GetMaterialData: WindowMaterial:Glazing:RefractionExtinctionMethod = NO MASS, duplicate name.").count()==1 && !text.contains("Conductivity") && ["No mass","WRAPPED K","Z NORMAL"].iter().all(|name|!input.is_object_unused("WindowMaterial:Glazing:RefractionExtinctionMethod",name)));
     }
 }

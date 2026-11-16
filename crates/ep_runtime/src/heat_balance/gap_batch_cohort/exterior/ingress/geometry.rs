@@ -473,6 +473,7 @@ impl GainFactory {
             infrared_transparent: Vec::new(),
             simple_glazing: Vec::new(),
             glazing: Vec::new(),
+            refraction: Vec::new(),
             window_gas: Vec::new(),
             window_gas_mixture: Vec::new(),
             regular: project_objects(factory, &["Material"])?

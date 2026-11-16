@@ -567,3 +567,142 @@ impl SelectedMaterialData {
         Ok(())
     }
 }
+
+impl SelectedMaterialData {
+    // Material.cc767-855. Same fresh MaterialGlass constructor, never SGS Setup.
+    pub(super) fn get_refraction_data(
+        &mut self,
+        raw: &super::SelectedMaterialInput,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(), RuntimeError> {
+        owners.shortcut.current_module_object =
+            "WindowMaterial:Glazing:RefractionExtinctionMethod".into();
+        self.num_w5_alt_glazings = super::count(
+            owners.input,
+            "WindowMaterial:Glazing:RefractionExtinctionMethod",
+        )?;
+        if usize::try_from(self.num_w5_alt_glazings).ok() != Some(raw.refraction.len()) {
+            return Err(unavailable("Refraction raw/IP count"));
+        }
+        for object in &raw.refraction {
+            raw.get_refraction_item(object, owners)?;
+            let name = owners.shortcut.alpha_args[0].clone();
+            if self.material_map.contains_key(&name) {
+                let flags = owners
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual Refraction duplicate phase owners"))?;
+                owners.backend.show_source_severe_error(&format!("GetMaterialData: WindowMaterial:Glazing:RefractionExtinctionMethod = {name}, duplicate name."),flags).map_err(|error|RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                *owners.errors_found = true;
+                continue;
+            }
+            let id = typed_id(
+                owners.model,
+                &name,
+                MaterialKind::WindowGlazingRefractionExtinction,
+            )?;
+            let position = self.insert(&name, id, SourceMaterialGroup::Glass)?;
+            self.simple_glazing
+                .insert(id, SourceSimpleGlazingMaterial::default());
+            let material = self
+                .simple_glazing
+                .get_mut(&id)
+                .ok_or_else(|| unavailable("allocated Refraction MaterialGlass row"))?;
+            material.roughness = Some(MaterialSurfaceRoughness::VerySmooth);
+            material.thickness = owners.shortcut.numeric_args[0];
+            self.resistance_only.insert(id, true);
+            let reflectivity_sol = squared(
+                (owners.shortcut.numeric_args[1] - 1.0) / (owners.shortcut.numeric_args[1] + 1.0),
+            );
+            let reflectivity_vis = squared(
+                (owners.shortcut.numeric_args[3] - 1.0) / (owners.shortcut.numeric_args[3] + 1.0),
+            );
+            let transmittivity_sol = ep_platform_math::exp(
+                -owners.shortcut.numeric_args[2] * owners.shortcut.numeric_args[0],
+            )
+            .map_err(|error| unavailable(&format!("required Refraction exp provider: {error}")))?;
+            let transmittivity_vis = ep_platform_math::exp(
+                -owners.shortcut.numeric_args[4] * owners.shortcut.numeric_args[0],
+            )
+            .map_err(|error| unavailable(&format!("required Refraction exp provider: {error}")))?;
+            material.transmittance = transmittivity_sol * squared(1.0 - reflectivity_sol)
+                / (1.0 - squared(reflectivity_sol * transmittivity_sol));
+            material.solar_reflectance_front = reflectivity_sol
+                * (1.0
+                    + squared(1.0 - reflectivity_sol) * squared(transmittivity_sol)
+                        / (1.0 - squared(reflectivity_sol * transmittivity_sol)));
+            material.solar_reflectance_back = material.solar_reflectance_front;
+            material.visible_transmittance = transmittivity_vis * squared(1.0 - reflectivity_vis)
+                / (1.0 - squared(reflectivity_vis * transmittivity_vis));
+            material.visible_reflectance_front = reflectivity_vis
+                * (1.0
+                    + squared(1.0 - reflectivity_vis) * squared(transmittivity_vis)
+                        / (1.0 - squared(reflectivity_vis * transmittivity_vis)));
+            material.visible_reflectance_back = material.solar_reflectance_front; // Exact Native821.
+            material.thermal_transmittance = owners.shortcut.numeric_args[5];
+            material.thermal_front = owners.shortcut.numeric_args[6];
+            material.thermal_back = owners.shortcut.numeric_args[6];
+            material.conductivity = owners.shortcut.numeric_args[7];
+            material.dirt_factor = owners.shortcut.numeric_args[8];
+            if owners.shortcut.numeric_args[8] == 0.0 {
+                material.dirt_factor = 1.0;
+            }
+            material.thermal_absorptance = material.thermal_back;
+            if material.conductivity > 0.0 {
+                self.nominal_r[position] = material.thickness / material.conductivity;
+                material.resistance = self.nominal_r[position];
+            }
+            // Native has no nonpositive-conductivity diagnostic here.
+            material.spectral_data_pointer = 0;
+            if owners.shortcut.numeric_args[5] + owners.shortcut.numeric_args[6] >= 1.0 {
+                *owners.errors_found = true;
+                let message = format!(
+                    "{} + {} not < 1.0",
+                    owners.shortcut.numeric_field_names[5], owners.shortcut.numeric_field_names[6]
+                );
+                let flags = owners
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual Refraction IR phase owners"))?;
+                owners.backend.show_source_severe_error(&format!("GetMaterialData: WindowMaterial:Glazing:RefractionExtinctionMethod = {name}"),flags).map_err(|error|RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                owners
+                    .backend
+                    .show_continue_error(&message)
+                    .map_err(|error| {
+                        RuntimeError::HeatBalanceInput(Box::new(HeatBalanceInputError::Backend(
+                            error,
+                        )))
+                    })?;
+            }
+            if owners.shortcut.alpha_args[1].is_empty() {
+                material.solar_diffusing = false;
+            } else if owners.shortcut.alpha_args[1] == "YES" {
+                material.solar_diffusing = true;
+            } else if owners.shortcut.alpha_args[1] == "NO" {
+                material.solar_diffusing = false;
+            } else {
+                *owners.errors_found = true;
+                let flags = owners
+                    .diagnostic_flags
+                    .as_ref()
+                    .ok_or_else(|| unavailable("actual Refraction diffusing phase owners"))?;
+                owners.backend.show_source_severe_error(&format!("WindowMaterial:Glazing:RefractionExtinctionMethod=\"{name}\", Illegal value."),flags).map_err(|error|RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                let entered = owners.shortcut.alpha_args.get(3).ok_or_else(|| {
+                    unavailable("schema-held invalid Refraction actual alpha4 operand")
+                })?;
+                owners
+                    .backend
+                    .show_continue_error(&format!(
+                        "{} must be Yes or No, entered value={entered}",
+                        owners.shortcut.numeric_field_names[1]
+                    ))
+                    .map_err(|error| {
+                        RuntimeError::HeatBalanceInput(Box::new(HeatBalanceInputError::Backend(
+                            error,
+                        )))
+                    })?;
+            }
+        }
+        Ok(())
+    }
+}

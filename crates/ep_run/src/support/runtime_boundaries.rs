@@ -356,17 +356,35 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
 
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Glazing:RefractionExtinctionMethod",
-        typed_model
-            .materials
-            .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowGlazingRefractionExtinction)
-            .count(),
-    );
+    let refraction_count = typed_model
+        .materials
+        .iter()
+        .filter(|row| row.kind() == MaterialKind::WindowGlazingRefractionExtinction)
+        .count();
+    let refraction_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Glazing:RefractionExtinctionMethod".into(),
+        ))
+        .map_or(0, |rows| rows.len());
+    let refraction_consumed =
+        source_admission.is_some_and(|admission| admission.consumes_unused_refraction(typed_model));
+    let refraction_used = typed_model.constructions.iter().any(|construction| {
+        construction.effective_layers().iter().any(|id| {
+            typed_model.materials.iter().any(|row| {
+                row.id == *id && row.kind() == MaterialKind::WindowGlazingRefractionExtinction
+            })
+        })
+    });
+    if !refraction_consumed || refraction_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Glazing:RefractionExtinctionMethod",
+            refraction_count.max(refraction_raw_count),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

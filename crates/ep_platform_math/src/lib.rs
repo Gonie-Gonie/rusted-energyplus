@@ -1,7 +1,7 @@
 //! Safe scalar math transport to the same CRT used by the pinned Native build.
 //!
 //! Windows GNU's default CRT differs from that build's Universal CRT. Only
-//! explicitly called inverse-trig operations use the System32 UCRT provider.
+//! explicitly called inverse-trig and exponential operations use the System32 UCRT provider.
 //! Other targets retain Rust's ordinary scalar methods. No engine is loaded.
 
 use std::fmt::{Display, Formatter};
@@ -48,6 +48,18 @@ pub fn acos(value: f64) -> Result<f64, MathProviderError> {
     }
 }
 
+/// Evaluate exp using the selected platform's actual scalar math provider.
+pub fn exp(value: f64) -> Result<f64, MathProviderError> {
+    #[cfg(all(target_os = "windows", target_env = "gnu"))]
+    {
+        windows_gnu::exp(value)
+    }
+    #[cfg(not(all(target_os = "windows", target_env = "gnu")))]
+    {
+        Ok(value.exp())
+    }
+}
+
 // This crate does not inherit the workspace forbid policy. Its own deny policy
 // permits unsafe code only inside this reviewed OS/CRT boundary. All exported
 // APIs above are safe, and ep_runtime keeps its inherited unsafe-code forbid.
@@ -64,6 +76,7 @@ mod windows_gnu {
     static MODULE: OnceLock<Result<usize, MathProviderError>> = OnceLock::new();
     static ASIN: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
     static ACOS: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
+    static EXP: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
 
     #[link(name = "kernel32")]
     unsafe extern "system" {
@@ -102,7 +115,7 @@ mod windows_gnu {
         *cache.get_or_init(|| {
             let handle = module()? as *mut c_void;
             // SAFETY: handle is the retained successful System32 module above;
-            // the only callers provide the fixed NUL-terminated asin/acos names.
+            // the only callers provide the fixed NUL-terminated asin/acos/exp names.
             let symbol = unsafe { GetProcAddress(handle, name.as_ptr()) };
             if symbol.is_null() {
                 // SAFETY: same argument-free OS error accessor as above.
@@ -111,7 +124,7 @@ mod windows_gnu {
                     win32_code: unsafe { GetLastError() },
                 });
             }
-            // SAFETY: the System32 UCRT exports asin and acos with the documented
+            // SAFETY: the System32 UCRT exports asin, acos and exp with the documented
             // C ABI double(double), and a Windows function pointer has this size.
             // No arbitrary symbol name, library or signature reaches this helper.
             Ok(unsafe { std::mem::transmute::<*mut c_void, Unary>(symbol) })
@@ -125,6 +138,11 @@ mod windows_gnu {
     }
     pub(super) fn acos(value: f64) -> Result<f64, MathProviderError> {
         let function = resolve(&ACOS, b"acos\0", "GetProcAddress(acos)")?;
+        // SAFETY: resolve returns that exact retained C ABI scalar function.
+        Ok(unsafe { function(value) })
+    }
+    pub(super) fn exp(value: f64) -> Result<f64, MathProviderError> {
+        let function = resolve(&EXP, b"exp\0", "GetProcAddress(exp)")?;
         // SAFETY: resolve returns that exact retained C ABI scalar function.
         Ok(unsafe { function(value) })
     }

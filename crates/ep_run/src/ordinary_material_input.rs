@@ -33,6 +33,7 @@ fn resolve_ordered(
         "Material:NoMass",
         "Material:AirGap",
         "Material:InfraredTransparent",
+        "WindowMaterial:Glazing:RefractionExtinctionMethod",
         "WindowMaterial:Glazing",
         "WindowMaterial:SimpleGlazingSystem",
         "WindowMaterial:Gas",
@@ -40,7 +41,8 @@ fn resolve_ordered(
     ] {
         if matches!(
             family,
-            "WindowMaterial:Glazing"
+            "WindowMaterial:Glazing:RefractionExtinctionMethod"
+                | "WindowMaterial:Glazing"
                 | "WindowMaterial:SimpleGlazingSystem"
                 | "WindowMaterial:Gas"
                 | "WindowMaterial:GasMixture"
@@ -71,6 +73,12 @@ fn resolve_ordered(
             for (field, value) in &row.fields {
                 // Native's direct-JSON named Gas getter reads only declared
                 // fields; Raw/IP retain every ignored member, including idf_*.
+                if source_order
+                    && family == "WindowMaterial:Glazing:RefractionExtinctionMethod"
+                    && !crate::ordinary_equipment_input::source_b_refraction_known_field(&field.0)
+                {
+                    continue;
+                }
                 if source_order
                     && family == "WindowMaterial:Glazing"
                     && !crate::ordinary_equipment_input::source_b_glazing_known_field(&field.0)
@@ -113,7 +121,8 @@ fn resolve_ordered(
                         let value = if source_order
                             && matches!(
                                 family,
-                                "WindowMaterial:Glazing"
+                                "WindowMaterial:Glazing:RefractionExtinctionMethod"
+                                    | "WindowMaterial:Glazing"
                                     | "WindowMaterial:SimpleGlazingSystem"
                                     | "WindowMaterial:Gas"
                                     | "WindowMaterial:GasMixture"
@@ -159,6 +168,7 @@ fn resolve_ordered(
             "Material:NoMass" => result.no_mass = values,
             "Material:AirGap" => result.air_gaps = values,
             "Material:InfraredTransparent" => result.infrared_transparent = values,
+            "WindowMaterial:Glazing:RefractionExtinctionMethod" => result.refraction = values,
             "WindowMaterial:Glazing" => result.glazing = values,
             "WindowMaterial:SimpleGlazingSystem" => result.simple_glazing = values,
             "WindowMaterial:Gas" => result.window_gas = values,

@@ -376,6 +376,9 @@
     "WindowMaterial:Glazing": [
       "Bounded Source B direct epJSON admits unused WindowMaterial:Glazing with exact SpectralAverage through the actual ordinary MaterialGlass getter, distinct GroupGlass and the same retained class as SGS without calling or changing SGS Setup. The actual map key is A1 under the official RE2 name rule; all20 known body fields retain their original schema types, ranges and exact enums, while unknown members of every JSON shape, including body name/idf_* metadata, remain Raw/IP custody and are not getter operands. One spectrum and three angle-table references remain arbitrary schema Strings under this inactive Average branch, without resolving or admitting positive spectral/Curve owners. Original numeric kinds and Native signed-i64-effective values remain separate. The real7A14N/min_fields14 primitive owns full scratch, defaults, blanks, names, returned counts and used state. All14 numeric writes, back-side base thermal absorptance, Young/Poisson and constructor-zero density/Cp/solar/visible absorptance come from this runtime row. Positive conductivity writes both Resistance and NominalR before the six ordered joint optical checks even after an earlier genuine shared error; wrapped conductivity/Young and diagnostic IO failures retain their exact state/error prefixes. The independently schema-valid unused compiler qualifier defers only those six sums, and total Raw/name/kind/count/loader/reverse-NameMap custody rejects missing-all-typed rows as well as aliases. Existing public Materials and checked Source geometry use the same row; they do not expose private Native optics or establish full geometry-unit traversal. Every Construction/window consumer, Source A/IDF, Legacy change, the other three optical modes, positive spectrum/Curve children and full-object completion remain held. A positive-infinite derived resistance reaches an unestablished Native report-formatter partition; no Raw/effective finiteness filter or formatter/diagnostic permission is added."
     ],
+    "WindowMaterial:Glazing:RefractionExtinctionMethod": [
+      "Bounded Source B direct epJSON admits only unused original-schema-valid WindowMaterial:Glazing:RefractionExtinctionMethod through the actual ordered MaterialGlass getter and GroupGlass row, after ordinary SpectralAverage without calling or changing SGS Setup. The official RE2 map key owns A1; all10 known body fields retain original JSON kinds, required fields, bounds and exact No/Yes enum. Unknown members of every JSON shape, including optical_data_type, Young/name/idf_* metadata, remain Raw/IP custody and are not getter operands. The real2A9N/11-slot primitive has no min_fields: required-only returns1A5N, while present solar_diffusing reaches2A9N; full scratch/default/blank/field-name/used effects are retained. Native Material.cc767-855 expression and assignment order is ported, including VisibleBack=SolarFront; original numeric tokens and signed-i64-effective values remain distinct. Runtime optical/base writes and positive-conductivity Resistance/NominalR writes precede the single infrared sum >=1 diagnostic. Nonpositive effective conductivity retains constructor-zero R/NominalR without adding a conductivity diagnostic or setting ErrorsFound; positive conductivity still writes after a genuine prior shared error. The joint IR check sets ErrorsFound before diagnostic IO and final solar_diffusing follows successful IO, preserving failure prefixes. The independent unused original-schema compiler qualifier defers only this joint check; total Raw/name/type/count/loader/reverse-alias closure includes Raw-present with every typed row missing. The safe scalar exp dependency uses a fixed retained System32 UCRT symbol on WindowsGNU and Rust exp elsewhere; this is static boundary custody, not observed Native provider or private optical parity. Existing public Materials and checked Source geometry use the same row but do not establish private Native optics/NominalR, full geometry traversal or window physics. Every Construction/window consumer, Source A/IDF, Legacy changes and additional optical/spectral/Curve admission remain held; existing Average/SGS/Gas domains are unchanged. Derived positive-infinite report-formatting remains Native undefined/unestablished, without a new Raw/effective finiteness filter, formatter or diagnostic permission."
+    ],
     "OutdoorAir:Node": [
       "Bounded ordinary no-AFN Source B direct epJSON only: coherent authored OutdoorAir:Node singles and nameless OutdoorAir:NodeList objects use actual DSOA and every existing positive-OA prerequisite. The selected IdealLoads OA node may already be a list or single registry member; the real CheckAndAdd owner appends only a genuinely absent node. Height is omitted/default or finite after Native numeric conversion. DB, WB and wind fields are omitted, exact-empty Strings or existing supported schedule references, including both named temperature schedules. On the ordinary no-AFN path, wind_pressure_coefficient_curve_name permits any String, symmetric_wind_pressure_coefficient_curve exactly empty/No/Yes, and wind_angle_type exactly empty/Absolute/Relative. These direct epJSON enums do not trim or case-fold; null, numeric, boolean, container and unknown-enum values stay held. OutdoorAir:NodeList instance keys are input-order and used-object identities, never an A1 node name. Omitted or empty member arrays perform the real zero-alpha input fill; each nodes array member is an Object with a required String node_or_nodelist_name field. An exact-empty field value returns zero nodes, while whitespace remains a real name. All OA-list objects are filled before all singles in actual IP order. Every returned membership preserves the exact Native allocation/reference effects: newly assigned names begin at ref0 and references to existing names increment. OutsideAir registrations and advancing fluid streams are retained per membership; only the final outdoor-node registry deduplicates node numbers. Single registration still precedes Height and schedule writes. Success alone commits the final list/count and clears the consumed input flag. The selected IdealLoads member consumer uses the existing registry path without invented reference or registration effects. Actual A2 then A3 lookup/null assignment/used state and ordered registration remain owners. AnyLocal is positional; IsLocal follows actual temperature pointers. All eight alpha slots, default/blank distinctions, object-used state, highest-field counts and counted N1 default remain genuine. Late-field presence can set AnyLocal; it does not make a local-temperature pointer. Ordinary GetInput never consumes A6-A8 into curve/AFN properties. No AirflowNetwork:SimulationControl, default multizone conjunction or duct-loss route may enter this boundary; positive AFN/Curve/Table families remain held. True InitCall retains global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. Any present WB pointer selects existing real W(Tdb,Twb,P), including both named schedules. DB-only instead writes global W before cached Twb and nested TsatPb/Psat, preserving live pressure, diagnostics, iteration order and default interpolation=false. Computed Twb replaces WB only on child success; earlier weather/clamp writes remain and H/P/Quality stay later. No additional outer clamp follows the computed Twb result; the psychrometric owner retains its own Native final clamp. False/local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. Three cold callers/HB transport actual owners without copied state or resets. The selected coherent scene preserves the inherited active OA climate, all numeric inputs and original output requests. Its complete BND prediction is derived and reviewed before actors from genuine empty owner state through general-list allocation, Zone equipment, OA lists and singles, Scheduled managers, PurchasedAir and the real reporting cutoff. Whole-body comparison covers node/reference identities, connection order, streams, registry order and conditional report blocks; complete general-list and Scheduled-manager exports cover their actual public raw/order custody. Original numeric science, clocks, ancillary and nine-report OA/mixed gates remain mandatory. A selected member consumer and existing owner tests provide distinct evidence; no physical absent-node autoappend or private getter-state witness is inferred. The one combined scene uses distinct real temperature schedule names with equal values; separate existing owner tests cover their declared non-equal clamp effects. Direct private DB/WB/Height/wind/call counts, active WPC/AFN curve validity or pressure physics, arbitrary schedule/value compositions, interpolation/statistics variants, EMS, other consumers, Source A/IDF, TypedModel completion and full-object conformance remain unestablished. Exact-empty OA-list entries are the defined zero-node route. Safe general-NodeList trailing blanks and unreferenced warning-only definitions remain separate from an expanded interior-blank zero prefix, whose Native one-based Node(0)/NodeRef(0) access is undefined or assertion-dependent; the Source checked stop does not claim completion of that partition. On direct epJSON OutdoorAir:Node singles, schema-legally ignored fields outside the eight declared body properties may have any JSON kind, including body name and idf_* members; their exact Raw/IP custody remains intact. They are not getter operands: A1 still comes from the actual map key, and ignored bookkeeping does not alter direct-JSON order, positional counts, defaults or AnyLocal. All known Height, schedule and WPC fields retain their strict type, numeric, enum and reference checks. The fixed child holds every755 parent numeric record and adds only two ignored Float metadata records. It changes no runtime/weather math, node registration/topology, report request, complete export or scientific criterion. Source A/IDF/Legacy, AFN, Native-fatal invalid combinations, unreviewed metadata in other families and broad list/consumer combinations have no new completion or exact fatal-prefix claim.",
       "The original110-type corpus already contains OutdoorAir:Node (12 original occurrences); its raw_source_getter/raw_only/bounded_b category and all141 prior registry classifications remain unchanged. The additional bounded OutdoorAir:NodeList dependency row raises the current registry to142; it does not change the original116-type example union or establish full-domain support. Numerical evidence is limited to fixed negative-global, point, wind, WB-with-wind, DB-only, combined DB/WB, inactive-WPC and the selected coherent multi/list scenes. The latter adds genuine list/single getter and whole-topology/export custody while preserving the active climate and original science. The inactive fields pass the real getter and positional/default effects; their unused curve String establishes no active AFN reference validity or wind-pressure physics. Private Height/DB/WB/wind/call counts, universal averaged laws and arbitrary/full-object combinations remain unobserved. Existing owner tests and frozen full comparisons provide separate scoped evidence."
@@ -11956,6 +11959,50 @@
           "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/source-evidence.json",
           "sha256": "449bd4d462bdb632441743e546e114ef23c5418ac3fb12a0fc5edd01d3a70c96",
           "bytes": 40274
+        }
+      },
+      "unused_window_glazing_refraction_extinction_current_Source": {
+        "actual_quality": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/quality01/summary.json",
+          "sha256": "73dc84937d892092322269f704293fd9bea1c867929497b68e5c4c8a57042b1a",
+          "bytes": 2791
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/evidence01/quality-ledger.json",
+          "sha256": "efc5cb87126df3e63e0ffb36a5461be2377732af8987c694fdaa10e22daba778",
+          "bytes": 5807
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/quality01/quality-preparation.json",
+          "sha256": "57d1f19180a03d1628e9a5ed81d8923e1e7f378ee5418402ae6ea84596230e61",
+          "bytes": 26444
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/evidence01/source-authority.json",
+          "sha256": "7f038f7d804119f348389ccfa6cb94e5afbfcfcf1bcc8e64dd86757cf52a2808",
+          "bytes": 66811
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/object-expansion/unit159-prep/independent-actual-unused-WindowMaterial-Glazing-RefractionExtinction-Source-authority-static-review01.json",
+          "sha256": "6f9f71ae6568cacbaf991a2ecfaa7e5cc34ee49943e3156479e2e066881a85fd",
+          "bytes": 3669
+        },
+        "total_actual_QA_commands": 8,
+        "current_QA_commands": 8,
+        "failed_QA_attempts": 0,
+        "current_test_body_executions": 4,
+        "historical_test_body_executions": 0,
+        "total_actual_test_body_executions": 4,
+        "distinct_existing_test_functions": 4,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "correction_reviews": [],
+        "actual_test_execution_evidence": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/evidence01/source-evidence.json",
+          "sha256": "a4c7b8e63ae9bc8d26de81383ac603bcd6ea295db656ca9da6ad2dcd2312dedc",
+          "bytes": 34879
         }
       }
     },
@@ -78451,12 +78498,333 @@
           "Material_Details_presence": true,
           "geometry_export_identity": true
         }
+      },
+      {
+        "id": "ideal-loads-unused-refraction-extinction-window-glazing",
+        "case_kind": "UNUSED_WINDOW_MATERIAL_GLAZING_REFRACTION_EXTINCTION",
+        "group": "WindowMaterial:Glazing:RefractionExtinctionMethod",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "source_build": "source-unused-refraction-extinction-glazing",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/unused-WindowMaterial-Glazing-RefractionExtinction-CLOSED-input-data-proposal01/input.epJSON",
+          "sha256": "95670b927e1364184b90243968abff442cd2b2a2b9c3449226050fdb52b68520",
+          "bytes": 105256
+        },
+        "weather": null,
+        "input_format": "epJSON",
+        "native_receipt": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/native/command/receipt.json",
+          "sha256": "3bb07366be4b1289f8ad0f3bff862e5c4706acdebcd5263d4a5758ae89f982c5",
+          "bytes": 318048
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/source/command/receipt.json",
+          "sha256": "b0de192b6c1ebf8cf058734c7ba366b833385ce3cdfd021d9815127068fb3848",
+          "bytes": 319455
+        },
+        "source_summary": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/source/output/run-summary.json",
+          "sha256": "36ff399dcc331ba833ff576e224b61a09211a3409a0c767af63d7cd6cb720e29",
+          "bytes": 64630
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/d7/d7ae85c8a738a02697dd3bde1bd04a4cccaa358a7624fabc8d16bd6128ceffb9",
+          "sha256": "d7ae85c8a738a02697dd3bde1bd04a4cccaa358a7624fabc8d16bd6128ceffb9"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/frozen/eplus-rs.exe",
+          "sha256": "a7115036a7d03ff352ac4b91e1ac1eac2b7bb54c68856a5d5f3bfa4eb038c087",
+          "bytes": 81933039
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/build/receipt.json",
+          "sha256": "c0ba449db8d91d50d34b3232cab51f5153072e6a6ecb13edc8df247d428dd169",
+          "bytes": 65097
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/readback.json",
+          "sha256": "b1b8992892ef95c024be3023bf40dda4bc0ed30b458eed58c31a4788e9a71496",
+          "bytes": 540936
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/Root-scientific-review.json",
+          "sha256": "b5c404aed6b5a8ef7a85b5035ef6a2e64d1a2f9b89bba2191b091f1fbe06dc12",
+          "bytes": 18419
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/case-config.json",
+          "sha256": "1dd576409ad11ab0a4a02eab7f7c774b3ffb1156dc0337f679a18e6c093ca1db",
+          "bytes": 111446
+        },
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse_delta": 2.039620483986755e-08
+        },
+        "coverage_kind": "unused_window_glazing_refraction_extinction_current_Source",
+        "numeric_policy_projection": {
+          "policy": {
+            "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+            "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+            "bytes": 43660
+          },
+          "all158_policy_rules_literal": true,
+          "policy_byte_identity": true,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "global_contract_changed": false,
+          "new_report_requests": 0
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v6/release.json",
+            "sha256": "fad05d195e3969372afbcbff8451aff70b70484e3b12683c1890c51ac5c01754",
+            "bytes": 9106
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/binding.json",
+            "sha256": "89f223c31ec8c4ad0122db15cb32d57e7572d392ce4b89d19c06405be04da2f3",
+            "bytes": 1192
+          },
+          "case_config": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/case-config.json",
+            "sha256": "1dd576409ad11ab0a4a02eab7f7c774b3ffb1156dc0337f679a18e6c093ca1db",
+            "bytes": 111446
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/evidence01/source-authority.json",
+            "sha256": "7f038f7d804119f348389ccfa6cb94e5afbfcfcf1bcc8e64dd86757cf52a2808",
+            "bytes": 66811
+          },
+          "completion": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/completed.json",
+            "sha256": "80199e3cb1f2ec45900860e6a01559f1c34b161b16b6efdf747cbcf22622ad1b",
+            "bytes": 2352
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/verify-command/receipt.json",
+            "sha256": "9ab2642742128f03dc3da3669e18d44e35f43182978a9e3d197623d85df85837",
+            "bytes": 319165
+          },
+          "Native_precheck": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/native-precheck.json",
+            "sha256": "6332323456d31498f14726bbc5393cf05d219e373d1a77de9e073da58569fde3",
+            "bytes": 21764
+          },
+          "Native_precheck_receipt": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/precheck-command/receipt.json",
+            "sha256": "920f1748bd066abee0794d2cb0a49c33ecd3056740433443d073594d5fcbb758",
+            "bytes": 318388
+          },
+          "actual_build": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/build-row.json",
+            "sha256": "c0bd58898cad884a4c0bcd84c186bfccb2d03c94c5f15a1340ae5346b9270980",
+            "bytes": 1435
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/quality01/summary.json",
+            "sha256": "73dc84937d892092322269f704293fd9bea1c867929497b68e5c4c8a57042b1a",
+            "bytes": 2791
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/evidence01/source-authority.json",
+            "sha256": "7f038f7d804119f348389ccfa6cb94e5afbfcfcf1bcc8e64dd86757cf52a2808",
+            "bytes": 66811
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "profile": "ideal_loads.oa_topology.v1",
+          "topology_prediction": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/prediction-actual-Source.json",
+            "sha256": "bfbb08f32be777808cbdfb0bb2bece5d038884bff71bb206e56d6e3f2f553918",
+            "bytes": 32612
+          },
+          "topology_derivation": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/derivation-actual-Source.json",
+            "sha256": "c34cd15df21d6490db69de9c55b57a522d8a327f4f9dbf1d8f3afaefd2f5550f",
+            "bytes": 113357
+          },
+          "topology_prediction_reviews": {
+            "Root": {
+              "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/Root-actual-prediction-review.json",
+              "sha256": "65ccc78c30c56ec136086dae27b3ecd68c09ce3a300a8ff5163245c675ad35b3",
+              "bytes": 2381
+            },
+            "independent": {
+              "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowMaterial-Glazing-RefractionExtinction-actual-Source-prediction-review01.json",
+              "sha256": "65ccc78c30c56ec136086dae27b3ecd68c09ce3a300a8ff5163245c675ad35b3",
+              "bytes": 2381
+            }
+          },
+          "Root_runtime_review": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/Root-runtime-review.json",
+            "sha256": "536827ee787f42bf54a4fcb8f1ca768b844a00edd89adc4583f4b4cfc64ca955",
+            "bytes": 2743
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowMaterial-Glazing-RefractionExtinction-CLOSED-input-topology-data-static-review01.json",
+            "sha256": "dc508685e47ce8f08f41e75a81af1acc19470a87587a9536d5b6481968dd62ef",
+            "bytes": 4892
+          },
+          "QA_profile": {
+            "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-Glazing-RefractionExtinction-QA-profile-data-proposal01/QA-profile.json",
+            "sha256": "87fe8e577bab194c37afc8e6d7e85916f21683432c9a7ca6191df420480aa60c",
+            "bytes": 8198
+          },
+          "QA_profile_binding": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/QA-profile-binding01.json",
+            "sha256": "449b03cd88d6a83fdebf05ee2d19d43d0a4b756cd4ede2cbad3f745ae262e4ad",
+            "bytes": 2173
+          },
+          "documentation_actual_facts": {
+            "path": ".runtime/porting/unused-refraction-extinction-glazing/Root-actual-documentation-facts01.json",
+            "sha256": "3b3cf6b546a0fc4b9ed2b4f846871381719fc3a495d43f9012015e5fffa1c489",
+            "bytes": 1607
+          }
+        },
+        "scientific_gate_counts": {
+          "engine": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "public_response_summary": {
+          "Native": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.03148489327319126,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          },
+          "Source": {
+            "full_clock_context_operand_joins": 4320,
+            "common_candidate_samples": 360,
+            "mixed_temperature_response_samples": 281,
+            "mixed_humidity_response_samples": 360,
+            "max_abs_candidate_temperature_difference": 0.031484893273194814,
+            "max_abs_candidate_humidity_difference": 0.00012480081842757354,
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            }
+          }
+        },
+        "effective_state": "One ordinary SourceB direct-epJSON scene adds one unused WindowMaterial:Glazing:RefractionExtinctionMethod named GLASS UNUSED REFRACTION DEFAULT with exactly five required Float operands thickness0.003,solar refraction index1.5/extinction20.0,visible refraction index1.7/extinction100.0;all optional and unknown fields remain omitted and use actual schema/getter defaults. Retained SpectralAverage,SGS,namedGas,CustomGas andGasMixture definitions remain present;no Construction references the new Glass. All768 parent numeric records and752 canonical numeric records are held,with five added Float records and21 total canonical additions. Native and Source public11-column Material Details rows agree,including rounded base Resistance;this public field exposes no Native private NominalR,optical coefficients or exp provider state. Actual Source geometry retains the same real SourceNum/map/typed Glass identity,GroupGlass3,VerySmooth5,thermal-back absorptance0.84 and constructor-zero solar/visible absorptances,plus internally associated Source-only NominalR value/bits without a hardcoded R or optical formula. Current,historical,failed and reused QA counts/names derive from this actual SourceAuthority and its authenticated Refraction four-body profile;no prior Source177 repair/failure history is copied or manufactured and public MaterialDetails grants no test credit. All158/75120 numerical,clock,diagnostics,topology and ancillary gates remain mandatory. No fixed-input observation establishes private Native optics/math-provider parity,arbitrary legal-combination/full-object or active-window support. Every Construction/window consumer,other optical modes,positive Spectrum/Curve,SourceA/IDF/Legacy and full MaterialGlass completion remain held.",
+        "authored_height": {
+          "JSON_kind": "Float",
+          "value": 12.5,
+          "bits": "4029000000000000"
+        },
+        "unused_refraction_extinction_glazing": {
+          "fixed_input_manifest": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-WindowMaterial-Glazing-RefractionExtinction-CLOSED-input-data-proposal02/prepared-manifest.json",
+            "sha256": "881188deeb9e6310f22ad92fa5b12166e63a1640222abf186ef3b998c1162410",
+            "bytes": 14101
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowMaterial-Glazing-RefractionExtinction-CLOSED-input-topology-data-static-review01.json",
+            "sha256": "dc508685e47ce8f08f41e75a81af1acc19470a87587a9536d5b6481968dd62ef",
+            "bytes": 4892
+          },
+          "parent_numeric_records": 768,
+          "current_numeric_records": 773,
+          "added_numeric_records": [
+            {
+              "JSON_path": "/WindowMaterial:Glazing:RefractionExtinctionMethod/GLASS UNUSED REFRACTION DEFAULT/solar_extinction_coefficient",
+              "JSON_kind": "float",
+              "token": "20.0",
+              "parsed_binary64_bits": "4034000000000000",
+              "parsed_binary64_hex": "0x1.4000000000000p+4"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Glazing:RefractionExtinctionMethod/GLASS UNUSED REFRACTION DEFAULT/solar_index_of_refraction",
+              "JSON_kind": "float",
+              "token": "1.5",
+              "parsed_binary64_bits": "3ff8000000000000",
+              "parsed_binary64_hex": "0x1.8000000000000p+0"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Glazing:RefractionExtinctionMethod/GLASS UNUSED REFRACTION DEFAULT/thickness",
+              "JSON_kind": "float",
+              "token": "0.003",
+              "parsed_binary64_bits": "3f689374bc6a7efa",
+              "parsed_binary64_hex": "0x1.89374bc6a7efap-9"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Glazing:RefractionExtinctionMethod/GLASS UNUSED REFRACTION DEFAULT/visible_extinction_coefficient",
+              "JSON_kind": "float",
+              "token": "100.0",
+              "parsed_binary64_bits": "4059000000000000",
+              "parsed_binary64_hex": "0x1.9000000000000p+6"
+            },
+            {
+              "JSON_path": "/WindowMaterial:Glazing:RefractionExtinctionMethod/GLASS UNUSED REFRACTION DEFAULT/visible_index_of_refraction",
+              "JSON_kind": "float",
+              "token": "1.7",
+              "parsed_binary64_bits": "3ffb333333333333",
+              "parsed_binary64_hex": "0x1.b333333333333p+0"
+            }
+          ],
+          "Refraction_family_present_in_parent": false,
+          "Refraction_map_before": {},
+          "Refraction_map_after": {
+            "GLASS UNUSED REFRACTION DEFAULT": {
+              "thickness": 0.003,
+              "solar_index_of_refraction": 1.5,
+              "solar_extinction_coefficient": 20.0,
+              "visible_index_of_refraction": 1.7,
+              "visible_extinction_coefficient": 100.0
+            }
+          },
+          "added_Raw_Refraction": {
+            "path": [
+              "WindowMaterial:Glazing:RefractionExtinctionMethod",
+              "GLASS UNUSED REFRACTION DEFAULT"
+            ],
+            "body": {
+              "thickness": 0.003,
+              "solar_index_of_refraction": 1.5,
+              "solar_extinction_coefficient": 20.0,
+              "visible_index_of_refraction": 1.7,
+              "visible_extinction_coefficient": 100.0
+            }
+          },
+          "Material_Details_presence": true,
+          "geometry_export_identity": true
+        }
       }
     ],
     "totals": {
-      "paired_cases": 259,
-      "reported_samples": 11398216,
-      "raw_operand_unequal": 2900558,
+      "paired_cases": 260,
+      "reported_samples": 11473336,
+      "raw_operand_unequal": 2923626,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -81648,6 +82016,38 @@
           "sha256": "4169235f5e3dc899ef0efa03cbb131824caae643fdfd066efae4d0081fd3bed2",
           "bytes": 69800
         }
+      },
+      {
+        "id": "source-unused-refraction-extinction-glazing",
+        "receipt": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/build/receipt.json",
+          "sha256": "c0ba449db8d91d50d34b3232cab51f5153072e6a6ecb13edc8df247d428dd169",
+          "bytes": 65097
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/d7/d7ae85c8a738a02697dd3bde1bd04a4cccaa358a7624fabc8d16bd6128ceffb9",
+          "sha256": "d7ae85c8a738a02697dd3bde1bd04a4cccaa358a7624fabc8d16bd6128ceffb9"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/frozen/eplus-rs.exe",
+          "sha256": "a7115036a7d03ff352ac4b91e1ac1eac2b7bb54c68856a5d5f3bfa4eb038c087",
+          "bytes": 81933039
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/frozen/build-receipt.json",
+          "sha256": "ec02c167f47ae1db45d27ed90b40ccacf756ad01672c84d2dffd873b4e9ea461",
+          "bytes": 1645519
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/quality01/quality-preparation.json",
+          "sha256": "57d1f19180a03d1628e9a5ed81d8923e1e7f378ee5418402ae6ea84596230e61",
+          "bytes": 26444
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/freeze/receipt.json",
+          "sha256": "14552f6cf4aa25b94b90c66a51991d2098836fce999b2a01519d9e2b43f8daad",
+          "bytes": 64116
+        }
       }
     ],
     "focused_since_workspace": {
@@ -82094,14 +82494,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 177,
-      "builds_with_accepted_paired_cases": 155,
+      "actual_recorded_builds": 178,
+      "builds_with_accepted_paired_cases": 156,
       "builds_with_only_retained_failed_Source_attempts": 8,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 14,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "177 recorded Source builds: 155 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "178 recorded Source builds: 156 retain accepted pairs and 22 have none, including 8 without Source execution. Only the latest strictly verified paired scene adds one case/75120 values here; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -86803,47 +87203,48 @@
         "ideal-loads-unused-named-window-gas",
         "ideal-loads-unused-custom-window-gas",
         "ideal-loads-unused-window-gas-mixture",
-        "ideal-loads-unused-spectral-average-window-glazing"
+        "ideal-loads-unused-spectral-average-window-glazing",
+        "ideal-loads-unused-refraction-extinction-window-glazing"
       ],
-      "accepted_paired_cases": 88,
-      "accepted_samples": 6497040,
-      "retained_Scheduled_B_pairs": 87,
-      "retained_Scheduled_B_samples": 6437520,
+      "accepted_paired_cases": 89,
+      "accepted_samples": 6572160,
+      "retained_Scheduled_B_pairs": 88,
+      "retained_Scheduled_B_samples": 6512640,
       "unused_NodeList_A_pairs": 1,
       "unused_NodeList_A_samples": 59520,
       "latest_complete_comparisons": {
-        "UNUSED_WINDOW_MATERIAL_GLAZING_SPECTRAL_AVERAGE": {
-          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/readback.json",
-          "sha256": "8c35112edbfd0ebbfe0df27ba326bea0e291e4ac758c7dc6cf209d054a1813c9",
-          "bytes": 540711
+        "UNUSED_WINDOW_MATERIAL_GLAZING_REFRACTION_EXTINCTION": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/readback.json",
+          "sha256": "b1b8992892ef95c024be3023bf40dda4bc0ed30b458eed58c31a4788e9a71496",
+          "bytes": 540936
         }
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/Root-scientific-review.json",
-        "sha256": "88f51234a5e121f732f589afbff29748689f95a5e9a8cf2c2cb6e47e0a68d6ae",
-        "bytes": 17797
+        "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/Root-scientific-review.json",
+        "sha256": "b5c404aed6b5a8ef7a85b5035ef6a2e64d1a2f9b89bba2191b091f1fbe06dc12",
+        "bytes": 18419
       },
-      "latest_source_build": "source-unused-spectral-average-glazing",
+      "latest_source_build": "source-unused-refraction-extinction-glazing",
       "latest_actual_Source_build": {
-        "path": ".runtime/porting/unused-spectral-average-glazing/build01/build-row.json",
-        "sha256": "2d88f183084a783b2cdb4a0b2aa222c04f4fb54176c2d9fb8e9a6a6c04267ff6",
-        "bytes": 1405
+        "path": ".runtime/porting/unused-refraction-extinction-glazing/build01/build-row.json",
+        "sha256": "c0bd58898cad884a4c0bcd84c186bfccb2d03c94c5f15a1340ae5346b9270980",
+        "bytes": 1435
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/unused-spectral-average-glazing/quality02/summary.json",
-        "sha256": "57a1ffd8bc35c9bbc6ce8f8d6e71a61276c3f29934482ec686cacca6a470b1ee",
-        "bytes": 2751
+        "path": ".runtime/porting/unused-refraction-extinction-glazing/quality01/summary.json",
+        "sha256": "73dc84937d892092322269f704293fd9bea1c867929497b68e5c4c8a57042b1a",
+        "bytes": 2791
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/porting/unused-spectral-average-glazing/evidence01/source-authority.json",
-        "sha256": "5a034692e38daf55f52dbda4acb8893928576b42bdec7e421d477440b7411812",
-        "bytes": 77233
+        "path": ".runtime/porting/unused-refraction-extinction-glazing/evidence01/source-authority.json",
+        "sha256": "7f038f7d804119f348389ccfa6cb94e5afbfcfcf1bcc8e64dd86757cf52a2808",
+        "bytes": 66811
       },
       "latest_input_contracts": {
-        "UNUSED_WINDOW_MATERIAL_GLAZING_SPECTRAL_AVERAGE": {
-          "path": ".runtime/porting/unused-spectral-average-glazing/runtime01/case-config.json",
-          "sha256": "96e084fd68bb18fa25e4288404d3c6fbb84f71f679173599fe361691164b16dc",
-          "bytes": 110664
+        "UNUSED_WINDOW_MATERIAL_GLAZING_REFRACTION_EXTINCTION": {
+          "path": ".runtime/porting/unused-refraction-extinction-glazing/runtime01/case-config.json",
+          "sha256": "1dd576409ad11ab0a4a02eab7f7c774b3ffb1156dc0337f679a18e6c093ca1db",
+          "bytes": 111446
         }
       },
       "latest_retained_evidence": {
@@ -86856,7 +87257,7 @@
         "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
         "bytes": 2919
       },
-      "scope": "87 bounded Source B Scheduled/NodeList pairs retain 6,437,520 values. The unused Source A pair adds59,520, giving 88 pairs and 6,497,040 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
+      "scope": "88 bounded Source B Scheduled/NodeList pairs retain 6,512,640 values. The unused Source A pair adds59,520, giving 89 pairs and 6,572,160 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
       "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",

@@ -117,7 +117,8 @@ impl SelectedMaterialData {
                             },
                         )
                     }
-                    MaterialDefinition::WindowGlazingSpectralAverage(_) => {
+                    MaterialDefinition::WindowGlazingSpectralAverage(_)
+                    | MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
                         if self.material_groups.get(id) != Some(&SourceMaterialGroup::Glass) {
                             return Err(unavailable("reported ordinary Glass actual group"));
                         }

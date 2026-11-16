@@ -323,6 +323,85 @@ fn refraction_extinction_shares_names_with_prior_material_families() {
             && diagnostic.object_type == "WindowMaterial:Glazing:RefractionExtinctionMethod"
             && diagnostic.object_name.as_deref() == Some("shared")
     }));
+
+    // Plain JSON and existing parser only: ep_compiler has no serde_json dep.
+    let mut source_json=r#"{
+        "Material":{" Opaque ":{"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000.0,"specific_heat":1000.0}},
+        "Construction":{"Opaque Ref":{"outside_layer":" OPAQUE "}},
+        "WindowMaterial:Glazing:RefractionExtinctionMethod":{
+            " Alternative ":{"thickness":0.003,"solar_index_of_refraction":1.5,"solar_extinction_coefficient":20.0,"visible_index_of_refraction":1.7,"visible_extinction_coefficient":100.0,"infrared_transmittance_at_normal_incidence":0.5,"infrared_hemispherical_emissivity":0.5,"solar_diffusing":"Yes","optical_data_type":{"ignored":true}},
+            "\u00a0":{"thickness":0.003,"solar_index_of_refraction":1.5,"solar_extinction_coefficient":20.0,"visible_index_of_refraction":1.7,"visible_extinction_coefficient":100.0},
+            "\u000b":{"thickness":0.003,"solar_index_of_refraction":1.5,"solar_extinction_coefficient":20.0,"visible_index_of_refraction":1.7,"visible_extinction_coefficient":100.0}
+        }
+    }"#.to_string();
+    let raw = parse_epjson_str(&source_json).unwrap();
+    let source = super::super::compile_raw_model_for_source(&raw);
+    assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+    let model = source.model.as_ref().unwrap();
+    assert!(
+        model.material_names.is_source_exact_namespace()
+            && model.material_names.resolve("Opaque").is_none()
+            && model.constructions[0].layers[0]
+                == model.material_names.resolve(" Opaque ").unwrap()
+    );
+    for name in [" Alternative ", "\u{a0}", "\u{b}"] {
+        let id = model.material_names.resolve(name).unwrap();
+        assert!(
+            model
+                .ctf_report_names
+                .materials
+                .contains(&(id, name.to_ascii_uppercase()))
+                && model.materials.iter().any(|row| row.id == id
+                    && matches!(
+                        row.definition,
+                        MaterialDefinition::WindowGlazingRefractionExtinction(_)
+                    ))
+        );
+    }
+    let legacy = compile_raw_model(&raw);
+    assert!(
+        legacy
+            .report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "InvalidWindowGlazingOpticalSum")
+    );
+    source_json = source_json.replacen(
+        r#""Material":"#,
+        r#""WindowMaterial:Gas":{"Named":{"gas_type":"Air","thickness":0.012}},"Material":"#,
+        1,
+    );
+    let used = source_json.replacen(
+        r#""Opaque Ref":"#,
+        r#""Alternative Used":{"outside_layer":" Alternative "},"Opaque Ref":"#,
+        1,
+    );
+    let invalid = source_json.replacen(
+        r#""solar_index_of_refraction":1.5"#,
+        r#""solar_index_of_refraction":1.0"#,
+        1,
+    );
+    let bad_enum = source_json.replacen(
+        r#""solar_diffusing":"Yes""#,
+        r#""solar_diffusing":"yes""#,
+        1,
+    );
+    for (text, code) in [
+        (used, "InvalidWindowGlazingOpticalSum"),
+        (invalid, "InvalidNumericRange"),
+        (bad_enum, "InvalidWindowGlazingOpticalSum"),
+    ] {
+        let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&text).unwrap());
+        assert!(result.report.diagnostics.iter().any(|d| d.code == code));
+    }
+    let no_refraction=super::super::compile_raw_model_for_source(&parse_epjson_str(r#"{"Material":{" Opaque ":{"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000.0,"specific_heat":1000.0}}}"#).unwrap());
+    assert!(
+        !no_refraction
+            .model
+            .unwrap()
+            .material_names
+            .is_source_exact_namespace()
+    );
 }
 
 #[test]

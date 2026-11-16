@@ -4330,6 +4330,69 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "WindowMaterial:Glazing:RefractionExtinctionMethod" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "thickness",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "solar_index_of_refraction",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "solar_extinction_coefficient",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "visible_index_of_refraction",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "visible_extinction_coefficient",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "infrared_transmittance_at_normal_incidence",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "infrared_hemispherical_emissivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "conductivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "dirt_correction_factor_for_solar_and_visible_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "solar_diffusing",
+                    default: SchemaDefault::String("No"),
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "WindowMaterial:Glazing" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

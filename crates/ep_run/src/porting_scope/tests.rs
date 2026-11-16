@@ -8218,6 +8218,297 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         )
         .is_err()
     );
+
+    // Actual Source compiler/IP/statistics/weather/support. Unknown body
+    // optical tags are metadata here, not a prerequisite for this family.
+    const ALTERNATIVE: &str = "WindowMaterial:Glazing:RefractionExtinctionMethod";
+    let mut alternative_value = input(PortingScope::B);
+    alternative_value["WindowMaterial:Glazing"] =
+        json!({"Average Neighbour":{"optical_data_type":"SpectralAverage","thickness":0.003}});
+    alternative_value[ALTERNATIVE] = json!({
+        " DEFAULT ":{"thickness":0.003,"solar_index_of_refraction":1.5,"solar_extinction_coefficient":20.0,"visible_index_of_refraction":1.7,"visible_extinction_coefficient":100.0,"solar_diffusing":""},
+        " WRAPPED ":{"thickness":u64::MAX,"solar_index_of_refraction":u64::MAX,"solar_extinction_coefficient":u64::MAX,"visible_index_of_refraction":u64::MAX,"visible_extinction_coefficient":u64::MAX,"conductivity":u64::MAX,"solar_diffusing":"Yes",
+            "optical_data_type":{"ignored":true},"young_s_modulus":false,"poisson_s_ratio":[],"name":null,"idf_order":{},"idf_max_fields":false,"metadata":[null,1.25]}
+    });
+    let alternative_raw = parse_epjson_str(&alternative_value.to_string()).unwrap();
+    let compiled = ep_compiler::compile_raw_model_for_source(&alternative_raw);
+    assert!(!compiled.has_errors(), "{:?}", compiled.report.diagnostics);
+    let model = compiled.model.as_ref().unwrap();
+    let id = model.material_names.resolve(" WRAPPED ").unwrap();
+    assert!(
+        model.material_names.is_source_exact_namespace()
+            && model
+                .ctf_report_names
+                .materials
+                .contains(&(id, " WRAPPED ".into()))
+    );
+    let mut ip = crate::ordinary_input_processor::resolve_source_b(&alternative_raw).unwrap();
+    let args = ip.get_object_def_max_args(ALTERNATIVE).unwrap();
+    assert_eq!(
+        (args.alphas, args.numerics, args.total().unwrap()),
+        (2, 9, 11)
+    );
+    let original = ip
+        .source_raw_object_fields(ALTERNATIVE, " WRAPPED ")
+        .unwrap();
+    assert!(
+        matches!(original.get("solar_index_of_refraction"),Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token=="18446744073709551615")
+            && original.contains_key("optical_data_type")
+            && original.contains_key("idf_max_fields")
+    );
+    let projected = crate::ordinary_material_input::resolve_source(&alternative_raw, &ip).unwrap();
+    assert_eq!(
+        (
+            projected.refraction.len(),
+            projected.refraction[0].fields.len(),
+            projected.refraction[1].fields.len()
+        ),
+        (2, 6, 7)
+    );
+    assert_eq!(
+        [
+            "thickness",
+            "solar_index_of_refraction",
+            "solar_extinction_coefficient",
+            "visible_index_of_refraction",
+            "visible_extinction_coefficient",
+            "conductivity"
+        ]
+        .map(|field| projected.refraction[1].fields[field].clone()),
+        [-1.0; 6].map(ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number)
+    );
+    assert!(
+        !projected.refraction[1]
+            .fields
+            .contains_key("optical_data_type")
+            && !projected.refraction[1]
+                .fields
+                .contains_key("young_s_modulus")
+    );
+    let mut stats = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+    ip.report_source_idf_records_stats(&mut stats).unwrap();
+    assert_eq!(
+        usize::try_from(stats.number_input_records).unwrap(),
+        alternative_raw
+            .objects
+            .values()
+            .map(|rows| rows.len())
+            .sum::<usize>()
+    );
+    assert!(
+        ip.is_object_unused(ALTERNATIVE, " DEFAULT ")
+            && ip.is_object_unused(ALTERNATIVE, " WRAPPED ")
+    );
+    let mut trace = inspect_porting_scope(
+        &alternative_raw,
+        &compiled.report,
+        Some(model),
+        PortingScope::B,
+    );
+    assert!(trace.admissible, "{:?}", trace.violations);
+    trace.environment = Some(
+        super::environment::environment_from_weather(
+            model,
+            &weather,
+            "existing Refraction caller weather",
+        )
+        .unwrap(),
+    );
+    let admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&alternative_raw, &trace)
+            .unwrap();
+    assert!(
+        crate::support::assess_support_with_source_admission(
+            &alternative_raw,
+            &compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&admission)
+        )
+        .allows_rust_runtime()
+    );
+    assert!(
+        crate::ordinary_equipment_input::resolve(&alternative_raw).is_err()
+            && crate::ordinary_equipment_input::resolve_source_a(&alternative_raw).is_err()
+            && !assess_support(
+                &alternative_raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal
+            )
+            .allows_rust_runtime()
+    );
+    let mut models = Vec::new();
+    let mut absent = model.clone();
+    absent
+        .materials
+        .retain(|row| row.kind() != ep_model::MaterialKind::WindowGlazingRefractionExtinction);
+    models.push(absent);
+    let mut alias = model.clone();
+    alias.material_names.insert("EXTRA ALTERNATIVE ALIAS", id);
+    models.push(alias);
+    let mut duplicate = model.clone();
+    duplicate.material_names.insert_instance(" WRAPPED ", id);
+    models.push(duplicate);
+    let mut loader = model.clone();
+    loader
+        .ctf_report_names
+        .materials
+        .push((id, "EXTRA LOADER".into()));
+    models.push(loader);
+    let mut missing = model.clone();
+    missing
+        .ctf_report_names
+        .materials
+        .retain(|(key, _)| *key != id);
+    models.push(missing);
+    let mut wrong_id = model.clone();
+    wrong_id
+        .materials
+        .iter_mut()
+        .find(|row| row.id == id)
+        .unwrap()
+        .id = ep_model::MaterialId(u32::MAX);
+    models.push(wrong_id);
+    let mut wrong_name = model.clone();
+    wrong_name
+        .materials
+        .iter_mut()
+        .find(|row| row.id == id)
+        .unwrap()
+        .name = ep_model::NormalizedName::new("WRONG");
+    models.push(wrong_name);
+    let mut wrong_kind = model.clone();
+    let average = wrong_kind
+        .materials
+        .iter()
+        .find(|row| row.kind() == ep_model::MaterialKind::WindowGlazing)
+        .unwrap()
+        .definition;
+    wrong_kind
+        .materials
+        .iter_mut()
+        .find(|row| row.id == id)
+        .unwrap()
+        .definition = average;
+    models.push(wrong_kind);
+    let mut extra = model.clone();
+    let mut row = extra
+        .materials
+        .iter()
+        .find(|row| row.id == id)
+        .unwrap()
+        .clone();
+    row.id = ep_model::MaterialId(u32::try_from(extra.materials.len()).unwrap());
+    extra.materials.push(row);
+    models.push(extra);
+    let mut used = model.clone();
+    used.constructions[0].layers.clear();
+    used.constructions[0].outside_layer = Some(id);
+    models.push(used);
+    let mut layered = model.clone();
+    let opaque = layered.constructions[0].outside_layer.unwrap();
+    layered.constructions[0].layers = vec![opaque, id];
+    models.push(layered);
+    for model in models {
+        assert!(
+            !crate::support::assess_support_with_source_admission(
+                &alternative_raw,
+                &compiled.report,
+                Some(&model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission)
+            )
+            .allows_rust_runtime()
+        );
+    }
+    let mut empty_value = alternative_value.clone();
+    empty_value.as_object_mut().unwrap().remove(ALTERNATIVE);
+    let empty_raw = parse_epjson_str(&empty_value.to_string()).unwrap();
+    let empty_compiled = ep_compiler::compile_raw_model_for_source(&empty_raw);
+    let empty_model = empty_compiled.model.as_ref().unwrap();
+    let mut empty_trace = inspect_porting_scope(
+        &empty_raw,
+        &empty_compiled.report,
+        Some(empty_model),
+        PortingScope::B,
+    );
+    empty_trace.environment = Some(
+        super::environment::environment_from_weather(
+            empty_model,
+            &weather,
+            "same noRefraction weather",
+        )
+        .unwrap(),
+    );
+    let empty_admission =
+        crate::support::SourceSupportAdmission::from_validated_scope(&empty_raw, &empty_trace)
+            .unwrap();
+    assert!(
+        !crate::support::assess_support_with_source_admission(
+            &empty_raw,
+            &empty_compiled.report,
+            Some(model),
+            RunMode::Compatibility,
+            PartialRunPolicy::Deny,
+            RunOutputFormat::RustNative,
+            TraceLevel::Normal,
+            Some(&empty_admission)
+        )
+        .allows_rust_runtime()
+    );
+    for (field, value) in [
+        ("thickness", json!(0.0)),
+        ("solar_index_of_refraction", json!(1.0)),
+        ("solar_extinction_coefficient", json!(null)),
+        ("visible_index_of_refraction", json!("1.7")),
+        ("visible_extinction_coefficient", json!(false)),
+        ("infrared_transmittance_at_normal_incidence", json!(1.0)),
+        ("infrared_hemispherical_emissivity", json!(0.0)),
+        ("conductivity", json!(0.0)),
+        (
+            "dirt_correction_factor_for_solar_and_visible_transmittance",
+            json!(1.1),
+        ),
+        ("solar_diffusing", json!("yes")),
+        ("solar_diffusing", json!(" ")),
+    ] {
+        let mut bad = alternative_value.clone();
+        bad[ALTERNATIVE][" DEFAULT "][field] = value;
+        assert!(
+            crate::ordinary_input_processor::resolve_source_b(
+                &parse_epjson_str(&bad.to_string()).unwrap()
+            )
+            .is_err()
+        );
+    }
+    let mut missing = alternative_value.clone();
+    missing[ALTERNATIVE][" DEFAULT "]
+        .as_object_mut()
+        .unwrap()
+        .remove("visible_extinction_coefficient");
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &parse_epjson_str(&missing.to_string()).unwrap()
+        )
+        .is_err()
+    );
+    alternative_value["Construction"]["Alternative Used"] = json!({"outside_layer":" WRAPPED "});
+    assert!(
+        crate::ordinary_equipment_input::resolve_source_b(
+            &parse_epjson_str(&alternative_value.to_string()).unwrap()
+        )
+        .is_err()
+    );
 }
 
 #[test]
