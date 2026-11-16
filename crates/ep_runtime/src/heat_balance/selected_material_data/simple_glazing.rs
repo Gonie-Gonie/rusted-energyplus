@@ -12,6 +12,7 @@ pub(super) enum SourceSimpleGlazingOpticalModel {
     #[default]
     SpectralAverage,
     Spectral,
+    SpectralAndAngle = 3,
 }
 
 /// Sole runtime GlassSimple properties. Typed derived values remain advisory.
@@ -40,6 +41,9 @@ pub(super) struct SourceSimpleGlazingMaterial {
     pub solar_diffusing: bool,
     pub dirt_factor: f64,
     pub optical_model: SourceSimpleGlazingOpticalModel,
+    pub spec_ang_trans_curve: i32,
+    pub spec_ang_front_curve: i32,
+    pub spec_ang_back_curve: i32,
     pub transmittance: f64,
     pub solar_reflectance_back: f64,
     pub solar_reflectance_front: f64,
@@ -73,6 +77,9 @@ impl Default for SourceSimpleGlazingMaterial {
             solar_diffusing: false,
             dirt_factor: 1.0,
             optical_model: SourceSimpleGlazingOpticalModel::SpectralAverage,
+            spec_ang_trans_curve: 0,
+            spec_ang_front_curve: 0,
+            spec_ang_back_curve: 0,
             transmittance: 0.0,
             solar_reflectance_back: 0.0,
             solar_reflectance_front: 0.0,
@@ -661,19 +668,22 @@ impl SelectedMaterialData {
             material.optical_model = match owners.shortcut.alpha_args[1].as_str() {
                 "SPECTRALAVERAGE" => SourceSimpleGlazingOpticalModel::SpectralAverage,
                 "SPECTRAL" => SourceSimpleGlazingOpticalModel::Spectral,
+                "SPECTRALANDANGLE" => SourceSimpleGlazingOpticalModel::SpectralAndAngle,
                 _ => {
                     return Err(unavailable(
-                        "ordinary Glazing optical owner beyond Average/Spectral",
+                        "ordinary Glazing optical owner beyond Average/Spectral/Angle",
                     ));
                 }
             };
-            material.transmittance = owners.shortcut.numeric_args[1];
-            material.solar_reflectance_front = owners.shortcut.numeric_args[2];
-            material.solar_reflectance_back = owners.shortcut.numeric_args[3];
-            material.visible_transmittance = owners.shortcut.numeric_args[4];
-            material.visible_reflectance_front = owners.shortcut.numeric_args[5];
-            material.visible_reflectance_back = owners.shortcut.numeric_args[6];
-            material.thermal_transmittance = owners.shortcut.numeric_args[7];
+            if material.optical_model != SourceSimpleGlazingOpticalModel::SpectralAndAngle {
+                material.transmittance = owners.shortcut.numeric_args[1];
+                material.solar_reflectance_front = owners.shortcut.numeric_args[2];
+                material.solar_reflectance_back = owners.shortcut.numeric_args[3];
+                material.visible_transmittance = owners.shortcut.numeric_args[4];
+                material.visible_reflectance_front = owners.shortcut.numeric_args[5];
+                material.visible_reflectance_back = owners.shortcut.numeric_args[6];
+                material.thermal_transmittance = owners.shortcut.numeric_args[7];
+            }
             material.thermal_front = owners.shortcut.numeric_args[8];
             material.thermal_back = owners.shortcut.numeric_args[9];
             material.conductivity = owners.shortcut.numeric_args[10];
@@ -700,9 +710,10 @@ impl SelectedMaterialData {
             material.optical_model = match owners.shortcut.alpha_args[1].as_str() {
                 "SPECTRALAVERAGE" => SourceSimpleGlazingOpticalModel::SpectralAverage,
                 "SPECTRAL" => SourceSimpleGlazingOpticalModel::Spectral,
+                "SPECTRALANDANGLE" => SourceSimpleGlazingOpticalModel::SpectralAndAngle,
                 _ => {
                     return Err(unavailable(
-                        "ordinary Glazing optical owner beyond Average/Spectral",
+                        "ordinary Glazing optical owner beyond Average/Spectral/Angle",
                     ));
                 }
             };
@@ -734,7 +745,7 @@ impl SelectedMaterialData {
                         *owners.errors_found = true;
                     }
                 }
-            } else {
+            } else if material.optical_model == SourceSimpleGlazingOpticalModel::SpectralAverage {
                 for (a, b) in [(1, 2), (1, 3), (4, 5), (4, 6), (7, 8), (7, 9)] {
                     if owners.shortcut.numeric_args[a] + owners.shortcut.numeric_args[b] > 1.0 {
                         *owners.errors_found = true;
@@ -880,6 +891,125 @@ impl SelectedMaterialData {
                             error,
                         )))
                     })?;
+            }
+            // Native Material.cc613-763: retain the same Curve owner and pointer order.
+            if material.optical_model == SourceSimpleGlazingOpticalModel::SpectralAndAngle {
+                let mut front_curve = None;
+                for alpha in [4, 5, 6] {
+                    if owners.shortcut.alpha_field_blanks[alpha] {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} cannot be empty when {} = SpectralAndAngle.",
+                            owners.shortcut.alpha_field_names[alpha],
+                            owners.shortcut.alpha_field_names[1]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                        continue;
+                    }
+                    let curves = owners
+                        .curves
+                        .ok_or_else(|| unavailable("actual SpectralAndAngle Curve owner"))?;
+                    let curve = curves.get_curve(&owners.shortcut.alpha_args[alpha]);
+                    let ordinal = curve.map_or(0, |row| row.num);
+                    match alpha {
+                        4 => material.spec_ang_trans_curve = ordinal,
+                        5 => {
+                            material.spec_ang_front_curve = ordinal;
+                            front_curve = curve;
+                        }
+                        6 => material.spec_ang_back_curve = ordinal,
+                        _ => unreachable!(),
+                    }
+                    let Some(curve) = curve else {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} = {}, item not found.",
+                            owners.shortcut.alpha_field_names[alpha],
+                            owners.shortcut.alpha_args[alpha]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                        continue;
+                    };
+                    if curve.num_dims != 2 {
+                        let flags = owners.diagnostic_flags.as_ref().ok_or_else(|| {
+                            unavailable("actual Curve dimensions diagnostic flags")
+                        })?;
+                        owners
+                            .backend
+                            .show_source_severe_error(
+                                &format!("GetMaterialData: WindowMaterial:Glazing=\"{name}\""),
+                                flags,
+                            )
+                            .map_err(|error| RuntimeError::HeatBalanceInput(Box::new(error)))?;
+                        for message in [
+                            format!(
+                                "...Invalid curve for {}.",
+                                owners.shortcut.alpha_field_names[alpha]
+                            ),
+                            format!(
+                                "...Input curve=\"{}\" has dimension {}.",
+                                owners.shortcut.alpha_args[alpha], curve.num_dims
+                            ),
+                            "...Curve type must have dimension 2.".into(),
+                        ] {
+                            owners
+                                .backend
+                                .show_continue_error(&message)
+                                .map_err(|error| {
+                                    RuntimeError::HeatBalanceInput(Box::new(
+                                        HeatBalanceInputError::Backend(error),
+                                    ))
+                                })?;
+                        }
+                        *owners.errors_found = true;
+                        continue;
+                    }
+                    // Native BACK validation intentionally reads FRONT input limits.
+                    let limits =
+                        if alpha == 6 {
+                            front_curve.ok_or_else(|| unavailable(
+                            "Native SpectralAndAngle null FRONT/BACK bounds fault partition"
+                        ))?
+                        } else {
+                            curve
+                        };
+                    let min_angle = limits.input_limits[0].min;
+                    let max_angle = limits.input_limits[0].max;
+                    let min_wavelength = limits.input_limits[1].min;
+                    let max_wavelength = limits.input_limits[1].max;
+                    if min_angle > 1.0e-6 {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} requires the minimum value = 0.0 in the entered table name={}",
+                            owners.shortcut.alpha_field_names[4], owners.shortcut.alpha_args[4]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                    }
+                    if (max_angle - 90.0).abs() > 1.0e-6 {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} requires the maximum value = 90.0 in the entered table name={}",
+                            owners.shortcut.alpha_field_names[4], owners.shortcut.alpha_args[4]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                    }
+                    if min_wavelength < 0.1 {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} requires the minimum value = 0.1 micron in the entered table name={}",
+                            owners.shortcut.alpha_field_names[4], owners.shortcut.alpha_args[4]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                    }
+                    if max_wavelength > 4.0 {
+                        *owners.errors_found = true;
+                        let message = format!(
+                            "{} requires the maximum value = 4.0 microns in the entered table name={}",
+                            owners.shortcut.alpha_field_names[4], owners.shortcut.alpha_args[4]
+                        );
+                        glazing_custom(owners, &name, &message, false)?;
+                    }
+                }
             }
         }
         Ok(())

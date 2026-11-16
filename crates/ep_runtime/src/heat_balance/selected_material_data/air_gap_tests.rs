@@ -217,6 +217,7 @@ fn get_materials(
     data.get_material_data(
         raw,
         &mut MaterialDataOwners {
+            curves: None,
             model,
             input: &mut input,
             shortcut: &mut shortcut,
@@ -1055,6 +1056,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -1331,6 +1333,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -1747,6 +1750,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -2189,6 +2193,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -2780,6 +2785,434 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 && eso.is_empty()
         );
     }
+    // One new genuine Angle context; same real IP initializes Curves before Material.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        use crate::heat_balance::setup_postludes::SelectedCurves;
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let curve_names = [
+            "ANGLE BIQUADRATIC",
+            "ANGLE QUADRATIC LINEAR",
+            "ANGLE CUBIC LINEAR",
+            "ANGLE BICUBIC",
+            "ANGLE FAN",
+        ];
+        for (at, curve_name) in curve_names.iter().enumerate() {
+            let name = format!("ANGLE GLASS {at}");
+            let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(&name),
+                definition: MaterialDefinition::WindowGlazingSpectralAndAngle(
+                    ep_model::WindowGlazingSpectralAndAngleMaterial {
+                        thickness_m: 99.0,
+                        solar_transmittance_at_normal_incidence: 0.2,
+                        front_side_solar_reflectance_at_normal_incidence: 0.2,
+                        back_side_solar_reflectance_at_normal_incidence: 0.2,
+                        visible_transmittance_at_normal_incidence: 0.2,
+                        front_side_visible_reflectance_at_normal_incidence: 0.2,
+                        back_side_visible_reflectance_at_normal_incidence: 0.2,
+                        infrared_transmittance_at_normal_incidence: 0.2,
+                        front_side_infrared_hemispherical_emissivity: 0.7,
+                        back_side_infrared_hemispherical_emissivity: 0.7,
+                        conductivity_w_per_m_k: 99.0,
+                        dirt_correction_factor_for_solar_and_visible_transmittance: 0.5,
+                        solar_diffusing: false,
+                        youngs_modulus_pa: 1.0,
+                        poissons_ratio: 0.2,
+                    },
+                ),
+            });
+            model.ctf_report_names.materials.push((id, name.clone()));
+            raw.glazing.push(ProjectInputObject { object_name: name, idf_max_fields: None, fields: BTreeMap::from([
+                ("optical_data_type".into(), Value::String("SpectralAndAngle".into())), ("thickness".into(), Value::Number(0.003)),
+                ("solar_transmittance_at_normal_incidence".into(), Value::Number(0.75)),
+                ("front_side_solar_reflectance_at_normal_incidence".into(), Value::Number(0.75)),
+                ("back_side_solar_reflectance_at_normal_incidence".into(), Value::Number(0.75)),
+                ("visible_transmittance_at_normal_incidence".into(), Value::Number(0.75)),
+                ("front_side_visible_reflectance_at_normal_incidence".into(), Value::Number(0.75)),
+                ("back_side_visible_reflectance_at_normal_incidence".into(), Value::Number(0.75)),
+                ("infrared_transmittance_at_normal_incidence".into(), Value::Number(0.75)),
+                ("window_glass_spectral_and_incident_angle_transmittance_data_set_table_name".into(), Value::String(curve_name.to_ascii_lowercase())),
+                ("window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name".into(), Value::String((*curve_name).into())),
+                ("window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name".into(), Value::String(if at == 0 { "ANGLE BACK BAD" } else { curve_name }.to_string())),
+            ]) });
+        }
+        let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> =
+            BTreeMap::from([
+                (
+                    "Curve:Biquadratic".into(),
+                    BTreeMap::from([
+                        (
+                            "ANGLE BACK BAD".into(),
+                            BTreeMap::from([
+                                ("coefficient1_constant".into(), S::Number("0.1".into())),
+                                ("coefficient2_x".into(), S::Number("0.1".into())),
+                                ("coefficient3_x_2".into(), S::Number("0.1".into())),
+                                ("coefficient4_y".into(), S::Number("0.1".into())),
+                                ("coefficient5_y_2".into(), S::Number("0.1".into())),
+                                ("coefficient6_x_y".into(), S::Number("0.1".into())),
+                                ("minimum_value_of_x".into(), S::Number("0.0".into())),
+                                ("maximum_value_of_x".into(), S::Number("60.0".into())),
+                                ("minimum_value_of_y".into(), S::Number("0.1".into())),
+                                ("maximum_value_of_y".into(), S::Number("4.0".into())),
+                                ("input_unit_type_for_x".into(), S::String("".into())),
+                            ]),
+                        ),
+                        (
+                            "ANGLE BIQUADRATIC".into(),
+                            BTreeMap::from([
+                                ("coefficient1_constant".into(), S::Number("0.1".into())),
+                                ("coefficient2_x".into(), S::Number("0.1".into())),
+                                ("coefficient3_x_2".into(), S::Number("0.1".into())),
+                                ("coefficient4_y".into(), S::Number("0.1".into())),
+                                ("coefficient5_y_2".into(), S::Number("0.1".into())),
+                                ("coefficient6_x_y".into(), S::Number("0.1".into())),
+                                ("minimum_value_of_x".into(), S::Number("0.000001".into())),
+                                ("maximum_value_of_x".into(), S::Number("90.0".into())),
+                                ("minimum_value_of_y".into(), S::Number("0.1".into())),
+                                ("maximum_value_of_y".into(), S::Number("4.0".into())),
+                                ("input_unit_type_for_x".into(), S::String("".into())),
+                            ]),
+                        ),
+                    ]),
+                ),
+                (
+                    "Curve:QuadraticLinear".into(),
+                    BTreeMap::from([(
+                        "ANGLE QUADRATIC LINEAR".into(),
+                        BTreeMap::from([
+                            ("coefficient1_constant".into(), S::Number("0.1".into())),
+                            ("coefficient2_x".into(), S::Number("0.1".into())),
+                            ("coefficient3_x_2".into(), S::Number("0.1".into())),
+                            ("coefficient4_y".into(), S::Number("0.1".into())),
+                            ("coefficient5_x_y".into(), S::Number("0.1".into())),
+                            ("coefficient6_x_2_y".into(), S::Number("0.1".into())),
+                            ("minimum_value_of_x".into(), S::Number("-1.0".into())),
+                            ("maximum_value_of_x".into(), S::Number("90.0000005".into())),
+                            ("minimum_value_of_y".into(), S::Number("0.1".into())),
+                            ("maximum_value_of_y".into(), S::Number("4.0".into())),
+                            ("minimum_curve_output".into(), S::Number("-0.0".into())),
+                        ]),
+                    )]),
+                ),
+                (
+                    "Curve:CubicLinear".into(),
+                    BTreeMap::from([(
+                        "ANGLE CUBIC LINEAR".into(),
+                        BTreeMap::from([
+                            ("coefficient1_constant".into(), S::Number("0.1".into())),
+                            ("coefficient2_x".into(), S::Number("0.1".into())),
+                            ("coefficient3_x_2".into(), S::Number("0.1".into())),
+                            ("coefficient4_x_3".into(), S::Number("0.1".into())),
+                            ("coefficient5_y".into(), S::Number("0.1".into())),
+                            ("coefficient6_x_y".into(), S::Number("0.1".into())),
+                            ("minimum_value_of_x".into(), S::Number("0.0".into())),
+                            ("maximum_value_of_x".into(), S::Number("90.0".into())),
+                            ("minimum_value_of_y".into(), S::Number("0.1".into())),
+                            ("maximum_value_of_y".into(), S::Number("4.0".into())),
+                            ("maximum_curve_output".into(), S::Number("0.0".into())),
+                        ]),
+                    )]),
+                ),
+                (
+                    "Curve:Bicubic".into(),
+                    BTreeMap::from([(
+                        "ANGLE BICUBIC".into(),
+                        BTreeMap::from([
+                            ("coefficient1_constant".into(), S::Number("0.1".into())),
+                            ("coefficient2_x".into(), S::Number("0.1".into())),
+                            ("coefficient3_x_2".into(), S::Number("0.1".into())),
+                            ("coefficient4_y".into(), S::Number("0.1".into())),
+                            ("coefficient5_y_2".into(), S::Number("0.1".into())),
+                            ("coefficient6_x_y".into(), S::Number("0.1".into())),
+                            ("coefficient7_x_3".into(), S::Number("0.1".into())),
+                            ("coefficient8_y_3".into(), S::Number("0.1".into())),
+                            ("coefficient9_x_2_y".into(), S::Number("0.1".into())),
+                            ("coefficient10_x_y_2".into(), S::Number("0.1".into())),
+                            ("minimum_value_of_x".into(), S::Number("0.0".into())),
+                            ("maximum_value_of_x".into(), S::Number("90.0".into())),
+                            ("minimum_value_of_y".into(), S::Number("0.1".into())),
+                            ("maximum_value_of_y".into(), S::Number("4.0".into())),
+                            ("minimum_curve_output".into(), S::Number("2.0".into())),
+                            ("maximum_curve_output".into(), S::Number("-1.0".into())),
+                        ]),
+                    )]),
+                ),
+                (
+                    "Curve:FanPressureRise".into(),
+                    BTreeMap::from([(
+                        "ANGLE FAN".into(),
+                        BTreeMap::from([
+                            ("coefficient1_c1".into(), S::Number("0.1".into())),
+                            ("coefficient2_c2".into(), S::Number("0.1".into())),
+                            ("coefficient3_c3".into(), S::Number("0.1".into())),
+                            ("coefficient4_c4".into(), S::Number("0.1".into())),
+                            ("minimum_value_of_qfan".into(), S::Number("0.0".into())),
+                            ("maximum_value_of_qfan".into(), S::Number("90.0".into())),
+                            ("minimum_value_of_psm".into(), S::Number("0.1".into())),
+                            ("maximum_value_of_psm".into(), S::Number("4.0".into())),
+                            ("input_unit_type_for_x".into(), S::Bool(true)),
+                        ]),
+                    )]),
+                ),
+            ]);
+        let mut object_order: BTreeMap<String, Vec<String>> = BTreeMap::from([
+            (
+                "Curve:Biquadratic".into(),
+                vec!["ANGLE BACK BAD".into(), "ANGLE BIQUADRATIC".into()],
+            ),
+            (
+                "Curve:QuadraticLinear".into(),
+                vec!["ANGLE QUADRATIC LINEAR".into()],
+            ),
+            (
+                "Curve:CubicLinear".into(),
+                vec!["ANGLE CUBIC LINEAR".into()],
+            ),
+            ("Curve:Bicubic".into(), vec!["ANGLE BICUBIC".into()]),
+            ("Curve:FanPressureRise".into(), vec!["ANGLE FAN".into()]),
+        ]);
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+        ];
+        let definitions = [
+            ("Curve:Biquadratic", 4, 12),
+            ("Curve:QuadraticLinear", 4, 12),
+            ("Curve:CubicLinear", 4, 12),
+            ("Curve:Bicubic", 4, 16),
+            ("Curve:FanPressureRise", 1, 10),
+        ]
+        .into_iter()
+        .map(|(f, a, n)| SourceObjectDefinition {
+            object_type: f.into(),
+            alpha_fields: a,
+            numeric_fields: n,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        })
+        .chain(families.iter().map(|(f, _, a, n)| SourceObjectDefinition {
+            object_type: (*f).into(),
+            alpha_fields: *a,
+            numeric_fields: *n,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        }))
+        .collect();
+        for (family, rows, _, _) in families {
+            object_order.insert(
+                family.into(),
+                rows.iter().map(|r| r.object_name.clone()).collect(),
+            );
+            objects.insert(
+                family.into(),
+                rows.iter()
+                    .map(|r| {
+                        (
+                            r.object_name.clone(),
+                            r.fields
+                                .iter()
+                                .map(|(k, v)| {
+                                    (
+                                        k.clone(),
+                                        match v {
+                                            Value::String(v) => S::String(v.clone()),
+                                            Value::Number(v) => S::Number(v.to_string()),
+                                        },
+                                    )
+                                })
+                                .collect(),
+                        )
+                    })
+                    .collect(),
+            );
+        }
+        let shapes = objects
+            .iter()
+            .map(|(family, rows)| {
+                (
+                    family.clone(),
+                    SourceInputFamily::Objects(
+                        object_order[family]
+                            .iter()
+                            .map(|name| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: rows[name].keys().map(|k| (k.clone(), 1)).collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut curves = SelectedCurves::default();
+        let mut state = error_state();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            curves
+                .initialize_state(&mut input, &mut shortcut, &flags, &mut backend)
+                .unwrap();
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: Some(&curves),
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+            .unwrap();
+        }
+        for (at, name) in curve_names.iter().enumerate() {
+            let id = MaterialId(u32::try_from(at + 3).unwrap());
+            let material = &data.simple_glazing[&id];
+            let curve = curves.get_curve(name).unwrap();
+            let back = curves
+                .get_curve(if at == 0 { "ANGLE BACK BAD" } else { name })
+                .unwrap();
+            assert_eq!(
+                (
+                    material.spec_ang_trans_curve,
+                    material.spec_ang_front_curve,
+                    material.spec_ang_back_curve
+                ),
+                (curve.num, curve.num, back.num)
+            );
+            assert!(
+                material.optical_model
+                    == super::simple_glazing::SourceSimpleGlazingOpticalModel::SpectralAndAngle
+                    && [
+                        material.transmittance,
+                        material.solar_reflectance_front,
+                        material.solar_reflectance_back,
+                        material.visible_transmittance,
+                        material.visible_reflectance_front,
+                        material.visible_reflectance_back,
+                        material.thermal_transmittance
+                    ]
+                    .iter()
+                    .all(|v| v.to_bits() == 0)
+            );
+            assert!(
+                material.thickness == 0.003
+                    && material.conductivity == 0.9
+                    && material.thermal_absorptance == 0.84
+                    && material.resistance > 0.0
+                    && material.resistance.to_bits()
+                        == data.nominal_r[usize::try_from(
+                            data.material_map[&format!("ANGLE GLASS {at}")] - 1
+                        )
+                        .unwrap()]
+                        .to_bits()
+                    && data.material_groups[&id] == SourceMaterialGroup::Glass
+            );
+            assert_eq!(
+                data.source_glazing_surface_properties(
+                    data.material_map[&format!("ANGLE GLASS {at}")],
+                    id
+                )
+                .unwrap(),
+                (
+                    MaterialSurfaceRoughness::VerySmooth,
+                    OpaqueSurfaceProperties {
+                        thermal_absorptance: 0.84,
+                        solar_absorptance: 0.0,
+                        visible_absorptance: 0.0
+                    }
+                )
+            );
+            let expected = [
+                (false, false, 0.0_f64.to_bits(), 0.0_f64.to_bits()),
+                (true, false, (-0.0_f64).to_bits(), 0.0_f64.to_bits()),
+                (false, true, 0.0_f64.to_bits(), 0.0_f64.to_bits()),
+                (true, true, 2.0_f64.to_bits(), (-1.0_f64).to_bits()),
+                (false, false, 0.0_f64.to_bits(), 0.0_f64.to_bits()),
+            ][at];
+            assert_eq!(
+                (
+                    curve.output_limits.min_present,
+                    curve.output_limits.max_present,
+                    curve.output_limits.min.to_bits(),
+                    curve.output_limits.max.to_bits()
+                ),
+                expected
+            );
+            assert!(curve.inputs.iter().all(|v| v.to_bits() == 0) && curve.output.to_bits() == 0);
+        }
+        assert!(
+            curves.get_curve("ANGLE BACK BAD").unwrap().input_limits[0].max == 60.0
+                && curves.get_curve("ANGLE BIQUADRATIC").unwrap().input_limits[0].max == 90.0
+                && curves.get_curve("ANGLE BIQUADRATIC").unwrap().input_limits[0].min == 1.0e-6
+                && curves
+                    .get_curve("ANGLE QUADRATIC LINEAR")
+                    .unwrap()
+                    .input_limits[0]
+                    .min
+                    == -1.0
+                && curves
+                    .get_curve("ANGLE QUADRATIC LINEAR")
+                    .unwrap()
+                    .input_limits[0]
+                    .max
+                    > 90.0
+                && !errors_found
+                && text.is_empty()
+        );
+        assert!(input.source_unused_objects().next().is_none());
+        data.write_material_reports(&model, &mut eio).unwrap();
+        assert_eq!(
+            std::str::from_utf8(&eio)
+                .unwrap()
+                .lines()
+                .filter(|line| line.starts_with(" Material Details,ANGLE GLASS "))
+                .count(),
+            5
+        );
+    }
 }
 
 #[test]
@@ -2926,6 +3359,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
             data.get_material_data(
                 &raw,
                 &mut MaterialDataOwners {
+                    curves: None,
                     model: &model,
                     input: &mut input,
                     shortcut: &mut shortcut,
@@ -3112,6 +3546,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
         data.get_material_data(
             &raw,
             &mut MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -3297,6 +3732,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -3547,6 +3983,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -3767,6 +4204,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -3925,6 +4363,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -4095,6 +4534,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -4250,6 +4690,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -4445,6 +4886,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -4614,6 +5056,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -4881,6 +5324,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -5132,6 +5576,7 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 sqlite: None,
             };
             let mut owners = MaterialDataOwners {
+                curves: None,
                 model: &model,
                 input: &mut input,
                 shortcut: &mut shortcut,
@@ -5390,5 +5835,348 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                     && retained.output_limits.min.to_bits() == 0
             );
         }
+    }
+    // Exactly three more fresh Angle contexts: successful diagnostics,firstblank IO,firstbounds IO.
+    for case in [0, 1, 2] {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        use crate::heat_balance::setup_postludes::SelectedCurves;
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let glass_rows = match case {
+            0 => vec![
+                ("A BLANK", ["", "", ""]),
+                ("B MISSING", ["MISSING", "MISSING", "MISSING"]),
+                ("C TRANS BAD", ["BAD", "GOOD", "GOOD"]),
+                ("D FRONT BAD", ["GOOD", "BAD", "GOOD"]),
+                ("E BACK BAD", ["GOOD", "GOOD", "BAD"]),
+                ("F GOOD", ["GOOD", "GOOD", "GOOD"]),
+            ],
+            1 => vec![
+                ("A BLANK", ["", "GOOD", "GOOD"]),
+                ("Z LATER", ["GOOD", "GOOD", "GOOD"]),
+            ],
+            _ => vec![
+                ("A BOUNDS", ["BAD", "GOOD", "GOOD"]),
+                ("Z LATER", ["GOOD", "GOOD", "GOOD"]),
+            ],
+        };
+        for (name, refs) in &glass_rows {
+            let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+            model.materials.push(Material {
+                id,
+                name: NormalizedName::new(name),
+                definition: MaterialDefinition::WindowGlazingSpectralAndAngle(
+                    ep_model::WindowGlazingSpectralAndAngleMaterial {
+                        thickness_m: 99.0,
+                        solar_transmittance_at_normal_incidence: 0.2,
+                        front_side_solar_reflectance_at_normal_incidence: 0.2,
+                        back_side_solar_reflectance_at_normal_incidence: 0.2,
+                        visible_transmittance_at_normal_incidence: 0.2,
+                        front_side_visible_reflectance_at_normal_incidence: 0.2,
+                        back_side_visible_reflectance_at_normal_incidence: 0.2,
+                        infrared_transmittance_at_normal_incidence: 0.2,
+                        front_side_infrared_hemispherical_emissivity: 0.7,
+                        back_side_infrared_hemispherical_emissivity: 0.7,
+                        conductivity_w_per_m_k: 99.0,
+                        dirt_correction_factor_for_solar_and_visible_transmittance: 0.5,
+                        solar_diffusing: false,
+                        youngs_modulus_pa: 1.0,
+                        poissons_ratio: 0.2,
+                    },
+                ),
+            });
+            model.ctf_report_names.materials.push((id, (*name).into()));
+            let mut fields=BTreeMap::from([
+                ("optical_data_type".into(),Value::String("SpectralAndAngle".into())),("thickness".into(),Value::Number(0.003)),
+                ("window_glass_spectral_and_incident_angle_transmittance_data_set_table_name".into(),Value::String(refs[0].into())),
+                ("window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name".into(),Value::String(refs[1].into())),
+                ("window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name".into(),Value::String(refs[2].into())),
+            ]);
+            if case == 1 && *name == "A BLANK" {
+                fields.remove(
+                    "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name",
+                );
+            }
+            raw.glazing.push(ProjectInputObject {
+                object_name: (*name).into(),
+                fields,
+                idf_max_fields: None,
+            });
+        }
+        let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> =
+            BTreeMap::from([(
+                "Curve:Biquadratic".into(),
+                BTreeMap::from([
+                    (
+                        "BAD".into(),
+                        BTreeMap::from([
+                            ("coefficient1_constant".into(), S::Number("0.1".into())),
+                            ("coefficient2_x".into(), S::Number("0.1".into())),
+                            ("coefficient3_x_2".into(), S::Number("0.1".into())),
+                            ("coefficient4_y".into(), S::Number("0.1".into())),
+                            ("coefficient5_y_2".into(), S::Number("0.1".into())),
+                            ("coefficient6_x_y".into(), S::Number("0.1".into())),
+                            ("minimum_value_of_x".into(), S::Number("0.000002".into())),
+                            ("maximum_value_of_x".into(), S::Number("100.0".into())),
+                            ("minimum_value_of_y".into(), S::Number("0.05".into())),
+                            ("maximum_value_of_y".into(), S::Number("5.0".into())),
+                        ]),
+                    ),
+                    (
+                        "GOOD".into(),
+                        BTreeMap::from([
+                            ("coefficient1_constant".into(), S::Number("0.1".into())),
+                            ("coefficient2_x".into(), S::Number("0.1".into())),
+                            ("coefficient3_x_2".into(), S::Number("0.1".into())),
+                            ("coefficient4_y".into(), S::Number("0.1".into())),
+                            ("coefficient5_y_2".into(), S::Number("0.1".into())),
+                            ("coefficient6_x_y".into(), S::Number("0.1".into())),
+                            ("minimum_value_of_x".into(), S::Number("0.0".into())),
+                            ("maximum_value_of_x".into(), S::Number("90.0".into())),
+                            ("minimum_value_of_y".into(), S::Number("0.1".into())),
+                            ("maximum_value_of_y".into(), S::Number("4.0".into())),
+                        ]),
+                    ),
+                ]),
+            )]);
+        let mut object_order: BTreeMap<String, Vec<String>> = BTreeMap::from([(
+            "Curve:Biquadratic".into(),
+            vec!["BAD".into(), "GOOD".into()],
+        )]);
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+        ];
+        let definitions = [
+            ("Curve:Biquadratic", 4, 12),
+            ("Curve:QuadraticLinear", 4, 12),
+            ("Curve:CubicLinear", 4, 12),
+            ("Curve:Bicubic", 4, 16),
+            ("Curve:FanPressureRise", 1, 10),
+        ]
+        .into_iter()
+        .map(|(f, a, n)| SourceObjectDefinition {
+            object_type: f.into(),
+            alpha_fields: a,
+            numeric_fields: n,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        })
+        .chain(families.iter().map(|(f, _, a, n)| SourceObjectDefinition {
+            object_type: (*f).into(),
+            alpha_fields: *a,
+            numeric_fields: *n,
+            alpha_extensions: 0,
+            numeric_extensions: 0,
+            extension: None,
+        }))
+        .collect();
+        for (family, rows, _, _) in families {
+            object_order.insert(
+                family.into(),
+                rows.iter().map(|r| r.object_name.clone()).collect(),
+            );
+            objects.insert(
+                family.into(),
+                rows.iter()
+                    .map(|r| {
+                        (
+                            r.object_name.clone(),
+                            r.fields
+                                .iter()
+                                .map(|(k, v)| {
+                                    (
+                                        k.clone(),
+                                        match v {
+                                            Value::String(v) => S::String(v.clone()),
+                                            Value::Number(v) => S::Number(v.to_string()),
+                                        },
+                                    )
+                                })
+                                .collect(),
+                        )
+                    })
+                    .collect(),
+            );
+        }
+        let shapes = objects
+            .iter()
+            .map(|(family, rows)| {
+                (
+                    family.clone(),
+                    SourceInputFamily::Objects(
+                        object_order[family]
+                            .iter()
+                            .map(|name| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: rows[name].keys().map(|k| (k.clone(), 1)).collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals {
+            doing_sizing: true,
+            ..Default::default()
+        };
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut broken = BrokenDiagnostic;
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut curves = SelectedCurves::default();
+        let outcome = {
+            let stream: &mut dyn std::io::Write = if case == 0 { &mut text } else { &mut broken };
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(stream),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            curves
+                .initialize_state(&mut input, &mut shortcut, &flags, &mut backend)
+                .unwrap();
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: Some(&curves),
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert_eq!(outcome.is_err(), case != 0);
+        assert!(
+            errors_found
+                && data.simple_glazing[&MaterialId(3)].transmittance.to_bits() == 0
+                && data.simple_glazing[&MaterialId(3)]
+                    .thermal_transmittance
+                    .to_bits()
+                    == 0
+        );
+        if case == 0 {
+            let log = std::str::from_utf8(&text).unwrap();
+            let first = &data.simple_glazing[&MaterialId(3)];
+            let missing = &data.simple_glazing[&MaterialId(4)];
+            assert_eq!(
+                (
+                    first.spec_ang_trans_curve,
+                    first.spec_ang_front_curve,
+                    first.spec_ang_back_curve,
+                    missing.spec_ang_trans_curve,
+                    missing.spec_ang_front_curve,
+                    missing.spec_ang_back_curve
+                ),
+                (0, 0, 0, 0, 0, 0)
+            );
+            let last = &data.simple_glazing[&MaterialId(8)];
+            let good = curves.get_curve("GOOD").unwrap().num;
+            let bad = curves.get_curve("BAD").unwrap().num;
+            assert_eq!(
+                (
+                    data.simple_glazing[&MaterialId(7)].spec_ang_back_curve,
+                    last.spec_ang_trans_curve,
+                    last.spec_ang_front_curve,
+                    last.spec_ang_back_curve
+                ),
+                (bad, good, good, good)
+            );
+            assert_eq!(
+                (
+                    state.tracking.total_severe_errors,
+                    state.tracking.total_severe_errors_during_sizing
+                ),
+                (18, 18)
+            );
+            let minimum = log.find("requires the minimum value = 0.0").unwrap();
+            let maximum = log.find("requires the maximum value = 90.0").unwrap();
+            let wave_min = log.find("requires the minimum value = 0.1 micron").unwrap();
+            let wave_max = log
+                .find("requires the maximum value = 4.0 microns")
+                .unwrap();
+            assert!(
+                minimum < maximum
+                    && maximum < wave_min
+                    && wave_min < wave_max
+                    && log.find("cannot be empty").unwrap() < log.find("item not found").unwrap()
+                    && log.find("item not found").unwrap() < minimum
+            );
+            assert_eq!(log.matches("requires the minimum value = 0.0").count(), 3);
+            assert!(log.contains("window_glass_spectral_and_incident_angle_transmittance_data_set_table_name requires the minimum value = 0.0 in the entered table name=GOOD") && !log.contains("front_reflectance_data_set_table_name requires") && last.resistance>0.0 && !input.is_object_unused("WindowMaterial:Glazing","F GOOD"));
+        } else {
+            let material = &data.simple_glazing[&MaterialId(3)];
+            assert_eq!(
+                (
+                    state.tracking.total_severe_errors,
+                    state.tracking.total_severe_errors_during_sizing,
+                    data.materials.len()
+                ),
+                (1, 1, 4)
+            );
+            assert_eq!(
+                (
+                    material.spec_ang_trans_curve,
+                    material.spec_ang_front_curve,
+                    material.spec_ang_back_curve
+                ),
+                (
+                    if case == 1 {
+                        0
+                    } else {
+                        curves.get_curve("BAD").unwrap().num
+                    },
+                    0,
+                    0
+                )
+            );
+            assert!(
+                !input.is_object_unused("WindowMaterial:Glazing", glass_rows[0].0)
+                    && input.is_object_unused("WindowMaterial:Glazing", "Z LATER")
+            );
+        }
+        assert!(
+            curves
+                .get_curve("GOOD")
+                .unwrap()
+                .inputs
+                .iter()
+                .all(|v| v.to_bits() == 0)
+                && curves.get_curve("BAD").unwrap().output.to_bits() == 0
+        );
     }
 }

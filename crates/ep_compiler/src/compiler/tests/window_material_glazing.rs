@@ -368,15 +368,15 @@ fn glazing_shares_material_names_and_classifies_single_layer_constructions() {
         1,
     );
     let invalid = source_value.replacen(r#""thickness":0.003"#, r#""thickness":0.0"#, 1);
-    let spectral = source_value.replacen(
+    let deferred_optical = source_value.replacen(
         r#""optical_data_type":"SpectralAverage"#,
-        r#""optical_data_type":"Spectral"#,
+        r#""optical_data_type":"BSDF"#,
         1,
     );
     for (value, code) in [
         (used, "InvalidWindowGlazingOpticalSum"),
         (invalid, "InvalidNumericRange"),
-        (spectral, "UnsupportedWindowGlazingOpticalDataType"),
+        (deferred_optical, "UnsupportedWindowGlazingOpticalDataType"),
     ] {
         let result = super::super::compile_raw_model_for_source(&parse_epjson_str(&value).unwrap());
         assert!(result.report.diagnostics.iter().any(|d| d.code == code));
@@ -388,6 +388,152 @@ fn glazing_shares_material_names_and_classifies_single_layer_constructions() {
             .unwrap()
             .material_names
             .is_source_exact_namespace()
+    );
+
+    // Angle is an honest Source-only tag. Raw strings remain Native getter
+    // operands, so blank/missing/unresolved Curve names do not become typed IDs.
+    let angle_value = r#"{
+        "Material":{" Opaque ":{"roughness":"Rough","thickness":0.1,"conductivity":1.0,"density":1000.0,"specific_heat":1000.0}},
+        "Construction":{"Opaque Ref":{"outside_layer":" OPAQUE "}},
+        "WindowMaterial:Glazing":{
+            " Angle ":{"optical_data_type":"SpectralAndAngle","thickness":0.003,
+                "solar_transmittance_at_normal_incidence":0.75,"front_side_solar_reflectance_at_normal_incidence":0.75,"back_side_solar_reflectance_at_normal_incidence":0.75,
+                "visible_transmittance_at_normal_incidence":0.75,"front_side_visible_reflectance_at_normal_incidence":0.75,"back_side_visible_reflectance_at_normal_incidence":0.75,
+                "infrared_transmittance_at_normal_incidence":0.75,
+                "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":" mixed curve ",
+                "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":"",
+                "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"MISSING"},
+            "\u00a0":{"optical_data_type":"SpectralAndAngle","thickness":0.003},
+            "\u000b":{"optical_data_type":"SpectralAndAngle","thickness":0.003}
+        }
+    }"#;
+    let angle_raw = parse_epjson_str(angle_value).unwrap();
+    let angle_source = super::super::compile_raw_model_for_source(&angle_raw);
+    assert!(
+        !angle_source.has_errors(),
+        "{:?}",
+        angle_source.report.diagnostics
+    );
+    let angle_model = angle_source.model.as_ref().unwrap();
+    for name in [" Angle ", "\u{a0}", "\u{b}"] {
+        let id = angle_model.material_names.resolve(name).unwrap();
+        let row = angle_model
+            .materials
+            .iter()
+            .find(|row| row.id == id)
+            .unwrap();
+        assert!(
+            angle_model.material_names.is_source_exact_namespace()
+                && angle_model.material_names.resolve("Opaque").is_none()
+                && angle_model.constructions[0].layers[0]
+                    == angle_model.material_names.resolve(" Opaque ").unwrap()
+                && angle_model
+                    .ctf_report_names
+                    .materials
+                    .contains(&(id, name.to_ascii_uppercase()))
+                && row.kind() == MaterialKind::WindowGlazing
+                && matches!(
+                    row.definition,
+                    MaterialDefinition::WindowGlazingSpectralAndAngle(_)
+                )
+                && row.as_window_glazing_spectral_average().is_none()
+        );
+    }
+    let angle_id = angle_model.material_names.resolve(" Angle ").unwrap();
+    let angle_material = angle_model
+        .materials
+        .iter()
+        .find(|row| row.id == angle_id)
+        .unwrap();
+    let angle_fields = match angle_material.definition {
+        MaterialDefinition::WindowGlazingSpectralAndAngle(fields) => Some(fields),
+        _ => None,
+    }
+    .expect("Angle must not materialize an Average or Spectral placeholder");
+    assert_eq!(
+        (
+            angle_fields.thickness_m,
+            angle_fields.solar_transmittance_at_normal_incidence,
+            angle_fields.visible_transmittance_at_normal_incidence,
+            angle_fields.infrared_transmittance_at_normal_incidence,
+            angle_fields.conductivity_w_per_m_k,
+            angle_fields.youngs_modulus_pa,
+            angle_fields.poissons_ratio,
+            angle_fields.solar_diffusing
+        ),
+        (0.003, 0.75, 0.75, 0.75, 0.9, 72_000_000_000.0, 0.22, false)
+    );
+    let angle_declaration = &angle_raw.objects
+        [&ep_raw_model::ObjectType("WindowMaterial:Glazing".into())]
+        [&ep_raw_model::ObjectName(" Angle ".into())];
+    assert!(matches!(
+        angle_declaration.fields.get(&ep_raw_model::FieldName("thickness".into())),
+        Some(ep_raw_model::RawValue::Number(token))
+            if matches!(ep_model::classify_source_json_number(token), Ok(ep_model::SourceJsonNumber::Float(value))
+                if value.to_bits() == 0.003_f64.to_bits())
+    ));
+    // A Named neighbour cannot waive the independent unused/original-schema
+    // qualifier, even though it selects the same SourceExact namespace.
+    let angle_with_named = angle_value.replacen(
+        r#""Material":"#,
+        r#""WindowMaterial:Gas":{"Named":{"gas_type":"Air","thickness":0.012}},"Material":"#,
+        1,
+    );
+    let angle_used = angle_with_named.replacen(
+        r#""Opaque Ref":"#,
+        r#""Angle Used":{"outside_layer":" Angle "},"Opaque Ref":"#,
+        1,
+    );
+    let used = super::super::compile_raw_model_for_source(&parse_epjson_str(&angle_used).unwrap());
+    assert!(
+        used.report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "UnsupportedWindowGlazingOpticalDataType")
+    );
+    let angle_invalid = angle_with_named.replacen(r#""thickness":0.003"#, r#""thickness":0.0"#, 1);
+    let invalid =
+        super::super::compile_raw_model_for_source(&parse_epjson_str(&angle_invalid).unwrap());
+    assert!(
+        invalid
+            .report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "InvalidNumericRange")
+    );
+    let angle_bsdf = angle_with_named.replacen(
+        r#""optical_data_type":"SpectralAndAngle"#,
+        r#""optical_data_type":"BSDF"#,
+        1,
+    );
+    let held = super::super::compile_raw_model_for_source(&parse_epjson_str(&angle_bsdf).unwrap());
+    assert!(
+        held.report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "UnsupportedWindowGlazingOpticalDataType")
+    );
+    let angle_wrong_kind = angle_with_named.replacen(
+        r#""window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":" mixed curve ""#,
+        r#""window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":false"#,
+        1,
+    );
+    let wrong_kind =
+        super::super::compile_raw_model_for_source(&parse_epjson_str(&angle_wrong_kind).unwrap());
+    assert!(
+        wrong_kind
+            .report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "UnsupportedWindowGlazingOpticalDataType")
+    );
+    let legacy_angle = compile_raw_model(&angle_raw);
+    assert!(
+        legacy_angle
+            .report
+            .diagnostics
+            .iter()
+            .any(|d| d.code == "UnsupportedWindowGlazingOpticalDataType")
     );
 }
 

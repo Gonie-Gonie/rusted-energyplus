@@ -9055,12 +9055,7 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
             "optical_data_type",
             json!("spectral"),
         ),
-        (
-            SPECTRAL_GLASS,
-            " LINK ",
-            "optical_data_type",
-            json!("SpectralAndAngle"),
-        ),
+        (SPECTRAL_GLASS, " LINK ", "optical_data_type", json!("BSDF")),
         (SPECTRAL_GLASS, " LINK ", "thickness", json!(0.0)),
         (
             SPECTRAL_GLASS,
@@ -9406,7 +9401,7 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
             ("Curve:Functional:PressureDrop", json!({"held":{}})),
             (
                 "WindowMaterial:Glazing",
-                json!({"held":{"optical_data_type":"SpectralAndAngle","thickness":0.003,"window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":"B SECOND","window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":"B SECOND","window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"B SECOND"}}),
+                json!({"held":{"optical_data_type":"BSDF","thickness":0.003,"window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":"B SECOND","window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":"B SECOND","window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"B SECOND"}}),
             ),
         ] {
             let mut held = curve_value.clone();
@@ -9414,6 +9409,197 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
             assert!(
                 crate::ordinary_equipment_input::resolve_source_b(
                     &ep_raw_model::parse_epjson_str_for_source(&held.to_string()).unwrap()
+                )
+                .is_err()
+            );
+        }
+        // New181 boundary: actual unused Angle is admitted; the old held matrix now names BSDF.
+        {
+            let mut angle_value = curve_value.clone();
+            angle_value["Curve:Biquadratic"]["ANGLE LOOKUP"] =
+                angle_value["Curve:Biquadratic"]["a first"].clone();
+            angle_value["Curve:Biquadratic"]["ANGLE LOOKUP"]["minimum_value_of_x"] = json!(0.0);
+            angle_value["Curve:Biquadratic"]["ANGLE LOOKUP"]["maximum_value_of_x"] = json!(90.0);
+            angle_value["Curve:Biquadratic"]["ANGLE LOOKUP"]["minimum_value_of_y"] = json!(0.1);
+            angle_value["Curve:Biquadratic"]["ANGLE LOOKUP"]["maximum_value_of_y"] = json!(4.0);
+            angle_value["WindowMaterial:Glazing"] = json!({" ANGLE GLASS ":{
+                "optical_data_type":"SpectralAndAngle","thickness":0.003,
+                "solar_transmittance_at_normal_incidence":0.75,"front_side_solar_reflectance_at_normal_incidence":0.75,
+                "visible_transmittance_at_normal_incidence":0.75,"infrared_transmittance_at_normal_incidence":0.75,
+                "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":"angle lookup",
+                "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":"ANGLE LOOKUP",
+                "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"ANGLE LOOKUP",
+                "name":false,"idf_max_fields":[{"retained":true}]
+            }});
+            let angle_raw =
+                ep_raw_model::parse_epjson_str_for_source(&angle_value.to_string()).unwrap();
+            let angle_compiled = ep_compiler::compile_raw_model_for_source(&angle_raw);
+            assert!(
+                !angle_compiled.has_errors(),
+                "{:?}",
+                angle_compiled.report.diagnostics
+            );
+            let angle_model = angle_compiled.model.as_ref().unwrap();
+            let id = angle_model.material_names.resolve(" ANGLE GLASS ").unwrap();
+            assert!(
+                angle_model.material_names.is_source_exact_namespace()
+                    && angle_model.material_names.resolve("ANGLE GLASS").is_none()
+                    && angle_model.materials.iter().any(|row| row.id == id
+                        && matches!(
+                            row.definition,
+                            ep_model::MaterialDefinition::WindowGlazingSpectralAndAngle(_)
+                        ))
+                    && angle_model
+                        .ctf_report_names
+                        .materials
+                        .iter()
+                        .any(|row| row == &(id, " ANGLE GLASS ".into()))
+            );
+            let angle_ip = crate::ordinary_input_processor::resolve_source_b(&angle_raw).unwrap();
+            assert!(
+                matches!(angle_ip.source_raw_object_fields("WindowMaterial:Glazing"," ANGLE GLASS ").unwrap().get("window_glass_spectral_and_incident_angle_transmittance_data_set_table_name"),Some(S::String(v))if v=="angle lookup")
+            );
+            assert!(
+                matches!(
+                    angle_ip
+                        .source_raw_object_fields("WindowMaterial:Glazing", " ANGLE GLASS ")
+                        .unwrap()
+                        .get("name"),
+                    Some(S::Bool(false))
+                ) && matches!(
+                    angle_ip
+                        .source_raw_object_fields("WindowMaterial:Glazing", " ANGLE GLASS ")
+                        .unwrap()
+                        .get("idf_max_fields"),
+                    Some(S::Array(_))
+                )
+            );
+            let mut angle_trace = inspect_porting_scope(
+                &angle_raw,
+                &angle_compiled.report,
+                Some(angle_model),
+                PortingScope::B,
+            );
+            assert!(angle_trace.admissible, "{:?}", angle_trace.violations);
+            angle_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    angle_model,
+                    &weather,
+                    "same Angle Source weather",
+                )
+                .unwrap(),
+            );
+            let angle_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &angle_raw,
+                &angle_trace,
+            )
+            .unwrap();
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &angle_raw,
+                    &angle_compiled.report,
+                    Some(angle_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&angle_admission)
+                )
+                .allows_rust_runtime()
+            );
+            assert!(
+                !crate::support::assess_support_with_source_admission(
+                    &angle_raw,
+                    &angle_compiled.report,
+                    Some(angle_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    None
+                )
+                .allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&angle_raw).is_err()
+                    && crate::ordinary_equipment_input::resolve(&angle_raw).is_err()
+            );
+            for (field, bad) in [
+                ("window_glass_spectral_data_set_name", json!(0)),
+                (
+                    "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name",
+                    json!(false),
+                ),
+                (
+                    "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name",
+                    json!(null),
+                ),
+                (
+                    "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name",
+                    json!([]),
+                ),
+                ("thickness", json!("0.003")),
+            ] {
+                let mut bad_value = angle_value.clone();
+                bad_value["WindowMaterial:Glazing"][" ANGLE GLASS "][field] = bad;
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string()).unwrap()
+                    )
+                    .is_err()
+                );
+            }
+            let mut wrong_tag = angle_model.clone();
+            let position = wrong_tag
+                .materials
+                .iter()
+                .position(|row| row.id == id)
+                .unwrap();
+            wrong_tag.materials[position].definition = angle_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowGlazing)
+                .unwrap()
+                .definition;
+            let mut missing_all = angle_model.clone();
+            missing_all
+                .materials
+                .retain(|row| row.kind() != ep_model::MaterialKind::WindowGlazing);
+            let mut wrong_id = angle_model.clone();
+            wrong_id.materials[position].id = ep_model::MaterialId(u32::MAX);
+            let mut loader_alias = angle_model.clone();
+            loader_alias
+                .ctf_report_names
+                .materials
+                .push((id, "ANGLE ALIAS".into()));
+            assert!(
+                [wrong_tag, missing_all, wrong_id, loader_alias]
+                    .iter()
+                    .all(
+                        |model| !crate::support::assess_support_with_source_admission(
+                            &angle_raw,
+                            &angle_compiled.report,
+                            Some(model),
+                            RunMode::Compatibility,
+                            PartialRunPolicy::Deny,
+                            RunOutputFormat::RustNative,
+                            TraceLevel::Normal,
+                            Some(&angle_admission)
+                        )
+                        .allows_rust_runtime()
+                    )
+            );
+            let mut used = angle_value.clone();
+            used["Construction"]["ANGLE USED"] = json!({"outside_layer":" ANGLE GLASS "});
+            assert!(
+                crate::ordinary_equipment_input::resolve_source_b(
+                    &ep_raw_model::parse_epjson_str_for_source(&used.to_string()).unwrap()
+                )
+                .is_err()
+            );
+            let mut staged = angle_value.clone();
+            staged["WindowMaterial:Glazing"][" ANGLE GLASS "]["optical_data_type"] = json!("BSDF");
+            assert!(
+                crate::ordinary_equipment_input::resolve_source_b(
+                    &ep_raw_model::parse_epjson_str_for_source(&staged.to_string()).unwrap()
                 )
                 .is_err()
             );

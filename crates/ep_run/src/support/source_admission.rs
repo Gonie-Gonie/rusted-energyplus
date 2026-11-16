@@ -31,10 +31,12 @@ fn retained_curve_value_matches(raw: &RawValue, retained: &SourceInputStatistics
 
 pub(crate) struct SourceSupportAdmission {
     covered_objects: BTreeSet<&'static str>,
-    /// Validated original Average names only; no advisory optical coefficients.
+    /// Validated unused ordinary Glass names; no advisory optical coefficients.
     glazing_bindings: BTreeSet<String>,
     /// Exact Spectral-vs-Average tag and original A3 lookup text;no optical seed.
     spectral_glazing_bindings: BTreeMap<String, Option<String>>,
+    /// Exact Angle tag only; original A5-A7 Strings remain owned by Raw/IP.
+    angle_glazing_bindings: BTreeSet<String>,
     /// Ordered effective dataset names,including duplicate uppercase names.
     spectral_data_bindings: Vec<String>,
     /// Validated alternative Glass names only, never advisory optical values.
@@ -253,6 +255,7 @@ impl SourceSupportAdmission {
         }
         let mut glazing_bindings = BTreeSet::new();
         let mut spectral_glazing_bindings = BTreeMap::new();
+        let mut angle_glazing_bindings = BTreeSet::new();
         let mut spectral_data_bindings = Vec::new();
         if trace.scope == PortingScope::B
             && raw
@@ -277,6 +280,10 @@ impl SourceSupportAdmission {
                         _ => return None,
                     };
                     spectral_glazing_bindings.insert(name.0.to_ascii_uppercase(), reference);
+                }
+                if matches!(object.fields.get(&FieldName("optical_data_type".into())),Some(RawValue::String(mode)) if mode=="SpectralAndAngle")
+                {
+                    angle_glazing_bindings.insert(name.0.to_ascii_uppercase());
                 }
                 if !glazing_bindings.insert(name.0.to_ascii_uppercase()) {
                     return None;
@@ -388,6 +395,7 @@ impl SourceSupportAdmission {
             covered_objects,
             glazing_bindings,
             spectral_glazing_bindings,
+            angle_glazing_bindings,
             spectral_data_bindings,
             refraction_bindings,
             window_gas_bindings,
@@ -538,9 +546,15 @@ impl SourceSupportAdmission {
             {
                 return false;
             }
-            match (self.spectral_glazing_bindings.get(name), row.definition) {
-                (None, ep_model::MaterialDefinition::WindowGlazingSpectralAverage(_)) => {}
+            match (
+                self.angle_glazing_bindings.contains(name),
+                self.spectral_glazing_bindings.get(name),
+                row.definition,
+            ) {
+                (false, None, ep_model::MaterialDefinition::WindowGlazingSpectralAverage(_)) => {}
+                (true, None, ep_model::MaterialDefinition::WindowGlazingSpectralAndAngle(_)) => {}
                 (
+                    false,
                     Some(reference),
                     ep_model::MaterialDefinition::WindowGlazingSpectral(material),
                 ) => {

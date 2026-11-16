@@ -88,16 +88,16 @@ use ep_model::{
     WindowGlazingEquivalentLayerDiffuseProperties,
     WindowGlazingEquivalentLayerDirectionalProperties, WindowGlazingEquivalentLayerMaterial,
     WindowGlazingEquivalentLayerOpticalBand, WindowGlazingRefractionExtinctionMaterial,
-    WindowGlazingSpectralAverageMaterial, WindowGlazingSpectralMaterial,
-    WindowGlazingThermochromicGroupMaterial, WindowGlazingThermochromicState,
-    WindowNfrcProductType, WindowRevealProperties, WindowScreenBeamReflectanceModel,
-    WindowScreenEquivalentLayerMaterial, WindowScreenEquivalentLayerSolarProperties,
-    WindowScreenEquivalentLayerVisibleProperties, WindowScreenMaterial,
-    WindowScreenTransmittanceMapResolution, WindowShadeEquivalentLayerMaterial,
-    WindowShadeEquivalentLayerSideOpticalProperties, WindowShadeMaterial,
-    WindowSimpleGlazingMaterial, WindowStandardGasType, ZoneEquipmentConnection,
-    ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry, ZoneEquipmentListId,
-    ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneThermostat,
+    WindowGlazingSpectralAndAngleMaterial, WindowGlazingSpectralAverageMaterial,
+    WindowGlazingSpectralMaterial, WindowGlazingThermochromicGroupMaterial,
+    WindowGlazingThermochromicState, WindowNfrcProductType, WindowRevealProperties,
+    WindowScreenBeamReflectanceModel, WindowScreenEquivalentLayerMaterial,
+    WindowScreenEquivalentLayerSolarProperties, WindowScreenEquivalentLayerVisibleProperties,
+    WindowScreenMaterial, WindowScreenTransmittanceMapResolution,
+    WindowShadeEquivalentLayerMaterial, WindowShadeEquivalentLayerSideOpticalProperties,
+    WindowShadeMaterial, WindowSimpleGlazingMaterial, WindowStandardGasType,
+    ZoneEquipmentConnection, ZoneEquipmentConnectionId, ZoneEquipmentList, ZoneEquipmentListEntry,
+    ZoneEquipmentListId, ZoneEquipmentObjectType, ZoneHumidistat, ZoneHumidistatId, ZoneThermostat,
     ZoneThermostatControl, ZoneThermostatId, parse_calendar_date_rule,
 };
 use ep_raw_model::{FieldName, RawModel, RawObject, RawValue};
@@ -186,7 +186,8 @@ fn window_construction_layer_kind(
     definition: &MaterialDefinition,
 ) -> Option<WindowConstructionLayerKind> {
     match definition {
-        MaterialDefinition::WindowGlazingSpectral(_)
+        MaterialDefinition::WindowGlazingSpectralAndAngle(_)
+        | MaterialDefinition::WindowGlazingSpectral(_)
         | MaterialDefinition::WindowGlazingSpectralAverage(_)
         | MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
             Some(WindowConstructionLayerKind::Glass)
@@ -219,6 +220,7 @@ fn window_glazing_is_solar_diffusing(definition: &MaterialDefinition) -> bool {
     match definition {
         MaterialDefinition::WindowGlazingSpectralAverage(material) => material.solar_diffusing,
         MaterialDefinition::WindowGlazingSpectral(material) => material.solar_diffusing,
+        MaterialDefinition::WindowGlazingSpectralAndAngle(material) => material.solar_diffusing,
         MaterialDefinition::WindowGlazingRefractionExtinction(material) => material.solar_diffusing,
         MaterialDefinition::Regular(_)
         | MaterialDefinition::NoMass(_)
@@ -273,6 +275,7 @@ fn window_gap_signature(definition: &MaterialDefinition) -> Option<WindowGapSign
         | MaterialDefinition::WindowSimpleGlazing(_)
         | MaterialDefinition::WindowComplexGap(_)
         | MaterialDefinition::WindowComplexShade(_)
+        | MaterialDefinition::WindowGlazingSpectralAndAngle(_)
         | MaterialDefinition::WindowGlazingSpectral(_)
         | MaterialDefinition::WindowGlazingSpectralAverage(_)
         | MaterialDefinition::WindowGlazingRefractionExtinction(_)
@@ -749,6 +752,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_spectral_average(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_spectral(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_spectral_and_angle(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing:RefractionExtinctionMethod".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_refraction(&name.0, object)))
             {
@@ -4670,6 +4675,95 @@ impl<'a> Compiler<'a> {
         })
     }
 
+    // Independent original-schema unused Angle admission; runtime owns all Curve lookup.
+    fn source_unused_spectral_and_angle(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let valid = |field: &str, value: &RawValue| {
+            if field == "optical_data_type" {
+                return matches!(value, RawValue::String(value) if value == "SpectralAndAngle");
+            }
+            if field == "solar_diffusing" {
+                return matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"));
+            }
+            if matches!(
+                field,
+                "window_glass_spectral_data_set_name"
+                    | "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name"
+                    | "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name"
+                    | "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name"
+            ) {
+                return matches!(value, RawValue::String(_));
+            }
+            if !matches!(
+                field,
+                "thickness"
+                    | "solar_transmittance_at_normal_incidence"
+                    | "front_side_solar_reflectance_at_normal_incidence"
+                    | "back_side_solar_reflectance_at_normal_incidence"
+                    | "visible_transmittance_at_normal_incidence"
+                    | "front_side_visible_reflectance_at_normal_incidence"
+                    | "back_side_visible_reflectance_at_normal_incidence"
+                    | "infrared_transmittance_at_normal_incidence"
+                    | "front_side_infrared_hemispherical_emissivity"
+                    | "back_side_infrared_hemispherical_emissivity"
+                    | "conductivity"
+                    | "dirt_correction_factor_for_solar_and_visible_transmittance"
+                    | "young_s_modulus"
+                    | "poisson_s_ratio"
+            ) {
+                return true; // Native ignores unknown direct-JSON members; Raw/IP keep them.
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|number| {
+                    number.is_finite()
+                        && match field {
+                            "thickness" | "conductivity" | "young_s_modulus" => number > 0.0,
+                            "front_side_infrared_hemispherical_emissivity"
+                            | "back_side_infrared_hemispherical_emissivity"
+                            | "poisson_s_ratio" => number > 0.0 && number < 1.0,
+                            "dirt_correction_factor_for_solar_and_visible_transmittance" => {
+                                number > 0.0 && number <= 1.0
+                            }
+                            _ => (0.0..=1.0).contains(&number),
+                        }
+                })
+        };
+        if ["optical_data_type", "thickness"]
+            .iter()
+            .any(|field| field_value(object, field).is_none_or(|value| !valid(field, value)))
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !valid(&field.0, value))
+        {
+            return false;
+        }
+        let Some(rows) = self
+            .raw_model
+            .objects
+            .get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
+        else {
+            return false;
+        };
+        !self.raw_model.objects.get(&ep_raw_model::ObjectType("Construction".into())).is_some_and(|constructions| {
+            constructions.values().any(|construction| construction.fields.iter().any(|(field, value)| {
+                let layer = field.0 == "outside_layer" || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                layer && matches!(value, RawValue::String(reference) if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+            }))
+        })
+    }
+
     // Original schema only: Native owns count/clamp/integrity diagnostics.
     fn source_spectral_data(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
@@ -4730,6 +4824,8 @@ impl<'a> Compiler<'a> {
         for (name, object) in self.objects(OBJECT_TYPE) {
             let source_unused_average = self.source_unused_spectral_average(&name, &object);
             let source_unused_spectral = self.source_unused_spectral(&name, &object);
+            let source_unused_spectral_and_angle =
+                self.source_unused_spectral_and_angle(&name, &object);
             let optical_data_type =
                 self.required_string(OBJECT_TYPE, &name, &object, "optical_data_type");
             let thickness_m =
@@ -4737,7 +4833,9 @@ impl<'a> Compiler<'a> {
             let Some(optical_data_type) = optical_data_type else {
                 continue;
             };
-            if !optical_data_type.eq_ignore_ascii_case("SpectralAverage") && !source_unused_spectral
+            if !optical_data_type.eq_ignore_ascii_case("SpectralAverage")
+                && !source_unused_spectral
+                && !source_unused_spectral_and_angle
             {
                 if ["BSDF", "Spectral", "SpectralAndAngle"]
                     .iter()
@@ -4920,7 +5018,11 @@ impl<'a> Compiler<'a> {
             ];
             let mut sums_valid = true;
             for (field, sum) in optical_sums {
-                if sum > 1.0 && !source_unused_average && !source_unused_spectral {
+                if sum > 1.0
+                    && !source_unused_average
+                    && !source_unused_spectral
+                    && !source_unused_spectral_and_angle
+                {
                     self.error(
                         "InvalidWindowGlazingOpticalSum",
                         OBJECT_TYPE,
@@ -4942,7 +5044,7 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
-            if source_unused_average || source_unused_spectral {
+            if source_unused_average || source_unused_spectral || source_unused_spectral_and_angle {
                 model
                     .ctf_report_names
                     .materials
@@ -4951,7 +5053,27 @@ impl<'a> Compiler<'a> {
             model.materials.push(Material {
                 id,
                 name: normalized_name,
-                definition: if source_unused_spectral {
+                definition: if source_unused_spectral_and_angle {
+                    MaterialDefinition::WindowGlazingSpectralAndAngle(
+                        WindowGlazingSpectralAndAngleMaterial {
+                            thickness_m,
+                            solar_transmittance_at_normal_incidence,
+                            front_side_solar_reflectance_at_normal_incidence,
+                            back_side_solar_reflectance_at_normal_incidence,
+                            visible_transmittance_at_normal_incidence,
+                            front_side_visible_reflectance_at_normal_incidence,
+                            back_side_visible_reflectance_at_normal_incidence,
+                            infrared_transmittance_at_normal_incidence,
+                            front_side_infrared_hemispherical_emissivity,
+                            back_side_infrared_hemispherical_emissivity,
+                            conductivity_w_per_m_k,
+                            dirt_correction_factor_for_solar_and_visible_transmittance,
+                            solar_diffusing,
+                            youngs_modulus_pa,
+                            poissons_ratio,
+                        },
+                    )
+                } else if source_unused_spectral {
                     MaterialDefinition::WindowGlazingSpectral(WindowGlazingSpectralMaterial {
                         thickness_m,
                         solar_transmittance_at_normal_incidence,
@@ -9446,6 +9568,7 @@ impl<'a> Compiler<'a> {
                 .is_some_and(|object| {
                     self.source_unused_spectral_average(name, object)
                         || self.source_unused_spectral(name, object)
+                        || self.source_unused_spectral_and_angle(name, object)
                 });
         let source_refraction_name = object_type
             == "WindowMaterial:Glazing:RefractionExtinctionMethod"

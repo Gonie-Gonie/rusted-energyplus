@@ -117,7 +117,8 @@ impl SelectedMaterialData {
                             },
                         )
                     }
-                    MaterialDefinition::WindowGlazingSpectral(_)
+                    MaterialDefinition::WindowGlazingSpectralAndAngle(_)
+                    | MaterialDefinition::WindowGlazingSpectral(_)
                     | MaterialDefinition::WindowGlazingSpectralAverage(_)
                     | MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
                         if self.material_groups.get(id) != Some(&SourceMaterialGroup::Glass) {

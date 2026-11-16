@@ -97,7 +97,7 @@ pub(crate) fn glazing_known_field(field: &str) -> bool {
 
 pub(super) fn glazing_admitted_field(field: &str, value: &RawValue) -> bool {
     if field == "optical_data_type" {
-        return matches!(value, RawValue::String(value) if matches!(value.as_str(),"SpectralAverage"|"Spectral"));
+        return matches!(value, RawValue::String(value) if matches!(value.as_str(),"SpectralAverage"|"Spectral"|"SpectralAndAngle"));
     }
     if field == "solar_diffusing" {
         return matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "No" | "Yes"));
@@ -177,7 +177,7 @@ pub(crate) fn validate_unused_spectral_average(raw: &RawModel) -> Result<(), Str
             .any(|(field, value)| !glazing_admitted_field(&field.0, value))
         {
             return Err(
-                "Source Glazing requires original schema-valid SpectralAverage or Spectral operands".into(),
+                "Source Glazing requires original schema-valid SpectralAverage, Spectral or SpectralAndAngle operands".into(),
             );
         }
     }

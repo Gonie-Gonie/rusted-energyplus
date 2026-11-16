@@ -42,6 +42,7 @@ pub(super) struct MaterialDataOwners<'a, 'b> {
     eio: &'a mut dyn Write,
     errors_found: &'a mut bool,
     diagnostic_flags: Option<SourceDiagnosticFlags<'a>>,
+    curves: Option<&'a super::setup_postludes::SelectedCurves>,
 }
 
 // The selected FrameAndDivider domain has no elements. Keeping an empty
@@ -605,6 +606,7 @@ impl CtfInitializationContext<'_> {
                 })
         });
         let mut owners = MaterialDataOwners {
+            curves: reports.selected_curves.as_ref(),
             diagnostic_flags,
             model,
             input,
