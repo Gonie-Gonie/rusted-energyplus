@@ -369,6 +369,7 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
                     | "WindowMaterial:Blind:EquivalentLayer"
                     | "WindowMaterial:Glazing:EquivalentLayer"
                     | "WindowMaterial:Gap:EquivalentLayer"
+                    | "Material:RoofVegetation"
                     | "WindowMaterial:Screen"
                     | "WindowMaterial:Blind"
                     | "ThermostatSetpoint:DualSetpoint"

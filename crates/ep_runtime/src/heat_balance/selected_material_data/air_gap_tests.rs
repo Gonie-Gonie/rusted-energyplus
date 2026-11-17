@@ -88,6 +88,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         window_glazing_equivalent_layer: Vec::new(),
         window_gap_equivalent_layer: Vec::new(),
         window_blind: Vec::new(),
+        roof_vegetation: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -10481,6 +10482,1167 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                     .is_err()
                 && data
                     .source_gap_equivalent_layer_surface_properties(0, MaterialId(3))
+                    .is_err()
+        );
+        assert!(
+            data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && report_rows[..2]
+                    == [
+                        vec![
+                            " Material Details",
+                            "Mass",
+                            "5.0000E-002",
+                            "MediumRough",
+                            "0.1000",
+                            "2.000",
+                            "2000.000",
+                            "800.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                        vec![
+                            " Material Details",
+                            "NO MASS",
+                            "0.2000",
+                            "MediumRough",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                    ]
+                && std::str::from_utf8(&eio)
+                    .unwrap()
+                    .lines()
+                    .filter(|line| line.starts_with(" Material:Air,"))
+                    .collect::<Vec<_>>()
+                    == [" Material:Air,MIXED GAP,0.1500"]
+        );
+    }
+
+    // RoofVegetation B1: same real Material/IP/backend; active EcoRoof remains excluded.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier binds ID/kind only; no physical runtime state is seeded from it.
+        let typed_roof = ep_model::RoofVegetationMaterial {
+            height_of_plants_m: 0.5,
+            leaf_area_index: 4.0,
+            leaf_reflectivity: 0.25,
+            leaf_emissivity: 1.0,
+            minimum_stomatal_resistance_s_per_m: 256.0,
+            roughness: MaterialSurfaceRoughness::VerySmooth,
+            thickness_m: 0.6,
+            dry_soil_conductivity_w_per_m_k: 1.2,
+            dry_soil_density_kg_per_m3: 1024.0,
+            dry_soil_specific_heat_j_per_kg_k: 1024.0,
+            surface: OpaqueSurfaceProperties {
+                thermal_absorptance: 1.0,
+                solar_absorptance: 0.5,
+                visible_absorptance: 1.0,
+            },
+            saturation_volumetric_moisture_content: 0.5,
+            residual_volumetric_moisture_content: 0.0625,
+            initial_volumetric_moisture_content: 0.125,
+            moisture_diffusion_method: ep_model::RoofVegetationMoistureDiffusionMethod::Simple,
+        };
+        let names = [
+            "A00 ROOF DEFAULTS",
+            "A01 ROOF EMPTY ALPHAS",
+            "A02 ROOF SOIL WHITESPACE",
+            "A03 ROOF ARBITRARY SOIL",
+            "B11 ROOF VERYROUGH SIMPLE",
+            "B12 ROOF VERYROUGH ADVANCED",
+            "B21 ROOF ROUGH SIMPLE",
+            "B22 ROOF ROUGH ADVANCED",
+            "B31 ROOF MEDIUMROUGH SIMPLE",
+            "B32 ROOF MEDIUMROUGH ADVANCED",
+            "B41 ROOF MEDIUMSMOOTH SIMPLE",
+            "B42 ROOF MEDIUMSMOOTH ADVANCED",
+            "B51 ROOF SMOOTH SIMPLE",
+            "B52 ROOF SMOOTH ADVANCED",
+            "B61 ROOF VERYSMOOTH SIMPLE",
+            "B62 ROOF VERYSMOOTH ADVANCED",
+            "C00 ROOF FULL EXPLICIT",
+            "C01 ROOF MOISTURE EQUALITY",
+        ];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::RoofVegetation(typed_roof),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "height_of_plants",
+            "leaf_area_index",
+            "leaf_reflectivity",
+            "leaf_emissivity",
+            "minimum_stomatal_resistance",
+            "thickness",
+            "conductivity_of_dry_soil",
+            "density_of_dry_soil",
+            "specific_heat_of_dry_soil",
+            "thermal_absorptance",
+            "solar_absorptance",
+            "visible_absorptance",
+            "saturation_volumetric_moisture_content_of_the_soil_layer",
+            "residual_volumetric_moisture_content_of_the_soil_layer",
+            "initial_volumetric_moisture_content_of_the_soil_layer",
+        ];
+        let alpha_names = [
+            "soil_layer_name",
+            "roughness",
+            "moisture_diffusion_calculation_method",
+        ];
+        let numeric_tokens: [[Option<&str>; 15]; 18] = [
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                Some("1"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("1.0"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None,
+                None,
+                None,
+                None,
+                Some("180"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None,
+                None,
+                None,
+                None,
+                Some("180.0"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                Some("0.5"),
+                Some("4.0"),
+                Some("0.25"),
+                Some("1.0"),
+                Some("256.0"),
+                Some("0.125"),
+                Some("0.5"),
+                Some("1024.0"),
+                Some("1024.0"),
+                Some("1.0"),
+                Some("0.5"),
+                Some("1.0"),
+                Some("0.5"),
+                Some("0.0625"),
+                Some("0.125"),
+            ],
+            [
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.3"),
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 3]; 18] = [
+            [None, None, None],
+            [Some(""), Some(""), Some("")],
+            [Some(" \t  "), Some(""), None],
+            [Some("soil\n\"ignored\"\\label\0"), None, Some("")],
+            [None, Some("VeryRough"), Some("Simple")],
+            [None, Some("VeryRough"), Some("Advanced")],
+            [None, Some("Rough"), Some("Simple")],
+            [None, Some("Rough"), Some("Advanced")],
+            [None, Some("MediumRough"), Some("Simple")],
+            [None, Some("MediumRough"), Some("Advanced")],
+            [None, Some("MediumSmooth"), Some("Simple")],
+            [None, Some("MediumSmooth"), Some("Advanced")],
+            [None, Some("Smooth"), Some("Simple")],
+            [None, Some("Smooth"), Some("Advanced")],
+            [None, Some("VerySmooth"), Some("Simple")],
+            [None, Some("VerySmooth"), Some("Advanced")],
+            [
+                Some("explicit unused soil"),
+                Some("MediumSmooth"),
+                Some("Advanced"),
+            ],
+            [None, None, None],
+        ];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .enumerate()
+            .map(|(index, (numbers, alphas))| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| ((*field).into(), S::Number(token.into())))
+                    })
+                    .collect();
+                fields.extend(alpha_names.iter().zip(alphas).filter_map(|(field, value)| {
+                    value.map(|value| ((*field).into(), S::String(value.into())))
+                }));
+                if index == 3 {
+                    fields.insert(
+                        "name".into(),
+                        S::Object(BTreeMap::from([("ignored".into(), S::Bool(true))])),
+                    );
+                    fields.insert(
+                        "idf_order".into(),
+                        S::Array(vec![S::Null, S::Bool(false), S::String("retained".into())]),
+                    );
+                }
+                fields
+            })
+            .collect();
+        raw.roof_vegetation = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter(|(field, _)| {
+                        numeric_names.contains(&field.as_str())
+                            || alpha_names.contains(&field.as_str())
+                    })
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Genuine empty Glass7A14N + Blind2A27N allocate nonempty 3A/12N tails; zero positive work credit.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            ("Material:RoofVegetation", &raw.roof_vegetation, 4, 15),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .enumerate()
+                            .map(|(index, row)| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: if *family == "Material:RoofVegetation" {
+                                    original_fields[index]
+                                        .iter()
+                                        .map(|(field, value)| {
+                                            (
+                                                field.clone(),
+                                                match value {
+                                                    S::Null => 0,
+                                                    S::Array(values) => values.len(),
+                                                    S::Object(values) => values.len(),
+                                                    _ => 1,
+                                                },
+                                            )
+                                        })
+                                        .collect()
+                                } else {
+                                    row.fields.keys().map(|field| (field.clone(), 1)).collect()
+                                },
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "Material:RoofVegetation" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let expected_numbers: [[f64; 15]; 18] = [
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                1.0, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                1.0, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1,
+            ],
+            [
+                0.5, 4.0, 0.25, 1.0, 256.0, 0.125, 0.5, 1024.0, 1024.0, 1.0, 0.5, 1.0, 0.5, 0.0625,
+                0.125,
+            ],
+            [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.3,
+            ],
+        ];
+        let expected_blanks: [[bool; 15]; 18] = [
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                false, true, true, true, true, true, true, true, true, true, true, true, true,
+                true, true,
+            ],
+            [
+                false, true, true, true, true, true, true, true, true, true, true, true, true,
+                true, true,
+            ],
+            [
+                true, true, true, true, false, true, true, true, true, true, true, true, true,
+                true, true,
+            ],
+            [
+                true, true, true, true, false, true, true, true, true, true, true, true, true,
+                true, true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                true,
+            ],
+            [
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false, false,
+            ],
+            [
+                true, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                false,
+            ],
+        ];
+        let expected_roughness = [
+            MaterialSurfaceRoughness::MediumRough,
+            MaterialSurfaceRoughness::MediumRough,
+            MaterialSurfaceRoughness::MediumRough,
+            MaterialSurfaceRoughness::MediumRough,
+            MaterialSurfaceRoughness::VeryRough,
+            MaterialSurfaceRoughness::VeryRough,
+            MaterialSurfaceRoughness::Rough,
+            MaterialSurfaceRoughness::Rough,
+            MaterialSurfaceRoughness::MediumRough,
+            MaterialSurfaceRoughness::MediumRough,
+            MaterialSurfaceRoughness::MediumSmooth,
+            MaterialSurfaceRoughness::MediumSmooth,
+            MaterialSurfaceRoughness::Smooth,
+            MaterialSurfaceRoughness::Smooth,
+            MaterialSurfaceRoughness::VerySmooth,
+            MaterialSurfaceRoughness::VerySmooth,
+            MaterialSurfaceRoughness::MediumSmooth,
+            MaterialSurfaceRoughness::MediumRough,
+        ];
+        let expected_methods = [1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1];
+        let expected_alpha_rows = [
+            ["GREEN ROOF SOIL", "MEDIUMROUGH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "MEDIUMROUGH", "ADVANCED"],
+            [" \t  ", "MEDIUMROUGH", "ADVANCED"],
+            ["SOIL\n\"IGNORED\"\\LABEL\0", "MEDIUMROUGH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "VERYROUGH", "SIMPLE"],
+            ["GREEN ROOF SOIL", "VERYROUGH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "ROUGH", "SIMPLE"],
+            ["GREEN ROOF SOIL", "ROUGH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "MEDIUMROUGH", "SIMPLE"],
+            ["GREEN ROOF SOIL", "MEDIUMROUGH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "MEDIUMSMOOTH", "SIMPLE"],
+            ["GREEN ROOF SOIL", "MEDIUMSMOOTH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "SMOOTH", "SIMPLE"],
+            ["GREEN ROOF SOIL", "SMOOTH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "VERYSMOOTH", "SIMPLE"],
+            ["GREEN ROOF SOIL", "VERYSMOOTH", "ADVANCED"],
+            ["EXPLICIT UNUSED SOIL", "MEDIUMSMOOTH", "ADVANCED"],
+            ["GREEN ROOF SOIL", "MEDIUMROUGH", "ADVANCED"],
+        ];
+        let mut text = Vec::new();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+                .expect("genuine unused RoofVegetation getter");
+            for (index, object) in raw.roof_vegetation.iter().enumerate() {
+                let id = MaterialId(3 + u32::try_from(index).unwrap());
+                let row = &data.roof_vegetation[&id];
+                assert!(
+                    data.materials[index + 3] == id
+                        && data.material_map[names[index]] == i32::try_from(index + 4).unwrap()
+                        && model
+                            .materials
+                            .iter()
+                            .find(|material| material.id == id)
+                            .unwrap()
+                            .name
+                            .0
+                            == names[index]
+                        && model.ctf_report_names.materials[index + 3] == (id, names[index].into())
+                        && data.material_groups[&id] == SourceMaterialGroup::EcoRoof
+                        && !data.resistance_only[&id]
+                );
+                assert!(
+                    [
+                        row.height_of_plants,
+                        row.leaf_area_index,
+                        row.leaf_reflectivity,
+                        row.leaf_emissivity,
+                        row.minimum_stomatal_resistance,
+                        row.thickness,
+                        row.conductivity,
+                        row.density,
+                        row.specific_heat,
+                        row.thermal_absorptance,
+                        row.solar_absorptance,
+                        row.visible_absorptance,
+                        row.porosity,
+                        row.minimum_moisture,
+                        row.initial_moisture
+                    ]
+                    .iter()
+                    .zip(expected_numbers[index])
+                    .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                );
+                assert!(
+                    row.roughness == Some(expected_roughness[index])
+                        && row.calc_method == expected_methods[index]
+                        && [
+                            row.thermal_absorptance_input,
+                            row.thermal_absorptance_back,
+                            row.thermal_absorptance_front,
+                            row.solar_absorptance_input,
+                            row.visible_absorptance_input
+                        ]
+                        .iter()
+                        .all(|value| value.to_bits() == 0)
+                );
+                let expected_r_bits = if index == 16 {
+                    0.25_f64.to_bits()
+                } else {
+                    0x3fd2492492492493_u64
+                };
+                assert!(
+                    row.resistance.to_bits() == expected_r_bits
+                        && data.nominal_r[index + 3].to_bits() == expected_r_bits
+                );
+                owners.shortcut.alpha_args.fill("stale".into());
+                owners.shortcut.numeric_args.fill(-123.0);
+                owners.shortcut.alpha_field_names.fill("stale".into());
+                owners.shortcut.numeric_field_names.fill("stale".into());
+                owners.shortcut.alpha_field_blanks.fill(false);
+                owners.shortcut.numeric_field_blanks.fill(false);
+                assert!(
+                    raw.get_roof_vegetation_item(object, &mut owners).unwrap() == (4, 15)
+                        && owners.shortcut.numeric_args[..15]
+                            .iter()
+                            .zip(expected_numbers[index])
+                            .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                );
+                assert!(
+                    owners.shortcut.alpha_args[..4]
+                        == [
+                            names[index],
+                            expected_alpha_rows[index][0],
+                            expected_alpha_rows[index][1],
+                            expected_alpha_rows[index][2]
+                        ]
+                        && owners.shortcut.alpha_field_names[..4]
+                            == [
+                                "name",
+                                "soil_layer_name",
+                                "roughness",
+                                "moisture_diffusion_calculation_method"
+                            ]
+                        && owners.shortcut.alpha_field_blanks[..4]
+                            == [
+                                false,
+                                alpha_rows[index][0].is_none_or(str::is_empty),
+                                alpha_rows[index][1].is_none_or(str::is_empty),
+                                alpha_rows[index][2].is_none_or(str::is_empty)
+                            ]
+                );
+                assert!(
+                    owners.shortcut.numeric_field_names[..15] == numeric_names
+                        && owners.shortcut.numeric_field_blanks[..15] == expected_blanks[index]
+                        && matches!(
+                            ep_model::classify_source_json_number("1").unwrap(),
+                            ep_model::SourceJsonNumber::Integer(1)
+                        )
+                        && matches!(ep_model::classify_source_json_number("1.0").unwrap(), ep_model::SourceJsonNumber::Float(value) if value.to_bits() == 1.0_f64.to_bits())
+                        && matches!(
+                            ep_model::classify_source_json_number("180").unwrap(),
+                            ep_model::SourceJsonNumber::Integer(180)
+                        )
+                );
+                assert!(
+                    owners.shortcut.alpha_args.len() == 7
+                        && owners.shortcut.numeric_args.len() == 27
+                        && owners.shortcut.alpha_args[4..7]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_names[4..7]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_blanks[4..7]
+                            .iter()
+                            .all(|blank| *blank)
+                        && owners.shortcut.numeric_args[15..27]
+                            .iter()
+                            .all(|value| value.to_bits() == 0)
+                        && owners.shortcut.numeric_field_names[15..27]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.numeric_field_blanks[15..27]
+                            .iter()
+                            .all(|blank| *blank)
+                );
+                assert!(
+                    !owners
+                        .input
+                        .is_object_unused("Material:RoofVegetation", names[index])
+                        && owners
+                            .input
+                            .source_raw_object_fields("Material:RoofVegetation", names[index])
+                            .unwrap()
+                            == &original_fields[index]
+                        && original_fields[index].iter().all(|(field, original)| {
+                            if numeric_names.contains(&field.as_str())
+                                || alpha_names.contains(&field.as_str())
+                            {
+                                match original {
+                                    S::Number(token) => {
+                                        object.fields[field]
+                                            == Value::Number(
+                                                ep_model::classify_source_json_number(token)
+                                                    .unwrap()
+                                                    .as_f64(),
+                                            )
+                                    }
+                                    S::String(value) => {
+                                        object.fields[field] == Value::String(value.clone())
+                                    }
+                                    _ => false,
+                                }
+                            } else {
+                                !object.fields.contains_key(field)
+                            }
+                        })
+                );
+            }
+        }
+        assert!(
+            !errors_found
+                && state.tracking.total_severe_errors == 0
+                && state.tracking.total_warning_errors == 0
+                && text.is_empty()
+                && console.is_empty()
+                && data.num_eco_roofs == 18
+                && data.roof_vegetation.len() == 18
+                && data.materials.len() == 21
+                && raw.glazing.is_empty()
+                && raw.window_blind.is_empty()
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let report_rows = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        let expected_report_rows = [
+            vec![
+                " Material Details",
+                "A00 ROOF DEFAULTS",
+                "0.2857",
+                "MediumRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "A01 ROOF EMPTY ALPHAS",
+                "0.2857",
+                "MediumRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "A02 ROOF SOIL WHITESPACE",
+                "0.2857",
+                "MediumRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "A03 ROOF ARBITRARY SOIL",
+                "0.2857",
+                "MediumRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B11 ROOF VERYROUGH SIMPLE",
+                "0.2857",
+                "VeryRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B12 ROOF VERYROUGH ADVANCED",
+                "0.2857",
+                "VeryRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B21 ROOF ROUGH SIMPLE",
+                "0.2857",
+                "Rough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B22 ROOF ROUGH ADVANCED",
+                "0.2857",
+                "Rough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B31 ROOF MEDIUMROUGH SIMPLE",
+                "0.2857",
+                "MediumRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B32 ROOF MEDIUMROUGH ADVANCED",
+                "0.2857",
+                "MediumRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B41 ROOF MEDIUMSMOOTH SIMPLE",
+                "0.2857",
+                "MediumSmooth",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B42 ROOF MEDIUMSMOOTH ADVANCED",
+                "0.2857",
+                "MediumSmooth",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B51 ROOF SMOOTH SIMPLE",
+                "0.2857",
+                "Smooth",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B52 ROOF SMOOTH ADVANCED",
+                "0.2857",
+                "Smooth",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B61 ROOF VERYSMOOTH SIMPLE",
+                "0.2857",
+                "VerySmooth",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "B62 ROOF VERYSMOOTH ADVANCED",
+                "0.2857",
+                "VerySmooth",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+            vec![
+                " Material Details",
+                "C00 ROOF FULL EXPLICIT",
+                "0.2500",
+                "MediumSmooth",
+                "0.1250",
+                "0.500",
+                "1024.000",
+                "1024.000",
+                "1.0000",
+                "0.5000",
+                "1.0000",
+            ],
+            vec![
+                " Material Details",
+                "C01 ROOF MOISTURE EQUALITY",
+                "0.2857",
+                "MediumRough",
+                "0.1000",
+                "0.350",
+                "1100.000",
+                "1200.000",
+                "0.9000",
+                "0.7000",
+                "0.7500",
+            ],
+        ];
+        assert!(
+            report_rows.len() == 20
+                && report_rows[2..] == expected_report_rows
+                && names.iter().enumerate().all(|(index, _)| data
+                    .source_roof_vegetation_surface_properties(
+                        i32::try_from(index + 4).unwrap(),
+                        MaterialId(3 + u32::try_from(index).unwrap())
+                    )
+                    .unwrap()
+                    == (
+                        expected_roughness[index],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: expected_numbers[index][9],
+                            solar_absorptance: expected_numbers[index][10],
+                            visible_absorptance: expected_numbers[index][11]
+                        }
+                    ))
+                && data
+                    .source_roof_vegetation_surface_properties(4, MaterialId(4))
+                    .is_err()
+                && data
+                    .source_roof_vegetation_surface_properties(0, MaterialId(3))
                     .is_err()
         );
         assert!(
@@ -22370,6 +23532,1301 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
         assert!(
             state.output_error_header
                 && state.tracking.last_severe_error.is_empty()
+                && console.is_empty()
+                && eio.is_empty()
+                && matches!(&result, Err(RuntimeError::HeatBalanceInput(_)))
+        );
+    }
+
+    // RoofVegetation B2: same real Material/IP/backend; active EcoRoof remains excluded.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier binds ID/kind only; no physical runtime state is seeded from it.
+        let typed_roof = ep_model::RoofVegetationMaterial {
+            height_of_plants_m: 0.5,
+            leaf_area_index: 4.0,
+            leaf_reflectivity: 0.25,
+            leaf_emissivity: 1.0,
+            minimum_stomatal_resistance_s_per_m: 256.0,
+            roughness: MaterialSurfaceRoughness::VerySmooth,
+            thickness_m: 0.6,
+            dry_soil_conductivity_w_per_m_k: 1.2,
+            dry_soil_density_kg_per_m3: 1024.0,
+            dry_soil_specific_heat_j_per_kg_k: 1024.0,
+            surface: OpaqueSurfaceProperties {
+                thermal_absorptance: 1.0,
+                solar_absorptance: 0.5,
+                visible_absorptance: 1.0,
+            },
+            saturation_volumetric_moisture_content: 0.5,
+            residual_volumetric_moisture_content: 0.0625,
+            initial_volumetric_moisture_content: 0.125,
+            moisture_diffusion_method: ep_model::RoofVegetationMoistureDiffusionMethod::Simple,
+        };
+        let names = ["A ROOF RESET", "MASS", "Z ROOF AFTER"];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::RoofVegetation(typed_roof),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "height_of_plants",
+            "leaf_area_index",
+            "leaf_reflectivity",
+            "leaf_emissivity",
+            "minimum_stomatal_resistance",
+            "thickness",
+            "conductivity_of_dry_soil",
+            "density_of_dry_soil",
+            "specific_heat_of_dry_soil",
+            "thermal_absorptance",
+            "solar_absorptance",
+            "visible_absorptance",
+            "saturation_volumetric_moisture_content_of_the_soil_layer",
+            "residual_volumetric_moisture_content_of_the_soil_layer",
+            "initial_volumetric_moisture_content_of_the_soil_layer",
+        ];
+        let alpha_names = [
+            "soil_layer_name",
+            "roughness",
+            "moisture_diffusion_calculation_method",
+        ];
+        let numeric_tokens: [[Option<&str>; 15]; 3] = [
+            [
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.125"),
+                Some("0.5"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.4"),
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 3]; 3] =
+            [[None, None, None], [None, None, None], [None, None, None]];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .map(|(numbers, alphas)| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| ((*field).into(), S::Number(token.into())))
+                    })
+                    .collect();
+                fields.extend(alpha_names.iter().zip(alphas).filter_map(|(field, value)| {
+                    value.map(|value| ((*field).into(), S::String(value.into())))
+                }));
+                fields
+            })
+            .collect();
+        raw.roof_vegetation = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter(|(field, _)| {
+                        numeric_names.contains(&field.as_str())
+                            || alpha_names.contains(&field.as_str())
+                    })
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Genuine empty Glass7A14N + Blind2A27N allocate nonempty 3A/12N tails; zero positive work credit.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            ("Material:RoofVegetation", &raw.roof_vegetation, 4, 15),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .enumerate()
+                            .map(|(index, row)| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: if *family == "Material:RoofVegetation" {
+                                    original_fields[index]
+                                        .iter()
+                                        .map(|(field, value)| {
+                                            (
+                                                field.clone(),
+                                                match value {
+                                                    S::Null => 0,
+                                                    S::Array(values) => values.len(),
+                                                    S::Object(values) => values.len(),
+                                                    _ => 1,
+                                                },
+                                            )
+                                        })
+                                        .collect()
+                                } else {
+                                    row.fields.keys().map(|field| (field.clone(), 1)).collect()
+                                },
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "Material:RoofVegetation" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+                .expect("genuine RoofVegetation ordered warning/reset and duplicate continuation");
+        }
+        assert!(
+            errors_found
+                && state.tracking.total_warning_errors == 1
+                && state.tracking.total_severe_errors == 1
+                && data.num_eco_roofs == 3
+                && data.roof_vegetation.len() == 2
+                && data.materials.len() == 5
+        );
+        let log = std::str::from_utf8(&text).unwrap();
+        let lines = log
+            .lines()
+            .filter(|line| {
+                line.contains(" ** Warning ** ")
+                    || line.contains(" ** Severe  ** ")
+                    || line.contains(" **   ~~~   ** ")
+            })
+            .collect::<Vec<_>>();
+        let expected_messages = [
+            "Material:RoofVegetation=\"A ROOF RESET\", Illegal value combination.",
+            "initial_volumetric_moisture_content_of_the_soil_layer is greater than saturation_volumetric_moisture_content_of_the_soil_layer. It must be less or equal.",
+            "saturation_volumetric_moisture_content_of_the_soil_layer = 0.300.",
+            "initial_volumetric_moisture_content_of_the_soil_layer = 0.400.",
+            "initial_volumetric_moisture_content_of_the_soil_layer is reset to the maximum (saturation) value = 0.300.",
+            "Simulation continues.",
+            "GetMaterialData: Material:RoofVegetation = MASS, duplicate name.",
+        ];
+        for (line, expected) in lines.iter().zip(expected_messages) {
+            assert!(
+                line.ends_with(expected),
+                "{line:?} does not end with {expected:?}"
+            );
+        }
+        assert!(
+            lines.len() == 7
+                && log.matches(" ** Warning ** ").count() == 1
+                && log.matches(" ** Severe  ** ").count() == 1
+                && log.matches(" **   ~~~   ** ").count() == 5
+                && names
+                    .iter()
+                    .all(|name| !input.is_object_unused("Material:RoofVegetation", name))
+        );
+        assert!(
+            data.materials
+                == [
+                    MaterialId(0),
+                    MaterialId(1),
+                    MaterialId(2),
+                    MaterialId(3),
+                    MaterialId(4)
+                ]
+                && data.material_map[names[0]] == 4
+                && data.material_map[names[2]] == 5
+                && !data.roof_vegetation.contains_key(&MaterialId(0))
+                && data.nominal_r[3].to_bits() == 0.25_f64.to_bits()
+                && data.nominal_r[4].to_bits() == 0x3fd2492492492493_u64
+                && data
+                    .roof_vegetation
+                    .keys()
+                    .all(
+                        |id| data.material_groups[id] == SourceMaterialGroup::EcoRoof
+                            && !data.resistance_only[id]
+                    )
+        );
+        let row = &data.roof_vegetation[&MaterialId(3)];
+        assert!(
+            [
+                row.height_of_plants,
+                row.leaf_area_index,
+                row.leaf_reflectivity,
+                row.leaf_emissivity,
+                row.minimum_stomatal_resistance,
+                row.thickness,
+                row.conductivity,
+                row.density,
+                row.specific_heat,
+                row.thermal_absorptance,
+                row.solar_absorptance,
+                row.visible_absorptance,
+                row.porosity,
+                row.minimum_moisture,
+                row.initial_moisture
+            ] == [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.125, 0.5, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.3
+            ] && row.resistance.to_bits() == 0.25_f64.to_bits()
+                && row.roughness == Some(MaterialSurfaceRoughness::MediumRough)
+                && row.calc_method == 1
+                && [
+                    row.thermal_absorptance_input,
+                    row.thermal_absorptance_back,
+                    row.thermal_absorptance_front,
+                    row.solar_absorptance_input,
+                    row.visible_absorptance_input
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+                && input
+                    .source_raw_object_fields("Material:RoofVegetation", names[0])
+                    .unwrap()
+                    == &original_fields[0]
+                && raw.roof_vegetation[0].fields["initial_volumetric_moisture_content_of_the_soil_layer"]
+                    == Value::Number(0.4)
+        );
+        let row = &data.roof_vegetation[&MaterialId(4)];
+        // Unlike GapEQL, positive Roof K computes R/NomR even after the duplicate set the shared error flag.
+        assert!(
+            [
+                row.height_of_plants,
+                row.leaf_area_index,
+                row.leaf_reflectivity,
+                row.leaf_emissivity,
+                row.minimum_stomatal_resistance,
+                row.thickness,
+                row.conductivity,
+                row.density,
+                row.specific_heat,
+                row.thermal_absorptance,
+                row.solar_absorptance,
+                row.visible_absorptance,
+                row.porosity,
+                row.minimum_moisture,
+                row.initial_moisture
+            ] == [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.1
+            ] && row.resistance.to_bits() == 0x3fd2492492492493_u64
+                && row.roughness == Some(MaterialSurfaceRoughness::MediumRough)
+                && row.calc_method == 1
+                && [
+                    row.thermal_absorptance_input,
+                    row.thermal_absorptance_back,
+                    row.thermal_absorptance_front,
+                    row.solar_absorptance_input,
+                    row.visible_absorptance_input
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+                && shortcut.numeric_args[..15]
+                    == [
+                        0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75,
+                        0.3, 0.01, 0.1
+                    ]
+                && shortcut.numeric_field_names[..15] == numeric_names
+                && shortcut.numeric_field_blanks[..15] == [true; 15]
+                && shortcut.alpha_args[..4]
+                    == [names[2], "GREEN ROOF SOIL", "MEDIUMROUGH", "ADVANCED"]
+                && shortcut.alpha_field_names[..4]
+                    == [
+                        "name",
+                        "soil_layer_name",
+                        "roughness",
+                        "moisture_diffusion_calculation_method"
+                    ]
+                && shortcut.alpha_field_blanks[..4] == [false, true, true, true]
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let report_rows = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert!(
+            data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && report_rows.len() == 4
+                && report_rows
+                    == [
+                        vec![
+                            " Material Details",
+                            "Mass",
+                            "5.0000E-002",
+                            "MediumRough",
+                            "0.1000",
+                            "2.000",
+                            "2000.000",
+                            "800.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                        vec![
+                            " Material Details",
+                            "NO MASS",
+                            "0.2000",
+                            "MediumRough",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                        vec![
+                            " Material Details",
+                            "A ROOF RESET",
+                            "0.2500",
+                            "MediumRough",
+                            "0.1250",
+                            "0.500",
+                            "1100.000",
+                            "1200.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7500"
+                        ],
+                        vec![
+                            " Material Details",
+                            "Z ROOF AFTER",
+                            "0.2857",
+                            "MediumRough",
+                            "0.1000",
+                            "0.350",
+                            "1100.000",
+                            "1200.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7500"
+                        ],
+                    ]
+                && std::str::from_utf8(&eio)
+                    .unwrap()
+                    .lines()
+                    .filter(|line| line.starts_with(" Material:Air,"))
+                    .collect::<Vec<_>>()
+                    == [" Material:Air,MIXED GAP,0.1500"]
+        );
+    }
+
+    // RoofVegetation B3: same real Material/IP/backend; active EcoRoof remains excluded.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier binds ID/kind only; no physical runtime state is seeded from it.
+        let typed_roof = ep_model::RoofVegetationMaterial {
+            height_of_plants_m: 0.5,
+            leaf_area_index: 4.0,
+            leaf_reflectivity: 0.25,
+            leaf_emissivity: 1.0,
+            minimum_stomatal_resistance_s_per_m: 256.0,
+            roughness: MaterialSurfaceRoughness::VerySmooth,
+            thickness_m: 0.6,
+            dry_soil_conductivity_w_per_m_k: 1.2,
+            dry_soil_density_kg_per_m3: 1024.0,
+            dry_soil_specific_heat_j_per_kg_k: 1024.0,
+            surface: OpaqueSurfaceProperties {
+                thermal_absorptance: 1.0,
+                solar_absorptance: 0.5,
+                visible_absorptance: 1.0,
+            },
+            saturation_volumetric_moisture_content: 0.5,
+            residual_volumetric_moisture_content: 0.0625,
+            initial_volumetric_moisture_content: 0.125,
+            moisture_diffusion_method: ep_model::RoofVegetationMoistureDiffusionMethod::Simple,
+        };
+        let names = ["A ROOF IO RESET", "Z ROOF UNREAD"];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::RoofVegetation(typed_roof),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "height_of_plants",
+            "leaf_area_index",
+            "leaf_reflectivity",
+            "leaf_emissivity",
+            "minimum_stomatal_resistance",
+            "thickness",
+            "conductivity_of_dry_soil",
+            "density_of_dry_soil",
+            "specific_heat_of_dry_soil",
+            "thermal_absorptance",
+            "solar_absorptance",
+            "visible_absorptance",
+            "saturation_volumetric_moisture_content_of_the_soil_layer",
+            "residual_volumetric_moisture_content_of_the_soil_layer",
+            "initial_volumetric_moisture_content_of_the_soil_layer",
+        ];
+        let alpha_names = [
+            "soil_layer_name",
+            "roughness",
+            "moisture_diffusion_calculation_method",
+        ];
+        let numeric_tokens: [[Option<&str>; 15]; 2] = [
+            [
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.4"),
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 3]; 2] = [[None, None, None], [None, None, None]];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .map(|(numbers, alphas)| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| ((*field).into(), S::Number(token.into())))
+                    })
+                    .collect();
+                fields.extend(alpha_names.iter().zip(alphas).filter_map(|(field, value)| {
+                    value.map(|value| ((*field).into(), S::String(value.into())))
+                }));
+                fields
+            })
+            .collect();
+        raw.roof_vegetation = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter(|(field, _)| {
+                        numeric_names.contains(&field.as_str())
+                            || alpha_names.contains(&field.as_str())
+                    })
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Genuine empty Glass7A14N + Blind2A27N allocate nonempty 3A/12N tails; zero positive work credit.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            ("Material:RoofVegetation", &raw.roof_vegetation, 4, 15),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .enumerate()
+                            .map(|(index, row)| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: if *family == "Material:RoofVegetation" {
+                                    original_fields[index]
+                                        .iter()
+                                        .map(|(field, value)| {
+                                            (
+                                                field.clone(),
+                                                match value {
+                                                    S::Null => 0,
+                                                    S::Array(values) => values.len(),
+                                                    S::Object(values) => values.len(),
+                                                    _ => 1,
+                                                },
+                                            )
+                                        })
+                                        .collect()
+                                } else {
+                                    row.fields.keys().map(|field| (field.clone(), 1)).collect()
+                                },
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "Material:RoofVegetation" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+        };
+        assert!(
+            matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+            crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+            if *operation == "error header" && source.kind() == std::io::ErrorKind::Other && source.to_string() == "authored IRT diagnostic failure"))
+                && !errors_found
+        );
+        let row = &data.roof_vegetation[&MaterialId(3)];
+        assert!(
+            [
+                row.height_of_plants,
+                row.leaf_area_index,
+                row.leaf_reflectivity,
+                row.leaf_emissivity,
+                row.minimum_stomatal_resistance,
+                row.thickness,
+                row.conductivity,
+                row.density,
+                row.specific_heat,
+                row.thermal_absorptance,
+                row.solar_absorptance,
+                row.visible_absorptance,
+                row.porosity,
+                row.minimum_moisture,
+                row.initial_moisture
+            ] == [
+                0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75, 0.3, 0.01,
+                0.4
+            ] && row.resistance.to_bits() == 0x3fd2492492492493_u64
+                && row.roughness == Some(MaterialSurfaceRoughness::MediumRough)
+                && row.calc_method == 1
+                && [
+                    row.thermal_absorptance_input,
+                    row.thermal_absorptance_back,
+                    row.thermal_absorptance_front,
+                    row.solar_absorptance_input,
+                    row.visible_absorptance_input
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+        );
+        assert!(
+            data.num_eco_roofs == 2
+                && data.roof_vegetation.len() == 1
+                && data.materials == [MaterialId(0), MaterialId(1), MaterialId(2), MaterialId(3)]
+                && !input.is_object_unused("Material:RoofVegetation", names[0])
+                && input.is_object_unused("Material:RoofVegetation", names[1])
+                && input
+                    .source_raw_object_fields("Material:RoofVegetation", names[0])
+                    .unwrap()
+                    == &original_fields[0]
+                && !data.material_map.contains_key(names[1])
+                && !data.roof_vegetation.contains_key(&MaterialId(4))
+                && shortcut.current_module_object == "Material:RoofVegetation"
+                && shortcut.alpha_args[..4]
+                    == [names[0], "GREEN ROOF SOIL", "MEDIUMROUGH", "ADVANCED"]
+                && shortcut.numeric_args[..15]
+                    == [
+                        0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75,
+                        0.3, 0.01, 0.4
+                    ]
+                && shortcut.numeric_field_names[..15] == numeric_names
+                && shortcut.numeric_field_blanks[..15]
+                    == [
+                        true, true, true, true, true, true, true, true, true, true, true, true,
+                        true, true, false
+                    ]
+        );
+        assert!(
+            data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && data.nominal_r[3].to_bits() == 0x3fd2492492492493_u64
+                && data.material_map[names[0]] == 4
+                && data.material_groups[&MaterialId(3)] == SourceMaterialGroup::EcoRoof
+                && !data.resistance_only[&MaterialId(3)]
+                && state.output_error_header
+                && state.tracking.last_severe_error.is_empty()
+                && state.tracking.total_warning_errors == 1
+                && state.tracking.total_severe_errors == 0
+                && console.is_empty()
+                && eio.is_empty()
+        );
+    }
+
+    // RoofVegetation B4: same real Material/IP/backend; active EcoRoof remains excluded.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier binds ID/kind only; no physical runtime state is seeded from it.
+        let typed_roof = ep_model::RoofVegetationMaterial {
+            height_of_plants_m: 0.5,
+            leaf_area_index: 4.0,
+            leaf_reflectivity: 0.25,
+            leaf_emissivity: 1.0,
+            minimum_stomatal_resistance_s_per_m: 256.0,
+            roughness: MaterialSurfaceRoughness::VerySmooth,
+            thickness_m: 0.6,
+            dry_soil_conductivity_w_per_m_k: 1.2,
+            dry_soil_density_kg_per_m3: 1024.0,
+            dry_soil_specific_heat_j_per_kg_k: 1024.0,
+            surface: OpaqueSurfaceProperties {
+                thermal_absorptance: 1.0,
+                solar_absorptance: 0.5,
+                visible_absorptance: 1.0,
+            },
+            saturation_volumetric_moisture_content: 0.5,
+            residual_volumetric_moisture_content: 0.0625,
+            initial_volumetric_moisture_content: 0.125,
+            moisture_diffusion_method: ep_model::RoofVegetationMoistureDiffusionMethod::Simple,
+        };
+        let names = ["MASS", "Z ROOF UNREAD"];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::RoofVegetation(typed_roof),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "height_of_plants",
+            "leaf_area_index",
+            "leaf_reflectivity",
+            "leaf_emissivity",
+            "minimum_stomatal_resistance",
+            "thickness",
+            "conductivity_of_dry_soil",
+            "density_of_dry_soil",
+            "specific_heat_of_dry_soil",
+            "thermal_absorptance",
+            "solar_absorptance",
+            "visible_absorptance",
+            "saturation_volumetric_moisture_content_of_the_soil_layer",
+            "residual_volumetric_moisture_content_of_the_soil_layer",
+            "initial_volumetric_moisture_content_of_the_soil_layer",
+        ];
+        let alpha_names = [
+            "soil_layer_name",
+            "roughness",
+            "moisture_diffusion_calculation_method",
+        ];
+        let numeric_tokens: [[Option<&str>; 15]; 2] = [
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+            [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 3]; 2] = [[None, None, None], [None, None, None]];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .map(|(numbers, alphas)| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| ((*field).into(), S::Number(token.into())))
+                    })
+                    .collect();
+                fields.extend(alpha_names.iter().zip(alphas).filter_map(|(field, value)| {
+                    value.map(|value| ((*field).into(), S::String(value.into())))
+                }));
+                fields
+            })
+            .collect();
+        raw.roof_vegetation = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter(|(field, _)| {
+                        numeric_names.contains(&field.as_str())
+                            || alpha_names.contains(&field.as_str())
+                    })
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Genuine empty Glass7A14N + Blind2A27N allocate nonempty 3A/12N tails; zero positive work credit.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            ("Material:RoofVegetation", &raw.roof_vegetation, 4, 15),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .enumerate()
+                            .map(|(index, row)| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: if *family == "Material:RoofVegetation" {
+                                    original_fields[index]
+                                        .iter()
+                                        .map(|(field, value)| {
+                                            (
+                                                field.clone(),
+                                                match value {
+                                                    S::Null => 0,
+                                                    S::Array(values) => values.len(),
+                                                    S::Object(values) => values.len(),
+                                                    _ => 1,
+                                                },
+                                            )
+                                        })
+                                        .collect()
+                                } else {
+                                    row.fields.keys().map(|field| (field.clone(), 1)).collect()
+                                },
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "Material:RoofVegetation" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+        };
+        assert!(
+            matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+            crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+            if *operation == "error header" && source.kind() == std::io::ErrorKind::Other && source.to_string() == "authored IRT diagnostic failure"))
+                && !errors_found
+        );
+        assert!(
+            data.num_eco_roofs == 2
+                && data.roof_vegetation.is_empty()
+                && data.materials == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.material_map.len() == 3
+                && data.material_map["MASS"] == 1
+                && !data.material_map.contains_key(names[1])
+        );
+        assert!(
+            !input.is_object_unused("Material:RoofVegetation", names[0])
+                && input.is_object_unused("Material:RoofVegetation", names[1])
+                && input
+                    .source_raw_object_fields("Material:RoofVegetation", names[0])
+                    .unwrap()
+                    == &original_fields[0]
+                && shortcut.current_module_object == "Material:RoofVegetation"
+                && shortcut.alpha_args[..4]
+                    == [names[0], "GREEN ROOF SOIL", "MEDIUMROUGH", "ADVANCED"]
+                && shortcut.alpha_field_names[..4]
+                    == [
+                        "name",
+                        "soil_layer_name",
+                        "roughness",
+                        "moisture_diffusion_calculation_method"
+                    ]
+                && shortcut.alpha_field_blanks[..4] == [false, true, true, true]
+                && shortcut.numeric_args[..15]
+                    == [
+                        0.2, 1.0, 0.22, 0.95, 180.0, 0.1, 0.35, 1100.0, 1200.0, 0.9, 0.7, 0.75,
+                        0.3, 0.01, 0.1
+                    ]
+                && shortcut.numeric_field_names[..15] == numeric_names
+                && shortcut.numeric_field_blanks[..15] == [true; 15]
+                && shortcut.alpha_args.len() == 7
+                && shortcut.numeric_args.len() == 27
+                && shortcut.alpha_args[4..7].iter().all(String::is_empty)
+                && shortcut.alpha_field_names[4..7]
+                    .iter()
+                    .all(String::is_empty)
+                && shortcut.alpha_field_blanks[4..7].iter().all(|blank| *blank)
+                && shortcut.numeric_args[15..27]
+                    .iter()
+                    .all(|value| value.to_bits() == 0)
+                && shortcut.numeric_field_names[15..27]
+                    .iter()
+                    .all(String::is_empty)
+                && shortcut.numeric_field_blanks[15..27]
+                    .iter()
+                    .all(|blank| *blank)
+        );
+        assert!(
+            data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && data.nominal_r == [0.05, 0.2, 0.15]
+                && model.ctf_report_names.materials[..3]
+                    == [
+                        (MaterialId(0), "Mass".into()),
+                        (MaterialId(1), "NO MASS".into()),
+                        (MaterialId(2), "MIXED GAP".into())
+                    ]
+        );
+        assert!(
+            state.output_error_header
+                && state.tracking.last_severe_error.is_empty()
+                && state.tracking.total_severe_errors == 1
+                && state.tracking.total_warning_errors == 0
                 && console.is_empty()
                 && eio.is_empty()
                 && matches!(&result, Err(RuntimeError::HeatBalanceInput(_)))

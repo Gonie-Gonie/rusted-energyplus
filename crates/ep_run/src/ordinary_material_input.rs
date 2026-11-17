@@ -109,6 +109,7 @@ fn resolve_ordered(
         "WindowMaterial:Blind:EquivalentLayer",
         "WindowMaterial:Glazing:EquivalentLayer",
         "WindowMaterial:Gap:EquivalentLayer",
+        "Material:RoofVegetation",
         "WindowMaterial:Screen",
         "WindowMaterial:Blind",
     ] {
@@ -126,6 +127,7 @@ fn resolve_ordered(
                 | "WindowMaterial:Blind:EquivalentLayer"
                 | "WindowMaterial:Glazing:EquivalentLayer"
                 | "WindowMaterial:Gap:EquivalentLayer"
+                | "Material:RoofVegetation"
                 | "WindowMaterial:Screen"
                 | "WindowMaterial:Blind"
         ) && !source_order
@@ -229,6 +231,14 @@ fn resolve_ordered(
                     continue;
                 }
                 if source_order
+                    && family == "Material:RoofVegetation"
+                    && !crate::ordinary_equipment_input::source_b_roof_vegetation_known_field(
+                        &field.0,
+                    )
+                {
+                    continue;
+                }
+                if source_order
                     && family == "WindowMaterial:Shade"
                     && !crate::ordinary_equipment_input::source_b_shade_known_field(&field.0)
                 {
@@ -282,6 +292,7 @@ fn resolve_ordered(
                                     | "WindowMaterial:Blind:EquivalentLayer"
                                     | "WindowMaterial:Glazing:EquivalentLayer"
                                     | "WindowMaterial:Gap:EquivalentLayer"
+                                    | "Material:RoofVegetation"
                                     | "WindowMaterial:Screen"
                                     | "WindowMaterial:Blind"
                             ) {
@@ -342,6 +353,7 @@ fn resolve_ordered(
                 result.window_glazing_equivalent_layer = values
             }
             "WindowMaterial:Gap:EquivalentLayer" => result.window_gap_equivalent_layer = values,
+            "Material:RoofVegetation" => result.roof_vegetation = values,
             "WindowMaterial:Screen" => result.window_screen = values,
             "WindowMaterial:Blind" => result.window_blind = values,
             _ => unreachable!("literal selected material family"),

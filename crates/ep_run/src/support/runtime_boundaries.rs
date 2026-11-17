@@ -724,17 +724,38 @@ pub(super) fn assess_typed_runtime_boundaries(
             blind_equivalent_layer_count.max(blind_equivalent_layer_raw_count),
         );
     }
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "Material:RoofVegetation",
-        typed_model
-            .materials
+    let roof_vegetation_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::RoofVegetation)
+        .count();
+    let roof_vegetation_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType("Material:RoofVegetation".into()))
+        .map_or(0, |rows| rows.len());
+    let roof_vegetation_consumed = source_admission
+        .is_some_and(|admission| admission.consumes_unused_roof_vegetation(typed_model));
+    let roof_vegetation_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::RoofVegetation)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .chain(construction.outside_layer.iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::RoofVegetation
+                })
+            })
+    });
+    if !roof_vegetation_consumed || roof_vegetation_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "Material:RoofVegetation",
+            roof_vegetation_count.max(roof_vegetation_raw_count),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

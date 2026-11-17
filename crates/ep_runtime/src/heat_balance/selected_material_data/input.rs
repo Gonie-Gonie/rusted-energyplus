@@ -46,6 +46,8 @@ pub struct SelectedMaterialInput {
     pub window_glazing_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialBlind2A27N/min29 operands.
     pub window_blind: Vec<ProjectInputObject>,
+    /// Genuine ordered EcoRoof4A15N/min19 operands; active EcoRoof remains excluded.
+    pub roof_vegetation: Vec<ProjectInputObject>,
 }
 
 /// Genuine scalar projection; empty extension objects retain their array position.
@@ -86,6 +88,100 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_roof_vegetation_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        let family = "Material:RoofVegetation";
+        if !self.source_is_epjson || !owners.input.has_object(family, &object.object_name) {
+            return Err(unavailable(
+                "RoofVegetation owned direct-epJSON raw/IP identity",
+            ));
+        }
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 4
+            || s.alpha_field_names.len() < 4
+            || s.alpha_field_blanks.len() < 4
+            || s.numeric_args.len() < 15
+            || s.numeric_field_names.len() < 15
+            || s.numeric_field_blanks.len() < 15
+        {
+            return Err(unavailable("actual RoofVegetation4A15N allocation"));
+        }
+        s.alpha_args.fill(String::new());
+        s.alpha_field_names.fill(String::new());
+        s.alpha_field_blanks.fill(true);
+        s.numeric_args.fill(0.0);
+        s.numeric_field_names.fill(String::new());
+        s.numeric_field_blanks.fill(true);
+        owners
+            .input
+            .mark_object_as_used(family, &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_names[0] = "name".into();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        for (index, name, default) in [
+            (1_usize, "soil_layer_name", "GREEN ROOF SOIL"),
+            (2_usize, "roughness", "MEDIUMROUGH"),
+            (3_usize, "moisture_diffusion_calculation_method", "ADVANCED"),
+        ] {
+            s.alpha_field_names[index] = name.into();
+            s.alpha_args[index] = default.into();
+            match object.fields.get(name) {
+                Some(ProjectInputValue::String(text)) => {
+                    if !text.is_empty() {
+                        s.alpha_args[index] = text.to_ascii_uppercase();
+                        s.alpha_field_blanks[index] = false;
+                    }
+                }
+                None => {}
+                _ => return Err(unavailable("admitted original RoofVegetation alpha")),
+            }
+        }
+        const FIELDS: [(&str, f64); 15] = [
+            ("height_of_plants", 0.2),
+            ("leaf_area_index", 1.0),
+            ("leaf_reflectivity", 0.22),
+            ("leaf_emissivity", 0.95),
+            ("minimum_stomatal_resistance", 180.0),
+            ("thickness", 0.1),
+            ("conductivity_of_dry_soil", 0.35),
+            ("density_of_dry_soil", 1100.0),
+            ("specific_heat_of_dry_soil", 1200.0),
+            ("thermal_absorptance", 0.9),
+            ("solar_absorptance", 0.7),
+            ("visible_absorptance", 0.75),
+            (
+                "saturation_volumetric_moisture_content_of_the_soil_layer",
+                0.3,
+            ),
+            (
+                "residual_volumetric_moisture_content_of_the_soil_layer",
+                0.01,
+            ),
+            ("initial_volumetric_moisture_content_of_the_soil_layer", 0.1),
+        ];
+        for (index, (name, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                }
+                None => {}
+                _ => {
+                    return Err(unavailable(
+                        "admitted original RoofVegetation numeric scalar",
+                    ));
+                }
+            }
+        }
+        // min_fields19 forces all four alphas and fifteen numeric defaults, even for {}.
+        Ok((4, 15))
+    }
+
     pub(super) fn get_spectral_data_item(
         &self,
         row: &SourceGlazingSpectralInput,

@@ -774,6 +774,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_glazing_equivalent_layer(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Gap:EquivalentLayer".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_gap_equivalent_layer(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("Material:RoofVegetation".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_roof_vegetation(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -9601,6 +9603,100 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn source_roof_vegetation_original_fields_valid(object: &RawObject) -> bool {
+        let valid = |field: &str, value: &RawValue| {
+            if !matches!(
+                field,
+                "height_of_plants"
+                    | "leaf_area_index"
+                    | "leaf_reflectivity"
+                    | "leaf_emissivity"
+                    | "minimum_stomatal_resistance"
+                    | "thickness"
+                    | "conductivity_of_dry_soil"
+                    | "density_of_dry_soil"
+                    | "specific_heat_of_dry_soil"
+                    | "thermal_absorptance"
+                    | "solar_absorptance"
+                    | "visible_absorptance"
+                    | "saturation_volumetric_moisture_content_of_the_soil_layer"
+                    | "residual_volumetric_moisture_content_of_the_soil_layer"
+                    | "initial_volumetric_moisture_content_of_the_soil_layer"
+                    | "soil_layer_name"
+                    | "roughness"
+                    | "moisture_diffusion_calculation_method"
+            ) {
+                return true;
+            }
+            if field == "soil_layer_name" {
+                return matches!(value, RawValue::String(_));
+            }
+            if field == "roughness" {
+                return matches!(value, RawValue::String(text) if matches!(text.as_str(), "" | "VeryRough" | "Rough" | "MediumRough" | "MediumSmooth" | "Smooth" | "VerySmooth"));
+            }
+            if field == "moisture_diffusion_calculation_method" {
+                return matches!(value, RawValue::String(text) if matches!(text.as_str(), "" | "Simple" | "Advanced"));
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match field {
+                            "height_of_plants" => value > 0.005 && value <= 1.0,
+                            "leaf_area_index" => value > 0.001 && value <= 5.0,
+                            "leaf_reflectivity" => (0.05..=0.5).contains(&value),
+                            "leaf_emissivity" => (0.8..=1.0).contains(&value),
+                            "minimum_stomatal_resistance" => (50.0..=300.0).contains(&value),
+                            "thickness" => value > 0.05 && value <= 0.7,
+                            "conductivity_of_dry_soil" => (0.2..=1.5).contains(&value),
+                            "density_of_dry_soil" => (300.0..=2000.0).contains(&value),
+                            "specific_heat_of_dry_soil" => value > 500.0 && value <= 2000.0,
+                            "thermal_absorptance" => value > 0.8 && value <= 1.0,
+                            "solar_absorptance" => (0.4..=0.9).contains(&value),
+                            "visible_absorptance" => value > 0.5 && value <= 1.0,
+                            "saturation_volumetric_moisture_content_of_the_soil_layer" => {
+                                value > 0.1 && value <= 0.5
+                            }
+                            "residual_volumetric_moisture_content_of_the_soil_layer" => {
+                                (0.01..=0.1).contains(&value)
+                            }
+                            "initial_volumetric_moisture_content_of_the_soil_layer" => {
+                                value > 0.05 && value <= 0.5
+                            }
+                            _ => false,
+                        }
+                })
+        };
+        object
+            .fields
+            .iter()
+            .all(|(field, value)| valid(&field.0, value))
+    }
+
+    // Selection only: actual EcoRoof getter owns warning, resistance and late moisture reset.
+    fn source_unused_roof_vegetation(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        if !Self::source_roof_vegetation_original_fields_valid(object) {
+            return false;
+        }
+        !self.raw_model.objects.iter().filter(|(family, _)| family.0.starts_with("Construction")).any(|(_, rows)| {
+            rows.values().any(|construction| construction.fields.iter().any(|(field, value)| {
+                (field.0 == "outside_layer" || (2..=10).any(|index| field.0 == format!("layer_{index}")))
+                    && matches!(value, RawValue::String(reference) if reference.eq_ignore_ascii_case(name))
+            }))
+        })
+    }
+
     fn parse_roof_vegetation_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "Material:RoofVegetation";
         const SOIL_LAYER_NAME_FIELD: &str = "soil_layer_name";
@@ -9612,6 +9708,19 @@ impl<'a> Compiler<'a> {
             "initial_volumetric_moisture_content_of_the_soil_layer";
 
         for (name, object) in self.objects(OBJECT_TYPE) {
+            if self.source_file_declarations
+                && self.raw_model.is_epjson()
+                && (name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+                    || !Self::source_roof_vegetation_original_fields_valid(&object))
+            {
+                self.error("InvalidOriginalSourceRoofVegetationField", OBJECT_TYPE, Some(&name), None,
+                    "Source RoofVegetation requires the original name, field kinds, enums and numeric bounds".to_string());
+                continue;
+            }
+            let source_unused_roof_vegetation = self.source_unused_roof_vegetation(&name, &object);
             let height_of_plants_m = self.number_bounded_blank_default(
                 OBJECT_TYPE,
                 &name,
@@ -9663,12 +9772,20 @@ impl<'a> Compiler<'a> {
             // soil label. Preserve that source-effective boundary while still
             // validating the input type and recording the default ledger.
             match field_value(&object, SOIL_LAYER_NAME_FIELD) {
-                Some(RawValue::String(value)) if value.trim().is_empty() => self.record_default(
-                    OBJECT_TYPE,
-                    &name,
-                    SOIL_LAYER_NAME_FIELD,
-                    "Green Roof Soil",
-                ),
+                Some(RawValue::String(value))
+                    if if source_unused_roof_vegetation {
+                        value.is_empty()
+                    } else {
+                        value.trim().is_empty()
+                    } =>
+                {
+                    self.record_default(
+                        OBJECT_TYPE,
+                        &name,
+                        SOIL_LAYER_NAME_FIELD,
+                        "Green Roof Soil",
+                    )
+                }
                 Some(RawValue::String(_)) => {}
                 Some(_) => {
                     self.invalid_field_type(OBJECT_TYPE, &name, SOIL_LAYER_NAME_FIELD, "string");
@@ -9790,7 +9907,9 @@ impl<'a> Compiler<'a> {
                 RoofVegetationMoistureDiffusionMethod::from_energyplus_name,
             );
 
-            if initial_volumetric_moisture_content > saturation_volumetric_moisture_content {
+            if !source_unused_roof_vegetation
+                && initial_volumetric_moisture_content > saturation_volumetric_moisture_content
+            {
                 self.warning(
                     "RoofVegetationInitialMoistureReset",
                     OBJECT_TYPE,
@@ -9808,6 +9927,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if source_unused_roof_vegetation {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -10717,6 +10842,13 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_gap_equivalent_layer(name, object));
+        let source_roof_vegetation_name = object_type == "Material:RoofVegetation"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_roof_vegetation(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
@@ -10732,7 +10864,8 @@ impl<'a> Compiler<'a> {
                 || source_screen_equivalent_layer_name
                 || source_blind_equivalent_layer_name
                 || source_glazing_equivalent_layer_name
-                || source_gap_equivalent_layer_name)
+                || source_gap_equivalent_layer_name
+                || source_roof_vegetation_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')

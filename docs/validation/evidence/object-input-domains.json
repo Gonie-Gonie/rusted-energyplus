@@ -447,6 +447,13 @@
       "Source190 fixed12-Float/two-String CUSTOM/VentedOutdoor insertion holds979 parent numbers (991total; canonical752+239/36alpha), all requests/series/policies and original/converted DOM custody. One Native/one Source process with0reruns pass158series/75120values and12+12+8+2 gates. Whole18x11 public MaterialDetails cells match with17 parent rows/order held. CommonResistance0/MediumRough/Thickness0.0125/commonzeros is distinct from actual Source-only NomR0.47169811320754723, Group18/id9/typed8/Rough2 on six actual physics surfaces; no Native-private NomR/gas/TAR parity follows.",
       "Static48assert/6for/4Material/0Window facts differ from8current/13total QA commands:1 QA01 compiler E0433 failure before that body,4current/2historical/0reused bodies and falsegettercredit. Root two-file correction used existing RawModel/RawValue and publicfield rustdoc with no Cargo/math/physics change; all8QA02 commands passed. The retained command failure is not a failed Source build or engine failure. A separate unresolved static limitation misses independently mutated typed outside_layer when typed layers is nonempty; Raw original Construction references and typed layers/effective/empty fallback remain fenced, with no outside-only mutation execution credit. Same-input science acceptance stays unchanged.",
       "Actual zero EQL Construction input skips positive unavailable EQL/ASHWAT work while ordinary Blind181-angle production and six-surface physics remain required. Actualinput61/currentcombined122/retained116/registry147 are separate from125scientificRust+3derivation=128Sourcecitations. Active EQL/window/Construction/control, SourceA/IDF/Legacy admission changes, Native-private state/full-object and arbitrary valid-combination parity remain unclaimed."
+    ],
+    "Material:RoofVegetation": [
+      "Source B additionally admits only original-valid unused direct epJSON Material:RoofVegetation through the genuine4A15N/min19 getter and same retained EcoRoof material row. All15 original numeric kinds/bounds, six roughness enums and Simple/Advanced methods remain distinct from signed-effective SourceJsonNumber operands. Defaults/blanks/used state, actual JSON-key scratch, exact names and total Raw/IP/global-ID/typed-ID/loader/reverse-alias/CTF custody remain checked. Soil Layer Name is type-checked, preserves exact empty-versus-whitespace handling and is source-inactive; no soil material is invented.",
+      "The constructor retains five input/directional absorptance zeros until real getter writes. Group8/ROnlyfalse, actual scalar assignments and report/accessor row stay owned state. Positive K computes Thickness/K into both Resistance and NominalR regardless of an earlier shared ErrorsFound flag. Nonpositive K preserves Severe/Continue/flag order. Initial moisture above Porosity emits Warning plus five Continues before its late clamp; interrupted IO retains the preceding writes and unclamped value. No extra residual/initial relation, provider, seeded resistance or finite-result gate is added.",
+      "Source191 fixed15-Float/three-String insertion holds991 parent numbers (1006total; canonical752+254/39alpha) and all requests/policies. Root reports one Native and one Source process with0reruns,158series/75120values and12+12+8+2 gates accepted. Whole19x11 public MaterialDetails cells are exact with all18 parent rows/order held. Public Roof row R0.3514/MediumSmooth/thickness0.1300/K0.370/density1130/Cp1230/absorptances0.93,0.73,0.77 joins actual Source Group8/id18/typed17/Rough3/NomR0.35135135135135137 bits3fd67c8a60dd67c9. Full-precision Native-private NomR or plant/soil state parity is not observed.",
+      "Static48assert/6for/4Material/0Window/0newtestfn facts differ from actual8current/8total QA commands,0failed,4current/0historical/0reused bodies and falsegettercredit. Roof original typed outside_layer was corrected before QA; InputDATA01 zero-count patch failed frozen-ledger preflight and DATA02 changed context only. Both are retained static/DATA histories,not QA/build/engine failures. Source190 compiler QA failure remains unchanged in its historical case/build. The shared fourteen-family original-outside prototype remains ignored and unadopted; prior14 limitation is not closed by this Roof case.",
+      "Six ordinary physics surfaces and ordinary Blind production remain required. Input62ObjectTypes,currentcombined122,retained116 and registry147 are distinct from127scientificRust+3derivation=130currentSourcecitations. This unused constructor/getter/common-report route does not admit active EcoRoof water/energy/soil evolution, Construction consumption, SourceA/IDF/Legacy changes, Native-private state, full-object or every-valid-combination parity."
     ]
   },
   "verification": {
@@ -12787,6 +12794,86 @@
           "sha256": "ccb9fc3d736d3816ab4af33e4b93730a059c0f86ebe15e39f4996623e28ff92b",
           "bytes": 1744
         }
+      },
+      "unused_roof_vegetation_material_details_and_public_series": {
+        "actual_quality": {
+          "path": ".runtime/porting/unused-roof-vegetation/QA01/summary.json",
+          "sha256": "ca0f3004a2937955caa812f996f44265712cfa5891840af147f10b185fcba27d",
+          "bytes": 2699
+        },
+        "retained_quality_history": [
+          {
+            "path": ".runtime/porting/unused-roof-vegetation/QA01/summary.json",
+            "sha256": "ca0f3004a2937955caa812f996f44265712cfa5891840af147f10b185fcba27d",
+            "bytes": 2699
+          }
+        ],
+        "retained_failed_QA_attempts": [],
+        "actual_QA_commands_DTO": {
+          "path": ".runtime/porting/unused-roof-vegetation/documentation-link-build-DTO01.json",
+          "sha256": "6883d7c39887c1ae737cffcbb46c9396064dac65ab8ba8b9ba570801b17696d4",
+          "bytes": 12012
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-roof-vegetation/evidence01/source-authority.json",
+          "sha256": "113a118dfe0d9dca7bb31e26308fc8c535a5515d4bef4887aa0398d1dd6aef5f",
+          "bytes": 69017
+        },
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/Material-RoofVegetation-QA-profile-DATA-DRAFT01/QA-profile.json",
+          "sha256": "35ce2f09d149ed6981bad738c00763cafa5e45277df651eac87c7e9a6d29372e",
+          "bytes": 8183
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/unused-roof-vegetation/QA-profile-binding01.json",
+          "sha256": "fd7459db08e22b8816597bfd9b286687c3edb4e98483e718d80cddd162eda39b",
+          "bytes": 2018
+        },
+        "counts": {
+          "current_QA_commands": 8,
+          "total_actual_QA_commands": 8,
+          "failed_QA_attempts": 0,
+          "current_test_body_executions": 4,
+          "historical_test_bodies": 0,
+          "reused_test_bodies": 0,
+          "current_getter_credit": false
+        },
+        "static_existing_body_CODE": {
+          "assertion_sites": 48,
+          "explicit_for": 6,
+          "fresh_Material_owners": 4,
+          "Window_owners": 0,
+          "new_test_functions": 0
+        },
+        "new_test_functions": 0,
+        "Source_paths_changed": 18,
+        "Source_existing_modified": 16,
+        "Source_added": 2,
+        "Source_held": 4683,
+        "Source_stages": [
+          18,
+          15
+        ],
+        "Root_actual_facts": {
+          "path": ".runtime/porting/unused-roof-vegetation/documentation-facts01.json",
+          "sha256": "39976500063f6b4a9f18fd90565764b4c539e7b97c1671ce9d81aa9626e6466e",
+          "bytes": 16509
+        },
+        "Root_scientific_review": {
+          "path": ".runtime/porting/unused-roof-vegetation/runtime01/Root-scientific-review.json",
+          "sha256": "c17b67af6493d6d57862a4fd606ffe97bba66e7bcb7a9c7c0c4bdb760712ca73",
+          "bytes": 10515
+        },
+        "Static_preQA_corrections": [
+          "Genuine static compiler/caller review found Roof typed original outside omitted when layers nonempty; Root one-line correction was folded before actualQA, not a failed QA/build/engine.",
+          "InputDATA01 zero-old-count unified hunk failed frozen ledger preflight; DATA02 adds context only while same input/original/effectiveDOM/maps/descriptors held. This is DATA preflight, not failed QA/build/engine/scientific reader."
+        ],
+        "retained_prior14_typed_original_outside_limitation": {
+          "path": ".runtime/porting/unused-window-gap-equivalent-layer/Root-known-typed-original-outside-fence-limitation01.json",
+          "sha256": "ccb9fc3d736d3816ab4af33e4b93730a059c0f86ebe15e39f4996623e28ff92b",
+          "bytes": 1744
+        },
+        "shared14_future_CODE_not_adopted": true
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -86520,12 +86607,708 @@
             "qualification": "Gap:EquivalentLayer alreadybelongsretained116;boundedruntimeadmission only. currentcombined122/registry147/retained116held. Actualinput61ObjectTypes;128Sourcecitations(125scientific+3deriv)separate."
           }
         }
+      },
+      {
+        "group": "Material:RoofVegetation",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-unused-roof-vegetation",
+        "case_kind": "UNUSED_ROOF_VEGETATION",
+        "source_build": "source-unused-roof-vegetation",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "numeric_policy_projection": {
+          "all158_policy_rules_literal": true,
+          "policy_changes": 0,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "new_report_requests": 0,
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-roof-vegetation/runtime01/Root-scientific-review.json",
+            "sha256": "c17b67af6493d6d57862a4fd606ffe97bba66e7bcb7a9c7c0c4bdb760712ca73",
+            "bytes": 10515
+          }
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v8/release.json",
+            "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+            "bytes": 11634
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/unused-roof-vegetation/runtime01/binding.json",
+            "sha256": "a541724b023603966342ca35f0860a300bf32193234877de25a790b2a3eca5c4",
+            "bytes": 1103
+          },
+          "case_config": {
+            "path": ".runtime/porting/unused-roof-vegetation/runtime01/case-config.json",
+            "sha256": "3a73e250e62623daa322eab747c8d0e5260bd67836a3664a087784d9761d2e4f",
+            "bytes": 137098
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/unused-roof-vegetation/evidence01/source-authority.json",
+            "sha256": "113a118dfe0d9dca7bb31e26308fc8c535a5515d4bef4887aa0398d1dd6aef5f",
+            "bytes": 69017
+          },
+          "completion": {
+            "path": ".runtime/porting/unused-roof-vegetation/runtime01/completed.json",
+            "sha256": "88d3adf4b7474014900916755d06bf6ab874542c64250b631b7d75826e717180",
+            "bytes": 2234
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/unused-roof-vegetation/runtime01/verify-command/receipt.json",
+            "sha256": "639052e37127969aa52819faed6c63f0cde89231c12d0a14deb7472e11621cfe",
+            "bytes": 335621
+          },
+          "actual_build": {
+            "path": ".runtime/porting/unused-roof-vegetation/build01/build-row.json",
+            "sha256": "45e3843efbfbc0336f1cbcbe21b18b2e0de5c872f4e108b528250f39046c98f9",
+            "bytes": 1346
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/unused-roof-vegetation/QA01/summary.json",
+            "sha256": "ca0f3004a2937955caa812f996f44265712cfa5891840af147f10b185fcba27d",
+            "bytes": 2699
+          },
+          "actual_quality_history": [
+            {
+              "path": ".runtime/porting/unused-roof-vegetation/QA01/summary.json",
+              "sha256": "ca0f3004a2937955caa812f996f44265712cfa5891840af147f10b185fcba27d",
+              "bytes": 2699
+            }
+          ],
+          "actual_QA_counts": {
+            "current_QA_commands": 8,
+            "total_actual_QA_commands": 8,
+            "failed_QA_attempts": 0,
+            "current_test_body_executions": 4,
+            "historical_test_bodies": 0,
+            "reused_test_bodies": 0,
+            "current_getter_credit": false
+          },
+          "retained_failed_QA_attempts": [],
+          "owner_execution_review": {
+            "path": ".runtime/porting/unused-roof-vegetation/evidence01/source-authority.json",
+            "sha256": "113a118dfe0d9dca7bb31e26308fc8c535a5515d4bef4887aa0398d1dd6aef5f",
+            "bytes": 69017
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "engine_reruns": 0,
+          "new_test_functions": 0,
+          "profile": "ideal_loads.oa_topology.v1",
+          "fixed_input_manifest": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-RoofVegetation-CLOSED-input-DRAFT02/prepared-manifest.json",
+            "sha256": "2f058b1405d15921e778813e521f03d71a113c7353040ab64bb0abc734306558",
+            "bytes": 15099
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-RoofVegetation-CLOSED-input-DRAFT02/independent-static-review01.json",
+            "sha256": "4c3a606e346d420e09e1f8c84cbd88b4710caf6fecee2ae42f2d273d627b9822",
+            "bytes": 8758
+          },
+          "documentation_actual_facts": {
+            "path": ".runtime/porting/unused-roof-vegetation/documentation-facts01.json",
+            "sha256": "39976500063f6b4a9f18fd90565764b4c539e7b97c1671ce9d81aa9626e6466e",
+            "bytes": 16509
+          },
+          "documentation_link_build_DTO": {
+            "path": ".runtime/porting/unused-roof-vegetation/documentation-link-build-DTO01.json",
+            "sha256": "6883d7c39887c1ae737cffcbb46c9396064dac65ab8ba8b9ba570801b17696d4",
+            "bytes": 12012
+          },
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-roof-vegetation/runtime01/Root-scientific-review.json",
+            "sha256": "c17b67af6493d6d57862a4fd606ffe97bba66e7bcb7a9c7c0c4bdb760712ca73",
+            "bytes": 10515
+          },
+          "actual_parent_publication": {
+            "path": ".runtime/porting/unused-window-gap-equivalent-layer/publish01/receipt.json",
+            "sha256": "a50f463cdef53aa0e2ff1c3117e06078be37a8022c296a4072e8e483111710c7",
+            "bytes": 155785
+          },
+          "Source_adoption": {
+            "path": ".runtime/porting/unused-roof-vegetation/adoption01.json",
+            "sha256": "1b0c8a3bb4f67d00c9a210443ce6da0eb1f30da74b731bf9fa5f12a6c7108abb",
+            "bytes": 15627
+          },
+          "Source_evidence": {
+            "path": ".runtime/porting/unused-roof-vegetation/evidence01/source-evidence.json",
+            "sha256": "c659bb6073f18927e668ed52b7344d59681d1ccfca6fd18ec57c4b9eb4d5e24b",
+            "bytes": 35422
+          },
+          "QA_profile": {
+            "path": ".runtime/object-expansion/unit159-prep/Material-RoofVegetation-QA-profile-DATA-DRAFT01/QA-profile.json",
+            "sha256": "35ce2f09d149ed6981bad738c00763cafa5e45277df651eac87c7e9a6d29372e",
+            "bytes": 8183
+          },
+          "QA_profile_binding": {
+            "path": ".runtime/porting/unused-roof-vegetation/QA-profile-binding01.json",
+            "sha256": "fd7459db08e22b8816597bfd9b286687c3edb4e98483e718d80cddd162eda39b",
+            "bytes": 2018
+          },
+          "Static_preQA_corrections": [
+            "Genuine static compiler/caller review found Roof typed original outside omitted when layers nonempty; Root one-line correction was folded before actualQA, not a failed QA/build/engine.",
+            "InputDATA01 zero-old-count unified hunk failed frozen ledger preflight; DATA02 adds context only while same input/original/effectiveDOM/maps/descriptors held. This is DATA preflight, not failed QA/build/engine/scientific reader."
+          ],
+          "actual_Source_correction_reviews": [],
+          "retained_prior14_typed_original_outside_limitation": {
+            "path": ".runtime/porting/unused-window-gap-equivalent-layer/Root-known-typed-original-outside-fence-limitation01.json",
+            "sha256": "ccb9fc3d736d3816ab4af33e4b93730a059c0f86ebe15e39f4996623e28ff92b",
+            "bytes": 1744
+          },
+          "shared14_future_CODE_not_adopted": true,
+          "Completed_DTO_literal_defaults": {
+            "engines_executed_by_completion": 0,
+            "source_launch_authorized": false,
+            "no_engine_reruns": false,
+            "automatic_retry": false,
+            "original_actor_identities_retained": false
+          },
+          "Completed_DTO": {
+            "schema": "paired.Completed.v1",
+            "case_id": "ideal-loads-unused-roof-vegetation",
+            "mode": "fresh",
+            "release": {
+              "path": "tools/porting/paired/v8/release.json",
+              "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+              "bytes": 11634
+            },
+            "bindings": {
+              "path": ".runtime/porting/unused-roof-vegetation/runtime01/binding.json",
+              "sha256": "a541724b023603966342ca35f0860a300bf32193234877de25a790b2a3eca5c4",
+              "bytes": 1103
+            },
+            "case_config": {
+              "path": ".runtime/porting/unused-roof-vegetation/runtime01/case-config.json",
+              "sha256": "3a73e250e62623daa322eab747c8d0e5260bd67836a3664a087784d9761d2e4f",
+              "bytes": 137098
+            },
+            "source_authority": {
+              "path": ".runtime/porting/unused-roof-vegetation/evidence01/source-authority.json",
+              "sha256": "113a118dfe0d9dca7bb31e26308fc8c535a5515d4bef4887aa0398d1dd6aef5f",
+              "bytes": 69017
+            },
+            "paired": {
+              "path": ".runtime/porting/unused-roof-vegetation/runtime01/readback.json",
+              "sha256": "2748ec9f4c2e242351cf128b68ab30bdf06f71eca48eceb9385c4f6d58a5132c",
+              "bytes": 540211
+            },
+            "verification_receipt": {
+              "path": ".runtime/porting/unused-roof-vegetation/runtime01/verify-command/receipt.json",
+              "sha256": "639052e37127969aa52819faed6c63f0cde89231c12d0a14deb7472e11621cfe",
+              "bytes": 335621
+            },
+            "native_launch": {
+              "path": ".runtime/porting/unused-roof-vegetation/runtime01/native/launch.json",
+              "sha256": "80945fe520bdbfd6480fae734f6bd606a2b1bad535247051c5f02c388bc847ee",
+              "bytes": 9140
+            },
+            "source_launch": {
+              "path": ".runtime/porting/unused-roof-vegetation/runtime01/source/launch.json",
+              "sha256": "acf30c5091b2f7dd61e4bb631ce2c840d8403e69b7a33acc975b970d7e956224",
+              "bytes": 15746
+            },
+            "accepted_for_retention": true,
+            "numeric_parity_accepted": true,
+            "engineering_comparison_completed": true,
+            "scientific_acceptance": true,
+            "qualifying_cases": 1,
+            "qualifying_values": 75120,
+            "engines_executed_by_completion": 0,
+            "actual_Native_engine_calls": 1,
+            "actual_Source_engine_calls": 1,
+            "source_launch_authorized": false,
+            "no_engine_reruns": false,
+            "automatic_retry": false,
+            "new_physical_credit": 1,
+            "original_actor_identities_retained": false
+          }
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/fa/faf414bae26f0b9128100ae9507e8f84996b76174f5c6569b095da3beeb4bc72",
+          "sha256": "faf414bae26f0b9128100ae9507e8f84996b76174f5c6569b095da3beeb4bc72"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/unused-roof-vegetation/build01/frozen/eplus-rs.exe",
+          "sha256": "63b880968604da4f7a82cbcff99e88f12eeb37bfa4b5a35c47ca038774193e48",
+          "bytes": 83583487
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/unused-roof-vegetation/build01/build/receipt.json",
+          "sha256": "169e2874398aaf21042190a517afbaad399d05341ef6530acce7deeaefd99be7",
+          "bytes": 70127
+        },
+        "native_launch": {
+          "path": ".runtime/porting/unused-roof-vegetation/runtime01/native/launch.json",
+          "sha256": "80945fe520bdbfd6480fae734f6bd606a2b1bad535247051c5f02c388bc847ee",
+          "bytes": 9140
+        },
+        "source_launch": {
+          "path": ".runtime/porting/unused-roof-vegetation/runtime01/source/launch.json",
+          "sha256": "acf30c5091b2f7dd61e4bb631ce2c840d8403e69b7a33acc975b970d7e956224",
+          "bytes": 15746
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/unused-roof-vegetation/runtime01/readback.json",
+          "sha256": "2748ec9f4c2e242351cf128b68ab30bdf06f71eca48eceb9385c4f6d58a5132c",
+          "bytes": 540211
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/unused-roof-vegetation/runtime01/Root-scientific-review.json",
+          "sha256": "c17b67af6493d6d57862a4fd606ffe97bba66e7bcb7a9c7c0c4bdb760712ca73",
+          "bytes": 10515
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/unused-roof-vegetation/runtime01/case-config.json",
+          "sha256": "3a73e250e62623daa322eab747c8d0e5260bd67836a3664a087784d9761d2e4f",
+          "bytes": 137098
+        },
+        "coverage_kind": "unused_roof_vegetation_material_details_and_public_series",
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse": 2.039620483986755e-08
+        },
+        "public_response_summary": {
+          "Native": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.03148489327319126,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          },
+          "Source": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.031484893273194814,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          }
+        },
+        "unused_roof_vegetation": {
+          "input_numeric_records": 1006,
+          "parent_numeric_records_held": 991,
+          "new_Float_operands": 15,
+          "new_String_operands": 3,
+          "canonical_numeric_records": 752,
+          "canonical_added_numeric_records": 254,
+          "canonical_alpha_changes": 39,
+          "new_report_requests": 0,
+          "QA_counts": {
+            "current_QA_commands": 8,
+            "total_actual_QA_commands": 8,
+            "failed_QA_attempts": 0,
+            "current_test_body_executions": 4,
+            "historical_test_bodies": 0,
+            "reused_test_bodies": 0,
+            "current_getter_credit": false
+          },
+          "static_existing_body_CODE": {
+            "assertion_sites": 48,
+            "explicit_for": 6,
+            "fresh_Material_owners": 4,
+            "Window_owners": 0,
+            "new_test_functions": 0
+          },
+          "Source_inventory": {
+            "before": 4699,
+            "current": 4701,
+            "modified": 16,
+            "added": 2,
+            "held": 4683,
+            "stages": [
+              18,
+              15
+            ]
+          },
+          "whole_public_MaterialDetails": {
+            "rows": 19,
+            "columns": 11,
+            "all_Native_Source_cells_exact": true,
+            "all18parent_rows_cells_order_held": true,
+            "table": [
+              [
+                " Material Details",
+                "Mass Layer",
+                "7.1429E-002",
+                "Rough",
+                "0.1000",
+                "1.400",
+                "2200.000",
+                "900.000",
+                "0.9000",
+                "0.7000",
+                "0.7000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED AVERAGE DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL AND ANGLE",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED REFRACTION DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLAZING EQL UNUSED SCALAR",
+                "0.1730",
+                "VerySmooth",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED CUSTOM NORMAL",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP EQL UNUSED CUSTOM",
+                "0.0000",
+                "MediumRough",
+                "1.2500E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "MIXTURE UNUSED AIR ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "2.0000E-003",
+                "0.100",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.7000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "DRAPE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SCREEN UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "1.0000E-003",
+                "0.250",
+                "0.000",
+                "0.000",
+                "0.3281",
+                "0.3281",
+                "0.2188"
+              ],
+              [
+                " Material Details",
+                "SCREEN EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND EQL UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "ROOF VEGETATION UNUSED SCALAR",
+                "0.3514",
+                "MediumSmooth",
+                "0.1300",
+                "0.370",
+                "1130.000",
+                "1230.000",
+                "0.9300",
+                "0.7300",
+                "0.7700"
+              ],
+              [
+                " Material Details",
+                "SGS UNUSED NORMAL",
+                "6.9976E-002",
+                "VerySmooth",
+                "2.0000E-003",
+                "2.858E-002",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ]
+            ]
+          },
+          "Source_geometry": {
+            "artifact": {
+              "path": ".runtime/porting/unused-roof-vegetation/runtime01/source/output/geometry-consumers.json",
+              "sha256": "6a32ea7dd517a819cb15571d402c0305f80c4d67acbec675e9bdd818b209c85e",
+              "bytes": 35561
+            },
+            "same_row": {
+              "NominalR": {
+                "value": 0.35135135135135137,
+                "value_bits": "3fd67c8a60dd67c9"
+              },
+              "group": 8,
+              "id": 18,
+              "map_key": "ROOF VEGETATION UNUSED SCALAR",
+              "typed_id": 17,
+              "validated_typed_properties": {
+                "AbsorpSolar": {
+                  "value": 0.73,
+                  "value_bits": "3fe75c28f5c28f5c"
+                },
+                "AbsorpThermal": {
+                  "value": 0.93,
+                  "value_bits": "3fedc28f5c28f5c3"
+                },
+                "AbsorpVisible": {
+                  "value": 0.77,
+                  "value_bits": "3fe8a3d70a3d70a4"
+                },
+                "Roughness": 3
+              }
+            },
+            "surfaces": 6,
+            "phase": "runtime_final_source_geometry",
+            "physics_executed": true,
+            "observer_supplies_inputs": false
+          },
+          "whole_topology": {
+            "rows": 153,
+            "events": 136,
+            "body_bytes": 12580,
+            "nodes": 10,
+            "nonparent_connections": 36,
+            "outdoor_registry": 5,
+            "suspicious_nodes": 2,
+            "nonconnected_nodes": 0,
+            "whole_prospective_topology_exact": true
+          },
+          "qualified_boundary": "Unused Source B direct-epJSON Material:RoofVegetation4A15N/min19 original/default/count/getter/SourceIO and common MaterialDetails/Source geometry. Fixed15Float/3String scene; required/default/6roughness/2method/schema-effective and late moisture-repair/diagnostic-IO partitions have bounded existing-body QA. K>0 Resistance/NomR=Thickness/K is unconditional on prior sharedErrorsFound; initialMoisture>Porosity warning/5Continue and late clamp preserve Native order. Public19x11 table exact/all18parentrows held; actual Source Group8/id18/typed17/Rough3/NomR0.35135135135135137 observed, Native-private exact NomR/soil/plant state not paired. Six ordinaryphysics surfaces and ordinaryBlind producer retained. No active EcoRoof water/energy/soil evolution, Construction consumption, SourceA/IDF/Legacy/fullobject/everyvalidcombination parity.",
+          "Static_preQA_corrections": [
+            "Genuine static compiler/caller review found Roof typed original outside omitted when layers nonempty; Root one-line correction was folded before actualQA, not a failed QA/build/engine.",
+            "InputDATA01 zero-old-count unified hunk failed frozen ledger preflight; DATA02 adds context only while same input/original/effectiveDOM/maps/descriptors held. This is DATA preflight, not failed QA/build/engine/scientific reader."
+          ],
+          "shared14_future_CODE_not_adopted": true,
+          "retained_prior14_typed_original_outside_limitation": {
+            "path": ".runtime/porting/unused-window-gap-equivalent-layer/Root-known-typed-original-outside-fence-limitation01.json",
+            "sha256": "ccb9fc3d736d3816ab4af33e4b93730a059c0f86ebe15e39f4996623e28ff92b",
+            "bytes": 1744
+          },
+          "Native_private_NomR_plant_soil_parity_claim": false,
+          "WindowOptical_unit_execution_credit": 0,
+          "full_object_support": false,
+          "Source_bibliography": {
+            "scientific_primary_Rust_paths": 127,
+            "additional_derivation_Rust_paths": 3,
+            "combined_current_Source_paths": 130,
+            "nonSource_primary_records": 38,
+            "Native_primary_records": 37,
+            "preexisting_schema_primary_records": 1,
+            "separate_documentary_rows": 52,
+            "qualification": "127scientific.primaryRust+3derivationRust=130Sourcecitations;38nonSourceprimary37Native+1schema and52separatedocrows held;input62/combined122/registry147/retained116distinct."
+          },
+          "ObjectType_inventory": {
+            "current_whole_scene": 62,
+            "current_combined": 122,
+            "retained_union": 116,
+            "registry_rows": 147,
+            "qualification": "RoofVegetation already in retained116; bounded unused route only. currentcombined122/registry147/retained116 held. Input62ObjectTypes and130Sourcecitations(127scientific+3deriv) distinct."
+          }
+        }
       }
     ],
     "totals": {
-      "paired_cases": 272,
-      "reported_samples": 12374776,
-      "raw_operand_unequal": 3200442,
+      "paired_cases": 273,
+      "reported_samples": 12449896,
+      "raw_operand_unequal": 3223510,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -90133,6 +90916,38 @@
           "sha256": "cf726645f91db20613e0241625566763ce6f86d00449ba25b439f5983c20979c",
           "bytes": 76779
         }
+      },
+      {
+        "id": "source-unused-roof-vegetation",
+        "receipt": {
+          "path": ".runtime/porting/unused-roof-vegetation/build01/build/receipt.json",
+          "sha256": "169e2874398aaf21042190a517afbaad399d05341ef6530acce7deeaefd99be7",
+          "bytes": 70127
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/fa/faf414bae26f0b9128100ae9507e8f84996b76174f5c6569b095da3beeb4bc72",
+          "sha256": "faf414bae26f0b9128100ae9507e8f84996b76174f5c6569b095da3beeb4bc72"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-roof-vegetation/build01/frozen/eplus-rs.exe",
+          "sha256": "63b880968604da4f7a82cbcff99e88f12eeb37bfa4b5a35c47ca038774193e48",
+          "bytes": 83583487
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-roof-vegetation/build01/frozen/build-receipt.json",
+          "sha256": "35e0cc75e1a9f69b42d95ee874c4428ffde6dec413563217618a0d2c3b6bcb7a",
+          "bytes": 1652081
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-roof-vegetation/QA01/quality-preparation.json",
+          "sha256": "4cc61238e2407e4b953f8db34b4c925010c04113c8a347d606f0d1c32a2da8d9",
+          "bytes": 23969
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-roof-vegetation/build01/freeze/receipt.json",
+          "sha256": "cab414a5990d22f98add4b323e9668dff0ed99f0954568a40593e65d14b3ce18",
+          "bytes": 69117
+        }
       }
     ],
     "focused_since_workspace": {
@@ -90579,14 +91394,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 190,
-      "builds_with_accepted_paired_cases": 168,
+      "actual_recorded_builds": 191,
+      "builds_with_accepted_paired_cases": 169,
       "builds_with_only_retained_failed_Source_attempts": 8,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 14,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "190 recorded Source builds: 168 retain accepted pairs and 22 have none, including 8 without Source execution. The latest strictly verified paired scene adds one case/75120 values; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "191 recorded Source builds:169 retain accepted pairs and22 have none,including8 without Source execution. The latest strictly verified paired scene adds one case/75120 values; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,

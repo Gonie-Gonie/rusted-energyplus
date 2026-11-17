@@ -53,6 +53,8 @@ pub(crate) struct SourceSupportAdmission {
     glazing_equivalent_layer_bindings: BTreeSet<String>,
     /// Original-schema unused GapEQL names; physical records belong to actual GasMix.
     gap_equivalent_layer_bindings: BTreeSet<String>,
+    /// Validated unused EcoRoof names only; physical moisture recovery belongs to Material.
+    roof_vegetation_bindings: BTreeSet<String>,
     /// Validated unused Screen names; no optical coefficients or precomputed arrays.
     screen_bindings: BTreeSet<String>,
     /// Validated unused Blind names;computedTAR belongs only to its actual Material owner.
@@ -465,6 +467,26 @@ impl SourceSupportAdmission {
             }
             covered_objects.insert("WindowMaterial:Gap:EquivalentLayer");
         }
+        let mut roof_vegetation_bindings = BTreeSet::new();
+        if trace.scope == PortingScope::B
+            && raw
+                .objects
+                .get(&ObjectType("Material:RoofVegetation".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            && crate::ordinary_equipment_input::source_b_validate_unused_roof_vegetation(raw)
+                .is_ok()
+        {
+            for name in raw
+                .objects
+                .get(&ObjectType("Material:RoofVegetation".into()))?
+                .keys()
+            {
+                if !roof_vegetation_bindings.insert(name.0.to_ascii_uppercase()) {
+                    return None;
+                }
+            }
+            covered_objects.insert("Material:RoofVegetation");
+        }
         let mut screen_bindings = BTreeSet::new();
         if trace.scope == PortingScope::B
             && raw
@@ -603,6 +625,7 @@ impl SourceSupportAdmission {
             blind_equivalent_layer_bindings,
             glazing_equivalent_layer_bindings,
             gap_equivalent_layer_bindings,
+            roof_vegetation_bindings,
             screen_bindings,
             blind_bindings,
             refraction_bindings,
@@ -1450,6 +1473,89 @@ impl SourceSupportAdmission {
             if !matches!(
                 row.definition,
                 ep_model::MaterialDefinition::WindowGapEquivalentLayer(_)
+            ) {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub(super) fn consumes_unused_roof_vegetation(&self, model: &ep_model::TypedModel) -> bool {
+        use ep_model::MaterialKind;
+        if !self.consumes("Material:RoofVegetation")
+            || !model.material_names.is_source_exact_namespace()
+        {
+            return false;
+        }
+        let all_ids: BTreeSet<_> = model.materials.iter().map(|row| row.id).collect();
+        if all_ids.len() != model.materials.len() {
+            return false;
+        }
+        let expected: BTreeSet<_> = self
+            .roof_vegetation_bindings
+            .iter()
+            .map(String::as_str)
+            .collect();
+        let mut roof_rows = BTreeMap::new();
+        for row in &model.materials {
+            if matches!(row.kind(), MaterialKind::RoofVegetation)
+                && roof_rows.insert(row.id, row).is_some()
+            {
+                return false;
+            }
+        }
+        if roof_rows.len() != expected.len() {
+            return false;
+        }
+        let mut material_map_names: BTreeMap<ep_model::MaterialId, &str> = BTreeMap::new();
+        for name in model.material_names.names() {
+            let id = model.material_names.resolve(&name.0);
+            if id.is_some_and(|id| roof_rows.contains_key(&id))
+                || expected.contains(name.0.as_str())
+            {
+                let Some(id) = id else {
+                    return false;
+                };
+                if !roof_rows.contains_key(&id)
+                    || !expected.contains(name.0.as_str())
+                    || material_map_names.insert(id, name.0.as_str()).is_some()
+                {
+                    return false;
+                }
+            }
+        }
+        let mut by_name: BTreeMap<&str, Vec<ep_model::MaterialId>> = BTreeMap::new();
+        let mut by_id: BTreeMap<ep_model::MaterialId, Vec<&str>> = BTreeMap::new();
+        for (id, name) in &model.ctf_report_names.materials {
+            if !all_ids.contains(id) {
+                return false;
+            }
+            if roof_rows.contains_key(id) || expected.contains(name.as_str()) {
+                by_name.entry(name.as_str()).or_default().push(*id);
+                by_id.entry(*id).or_default().push(name.as_str());
+            }
+        }
+        for name in expected {
+            let Some(ids) = by_name.get(name) else {
+                return false;
+            };
+            if ids.len() != 1 {
+                return false;
+            }
+            let id = ids[0];
+            let Some(row) = roof_rows.get(&id) else {
+                return false;
+            };
+            if row.name.0 != name
+                || model.material_names.resolve(name) != Some(id)
+                || material_map_names.get(&id).copied() != Some(name)
+                || by_id.get(&id).is_none_or(|names| names.len() != 1)
+            {
+                return false;
+            }
+            if !matches!(
+                row.definition,
+                ep_model::MaterialDefinition::RoofVegetation(_)
             ) {
                 return false;
             }

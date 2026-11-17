@@ -14131,6 +14131,739 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+
+        // RoofVegetation uses the existing real DSOA/Ideal/OA fixture; no Material or Window context.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            const ROOF: &str = "Material:RoofVegetation";
+            let mut roof_value = curve_value.clone();
+            roof_value[ROOF] = json!({
+                "\u{b}":{},
+                "\u{a0}":{
+                    "height_of_plants":0.45,"leaf_area_index":2,"leaf_reflectivity":0.24,"leaf_emissivity":0.96,
+                    "minimum_stomatal_resistance":190.0,"soil_layer_name":" \t ","roughness":"MediumSmooth",
+                    "thickness":0.13,"conductivity_of_dry_soil":0.37,"density_of_dry_soil":1130.0,
+                    "specific_heat_of_dry_soil":1230,"thermal_absorptance":0.93,"solar_absorptance":0.73,
+                    "visible_absorptance":0.77,"saturation_volumetric_moisture_content_of_the_soil_layer":0.33,
+                    "residual_volumetric_moisture_content_of_the_soil_layer":0.03,"initial_volumetric_moisture_content_of_the_soil_layer":0.4,
+                    "moisture_diffusion_calculation_method":"Simple","name":false,"idf_order":u64::MAX,
+                    "idf_max_fields":[],"idf_max_extensible_fields":null,"metadata":{"held":[null,true,1.25,"text",{"nested":u64::MAX}]}
+                }
+            });
+            let roof_raw = ep_raw_model::parse_epjson_str_for_source(&roof_value.to_string())
+                .expect("two original Roof rows");
+            let roof_compiled = ep_compiler::compile_raw_model_for_source(&roof_raw);
+            let roof_model = roof_compiled
+                .model
+                .as_ref()
+                .expect("genuine Source Roof typed identities");
+            let roof_a = roof_model
+                .material_names
+                .resolve("\u{b}")
+                .expect("untrimmed VT Roof");
+            let roof_b = roof_model
+                .material_names
+                .resolve("\u{a0}")
+                .expect("untrimmed NBSP Roof");
+            // U01: the real Source compiler/loader namespace and report identity are global, not arena indices.
+            assert!(
+                !roof_compiled.has_errors()
+                    && roof_a != roof_b
+                    && roof_model.material_names.is_source_exact_namespace()
+                    && roof_model
+                        .materials
+                        .iter()
+                        .filter(|row| row.kind() == ep_model::MaterialKind::RoofVegetation)
+                        .count()
+                        == 2
+                    && roof_model.material_names.resolve("").is_none()
+                    && roof_model.materials.iter().any(|row| row.id == roof_a
+                        && row.name.0 == "\u{b}"
+                        && row.kind() == ep_model::MaterialKind::RoofVegetation)
+                    && roof_model.materials.iter().any(|row| row.id == roof_b
+                        && row.name.0 == "\u{a0}"
+                        && row.kind() == ep_model::MaterialKind::RoofVegetation)
+                    && roof_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(roof_a, "\u{b}".into()))
+                    && roof_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(roof_b, "\u{a0}".into()))
+            );
+            let mut roof_ip = crate::ordinary_input_processor::resolve_source_b(&roof_raw)
+                .expect("same original Roof Raw/IP");
+            let args = roof_ip
+                .get_object_def_max_args(ROOF)
+                .expect("public4A15N definition");
+            let mut stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            roof_ip
+                .report_source_idf_records_stats(&mut stats)
+                .expect("real object census");
+            // U02: public definition and original unused census only; private item blanks/counts belong to Runtime B1.
+            assert!(
+                (
+                    args.alphas,
+                    args.numerics,
+                    args.total().expect("fixed definition")
+                ) == (4, 15, 19)
+                    && roof_ip.get_num_objects_found(ROOF) == 2
+                    && roof_ip
+                        .source_raw_object_names(ROOF)
+                        .expect("signed-i8 Source order")
+                        .iter()
+                        .map(String::as_str)
+                        .eq(["\u{a0}", "\u{b}"])
+                    && roof_ip.is_object_unused(ROOF, "\u{b}")
+                    && roof_ip.is_object_unused(ROOF, "\u{a0}")
+                    && usize::try_from(stats.number_input_records).expect("nonnegative records")
+                        == roof_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let original = roof_ip
+                .source_raw_object_fields(ROOF, "\u{a0}")
+                .expect("original full row");
+            let default_original = roof_ip
+                .source_raw_object_fields(ROOF, "\u{b}")
+                .expect("original empty row");
+            let original_raw = &roof_raw.objects[&ep_raw_model::ObjectType(ROOF.into())]
+                [&ep_raw_model::ObjectName("\u{a0}".into())]
+                .fields;
+            let projected = crate::ordinary_material_input::resolve_source(&roof_raw, &roof_ip)
+                .expect("real Source material projection");
+            let full = projected
+                .roof_vegetation
+                .iter()
+                .find(|row| row.object_name == "\u{a0}")
+                .expect("full Roof projection");
+            let empty = projected
+                .roof_vegetation
+                .iter()
+                .find(|row| row.object_name == "\u{b}")
+                .expect("empty Roof projection");
+            let roof_numeric = [
+                "height_of_plants",
+                "leaf_area_index",
+                "leaf_reflectivity",
+                "leaf_emissivity",
+                "minimum_stomatal_resistance",
+                "thickness",
+                "conductivity_of_dry_soil",
+                "density_of_dry_soil",
+                "specific_heat_of_dry_soil",
+                "thermal_absorptance",
+                "solar_absorptance",
+                "visible_absorptance",
+                "saturation_volumetric_moisture_content_of_the_soil_layer",
+                "residual_volumetric_moisture_content_of_the_soil_layer",
+                "initial_volumetric_moisture_content_of_the_soil_layer",
+            ];
+            let mut wrong_count = roof_raw.clone();
+            wrong_count
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(ROOF.into()))
+                .expect("family")
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()));
+            let mut wrong_name = roof_raw.clone();
+            let rows = wrong_name
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(ROOF.into()))
+                .expect("family");
+            let row = rows
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()))
+                .expect("row");
+            rows.insert(ep_raw_model::ObjectName("WRONG ROOF IP NAME".into()), row);
+            // U03: Raw/IP preserve original number tokens and recursive metadata; projection is only plain f64.
+            assert!(default_original.is_empty() && empty.fields.is_empty() && projected.roof_vegetation.len()==2 && projected.source_is_epjson
+                && full.fields.len()==18 && full.idf_max_fields.is_none() && empty.idf_max_fields.is_none()
+                && matches!(original_raw.get(&ep_raw_model::FieldName("leaf_area_index".into())),Some(ep_raw_model::RawValue::Number(token)) if token=="2")
+                && matches!(original.get("leaf_area_index"),Some(S::Number(token)) if token=="2")
+                && matches!(ep_model::classify_source_json_number("2"),Ok(ep_model::SourceJsonNumber::Integer(2)))
+                && matches!(original.get("minimum_stomatal_resistance"),Some(S::Number(token)) if token=="190.0")
+                && matches!(ep_model::classify_source_json_number("190.0"),Ok(ep_model::SourceJsonNumber::Float(v)) if v.to_bits()==190.0_f64.to_bits())
+                && matches!(original.get("soil_layer_name"),Some(S::String(s)) if s==" \t ")
+                && matches!(original.get("name"),Some(S::Bool(false))) && matches!(original.get("idf_order"),Some(S::Number(t)) if t=="18446744073709551615")
+                && matches!(original.get("idf_max_fields"),Some(S::Array(v)) if v.is_empty()) && matches!(original.get("idf_max_extensible_fields"),Some(S::Null))
+                && matches!(original.get("metadata"),Some(S::Object(v)) if matches!(v.get("held"),Some(S::Array(items)) if items.len()==5))
+                && roof_numeric.iter().zip([0.45_f64,2.0,0.24,0.96,190.0,0.13,0.37,1130.0,1230.0,0.93,0.73,0.77,0.33,0.03,0.4])
+                    .all(|(field,want)|matches!(full.fields.get(*field),Some(P::Number(got)) if got.to_bits()==want.to_bits()))
+                && full.fields.keys().all(|field|crate::ordinary_equipment_input::source_b_roof_vegetation_known_field(field))
+                && crate::ordinary_material_input::resolve_source(&wrong_count,&roof_ip).is_err() && crate::ordinary_material_input::resolve_source(&wrong_name,&roof_ip).is_err());
+            let mut legacy_joint_raw = ep_raw_model::parse_epjson_str_for_source(
+                r#"{"Material:RoofVegetation":{"LEGACY JOINT ROOF":{}}}"#,
+            )
+            .expect("standalone legal Legacy joint control");
+            legacy_joint_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(ROOF.into()))
+                .expect("Legacy family")
+                .get_mut(&ep_raw_model::ObjectName("LEGACY JOINT ROOF".into()))
+                .expect("Legacy row")
+                .fields = original_raw.clone();
+            let legacy = ep_compiler::compile_raw_model(&legacy_joint_raw);
+            // U04: Source advisory retains legal excessive initial moisture, Legacy still clamps/warns; metadata remains inert.
+            assert!(
+                !roof_compiled
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|row| row.code == "RoofVegetationInitialMoistureReset")
+                    && !roof_compiled
+                        .report
+                        .defaults_applied
+                        .iter()
+                        .any(|row| row.object_type == ROOF
+                            && row.object_name == "\u{a0}"
+                            && row.field == "soil_layer_name")
+                    && roof_model
+                        .materials
+                        .iter()
+                        .find(|row| row.id == roof_b)
+                        .expect("same Roof B")
+                        .as_roof_vegetation()
+                        .is_some_and(|row| row.initial_volumetric_moisture_content.to_bits()
+                            == 0.4_f64.to_bits())
+                    && legacy
+                        .report
+                        .diagnostics
+                        .iter()
+                        .any(|row| row.code == "RoofVegetationInitialMoistureReset")
+                    && legacy.model.as_ref().is_some_and(|model| model
+                        .materials
+                        .iter()
+                        .filter_map(|row| row.as_roof_vegetation())
+                        .any(|row| row.initial_volumetric_moisture_content.to_bits()
+                            == 0.33_f64.to_bits()))
+                    && [
+                        json!(null),
+                        json!(false),
+                        json!(u64::MAX),
+                        json!("unconsumed"),
+                        json!([]),
+                        json!({"nested":[true,null]})
+                    ]
+                    .iter()
+                    .all(|metadata| {
+                        let mut value = roof_value.clone();
+                        value[ROOF]["\u{a0}"]["metadata"] = metadata.clone();
+                        crate::ordinary_equipment_input::resolve_source_b(
+                            &ep_raw_model::parse_epjson_str_for_source(&value.to_string())
+                                .expect("unknown metadata kinds"),
+                        )
+                        .is_ok()
+                    })
+            );
+            let mut roof_trace = inspect_porting_scope(
+                &roof_raw,
+                &roof_compiled.report,
+                Some(roof_model),
+                PortingScope::B,
+            );
+            // U05: genuine full scene admission precedes its real weather environment.
+            assert!(roof_trace.admissible, "{:?}", roof_trace.violations);
+            roof_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    roof_model,
+                    &weather,
+                    "same unused Roof Source weather",
+                )
+                .expect("actual Source environment"),
+            );
+            let roof_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &roof_raw,
+                &roof_trace,
+            )
+            .expect("genuine Roof Source scope");
+            let roof_a_position = roof_model
+                .materials
+                .iter()
+                .position(|row| row.id == roof_a)
+                .expect("Roof A arena row");
+            let roof_b_position = roof_model
+                .materials
+                .iter()
+                .position(|row| row.id == roof_b)
+                .expect("Roof B arena row");
+            let mut permuted = roof_model.clone();
+            permuted.materials.swap(roof_a_position, roof_b_position);
+            // U06: valid arena permutation keeps global identity, while absence of actual admission remains closed.
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &roof_raw,
+                    &roof_compiled.report,
+                    Some(roof_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&roof_admission)
+                )
+                .allows_rust_runtime()
+                    && crate::support::assess_support_with_source_admission(
+                        &roof_raw,
+                        &roof_compiled.report,
+                        Some(&permuted),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&roof_admission)
+                    )
+                    .allows_rust_runtime()
+                    && !crate::support::assess_support_with_source_admission(
+                        &roof_raw,
+                        &roof_compiled.report,
+                        Some(roof_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        None
+                    )
+                    .allows_rust_runtime()
+            );
+            let source_a_base =
+                ep_raw_model::parse_epjson_str_for_source(&input(PortingScope::A).to_string())
+                    .expect("valid SourceA control");
+            let mut a_with_roof = source_a_base.clone();
+            a_with_roof.objects.insert(
+                ep_raw_model::ObjectType(ROOF.into()),
+                roof_raw.objects[&ep_raw_model::ObjectType(ROOF.into())].clone(),
+            );
+            let roof_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                r#"{"Zone":{"Zone":{}},"Material:RoofVegetation":{"IDF ROOF":{}}}"#,
+                "Zone,Zone;Material:RoofVegetation,IDF ROOF,,,,,,,,,,,,,,,,,,;",
+            )
+            .expect("matched Zone and Name plus18 blank Roof operands");
+            let idf_legacy = ep_compiler::compile_raw_model(&roof_idf);
+            // U07: matched SourceA differs only by this family; matched IDF is Legacy-positive before its format fence.
+            assert!(crate::ordinary_equipment_input::resolve_source_a(&source_a_base).is_ok()
+                && crate::ordinary_equipment_input::resolve_source_a(&a_with_roof).is_err_and(|e|e=="ordinary equipment excludes positive family Material:RoofVegetation")
+                && !roof_idf.is_epjson() && !idf_legacy.has_errors()
+                && idf_legacy.model.as_ref().is_some_and(|model|model.materials.len()==1 && model.materials[0].kind()==ep_model::MaterialKind::RoofVegetation)
+                && crate::ordinary_equipment_input::resolve_source_b(&roof_idf).is_err_and(|e|e=="Source unused RoofVegetation requires direct epJSON"));
+            // U08: invalid original names cannot fall through either Source loader; bounded values do not license UIntMAX.
+            assert!(
+                ["", "\n", " \t\r\u{c}", "BAD\nNAME"].iter().all(|name| {
+                    let mut value = roof_value.clone();
+                    let row = value[ROOF]
+                        .as_object_mut()
+                        .expect("family")
+                        .remove("\u{b}")
+                        .expect("row");
+                    value[ROOF]
+                        .as_object_mut()
+                        .expect("family")
+                        .insert((*name).into(), row);
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&value.to_string())
+                            .expect("bad original Roof name"),
+                    )
+                    .is_err_and(|e| {
+                        e == "Source RoofVegetation requires original RE2 material name"
+                    })
+                }) && roof_model
+                    .materials
+                    .iter()
+                    .any(|row| row.id == ep_model::MaterialId(0)
+                        && row.kind() != ep_model::MaterialKind::RoofVegetation)
+            );
+            let mut roof_cases: Vec<(&str, Option<serde_json::Value>, bool)> = roof_numeric
+                .iter()
+                .flat_map(|&field| {
+                    [
+                        (field, Some(json!(null)), false),
+                        (field, Some(json!(false)), false),
+                        (field, Some(json!("0.2")), false),
+                        (field, Some(json!([])), false),
+                        (field, Some(json!({})), false),
+                    ]
+                })
+                .collect();
+            roof_cases.extend(
+                [
+                    "soil_layer_name",
+                    "roughness",
+                    "moisture_diffusion_calculation_method",
+                ]
+                .into_iter()
+                .flat_map(|field| {
+                    [
+                        (field, Some(json!(null)), false),
+                        (field, Some(json!(false)), false),
+                        (field, Some(json!(0.2)), false),
+                        (field, Some(json!([])), false),
+                        (field, Some(json!({})), false),
+                    ]
+                }),
+            );
+            roof_cases.extend(
+                [
+                    ("height_of_plants", "0.0049", false),
+                    ("height_of_plants", "0.005", false),
+                    ("height_of_plants", "0.2", true),
+                    ("height_of_plants", "1.0", true),
+                    ("height_of_plants", "1.0001", false),
+                    ("leaf_area_index", "0.0009", false),
+                    ("leaf_area_index", "0.001", false),
+                    ("leaf_area_index", "1.0", true),
+                    ("leaf_area_index", "5.0", true),
+                    ("leaf_area_index", "5.0001", false),
+                    ("leaf_reflectivity", "0.0499", false),
+                    ("leaf_reflectivity", "0.05", true),
+                    ("leaf_reflectivity", "0.22", true),
+                    ("leaf_reflectivity", "0.5", true),
+                    ("leaf_reflectivity", "0.5001", false),
+                    ("leaf_emissivity", "0.7999", false),
+                    ("leaf_emissivity", "0.8", true),
+                    ("leaf_emissivity", "0.95", true),
+                    ("leaf_emissivity", "1.0", true),
+                    ("leaf_emissivity", "1.0001", false),
+                    ("minimum_stomatal_resistance", "49.999", false),
+                    ("minimum_stomatal_resistance", "50.0", true),
+                    ("minimum_stomatal_resistance", "180.0", true),
+                    ("minimum_stomatal_resistance", "300.0", true),
+                    ("minimum_stomatal_resistance", "300.001", false),
+                    ("thickness", "0.0499", false),
+                    ("thickness", "0.05", false),
+                    ("thickness", "0.1", true),
+                    ("thickness", "0.7", true),
+                    ("thickness", "0.7001", false),
+                    ("conductivity_of_dry_soil", "0.1999", false),
+                    ("conductivity_of_dry_soil", "0.2", true),
+                    ("conductivity_of_dry_soil", "0.35", true),
+                    ("conductivity_of_dry_soil", "1.5", true),
+                    ("conductivity_of_dry_soil", "1.5001", false),
+                    ("density_of_dry_soil", "299.999", false),
+                    ("density_of_dry_soil", "300.0", true),
+                    ("density_of_dry_soil", "1100.0", true),
+                    ("density_of_dry_soil", "2000.0", true),
+                    ("density_of_dry_soil", "2000.001", false),
+                    ("specific_heat_of_dry_soil", "499.999", false),
+                    ("specific_heat_of_dry_soil", "500.0", false),
+                    ("specific_heat_of_dry_soil", "1200.0", true),
+                    ("specific_heat_of_dry_soil", "2000.0", true),
+                    ("specific_heat_of_dry_soil", "2000.001", false),
+                    ("thermal_absorptance", "0.7999", false),
+                    ("thermal_absorptance", "0.8", false),
+                    ("thermal_absorptance", "0.9", true),
+                    ("thermal_absorptance", "1.0", true),
+                    ("thermal_absorptance", "1.0001", false),
+                    ("solar_absorptance", "0.3999", false),
+                    ("solar_absorptance", "0.4", true),
+                    ("solar_absorptance", "0.7", true),
+                    ("solar_absorptance", "0.9", true),
+                    ("solar_absorptance", "0.9001", false),
+                    ("visible_absorptance", "0.4999", false),
+                    ("visible_absorptance", "0.5", false),
+                    ("visible_absorptance", "0.75", true),
+                    ("visible_absorptance", "1.0", true),
+                    ("visible_absorptance", "1.0001", false),
+                    (
+                        "saturation_volumetric_moisture_content_of_the_soil_layer",
+                        "0.0999",
+                        false,
+                    ),
+                    (
+                        "saturation_volumetric_moisture_content_of_the_soil_layer",
+                        "0.1",
+                        false,
+                    ),
+                    (
+                        "saturation_volumetric_moisture_content_of_the_soil_layer",
+                        "0.3",
+                        true,
+                    ),
+                    (
+                        "saturation_volumetric_moisture_content_of_the_soil_layer",
+                        "0.5",
+                        true,
+                    ),
+                    (
+                        "saturation_volumetric_moisture_content_of_the_soil_layer",
+                        "0.5001",
+                        false,
+                    ),
+                    (
+                        "residual_volumetric_moisture_content_of_the_soil_layer",
+                        "0.0099",
+                        false,
+                    ),
+                    (
+                        "residual_volumetric_moisture_content_of_the_soil_layer",
+                        "0.01",
+                        true,
+                    ),
+                    (
+                        "residual_volumetric_moisture_content_of_the_soil_layer",
+                        "0.03",
+                        true,
+                    ),
+                    (
+                        "residual_volumetric_moisture_content_of_the_soil_layer",
+                        "0.1",
+                        true,
+                    ),
+                    (
+                        "residual_volumetric_moisture_content_of_the_soil_layer",
+                        "0.1001",
+                        false,
+                    ),
+                    (
+                        "initial_volumetric_moisture_content_of_the_soil_layer",
+                        "0.0499",
+                        false,
+                    ),
+                    (
+                        "initial_volumetric_moisture_content_of_the_soil_layer",
+                        "0.05",
+                        false,
+                    ),
+                    (
+                        "initial_volumetric_moisture_content_of_the_soil_layer",
+                        "0.1",
+                        true,
+                    ),
+                    (
+                        "initial_volumetric_moisture_content_of_the_soil_layer",
+                        "0.5",
+                        true,
+                    ),
+                    (
+                        "initial_volumetric_moisture_content_of_the_soil_layer",
+                        "0.5001",
+                        false,
+                    ),
+                ]
+                .into_iter()
+                .map(|(field, token, accepted)| {
+                    (
+                        field,
+                        Some(
+                            serde_json::from_str::<serde_json::Value>(token)
+                                .expect("literal numeric boundary"),
+                        ),
+                        accepted,
+                    )
+                }),
+            );
+            roof_cases.extend(roof_numeric.iter().flat_map(|&field| {
+                ["", "Autocalculate", "Autosize"]
+                    .into_iter()
+                    .map(move |token| (field, Some(json!(token)), false))
+            }));
+            roof_cases.extend(roof_numeric.iter().flat_map(|&field| {
+                [
+                    json!(u64::MAX),
+                    json!(1.8446744073709552e19),
+                    json!(0),
+                    json!(-0.0),
+                ]
+                .into_iter()
+                .map(move |value| (field, Some(value), false))
+            }));
+            roof_cases.extend(
+                [
+                    ("roughness", "rough"),
+                    ("roughness", "ROUGH"),
+                    ("roughness", " Rough"),
+                    ("roughness", "Unknown"),
+                    ("moisture_diffusion_calculation_method", "simple"),
+                    ("moisture_diffusion_calculation_method", "ADVANCED"),
+                    ("moisture_diffusion_calculation_method", " Simple"),
+                    ("moisture_diffusion_calculation_method", "Unknown"),
+                ]
+                .into_iter()
+                .map(|(field, token)| (field, Some(json!(token)), false)),
+            );
+            roof_cases.extend(
+                roof_numeric
+                    .iter()
+                    .copied()
+                    .chain([
+                        "soil_layer_name",
+                        "roughness",
+                        "moisture_diffusion_calculation_method",
+                    ])
+                    .map(|field| (field, None, true)),
+            );
+            roof_cases.extend(
+                [
+                    "soil_layer_name",
+                    "roughness",
+                    "moisture_diffusion_calculation_method",
+                ]
+                .into_iter()
+                .map(|field| (field, Some(json!("")), true)),
+            );
+            // U09: the sole original-field loop includes90 kinds/75bounds plus strict enums/NoAuto/huge/zero/default cases.
+            for (field, value, accepted) in roof_cases {
+                let mut value_tree = roof_value.clone();
+                if let Some(value) = value {
+                    value_tree[ROOF]["\u{a0}"][field] = value;
+                } else {
+                    value_tree[ROOF]["\u{a0}"]
+                        .as_object_mut()
+                        .expect("row")
+                        .remove(field);
+                }
+                let raw = ep_raw_model::parse_epjson_str_for_source(&value_tree.to_string())
+                    .expect("original Roof field fixture");
+                let resolved = crate::ordinary_equipment_input::resolve_source_b(&raw);
+                assert!(resolved.is_err() != accepted && (accepted || resolved.is_err_and(|e|e=="Source RoofVegetation requires every supplied known field to remain original-schema-valid")),"Roof original {field}");
+            }
+            let opaque = roof_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::RoofVegetation)
+                .expect("held opaque material");
+            // U10: Raw-present/typed-zero, kind/count/global ID, loader/report and both name-to-ID associations.
+            for case in 0_usize..12 {
+                let mut bad = roof_model.clone();
+                match case {
+                    0 => bad
+                        .materials
+                        .retain(|row| row.kind() != ep_model::MaterialKind::RoofVegetation),
+                    1 => {
+                        let mut extra = bad.materials[roof_a_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA ROOF".into());
+                        bad.materials.push(extra);
+                    }
+                    2 => bad.materials[roof_a_position].id = opaque.id,
+                    3 => bad.materials[roof_a_position].definition = opaque.definition,
+                    4 => {
+                        bad.materials[roof_a_position].name =
+                            ep_model::NormalizedName("WRONG ROOF".into())
+                    }
+                    5 => bad.materials[roof_a_position].id = ep_model::MaterialId(u32::MAX),
+                    6 => bad
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != roof_a),
+                    7 => bad
+                        .ctf_report_names
+                        .materials
+                        .push((roof_a, "\u{b}".into())),
+                    8 => {
+                        let _ = bad.material_names.insert("EXTRA ROOF ALIAS", roof_a);
+                    }
+                    9 => {
+                        bad.ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == roof_a)
+                            .expect("A tuple")
+                            .1 = "\u{a0}".into();
+                        bad.ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == roof_b)
+                            .expect("B tuple")
+                            .1 = "\u{b}".into();
+                    }
+                    10 => {
+                        bad.material_names = ep_model::NameMap::default();
+                        bad.materials.iter().for_each(|row| {
+                            let _ = bad.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => {
+                        bad.material_names = ep_model::NameMap::source_exact_namespace();
+                        bad.materials.iter().for_each(|row| {
+                            let id = if row.id == roof_a {
+                                roof_b
+                            } else if row.id == roof_b {
+                                roof_a
+                            } else {
+                                row.id
+                            };
+                            let _ = bad.material_names.insert(&row.name.0, id);
+                        });
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &roof_raw,
+                        &roof_compiled.report,
+                        Some(&bad),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&roof_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "Roof custody {case}"
+                );
+            }
+            let construction_index = roof_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("real opaque Construction");
+            // U11/U12: actual Raw outside/layers2..10 and typed original/effective/nonempty/empty-fallback positions.
+            for case in 0_usize..11 {
+                assert!(["Construction","Construction:WindowEquivalentLayer","Construction:AirBoundary","Construction:InternalSource"].iter().all(|family| {
+                    let mut used=roof_value.clone();let mut fields=serde_json::Map::from_iter([("outside_layer".into(),json!("Opaque"))]);
+                    let field=if case==0 || case==10 {"outside_layer".into()}else{format!("layer_{}",case+1)};
+                    fields.insert(field,json!(if case.is_multiple_of(2){"\u{b}"}else{"\u{a0}"}));used[*family]["ROOF USED"]=serde_json::Value::Object(fields);
+                    crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&used.to_string()).expect("Raw Construction-prefix Roof use"))
+                        .is_err_and(|e|e=="Source unused RoofVegetation excludes every Construction layer reference")
+                }),"Raw Roof Construction position {case}");
+                let mut used = roof_model.clone();
+                let construction = &mut used.constructions[construction_index];
+                if case == 10 {
+                    construction.layers.clear();
+                    construction.outside_layer = Some(roof_a);
+                } else {
+                    construction.layers.resize(case + 1, opaque.id);
+                    construction.layers[case] = if case.is_multiple_of(2) {
+                        roof_a
+                    } else {
+                        roof_b
+                    };
+                }
+                let blocked = crate::support::assess_support_with_source_admission(
+                    &roof_raw,
+                    &roof_compiled.report,
+                    Some(&used),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&roof_admission),
+                );
+                let mut original_outside = roof_model.clone();
+                original_outside.constructions[construction_index].outside_layer = Some(roof_a);
+                assert!(
+                    !blocked.allows_rust_runtime()
+                        && blocked
+                            .unsupported_objects
+                            .iter()
+                            .any(|row| row.object_type == ROOF)
+                        && (case != 0
+                            || !crate::support::assess_support_with_source_admission(
+                                &roof_raw,
+                                &roof_compiled.report,
+                                Some(&original_outside),
+                                RunMode::Compatibility,
+                                PartialRunPolicy::Deny,
+                                RunOutputFormat::RustNative,
+                                TraceLevel::Normal,
+                                Some(&roof_admission)
+                            )
+                            .allows_rust_runtime()),
+                    "typed/effective/fallback Roof position {case}"
+                );
+            }
+        }
     }
 }
 

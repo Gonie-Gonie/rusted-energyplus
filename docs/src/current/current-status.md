@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 272 paired physical cases and 12,374,776 reported values with zero
+contains 273 paired physical cases and 12,449,896 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -79,6 +79,8 @@ Unused WindowMaterial:Shade:EquivalentLayer, Drape:EquivalentLayer, Screen:Equiv
 | Gap | 3A12N/min3; NumNums1..12; five-slot GasMix and shared-error-gated NomR | 12 Float operands over979 held numbers; 991 total; 18x11 table |
 
 The latest Gap EQL pair uses one Native and one Source process with zero reruns. Its18x11 public table holds all17 parent rows; common Resistance0 differs from Source-only NomR0.47169811320754723 (Group18/id9/typed8/Rough2) on six physics surfaces. Static48 assertions/6 for loops/4 Material/0 Window owners differ from8 current QA commands/13 total: one QA01 compiler E0433 failure before its body,4 current and2 historical bodies,0 reuse and false getter-body credit. Root corrected two files before all8 QA02 commands passed; this was no failed Source build or engine failure. A separate static limitation remains: independently mutating typed outside_layer is not checked when typed layers is nonempty; Raw references and typed layers/effective/empty fallback remain fenced. Input61/currentcombined122/retained116/registry147 remain distinct from128 Source citations (125scientific+3derivation).
+
+Unused Material:RoofVegetation now has a bounded Source B direct-epJSON4A15N/min19 getter/common-report route. The fixed15-Float/three-String input holds991 parent numbers (1006total); all158series/75120values and12+12+8+2 gates pass with one Native/one Source process and0reruns. Whole19x11 MaterialDetails holds all18 parent rows; Source Group8/id18/typed17/Rough3/NomR0.35135135135135137 joins six physics surfaces. Static48assert/6for/4Material/0Window differs from actual8QA/4current bodies with0failure/history/reuse and falsegettercredit. Roof typed outside was fixed before QA; Input01 ledger-context preflight was a separate DATA correction. Prior14-family typed-outside limits remain; their shared fix is ignored,not adopted. Soil/plant constructor/getter custody does not establish active EcoRoof water/energy/soil calculation, Construction/SourceA/IDF/Legacy or full-object/all-combination parity. Input62/currentcombined122/retained116/registry147 differs from130Sourcecitations.
 
 These routes use the same retained Material owners and real report/geometry path. Actual zero EQL Construction count skips positive unavailable EQL/ASHWAT work; ordinary Blind181-angle production and six-surface physics remain required. Active windows/Construction/control, Source A/IDF/Legacy admission changes, Native-private TAR/optics/pointer parity, full-object and arbitrary valid-combination completion remain held.
 
@@ -162,8 +164,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 190 recorded Source builds,
-168 with accepted pairs and 22 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 191 recorded Source builds,
+169 with accepted pairs and 22 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
