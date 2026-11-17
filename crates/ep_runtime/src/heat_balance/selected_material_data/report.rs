@@ -170,6 +170,32 @@ impl SelectedMaterialData {
                             },
                         )
                     }
+                    MaterialDefinition::WindowShadeEquivalentLayer(_) => {
+                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::ShadeEql) {
+                            return Err(unavailable("reported ShadeEQL actual group"));
+                        }
+                        let value =
+                            self.window_shade_equivalent_layer.get(id).ok_or_else(|| {
+                                unavailable("reported actual ShadeEQL runtime properties")
+                            })?;
+                        (
+                            value.resistance,
+                            value
+                                .roughness
+                                .ok_or_else(|| unavailable("ShadeEQL getter roughness"))?,
+                            [
+                                value.thickness,
+                                value.conductivity,
+                                value.density,
+                                value.specific_heat,
+                            ],
+                            OpaqueSurfaceProperties {
+                                thermal_absorptance: value.thermal_absorptance,
+                                solar_absorptance: value.solar_absorptance,
+                                visible_absorptance: value.visible_absorptance,
+                            },
+                        )
+                    }
                     MaterialDefinition::WindowScreen(_) => {
                         if self.material_groups.get(id) != Some(&SourceMaterialGroup::Screen) {
                             return Err(unavailable("reported Screen actual group"));

@@ -103,6 +103,7 @@ fn resolve_ordered(
         "WindowMaterial:Gas",
         "WindowMaterial:GasMixture",
         "WindowMaterial:Shade",
+        "WindowMaterial:Shade:EquivalentLayer",
         "WindowMaterial:Screen",
         "WindowMaterial:Blind",
     ] {
@@ -114,6 +115,7 @@ fn resolve_ordered(
                 | "WindowMaterial:Gas"
                 | "WindowMaterial:GasMixture"
                 | "WindowMaterial:Shade"
+                | "WindowMaterial:Shade:EquivalentLayer"
                 | "WindowMaterial:Screen"
                 | "WindowMaterial:Blind"
         ) && !source_order
@@ -168,6 +170,14 @@ fn resolve_ordered(
                     continue;
                 }
                 if source_order
+                    && family == "WindowMaterial:Shade:EquivalentLayer"
+                    && !crate::ordinary_equipment_input::source_b_shade_equivalent_layer_known_field(
+                        &field.0,
+                    )
+                {
+                    continue;
+                }
+                if source_order
                     && family == "WindowMaterial:Shade"
                     && !crate::ordinary_equipment_input::source_b_shade_known_field(&field.0)
                 {
@@ -215,6 +225,7 @@ fn resolve_ordered(
                                     | "WindowMaterial:Gas"
                                     | "WindowMaterial:GasMixture"
                                     | "WindowMaterial:Shade"
+                                    | "WindowMaterial:Shade:EquivalentLayer"
                                     | "WindowMaterial:Screen"
                                     | "WindowMaterial:Blind"
                             ) {
@@ -265,6 +276,7 @@ fn resolve_ordered(
             "WindowMaterial:Gas" => result.window_gas = values,
             "WindowMaterial:GasMixture" => result.window_gas_mixture = values,
             "WindowMaterial:Shade" => result.window_shade = values,
+            "WindowMaterial:Shade:EquivalentLayer" => result.window_shade_equivalent_layer = values,
             "WindowMaterial:Screen" => result.window_screen = values,
             "WindowMaterial:Blind" => result.window_blind = values,
             _ => unreachable!("literal selected material family"),

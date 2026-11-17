@@ -30,6 +30,7 @@ pub(crate) use window_blind::{
 mod window_gas;
 mod window_screen;
 mod window_shade;
+mod window_shade_equivalent_layer;
 pub(crate) use type_group::SourceMaterialGroup;
 
 pub(super) fn unavailable(message: &str) -> RuntimeError {
@@ -73,6 +74,9 @@ pub(crate) struct SelectedMaterialData {
     window_gas: BTreeMap<MaterialId, window_gas::SourceWindowGasMaterial>,
     /// Actual MaterialShade rows; typed optical derivations remain advisory.
     window_shade: BTreeMap<MaterialId, window_shade::SourceShadeMaterial>,
+    /// Same actual MaterialShadeEQL owner and constructor-zero TAR1.
+    window_shade_equivalent_layer:
+        BTreeMap<MaterialId, window_shade_equivalent_layer::SourceShadeEquivalentLayerMaterial>,
     /// Actual ordinary MaterialScreen scalar rows;typed optical properties are advisory.
     window_screen: BTreeMap<MaterialId, window_screen::SourceScreenMaterial>,
     /// Same actual MaterialBlind rows and constructor-owned heap TAR tables.
@@ -252,6 +256,44 @@ impl SelectedMaterialData {
         if row.roughness != Some(MaterialSurfaceRoughness::MediumRough) {
             return Err(HeatBalanceInputError::Unavailable(
                 "actual Shade getter roughness",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::MediumRough,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    /// Read the same MaterialShadeEQL row by actual Source order and typed ID.
+    pub(crate) fn source_shade_equivalent_layer_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native ShadeEQL MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::ShadeEql)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual ShadeEQL Source order/group/physical identity",
+            ));
+        }
+        let row = self.window_shade_equivalent_layer.get(&typed_id).ok_or(
+            HeatBalanceInputError::Unavailable("actual retained ShadeEQL runtime row"),
+        )?;
+        if row.roughness != Some(MaterialSurfaceRoughness::MediumRough) {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual ShadeEQL getter roughness",
             ));
         }
         Ok((
@@ -687,7 +729,7 @@ impl SelectedMaterialData {
         empty!(num_eql_gaps, "WindowMaterial:Gap:EquivalentLayer");
         self.get_window_gas_mixture_data(raw, o)?;
         self.get_window_shade_data(raw, o)?;
-        empty!(num_eql_shades, "WindowMaterial:Shade:EquivalentLayer");
+        self.get_window_shade_equivalent_layer_data(raw, o)?;
         empty!(num_eql_drapes, "WindowMaterial:Drape:EquivalentLayer");
         self.get_window_screen_data(raw, o)?;
         empty!(num_eql_screens, "WindowMaterial:Screen:EquivalentLayer");

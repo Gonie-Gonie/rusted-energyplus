@@ -548,6 +548,9 @@ impl CtfInitializationReports {
                     } else if material.kind() == ep_model::MaterialKind::WindowShade {
                         let (roughness, surface) = material_owner.source_shade_surface_properties(source_number, *id)?;
                         (roughness_code(roughness), surface)
+                    } else if material.kind() == ep_model::MaterialKind::WindowShadeEquivalentLayer {
+                        let (roughness, surface) = material_owner.source_shade_equivalent_layer_surface_properties(source_number, *id)?;
+                        (roughness_code(roughness), surface)
                     } else if material.kind() == ep_model::MaterialKind::WindowBlind {
                         let (roughness, surface) = material_owner.source_blind_surface_properties(source_number, *id)?;
                         (roughness_code(roughness), surface)

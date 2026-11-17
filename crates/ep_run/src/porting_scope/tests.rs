@@ -10791,6 +10791,415 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+
+        // Unused Shade:EQL uses the existing positive DSOA/Ideal/OA fixture, not a substitute scene.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            const EQL: &str = "WindowMaterial:Shade:EquivalentLayer";
+            let mut eql_value = curve_value.clone();
+            eql_value[EQL] = json!({
+                " A SHADE EQL ":{
+                    "front_side_shade_beam_diffuse_solar_transmittance":0.1,
+                    "back_side_shade_beam_diffuse_solar_transmittance":0.15,
+                    "front_side_shade_beam_diffuse_solar_reflectance":0.2,
+                    "back_side_shade_beam_diffuse_solar_reflectance":0.25,
+                    "name":false,"idf_order":[],"metadata":null
+                },
+                " B SHADE EQL ":{
+                    "shade_beam_beam_solar_transmittance":0,
+                    "front_side_shade_beam_diffuse_solar_transmittance":0.1,
+                    "back_side_shade_beam_diffuse_solar_transmittance":0.15,
+                    "front_side_shade_beam_diffuse_solar_reflectance":0.2,
+                    "back_side_shade_beam_diffuse_solar_reflectance":0.25,
+                    "shade_beam_beam_visible_transmittance_at_normal_incidence":0.1,
+                    "shade_beam_diffuse_visible_transmittance_at_normal_incidence":0.2,
+                    "shade_beam_diffuse_visible_reflectance_at_normal_incidence":0.3,
+                    "shade_material_infrared_transmittance":0.04,
+                    "front_side_shade_material_infrared_emissivity":0.8,
+                    "back_side_shade_material_infrared_emissivity":0.75,
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},
+                    "idf_max_extensible_fields":null,"extra_string":"unconsumed",
+                    "metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}
+                }
+            });
+            let eql_raw = ep_raw_model::parse_epjson_str_for_source(&eql_value.to_string())
+                .expect("Source EQL epJSON");
+            let eql_compiled = ep_compiler::compile_raw_model_for_source(&eql_raw);
+            assert!(
+                !eql_compiled.has_errors(),
+                "{:?}",
+                eql_compiled.report.diagnostics
+            );
+            let eql_model = eql_compiled
+                .model
+                .as_ref()
+                .expect("two real Source EQL materials");
+            let eql_a = eql_model
+                .material_names
+                .resolve(" A SHADE EQL ")
+                .expect("untrimmed A");
+            let eql_b = eql_model
+                .material_names
+                .resolve(" B SHADE EQL ")
+                .expect("untrimmed B");
+            assert!(
+                eql_a != eql_b
+                    && eql_model.material_names.is_source_exact_namespace()
+                    && eql_model.material_names.resolve("A SHADE EQL").is_none()
+                    && eql_model
+                        .materials
+                        .iter()
+                        .filter(
+                            |row| row.kind() == ep_model::MaterialKind::WindowShadeEquivalentLayer
+                        )
+                        .count()
+                        == 2
+                    && eql_model.materials.iter().any(|row| row.id == eql_a
+                        && row.name.0 == " A SHADE EQL "
+                        && matches!(
+                            row.definition,
+                            ep_model::MaterialDefinition::WindowShadeEquivalentLayer(_)
+                        ))
+                    && eql_model.materials.iter().any(|row| row.id == eql_b
+                        && row.name.0 == " B SHADE EQL "
+                        && matches!(
+                            row.definition,
+                            ep_model::MaterialDefinition::WindowShadeEquivalentLayer(_)
+                        ))
+                    && eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(eql_a, " A SHADE EQL ".into()))
+                    && eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(eql_b, " B SHADE EQL ".into()))
+            );
+            let mut eql_ip = crate::ordinary_input_processor::resolve_source_b(&eql_raw)
+                .expect("same real Raw/IP");
+            let eql_args = eql_ip.get_object_def_max_args(EQL).expect("actual1A11N");
+            let mut eql_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            eql_ip
+                .report_source_idf_records_stats(&mut eql_stats)
+                .expect("actual record statistics");
+            assert!(
+                (
+                    eql_args.alphas,
+                    eql_args.numerics,
+                    eql_args.total().expect("bounded args")
+                ) == (1, 11, 12)
+                    && eql_ip.get_num_objects_found(EQL) == 2
+                    && eql_ip
+                        .source_raw_object_names(EQL)
+                        .expect("actual ordered names")
+                        .iter()
+                        .map(String::as_str)
+                        .eq([" A SHADE EQL ", " B SHADE EQL "])
+                    && eql_ip.is_object_unused(EQL, " A SHADE EQL ")
+                    && eql_ip.is_object_unused(EQL, " B SHADE EQL ")
+                    && usize::try_from(eql_stats.number_input_records)
+                        .expect("nonnegative records")
+                        == eql_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let eql_original = eql_ip
+                .source_raw_object_fields(EQL, " B SHADE EQL ")
+                .expect("original field custody");
+            let eql_raw_fields = &eql_raw.objects[&ep_raw_model::ObjectType(EQL.into())]
+                [&ep_raw_model::ObjectName(" B SHADE EQL ".into())]
+                .fields;
+            assert!(
+                matches!(eql_raw_fields.get(&ep_raw_model::FieldName("shade_beam_beam_solar_transmittance".into())),Some(ep_raw_model::RawValue::Number(token)) if token == "0")
+                    && matches!(eql_original.get("shade_beam_beam_solar_transmittance"),Some(S::Number(token)) if token == "0")
+                    && matches!(
+                        ep_model::classify_source_json_number("0"),
+                        Ok(ep_model::SourceJsonNumber::Integer(0))
+                    )
+                    && matches!(eql_original.get("name"), Some(S::Bool(false)))
+                    && matches!(eql_original.get("idf_order"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(eql_original.get("idf_max_fields"), Some(S::Object(_)))
+                    && matches!(eql_original.get("idf_max_extensible_fields"), Some(S::Null))
+                    && matches!(eql_original.get("extra_string"),Some(S::String(value)) if value == "unconsumed")
+                    && matches!(eql_original.get("metadata"),Some(S::Object(fields)) if matches!(fields.get("retained"),Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let eql_projection = crate::ordinary_material_input::resolve_source(&eql_raw, &eql_ip)
+                .expect("same Raw/IP material projection");
+            let eql_keys = [
+                "shade_beam_beam_solar_transmittance",
+                "front_side_shade_beam_diffuse_solar_transmittance",
+                "back_side_shade_beam_diffuse_solar_transmittance",
+                "front_side_shade_beam_diffuse_solar_reflectance",
+                "back_side_shade_beam_diffuse_solar_reflectance",
+                "shade_beam_beam_visible_transmittance_at_normal_incidence",
+                "shade_beam_diffuse_visible_transmittance_at_normal_incidence",
+                "shade_beam_diffuse_visible_reflectance_at_normal_incidence",
+                "shade_material_infrared_transmittance",
+                "front_side_shade_material_infrared_emissivity",
+                "back_side_shade_material_infrared_emissivity",
+            ];
+            let projected = &eql_projection.window_shade_equivalent_layer;
+            assert!(
+                eql_projection.source_is_epjson && projected.len() == 2
+                    && projected[0].object_name == " A SHADE EQL " && projected[0].fields.len() == 4
+                    && projected[1].object_name == " B SHADE EQL " && projected[1].fields.len() == 11
+                    && projected.iter().all(|row| row.idf_max_fields.is_none()
+                        && row.fields.keys().all(|field| crate::ordinary_equipment_input::source_b_shade_equivalent_layer_known_field(field)))
+                    && eql_keys.iter().zip([0.0_f64,0.1,0.15,0.2,0.25,0.1,0.2,0.3,0.04,0.8,0.75])
+                        .all(|(field,value)|matches!(projected[1].fields.get(*field),Some(P::Number(actual)) if actual.to_bits() == value.to_bits()))
+            );
+            let mut eql_trace = inspect_porting_scope(
+                &eql_raw,
+                &eql_compiled.report,
+                Some(eql_model),
+                PortingScope::B,
+            );
+            assert!(eql_trace.admissible, "{:?}", eql_trace.violations);
+            eql_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    eql_model,
+                    &weather,
+                    "same ShadeEQL Source weather",
+                )
+                .expect("actual Source environment"),
+            );
+            let eql_admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&eql_raw, &eql_trace)
+                    .expect("validated Source EQL scope");
+            let mut permuted_eql_model = eql_model.clone();
+            let eql_a_position = eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == eql_a)
+                .expect("A arena row");
+            let eql_b_position = eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == eql_b)
+                .expect("B arena row");
+            permuted_eql_model
+                .materials
+                .swap(eql_a_position, eql_b_position);
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &eql_raw,
+                    &eql_compiled.report,
+                    Some(eql_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&eql_admission)
+                )
+                .allows_rust_runtime()
+                    && crate::support::assess_support_with_source_admission(
+                        &eql_raw,
+                        &eql_compiled.report,
+                        Some(&permuted_eql_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&eql_admission)
+                    )
+                    .allows_rust_runtime()
+            );
+            let eql_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                &json!({"Zone":{"Zone":{}},"WindowMaterial:Shade:EquivalentLayer":{"IDF SHADE EQL":{
+                    "shade_beam_beam_solar_transmittance":0.1,
+                    "front_side_shade_beam_diffuse_solar_transmittance":0.1,
+                    "back_side_shade_beam_diffuse_solar_transmittance":0.15,
+                    "front_side_shade_beam_diffuse_solar_reflectance":0.2,
+                    "back_side_shade_beam_diffuse_solar_reflectance":0.25,
+                    "shade_beam_beam_visible_transmittance_at_normal_incidence":0.1,
+                    "shade_beam_diffuse_visible_transmittance_at_normal_incidence":0.2,
+                    "shade_beam_diffuse_visible_reflectance_at_normal_incidence":0.3,
+                    "shade_material_infrared_transmittance":0.04,
+                    "front_side_shade_material_infrared_emissivity":0.8,
+                    "back_side_shade_material_infrared_emissivity":0.75
+                }}}).to_string(),
+                "Zone,Zone;WindowMaterial:Shade:EquivalentLayer,IDF SHADE EQL,0.1,0.1,0.15,0.2,0.25,0.1,0.2,0.3,0.04,0.8,0.75;",
+            ).expect("genuinely matched twelve-operand IDF");
+            let mut controlled_eql = eql_value.clone();
+            controlled_eql["WindowShadingControl"] = json!({"EQL CONTROL":{"shading_type":"ExteriorShade","shading_device_material_name":" A SHADE EQL "}});
+            let mut active_eql = eql_value.clone();
+            active_eql["Construction:WindowEquivalentLayer"] =
+                json!({"ACTIVE EQL":{"outside_layer":" A SHADE EQL "}});
+            assert!(
+                !crate::support::assess_support_with_source_admission(
+                    &eql_raw,
+                    &eql_compiled.report,
+                    Some(eql_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    None
+                )
+                .allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&eql_raw).is_err()
+                    && crate::ordinary_equipment_input::resolve(&eql_raw).is_err()
+                    && !eql_idf.is_epjson()
+                    && crate::ordinary_equipment_input::resolve_source_b(&eql_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&controlled_eql.to_string())
+                            .expect("controlled EQL Raw")
+                    )
+                    .is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&active_eql.to_string())
+                            .expect("active EQL Raw")
+                    )
+                    .is_err()
+            );
+            for field in eql_keys {
+                let mut bad_value = eql_value.clone();
+                bad_value[EQL][" B SHADE EQL "][field] = json!(false);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string())
+                            .expect("wrong-kind Raw")
+                    )
+                    .is_err(),
+                    "ShadeEQL known field {field}"
+                );
+            }
+            let opaque_eql = eql_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowShadeEquivalentLayer)
+                .expect("held opaque material");
+            for case in 0..12 {
+                let mut bad_model = eql_model.clone();
+                match case {
+                    0 => bad_model.materials.retain(|row| {
+                        row.kind() != ep_model::MaterialKind::WindowShadeEquivalentLayer
+                    }),
+                    1 => {
+                        let mut extra = bad_model.materials[eql_a_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA SHADE EQL".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[eql_a_position].id = opaque_eql.id,
+                    3 => bad_model.materials[eql_a_position].definition = opaque_eql.definition,
+                    4 => {
+                        bad_model.materials[eql_a_position].name =
+                            ep_model::NormalizedName("WRONG SHADE EQL".into())
+                    }
+                    5 => bad_model.materials[eql_a_position].id = ep_model::MaterialId(u32::MAX),
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != eql_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((eql_a, " A SHADE EQL ".into())),
+                    8 => {
+                        let _ = bad_model.material_names.insert(" EXTRA EQL ALIAS ", eql_a);
+                    }
+                    9 => {
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == eql_a)
+                            .expect("A report tuple")
+                            .1 = " B SHADE EQL ".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == eql_b)
+                            .expect("B report tuple")
+                            .1 = " A SHADE EQL ".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => bad_model
+                        .material_names
+                        .insert_instance(" A SHADE EQL ", eql_a),
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &eql_raw,
+                        &eql_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&eql_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "ShadeEQL custody case {case}"
+                );
+            }
+            let eql_construction = eql_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("real opaque Construction");
+            for case in 0_usize..11 {
+                let mut used_value = eql_value.clone();
+                let mut fields =
+                    serde_json::Map::from_iter([("outside_layer".into(), json!("Opaque"))]);
+                let key = if case == 0 || case == 10 {
+                    "outside_layer".into()
+                } else {
+                    format!("layer_{}", case + 1)
+                };
+                fields.insert(
+                    key,
+                    json!(if case.is_multiple_of(2) {
+                        " A SHADE EQL "
+                    } else {
+                        " B SHADE EQL "
+                    }),
+                );
+                used_value["Construction"]["EQL USED"] = serde_json::Value::Object(fields);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&used_value.to_string())
+                            .expect("original active EQL layer")
+                    )
+                    .is_err(),
+                    "Raw EQL layer {case}"
+                );
+                let mut used_model = eql_model.clone();
+                let construction = &mut used_model.constructions[eql_construction];
+                if case == 10 {
+                    construction.layers.clear();
+                    construction.outside_layer = Some(eql_a);
+                } else {
+                    construction.layers.resize(case + 1, opaque_eql.id);
+                    construction.layers[case] = if case.is_multiple_of(2) { eql_a } else { eql_b };
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &eql_raw,
+                        &eql_compiled.report,
+                        Some(&used_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&eql_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "typed/effective EQL layer {case}"
+                );
+            }
+        }
     }
 }
 
