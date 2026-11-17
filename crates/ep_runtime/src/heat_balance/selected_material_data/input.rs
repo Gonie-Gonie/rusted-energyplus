@@ -32,6 +32,8 @@ pub struct SelectedMaterialInput {
     pub window_shade: Vec<ProjectInputObject>,
     /// Genuine ordered MaterialShadeEQL1A11N operands; NumNums may be5..11.
     pub window_shade_equivalent_layer: Vec<ProjectInputObject>,
+    /// Genuine ordered MaterialDrapeEQL1A13N operands; legal rows return5..13.
+    pub window_drape_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialScreen2A12N operands.
     pub window_screen: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialBlind2A27N/min29 operands.
@@ -691,6 +693,81 @@ impl SelectedMaterialInput {
                 }
                 None => {}
                 _ => return Err(unavailable("admitted ShadeEQL numeric scalar")),
+            }
+        }
+        Ok((1, numbers))
+    }
+
+    pub(super) fn get_window_drape_equivalent_layer_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:Drape:EquivalentLayer", &object.object_name)
+        {
+            return Err(unavailable("DrapeEQL owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, f64); 13] = [
+            (
+                "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                0.0,
+            ),
+            ("front_side_drape_beam_diffuse_solar_transmittance", 0.0),
+            ("back_side_drape_beam_diffuse_solar_transmittance", 0.0),
+            ("front_side_drape_beam_diffuse_solar_reflectance", 0.0),
+            ("back_side_drape_beam_diffuse_solar_reflectance", 0.0),
+            ("drape_beam_beam_visible_transmittance", 0.0),
+            ("drape_beam_diffuse_visible_transmittance", 0.0),
+            ("drape_beam_diffuse_visible_reflectance", 0.0),
+            ("drape_material_infrared_transmittance", 0.05),
+            ("front_side_drape_material_infrared_emissivity", 0.87),
+            ("back_side_drape_material_infrared_emissivity", 0.87),
+            ("width_of_pleated_fabric", 0.0),
+            ("length_of_pleated_fabric", 0.0),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.is_empty()
+            || s.alpha_field_blanks.is_empty()
+            || s.alpha_field_names.is_empty()
+            || s.numeric_args.len() < 13
+            || s.numeric_field_blanks.len() < 13
+            || s.numeric_field_names.len() < 13
+        {
+            return Err(unavailable(
+                "actual complete DrapeEQL1alpha13numeric allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Drape:EquivalentLayer", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        // Official min_fields4 includes Name. Fixed defaults are processed even
+        // outside the returned count, exactly as setObjectItemValue does.
+        // Original required N2..N5 make admitted whole-Source rows return5..13;
+        // the underlying generic primitive still has Native numeric floor3.
+        let mut numbers = 3;
+        for (index, (name, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                    numbers = numbers.max(index + 1);
+                }
+                None => {}
+                _ => return Err(unavailable("admitted DrapeEQL numeric scalar")),
             }
         }
         Ok((1, numbers))

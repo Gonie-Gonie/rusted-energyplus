@@ -194,6 +194,460 @@ fn drape_equivalent_layer_materializes_all_inputs_defaults_and_source_quirks()
         .ok_or_else(|| std::io::Error::other("missing equivalent-layer drape coverage"))?;
     assert_eq!(coverage.object_count, 2);
     assert_eq!(coverage.status, ObjectCoverageStatus::Typed);
+
+    // SourceB original-schema qualification is separate from the three Native joint sums.
+    {
+        use ep_raw_model::{FieldName, ObjectName, ObjectType, RawValue};
+        let source_raw = ep_raw_model::parse_epjson_str_for_source(
+            r#"{
+    "WindowMaterial:Drape:EquivalentLayer": {
+        "\u000bA DEFAULT DRAPE\u00a0": {
+            "front_side_drape_beam_diffuse_solar_transmittance": 0.1,
+            "back_side_drape_beam_diffuse_solar_transmittance": 0.15,
+            "front_side_drape_beam_diffuse_solar_reflectance": 0.2,
+            "back_side_drape_beam_diffuse_solar_reflectance": 0.25,
+            "name": false,
+            "idf_order": [],
+            "metadata": null
+        },
+        " Z FULL DRAPE ": {
+            "drape_beam_beam_solar_transmittance_at_normal_incidence": 0.1,
+            "front_side_drape_beam_diffuse_solar_transmittance": 0.1,
+            "back_side_drape_beam_diffuse_solar_transmittance": 0.15,
+            "front_side_drape_beam_diffuse_solar_reflectance": 0.2,
+            "back_side_drape_beam_diffuse_solar_reflectance": 0.25,
+            "drape_beam_beam_visible_transmittance": 0.1,
+            "drape_beam_diffuse_visible_transmittance": 0.2,
+            "drape_beam_diffuse_visible_reflectance": 0.3,
+            "drape_material_infrared_transmittance": 0.04,
+            "front_side_drape_material_infrared_emissivity": 0.8,
+            "back_side_drape_material_infrared_emissivity": 0.75,
+            "width_of_pleated_fabric": 0.03,
+            "length_of_pleated_fabric": 0.05,
+            "name": null,
+            "idf_order": false,
+            "idf_max_fields": {
+                "ignored": true
+            },
+            "idf_max_extensible_fields": [],
+            "extra_string": "unconsumed",
+            "extra_number": 18446744073709551615,
+            "metadata": {
+                "retained": [
+                    null,
+                    true,
+                    1.25,
+                    "mixed"
+                ]
+            }
+        }
+    }
+}"#,
+        )?;
+        let source = super::super::compile_raw_model_for_source(&source_raw);
+        assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+        let source_model = source.model.as_ref().expect("two Source EQL drapes");
+        let default_id = source_model
+            .material_names
+            .resolve("\u{b}A DEFAULT DRAPE\u{a0}")
+            .expect("untrimmed default name");
+        let full_id = source_model
+            .material_names
+            .resolve(" Z FULL DRAPE ")
+            .expect("untrimmed full name");
+        assert!(
+            default_id == ep_model::MaterialId(0)
+                && default_id != full_id
+                && source_model.material_names.is_source_exact_namespace()
+                && source_model
+                    .material_names
+                    .resolve("A DEFAULT DRAPE")
+                    .is_none()
+                && source_model.materials.len() == 2
+                && source_model.ctf_report_names.materials
+                    == vec![
+                        (default_id, "\u{b}A DEFAULT DRAPE\u{a0}".into()),
+                        (full_id, " Z FULL DRAPE ".into())
+                    ]
+                && source_model.materials[0].kind() == MaterialKind::WindowDrapeEquivalentLayer
+                && source_model.materials[0].family() == MaterialFamily::EquivalentLayer
+        );
+        let source_default = source_model.materials[0]
+            .as_window_drape_equivalent_layer()
+            .expect("default Source payload");
+        let source_full = source_model.materials[1]
+            .as_window_drape_equivalent_layer()
+            .expect("full Source payload");
+        assert!(
+            source_default.front_solar.beam_beam_transmittance.to_bits() == 0.0_f64.to_bits()
+                && source_default.front_visible
+                    == WindowShadeEquivalentLayerSideOpticalProperties::default()
+                && source_default.back_visible
+                    == WindowShadeEquivalentLayerSideOpticalProperties::default()
+                && source_default.infrared_transmittance.to_bits() == 0.05_f64.to_bits()
+                && source_default.front_infrared_emissivity.to_bits() == 0.87_f64.to_bits()
+                && source_default.back_infrared_emissivity.to_bits() == 0.87_f64.to_bits()
+                && source_full.front_solar
+                    == WindowShadeEquivalentLayerSideOpticalProperties {
+                        beam_beam_transmittance: 0.1,
+                        beam_diffuse_transmittance: 0.1,
+                        beam_diffuse_reflectance: 0.2
+                    }
+                && source_full.back_solar
+                    == WindowShadeEquivalentLayerSideOpticalProperties {
+                        beam_beam_transmittance: 0.1,
+                        beam_diffuse_transmittance: 0.15,
+                        beam_diffuse_reflectance: 0.25
+                    }
+                && source_full.front_visible
+                    == WindowShadeEquivalentLayerSideOpticalProperties {
+                        beam_beam_transmittance: 0.1,
+                        beam_diffuse_transmittance: 0.2,
+                        beam_diffuse_reflectance: 0.3
+                    }
+                && source_full.back_visible
+                    == WindowShadeEquivalentLayerSideOpticalProperties::default()
+                && [
+                    source_full.infrared_transmittance,
+                    source_full.front_infrared_emissivity,
+                    source_full.back_infrared_emissivity,
+                    source_full.front_thermal_absorptance,
+                    source_full.back_thermal_absorptance,
+                    source_full.thermal_transmittance
+                ]
+                .map(f64::to_bits)
+                    == [0.04_f64, 0.8, 0.75, 0.8, 0.75, 0.04].map(f64::to_bits)
+                && source_default.pleated_width_m.to_bits() == 0.0_f64.to_bits()
+                && source_default.pleated_length_m.to_bits() == 0.0_f64.to_bits()
+                && !source_default.is_pleated()
+                && source_full.pleated_width_m.to_bits() == 0.03_f64.to_bits()
+                && source_full.pleated_length_m.to_bits() == 0.05_f64.to_bits()
+                && source_full.is_pleated()
+                && source_full.roughness == MaterialSurfaceRoughness::MediumRough
+                && source_full.is_resistance_only()
+                && source_model
+                    .materials
+                    .iter()
+                    .all(|row| row.thickness_m().is_none()
+                        && row.conductivity_w_per_m_k().is_none()
+                        && row.thermal_resistance().is_none())
+        );
+        let full_raw = &source_raw.objects[&ObjectType(OBJECT_TYPE.into())]
+            [&ObjectName(" Z FULL DRAPE ".into())];
+        assert!(
+            matches!(
+                full_raw.fields.get(&FieldName("name".into())),
+                Some(RawValue::Null)
+            ) && matches!(
+                full_raw.fields.get(&FieldName("idf_order".into())),
+                Some(RawValue::Bool(false))
+            ) && matches!(
+                full_raw.fields.get(&FieldName("idf_max_fields".into())),
+                Some(RawValue::Object(_))
+            ) && matches!(
+                full_raw
+                    .fields
+                    .get(&FieldName("idf_max_extensible_fields".into())),
+                Some(RawValue::Array(_))
+            ) && matches!(
+                full_raw.fields.get(&FieldName("metadata".into())),
+                Some(RawValue::Object(_))
+            ) && matches!(full_raw.fields.get(&FieldName("extra_string".into())),Some(RawValue::String(value)) if value == "unconsumed")
+                && matches!(full_raw.fields.get(&FieldName("extra_number".into())),Some(RawValue::Number(token)) if token == "18446744073709551615")
+        );
+        let legacy = compile_raw_model(&source_raw);
+        assert!(
+            !legacy.has_errors()
+                && !legacy
+                    .model
+                    .as_ref()
+                    .expect("held Legacy typed projection")
+                    .material_names
+                    .is_source_exact_namespace()
+                && legacy
+                    .model
+                    .as_ref()
+                    .expect("Legacy full payload")
+                    .materials[1]
+                    .definition
+                    == source_model.materials[1].definition
+        );
+        let mut referenced = source_raw.clone();
+        referenced
+            .objects
+            .get_mut(&ObjectType(OBJECT_TYPE.into()))
+            .expect("EQL family")
+            .get_mut(&ObjectName(" Z FULL DRAPE ".into()))
+            .expect("EQL row")
+            .fields
+            .extend([
+                (
+                    FieldName("drape_beam_beam_solar_transmittance_at_normal_incidence".into()),
+                    RawValue::Number("0.2".into()),
+                ),
+                (
+                    FieldName("front_side_drape_beam_diffuse_solar_transmittance".into()),
+                    RawValue::Number("0.4".into()),
+                ),
+                (
+                    FieldName("front_side_drape_beam_diffuse_solar_reflectance".into()),
+                    RawValue::Number("0.5".into()),
+                ),
+            ]);
+        referenced.objects.insert(
+            ObjectType("Construction".into()),
+            std::collections::BTreeMap::from([(
+                ObjectName("EQL ACTIVE".into()),
+                ep_raw_model::RawObject {
+                    fields: std::collections::BTreeMap::from([(
+                        FieldName("outside_layer".into()),
+                        RawValue::String(" Z FULL DRAPE ".into()),
+                    )]),
+                    source_span: None,
+                },
+            )]),
+        );
+        assert!(has_diagnostic(
+            &super::super::compile_raw_model_for_source(&referenced),
+            "InvalidWindowDrapeEquivalentLayerOpticalSum",
+            " Z FULL DRAPE ",
+            None
+        ));
+        for (kind, field, joint) in [
+            (
+                "kind",
+                "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                0_usize,
+            ),
+            (
+                "kind",
+                "front_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "kind",
+                "back_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "kind",
+                "front_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            (
+                "kind",
+                "back_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            ("kind", "drape_beam_beam_visible_transmittance", 0_usize),
+            ("kind", "drape_beam_diffuse_visible_transmittance", 0_usize),
+            ("kind", "drape_beam_diffuse_visible_reflectance", 0_usize),
+            ("kind", "drape_material_infrared_transmittance", 0_usize),
+            (
+                "kind",
+                "front_side_drape_material_infrared_emissivity",
+                0_usize,
+            ),
+            (
+                "kind",
+                "back_side_drape_material_infrared_emissivity",
+                0_usize,
+            ),
+            ("kind", "width_of_pleated_fabric", 0_usize),
+            ("kind", "length_of_pleated_fabric", 0_usize),
+            (
+                "missing",
+                "front_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "missing",
+                "back_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "missing",
+                "front_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            (
+                "missing",
+                "back_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            (
+                "lower",
+                "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                0_usize,
+            ),
+            (
+                "lower",
+                "front_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "lower",
+                "back_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "lower",
+                "front_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            (
+                "lower",
+                "back_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            ("lower", "drape_beam_beam_visible_transmittance", 0_usize),
+            ("lower", "drape_beam_diffuse_visible_transmittance", 0_usize),
+            ("lower", "drape_beam_diffuse_visible_reflectance", 0_usize),
+            ("lower", "drape_material_infrared_transmittance", 0_usize),
+            (
+                "lower",
+                "front_side_drape_material_infrared_emissivity",
+                0_usize,
+            ),
+            (
+                "lower",
+                "back_side_drape_material_infrared_emissivity",
+                0_usize,
+            ),
+            ("lower", "width_of_pleated_fabric", 0_usize),
+            ("lower", "length_of_pleated_fabric", 0_usize),
+            (
+                "upper",
+                "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                0_usize,
+            ),
+            (
+                "upper",
+                "front_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "upper",
+                "back_side_drape_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            (
+                "upper",
+                "front_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            (
+                "upper",
+                "back_side_drape_beam_diffuse_solar_reflectance",
+                0_usize,
+            ),
+            ("upper", "drape_beam_beam_visible_transmittance", 0_usize),
+            ("upper", "drape_beam_diffuse_visible_transmittance", 0_usize),
+            ("upper", "drape_beam_diffuse_visible_reflectance", 0_usize),
+            ("upper", "drape_material_infrared_transmittance", 0_usize),
+            (
+                "upper",
+                "front_side_drape_material_infrared_emissivity",
+                0_usize,
+            ),
+            (
+                "upper",
+                "back_side_drape_material_infrared_emissivity",
+                0_usize,
+            ),
+            ("joint", "", 0_usize),
+            ("joint", "", 1_usize),
+            ("joint", "", 2_usize),
+        ] {
+            let mut candidate = source_raw.clone();
+            let fields = &mut candidate
+                .objects
+                .get_mut(&ObjectType(OBJECT_TYPE.into()))
+                .expect("EQL family")
+                .get_mut(&ObjectName(" Z FULL DRAPE ".into()))
+                .expect("full EQL row")
+                .fields;
+            match kind {
+                "kind" => {
+                    fields.insert(FieldName(field.into()), RawValue::Bool(false));
+                }
+                "missing" => {
+                    fields.remove(&FieldName(field.into()));
+                }
+                "lower" => {
+                    fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            if field.ends_with("_infrared_emissivity") {
+                                "0.0"
+                            } else {
+                                "-0.01"
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "upper" => {
+                    fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            if field == "drape_beam_beam_solar_transmittance_at_normal_incidence" {
+                                "0.200001"
+                            } else {
+                                "1.0"
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                _ => {
+                    let values: &[(&str, &str)] = match joint {
+                        0 => &[
+                            (
+                                "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                                "0.2",
+                            ),
+                            ("front_side_drape_beam_diffuse_solar_transmittance", "0.4"),
+                            ("front_side_drape_beam_diffuse_solar_reflectance", "0.5"),
+                        ],
+                        1 => &[
+                            ("drape_beam_beam_visible_transmittance", "0.4"),
+                            ("drape_beam_diffuse_visible_transmittance", "0.3"),
+                            ("drape_beam_diffuse_visible_reflectance", "0.4"),
+                        ],
+                        _ => &[
+                            ("drape_material_infrared_transmittance", "0.3"),
+                            ("front_side_drape_material_infrared_emissivity", "0.8"),
+                            ("back_side_drape_material_infrared_emissivity", "0.5"),
+                        ],
+                    };
+                    values.iter().for_each(|(key, value)| {
+                        fields.insert(FieldName((*key).into()), RawValue::Number((*value).into()));
+                    });
+                }
+            }
+            let checked = super::super::compile_raw_model_for_source(&candidate);
+            assert_eq!(
+                checked.has_errors(),
+                kind != "joint",
+                "Source original-schema row {kind}/{field}/{joint}: {:?}",
+                checked.report.diagnostics
+            );
+            if kind == "joint" {
+                let held_legacy = compile_raw_model(&candidate);
+                assert!(
+                    held_legacy.has_errors()
+                        && has_diagnostic(
+                            &held_legacy,
+                            "InvalidWindowDrapeEquivalentLayerOpticalSum",
+                            " Z FULL DRAPE ",
+                            None
+                        ),
+                    "Legacy joint row {joint}"
+                );
+            }
+        }
+    }
     Ok(())
 }
 

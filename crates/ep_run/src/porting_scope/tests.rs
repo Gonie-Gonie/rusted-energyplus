@@ -11200,6 +11200,466 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+
+        // Unused Drape:EQL uses the existing real positive DSOA/Ideal/OA fixture.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            const DRAPE: &str = "WindowMaterial:Drape:EquivalentLayer";
+            let mut drape_value = curve_value.clone();
+            drape_value[DRAPE] = json!({
+                "\u{b}A DRAPE EQL\u{a0}":{
+                    "front_side_drape_beam_diffuse_solar_transmittance":0.1,
+                    "back_side_drape_beam_diffuse_solar_transmittance":0.15,
+                    "front_side_drape_beam_diffuse_solar_reflectance":0.2,
+                    "back_side_drape_beam_diffuse_solar_reflectance":0.25,
+                    "name":false,"idf_order":[],"metadata":null
+                },
+                " B DRAPE EQL ":{
+                    "drape_beam_beam_solar_transmittance_at_normal_incidence":0,
+                    "front_side_drape_beam_diffuse_solar_transmittance":0.1,
+                    "back_side_drape_beam_diffuse_solar_transmittance":0.15,
+                    "front_side_drape_beam_diffuse_solar_reflectance":0.2,
+                    "back_side_drape_beam_diffuse_solar_reflectance":0.25,
+                    "drape_beam_beam_visible_transmittance":0.1,
+                    "drape_beam_diffuse_visible_transmittance":0.2,
+                    "drape_beam_diffuse_visible_reflectance":0.3,
+                    "drape_material_infrared_transmittance":0.04,
+                    "front_side_drape_material_infrared_emissivity":0.8,
+                    "back_side_drape_material_infrared_emissivity":0.75,
+                    "width_of_pleated_fabric":u64::MAX,"length_of_pleated_fabric":0.8,
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},
+                    "idf_max_extensible_fields":null,"extra_string":"unconsumed",
+                    "metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}
+                }
+            });
+            let drape_raw = ep_raw_model::parse_epjson_str_for_source(&drape_value.to_string())
+                .expect("Source DRAPE epJSON");
+            let drape_compiled = ep_compiler::compile_raw_model_for_source(&drape_raw);
+            assert!(
+                !drape_compiled.has_errors(),
+                "{:?}",
+                drape_compiled.report.diagnostics
+            );
+            let drape_model = drape_compiled
+                .model
+                .as_ref()
+                .expect("two real Source DRAPE materials");
+            let drape_a = drape_model
+                .material_names
+                .resolve("\u{b}A DRAPE EQL\u{a0}")
+                .expect("untrimmed A");
+            let drape_b = drape_model
+                .material_names
+                .resolve(" B DRAPE EQL ")
+                .expect("untrimmed B");
+            assert!(
+                drape_a != drape_b
+                    && drape_model.material_names.is_source_exact_namespace()
+                    && drape_model.material_names.resolve("A DRAPE EQL").is_none()
+                    && drape_model
+                        .materials
+                        .iter()
+                        .filter(
+                            |row| row.kind() == ep_model::MaterialKind::WindowDrapeEquivalentLayer
+                        )
+                        .count()
+                        == 2
+                    && drape_model.materials.iter().any(|row| row.id == drape_a
+                        && row.name.0 == "\u{b}A DRAPE EQL\u{a0}"
+                        && matches!(
+                            row.definition,
+                            ep_model::MaterialDefinition::WindowDrapeEquivalentLayer(_)
+                        ))
+                    && drape_model.materials.iter().any(|row| row.id == drape_b
+                        && row.name.0 == " B DRAPE EQL "
+                        && matches!(
+                            row.definition,
+                            ep_model::MaterialDefinition::WindowDrapeEquivalentLayer(_)
+                        ))
+                    && drape_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(drape_a, "\u{b}A DRAPE EQL\u{a0}".into()))
+                    && drape_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(drape_b, " B DRAPE EQL ".into()))
+            );
+            let mut drape_ip = crate::ordinary_input_processor::resolve_source_b(&drape_raw)
+                .expect("same real Raw/IP");
+            let drape_args = drape_ip
+                .get_object_def_max_args(DRAPE)
+                .expect("actual1A13N");
+            let mut drape_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            drape_ip
+                .report_source_idf_records_stats(&mut drape_stats)
+                .expect("actual record statistics");
+            assert!(
+                (
+                    drape_args.alphas,
+                    drape_args.numerics,
+                    drape_args.total().expect("bounded args")
+                ) == (1, 13, 14)
+                    && drape_ip.get_num_objects_found(DRAPE) == 2
+                    && drape_ip
+                        .source_raw_object_names(DRAPE)
+                        .expect("actual ordered names")
+                        .iter()
+                        .map(String::as_str)
+                        .eq(["\u{b}A DRAPE EQL\u{a0}", " B DRAPE EQL "])
+                    && drape_ip.is_object_unused(DRAPE, "\u{b}A DRAPE EQL\u{a0}")
+                    && drape_ip.is_object_unused(DRAPE, " B DRAPE EQL ")
+                    && usize::try_from(drape_stats.number_input_records)
+                        .expect("nonnegative records")
+                        == drape_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let drape_original = drape_ip
+                .source_raw_object_fields(DRAPE, " B DRAPE EQL ")
+                .expect("original field custody");
+            let drape_raw_fields = &drape_raw.objects[&ep_raw_model::ObjectType(DRAPE.into())]
+                [&ep_raw_model::ObjectName(" B DRAPE EQL ".into())]
+                .fields;
+            assert!(
+                matches!(drape_raw_fields.get(&ep_raw_model::FieldName("drape_beam_beam_solar_transmittance_at_normal_incidence".into())),Some(ep_raw_model::RawValue::Number(token)) if token == "0")
+                    && matches!(drape_original.get("drape_beam_beam_solar_transmittance_at_normal_incidence"),Some(S::Number(token)) if token == "0")
+                    && matches!(
+                        ep_model::classify_source_json_number("0"),
+                        Ok(ep_model::SourceJsonNumber::Integer(0))
+                    )
+                    && matches!(drape_raw_fields.get(&ep_raw_model::FieldName("width_of_pleated_fabric".into())),Some(ep_raw_model::RawValue::Number(token)) if token == "18446744073709551615")
+                    && matches!(drape_original.get("width_of_pleated_fabric"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(
+                        ep_model::classify_source_json_number("18446744073709551615"),
+                        Ok(ep_model::SourceJsonNumber::Integer(-1))
+                    )
+                    && matches!(drape_original.get("name"), Some(S::Bool(false)))
+                    && matches!(drape_original.get("idf_order"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(drape_original.get("idf_max_fields"), Some(S::Object(_)))
+                    && matches!(
+                        drape_original.get("idf_max_extensible_fields"),
+                        Some(S::Null)
+                    )
+                    && matches!(drape_original.get("extra_string"),Some(S::String(value)) if value == "unconsumed")
+                    && matches!(drape_original.get("metadata"),Some(S::Object(fields)) if matches!(fields.get("retained"),Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let drape_projection =
+                crate::ordinary_material_input::resolve_source(&drape_raw, &drape_ip)
+                    .expect("same Raw/IP material projection");
+            let drape_keys = [
+                "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                "front_side_drape_beam_diffuse_solar_transmittance",
+                "back_side_drape_beam_diffuse_solar_transmittance",
+                "front_side_drape_beam_diffuse_solar_reflectance",
+                "back_side_drape_beam_diffuse_solar_reflectance",
+                "drape_beam_beam_visible_transmittance",
+                "drape_beam_diffuse_visible_transmittance",
+                "drape_beam_diffuse_visible_reflectance",
+                "drape_material_infrared_transmittance",
+                "front_side_drape_material_infrared_emissivity",
+                "back_side_drape_material_infrared_emissivity",
+                "width_of_pleated_fabric",
+                "length_of_pleated_fabric",
+            ];
+            let projected = &drape_projection.window_drape_equivalent_layer;
+            let mut count_mismatch_raw = drape_raw.clone();
+            count_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(DRAPE.into()))
+                .expect("Drape family")
+                .remove(&ep_raw_model::ObjectName("\u{b}A DRAPE EQL\u{a0}".into()));
+            let mut identity_mismatch_raw = drape_raw.clone();
+            let identity_rows = identity_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(DRAPE.into()))
+                .expect("Drape family");
+            let identity_row = identity_rows
+                .remove(&ep_raw_model::ObjectName("\u{b}A DRAPE EQL\u{a0}".into()))
+                .expect("existing Drape row");
+            identity_rows.insert(
+                ep_raw_model::ObjectName("WRONG DRAPE IP NAME".into()),
+                identity_row,
+            );
+            assert!(
+                drape_projection.source_is_epjson && projected.len() == 2
+                    && crate::ordinary_material_input::resolve_source(&count_mismatch_raw,&drape_ip).is_err()
+                    && crate::ordinary_material_input::resolve_source(&identity_mismatch_raw,&drape_ip).is_err()
+                    && projected[0].object_name == "\u{b}A DRAPE EQL\u{a0}" && projected[0].fields.len() == 4
+                    && projected[1].object_name == " B DRAPE EQL " && projected[1].fields.len() == 13
+                    && projected.iter().all(|row| row.idf_max_fields.is_none()
+                        && row.fields.keys().all(|field| crate::ordinary_equipment_input::source_b_drape_equivalent_layer_known_field(field)))
+                    && drape_keys.iter().zip([0.0_f64,0.1,0.15,0.2,0.25,0.1,0.2,0.3,0.04,0.8,0.75,-1.0,0.8])
+                        .all(|(field,value)|matches!(projected[1].fields.get(*field),Some(P::Number(actual)) if actual.to_bits() == value.to_bits()))
+            );
+            let mut drape_trace = inspect_porting_scope(
+                &drape_raw,
+                &drape_compiled.report,
+                Some(drape_model),
+                PortingScope::B,
+            );
+            assert!(drape_trace.admissible, "{:?}", drape_trace.violations);
+            drape_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    drape_model,
+                    &weather,
+                    "same DrapeEQL Source weather",
+                )
+                .expect("actual Source environment"),
+            );
+            let drape_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &drape_raw,
+                &drape_trace,
+            )
+            .expect("validated Source DRAPE scope");
+            let mut permuted_drape_model = drape_model.clone();
+            let drape_a_position = drape_model
+                .materials
+                .iter()
+                .position(|row| row.id == drape_a)
+                .expect("A arena row");
+            let drape_b_position = drape_model
+                .materials
+                .iter()
+                .position(|row| row.id == drape_b)
+                .expect("B arena row");
+            permuted_drape_model
+                .materials
+                .swap(drape_a_position, drape_b_position);
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &drape_raw,
+                    &drape_compiled.report,
+                    Some(drape_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&drape_admission)
+                )
+                .allows_rust_runtime()
+                    && crate::support::assess_support_with_source_admission(
+                        &drape_raw,
+                        &drape_compiled.report,
+                        Some(&permuted_drape_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&drape_admission)
+                    )
+                    .allows_rust_runtime()
+            );
+            let drape_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                &json!({"Zone":{"Zone":{}},"WindowMaterial:Drape:EquivalentLayer":{"IDF DRAPE":{
+                    "front_side_drape_beam_diffuse_solar_transmittance":0.1,
+                    "back_side_drape_beam_diffuse_solar_transmittance":0.2,
+                    "front_side_drape_beam_diffuse_solar_reflectance":0.3,
+                    "back_side_drape_beam_diffuse_solar_reflectance":0.4
+                }}})
+                .to_string(),
+                "Zone,Zone;WindowMaterial:Drape:EquivalentLayer,IDF DRAPE,,0.1,0.2,0.3,0.4;",
+            )
+            .expect("matched Zone+Drape IDF with blankN1 and four required numbers");
+            let mut controlled_drape = drape_value.clone();
+            controlled_drape["WindowShadingControl"] = json!({"DRAPE CONTROL":{"shading_type":"ExteriorShade","shading_device_material_name":"\u{b}A DRAPE EQL\u{a0}"}});
+            let mut active_drape = drape_value.clone();
+            active_drape["Construction:WindowEquivalentLayer"] =
+                json!({"ACTIVE DRAPE":{"outside_layer":"\u{b}A DRAPE EQL\u{a0}"}});
+            assert!(
+                !crate::support::assess_support_with_source_admission(
+                    &drape_raw,
+                    &drape_compiled.report,
+                    Some(drape_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    None
+                )
+                .allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&drape_raw).is_err()
+                    && crate::ordinary_equipment_input::resolve(&drape_raw).is_err()
+                    && !drape_idf.is_epjson()
+                    && crate::ordinary_equipment_input::resolve_source_b(&drape_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&controlled_drape.to_string())
+                            .expect("controlled DRAPE Raw")
+                    )
+                    .is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&active_drape.to_string())
+                            .expect("active DRAPE Raw")
+                    )
+                    .is_err()
+            );
+            for field in drape_keys {
+                let mut bad_value = drape_value.clone();
+                bad_value[DRAPE][" B DRAPE EQL "][field] = json!(false);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string())
+                            .expect("wrong-kind Raw")
+                    )
+                    .is_err(),
+                    "DrapeEQL known field {field}"
+                );
+            }
+            let opaque_drape = drape_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowDrapeEquivalentLayer)
+                .expect("held opaque material");
+            for case in 0_usize..13 {
+                let mut bad_model = drape_model.clone();
+                match case {
+                    0 => bad_model.materials.retain(|row| {
+                        row.kind() != ep_model::MaterialKind::WindowDrapeEquivalentLayer
+                    }),
+                    1 => {
+                        let mut extra = bad_model.materials[drape_a_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA DRAPE EQL".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[drape_a_position].id = opaque_drape.id,
+                    3 => bad_model.materials[drape_a_position].definition = opaque_drape.definition,
+                    4 => {
+                        bad_model.materials[drape_a_position].name =
+                            ep_model::NormalizedName("WRONG DRAPE EQL".into())
+                    }
+                    5 => bad_model.materials[drape_a_position].id = ep_model::MaterialId(u32::MAX),
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != drape_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((drape_a, "\u{b}A DRAPE EQL\u{a0}".into())),
+                    8 => {
+                        let _ = bad_model
+                            .material_names
+                            .insert(" EXTRA DRAPE ALIAS ", drape_a);
+                    }
+                    9 => {
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == drape_a)
+                            .expect("A report tuple")
+                            .1 = " B DRAPE EQL ".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == drape_b)
+                            .expect("B report tuple")
+                            .1 = "\u{b}A DRAPE EQL\u{a0}".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    11 => bad_model
+                        .material_names
+                        .insert_instance("\u{b}A DRAPE EQL\u{a0}", drape_a),
+                    _ => {
+                        bad_model.material_names = ep_model::NameMap::source_exact_namespace();
+                        bad_model.materials.iter().for_each(|row| {
+                            let id = if row.id == drape_a {
+                                drape_b
+                            } else if row.id == drape_b {
+                                drape_a
+                            } else {
+                                row.id
+                            };
+                            let _ = bad_model.material_names.insert(&row.name.0, id);
+                        });
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &drape_raw,
+                        &drape_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&drape_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "DrapeEQL custody case {case}"
+                );
+            }
+            let drape_construction = drape_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("real opaque Construction");
+            for case in 0_usize..11 {
+                let mut used_value = drape_value.clone();
+                let mut fields =
+                    serde_json::Map::from_iter([("outside_layer".into(), json!("Opaque"))]);
+                let key = if case == 0 || case == 10 {
+                    "outside_layer".into()
+                } else {
+                    format!("layer_{}", case + 1)
+                };
+                fields.insert(
+                    key,
+                    json!(if case.is_multiple_of(2) {
+                        "\u{b}A DRAPE EQL\u{a0}"
+                    } else {
+                        " b drape eql "
+                    }),
+                );
+                used_value["Construction"]["DRAPE USED"] = serde_json::Value::Object(fields);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&used_value.to_string())
+                            .expect("original active DRAPE layer")
+                    )
+                    .is_err(),
+                    "Raw DRAPE layer {case}"
+                );
+                let mut used_model = drape_model.clone();
+                let construction = &mut used_model.constructions[drape_construction];
+                if case == 10 {
+                    construction.layers.clear();
+                    construction.outside_layer = Some(drape_a);
+                } else {
+                    construction.layers.resize(case + 1, opaque_drape.id);
+                    construction.layers[case] = if case.is_multiple_of(2) {
+                        drape_a
+                    } else {
+                        drape_b
+                    };
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &drape_raw,
+                        &drape_compiled.report,
+                        Some(&used_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&drape_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "typed/effective DRAPE layer {case}"
+                );
+            }
+        }
     }
 }
 

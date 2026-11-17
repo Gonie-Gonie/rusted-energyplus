@@ -479,6 +479,7 @@ impl GainFactory {
             window_gas_mixture: Vec::new(),
             window_shade: Vec::new(),
             window_shade_equivalent_layer: Vec::new(),
+            window_drape_equivalent_layer: Vec::new(),
             window_screen: Vec::new(),
             window_blind: Vec::new(),
             regular: project_objects(factory, &["Material"])?

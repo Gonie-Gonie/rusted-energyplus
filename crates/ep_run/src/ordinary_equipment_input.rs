@@ -536,6 +536,11 @@ mod window_screen;
 pub(crate) use window_screen::{
     known_field as source_b_screen_known_field, validate as source_b_validate_unused_screen,
 };
+mod window_drape_equivalent_layer;
+pub(crate) use window_drape_equivalent_layer::{
+    known_field as source_b_drape_equivalent_layer_known_field,
+    validate as source_b_validate_unused_drape_equivalent_layer,
+};
 mod window_shade_equivalent_layer;
 pub(crate) use window_shade_equivalent_layer::{
     known_field as source_b_shade_equivalent_layer_known_field,
@@ -630,6 +635,7 @@ fn resolve_raw(
         window_gas::validate_mixture(raw)?;
         window_shade::validate(raw)?;
         window_shade_equivalent_layer::validate(raw)?;
+        window_drape_equivalent_layer::validate(raw)?;
         window_screen::validate(raw)?;
         window_blind::validate(raw)?;
     }
@@ -659,6 +665,8 @@ fn resolve_raw(
         let source_shade_family = source_b_ingress && family.0 == "WindowMaterial:Shade";
         let source_shade_equivalent_layer_family =
             source_b_ingress && family.0 == "WindowMaterial:Shade:EquivalentLayer";
+        let source_drape_equivalent_layer_family =
+            source_b_ingress && family.0 == "WindowMaterial:Drape:EquivalentLayer";
         let source_screen_family = source_b_ingress && family.0 == "WindowMaterial:Screen";
         let source_blind_family = source_b_ingress && family.0 == "WindowMaterial:Blind";
         let source_people_family = source_calendar_ingress && family.0 == "People";
@@ -734,6 +742,7 @@ fn resolve_raw(
             && !source_gas_mixture_family
             && !source_shade_family
             && !source_shade_equivalent_layer_family
+            && !source_drape_equivalent_layer_family
             && !source_screen_family
             && !source_blind_family
             && !source_calendar_family
@@ -797,6 +806,7 @@ fn resolve_raw(
                 || source_gas_mixture_family
                 || source_shade_family
                 || source_shade_equivalent_layer_family
+                || source_drape_equivalent_layer_family
                 || source_screen_family
                 || source_blind_family
             {
@@ -902,6 +912,8 @@ fn resolve_raw(
                         && window_shade::admitted_field(&field.0, value))
                     && !(source_shade_equivalent_layer_family
                         && window_shade_equivalent_layer::admitted_field(&field.0, value))
+                    && !(source_drape_equivalent_layer_family
+                        && window_drape_equivalent_layer::admitted_field(&field.0, value))
                     && !(source_screen_family
                         && window_screen::admitted_field(&field.0, value))
                     && !(source_blind_family
@@ -1244,6 +1256,7 @@ fn resolve_raw(
                 "WindowMaterial:GasMixture" => source_gas_mixture_family,
                 "WindowMaterial:Shade" => source_shade_family,
                 "WindowMaterial:Shade:EquivalentLayer" => source_shade_equivalent_layer_family,
+                "WindowMaterial:Drape:EquivalentLayer" => source_drape_equivalent_layer_family,
                 "WindowMaterial:Screen" => source_screen_family,
                 "WindowMaterial:Blind" => source_blind_family,
                 "People" => {

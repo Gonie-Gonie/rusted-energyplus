@@ -220,6 +220,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("WindowMaterial:GasMixture", 5, 6, 0, 0, None),
         ("WindowMaterial:Shade", 1, 14, 0, 0, None),
         ("WindowMaterial:Shade:EquivalentLayer", 1, 11, 0, 0, None),
+        ("WindowMaterial:Drape:EquivalentLayer", 1, 13, 0, 0, None),
         ("WindowMaterial:Screen", 2, 12, 0, 0, None),
         ("WindowMaterial:Blind", 2, 27, 0, 0, None),
         ("OtherEquipment", 6, 7, 0, 0, None),
