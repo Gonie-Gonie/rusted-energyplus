@@ -12130,6 +12130,602 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+
+        // Unused Blind:EQL extends the existing real positive DSOA/Ideal/OA scene.
+        // Caller observes public definition/Raw/IP/projection custody; private item counts/blanks belong to runtime B1.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            const BLIND_EQL: &str = "WindowMaterial:Blind:EquivalentLayer";
+            let mut blind_eql_value = curve_value.clone();
+            blind_eql_value[BLIND_EQL] = json!({
+                "\u{b}":{
+                    "slat_width":0.02,"slat_separation":0.015,"slat_angle":45,
+                    "front_side_slat_beam_diffuse_solar_reflectance":0.3,"back_side_slat_beam_diffuse_solar_reflectance":0.35,
+                    "front_side_slat_diffuse_diffuse_solar_reflectance":0.2,"back_side_slat_diffuse_diffuse_solar_reflectance":0.3,
+                    "name":false,"idf_order":[],"metadata":null
+                },
+                "\u{a0}":{
+                    "slat_orientation":"Horizontal","slat_width":0.02,"slat_separation":0.015,"slat_crown":-0.0,"slat_angle":45.0,
+                    "front_side_slat_beam_diffuse_solar_transmittance":0.1,"back_side_slat_beam_diffuse_solar_transmittance":0.15,
+                    "front_side_slat_beam_diffuse_solar_reflectance":0.3,"back_side_slat_beam_diffuse_solar_reflectance":0.35,
+                    "front_side_slat_beam_diffuse_visible_transmittance":0.02,"back_side_slat_beam_diffuse_visible_transmittance":0.03,
+                    "front_side_slat_beam_diffuse_visible_reflectance":0.25,"back_side_slat_beam_diffuse_visible_reflectance":0.28,
+                    "slat_diffuse_diffuse_solar_transmittance":0.1,"front_side_slat_diffuse_diffuse_solar_reflectance":0.2,
+                    "back_side_slat_diffuse_diffuse_solar_reflectance":0.3,"slat_diffuse_diffuse_visible_transmittance":0.11,
+                    "front_side_slat_diffuse_diffuse_visible_reflectance":0.22,"back_side_slat_diffuse_diffuse_visible_reflectance":0.33,
+                    "slat_infrared_transmittance":0.05,"front_side_slat_infrared_emissivity":0.84,"back_side_slat_infrared_emissivity":0.76,
+                    "slat_angle_control":"FixedSlatAngle","name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},
+                    "idf_max_extensible_fields":null,"extra_string":"unconsumed",
+                    "metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}
+                }
+            });
+            let blind_eql_raw =
+                ep_raw_model::parse_epjson_str_for_source(&blind_eql_value.to_string())
+                    .expect("Source BlindEQL epJSON");
+            let blind_eql_compiled = ep_compiler::compile_raw_model_for_source(&blind_eql_raw);
+            assert!(
+                !blind_eql_compiled.has_errors(),
+                "{:?}",
+                blind_eql_compiled.report.diagnostics
+            );
+            let blind_eql_model = blind_eql_compiled
+                .model
+                .as_ref()
+                .expect("two Source BlindEQL materials");
+            let blind_eql_a = blind_eql_model
+                .material_names
+                .resolve("\u{b}")
+                .expect("untrimmed A");
+            let blind_eql_b = blind_eql_model
+                .material_names
+                .resolve("\u{a0}")
+                .expect("untrimmed B");
+            assert!(
+                blind_eql_a != blind_eql_b
+                    && blind_eql_model.material_names.is_source_exact_namespace()
+                    && blind_eql_model.material_names.resolve("").is_none()
+                    && blind_eql_model
+                        .materials
+                        .iter()
+                        .filter(
+                            |row| row.kind() == ep_model::MaterialKind::WindowBlindEquivalentLayer
+                        )
+                        .count()
+                        == 2
+                    && blind_eql_model
+                        .materials
+                        .iter()
+                        .any(|row| row.id == blind_eql_a
+                            && row.name.0 == "\u{b}"
+                            && matches!(
+                                row.definition,
+                                ep_model::MaterialDefinition::WindowBlindEquivalentLayer(_)
+                            ))
+                    && blind_eql_model
+                        .materials
+                        .iter()
+                        .any(|row| row.id == blind_eql_b
+                            && row.name.0 == "\u{a0}"
+                            && matches!(
+                                row.definition,
+                                ep_model::MaterialDefinition::WindowBlindEquivalentLayer(_)
+                            ))
+                    && blind_eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(blind_eql_a, "\u{b}".into()))
+                    && blind_eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(blind_eql_b, "\u{a0}".into()))
+            );
+            let mut blind_eql_ip =
+                crate::ordinary_input_processor::resolve_source_b(&blind_eql_raw)
+                    .expect("real Raw/IP");
+            let blind_eql_args = blind_eql_ip
+                .get_object_def_max_args(BLIND_EQL)
+                .expect("public3A21N definition, not private item counts");
+            let mut blind_eql_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            blind_eql_ip
+                .report_source_idf_records_stats(&mut blind_eql_stats)
+                .expect("real record statistics");
+            assert!(
+                (
+                    blind_eql_args.alphas,
+                    blind_eql_args.numerics,
+                    blind_eql_args.total().expect("bounded args")
+                ) == (3, 21, 24)
+                    && blind_eql_ip.get_num_objects_found(BLIND_EQL) == 2
+                    && blind_eql_ip
+                        .source_raw_object_names(BLIND_EQL)
+                        .expect("ordered names")
+                        .iter()
+                        .map(String::as_str)
+                        .eq(["\u{a0}", "\u{b}"])
+                    && blind_eql_ip.is_object_unused(BLIND_EQL, "\u{b}")
+                    && blind_eql_ip.is_object_unused(BLIND_EQL, "\u{a0}")
+                    && usize::try_from(blind_eql_stats.number_input_records)
+                        .expect("nonnegative records")
+                        == blind_eql_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let blind_eql_original = blind_eql_ip
+                .source_raw_object_fields(BLIND_EQL, "\u{a0}")
+                .expect("full original custody");
+            let blind_eql_minimum = blind_eql_ip
+                .source_raw_object_fields(BLIND_EQL, "\u{b}")
+                .expect("minimum original custody");
+            let blind_eql_raw_fields = &blind_eql_raw.objects
+                [&ep_raw_model::ObjectType(BLIND_EQL.into())]
+                [&ep_raw_model::ObjectName("\u{a0}".into())]
+                .fields;
+            assert!(
+                matches!(blind_eql_minimum.get("slat_angle"),Some(S::Number(token)) if token == "45")
+                    && matches!(
+                        ep_model::classify_source_json_number("45"),
+                        Ok(ep_model::SourceJsonNumber::Integer(45))
+                    )
+                    && matches!(blind_eql_raw_fields.get(&ep_raw_model::FieldName("slat_angle".into())),Some(ep_raw_model::RawValue::Number(token)) if token == "45.0")
+                    && matches!(blind_eql_original.get("slat_angle"),Some(S::Number(token)) if token == "45.0")
+                    && matches!(ep_model::classify_source_json_number("45.0"),Ok(ep_model::SourceJsonNumber::Float(value)) if value.to_bits() == 45.0_f64.to_bits())
+                    && matches!(blind_eql_original.get("slat_crown"),Some(S::Number(token)) if token == "-0.0")
+                    && matches!(ep_model::classify_source_json_number("-0.0"),Ok(ep_model::SourceJsonNumber::Float(value)) if value.to_bits() == (-0.0_f64).to_bits())
+                    && matches!(blind_eql_original.get("name"), Some(S::Bool(false)))
+                    && matches!(blind_eql_original.get("idf_order"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(blind_eql_original.get("idf_max_fields"), Some(S::Object(_)))
+                    && matches!(
+                        blind_eql_original.get("idf_max_extensible_fields"),
+                        Some(S::Null)
+                    )
+                    && matches!(blind_eql_original.get("extra_string"),Some(S::String(text)) if text == "unconsumed")
+                    && matches!(blind_eql_original.get("metadata"),Some(S::Object(fields)) if matches!(fields.get("retained"),Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let blind_eql_projection =
+                crate::ordinary_material_input::resolve_source(&blind_eql_raw, &blind_eql_ip)
+                    .expect("same Raw/IP projection");
+            let blind_eql_numeric_keys = [
+                "slat_width",
+                "slat_separation",
+                "slat_crown",
+                "slat_angle",
+                "front_side_slat_beam_diffuse_solar_transmittance",
+                "back_side_slat_beam_diffuse_solar_transmittance",
+                "front_side_slat_beam_diffuse_solar_reflectance",
+                "back_side_slat_beam_diffuse_solar_reflectance",
+                "front_side_slat_beam_diffuse_visible_transmittance",
+                "back_side_slat_beam_diffuse_visible_transmittance",
+                "front_side_slat_beam_diffuse_visible_reflectance",
+                "back_side_slat_beam_diffuse_visible_reflectance",
+                "slat_diffuse_diffuse_solar_transmittance",
+                "front_side_slat_diffuse_diffuse_solar_reflectance",
+                "back_side_slat_diffuse_diffuse_solar_reflectance",
+                "slat_diffuse_diffuse_visible_transmittance",
+                "front_side_slat_diffuse_diffuse_visible_reflectance",
+                "back_side_slat_diffuse_diffuse_visible_reflectance",
+                "slat_infrared_transmittance",
+                "front_side_slat_infrared_emissivity",
+                "back_side_slat_infrared_emissivity",
+            ];
+            let projected = &blind_eql_projection.window_blind_equivalent_layer;
+            let projected_minimum = projected
+                .iter()
+                .find(|row| row.object_name == "\u{b}")
+                .expect("minimum projection");
+            let projected_full = projected
+                .iter()
+                .find(|row| row.object_name == "\u{a0}")
+                .expect("full projection");
+            let mut count_mismatch_raw = blind_eql_raw.clone();
+            count_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(BLIND_EQL.into()))
+                .expect("EQL family")
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()));
+            let mut identity_mismatch_raw = blind_eql_raw.clone();
+            let identity_rows = identity_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(BLIND_EQL.into()))
+                .expect("EQL family");
+            let identity_row = identity_rows
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()))
+                .expect("existing row");
+            identity_rows.insert(
+                ep_raw_model::ObjectName("WRONG BLIND EQL IP NAME".into()),
+                identity_row,
+            );
+            assert!(
+                blind_eql_projection.source_is_epjson && projected.len() == 2
+                    && crate::ordinary_material_input::resolve_source(&count_mismatch_raw,&blind_eql_ip).is_err()
+                    && crate::ordinary_material_input::resolve_source(&identity_mismatch_raw,&blind_eql_ip).is_err()
+                    && projected_minimum.fields.len() == 7 && projected_full.fields.len() == 23
+                    && projected.iter().all(|row|row.idf_max_fields.is_none() && row.fields.keys().all(|field|
+                        crate::ordinary_equipment_input::source_b_blind_equivalent_layer_known_field(field)))
+                    && blind_eql_numeric_keys.iter().zip([0.02_f64,0.015,-0.0,45.0,0.1,0.15,0.3,0.35,0.02,0.03,0.25,0.28,0.1,0.2,0.3,0.11,0.22,0.33,0.05,0.84,0.76])
+                        .all(|(field,value)|matches!(projected_full.fields.get(*field),Some(P::Number(actual)) if actual.to_bits() == value.to_bits()))
+                    && matches!(projected_minimum.fields.get("slat_angle"),Some(P::Number(value)) if value.to_bits() == 45.0_f64.to_bits())
+                    && matches!(projected_full.fields.get("slat_orientation"),Some(P::String(text)) if text == "Horizontal")
+                    && matches!(projected_full.fields.get("slat_angle_control"),Some(P::String(text)) if text == "FixedSlatAngle")
+                    && ["\n"," \t\r\u{c}"].iter().all(|name|{
+                        let mut bad_name = blind_eql_value.clone();
+                        let row = bad_name[BLIND_EQL].as_object_mut().expect("family map").remove("\u{b}").expect("minimum row");
+                        bad_name[BLIND_EQL].as_object_mut().expect("family map").insert((*name).into(),row);
+                        crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&bad_name.to_string()).expect("bad original name Raw"))
+                            .is_err_and(|error|error.contains("Source BlindEQL requires original RE2 material name"))
+                    })
+            );
+            let mut blind_eql_trace = inspect_porting_scope(
+                &blind_eql_raw,
+                &blind_eql_compiled.report,
+                Some(blind_eql_model),
+                PortingScope::B,
+            );
+            assert!(
+                blind_eql_trace.admissible,
+                "{:?}",
+                blind_eql_trace.violations
+            );
+            blind_eql_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    blind_eql_model,
+                    &weather,
+                    "same BlindEQL Source weather",
+                )
+                .expect("actual Source environment"),
+            );
+            let blind_eql_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &blind_eql_raw,
+                &blind_eql_trace,
+            )
+            .expect("validated Source BLIND_EQL scope");
+            let mut permuted_blind_eql_model = blind_eql_model.clone();
+            let blind_eql_a_position = blind_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == blind_eql_a)
+                .expect("A arena row");
+            let blind_eql_b_position = blind_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == blind_eql_b)
+                .expect("B arena row");
+            permuted_blind_eql_model
+                .materials
+                .swap(blind_eql_a_position, blind_eql_b_position);
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &blind_eql_raw,
+                    &blind_eql_compiled.report,
+                    Some(blind_eql_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&blind_eql_admission)
+                )
+                .allows_rust_runtime()
+                    && crate::support::assess_support_with_source_admission(
+                        &blind_eql_raw,
+                        &blind_eql_compiled.report,
+                        Some(&permuted_blind_eql_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&blind_eql_admission)
+                    )
+                    .allows_rust_runtime()
+            );
+            let blind_eql_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                r#"{"Zone":{"Zone":{}},"WindowMaterial:Blind:EquivalentLayer":{"IDF BLIND EQL":{"slat_width":0.02,"slat_separation":0.015,"slat_crown":0.0015,"slat_angle":45.0,"front_side_slat_beam_diffuse_solar_transmittance":0.1,"back_side_slat_beam_diffuse_solar_transmittance":0.15,"front_side_slat_beam_diffuse_solar_reflectance":0.3,"back_side_slat_beam_diffuse_solar_reflectance":0.35,"front_side_slat_beam_diffuse_visible_transmittance":0.02,"back_side_slat_beam_diffuse_visible_transmittance":0.03,"front_side_slat_beam_diffuse_visible_reflectance":0.25,"back_side_slat_beam_diffuse_visible_reflectance":0.28,"slat_diffuse_diffuse_solar_transmittance":0.1,"front_side_slat_diffuse_diffuse_solar_reflectance":0.2,"back_side_slat_diffuse_diffuse_solar_reflectance":0.3,"slat_diffuse_diffuse_visible_transmittance":0.11,"front_side_slat_diffuse_diffuse_visible_reflectance":0.22,"back_side_slat_diffuse_diffuse_visible_reflectance":0.33,"slat_infrared_transmittance":0.05,"front_side_slat_infrared_emissivity":0.84,"back_side_slat_infrared_emissivity":0.76,"slat_orientation":"Horizontal","slat_angle_control":"FixedSlatAngle"}}}"#,
+                "Zone,Zone;WindowMaterial:Blind:EquivalentLayer,IDF BLIND EQL,Horizontal,0.02,0.015,0.0015,45.0,0.1,0.15,0.3,0.35,0.02,0.03,0.25,0.28,0.1,0.2,0.3,0.11,0.22,0.33,0.05,0.84,0.76,FixedSlatAngle;",
+            ).expect("matched Zone+BlindEQL IDF24materialoperands");
+            let blind_eql_idf_compiled = ep_compiler::compile_raw_model(&blind_eql_idf);
+            let source_a_base =
+                ep_raw_model::parse_epjson_str_for_source(&input(PortingScope::A).to_string())
+                    .expect("unchanged valid SourceA baseline");
+            let mut source_a_with_blind_eql = source_a_base.clone();
+            source_a_with_blind_eql.objects.insert(
+                ep_raw_model::ObjectType(BLIND_EQL.into()),
+                blind_eql_raw
+                    .objects
+                    .get(&ep_raw_model::ObjectType(BLIND_EQL.into()))
+                    .expect("same genuine BlindEQL family only")
+                    .clone(),
+            );
+            let mut controlled_blind_eql = blind_eql_value.clone();
+            controlled_blind_eql["WindowShadingControl"] = json!({"EQL BLIND CONTROL":{"shading_type":"ExteriorBlind","shading_device_material_name":"\u{b}"}});
+            let mut active_blind_eql = blind_eql_value.clone();
+            active_blind_eql["Construction:WindowEquivalentLayer"] =
+                json!({"ACTIVE EQL BLIND":{"outside_layer":"\u{b}"}});
+            let mut ems_blind_eql = blind_eql_value.clone();
+            ems_blind_eql["EnergyManagementSystem:ConstructionIndexVariable"] =
+                json!({"HELD_EQL_EMS":{"construction_object_name":"Opaque"}});
+            assert!(
+                !crate::support::assess_support_with_source_admission(&blind_eql_raw,&blind_eql_compiled.report,Some(blind_eql_model),RunMode::Compatibility,PartialRunPolicy::Deny,RunOutputFormat::RustNative,TraceLevel::Normal,None).allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&source_a_base).is_ok()
+                    && crate::ordinary_equipment_input::resolve_source_a(&source_a_with_blind_eql)
+                        .is_err_and(|error|error == "ordinary equipment excludes positive family WindowMaterial:Blind:EquivalentLayer")
+                    && crate::ordinary_equipment_input::resolve(&blind_eql_raw).is_err()
+                    && !blind_eql_idf.is_epjson() && !blind_eql_idf_compiled.has_errors()
+                    && blind_eql_idf_compiled.model.as_ref().is_some_and(|model|model.materials.len() == 1
+                        && model.materials[0].kind() == ep_model::MaterialKind::WindowBlindEquivalentLayer)
+                    && crate::ordinary_equipment_input::resolve_source_b(&blind_eql_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_a(&blind_eql_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&controlled_blind_eql.to_string()).expect("control Raw")).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&active_blind_eql.to_string()).expect("active EQL Raw")).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&ems_blind_eql.to_string()).expect("held EMS Raw")).is_err()
+            );
+            for (field, kind, probe) in [
+                ("slat_width", "kind", 0_usize),
+                ("slat_separation", "kind", 0_usize),
+                ("slat_crown", "kind", 0_usize),
+                ("slat_angle", "kind", 0_usize),
+                (
+                    "front_side_slat_beam_diffuse_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_slat_beam_diffuse_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_slat_beam_diffuse_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_slat_beam_diffuse_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_slat_beam_diffuse_visible_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_slat_beam_diffuse_visible_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_slat_beam_diffuse_visible_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_slat_beam_diffuse_visible_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                ("slat_diffuse_diffuse_solar_transmittance", "kind", 0_usize),
+                (
+                    "front_side_slat_diffuse_diffuse_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_slat_diffuse_diffuse_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "slat_diffuse_diffuse_visible_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_slat_diffuse_diffuse_visible_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_slat_diffuse_diffuse_visible_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                ("slat_infrared_transmittance", "kind", 0_usize),
+                ("front_side_slat_infrared_emissivity", "kind", 0_usize),
+                ("back_side_slat_infrared_emissivity", "kind", 0_usize),
+                ("slat_orientation", "kind", 0_usize),
+                ("slat_angle_control", "kind", 0_usize),
+                ("", "alpha", 0_usize),
+                ("", "alpha", 1_usize),
+                ("", "alpha", 2_usize),
+                ("", "alpha", 3_usize),
+                ("", "alpha", 4_usize),
+                ("", "alpha", 5_usize),
+            ] {
+                let mut bad_value = blind_eql_value.clone();
+                if kind == "kind" {
+                    bad_value[BLIND_EQL]["\u{a0}"][field] = json!(false);
+                } else {
+                    let (key, text) = match probe {
+                        0 => ("slat_orientation", "horizontal"),
+                        1 => ("slat_orientation", " Horizontal "),
+                        2 => ("slat_orientation", "UnknownOrientation"),
+                        3 => ("slat_angle_control", "fixedslatangle"),
+                        4 => ("slat_angle_control", " FixedSlatAngle "),
+                        _ => ("slat_angle_control", "UnknownControl"),
+                    };
+                    bad_value[BLIND_EQL]["\u{a0}"][key] = json!(text);
+                }
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string())
+                            .expect("wrong-kind/strict-alpha Raw")
+                    )
+                    .is_err_and(|error| error.contains("Source BlindEQL requires")),
+                    "BlindEQL original boundary {field}/{kind}/{probe}"
+                );
+            }
+            let opaque_blind_eql = blind_eql_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowBlindEquivalentLayer)
+                .expect("held opaque material");
+            for case in 0_usize..12 {
+                let mut bad_model = blind_eql_model.clone();
+                match case {
+                    0 => bad_model.materials.retain(|row| {
+                        row.kind() != ep_model::MaterialKind::WindowBlindEquivalentLayer
+                    }),
+                    1 => {
+                        let mut extra = bad_model.materials[blind_eql_a_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA BLIND EQL".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[blind_eql_a_position].id = opaque_blind_eql.id,
+                    3 => {
+                        bad_model.materials[blind_eql_a_position].definition =
+                            opaque_blind_eql.definition
+                    }
+                    4 => {
+                        bad_model.materials[blind_eql_a_position].name =
+                            ep_model::NormalizedName("WRONG BLIND EQL".into())
+                    }
+                    5 => {
+                        bad_model.materials[blind_eql_a_position].id =
+                            ep_model::MaterialId(u32::MAX)
+                    }
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != blind_eql_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((blind_eql_a, "\u{b}".into())),
+                    8 => {
+                        let _ = bad_model
+                            .material_names
+                            .insert(" EXTRA BLIND_EQL ALIAS ", blind_eql_a);
+                    }
+                    9 => {
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == blind_eql_a)
+                            .expect("A report tuple")
+                            .1 = "\u{a0}".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == blind_eql_b)
+                            .expect("B report tuple")
+                            .1 = "\u{b}".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => {
+                        bad_model.material_names = ep_model::NameMap::source_exact_namespace();
+                        bad_model.materials.iter().for_each(|row| {
+                            let id = if row.id == blind_eql_a {
+                                blind_eql_b
+                            } else if row.id == blind_eql_b {
+                                blind_eql_a
+                            } else {
+                                row.id
+                            };
+                            let _ = bad_model.material_names.insert(&row.name.0, id);
+                        });
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &blind_eql_raw,
+                        &blind_eql_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&blind_eql_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "BlindEQL custody case {case}"
+                );
+            }
+            let blind_eql_construction = blind_eql_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("real opaque Construction");
+            for case in 0_usize..11 {
+                let mut used_value = blind_eql_value.clone();
+                let mut fields =
+                    serde_json::Map::from_iter([("outside_layer".into(), json!("Opaque"))]);
+                let key = if case == 0 || case == 10 {
+                    "outside_layer".into()
+                } else {
+                    format!("layer_{}", case + 1)
+                };
+                fields.insert(
+                    key,
+                    json!(if case.is_multiple_of(2) {
+                        "\u{b}"
+                    } else {
+                        "\u{a0}"
+                    }),
+                );
+                used_value["Construction"]["BLIND_EQL USED"] = serde_json::Value::Object(fields);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&used_value.to_string())
+                            .expect("original active BLIND_EQL layer")
+                    )
+                    .is_err_and(|error| error.contains(
+                        "Source unused BlindEQL excludes every Construction layer reference"
+                    )),
+                    "Raw BLIND_EQL layer {case}"
+                );
+                let mut used_model = blind_eql_model.clone();
+                let construction = &mut used_model.constructions[blind_eql_construction];
+                if case == 10 {
+                    construction.layers.clear();
+                    construction.outside_layer = Some(blind_eql_a);
+                } else {
+                    construction.layers.resize(case + 1, opaque_blind_eql.id);
+                    construction.layers[case] = if case.is_multiple_of(2) {
+                        blind_eql_a
+                    } else {
+                        blind_eql_b
+                    };
+                }
+                let used_assessment = crate::support::assess_support_with_source_admission(
+                    &blind_eql_raw,
+                    &blind_eql_compiled.report,
+                    Some(&used_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&blind_eql_admission),
+                );
+                assert!(
+                    !used_assessment.allows_rust_runtime()
+                        && used_assessment
+                            .unsupported_objects
+                            .iter()
+                            .any(|entry| entry.object_type == BLIND_EQL),
+                    "typed/effective BLIND_EQL layer {case}"
+                );
+            }
+        }
     }
 }
 

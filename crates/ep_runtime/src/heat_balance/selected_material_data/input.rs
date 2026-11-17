@@ -38,6 +38,8 @@ pub struct SelectedMaterialInput {
     pub window_screen: Vec<ProjectInputObject>,
     /// Genuine ScreenEQL1A10N/min11; Auto sentinel and blank wires are retained.
     pub window_screen_equivalent_layer: Vec<ProjectInputObject>,
+    /// Genuine BlindEQL3A21N/min10; original blank guards remain separate from defaults.
+    pub window_blind_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialBlind2A27N/min29 operands.
     pub window_blind: Vec<ProjectInputObject>,
 }
@@ -773,6 +775,103 @@ impl SelectedMaterialInput {
             }
         }
         Ok((1, numbers))
+    }
+
+    pub(super) fn get_window_blind_equivalent_layer_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:Blind:EquivalentLayer", &object.object_name)
+        {
+            return Err(unavailable("BlindEQL owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, f64); 21] = [
+            ("slat_width", 0.0),
+            ("slat_separation", 0.0),
+            ("slat_crown", 0.0015),
+            ("slat_angle", 45.0),
+            ("front_side_slat_beam_diffuse_solar_transmittance", 0.0),
+            ("back_side_slat_beam_diffuse_solar_transmittance", 0.0),
+            ("front_side_slat_beam_diffuse_solar_reflectance", 0.0),
+            ("back_side_slat_beam_diffuse_solar_reflectance", 0.0),
+            ("front_side_slat_beam_diffuse_visible_transmittance", 0.0),
+            ("back_side_slat_beam_diffuse_visible_transmittance", 0.0),
+            ("front_side_slat_beam_diffuse_visible_reflectance", 0.0),
+            ("back_side_slat_beam_diffuse_visible_reflectance", 0.0),
+            ("slat_diffuse_diffuse_solar_transmittance", 0.0),
+            ("front_side_slat_diffuse_diffuse_solar_reflectance", 0.0),
+            ("back_side_slat_diffuse_diffuse_solar_reflectance", 0.0),
+            ("slat_diffuse_diffuse_visible_transmittance", 0.0),
+            ("front_side_slat_diffuse_diffuse_visible_reflectance", 0.0),
+            ("back_side_slat_diffuse_diffuse_visible_reflectance", 0.0),
+            ("slat_infrared_transmittance", 0.0),
+            ("front_side_slat_infrared_emissivity", 0.9),
+            ("back_side_slat_infrared_emissivity", 0.9),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 3
+            || s.alpha_field_blanks.len() < 3
+            || s.alpha_field_names.len() < 3
+            || s.numeric_args.len() < 21
+            || s.numeric_field_blanks.len() < 21
+            || s.numeric_field_names.len() < 21
+        {
+            return Err(unavailable("actual BlindEQL3A21N allocation"));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Blind:EquivalentLayer", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        for (index, name, default) in [
+            (1_usize, "slat_orientation", "HORIZONTAL"),
+            (2_usize, "slat_angle_control", "FIXEDSLATANGLE"),
+        ] {
+            s.alpha_field_names[index] = name.into();
+            s.alpha_args[index] = default.into();
+            match object.fields.get(name) {
+                Some(ProjectInputValue::String(text)) => {
+                    if !text.is_empty() {
+                        s.alpha_args[index] = text.to_ascii_uppercase();
+                        s.alpha_field_blanks[index] = false;
+                    }
+                }
+                None => {}
+                _ => return Err(unavailable("admitted original BlindEQL alpha")),
+            }
+        }
+        // min_fields10 includes Name/A2 and eight numeric slots; defaults beyond it still run.
+        let mut numbers = 8_usize;
+        for (index, (name, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                    numbers = numbers.max(index + 1);
+                }
+                None => {}
+                _ => return Err(unavailable("admitted original BlindEQL numeric scalar")),
+            }
+        }
+        // Explicit trailing A3, even empty, extends Native max_fields24 across all21 numbers.
+        if object.fields.contains_key("slat_angle_control") {
+            Ok((3, 21))
+        } else {
+            Ok((2, numbers))
+        }
     }
 
     pub(super) fn get_window_screen_equivalent_layer_item(

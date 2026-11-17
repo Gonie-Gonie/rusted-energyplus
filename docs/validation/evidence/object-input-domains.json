@@ -428,6 +428,12 @@
       "Qualified Source compilation defers Native wire thresholds/relationship/openness and joint diagnostics to the same actual runtime owner, preserving Legacy. Ordered repair Severe/Continue messages,one-sidedopenness test,existing sqrt followed bysame-row write thenround4/finalContinue retain Native IO prefixes and no-error-flag rules. N6 writes visiblefrontDf.Ref,backvisible/commonbaseabsorptances/NomR remainzero. Static47assert/6for/4Material/0Window CODE facts are separate from actual8QA/4current/0fail-history-reuse;getterbodycreditfalse.",
       "Source187 adds one fixed unused10-Float row over922 held parent numbers (932total),without new requests/series. One fresh Native/Source pair passes all158series/75120values and unchanged12+12+8+2 gates;whole15x11 public MaterialDetails cells match andall14parent rows/order remain. Source same-row geometry binds Group17/id13/typed12/Rough2/NomR+0/commonzeros with six actualphysics surfaces. Bibliography119scientificRust+3derivation=122combined;37Native+1preexistingprimarydocument and52separate documentaryrows remain distinct.",
       "Actual zero EQL Construction count legitimately skips positive unavailable EQL/ASHWAT initialization;ordinary same-owner Blind precompute remains required. Active windows/Construction/control,Native-privateTAR/wire-optics/pointer parity,SourceA/IDF/Legacy admission changes,full-object and arbitrary valid-combination completion remain held."
+    ],
+    "WindowMaterial:Blind:EquivalentLayer": [
+      "Source B additionally admits only unused direct epJSON through the genuine 3A21N/min10 MaterialBlindEQL getter and one inherited TAR1/common row. Required N1/N2/N7/N8/N14/N15, Horizontal/FixedSlatAngle defaults, legal NumNums15..21, original field kinds/bounds and all21 fixed default/blank/used slots remain checked. Both SourceExact name hooks and total Raw/IP/global-name/typed-ID/count/loader/reverse-alias/CTF custody retain whitespace and source ordering; original positive UInt operands and signed-effective Real64 operands remain distinct.",
+      "Qualified Source compilation defers Native geometry warnings/recovery and four raw beam-sum diagnostics only for original-valid unused input, preserving Legacy. Five ordered warnings/recovery steps and IO flag/commit prefixes remain owned by the same actual Material. N16..18 blank guards copy N13..15 into visible diffuse state; infrared guards are independent. Common base properties and NominalR remain zero, Group16/Rough1 and resistance-only behavior are retained. Static47 assertion sites/6 explicit for loops/4 Material/0 Window owners remain separate from actual8 QA commands/4 current bodies/0 failed-history-reuse; getterbodycreditfalse.",
+      "Source188 adds one fixed unused21-Float/two-String row over932 held parent numbers (953total; canonical752+201) without new requests or series. One fresh Native/Source pair with0 reruns passes all158series/75120values and unchanged12+12+8+2 gates. Whole16x11 public MaterialDetails cells match with all15 parent rows/order held. Source same-row geometry binds Group16/id15/typed14/Rough1/NomR+0/commonzeros and six actual physics surfaces. Bibliography121scientificRust+3derivation=124combined current Source citations is distinct from122 current ObjectTypes;37Native+1preexisting primary documentary record and52 separate documentary rows remain distinct.",
+      "Actual zero EQL Construction count legitimately skips positive unavailable EQL/ASHWAT initialization; the ordinary same-owner Blind181-angle producer remains required. Active windows/Construction/control, Native-private TAR/optics/pointer parity, SourceA/IDF/Legacy admission changes, full-object and arbitrary valid-combination completion remain held."
     ]
   },
   "verification": {
@@ -12548,6 +12554,63 @@
           "path": ".runtime/porting/unused-window-screen-equivalent-layer/runtime01/Root-scientific-review.json",
           "sha256": "a4adc6da423a368d99f05d226d2a8091dbbd23225c44bc45f9abd9d30c901b8c",
           "bytes": 9591
+        }
+      },
+      "unused_window_blind_equivalent_layer_material_details_and_public_series": {
+        "actual_quality": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/QA01/summary.json",
+          "sha256": "c70050a3c2f5ec37295eb6b2ad1e33590b5be3830c8b2b2ab503eec3c39499de",
+          "bytes": 2775
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/evidence01/source-authority.json",
+          "sha256": "b946e8b4751e148fe7de10fe80664a3eebbd8c940b9a7525cd356a78b79e92dc",
+          "bytes": 70796
+        },
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-BlindEQL-QA-profile-DATA-DRAFT01/QA-profile.json",
+          "sha256": "be1894298172ae273aeefce9af44be3cc9451c6eeaae14f89a907345be39ef1e",
+          "bytes": 8283
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/QA-profile-binding01.json",
+          "sha256": "8fd1cf5052e2fcd15c7ff46312934b6343de638bea8a7d4521f523a90dd17be7",
+          "bytes": 2091
+        },
+        "counts": {
+          "current_QA_commands": 8,
+          "total_actual_QA_commands": 8,
+          "failed_QA_attempts": 0,
+          "current_test_body_executions": 4,
+          "historical_test_bodies": 0,
+          "reused_test_bodies": 0,
+          "current_getter_credit": false
+        },
+        "static_existing_body_CODE": {
+          "assertion_sites": 47,
+          "explicit_for": 6,
+          "fresh_Material_owners": 4,
+          "Window_owners": 0,
+          "new_test_functions": 0
+        },
+        "new_test_functions": 0,
+        "Source_paths_changed": 18,
+        "Source_existing_modified": 16,
+        "Source_added": 2,
+        "Source_held": 4677,
+        "Source_stages": [
+          18,
+          11
+        ],
+        "Root_actual_facts": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/documentation-facts01.json",
+          "sha256": "1ce65e37640d541292a71dd75d10fc712db2cd6c7a8a4af125023e60e504b66f",
+          "bytes": 13915
+        },
+        "Root_scientific_review": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/Root-scientific-review.json",
+          "sha256": "f68eff868b6c19790b36153cce157f03006194e15c251196585a9e9ae4c303a1",
+          "bytes": 9396
         }
       }
     },
@@ -84373,12 +84436,568 @@
             "qualification": "119 scientific.primary Rust paths plus3 additional derivation Rust paths=122combined current Source citations;38nonSource primary records comprise37Native+1preexistingdocumentary;52separate documentaryrows held."
           }
         }
+      },
+      {
+        "group": "WindowMaterial:Blind:EquivalentLayer",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-unused-window-blind-equivalent-layer",
+        "case_kind": "UNUSED_WINDOW_BLIND_EQUIVALENT_LAYER",
+        "source_build": "source-unused-window-blind-equivalent-layer",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "numeric_policy_projection": {
+          "all158_policy_rules_literal": true,
+          "policy_changes": 0,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "new_report_requests": 0,
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/Root-scientific-review.json",
+            "sha256": "f68eff868b6c19790b36153cce157f03006194e15c251196585a9e9ae4c303a1",
+            "bytes": 9396
+          }
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v8/release.json",
+            "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+            "bytes": 11634
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/binding.json",
+            "sha256": "9160bef648f650a7f5467e85fdc7977e991a96f3fcb9f4200755101c9be24a06",
+            "bytes": 1159
+          },
+          "case_config": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/case-config.json",
+            "sha256": "84ccab8a94581fae06ef7019fac30af193ca08479f7bf29c6244b7d6302a9d1c",
+            "bytes": 131180
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/evidence01/source-authority.json",
+            "sha256": "b946e8b4751e148fe7de10fe80664a3eebbd8c940b9a7525cd356a78b79e92dc",
+            "bytes": 70796
+          },
+          "completion": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/completed.json",
+            "sha256": "406794d002560e3424f2f714463a845898e2d4dac624cef8ff5981bedb7cec65",
+            "bytes": 2346
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/verify-command/receipt.json",
+            "sha256": "824ddda8e4f3e46c9297c62db7e513cbf2f05086fbc74999e9aa31672d7416b2",
+            "bytes": 328084
+          },
+          "actual_build": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/build-row.json",
+            "sha256": "ec0fd697685730b858db8929901811d9ccfc672f536715bc8c51b44c73d3fcb6",
+            "bytes": 1430
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/QA01/summary.json",
+            "sha256": "c70050a3c2f5ec37295eb6b2ad1e33590b5be3830c8b2b2ab503eec3c39499de",
+            "bytes": 2775
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/evidence01/source-authority.json",
+            "sha256": "b946e8b4751e148fe7de10fe80664a3eebbd8c940b9a7525cd356a78b79e92dc",
+            "bytes": 70796
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "engine_reruns": 0,
+          "new_test_functions": 0,
+          "profile": "ideal_loads.oa_topology.v1",
+          "fixed_input_manifest": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-BlindEQL-CLOSED-input-parent187-binding01/prepared-manifest.json",
+            "sha256": "c0a089e8a353f1eb4086ae57f8e47b3798ead6347a143dab2cc9b99a05d15834",
+            "bytes": 13404
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-BlindEQL-CLOSED-input-parent187-binding01/independent-static-review01.json",
+            "sha256": "75c420f621e4988233bd6b8156853ac8e0e958d881eab495ae080ee110b6c00a",
+            "bytes": 5150
+          },
+          "documentation_actual_facts": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/documentation-facts01.json",
+            "sha256": "1ce65e37640d541292a71dd75d10fc712db2cd6c7a8a4af125023e60e504b66f",
+            "bytes": 13915
+          },
+          "documentation_link_build_DTO": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/documentation-link-build-DTO01.json",
+            "sha256": "282b99f4d9627bc1bde90bd030546b13d137df00f347699caa517b5b74c1bbe5",
+            "bytes": 12314
+          },
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/Root-scientific-review.json",
+            "sha256": "f68eff868b6c19790b36153cce157f03006194e15c251196585a9e9ae4c303a1",
+            "bytes": 9396
+          },
+          "actual_parent_publication": {
+            "path": ".runtime/porting/unused-window-screen-equivalent-layer/publish01/receipt.json",
+            "sha256": "7e20461525d57a7f7861254c34750aae1abef4d3a42bd3734dc3aee957eaebc8",
+            "bytes": 155715
+          },
+          "Source_adoption": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/adoption01.json",
+            "sha256": "7bd1b4e2afc2f0987cddecf167561e1ede5d0436665dd7c3d0fc3ce674574e24",
+            "bytes": 30288
+          },
+          "Source_evidence": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/evidence01/source-evidence.json",
+            "sha256": "cbed28fae357e8c0254eb1a7b145e6d7dc90c001796fc6266c8559bda91a512c",
+            "bytes": 34198
+          },
+          "QA_profile": {
+            "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-BlindEQL-QA-profile-DATA-DRAFT01/QA-profile.json",
+            "sha256": "be1894298172ae273aeefce9af44be3cc9451c6eeaae14f89a907345be39ef1e",
+            "bytes": 8283
+          },
+          "QA_profile_binding": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/QA-profile-binding01.json",
+            "sha256": "8fd1cf5052e2fcd15c7ff46312934b6343de638bea8a7d4521f523a90dd17be7",
+            "bytes": 2091
+          },
+          "Static_preQA_corrections": [
+            "Production01 Legacy crown/angle scope corrected preseal; genuineblocked01 SourceExact hooks corrected02. Runtime MaterialDetails/Air prefix and MASS R format expected-data fixes retained. Compiler/caller matched SourceA-only delta corrected02. All are static pre-QA histories; actual8QA/defaultCLI/Native1/Source1 have0failures and0reruns."
+          ],
+          "Completed_DTO_literal_defaults": {
+            "engines_executed_by_completion": 0,
+            "source_launch_authorized": false,
+            "no_engine_reruns": false,
+            "automatic_retry": false,
+            "original_actor_identities_retained": false
+          }
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/68/686e5f4bed1a9ca673cb2949c1ecbcb0d882fcc30ebf5f9dda1dfdde7fab21cd",
+          "sha256": "686e5f4bed1a9ca673cb2949c1ecbcb0d882fcc30ebf5f9dda1dfdde7fab21cd"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/frozen/eplus-rs.exe",
+          "sha256": "cea86d4e99e6d308503ed1d645b883ff6f26832ac07fb0b08dd0e9779e46a432",
+          "bytes": 83232951
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/build/receipt.json",
+          "sha256": "cfc8ee9370bd91775fee912004e962a69f1bf923d33068cc3b591800b6bef0dd",
+          "bytes": 72432
+        },
+        "native_launch": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/native/launch.json",
+          "sha256": "65e135676a332ddf25e8dbddd07ef5d8a1e30df64d08093e1bafb842746af232",
+          "bytes": 9411
+        },
+        "source_launch": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/source/launch.json",
+          "sha256": "9f53dd616b9103260308616cd67070f8116cd2ea9a9e33751ecb82350c55257b",
+          "bytes": 16441
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/readback.json",
+          "sha256": "0ddbd9f34808ffc689ec29ca33a5f097337fc7c74490d5fafdb09db180148c58",
+          "bytes": 540806
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/Root-scientific-review.json",
+          "sha256": "f68eff868b6c19790b36153cce157f03006194e15c251196585a9e9ae4c303a1",
+          "bytes": 9396
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/case-config.json",
+          "sha256": "84ccab8a94581fae06ef7019fac30af193ca08479f7bf29c6244b7d6302a9d1c",
+          "bytes": 131180
+        },
+        "coverage_kind": "unused_window_blind_equivalent_layer_material_details_and_public_series",
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse": 2.039620483986755e-08
+        },
+        "public_response_summary": {
+          "Native": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.03148489327319126,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          },
+          "Source": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.031484893273194814,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          }
+        },
+        "unused_window_blind_equivalent_layer": {
+          "input_numeric_records": 953,
+          "parent_numeric_records_held": 932,
+          "new_Float_operands": 21,
+          "new_String_operands": 2,
+          "canonical_numeric_records": 752,
+          "canonical_added_numeric_records": 201,
+          "new_report_requests": 0,
+          "QA_counts": {
+            "current_QA_commands": 8,
+            "total_actual_QA_commands": 8,
+            "failed_QA_attempts": 0,
+            "current_test_body_executions": 4,
+            "historical_test_bodies": 0,
+            "reused_test_bodies": 0,
+            "current_getter_credit": false
+          },
+          "static_existing_body_CODE": {
+            "assertion_sites": 47,
+            "explicit_for": 6,
+            "fresh_Material_owners": 4,
+            "Window_owners": 0,
+            "new_test_functions": 0
+          },
+          "Source_inventory": {
+            "before": 4693,
+            "current": 4695,
+            "modified": 16,
+            "added": 2,
+            "held": 4677,
+            "stages": [
+              18,
+              11
+            ]
+          },
+          "whole_public_MaterialDetails": {
+            "rows": 16,
+            "columns": 11,
+            "all_Native_Source_cells_exact": true,
+            "all15parent_rows_cells_order_held": true,
+            "table": [
+              [
+                " Material Details",
+                "Mass Layer",
+                "7.1429E-002",
+                "Rough",
+                "0.1000",
+                "1.400",
+                "2200.000",
+                "900.000",
+                "0.9000",
+                "0.7000",
+                "0.7000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED AVERAGE DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL AND ANGLE",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED REFRACTION DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED CUSTOM NORMAL",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "MIXTURE UNUSED AIR ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "2.0000E-003",
+                "0.100",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.7000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "DRAPE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SCREEN UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "1.0000E-003",
+                "0.250",
+                "0.000",
+                "0.000",
+                "0.3281",
+                "0.3281",
+                "0.2188"
+              ],
+              [
+                " Material Details",
+                "SCREEN EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND EQL UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SGS UNUSED NORMAL",
+                "6.9976E-002",
+                "VerySmooth",
+                "2.0000E-003",
+                "2.858E-002",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ]
+            ]
+          },
+          "Source_geometry": {
+            "artifact": {
+              "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/source/output/geometry-consumers.json",
+              "sha256": "b87371ca71b8ea086982c82f3badad4532e7b37a930e218c68a27899e0c57d15",
+              "bytes": 34357
+            },
+            "same_row": {
+              "NominalR": {
+                "value": 0.0,
+                "value_bits": "0000000000000000"
+              },
+              "group": 16,
+              "id": 15,
+              "map_key": "BLIND EQL UNUSED SCALAR",
+              "typed_id": 14,
+              "validated_typed_properties": {
+                "AbsorpSolar": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "AbsorpThermal": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "AbsorpVisible": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "Roughness": 1
+              }
+            },
+            "surfaces": 6,
+            "phase": "runtime_final_source_geometry",
+            "physics_executed": true,
+            "observer_supplies_inputs": false,
+            "actual_EQL_Construction_input_count": 0
+          },
+          "whole_topology": {
+            "rows": 153,
+            "events": 136,
+            "body_bytes": 12580,
+            "nodes": 10,
+            "nonparent_connections": 36,
+            "outdoor_registry": 5,
+            "suspicious_nodes": 2,
+            "nonconnected_nodes": 0,
+            "whole_prospective_topology_exact": true
+          },
+          "qualified_boundary": "Unused direct-epJSON Blind:EquivalentLayer3A21N/min10 original/default/count/blankguard/recovery/sum/IO state with same owned TAR1/common report and geometry. Actual zero EQL Construction count legitimately skips positive unavailable EQL work. Six-surface ordinaryphysics and ordinaryBlind181-angle producer retained; no activeEQL/window/ASHWAT/privateNativeTAR/fullobject/arbitrary-combination parity.",
+          "Native_private_TAR_parity_claim": false,
+          "WindowOptical_unit_execution_credit": 0,
+          "full_object_support": false,
+          "Source_bibliography": {
+            "scientific_primary_Rust_paths": 121,
+            "additional_derivation_Rust_paths": 3,
+            "combined_current_Source_paths": 124,
+            "nonSource_primary_records": 38,
+            "Native_primary_records": 37,
+            "preexisting_documentary_primary_records": 1,
+            "separate_documentary_rows": 52,
+            "qualification": "121 scientific.primary Rust +3additional derivation Rust =124combined current Source citations;38nonSource primary=37Native+1documentary;52separate documentaryrows held."
+          }
+        }
       }
     ],
     "totals": {
-      "paired_cases": 269,
-      "reported_samples": 12149416,
-      "raw_operand_unequal": 3131238,
+      "paired_cases": 270,
+      "reported_samples": 12224536,
+      "raw_operand_unequal": 3154306,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -87890,6 +88509,38 @@
           "sha256": "db4653b12a9082345f03debd1e3801253800265e8b0f01409371bb18643c1ad8",
           "bytes": 71400
         }
+      },
+      {
+        "id": "source-unused-window-blind-equivalent-layer",
+        "receipt": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/build/receipt.json",
+          "sha256": "cfc8ee9370bd91775fee912004e962a69f1bf923d33068cc3b591800b6bef0dd",
+          "bytes": 72432
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/68/686e5f4bed1a9ca673cb2949c1ecbcb0d882fcc30ebf5f9dda1dfdde7fab21cd",
+          "sha256": "686e5f4bed1a9ca673cb2949c1ecbcb0d882fcc30ebf5f9dda1dfdde7fab21cd"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/frozen/eplus-rs.exe",
+          "sha256": "cea86d4e99e6d308503ed1d645b883ff6f26832ac07fb0b08dd0e9779e46a432",
+          "bytes": 83232951
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/frozen/build-receipt.json",
+          "sha256": "76adcd52ffa6194e40ba7ae4948fa7d595c1021df1916d7ae621dc33f12a7b66",
+          "bytes": 1650288
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/QA01/quality-preparation.json",
+          "sha256": "704efca8c39b4308bddcbc91147199508d8fe247a3fd56d949b48b95c5cb6bbd",
+          "bytes": 21569
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/freeze/receipt.json",
+          "sha256": "8c8ded7ffc8e7b16b69fb54a47fa3be6a22e44aa6ed6a88707a94e468e7eda4b",
+          "bytes": 71450
+        }
       }
     ],
     "focused_since_workspace": {
@@ -88336,14 +88987,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 187,
-      "builds_with_accepted_paired_cases": 165,
+      "actual_recorded_builds": 188,
+      "builds_with_accepted_paired_cases": 166,
       "builds_with_only_retained_failed_Source_attempts": 8,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 14,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "187 recorded Source builds: 165 retain accepted pairs and 22 have none, including 8 without Source execution. The latest strictly verified paired scene adds one case/75120 values; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "188 recorded Source builds: 166 retain accepted pairs and 22 have none, including 8 without Source execution. The latest strictly verified paired scene adds one case/75120 values; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -93055,12 +93706,13 @@
         "ideal-loads-unused-window-blind",
         "ideal-loads-unused-window-shade-equivalent-layer",
         "ideal-loads-unused-window-drape-equivalent-layer",
-        "ideal-loads-unused-window-screen-equivalent-layer"
+        "ideal-loads-unused-window-screen-equivalent-layer",
+        "ideal-loads-unused-window-blind-equivalent-layer"
       ],
-      "accepted_paired_cases": 98,
-      "accepted_samples": 7248240,
-      "retained_Scheduled_B_pairs": 97,
-      "retained_Scheduled_B_samples": 7188720,
+      "accepted_paired_cases": 99,
+      "accepted_samples": 7323360,
+      "retained_Scheduled_B_pairs": 98,
+      "retained_Scheduled_B_samples": 7263840,
       "unused_NodeList_A_pairs": 1,
       "unused_NodeList_A_samples": 59520,
       "latest_complete_comparisons": {
@@ -93083,28 +93735,33 @@
           "path": ".runtime/porting/unused-window-screen-equivalent-layer/runtime01/readback.json",
           "sha256": "e4ad54315b2e61ebca48d68b8023ac9299194276d94fb8731c41d95bf8376f6a",
           "bytes": 540851
+        },
+        "UNUSED_WINDOW_BLIND_EQUIVALENT_LAYER": {
+          "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/readback.json",
+          "sha256": "0ddbd9f34808ffc689ec29ca33a5f097337fc7c74490d5fafdb09db180148c58",
+          "bytes": 540806
         }
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/porting/unused-window-screen-equivalent-layer/runtime01/Root-scientific-review.json",
-        "sha256": "a4adc6da423a368d99f05d226d2a8091dbbd23225c44bc45f9abd9d30c901b8c",
-        "bytes": 9591
+        "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/Root-scientific-review.json",
+        "sha256": "f68eff868b6c19790b36153cce157f03006194e15c251196585a9e9ae4c303a1",
+        "bytes": 9396
       },
-      "latest_source_build": "source-unused-window-screen-equivalent-layer",
+      "latest_source_build": "source-unused-window-blind-equivalent-layer",
       "latest_actual_Source_build": {
-        "path": ".runtime/porting/unused-window-screen-equivalent-layer/build01/build-row.json",
-        "sha256": "44f9012b6d595163e5e1ed4346ab5c5f8bf74e10fcb6e9945cb5c15dc70c7f87",
-        "bytes": 1436
+        "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/build-row.json",
+        "sha256": "ec0fd697685730b858db8929901811d9ccfc672f536715bc8c51b44c73d3fcb6",
+        "bytes": 1430
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/unused-window-screen-equivalent-layer/QA01/summary.json",
-        "sha256": "fb5d37eeefa2c8ab48ba0cbebcc61af4ad607f2992f39adf995c33034ac2c5e6",
-        "bytes": 2789
+        "path": ".runtime/porting/unused-window-blind-equivalent-layer/QA01/summary.json",
+        "sha256": "c70050a3c2f5ec37295eb6b2ad1e33590b5be3830c8b2b2ab503eec3c39499de",
+        "bytes": 2775
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/porting/unused-window-screen-equivalent-layer/evidence01/source-authority.json",
-        "sha256": "949f92f64db0a512b095fe88b0956edafb167aecf84613b4277b62c6f5f00b81",
-        "bytes": 70834
+        "path": ".runtime/porting/unused-window-blind-equivalent-layer/evidence01/source-authority.json",
+        "sha256": "b946e8b4751e148fe7de10fe80664a3eebbd8c940b9a7525cd356a78b79e92dc",
+        "bytes": 70796
       },
       "latest_input_contracts": {
         "UNUSED_WINDOW_BLIND": {
@@ -93126,6 +93783,11 @@
           "path": ".runtime/object-expansion/unit159-prep/unused-ScreenEQL-CLOSED-input-parent186-binding01/prepared-manifest.json",
           "sha256": "b2a5a255205c4548c200347b791afc65a428f52614898bb6816e9cedd74883e8",
           "bytes": 10848
+        },
+        "UNUSED_WINDOW_BLIND_EQUIVALENT_LAYER": {
+          "path": ".runtime/object-expansion/unit159-prep/unused-BlindEQL-CLOSED-input-parent187-binding01/prepared-manifest.json",
+          "sha256": "c0a089e8a353f1eb4086ae57f8e47b3798ead6347a143dab2cc9b99a05d15834",
+          "bytes": 13404
         }
       },
       "latest_retained_evidence": {
@@ -93138,7 +93800,7 @@
         "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
         "bytes": 2919
       },
-      "scope": "97 bounded Source B Scheduled/NodeList pairs retain 7,188,720 values. The unused Source A pair adds59,520, giving 98 pairs and 7,248,240 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
+      "scope": "98 bounded Source B Scheduled/NodeList pairs retain 7,263,840 values. The unused Source A pair adds59,520, giving 99 pairs and 7,323,360 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
       "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",

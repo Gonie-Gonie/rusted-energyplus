@@ -768,6 +768,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_drape_equivalent_layer(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Screen:EquivalentLayer".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_screen_equivalent_layer(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Blind:EquivalentLayer".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_blind_equivalent_layer(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -8063,6 +8065,112 @@ impl<'a> Compiler<'a> {
             })
     }
 
+    fn source_unused_blind_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let valid = |field: &str, value: &RawValue| {
+            if !matches!(
+                field,
+                "slat_orientation"
+                    | "slat_width"
+                    | "slat_separation"
+                    | "slat_crown"
+                    | "slat_angle"
+                    | "front_side_slat_beam_diffuse_solar_transmittance"
+                    | "back_side_slat_beam_diffuse_solar_transmittance"
+                    | "front_side_slat_beam_diffuse_solar_reflectance"
+                    | "back_side_slat_beam_diffuse_solar_reflectance"
+                    | "front_side_slat_beam_diffuse_visible_transmittance"
+                    | "back_side_slat_beam_diffuse_visible_transmittance"
+                    | "front_side_slat_beam_diffuse_visible_reflectance"
+                    | "back_side_slat_beam_diffuse_visible_reflectance"
+                    | "slat_diffuse_diffuse_solar_transmittance"
+                    | "front_side_slat_diffuse_diffuse_solar_reflectance"
+                    | "back_side_slat_diffuse_diffuse_solar_reflectance"
+                    | "slat_diffuse_diffuse_visible_transmittance"
+                    | "front_side_slat_diffuse_diffuse_visible_reflectance"
+                    | "back_side_slat_diffuse_diffuse_visible_reflectance"
+                    | "slat_infrared_transmittance"
+                    | "front_side_slat_infrared_emissivity"
+                    | "back_side_slat_infrared_emissivity"
+                    | "slat_angle_control"
+            ) {
+                return true;
+            }
+            if matches!(field, "slat_orientation" | "slat_angle_control") {
+                let RawValue::String(text) = value else {
+                    return false;
+                };
+                return if field == "slat_orientation" {
+                    matches!(text.as_str(), "" | "Horizontal" | "Vertical")
+                } else {
+                    matches!(
+                        text.as_str(),
+                        "" | "FixedSlatAngle" | "MaximizeSolar" | "BlockBeamSolar"
+                    )
+                };
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match field {
+                            "slat_width" | "slat_separation" => value > 0.0 && value <= 0.025,
+                            "slat_crown" => (0.0..=0.00156).contains(&value),
+                            "slat_angle" => (-90.0..=90.0).contains(&value),
+                            _ => (0.0..1.0).contains(&value),
+                        }
+                })
+        };
+        if [
+            "slat_width",
+            "slat_separation",
+            "front_side_slat_beam_diffuse_solar_reflectance",
+            "back_side_slat_beam_diffuse_solar_reflectance",
+            "front_side_slat_diffuse_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_diffuse_solar_reflectance",
+        ]
+        .iter()
+        .any(|field| field_value(object, field).is_none_or(|value| !valid(field, value)))
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !valid(&field.0, value))
+        {
+            return false;
+        }
+        let Some(rows) = self.raw_model.objects.get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Blind:EquivalentLayer".into(),
+        )) else {
+            return false;
+        };
+        !self
+            .raw_model
+            .objects
+            .iter()
+            .filter(|(family, _)| family.0.starts_with("Construction"))
+            .any(|(_, constructions)| {
+                constructions.values().any(|construction| {
+                    construction.fields.iter().any(|(field, value)| {
+                        let layer = field.0 == "outside_layer"
+                            || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                        layer
+                            && matches!(value, RawValue::String(reference)
+                        if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+                    })
+                })
+            })
+    }
+
     fn parse_window_screen_equivalent_layer_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Screen:EquivalentLayer";
         const SOLAR_BEAM_BEAM_FIELD: &str = "screen_beam_beam_solar_transmittance";
@@ -8828,6 +8936,8 @@ impl<'a> Compiler<'a> {
         const UNIT_INTERVAL: ((f64, bool), (f64, bool)) = ((0.0, true), (1.0, false));
 
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let source_unused_blind_equivalent_layer =
+                self.source_unused_blind_equivalent_layer(&name, &object);
             let slat_orientation = self.enum_default(
                 OBJECT_TYPE,
                 &name,
@@ -9055,66 +9165,68 @@ impl<'a> Compiler<'a> {
                 continue;
             }
 
-            if slat_width_m < slat_separation_m {
-                self.warning(
-                    "WindowBlindEquivalentLayerSlatWidthLessThanSeparation",
-                    OBJECT_TYPE,
-                    Some(&name),
-                    Some("slat_width"),
-                    format!(
-                        "{OBJECT_TYPE}/{name} slat width {slat_width_m} m is less than slat separation {slat_separation_m} m; direct beam can pass when the slat angle is zero"
-                    ),
-                );
-            }
-            if slat_separation_m < 0.001 {
-                self.warning(
-                    "WindowBlindEquivalentLayerSlatSeparationReset",
-                    OBJECT_TYPE,
-                    Some(&name),
-                    Some("slat_separation"),
-                    format!(
-                        "{OBJECT_TYPE}/{name} slat separation {slat_separation_m} m is below 0.001 m; EnergyPlus resets it to 0.025 m"
-                    ),
-                );
-                slat_separation_m = 0.025;
-            }
-            if slat_width_m < 0.001 || slat_width_m >= 2.0 * slat_separation_m {
-                self.warning(
-                    "WindowBlindEquivalentLayerSlatWidthReset",
-                    OBJECT_TYPE,
-                    Some(&name),
-                    Some("slat_width"),
-                    format!(
-                        "{OBJECT_TYPE}/{name} slat width {slat_width_m} m is outside the source geometry range; EnergyPlus resets it to the recovered separation {slat_separation_m} m"
-                    ),
-                );
-                slat_width_m = slat_separation_m;
-            }
             let mut slat_crown_m = slat_crown_m;
-            if slat_crown_m < 0.0 || slat_crown_m >= 0.5 * slat_width_m {
-                self.warning(
-                    "WindowBlindEquivalentLayerSlatCrownReset",
-                    OBJECT_TYPE,
-                    Some(&name),
-                    Some("slat_crown"),
-                    format!(
-                        "{OBJECT_TYPE}/{name} slat crown {slat_crown_m} m is outside [0, 0.5*width); EnergyPlus resets it to 0 m"
-                    ),
-                );
-                slat_crown_m = 0.0;
-            }
             let mut slat_angle_deg = slat_angle_deg;
-            if !(-90.0..=90.0).contains(&slat_angle_deg) {
-                self.warning(
-                    "WindowBlindEquivalentLayerSlatAngleReset",
-                    OBJECT_TYPE,
-                    Some(&name),
-                    Some("slat_angle"),
-                    format!(
-                        "{OBJECT_TYPE}/{name} slat angle {slat_angle_deg} degrees is outside [-90, 90]; EnergyPlus resets it to 0 degrees"
-                    ),
-                );
-                slat_angle_deg = 0.0;
+            if !source_unused_blind_equivalent_layer {
+                if slat_width_m < slat_separation_m {
+                    self.warning(
+                        "WindowBlindEquivalentLayerSlatWidthLessThanSeparation",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("slat_width"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} slat width {slat_width_m} m is less than slat separation {slat_separation_m} m; direct beam can pass when the slat angle is zero"
+                        ),
+                    );
+                }
+                if slat_separation_m < 0.001 {
+                    self.warning(
+                        "WindowBlindEquivalentLayerSlatSeparationReset",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("slat_separation"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} slat separation {slat_separation_m} m is below 0.001 m; EnergyPlus resets it to 0.025 m"
+                        ),
+                    );
+                    slat_separation_m = 0.025;
+                }
+                if slat_width_m < 0.001 || slat_width_m >= 2.0 * slat_separation_m {
+                    self.warning(
+                        "WindowBlindEquivalentLayerSlatWidthReset",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("slat_width"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} slat width {slat_width_m} m is outside the source geometry range; EnergyPlus resets it to the recovered separation {slat_separation_m} m"
+                        ),
+                    );
+                    slat_width_m = slat_separation_m;
+                }
+                if slat_crown_m < 0.0 || slat_crown_m >= 0.5 * slat_width_m {
+                    self.warning(
+                        "WindowBlindEquivalentLayerSlatCrownReset",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("slat_crown"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} slat crown {slat_crown_m} m is outside [0, 0.5*width); EnergyPlus resets it to 0 m"
+                        ),
+                    );
+                    slat_crown_m = 0.0;
+                }
+                if !(-90.0..=90.0).contains(&slat_angle_deg) {
+                    self.warning(
+                        "WindowBlindEquivalentLayerSlatAngleReset",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("slat_angle"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} slat angle {slat_angle_deg} degrees is outside [-90, 90]; EnergyPlus resets it to 0 degrees"
+                        ),
+                    );
+                    slat_angle_deg = 0.0;
+                }
             }
 
             let front_visible_transmittance_raw = front_visible_transmittance.unwrap_or(0.0);
@@ -9141,7 +9253,7 @@ impl<'a> Compiler<'a> {
             ];
             let mut optical_sums_valid = true;
             for (field, sum) in optical_sums {
-                if sum >= 1.0 {
+                if sum >= 1.0 && !source_unused_blind_equivalent_layer {
                     self.error(
                         "InvalidWindowBlindEquivalentLayerOpticalSum",
                         OBJECT_TYPE,
@@ -9235,6 +9347,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if source_unused_blind_equivalent_layer {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -10366,6 +10484,14 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_screen_equivalent_layer(name, object));
+        let source_blind_equivalent_layer_name = object_type
+            == "WindowMaterial:Blind:EquivalentLayer"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_blind_equivalent_layer(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
@@ -10378,7 +10504,8 @@ impl<'a> Compiler<'a> {
                 || source_blind_name
                 || source_shade_equivalent_layer_name
                 || source_drape_equivalent_layer_name
-                || source_screen_equivalent_layer_name)
+                || source_screen_equivalent_layer_name
+                || source_blind_equivalent_layer_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')

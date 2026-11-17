@@ -27,6 +27,7 @@ mod window_blind;
 pub(crate) use window_blind::{
     SOURCE_BLIND_MAX_PROFILE_ANGLES, SOURCE_BLIND_MAX_SLAT_ANGLES, SourceBlindMaterial,
 };
+mod window_blind_equivalent_layer;
 mod window_drape_equivalent_layer;
 mod window_gas;
 mod window_screen;
@@ -87,6 +88,9 @@ pub(crate) struct SelectedMaterialData {
     /// Genuine MaterialScreenEQL inherited TAR1/base and ordered wire recovery.
     window_screen_equivalent_layer:
         BTreeMap<MaterialId, window_screen_equivalent_layer::SourceScreenEquivalentLayerMaterial>,
+    /// Genuine MaterialBlindEQL: one inherited TAR1 and four raw/recovered slat operands.
+    window_blind_equivalent_layer:
+        BTreeMap<MaterialId, window_blind_equivalent_layer::SourceBlindEquivalentLayerMaterial>,
     /// Same actual MaterialBlind rows and constructor-owned heap TAR tables.
     window_blind: BTreeMap<MaterialId, window_blind::SourceBlindMaterial>,
     pub(crate) num_no_masses: i32,
@@ -384,6 +388,45 @@ impl SelectedMaterialData {
         }
         Ok((
             MaterialSurfaceRoughness::MediumRough,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    /// Read the same MaterialBlindEQL row by Source order and typed ID.
+    pub(crate) fn source_blind_equivalent_layer_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native BlindEQL MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::BlindEql)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual BlindEQL Source order/group/physical identity",
+            ));
+        }
+        let row = self.window_blind_equivalent_layer.get(&typed_id).ok_or(
+            HeatBalanceInputError::Unavailable("actual retained BlindEQL runtime row"),
+        )?;
+        let row = &row.base;
+        if row.roughness != Some(MaterialSurfaceRoughness::Rough) {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual BlindEQL getter roughness",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::Rough,
             OpaqueSurfaceProperties {
                 thermal_absorptance: row.thermal_absorptance,
                 solar_absorptance: row.solar_absorptance,
@@ -820,7 +863,7 @@ impl SelectedMaterialData {
         self.get_window_screen_data(raw, o)?;
         self.get_window_screen_equivalent_layer_data(raw, o)?;
         self.get_window_blind_data(raw, o)?;
-        empty!(num_eql_blinds, "WindowMaterial:Blind:EquivalentLayer");
+        self.get_window_blind_equivalent_layer_data(raw, o)?;
         empty!(num_eco_roofs, "Material:RoofVegetation");
         empty!(num_tc_glazings, "WindowMaterial:GlazingGroup:Thermochromic");
         self.get_simple_glazing_data(raw, o)?;

@@ -645,17 +645,40 @@ pub(super) fn assess_typed_runtime_boundaries(
             blind_count.max(blind_raw_count),
         );
     }
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Blind:EquivalentLayer",
-        typed_model
-            .materials
+    let blind_equivalent_layer_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowBlindEquivalentLayer)
+        .count();
+    let blind_equivalent_layer_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Blind:EquivalentLayer".into(),
+        ))
+        .map_or(0, |rows| rows.len());
+    let blind_equivalent_layer_consumed = source_admission
+        .is_some_and(|admission| admission.consumes_unused_blind_equivalent_layer(typed_model));
+    let blind_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowBlindEquivalentLayer)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id
+                        && material.kind() == MaterialKind::WindowBlindEquivalentLayer
+                })
+            })
+    });
+    if !blind_equivalent_layer_consumed || blind_equivalent_layer_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Blind:EquivalentLayer",
+            blind_equivalent_layer_count.max(blind_equivalent_layer_raw_count),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

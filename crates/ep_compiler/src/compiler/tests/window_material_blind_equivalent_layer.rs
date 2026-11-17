@@ -299,6 +299,786 @@ fn blind_equivalent_layer_materializes_all_inputs_defaults_and_source_quirks()
         .ok_or_else(|| std::io::Error::other("missing equivalent-layer blind coverage"))?;
     assert_eq!(coverage.status, ObjectCoverageStatus::Typed);
     assert_eq!(coverage.object_count, 2);
+
+    // Source-only unused BlindEQL: standalone names exercise BOTH SourceExact hooks.
+    {
+        use ep_raw_model::{FieldName, ObjectName, ObjectType, RawValue};
+        let blind_eql_full = parse_epjson_str(
+            r#"{"WindowMaterial:Blind:EquivalentLayer":{" B BLIND EQL ":{"slat_width":0.02,"slat_separation":0.015,"slat_crown":0.0015,"slat_angle":45.0,"front_side_slat_beam_diffuse_solar_transmittance":0.1,"back_side_slat_beam_diffuse_solar_transmittance":0.15,"front_side_slat_beam_diffuse_solar_reflectance":0.3,"back_side_slat_beam_diffuse_solar_reflectance":0.35,"front_side_slat_beam_diffuse_visible_transmittance":0.02,"back_side_slat_beam_diffuse_visible_transmittance":0.03,"front_side_slat_beam_diffuse_visible_reflectance":0.25,"back_side_slat_beam_diffuse_visible_reflectance":0.28,"slat_diffuse_diffuse_solar_transmittance":0.1,"front_side_slat_diffuse_diffuse_solar_reflectance":0.2,"back_side_slat_diffuse_diffuse_solar_reflectance":0.3,"slat_diffuse_diffuse_visible_transmittance":0.11,"front_side_slat_diffuse_diffuse_visible_reflectance":0.22,"back_side_slat_diffuse_diffuse_visible_reflectance":0.33,"slat_infrared_transmittance":0.05,"front_side_slat_infrared_emissivity":0.84,"back_side_slat_infrared_emissivity":0.76,"slat_orientation":"Horizontal","slat_angle_control":"FixedSlatAngle","name":false,"idf_order":[],"metadata":{"retained":true}}}}"#,
+        )?;
+        let blind_eql_keys = [
+            "slat_width",
+            "slat_separation",
+            "slat_crown",
+            "slat_angle",
+            "front_side_slat_beam_diffuse_solar_transmittance",
+            "back_side_slat_beam_diffuse_solar_transmittance",
+            "front_side_slat_beam_diffuse_solar_reflectance",
+            "back_side_slat_beam_diffuse_solar_reflectance",
+            "front_side_slat_beam_diffuse_visible_transmittance",
+            "back_side_slat_beam_diffuse_visible_transmittance",
+            "front_side_slat_beam_diffuse_visible_reflectance",
+            "back_side_slat_beam_diffuse_visible_reflectance",
+            "slat_diffuse_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_diffuse_solar_reflectance",
+            "slat_diffuse_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_diffuse_visible_reflectance",
+            "slat_infrared_transmittance",
+            "front_side_slat_infrared_emissivity",
+            "back_side_slat_infrared_emissivity",
+        ];
+        let full_source = super::super::compile_raw_model_for_source(&blind_eql_full);
+        let full_model = full_source.model.as_ref().expect("Source full BlindEQL");
+        let full_payload = full_model.materials[0]
+            .as_window_blind_equivalent_layer()
+            .expect("real typed payload");
+        // Every original operand is supplied. Visible diffuse deliberately copies N13..15.
+        assert!(
+            !full_source.has_errors()
+                && full_model.material_names.is_source_exact_namespace()
+                && full_model.materials[0].id == ep_model::MaterialId(0)
+                && full_payload.roughness == MaterialSurfaceRoughness::Rough
+                && full_payload.is_resistance_only()
+                && full_payload
+                    .nominal_thermal_resistance_m2_k_per_w()
+                    .is_none()
+                && [
+                    full_payload.slat_width_m,
+                    full_payload.slat_separation_m,
+                    full_payload.slat_crown_m,
+                    full_payload.slat_angle_deg,
+                    full_payload.front_solar.beam_diffuse_transmittance,
+                    full_payload.back_solar.beam_diffuse_transmittance,
+                    full_payload.front_solar.beam_diffuse_reflectance,
+                    full_payload.back_solar.beam_diffuse_reflectance,
+                    full_payload.front_visible.beam_diffuse_transmittance,
+                    full_payload.back_visible.beam_diffuse_transmittance,
+                    full_payload.front_visible.beam_diffuse_reflectance,
+                    full_payload.back_visible.beam_diffuse_reflectance,
+                    full_payload.solar_diffuse_diffuse.transmittance,
+                    full_payload.solar_diffuse_diffuse.front_reflectance,
+                    full_payload.solar_diffuse_diffuse.back_reflectance,
+                    full_payload.visible_diffuse_diffuse.transmittance,
+                    full_payload.visible_diffuse_diffuse.front_reflectance,
+                    full_payload.visible_diffuse_diffuse.back_reflectance,
+                    full_payload.infrared_transmittance,
+                    full_payload.front_infrared_emissivity,
+                    full_payload.back_infrared_emissivity
+                ]
+                .iter()
+                .zip([
+                    0.02_f64, 0.015, 0.0015, 45.0, 0.1, 0.15, 0.3, 0.35, 0.02, 0.03, 0.25, 0.28,
+                    0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.05, 0.84, 0.76
+                ])
+                .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                && full_payload.front_thermal_absorptance.to_bits() == 0.84_f64.to_bits()
+                && full_payload.back_thermal_absorptance.to_bits() == 0.76_f64.to_bits()
+                && full_payload.thermal_transmittance.to_bits() == 0.05_f64.to_bits()
+                && blind_eql_keys.iter().all(|key| matches!(
+                    blind_eql_full.objects[&ObjectType(OBJECT_TYPE.into())]
+                        [&ObjectName(" B BLIND EQL ".into())]
+                        .fields
+                        .get(&FieldName((*key).into())),
+                    Some(RawValue::Number(_))
+                ))
+        );
+        let minimum_raw = parse_epjson_str(
+            r#"{"WindowMaterial:Blind:EquivalentLayer":{"MIN":{"slat_width":0.02,"slat_separation":0.015,"front_side_slat_beam_diffuse_solar_reflectance":0.3,"back_side_slat_beam_diffuse_solar_reflectance":0.35,"front_side_slat_diffuse_diffuse_solar_reflectance":0.2,"back_side_slat_diffuse_diffuse_solar_reflectance":0.3}}}"#,
+        )?;
+        let mut empty_alphas_raw = minimum_raw.clone();
+        empty_alphas_raw
+            .objects
+            .get_mut(&ObjectType(OBJECT_TYPE.into()))
+            .expect("minimum family")
+            .get_mut(&ObjectName("MIN".into()))
+            .expect("minimum row")
+            .fields
+            .extend([
+                (
+                    FieldName("slat_orientation".into()),
+                    RawValue::String(String::new()),
+                ),
+                (
+                    FieldName("slat_angle_control".into()),
+                    RawValue::String(String::new()),
+                ),
+            ]);
+        assert!([&minimum_raw, &empty_alphas_raw].iter().all(|raw| {
+            let result = super::super::compile_raw_model_for_source(raw);
+            result.model.as_ref().is_some_and(|model| {
+                !result.has_errors()
+                    && model.material_names.is_source_exact_namespace()
+                    && model.materials.len() == 1
+                    && model.materials[0].id == ep_model::MaterialId(0)
+                    && model.material_names.resolve("MIN") == Some(ep_model::MaterialId(0))
+                    && model.ctf_report_names.materials == [(ep_model::MaterialId(0), "MIN".into())]
+                    && model.materials[0]
+                        .as_window_blind_equivalent_layer()
+                        .is_some_and(|row| {
+                            row.slat_orientation == WindowBlindSlatOrientation::Horizontal
+                                && row.slat_angle_control
+                                    == WindowBlindEquivalentLayerSlatAngleControl::FixedSlatAngle
+                                && row.slat_crown_m.to_bits() == 0.0015_f64.to_bits()
+                                && row.slat_angle_deg.to_bits() == 45.0_f64.to_bits()
+                                && row.visible_diffuse_diffuse
+                                    == WindowBlindDirectionalOpticalProperties::default()
+                                && row.front_infrared_emissivity.to_bits() == 0.0_f64.to_bits()
+                                && row.back_infrared_emissivity.to_bits() == 0.0_f64.to_bits()
+                        })
+            })
+        }));
+        assert!(["\n", " \t\r\u{c}"].iter().all(|name| {
+            let mut raw = blind_eql_full.clone();
+            let rows = raw
+                .objects
+                .get_mut(&ObjectType(OBJECT_TYPE.into()))
+                .expect("standalone family");
+            let row = rows
+                .remove(&ObjectName(" B BLIND EQL ".into()))
+                .expect("full row");
+            rows.insert(ObjectName((*name).into()), row);
+            let result = super::super::compile_raw_model_for_source(&raw);
+            result.has_errors()
+                && result.model.as_ref().is_none_or(|model| {
+                    !model.material_names.is_source_exact_namespace()
+                        && model.ctf_report_names.materials.is_empty()
+                })
+        }));
+        // Finite original-schema/name/enum/deferral table; no owner is constructed here.
+        for (kind, field, probe, name) in [
+            ("name", "", 0_usize, "\u{b}"),
+            ("name", "", 1_usize, "\u{a0}"),
+            ("name", "", 2_usize, " odd  spaces "),
+            ("name", "", 3_usize, "\tMixed\u{b}\u{a0} "),
+            ("kind", "slat_width", 0_usize, " B BLIND EQL "),
+            ("kind", "slat_separation", 0_usize, " B BLIND EQL "),
+            ("kind", "slat_crown", 0_usize, " B BLIND EQL "),
+            ("kind", "slat_angle", 0_usize, " B BLIND EQL "),
+            (
+                "kind",
+                "front_side_slat_beam_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "back_side_slat_beam_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "front_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "back_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "front_side_slat_beam_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "back_side_slat_beam_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "front_side_slat_beam_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "back_side_slat_beam_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "slat_diffuse_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "front_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "back_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "slat_diffuse_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "front_side_slat_diffuse_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "back_side_slat_diffuse_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "slat_infrared_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "front_side_slat_infrared_emissivity",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "kind",
+                "back_side_slat_infrared_emissivity",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            ("kind", "slat_orientation", 0_usize, " B BLIND EQL "),
+            ("kind", "slat_angle_control", 0_usize, " B BLIND EQL "),
+            ("missing", "slat_width", 0_usize, " B BLIND EQL "),
+            ("missing", "slat_separation", 0_usize, " B BLIND EQL "),
+            (
+                "missing",
+                "front_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "missing",
+                "back_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "missing",
+                "front_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "missing",
+                "back_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            ("lower", "slat_width", 0_usize, " B BLIND EQL "),
+            ("lower", "slat_separation", 0_usize, " B BLIND EQL "),
+            ("lower", "slat_crown", 0_usize, " B BLIND EQL "),
+            ("lower", "slat_angle", 0_usize, " B BLIND EQL "),
+            (
+                "lower",
+                "front_side_slat_beam_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "back_side_slat_beam_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "front_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "back_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "front_side_slat_beam_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "back_side_slat_beam_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "front_side_slat_beam_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "back_side_slat_beam_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "slat_diffuse_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "front_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "back_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "slat_diffuse_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "front_side_slat_diffuse_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "back_side_slat_diffuse_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "slat_infrared_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "front_side_slat_infrared_emissivity",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "lower",
+                "back_side_slat_infrared_emissivity",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            ("upper", "slat_width", 0_usize, " B BLIND EQL "),
+            ("upper", "slat_separation", 0_usize, " B BLIND EQL "),
+            ("upper", "slat_crown", 0_usize, " B BLIND EQL "),
+            ("upper", "slat_angle", 0_usize, " B BLIND EQL "),
+            (
+                "upper",
+                "front_side_slat_beam_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "back_side_slat_beam_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "front_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "back_side_slat_beam_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "front_side_slat_beam_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "back_side_slat_beam_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "front_side_slat_beam_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "back_side_slat_beam_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "slat_diffuse_diffuse_solar_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "front_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "back_side_slat_diffuse_diffuse_solar_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "slat_diffuse_diffuse_visible_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "front_side_slat_diffuse_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "back_side_slat_diffuse_diffuse_visible_reflectance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "slat_infrared_transmittance",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "front_side_slat_infrared_emissivity",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            (
+                "upper",
+                "back_side_slat_infrared_emissivity",
+                0_usize,
+                " B BLIND EQL ",
+            ),
+            ("alpha", "", 0_usize, " B BLIND EQL "),
+            ("alpha", "", 1_usize, " B BLIND EQL "),
+            ("alpha", "", 2_usize, " B BLIND EQL "),
+            ("alpha", "", 3_usize, " B BLIND EQL "),
+            ("alpha", "", 4_usize, " B BLIND EQL "),
+            ("alpha", "", 5_usize, " B BLIND EQL "),
+            ("enum", "", 0_usize, " B BLIND EQL "),
+            ("enum", "", 1_usize, " B BLIND EQL "),
+            ("enum", "", 2_usize, " B BLIND EQL "),
+            ("enum", "", 3_usize, " B BLIND EQL "),
+            ("enum", "", 4_usize, " B BLIND EQL "),
+            ("enum", "", 5_usize, " B BLIND EQL "),
+            ("defer", "", 0_usize, " B BLIND EQL "),
+            ("defer", "", 1_usize, " B BLIND EQL "),
+            ("defer", "", 2_usize, " B BLIND EQL "),
+            ("defer", "", 3_usize, " B BLIND EQL "),
+            ("defer", "", 4_usize, " B BLIND EQL "),
+            ("defer", "", 5_usize, " B BLIND EQL "),
+            ("defer", "", 6_usize, " B BLIND EQL "),
+            ("defer", "", 7_usize, " B BLIND EQL "),
+        ] {
+            let mut candidate = blind_eql_full.clone();
+            let rows = candidate
+                .objects
+                .get_mut(&ObjectType(OBJECT_TYPE.into()))
+                .expect("standalone family");
+            let mut object = rows
+                .remove(&ObjectName(" B BLIND EQL ".into()))
+                .expect("full standalone row");
+            match kind {
+                "kind" => {
+                    object
+                        .fields
+                        .insert(FieldName(field.into()), RawValue::Bool(false));
+                }
+                "missing" => {
+                    object.fields.remove(&FieldName(field.into()));
+                }
+                "lower" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            match field {
+                                "slat_width" | "slat_separation" => "0.0",
+                                "slat_crown" => "-0.001",
+                                "slat_angle" => "-90.001",
+                                _ => "-0.1",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "upper" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            match field {
+                                "slat_width" | "slat_separation" => "0.0250001",
+                                "slat_crown" => "0.0015601",
+                                "slat_angle" => "90.001",
+                                _ => "1.0",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "alpha" => {
+                    let (key, text) = match probe {
+                        0 => ("slat_orientation", "horizontal"),
+                        1 => ("slat_orientation", " Horizontal "),
+                        2 => ("slat_orientation", "UnknownOrientation"),
+                        3 => ("slat_angle_control", "fixedslatangle"),
+                        4 => ("slat_angle_control", " FixedSlatAngle "),
+                        _ => ("slat_angle_control", "UnknownControl"),
+                    };
+                    object
+                        .fields
+                        .insert(FieldName(key.into()), RawValue::String(text.into()));
+                }
+                "enum" => {
+                    object.fields.insert(
+                        FieldName("slat_orientation".into()),
+                        RawValue::String(if probe < 3 { "Horizontal" } else { "Vertical" }.into()),
+                    );
+                    object.fields.insert(
+                        FieldName("slat_angle_control".into()),
+                        RawValue::String(
+                            match probe % 3 {
+                                0 => "FixedSlatAngle",
+                                1 => "MaximizeSolar",
+                                _ => "BlockBeamSolar",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "defer" => {
+                    let values: &[(&str, &str)] = match probe {
+                        0 => &[("slat_width", "0.01")],
+                        1 => &[("slat_separation", "0.0005")],
+                        2 => &[("slat_width", "0.0005")],
+                        3 => &[
+                            ("slat_width", "0.003"),
+                            ("slat_separation", "0.002"),
+                            ("slat_crown", "0.00156"),
+                        ],
+                        4 => &[("front_side_slat_beam_diffuse_solar_transmittance", "0.75")],
+                        5 => &[("back_side_slat_beam_diffuse_solar_transmittance", "0.75")],
+                        6 => &[("front_side_slat_beam_diffuse_visible_transmittance", "0.8")],
+                        _ => &[("back_side_slat_beam_diffuse_visible_transmittance", "0.8")],
+                    };
+                    values.iter().for_each(|(key, value)| {
+                        object
+                            .fields
+                            .insert(FieldName((*key).into()), RawValue::Number((*value).into()));
+                    });
+                }
+                _ => {}
+            }
+            rows.insert(ObjectName(name.into()), object);
+            let checked = super::super::compile_raw_model_for_source(&candidate);
+            if kind == "name" {
+                let model = checked
+                    .model
+                    .as_ref()
+                    .expect("standalone legal Source name");
+                let expected = name.to_ascii_uppercase();
+                assert!(
+                    !checked.has_errors()
+                        && model.material_names.is_source_exact_namespace()
+                        && model.materials.len() == 1
+                        && model.materials[0].id == ep_model::MaterialId(0)
+                        && model.materials[0].name.0 == expected
+                        && model.material_names.resolve(name) == Some(ep_model::MaterialId(0))
+                        && model.material_names.resolve(&expected) == Some(ep_model::MaterialId(0))
+                        && model.material_names.len() == 1
+                        && model.material_names.names()
+                            == [ep_model::NormalizedName(expected.clone())]
+                        && model.ctf_report_names.materials
+                            == [(ep_model::MaterialId(0), expected)]
+                        && model.materials[0].kind() == MaterialKind::WindowBlindEquivalentLayer,
+                    "standalone name {probe}"
+                );
+            } else if kind == "enum" {
+                let model = checked
+                    .model
+                    .as_ref()
+                    .expect("six legal orientation/control pairs");
+                let row = model.materials[0]
+                    .as_window_blind_equivalent_layer()
+                    .expect("typed enum row");
+                assert!(
+                    !checked.has_errors()
+                        && model.material_names.is_source_exact_namespace()
+                        && model.ctf_report_names.materials
+                            == [(ep_model::MaterialId(0), name.to_ascii_uppercase())]
+                        && row.slat_orientation
+                            == if probe < 3 {
+                                WindowBlindSlatOrientation::Horizontal
+                            } else {
+                                WindowBlindSlatOrientation::Vertical
+                            }
+                        && row.slat_angle_control
+                            == match probe % 3 {
+                                0 => WindowBlindEquivalentLayerSlatAngleControl::FixedSlatAngle,
+                                1 => WindowBlindEquivalentLayerSlatAngleControl::MaximizeSolar,
+                                _ => WindowBlindEquivalentLayerSlatAngleControl::BlockBeamSolar,
+                            }
+                );
+            } else if kind == "defer" {
+                let model = checked
+                    .model
+                    .as_ref()
+                    .expect("Source defers runtime diagnostics");
+                let row = model.materials[0]
+                    .as_window_blind_equivalent_layer()
+                    .expect("unrecovered advisory row");
+                let geometry = match probe {
+                    0 => [0.01, 0.015, 0.0015, 45.0],
+                    1 => [0.02, 0.0005, 0.0015, 45.0],
+                    2 => [0.0005, 0.015, 0.0015, 45.0],
+                    3 => [0.003, 0.002, 0.00156, 45.0],
+                    _ => [0.02, 0.015, 0.0015, 45.0],
+                };
+                assert!(
+                    !checked.has_errors()
+                        && model.material_names.is_source_exact_namespace()
+                        && checked
+                            .report
+                            .diagnostics
+                            .iter()
+                            .all(|item| item.severity != DiagnosticSeverity::Warning)
+                        && model.ctf_report_names.materials
+                            == [(ep_model::MaterialId(0), name.to_ascii_uppercase())]
+                        && [
+                            row.slat_width_m,
+                            row.slat_separation_m,
+                            row.slat_crown_m,
+                            row.slat_angle_deg
+                        ]
+                        .iter()
+                        .zip(geometry)
+                        .all(|(actual, expected): (&f64, f64)| actual.to_bits()
+                            == expected.to_bits())
+                        && [
+                            row.front_solar.beam_diffuse_transmittance,
+                            row.back_solar.beam_diffuse_transmittance,
+                            row.front_visible.beam_diffuse_transmittance,
+                            row.back_visible.beam_diffuse_transmittance
+                        ]
+                        .iter()
+                        .zip(match probe {
+                            4 => [0.75, 0.15, 0.02, 0.03],
+                            5 => [0.1, 0.75, 0.02, 0.03],
+                            6 => [0.1, 0.15, 0.8, 0.03],
+                            7 => [0.1, 0.15, 0.02, 0.8],
+                            _ => [0.1, 0.15, 0.02, 0.03],
+                        })
+                        .all(|(actual, expected): (&f64, f64)| actual.to_bits()
+                            == expected.to_bits()),
+                    "Source Native deferral {probe}"
+                );
+                let legacy = compile_raw_model(&candidate);
+                assert!(
+                    if probe < 4 {
+                        let geometry = match probe {
+                            0 => [0.01, 0.015, 0.0015],
+                            1 => [0.02, 0.025, 0.0015],
+                            2 => [0.015, 0.015, 0.0015],
+                            _ => [0.003, 0.002, 0.0],
+                        };
+                        !legacy.has_errors()
+                            && legacy
+                                .report
+                                .diagnostics
+                                .iter()
+                                .any(|item| item.severity == DiagnosticSeverity::Warning)
+                            && legacy.model.as_ref().is_some_and(|model| {
+                                !model.material_names.is_source_exact_namespace()
+                                    && model.ctf_report_names.materials.is_empty()
+                                    && model.materials[0]
+                                        .as_window_blind_equivalent_layer()
+                                        .is_some_and(|row| {
+                                            [
+                                                row.slat_width_m,
+                                                row.slat_separation_m,
+                                                row.slat_crown_m,
+                                            ]
+                                            .iter()
+                                            .zip(geometry)
+                                            .all(
+                                                |(actual, expected): (&f64, f64)| {
+                                                    actual.to_bits() == expected.to_bits()
+                                                },
+                                            )
+                                        })
+                            })
+                    } else {
+                        legacy.has_errors()
+                            && has_diagnostic(
+                                &legacy,
+                                "InvalidWindowBlindEquivalentLayerOpticalSum",
+                                name,
+                                None,
+                            )
+                    },
+                    "Legacy Native policy {probe}"
+                );
+            } else {
+                assert!(
+                    checked
+                        .model
+                        .as_ref()
+                        .is_none_or(|model| !model.material_names.is_source_exact_namespace()
+                            && model.ctf_report_names.materials.is_empty())
+                        && (kind == "alpha" || checked.has_errors()),
+                    "original Source boundary {kind}/{field}/{probe}"
+                );
+            }
+        }
+    }
     Ok(())
 }
 

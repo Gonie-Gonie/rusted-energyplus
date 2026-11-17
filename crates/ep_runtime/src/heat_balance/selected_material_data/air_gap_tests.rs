@@ -84,6 +84,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         window_drape_equivalent_layer: Vec::new(),
         window_screen: Vec::new(),
         window_screen_equivalent_layer: Vec::new(),
+        window_blind_equivalent_layer: Vec::new(),
         window_blind: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
@@ -6263,6 +6264,906 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                     .is_err()
                 && data
                     .source_screen_equivalent_layer_surface_properties(0, MaterialId(3))
+                    .is_err()
+        );
+    }
+
+    // BlindEQL B1: one genuine Material owner, fifteen finite rows, zero Window owners.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier supplies identity/kind only; actual TAR is written by the getter.
+        let typed_eql = ep_model::WindowBlindEquivalentLayerMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.0,
+            slat_separation_m: 0.0,
+            slat_crown_m: 0.0,
+            slat_angle_deg: 0.0,
+            front_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            front_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.0,
+            back_infrared_emissivity: 0.0,
+            front_thermal_absorptance: 0.0,
+            back_thermal_absorptance: 0.0,
+            thermal_transmittance: 0.0,
+            slat_angle_control:
+                ep_model::WindowBlindEquivalentLayerSlatAngleControl::FixedSlatAngle,
+        };
+        let names = [
+            "A BLIND EQL MIN",
+            "B BLIND EQL EMPTY ALPHAS",
+            "C BLIND EQL FULL",
+            "D BLIND EQL MAXIMIZE",
+            "E BLIND EQL BLOCK",
+            "F BLIND EQL VISIBLE PARTIAL",
+            "G BLIND EQL SOLAR DF COMPLETE",
+            "H BLIND EQL VISIBLE DF ONLY",
+            "I BLIND EQL VISIBLE DF PARTIAL",
+            "J BLIND EQL IR SPLIT",
+            "K BLIND EQL SIGNED ZERO",
+            "L BLIND EQL RECOVER SPACING WIDTH",
+            "M BLIND EQL RECOVER CROWN",
+            "N BLIND EQL PLUS90",
+            "O BLIND EQL MINUS90",
+        ];
+        let typed_names = names;
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowBlindEquivalentLayer(typed_eql),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_crown",
+            "slat_angle",
+            "front_side_slat_beam_diffuse_solar_transmittance",
+            "back_side_slat_beam_diffuse_solar_transmittance",
+            "front_side_slat_beam_diffuse_solar_reflectance",
+            "back_side_slat_beam_diffuse_solar_reflectance",
+            "front_side_slat_beam_diffuse_visible_transmittance",
+            "back_side_slat_beam_diffuse_visible_transmittance",
+            "front_side_slat_beam_diffuse_visible_reflectance",
+            "back_side_slat_beam_diffuse_visible_reflectance",
+            "slat_diffuse_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_diffuse_solar_reflectance",
+            "slat_diffuse_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_diffuse_visible_reflectance",
+            "slat_infrared_transmittance",
+            "front_side_slat_infrared_emissivity",
+            "back_side_slat_infrared_emissivity",
+        ];
+        let numeric_rows: [[f64; 21]; 15] = [
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.1, 0.15, 0.3, 0.35, 0.02, 0.03, 0.25, 0.28, 0.1, 0.2,
+                0.3, 0.11, 0.22, 0.33, 0.05, 0.84, 0.76,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.1, 0.15, 0.3, 0.35, 0.02, 0.03, 0.25, 0.28, 0.1, 0.2,
+                0.3, 0.11, 0.22, 0.33, 0.05, 0.84, 0.76,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.1, 0.15, 0.3, 0.35, 0.02, 0.03, 0.25, 0.28, 0.1, 0.2,
+                0.3, 0.11, 0.22, 0.33, 0.05, 0.84, 0.76,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.1, 0.0, 0.25, 0.28, 0.0, 0.2,
+                0.3, 0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.1, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.11, 0.22, 0.33, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.1, 0.2, 0.3,
+                0.11, 0.22, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.8, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, -0.0, -0.0, -0.0, -0.0, 0.3, 0.35, -0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.0004, 0.0005, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2,
+                0.3, 0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.003, 0.002, 0.00156, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2,
+                0.3, 0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 90.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, -90.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+        ];
+        let supplied: [&[usize]; 15] = [
+            &[0, 1, 6, 7, 13, 14],
+            &[0, 1, 6, 7, 13, 14],
+            &[
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            ],
+            &[
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            ],
+            &[
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            ],
+            &[0, 1, 6, 7, 8, 10, 11, 13, 14],
+            &[0, 1, 6, 7, 12, 13, 14],
+            &[0, 1, 6, 7, 13, 14, 15, 16, 17],
+            &[0, 1, 6, 7, 12, 13, 14, 15, 16],
+            &[0, 1, 6, 7, 13, 14, 18, 20],
+            &[0, 1, 2, 3, 4, 5, 6, 7, 8, 13, 14],
+            &[0, 1, 6, 7, 13, 14],
+            &[0, 1, 2, 6, 7, 13, 14],
+            &[0, 1, 3, 6, 7, 13, 14],
+            &[0, 1, 3, 6, 7, 13, 14],
+        ];
+        let alpha_rows: [[Option<&str>; 2]; 15] = [
+            [None, None],
+            [Some(""), Some("")],
+            [Some("Horizontal"), Some("FixedSlatAngle")],
+            [Some("Vertical"), Some("MaximizeSolar")],
+            [Some("Horizontal"), Some("BlockBeamSolar")],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+        ];
+        raw.window_blind_equivalent_layer = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .enumerate()
+                    .filter(|(column, _)| supplied[index].contains(column))
+                    .map(|(column, field)| {
+                        ((*field).into(), Value::Number(numeric_rows[index][column]))
+                    })
+                    .collect();
+                fields.extend(
+                    ["slat_orientation", "slat_angle_control"]
+                        .iter()
+                        .zip(alpha_rows[index])
+                        .filter_map(|(field, value)| {
+                            value.map(|text| ((*field).into(), Value::String(text.into())))
+                        }),
+                );
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Actual empty family definitions allocate scratch; they perform zero Glass/ordinaryBlind work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Blind:EquivalentLayer",
+                &raw.window_blind_equivalent_layer,
+                3,
+                21,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let expected_slats: [[f64; 4]; 15] = [
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, 0.0015, 45.0],
+            [0.02, 0.015, -0.0, -0.0],
+            [0.025, 0.025, 0.0015, 45.0],
+            [0.003, 0.002, 0.0, 45.0],
+            [0.02, 0.015, 0.0015, 90.0],
+            [0.02, 0.015, 0.0015, -90.0],
+        ];
+        let expected_solar_bm: [[f64; 10]; 15] = [
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.1, 0.3, 0.0, 0.0, 0.0, 0.15, 0.35, 0.0, 0.0],
+            [0.0, 0.1, 0.3, 0.0, 0.0, 0.0, 0.15, 0.35, 0.0, 0.0],
+            [0.0, 0.1, 0.3, 0.0, 0.0, 0.0, 0.15, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, -0.0, 0.3, 0.0, 0.0, 0.0, -0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+            [0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.35, 0.0, 0.0],
+        ];
+        let expected_visible_bm: [[f64; 10]; 15] = [
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.02, 0.25, 0.0, 0.0, 0.0, 0.03, 0.28, 0.0, 0.0],
+            [0.0, 0.02, 0.25, 0.0, 0.0, 0.0, 0.03, 0.28, 0.0, 0.0],
+            [0.0, 0.02, 0.25, 0.0, 0.0, 0.0, 0.03, 0.28, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        ];
+        let expected_diffuse: [[f64; 8]; 15] = [
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.0, 0.0],
+            [0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.0, 0.0],
+            [0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.1, 0.2, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.2, 0.3, 0.0, 0.0],
+            [0.1, 0.2, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        ];
+        let expected_ir: [[f64; 4]; 15] = [
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.05, 0.05, 0.84, 0.76],
+            [0.05, 0.05, 0.84, 0.76],
+            [0.05, 0.05, 0.84, 0.76],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.8, 0.8, 0.0, 0.9],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ];
+        let expected_numeric_blanks: [[bool; 21]; 15] = [
+            [
+                false, false, true, true, true, true, false, false, true, true, true, true, true,
+                false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, true, true, true, true, false, false, true, true, true, true, true,
+                false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false, false,
+            ],
+            [
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false, false,
+            ],
+            [
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false, false,
+            ],
+            [
+                false, false, true, true, true, true, false, false, false, true, false, false,
+                true, false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, true, true, true, true, false, false, true, true, true, true, false,
+                false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, true, true, true, true, false, false, true, true, true, true, true,
+                false, false, false, false, false, true, true, true,
+            ],
+            [
+                false, false, true, true, true, true, false, false, true, true, true, true, false,
+                false, false, false, false, true, true, true, true,
+            ],
+            [
+                false, false, true, true, true, true, false, false, true, true, true, true, true,
+                false, false, true, true, true, false, true, false,
+            ],
+            [
+                false, false, false, false, false, false, false, false, false, true, true, true,
+                true, false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, true, true, true, true, false, false, true, true, true, true, true,
+                false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, true, true, true, false, false, true, true, true, true, true,
+                false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, true, false, true, true, false, false, true, true, true, true, true,
+                false, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, true, false, true, true, false, false, true, true, true, true, true,
+                false, false, true, true, true, true, true, true,
+            ],
+        ];
+        let expected_alpha_blanks: [[bool; 3]; 15] = [
+            [false, true, true],
+            [false, true, true],
+            [false, false, false],
+            [false, false, false],
+            [false, false, false],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+            [false, true, true],
+        ];
+        let expected_alpha_values: [[&str; 2]; 15] = [
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["VERTICAL", "MAXIMIZESOLAR"],
+            ["HORIZONTAL", "BLOCKBEAMSOLAR"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+            ["HORIZONTAL", "FIXEDSLATANGLE"],
+        ];
+        let expected_enums: [[i32; 2]; 15] = [
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [1, 1],
+            [0, 2],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+            [0, 0],
+        ];
+        let expected_counts: [(usize, usize); 15] = [
+            (2, 15),
+            (3, 21),
+            (3, 21),
+            (3, 21),
+            (3, 21),
+            (2, 15),
+            (2, 15),
+            (2, 18),
+            (2, 17),
+            (2, 21),
+            (2, 15),
+            (2, 15),
+            (2, 15),
+            (2, 15),
+            (2, 15),
+        ];
+        let mut text = Vec::new();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+                .expect("genuine BlindEQL getter");
+            for (index, object) in raw.window_blind_equivalent_layer.iter().enumerate() {
+                let id = MaterialId(3 + u32::try_from(index).unwrap());
+                let blind = &data.window_blind_equivalent_layer[&id];
+                let row = &blind.base;
+                // B1-03: same actual Source ordinal/ID/map/group; nominalR is the constructor's +0.
+                assert!(
+                    data.materials[index + 3] == id
+                        && data.material_map[names[index]] == i32::try_from(index + 4).unwrap()
+                        && model
+                            .materials
+                            .iter()
+                            .find(|material| material.id == id)
+                            .unwrap()
+                            .name
+                            .0
+                            == names[index]
+                        && data.material_groups[&id] == SourceMaterialGroup::BlindEql
+                        && data.resistance_only[&id]
+                        && data.nominal_r[index + 3].to_bits() == 0
+                );
+                // B1-04: literal retained slats after Native recovery, including signed zero/endpoints.
+                assert!(
+                    [
+                        blind.slat_width,
+                        blind.slat_separation,
+                        blind.slat_crown,
+                        blind.slat_angle
+                    ]
+                    .iter()
+                    .zip(expected_slats[index])
+                    .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                        && [blind.slat_orientation, blind.slat_angle_type] == expected_enums[index]
+                );
+                assert!(
+                    [
+                        row.tar.sol.ft.bm[0].bm_tra,
+                        row.tar.sol.ft.bm[0].df_tra,
+                        row.tar.sol.ft.bm[0].df_ref,
+                        row.tar.sol.ft.bm[0].bm_ref,
+                        row.tar.sol.ft.bm[0].abs,
+                        row.tar.sol.bk.bm[0].bm_tra,
+                        row.tar.sol.bk.bm[0].df_tra,
+                        row.tar.sol.bk.bm[0].df_ref,
+                        row.tar.sol.bk.bm[0].bm_ref,
+                        row.tar.sol.bk.bm[0].abs
+                    ]
+                    .iter()
+                    .zip(expected_solar_bm[index])
+                    .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                );
+                assert!(
+                    [
+                        row.tar.vis.ft.bm[0].bm_tra,
+                        row.tar.vis.ft.bm[0].df_tra,
+                        row.tar.vis.ft.bm[0].df_ref,
+                        row.tar.vis.ft.bm[0].bm_ref,
+                        row.tar.vis.ft.bm[0].abs,
+                        row.tar.vis.bk.bm[0].bm_tra,
+                        row.tar.vis.bk.bm[0].df_tra,
+                        row.tar.vis.bk.bm[0].df_ref,
+                        row.tar.vis.bk.bm[0].bm_ref,
+                        row.tar.vis.bk.bm[0].abs
+                    ]
+                    .iter()
+                    .zip(expected_visible_bm[index])
+                    .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                );
+                assert!(
+                    [
+                        row.tar.sol.ft.df.tra,
+                        row.tar.sol.ft.df.refl,
+                        row.tar.sol.bk.df.refl,
+                        row.tar.vis.ft.df.tra,
+                        row.tar.vis.ft.df.refl,
+                        row.tar.vis.bk.df.refl,
+                        row.tar.sol.bk.df.tra,
+                        row.tar.vis.bk.df.tra
+                    ]
+                    .iter()
+                    .zip(expected_diffuse[index])
+                    .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                        && [
+                            &row.tar.sol.ft.df,
+                            &row.tar.sol.bk.df,
+                            &row.tar.vis.ft.df,
+                            &row.tar.vis.bk.df
+                        ]
+                        .iter()
+                        .all(|side| [
+                            side.tra_gnd,
+                            side.tra_sky,
+                            side.refl_gnd,
+                            side.refl_sky,
+                            side.abs,
+                            side.abs_gnd,
+                            side.abs_sky
+                        ]
+                        .iter()
+                        .all(|value| value.to_bits() == 0))
+                );
+                assert!(
+                    [
+                        row.tar.ir.ft.tra,
+                        row.tar.ir.bk.tra,
+                        row.tar.ir.ft.emi,
+                        row.tar.ir.bk.emi
+                    ]
+                    .iter()
+                    .zip(expected_ir[index])
+                    .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                        && row.thermal_transmittance.to_bits() == expected_ir[index][0].to_bits()
+                        && row.thermal_absorptance_front.to_bits()
+                            == expected_ir[index][2].to_bits()
+                        && row.thermal_absorptance_back.to_bits()
+                            == expected_ir[index][3].to_bits()
+                        && row.roughness == Some(MaterialSurfaceRoughness::Rough)
+                        && [
+                            row.thickness,
+                            row.conductivity,
+                            row.resistance,
+                            row.density,
+                            row.specific_heat,
+                            row.thermal_absorptance,
+                            row.thermal_absorptance_input,
+                            row.solar_absorptance,
+                            row.solar_absorptance_input,
+                            row.visible_absorptance,
+                            row.visible_absorptance_input,
+                            row.transmittance,
+                            row.visible_transmittance,
+                            row.shade_reflectance,
+                            row.shade_visible_reflectance,
+                            row.to_glass_distance,
+                            row.top_opening,
+                            row.bottom_opening,
+                            row.left_opening,
+                            row.right_opening,
+                            row.airflow_permeability
+                        ]
+                        .iter()
+                        .all(|value| value.to_bits() == 0)
+                );
+                // Poison only shared input scratch, then requery the same object/owner, not Material state/latches.
+                owners.shortcut.alpha_args.fill("stale".into());
+                owners.shortcut.numeric_args.fill(-123.0);
+                owners.shortcut.alpha_field_names.fill("stale".into());
+                owners.shortcut.numeric_field_names.fill("stale".into());
+                owners.shortcut.alpha_field_blanks.fill(false);
+                owners.shortcut.numeric_field_blanks.fill(false);
+                assert!(
+                    raw.get_window_blind_equivalent_layer_item(object, &mut owners)
+                        .unwrap()
+                        == expected_counts[index]
+                        && !owners
+                            .input
+                            .is_object_unused("WindowMaterial:Blind:EquivalentLayer", names[index])
+                );
+                assert!(
+                    owners.shortcut.alpha_args[..3]
+                        == [
+                            names[index],
+                            expected_alpha_values[index][0],
+                            expected_alpha_values[index][1]
+                        ]
+                        && owners.shortcut.alpha_field_names[..3]
+                            == ["name", "slat_orientation", "slat_angle_control"]
+                        && owners.shortcut.alpha_field_blanks[..3] == expected_alpha_blanks[index]
+                        && owners.shortcut.numeric_field_names[..21] == numeric_names
+                        && owners.shortcut.numeric_field_blanks[..21]
+                            == expected_numeric_blanks[index]
+                        && owners.shortcut.numeric_args[..21]
+                            .iter()
+                            .zip(numeric_rows[index])
+                            .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                );
+                assert!(
+                    owners.shortcut.alpha_args.len() == 7
+                        && owners.shortcut.numeric_args.len() == 27
+                        && owners.shortcut.alpha_args[3..7]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_names[3..7]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_blanks[3..7]
+                            .iter()
+                            .all(|blank| *blank)
+                        && owners.shortcut.numeric_args[21..27]
+                            .iter()
+                            .all(|value| value.to_bits() == 0)
+                        && owners.shortcut.numeric_field_names[21..27]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.numeric_field_blanks[21..27]
+                            .iter()
+                            .all(|blank| *blank)
+                );
+            }
+        }
+        assert!(
+            !errors_found
+                && data.num_eql_blinds == 15
+                && data.window_blind_equivalent_layer.len() == 15
+                && data.materials.len() == 18
+                && data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && raw.glazing.is_empty()
+                && raw.window_blind.is_empty()
+                && shortcut.alpha_args.len() == 7
+                && shortcut.numeric_args.len() == 27
+        );
+        let log = std::str::from_utf8(&text).unwrap();
+        let lines = log
+            .lines()
+            .filter(|line| line.contains(" ** Warning ** ") || line.contains(" **   ~~~   ** "))
+            .collect::<Vec<_>>();
+        let expected_messages = [
+            "WindowMaterial:Blind:EquivalentLayer=\"L BLIND EQL RECOVER SPACING WIDTH\", Slat Separation/Width",
+            "slat_width [4.00E-004] is less than slat_separation [5.00E-004].",
+            "This will allow direct beam to be transmitted when Slat angle = 0.",
+            "WindowMaterial:Blind:EquivalentLayer=\"L BLIND EQL RECOVER SPACING WIDTH\", Slat Separation",
+            "slat_separation [5.00E-004]. Slate spacing must be > 0.0",
+            "...Setting slate spacing to default value of 0.025 m and simulation continues.",
+            "WindowMaterial:Blind:EquivalentLayer=\"L BLIND EQL RECOVER SPACING WIDTH\", Slat Width",
+            "slat_width [4.00E-004]. Slat width range is 0 < Width <= 2*Spacing",
+            "...Setting slate width equal to slate spacing and simulation continues.",
+            "WindowMaterial:Blind:EquivalentLayer=\"M BLIND EQL RECOVER CROWN\", Slat Crown",
+            "slat_crown [1.56E-003]. Slat crwon range is 0 <= crown < 0.5*Width",
+            "...Setting slate crown to 0.0 and simulation continues.",
+        ];
+        assert!(
+            state.tracking.total_warning_errors == 4
+                && state.tracking.total_severe_errors == 0
+                && lines.len() == 12
+                && log.matches(" ** Warning ** ").count() == 4
+                && log.matches(" **   ~~~   ** ").count() == 8
+                && lines
+                    .iter()
+                    .zip(expected_messages)
+                    .all(|(line, expected)| line.ends_with(expected))
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let report_rows = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert!(
+            report_rows.len() == 17
+                && report_rows[..2]
+                    == [
+                        vec![
+                            " Material Details",
+                            "Mass",
+                            "5.0000E-002",
+                            "MediumRough",
+                            "0.1000",
+                            "2.000",
+                            "2000.000",
+                            "800.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                        vec![
+                            " Material Details",
+                            "NO MASS",
+                            "0.2000",
+                            "MediumRough",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                    ]
+                && std::str::from_utf8(&eio)
+                    .unwrap()
+                    .lines()
+                    .any(|line| line == " Material:Air,MIXED GAP,0.1500")
+                && report_rows[2..]
+                    == names
+                        .iter()
+                        .map(|name| vec![
+                            " Material Details",
+                            *name,
+                            "0.0000",
+                            "Rough",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.0000",
+                            "0.0000",
+                            "0.0000"
+                        ])
+                        .collect::<Vec<_>>()
+                && names.iter().enumerate().all(|(index, _)| data
+                    .source_blind_equivalent_layer_surface_properties(
+                        i32::try_from(index + 4).unwrap(),
+                        MaterialId(3 + u32::try_from(index).unwrap())
+                    )
+                    .unwrap()
+                    == (
+                        MaterialSurfaceRoughness::Rough,
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: 0.0,
+                            solar_absorptance: 0.0,
+                            visible_absorptance: 0.0
+                        }
+                    ))
+                && data
+                    .source_blind_equivalent_layer_surface_properties(4, MaterialId(4))
+                    .is_err()
+                && data
+                    .source_blind_equivalent_layer_surface_properties(0, MaterialId(3))
                     .is_err()
         );
     }
@@ -14112,6 +15013,1129 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 && state.tracking.total_severe_errors == 1
                 && state.tracking.total_warning_errors == 0
                 && eio.is_empty()
+        );
+    }
+
+    // BlindEQL B2: one explicit Material owner, zero Window owners.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier supplies identity/kind only; actual TAR is written by the getter.
+        let typed_eql = ep_model::WindowBlindEquivalentLayerMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.0,
+            slat_separation_m: 0.0,
+            slat_crown_m: 0.0,
+            slat_angle_deg: 0.0,
+            front_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            front_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.0,
+            back_infrared_emissivity: 0.0,
+            front_thermal_absorptance: 0.0,
+            back_thermal_absorptance: 0.0,
+            thermal_transmittance: 0.0,
+            slat_angle_control:
+                ep_model::WindowBlindEquivalentLayerSlatAngleControl::FixedSlatAngle,
+        };
+        let names = ["BAD BLIND EQL", "MASS", "ZZ VALID BLIND EQL"];
+        let typed_names = ["BAD BLIND EQL", "ZZ VALID BLIND EQL"];
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowBlindEquivalentLayer(typed_eql),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_crown",
+            "slat_angle",
+            "front_side_slat_beam_diffuse_solar_transmittance",
+            "back_side_slat_beam_diffuse_solar_transmittance",
+            "front_side_slat_beam_diffuse_solar_reflectance",
+            "back_side_slat_beam_diffuse_solar_reflectance",
+            "front_side_slat_beam_diffuse_visible_transmittance",
+            "back_side_slat_beam_diffuse_visible_transmittance",
+            "front_side_slat_beam_diffuse_visible_reflectance",
+            "back_side_slat_beam_diffuse_visible_reflectance",
+            "slat_diffuse_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_diffuse_solar_reflectance",
+            "slat_diffuse_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_diffuse_visible_reflectance",
+            "slat_infrared_transmittance",
+            "front_side_slat_infrared_emissivity",
+            "back_side_slat_infrared_emissivity",
+        ];
+        let numeric_rows: [[f64; 21]; 3] = [
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.6, 0.7, 0.5, 0.4, 0.6, 0.7, 0.5, 0.4, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+        ];
+        let supplied: [&[usize]; 3] = [
+            &[0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14],
+            &[0, 1, 6, 7, 13, 14],
+            &[0, 1, 6, 7, 13, 14],
+        ];
+        let alpha_rows: [[Option<&str>; 2]; 3] = [[None, None]; 3];
+        raw.window_blind_equivalent_layer = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .enumerate()
+                    .filter(|(column, _)| supplied[index].contains(column))
+                    .map(|(column, field)| {
+                        ((*field).into(), Value::Number(numeric_rows[index][column]))
+                    })
+                    .collect();
+                fields.extend(
+                    ["slat_orientation", "slat_angle_control"]
+                        .iter()
+                        .zip(alpha_rows[index])
+                        .filter_map(|(field, value)| {
+                            value.map(|text| ((*field).into(), Value::String(text.into())))
+                        }),
+                );
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Actual empty family definitions allocate scratch; they perform zero Glass/ordinaryBlind work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Blind:EquivalentLayer",
+                &raw.window_blind_equivalent_layer,
+                3,
+                21,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+            .expect("Native BlindEQL joint diagnostics continue");
+        }
+        let log = std::str::from_utf8(&text).unwrap();
+        let lines = log
+            .lines()
+            .filter(|line| line.contains(" ** Severe  ** ") || line.contains(" **   ~~~   ** "))
+            .collect::<Vec<_>>();
+        assert!(
+            errors_found
+                && data.num_eql_blinds == 3
+                && data.window_blind_equivalent_layer.len() == 2
+                && data.materials.len() == 5
+                && state.tracking.total_severe_errors == 5
+                && state.tracking.total_warning_errors == 0
+                && lines.len() == 9
+                && log.matches(" ** Severe  ** ").count() == 5
+                && log.matches(" **   ~~~   ** ").count() == 4
+        );
+        assert!(
+            data.materials
+                == [
+                    MaterialId(0),
+                    MaterialId(1),
+                    MaterialId(2),
+                    MaterialId(3),
+                    MaterialId(4)
+                ]
+                && data.material_map["BAD BLIND EQL"] == 4
+                && data.material_map["MASS"] == 1
+                && data.material_map["ZZ VALID BLIND EQL"] == 5
+                && data.nominal_r == [0.05, 0.2, 0.15, 0.0, 0.0]
+        );
+        let blind = &data.window_blind_equivalent_layer[&MaterialId(3)];
+        let row = &blind.base;
+        assert!(
+            [
+                blind.slat_width,
+                blind.slat_separation,
+                blind.slat_crown,
+                blind.slat_angle
+            ] == [0.02, 0.015, 0.0015, 45.0]
+                && blind.slat_orientation == 0
+                && blind.slat_angle_type == 0
+                && [
+                    row.tar.sol.ft.bm[0].df_tra,
+                    row.tar.sol.bk.bm[0].df_tra,
+                    row.tar.sol.ft.bm[0].df_ref,
+                    row.tar.sol.bk.bm[0].df_ref,
+                    row.tar.vis.ft.bm[0].df_tra,
+                    row.tar.vis.bk.bm[0].df_tra,
+                    row.tar.vis.ft.bm[0].df_ref,
+                    row.tar.vis.bk.bm[0].df_ref
+                ] == [0.6, 0.7, 0.5, 0.4, 0.6, 0.7, 0.5, 0.4]
+                && [
+                    &row.tar.sol.ft.bm[0],
+                    &row.tar.sol.bk.bm[0],
+                    &row.tar.vis.ft.bm[0],
+                    &row.tar.vis.bk.bm[0]
+                ]
+                .iter()
+                .all(|beam| [beam.bm_tra, beam.bm_ref, beam.abs]
+                    .iter()
+                    .all(|value| value.to_bits() == 0))
+        );
+        assert!(
+            [
+                &row.tar.sol.ft.df,
+                &row.tar.sol.bk.df,
+                &row.tar.vis.ft.df,
+                &row.tar.vis.bk.df
+            ]
+            .iter()
+            .all(|side| [
+                side.tra,
+                side.tra_gnd,
+                side.tra_sky,
+                side.refl,
+                side.refl_gnd,
+                side.refl_sky,
+                side.abs,
+                side.abs_gnd,
+                side.abs_sky
+            ]
+            .iter()
+            .all(|value| value.to_bits() == 0))
+                && [
+                    row.tar.ir.ft.tra,
+                    row.tar.ir.bk.tra,
+                    row.tar.ir.ft.emi,
+                    row.tar.ir.bk.emi,
+                    row.thermal_transmittance,
+                    row.thermal_absorptance_front,
+                    row.thermal_absorptance_back
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+                && [
+                    row.thickness,
+                    row.conductivity,
+                    row.resistance,
+                    row.density,
+                    row.specific_heat,
+                    row.thermal_absorptance,
+                    row.thermal_absorptance_input,
+                    row.solar_absorptance,
+                    row.solar_absorptance_input,
+                    row.visible_absorptance,
+                    row.visible_absorptance_input,
+                    row.transmittance,
+                    row.visible_transmittance,
+                    row.shade_reflectance,
+                    row.shade_visible_reflectance,
+                    row.to_glass_distance,
+                    row.top_opening,
+                    row.bottom_opening,
+                    row.left_opening,
+                    row.right_opening,
+                    row.airflow_permeability
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+                && row.roughness == Some(MaterialSurfaceRoughness::Rough)
+        );
+        let following = &data.window_blind_equivalent_layer[&MaterialId(4)];
+        assert!(
+            names
+                .iter()
+                .all(|name| !input.is_object_unused("WindowMaterial:Blind:EquivalentLayer", name))
+                && following.slat_width == 0.02
+                && following.slat_separation == 0.015
+                && following.slat_orientation == 0
+                && following.slat_angle_type == 0
+                && following.base.tar.sol.ft.bm[0].df_ref == 0.3
+                && following.base.tar.sol.bk.bm[0].df_ref == 0.35
+                && following.base.tar.ir.ft.emi.to_bits() == 0
+                && following.base.tar.ir.bk.emi.to_bits() == 0
+                && shortcut.numeric_args[..21] == numeric_rows[2]
+                && shortcut.numeric_field_names[..21] == numeric_names
+                && shortcut.numeric_args[19..21] == [0.9, 0.9]
+                && shortcut.numeric_field_blanks[19..21] == [true, true]
+        );
+        let expected_messages = [
+            "WindowMaterial:Blind:EquivalentLayer=\"BAD BLIND EQL\", Illegal value combination.",
+            "front_side_slat_beam_diffuse_solar_transmittance + front_side_slat_beam_diffuse_solar_reflectance not < 1.0",
+            "WindowMaterial:Blind:EquivalentLayer=\"BAD BLIND EQL\", Illegal value combination.",
+            "back_side_slat_beam_diffuse_solar_transmittance + back_side_slat_beam_diffuse_solar_reflectance not < 1.0",
+            "WindowMaterial:Blind:EquivalentLayer=\"BAD BLIND EQL\", Illegal value combination.",
+            "front_side_slat_beam_diffuse_visible_transmittance + front_side_slat_beam_diffuse_visible_reflectance not < 1.0",
+            "WindowMaterial:Blind:EquivalentLayer=\"BAD BLIND EQL\", Illegal value combination.",
+            "back_side_slat_beam_diffuse_visible_transmittance + back_side_slat_beam_diffuse_visible_reflectance not < 1.0",
+            "GetMaterialData: WindowMaterial:Blind:EquivalentLayer = MASS, duplicate name.",
+        ];
+        for (line, expected) in lines.iter().zip(expected_messages) {
+            assert!(
+                line.ends_with(expected),
+                "{line:?} does not end with {expected:?}"
+            );
+        }
+        assert!(
+            !data
+                .window_blind_equivalent_layer
+                .contains_key(&MaterialId(0))
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && data
+                    .window_blind_equivalent_layer
+                    .iter()
+                    .all(
+                        |(id, row)| data.material_groups[id] == SourceMaterialGroup::BlindEql
+                            && data.resistance_only[id]
+                            && row.base.roughness == Some(MaterialSurfaceRoughness::Rough)
+                    )
+                && model.materials[0].name.0 == "MASS"
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+        );
+    }
+
+    // BlindEQL B3: one explicit Material owner, zero Window owners.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier supplies identity/kind only; actual TAR is written by the getter.
+        let typed_eql = ep_model::WindowBlindEquivalentLayerMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.0,
+            slat_separation_m: 0.0,
+            slat_crown_m: 0.0,
+            slat_angle_deg: 0.0,
+            front_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            front_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.0,
+            back_infrared_emissivity: 0.0,
+            front_thermal_absorptance: 0.0,
+            back_thermal_absorptance: 0.0,
+            thermal_transmittance: 0.0,
+            slat_angle_control:
+                ep_model::WindowBlindEquivalentLayerSlatAngleControl::FixedSlatAngle,
+        };
+        let names = ["BAD BLIND EQL", "ZZ VALID BLIND EQL"];
+        let typed_names = ["BAD BLIND EQL", "ZZ VALID BLIND EQL"];
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowBlindEquivalentLayer(typed_eql),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_crown",
+            "slat_angle",
+            "front_side_slat_beam_diffuse_solar_transmittance",
+            "back_side_slat_beam_diffuse_solar_transmittance",
+            "front_side_slat_beam_diffuse_solar_reflectance",
+            "back_side_slat_beam_diffuse_solar_reflectance",
+            "front_side_slat_beam_diffuse_visible_transmittance",
+            "back_side_slat_beam_diffuse_visible_transmittance",
+            "front_side_slat_beam_diffuse_visible_reflectance",
+            "back_side_slat_beam_diffuse_visible_reflectance",
+            "slat_diffuse_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_diffuse_solar_reflectance",
+            "slat_diffuse_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_diffuse_visible_reflectance",
+            "slat_infrared_transmittance",
+            "front_side_slat_infrared_emissivity",
+            "back_side_slat_infrared_emissivity",
+        ];
+        let numeric_rows: [[f64; 21]; 2] = [
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.6, 0.0, 0.5, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+        ];
+        let supplied: [&[usize]; 2] = [&[0, 1, 4, 6, 7, 13, 14], &[0, 1, 6, 7, 13, 14]];
+        let alpha_rows: [[Option<&str>; 2]; 2] = [[None, None]; 2];
+        raw.window_blind_equivalent_layer = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .enumerate()
+                    .filter(|(column, _)| supplied[index].contains(column))
+                    .map(|(column, field)| {
+                        ((*field).into(), Value::Number(numeric_rows[index][column]))
+                    })
+                    .collect();
+                fields.extend(
+                    ["slat_orientation", "slat_angle_control"]
+                        .iter()
+                        .zip(alpha_rows[index])
+                        .filter_map(|(field, value)| {
+                            value.map(|text| ((*field).into(), Value::String(text.into())))
+                        }),
+                );
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Actual empty family definitions allocate scratch; they perform zero Glass/ordinaryBlind work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Blind:EquivalentLayer",
+                &raw.window_blind_equivalent_layer,
+                3,
+                21,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(
+            matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+            crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+            if *operation == "error header" && source.kind() == std::io::ErrorKind::Other && source.to_string() == "authored IRT diagnostic failure"))
+                && errors_found
+                && data.num_eql_blinds == 2
+                && data.window_blind_equivalent_layer.len() == 1
+        );
+        assert!(
+            !input.is_object_unused("WindowMaterial:Blind:EquivalentLayer", names[0])
+                && input.is_object_unused("WindowMaterial:Blind:EquivalentLayer", names[1])
+                && shortcut.current_module_object == "WindowMaterial:Blind:EquivalentLayer"
+                && shortcut.alpha_args[..3] == ["BAD BLIND EQL", "HORIZONTAL", "FIXEDSLATANGLE"]
+                && shortcut.numeric_args[..21] == numeric_rows[0]
+                && shortcut.numeric_field_names[..21] == numeric_names
+                && shortcut.numeric_args[19..21] == [0.9, 0.9]
+                && shortcut.numeric_field_blanks[19..21] == [true, true]
+                && state.output_error_header
+                && state.tracking.last_severe_error.is_empty()
+                && console.is_empty()
+                && eio.is_empty()
+        );
+        let blind = &data.window_blind_equivalent_layer[&MaterialId(3)];
+        let row = &blind.base;
+        assert!(
+            [
+                blind.slat_width,
+                blind.slat_separation,
+                blind.slat_crown,
+                blind.slat_angle
+            ] == [0.02, 0.015, 0.0015, 45.0]
+                && [blind.slat_orientation, blind.slat_angle_type] == [0, 0]
+                && [
+                    row.tar.sol.ft.bm[0].df_tra,
+                    row.tar.sol.bk.bm[0].df_tra,
+                    row.tar.sol.ft.bm[0].df_ref,
+                    row.tar.sol.bk.bm[0].df_ref
+                ] == [0.6, 0.0, 0.5, 0.35]
+                && [&row.tar.vis.ft.bm[0], &row.tar.vis.bk.bm[0]]
+                    .iter()
+                    .all(
+                        |beam| [beam.bm_tra, beam.df_tra, beam.bm_ref, beam.df_ref, beam.abs]
+                            .iter()
+                            .all(|value| value.to_bits() == 0)
+                    )
+                && [
+                    &row.tar.sol.ft.df,
+                    &row.tar.sol.bk.df,
+                    &row.tar.vis.ft.df,
+                    &row.tar.vis.bk.df
+                ]
+                .iter()
+                .all(|side| [
+                    side.tra,
+                    side.tra_gnd,
+                    side.tra_sky,
+                    side.refl,
+                    side.refl_gnd,
+                    side.refl_sky,
+                    side.abs,
+                    side.abs_gnd,
+                    side.abs_sky
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0))
+                && [
+                    row.tar.ir.ft.tra,
+                    row.tar.ir.bk.tra,
+                    row.tar.ir.ft.emi,
+                    row.tar.ir.bk.emi,
+                    row.thermal_transmittance,
+                    row.thermal_absorptance_front,
+                    row.thermal_absorptance_back
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+                && row.roughness == Some(MaterialSurfaceRoughness::Rough)
+                && [
+                    row.thickness,
+                    row.conductivity,
+                    row.resistance,
+                    row.density,
+                    row.specific_heat,
+                    row.thermal_absorptance,
+                    row.thermal_absorptance_input,
+                    row.solar_absorptance,
+                    row.solar_absorptance_input,
+                    row.visible_absorptance,
+                    row.visible_absorptance_input,
+                    row.transmittance,
+                    row.visible_transmittance,
+                    row.shade_reflectance,
+                    row.shade_visible_reflectance,
+                    row.to_glass_distance,
+                    row.top_opening,
+                    row.bottom_opening,
+                    row.left_opening,
+                    row.right_opening,
+                    row.airflow_permeability
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+        );
+        assert!(
+            data.materials == [MaterialId(0), MaterialId(1), MaterialId(2), MaterialId(3)]
+                && data.material_map["MASS"] == 1
+                && data.material_map["BAD BLIND EQL"] == 4
+                && !data.material_map.contains_key(names[1])
+                && !data
+                    .window_blind_equivalent_layer
+                    .contains_key(&MaterialId(4))
+                && data.nominal_r == [0.05, 0.2, 0.15, 0.0]
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.material_groups[&MaterialId(3)] == SourceMaterialGroup::BlindEql
+                && data.resistance_only[&MaterialId(3)]
+        );
+    }
+
+    // BlindEQL B4: one explicit Material owner, zero Window owners.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Advisory typed carrier supplies identity/kind only; actual TAR is written by the getter.
+        let typed_eql = ep_model::WindowBlindEquivalentLayerMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.0,
+            slat_separation_m: 0.0,
+            slat_crown_m: 0.0,
+            slat_angle_deg: 0.0,
+            front_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_solar: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            front_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            back_visible: ep_model::WindowShadeEquivalentLayerSideOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties {
+                transmittance: 0.0,
+                front_reflectance: 0.0,
+                back_reflectance: 0.0,
+            },
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.0,
+            back_infrared_emissivity: 0.0,
+            front_thermal_absorptance: 0.0,
+            back_thermal_absorptance: 0.0,
+            thermal_transmittance: 0.0,
+            slat_angle_control:
+                ep_model::WindowBlindEquivalentLayerSlatAngleControl::FixedSlatAngle,
+        };
+        let names = ["MASS", "ZZ VALID BLIND EQL"];
+        let typed_names = ["ZZ VALID BLIND EQL"];
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowBlindEquivalentLayer(typed_eql),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_crown",
+            "slat_angle",
+            "front_side_slat_beam_diffuse_solar_transmittance",
+            "back_side_slat_beam_diffuse_solar_transmittance",
+            "front_side_slat_beam_diffuse_solar_reflectance",
+            "back_side_slat_beam_diffuse_solar_reflectance",
+            "front_side_slat_beam_diffuse_visible_transmittance",
+            "back_side_slat_beam_diffuse_visible_transmittance",
+            "front_side_slat_beam_diffuse_visible_reflectance",
+            "back_side_slat_beam_diffuse_visible_reflectance",
+            "slat_diffuse_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_diffuse_solar_reflectance",
+            "slat_diffuse_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_diffuse_visible_reflectance",
+            "slat_infrared_transmittance",
+            "front_side_slat_infrared_emissivity",
+            "back_side_slat_infrared_emissivity",
+        ];
+        let numeric_rows: [[f64; 21]; 2] = [
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+            [
+                0.02, 0.015, 0.0015, 45.0, 0.0, 0.0, 0.3, 0.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.3,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9,
+            ],
+        ];
+        let supplied: [&[usize]; 2] = [&[0, 1, 6, 7, 13, 14], &[0, 1, 6, 7, 13, 14]];
+        let alpha_rows: [[Option<&str>; 2]; 2] = [[None, None]; 2];
+        raw.window_blind_equivalent_layer = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .enumerate()
+                    .filter(|(column, _)| supplied[index].contains(column))
+                    .map(|(column, field)| {
+                        ((*field).into(), Value::Number(numeric_rows[index][column]))
+                    })
+                    .collect();
+                fields.extend(
+                    ["slat_orientation", "slat_angle_control"]
+                        .iter()
+                        .zip(alpha_rows[index])
+                        .filter_map(|(field, value)| {
+                            value.map(|text| ((*field).into(), Value::String(text.into())))
+                        }),
+                );
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Actual empty family definitions allocate scratch; they perform zero Glass/ordinaryBlind work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Blind:EquivalentLayer",
+                &raw.window_blind_equivalent_layer,
+                3,
+                21,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(
+            matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+            crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+            if *operation == "error header" && source.kind() == std::io::ErrorKind::Other && source.to_string() == "authored IRT diagnostic failure"))
+                && !errors_found
+                && data.num_eql_blinds == 2
+                && data.window_blind_equivalent_layer.is_empty()
+        );
+        assert!(
+            data.materials == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.material_map.len() == 3
+                && data.material_map["MASS"] == 1
+                && !data.material_map.contains_key(names[1])
+                && data.nominal_r == [0.05, 0.2, 0.15]
+        );
+        assert!(
+            !input.is_object_unused("WindowMaterial:Blind:EquivalentLayer", names[0])
+                && input.is_object_unused("WindowMaterial:Blind:EquivalentLayer", names[1])
+                && shortcut.current_module_object == "WindowMaterial:Blind:EquivalentLayer"
+                && shortcut.alpha_args[..3] == ["MASS", "HORIZONTAL", "FIXEDSLATANGLE"]
+                && shortcut.alpha_field_names[..3]
+                    == ["name", "slat_orientation", "slat_angle_control"]
+                && shortcut.alpha_field_blanks[..3] == [false, true, true]
+                && shortcut.numeric_args[..21] == numeric_rows[0]
+                && shortcut.numeric_field_names[..21] == numeric_names
+                && shortcut.numeric_args[19..21] == [0.9, 0.9]
+                && shortcut.numeric_field_blanks[19..21] == [true, true]
+                && state.output_error_header
+                && state.tracking.last_severe_error.is_empty()
+                && console.is_empty()
+                && eio.is_empty()
+        );
+        assert!(
+            data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.material_groups[&MaterialId(1)] == SourceMaterialGroup::Regular
+                && data.resistance_only[&MaterialId(1)]
+                && data.material_groups[&MaterialId(2)] == SourceMaterialGroup::AirGap
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
         );
     }
 }
