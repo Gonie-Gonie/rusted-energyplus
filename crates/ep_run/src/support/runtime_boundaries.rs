@@ -385,17 +385,40 @@ pub(super) fn assess_typed_runtime_boundaries(
             refraction_count.max(refraction_raw_count),
         );
     }
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Glazing:EquivalentLayer",
-        typed_model
-            .materials
+    let glazing_equivalent_layer_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowGlazingEquivalentLayer)
+        .count();
+    let glazing_equivalent_layer_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Glazing:EquivalentLayer".into(),
+        ))
+        .map_or(0, |rows| rows.len());
+    let glazing_equivalent_layer_consumed = source_admission
+        .is_some_and(|admission| admission.consumes_unused_glazing_equivalent_layer(typed_model));
+    let glazing_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowGlazingEquivalentLayer)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id
+                        && material.kind() == MaterialKind::WindowGlazingEquivalentLayer
+                })
+            })
+    });
+    if !glazing_equivalent_layer_consumed || glazing_equivalent_layer_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Glazing:EquivalentLayer",
+            glazing_equivalent_layer_count.max(glazing_equivalent_layer_raw_count),
+        );
+    }
     let gas_consumed = source_admission
         .is_some_and(|admission| admission.consumes_window_gas_materials(typed_model));
     let named_gas_used = typed_model.constructions.iter().any(|construction| {

@@ -483,6 +483,7 @@ impl GainFactory {
             window_screen: Vec::new(),
             window_screen_equivalent_layer: Vec::new(),
             window_blind_equivalent_layer: Vec::new(),
+            window_glazing_equivalent_layer: Vec::new(),
             window_blind: Vec::new(),
             regular: project_objects(factory, &["Material"])?
                 .remove("Material")

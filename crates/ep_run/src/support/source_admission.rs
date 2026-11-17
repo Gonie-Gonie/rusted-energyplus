@@ -49,6 +49,8 @@ pub(crate) struct SourceSupportAdmission {
     screen_equivalent_layer_bindings: BTreeSet<String>,
     /// Original-schema unused BlindEQL names; recovery stays with the actual Material getter.
     blind_equivalent_layer_bindings: BTreeSet<String>,
+    /// Original-schema unused GlassEQL names; actual TAR/common state belongs to Material.
+    glazing_equivalent_layer_bindings: BTreeSet<String>,
     /// Validated unused Screen names; no optical coefficients or precomputed arrays.
     screen_bindings: BTreeSet<String>,
     /// Validated unused Blind names;computedTAR belongs only to its actual Material owner.
@@ -419,6 +421,28 @@ impl SourceSupportAdmission {
             }
             covered_objects.insert("WindowMaterial:Blind:EquivalentLayer");
         }
+        let mut glazing_equivalent_layer_bindings = BTreeSet::new();
+        if trace.scope == PortingScope::B
+            && raw
+                .objects
+                .get(&ObjectType("WindowMaterial:Glazing:EquivalentLayer".into()))
+                .is_some_and(|rows| !rows.is_empty())
+            && crate::ordinary_equipment_input::source_b_validate_unused_glazing_equivalent_layer(
+                raw,
+            )
+            .is_ok()
+        {
+            for name in raw
+                .objects
+                .get(&ObjectType("WindowMaterial:Glazing:EquivalentLayer".into()))?
+                .keys()
+            {
+                if !glazing_equivalent_layer_bindings.insert(name.0.to_ascii_uppercase()) {
+                    return None;
+                }
+            }
+            covered_objects.insert("WindowMaterial:Glazing:EquivalentLayer");
+        }
         let mut screen_bindings = BTreeSet::new();
         if trace.scope == PortingScope::B
             && raw
@@ -555,6 +579,7 @@ impl SourceSupportAdmission {
             drape_equivalent_layer_bindings,
             screen_equivalent_layer_bindings,
             blind_equivalent_layer_bindings,
+            glazing_equivalent_layer_bindings,
             screen_bindings,
             blind_bindings,
             refraction_bindings,
@@ -1230,6 +1255,92 @@ impl SourceSupportAdmission {
             if !matches!(
                 row.definition,
                 ep_model::MaterialDefinition::WindowBlindEquivalentLayer(_)
+            ) {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub(super) fn consumes_unused_glazing_equivalent_layer(
+        &self,
+        model: &ep_model::TypedModel,
+    ) -> bool {
+        use ep_model::MaterialKind;
+        if !self.consumes("WindowMaterial:Glazing:EquivalentLayer")
+            || !model.material_names.is_source_exact_namespace()
+        {
+            return false;
+        }
+        let all_ids: BTreeSet<_> = model.materials.iter().map(|row| row.id).collect();
+        if all_ids.len() != model.materials.len() {
+            return false;
+        }
+        let expected: BTreeSet<_> = self
+            .glazing_equivalent_layer_bindings
+            .iter()
+            .map(String::as_str)
+            .collect();
+        let mut glazing_eql_rows = BTreeMap::new();
+        for row in &model.materials {
+            if matches!(row.kind(), MaterialKind::WindowGlazingEquivalentLayer)
+                && glazing_eql_rows.insert(row.id, row).is_some()
+            {
+                return false;
+            }
+        }
+        if glazing_eql_rows.len() != expected.len() {
+            return false;
+        }
+        let mut material_map_names: BTreeMap<ep_model::MaterialId, &str> = BTreeMap::new();
+        for name in model.material_names.names() {
+            let id = model.material_names.resolve(&name.0);
+            if id.is_some_and(|id| glazing_eql_rows.contains_key(&id))
+                || expected.contains(name.0.as_str())
+            {
+                let Some(id) = id else {
+                    return false;
+                };
+                if !glazing_eql_rows.contains_key(&id)
+                    || !expected.contains(name.0.as_str())
+                    || material_map_names.insert(id, name.0.as_str()).is_some()
+                {
+                    return false;
+                }
+            }
+        }
+        let mut by_name: BTreeMap<&str, Vec<ep_model::MaterialId>> = BTreeMap::new();
+        let mut by_id: BTreeMap<ep_model::MaterialId, Vec<&str>> = BTreeMap::new();
+        for (id, name) in &model.ctf_report_names.materials {
+            if !all_ids.contains(id) {
+                return false;
+            }
+            if glazing_eql_rows.contains_key(id) || expected.contains(name.as_str()) {
+                by_name.entry(name.as_str()).or_default().push(*id);
+                by_id.entry(*id).or_default().push(name.as_str());
+            }
+        }
+        for name in expected {
+            let Some(ids) = by_name.get(name) else {
+                return false;
+            };
+            if ids.len() != 1 {
+                return false;
+            }
+            let id = ids[0];
+            let Some(row) = glazing_eql_rows.get(&id) else {
+                return false;
+            };
+            if row.name.0 != name
+                || model.material_names.resolve(name) != Some(id)
+                || material_map_names.get(&id).copied() != Some(name)
+                || by_id.get(&id).is_none_or(|names| names.len() != 1)
+            {
+                return false;
+            }
+            if !matches!(
+                row.definition,
+                ep_model::MaterialDefinition::WindowGlazingEquivalentLayer(_)
             ) {
                 return false;
             }

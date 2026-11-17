@@ -4933,6 +4933,159 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "WindowMaterial:Glazing:EquivalentLayer" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "optical_data_type",
+                    default: SchemaDefault::String("SpectralAverage"),
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "window_glass_spectral_data_set_name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_beam_solar_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_beam_solar_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_beam_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_beam_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_beam_visible_solar_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_beam_visible_solar_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_beam_visible_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_beam_visible_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_diffuse_solar_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_diffuse_solar_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_diffuse_solar_reflectance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_diffuse_solar_reflectance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_diffuse_visible_solar_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_diffuse_visible_solar_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_beam_diffuse_visible_solar_reflectance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_beam_diffuse_visible_solar_reflectance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "diffuse_diffuse_solar_transmittance",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "front_side_diffuse_diffuse_solar_reflectance",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "back_side_diffuse_diffuse_solar_reflectance",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "diffuse_diffuse_visible_solar_transmittance",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "front_side_diffuse_diffuse_visible_solar_reflectance",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "back_side_diffuse_diffuse_visible_solar_reflectance",
+                    default: SchemaDefault::String("Autocalculate"),
+                    automatic: &[SchemaAutomatic::Autocalculate],
+                },
+                SchemaField {
+                    name: "infrared_transmittance_applies_to_front_and_back_",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_infrared_emissivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_infrared_emissivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "thermal_resistance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "WindowMaterial:Blind:EquivalentLayer" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

@@ -85,6 +85,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         window_screen: Vec::new(),
         window_screen_equivalent_layer: Vec::new(),
         window_blind_equivalent_layer: Vec::new(),
+        window_glazing_equivalent_layer: Vec::new(),
         window_blind: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
@@ -7165,6 +7166,1873 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 && data
                     .source_blind_equivalent_layer_surface_properties(0, MaterialId(3))
                     .is_err()
+        );
+    }
+
+    // GlazingEQL B1: genuine owned getter state; no Window owner or active optics claim.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Typed carrier supplies actual ID/kind only; the genuine getter owns every runtime write.
+        let typed_direction = ep_model::WindowGlazingEquivalentLayerDirectionalProperties {
+            front_transmittance: 0.0,
+            back_transmittance: 0.0,
+            front_reflectance: 0.0,
+            back_reflectance: 0.0,
+        };
+        let typed_band = ep_model::WindowGlazingEquivalentLayerOpticalBand {
+            beam_beam: typed_direction,
+            beam_diffuse: typed_direction,
+            diffuse_diffuse: ep_model::WindowGlazingEquivalentLayerDiffuseProperties {
+                transmittance: ep_model::AutoOrNumber::AutoCalculate,
+                front_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+                back_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+            },
+        };
+        let typed_eql = ep_model::WindowGlazingEquivalentLayerMaterial {
+            solar: typed_band,
+            visible: typed_band,
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.84,
+            back_infrared_emissivity: 0.84,
+            thermal_resistance_m2_k_per_w: 0.158,
+        };
+        let names = [
+            "AA GLASS EQL MIN",
+            "AB GLASS EQL FULL",
+            "AC GLASS EQL EXACT AUTO",
+            "AD GLASS EQL EMPTY AUTO ALPHAS",
+            "AE GLASS EQL U64MAX",
+            "AF GLASS EQL I64WRAP",
+            "AG GLASS EQL OUTSIDE U64",
+            "AH GLASS EQL EXPONENT",
+            "AI GLASS EQL SIGNED ZERO",
+            "AJ GLASS EQL NO SUM GATE",
+            "N08 GLASS EQL COUNT",
+            "N09 GLASS EQL COUNT",
+            "N10 GLASS EQL COUNT",
+            "N11 GLASS EQL COUNT",
+            "N12 GLASS EQL COUNT",
+            "N13 GLASS EQL COUNT",
+            "N14 GLASS EQL COUNT",
+            "N15 GLASS EQL COUNT",
+            "N16 GLASS EQL COUNT",
+            "N17 GLASS EQL COUNT",
+            "N18 GLASS EQL COUNT",
+            "N19 GLASS EQL COUNT",
+            "N20 GLASS EQL COUNT",
+            "N21 GLASS EQL COUNT",
+            "N22 GLASS EQL COUNT",
+            "N23 GLASS EQL COUNT",
+            "N24 GLASS EQL COUNT",
+            "N25 GLASS EQL COUNT",
+            "N26 GLASS EQL COUNT",
+        ];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowGlazingEquivalentLayer(typed_eql),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "front_side_beam_beam_solar_transmittance",
+            "back_side_beam_beam_solar_transmittance",
+            "front_side_beam_beam_solar_reflectance",
+            "back_side_beam_beam_solar_reflectance",
+            "front_side_beam_beam_visible_solar_transmittance",
+            "back_side_beam_beam_visible_solar_transmittance",
+            "front_side_beam_beam_visible_solar_reflectance",
+            "back_side_beam_beam_visible_solar_reflectance",
+            "front_side_beam_diffuse_solar_transmittance",
+            "back_side_beam_diffuse_solar_transmittance",
+            "front_side_beam_diffuse_solar_reflectance",
+            "back_side_beam_diffuse_solar_reflectance",
+            "front_side_beam_diffuse_visible_solar_transmittance",
+            "back_side_beam_diffuse_visible_solar_transmittance",
+            "front_side_beam_diffuse_visible_solar_reflectance",
+            "back_side_beam_diffuse_visible_solar_reflectance",
+            "diffuse_diffuse_solar_transmittance",
+            "front_side_diffuse_diffuse_solar_reflectance",
+            "back_side_diffuse_diffuse_solar_reflectance",
+            "diffuse_diffuse_visible_solar_transmittance",
+            "front_side_diffuse_diffuse_visible_solar_reflectance",
+            "back_side_diffuse_diffuse_visible_solar_reflectance",
+            "infrared_transmittance_applies_to_front_and_back_",
+            "front_side_infrared_emissivity",
+            "back_side_infrared_emissivity",
+            "thermal_resistance",
+        ];
+        let numeric_tokens: [[Option<&str>; 26]; 29] = [
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                Some("0.71"),
+                Some("0.72"),
+                Some("0.11"),
+                Some("0.12"),
+                Some("0.31"),
+                Some("0.32"),
+                Some("0.23"),
+                Some("0.24"),
+                Some("0.41"),
+                Some("0.42"),
+                Some("0.13"),
+                Some("0.14"),
+                Some("0.51"),
+                Some("0.25"),
+                Some("0.26"),
+                Some("0.52"),
+                Some("0.15"),
+                Some("0.16"),
+                Some("0.03"),
+                Some("0.81"),
+                Some("0.82"),
+                Some("0.17"),
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("Autocalculate"),
+                Some("Autocalculate"),
+                Some("Autocalculate"),
+                Some("Autocalculate"),
+                Some("Autocalculate"),
+                Some("Autocalculate"),
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some(""),
+                Some(""),
+                Some(""),
+                Some(""),
+                Some(""),
+                Some(""),
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("18446744073709551615"),
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("9223372036854775808"),
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("18446744073709551616"),
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("1.8446744073709552e19"),
+            ],
+            [
+                Some("-0"),
+                Some("-0.0"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("1.0"),
+                Some("0.5"),
+                Some("0.5"),
+                Some("0.5"),
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                Some("0.12"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                Some("0.31"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.32"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.23"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.24"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.41"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.42"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.13"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.14"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.51"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.25"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.26"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.52"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.15"),
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.16"),
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.03"),
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.81"),
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.82"),
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                Some("0.17"),
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 2]; 29] = [
+            [None, None],
+            [
+                Some("SpectralAverage"),
+                Some("Unresolved set is ignored here"),
+            ],
+            [None, None],
+            [Some(""), Some("")],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+            [None, None],
+        ];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .map(|(numbers, alphas)| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| {
+                            (
+                                (*field).into(),
+                                if matches!(token, "" | "Autocalculate") {
+                                    S::String(token.into())
+                                } else {
+                                    S::Number(token.into())
+                                },
+                            )
+                        })
+                    })
+                    .collect();
+                fields.extend(
+                    ["optical_data_type", "window_glass_spectral_data_set_name"]
+                        .iter()
+                        .zip(alphas)
+                        .filter_map(|(field, value)| {
+                            value.map(|value| ((*field).into(), S::String(value.into())))
+                        }),
+                );
+                fields
+            })
+            .collect();
+        raw.window_glazing_equivalent_layer = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Empty genuine Glass/Blind definitions allocate 7A/27N; neither performs positive work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Glazing:EquivalentLayer",
+                &raw.window_glazing_equivalent_layer,
+                3,
+                26,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "WindowMaterial:Glazing:EquivalentLayer" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let expected_numbers: [[f64; 26]; 29] = [
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.71, 0.72, 0.11, 0.12, 0.31, 0.32, 0.23, 0.24, 0.41, 0.42,
+                0.13, 0.14, 0.51, 0.25, 0.26, 0.52, 0.15, 0.16, 0.03, 0.81, 0.82, 0.17,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, -1.0,
+            ],
+            [
+                0.61,
+                0.62,
+                0.21,
+                0.22,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                0.0,
+                0.84,
+                0.84,
+                -9.223372036854776e+18,
+            ],
+            [
+                0.61,
+                0.62,
+                0.21,
+                0.22,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                0.0,
+                0.84,
+                0.84,
+                1.8446744073709552e+19,
+            ],
+            [
+                0.61,
+                0.62,
+                0.21,
+                0.22,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                -99999.0,
+                0.0,
+                0.84,
+                0.84,
+                1.8446744073709552e+19,
+            ],
+            [
+                0.0, -0.0, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.12, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.31, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.32, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.23, 0.0, 0.0, 0.0, 0.0,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.24, 0.0, 0.0, 0.0,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.41, 0.0, 0.0,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.42, 0.0,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.13,
+                0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.14, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.51, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, 0.25, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, 0.26, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, 0.52, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, 0.15, -99999.0, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.16, 0.0, 0.84, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.03, 0.84, 0.84,
+                0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.81, 0.84, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.82, 0.158,
+            ],
+            [
+                0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0, 0.84, 0.84, 0.17,
+            ],
+        ];
+        let expected_blanks: [[bool; 26]; 29] = [
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, false, false, false, false, false, false, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, false,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, false,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, false,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, false,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                false, false,
+            ],
+            [
+                false, false, false, false, true, true, true, false, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, false, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, false, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, false, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, false, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, false,
+                true, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                false, true, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, false, true, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, false, true, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, false, true, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, false, true, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, false, true, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, false, true, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, false, true, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, false, true, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, false, true, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, false, true, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, false, true,
+            ],
+            [
+                false, false, false, false, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true, true, false,
+            ],
+        ];
+        let expected_counts: [usize; 29] = [
+            8_usize, 26_usize, 22_usize, 22_usize, 26_usize, 26_usize, 26_usize, 26_usize, 8_usize,
+            26_usize, 8_usize, 9_usize, 10_usize, 11_usize, 12_usize, 13_usize, 14_usize, 15_usize,
+            16_usize, 17_usize, 18_usize, 19_usize, 20_usize, 21_usize, 22_usize, 23_usize,
+            24_usize, 25_usize, 26_usize,
+        ];
+        let expected_resistance: [f64; 29] = [
+            0.158,
+            0.17,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            1.8446744073709552e+19,
+            1.8446744073709552e+19,
+            0.158,
+            0.5,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.158,
+            0.17,
+        ];
+        // Source .4R positive digits19+precision4 >=17 uses fixed0 plus dot, not an executed formatter.
+        let expected_report_r = [
+            "0.1580",
+            "0.1700",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "18446744073709551616.",
+            "18446744073709551616.",
+            "0.1580",
+            "0.5000",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1580",
+            "0.1700",
+        ];
+        let mut text = Vec::new();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+                .expect("genuine GlazingEQL getter");
+            // This post-getter inspection reuses the same raw/IP/shortcut; only scratch is poisoned.
+            for (index, object) in raw.window_glazing_equivalent_layer.iter().enumerate() {
+                let id = MaterialId(3 + u32::try_from(index).unwrap());
+                let row = &data.window_glazing_equivalent_layer[&id];
+                assert!(
+                    data.materials[index + 3] == id
+                        && data.material_map[names[index]] == i32::try_from(index + 4).unwrap()
+                        && model
+                            .materials
+                            .iter()
+                            .find(|material| material.id == id)
+                            .unwrap()
+                            .name
+                            .0
+                            == names[index]
+                        && model.ctf_report_names.materials[index + 3] == (id, names[index].into())
+                        && data.material_groups[&id] == SourceMaterialGroup::GlassEql
+                        && data.resistance_only[&id]
+                );
+                assert!(
+                    [
+                        row.tar.sol.ft.bm[0].bm_tra,
+                        row.tar.sol.bk.bm[0].bm_tra,
+                        row.tar.sol.ft.bm[0].bm_ref,
+                        row.tar.sol.bk.bm[0].bm_ref,
+                        row.tar.vis.ft.bm[0].bm_tra,
+                        row.tar.vis.bk.bm[0].bm_tra,
+                        row.tar.vis.ft.bm[0].bm_ref,
+                        row.tar.vis.bk.bm[0].bm_ref,
+                        row.tar.sol.ft.bm[0].df_tra,
+                        row.tar.sol.bk.bm[0].df_tra,
+                        row.tar.sol.ft.bm[0].df_ref,
+                        row.tar.sol.bk.bm[0].df_ref,
+                        row.tar.vis.ft.bm[0].df_tra,
+                        row.tar.vis.bk.bm[0].df_tra,
+                        row.tar.vis.ft.bm[0].df_ref,
+                        row.tar.vis.bk.bm[0].df_ref,
+                        row.tar.sol.ft.df.tra,
+                        row.tar.sol.ft.df.refl,
+                        row.tar.sol.bk.df.refl,
+                        row.tar.vis.ft.df.tra,
+                        row.tar.vis.ft.df.refl,
+                        row.tar.vis.bk.df.refl,
+                        row.tar.ir.ft.tra,
+                        row.tar.ir.ft.emi,
+                        row.tar.ir.bk.emi,
+                        row.resistance
+                    ]
+                    .iter()
+                    .zip(
+                        expected_numbers[index][..25]
+                            .iter()
+                            .copied()
+                            .chain([expected_resistance[index]])
+                    )
+                    .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                );
+                assert!(
+                    [
+                        row.thickness,
+                        row.conductivity,
+                        row.density,
+                        row.specific_heat,
+                        row.thermal_absorptance,
+                        row.thermal_absorptance_input,
+                        row.solar_absorptance,
+                        row.solar_absorptance_input,
+                        row.visible_absorptance,
+                        row.visible_absorptance_input,
+                        row.transmittance,
+                        row.visible_transmittance,
+                        row.reflect_solar_beam_back,
+                        row.reflect_solar_beam_front
+                    ]
+                    .iter()
+                    .all(|value| value.to_bits() == 0)
+                        && [
+                            &row.tar.sol.ft.bm[0],
+                            &row.tar.sol.bk.bm[0],
+                            &row.tar.vis.ft.bm[0],
+                            &row.tar.vis.bk.bm[0]
+                        ]
+                        .iter()
+                        .all(|beam| beam.abs.to_bits() == 0)
+                        && [
+                            &row.tar.sol.ft.df,
+                            &row.tar.sol.bk.df,
+                            &row.tar.vis.ft.df,
+                            &row.tar.vis.bk.df
+                        ]
+                        .iter()
+                        .all(|side| [
+                            side.tra_gnd,
+                            side.tra_sky,
+                            side.refl_gnd,
+                            side.refl_sky,
+                            side.abs,
+                            side.abs_gnd,
+                            side.abs_sky
+                        ]
+                        .iter()
+                        .all(|value| value.to_bits() == 0))
+                        && row.roughness == Some(MaterialSurfaceRoughness::VerySmooth)
+                        && row.optical_model == 0
+                        && data.nominal_r[index + 3].to_bits() == 0
+                );
+                assert!(
+                    [
+                        row.thermal_absorptance_front,
+                        row.thermal_absorptance_back,
+                        row.thermal_transmittance,
+                        row.tar.ir.bk.tra
+                    ]
+                    .iter()
+                    .all(|actual| actual.to_bits() == expected_numbers[index][22].to_bits())
+                        && row.tar.sol.bk.df.tra.to_bits() == expected_numbers[index][16].to_bits()
+                        && row.tar.vis.bk.df.tra.to_bits() == expected_numbers[index][19].to_bits()
+                );
+                assert!(
+                    row.resistance.to_bits() == expected_resistance[index].to_bits()
+                        && matches!(
+                            ep_model::classify_source_json_number("18446744073709551615").unwrap(),
+                            ep_model::SourceJsonNumber::Integer(-1)
+                        )
+                        && matches!(
+                            ep_model::classify_source_json_number("9223372036854775808").unwrap(),
+                            ep_model::SourceJsonNumber::Integer(i64::MIN)
+                        )
+                        && matches!(ep_model::classify_source_json_number("18446744073709551616").unwrap(), ep_model::SourceJsonNumber::Float(value) if value.to_bits() == 18446744073709551616.0_f64.to_bits())
+                        && matches!(ep_model::classify_source_json_number("1.8446744073709552e19").unwrap(), ep_model::SourceJsonNumber::Float(value) if value.to_bits() == 18446744073709551616.0_f64.to_bits())
+                );
+                owners.shortcut.alpha_args.fill("stale".into());
+                owners.shortcut.numeric_args.fill(-123.0);
+                owners.shortcut.alpha_field_names.fill("stale".into());
+                owners.shortcut.numeric_field_names.fill("stale".into());
+                owners.shortcut.alpha_field_blanks.fill(false);
+                owners.shortcut.numeric_field_blanks.fill(false);
+                assert!(
+                    raw.get_window_glazing_equivalent_layer_item(object, &mut owners)
+                        .unwrap()
+                        == (3, expected_counts[index])
+                        && owners.shortcut.numeric_args[..26]
+                            .iter()
+                            .zip(expected_numbers[index])
+                            .all(|(actual, expected)| actual.to_bits() == expected.to_bits())
+                );
+                assert!(
+                    owners.shortcut.alpha_args[..3]
+                        == [
+                            names[index],
+                            "SPECTRALAVERAGE",
+                            if index == 1 {
+                                "UNRESOLVED SET IS IGNORED HERE"
+                            } else {
+                                ""
+                            }
+                        ]
+                        && owners.shortcut.alpha_field_names[..3]
+                            == [
+                                "name",
+                                "optical_data_type",
+                                "window_glass_spectral_data_set_name"
+                            ]
+                        && owners.shortcut.alpha_field_blanks[..3]
+                            == [false, index != 1, index != 1]
+                        && owners.shortcut.numeric_field_names[..26] == numeric_names
+                        && owners.shortcut.numeric_field_blanks[..26] == expected_blanks[index]
+                );
+                assert!(
+                    owners.shortcut.alpha_args.len() == 7
+                        && owners.shortcut.numeric_args.len() == 27
+                        && owners.shortcut.alpha_args[3..7]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_names[3..7]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_blanks[3..7]
+                            .iter()
+                            .all(|blank| *blank)
+                        && owners.shortcut.numeric_args[26..27]
+                            .iter()
+                            .all(|value| value.to_bits() == 0)
+                        && owners.shortcut.numeric_field_names[26..27]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.numeric_field_blanks[26..27]
+                            .iter()
+                            .all(|blank| *blank)
+                );
+                assert!(
+                    !owners
+                        .input
+                        .is_object_unused("WindowMaterial:Glazing:EquivalentLayer", names[index])
+                        && original_fields[index]
+                            .iter()
+                            .all(|(field, original)| match original {
+                                S::Number(token) =>
+                                    object.fields[field]
+                                        == Value::Number(
+                                            ep_model::classify_source_json_number(token)
+                                                .unwrap()
+                                                .as_f64()
+                                        ),
+                                S::String(value) =>
+                                    object.fields[field] == Value::String(value.clone()),
+                                _ => false,
+                            })
+                );
+            }
+        }
+        assert!(
+            !errors_found
+                && state.tracking.total_severe_errors == 0
+                && state.tracking.total_warning_errors == 0
+                && text.is_empty()
+                && console.is_empty()
+                && data.num_eql_glazings == 29
+                && data.window_glazing_equivalent_layer.len() == 29
+                && data.materials.len() == 32
+                && raw.glazing.is_empty()
+                && raw.window_blind.is_empty()
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let report_rows = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert!(
+            report_rows.len() == 31
+                && report_rows[2..]
+                    == names
+                        .iter()
+                        .zip(expected_report_r)
+                        .map(|(name, resistance)| vec![
+                            " Material Details",
+                            *name,
+                            resistance,
+                            "VerySmooth",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.0000",
+                            "0.0000",
+                            "0.0000"
+                        ])
+                        .collect::<Vec<_>>()
+                && names.iter().enumerate().all(|(index, _)| data
+                    .source_glazing_equivalent_layer_surface_properties(
+                        i32::try_from(index + 4).unwrap(),
+                        MaterialId(3 + u32::try_from(index).unwrap())
+                    )
+                    .unwrap()
+                    == (
+                        MaterialSurfaceRoughness::VerySmooth,
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: 0.0,
+                            solar_absorptance: 0.0,
+                            visible_absorptance: 0.0
+                        }
+                    ))
+                && data
+                    .source_glazing_equivalent_layer_surface_properties(4, MaterialId(4))
+                    .is_err()
+                && data
+                    .source_glazing_equivalent_layer_surface_properties(0, MaterialId(3))
+                    .is_err()
+        );
+        assert!(
+            data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && report_rows[..2]
+                    == [
+                        vec![
+                            " Material Details",
+                            "Mass",
+                            "5.0000E-002",
+                            "MediumRough",
+                            "0.1000",
+                            "2.000",
+                            "2000.000",
+                            "800.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                        vec![
+                            " Material Details",
+                            "NO MASS",
+                            "0.2000",
+                            "MediumRough",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.9000",
+                            "0.7000",
+                            "0.7000"
+                        ],
+                    ]
+                && std::str::from_utf8(&eio)
+                    .unwrap()
+                    .lines()
+                    .filter(|line| line.starts_with(" Material:Air,"))
+                    .collect::<Vec<_>>()
+                    == [" Material:Air,MIXED GAP,0.1500"]
         );
     }
 }
@@ -16136,6 +18004,1520 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 && data.resistance_only[&MaterialId(2)]
                 && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
                 if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+        );
+    }
+
+    // GlazingEQL B2: real getter and original token custody; no Window owner.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Typed carrier supplies actual ID/kind only; the genuine getter owns every runtime write.
+        let typed_direction = ep_model::WindowGlazingEquivalentLayerDirectionalProperties {
+            front_transmittance: 0.0,
+            back_transmittance: 0.0,
+            front_reflectance: 0.0,
+            back_reflectance: 0.0,
+        };
+        let typed_band = ep_model::WindowGlazingEquivalentLayerOpticalBand {
+            beam_beam: typed_direction,
+            beam_diffuse: typed_direction,
+            diffuse_diffuse: ep_model::WindowGlazingEquivalentLayerDiffuseProperties {
+                transmittance: ep_model::AutoOrNumber::AutoCalculate,
+                front_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+                back_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+            },
+        };
+        let typed_eql = ep_model::WindowGlazingEquivalentLayerMaterial {
+            solar: typed_band,
+            visible: typed_band,
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.84,
+            back_infrared_emissivity: 0.84,
+            thermal_resistance_m2_k_per_w: 0.158,
+        };
+        let names = ["A GLASS EQL BAD", "MASS", "Z GLASS EQL AFTER"];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowGlazingEquivalentLayer(typed_eql),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "front_side_beam_beam_solar_transmittance",
+            "back_side_beam_beam_solar_transmittance",
+            "front_side_beam_beam_solar_reflectance",
+            "back_side_beam_beam_solar_reflectance",
+            "front_side_beam_beam_visible_solar_transmittance",
+            "back_side_beam_beam_visible_solar_transmittance",
+            "front_side_beam_beam_visible_solar_reflectance",
+            "back_side_beam_beam_visible_solar_reflectance",
+            "front_side_beam_diffuse_solar_transmittance",
+            "back_side_beam_diffuse_solar_transmittance",
+            "front_side_beam_diffuse_solar_reflectance",
+            "back_side_beam_diffuse_solar_reflectance",
+            "front_side_beam_diffuse_visible_solar_transmittance",
+            "back_side_beam_diffuse_visible_solar_transmittance",
+            "front_side_beam_diffuse_visible_solar_reflectance",
+            "back_side_beam_diffuse_visible_solar_reflectance",
+            "diffuse_diffuse_solar_transmittance",
+            "front_side_diffuse_diffuse_solar_reflectance",
+            "back_side_diffuse_diffuse_solar_reflectance",
+            "diffuse_diffuse_visible_solar_transmittance",
+            "front_side_diffuse_diffuse_visible_solar_reflectance",
+            "back_side_diffuse_diffuse_visible_solar_reflectance",
+            "infrared_transmittance_applies_to_front_and_back_",
+            "front_side_infrared_emissivity",
+            "back_side_infrared_emissivity",
+            "thermal_resistance",
+        ];
+        let numeric_tokens: [[Option<&str>; 26]; 3] = [
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                Some("0.71"),
+                Some("0.72"),
+                Some("0.11"),
+                Some("0.12"),
+                Some("0.31"),
+                Some("0.32"),
+                Some("0.23"),
+                Some("0.24"),
+                Some("0.41"),
+                Some("0.42"),
+                Some("0.13"),
+                Some("0.14"),
+                Some("0.51"),
+                Some("0.25"),
+                Some("0.26"),
+                Some("0.52"),
+                Some("0.15"),
+                Some("0.16"),
+                Some("0.03"),
+                Some("0.81"),
+                Some("0.82"),
+                Some("18446744073709551615"),
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                Some("0.71"),
+                Some("0.72"),
+                Some("0.11"),
+                Some("0.12"),
+                Some("0.31"),
+                Some("0.32"),
+                Some("0.23"),
+                Some("0.24"),
+                Some("0.41"),
+                Some("0.42"),
+                Some("0.13"),
+                Some("0.14"),
+                Some("0.51"),
+                Some("0.25"),
+                Some("0.26"),
+                Some("0.52"),
+                Some("0.15"),
+                Some("0.16"),
+                Some("0.03"),
+                Some("0.81"),
+                Some("0.82"),
+                Some("0.17"),
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 2]; 3] = [
+            [Some("Spectral"), Some("unresolved identifier")],
+            [Some("SpectralAverage"), None],
+            [Some("SpectralAverage"), None],
+        ];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .map(|(numbers, alphas)| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| {
+                            (
+                                (*field).into(),
+                                if matches!(token, "" | "Autocalculate") {
+                                    S::String(token.into())
+                                } else {
+                                    S::Number(token.into())
+                                },
+                            )
+                        })
+                    })
+                    .collect();
+                fields.extend(
+                    ["optical_data_type", "window_glass_spectral_data_set_name"]
+                        .iter()
+                        .zip(alphas)
+                        .filter_map(|(field, value)| {
+                            value.map(|value| ((*field).into(), S::String(value.into())))
+                        }),
+                );
+                fields
+            })
+            .collect();
+        raw.window_glazing_equivalent_layer = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Empty genuine Glass/Blind definitions allocate 7A/27N; neither performs positive work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Glazing:EquivalentLayer",
+                &raw.window_glazing_equivalent_layer,
+                3,
+                26,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "WindowMaterial:Glazing:EquivalentLayer" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+                .expect("direct GlazingEQL invalid-key/duplicate continuation");
+        }
+        assert!(
+            errors_found
+                && data.num_eql_glazings == 3
+                && data.window_glazing_equivalent_layer.len() == 2
+                && state.tracking.total_severe_errors == 2
+                && state.tracking.total_warning_errors == 0
+        );
+        let log = std::str::from_utf8(&text).unwrap();
+        let lines = log
+            .lines()
+            .filter(|line| line.contains(" ** Severe  ** ") || line.contains(" **   ~~~   ** "))
+            .collect::<Vec<_>>();
+        let expected_messages = [
+            "GetMaterialData: WindowMaterial:Glazing:EquivalentLayer = A GLASS EQL BAD",
+            "optical_data_type = SPECTRAL, invalid key.",
+            "Must be \"SpectralAverage\".",
+            "GetMaterialData: WindowMaterial:Glazing:EquivalentLayer = MASS, duplicate name.",
+        ];
+        for (line, expected) in lines.iter().zip(expected_messages) {
+            assert!(
+                line.ends_with(expected),
+                "{line:?} does not end with {expected:?}"
+            );
+        }
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let report_rows = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert!(
+            data.materials
+                == [
+                    MaterialId(0),
+                    MaterialId(1),
+                    MaterialId(2),
+                    MaterialId(3),
+                    MaterialId(4)
+                ]
+                && data.material_map["A GLASS EQL BAD"] == 4
+                && data.material_map["Z GLASS EQL AFTER"] == 5
+                && data.material_map["MASS"] == 1
+                && !data
+                    .window_glazing_equivalent_layer
+                    .contains_key(&MaterialId(0))
+                && report_rows.len() == 4
+                && report_rows[2..]
+                    == [
+                        vec![
+                            " Material Details",
+                            "A GLASS EQL BAD",
+                            "0.1580",
+                            "VerySmooth",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.0000",
+                            "0.0000",
+                            "0.0000"
+                        ],
+                        vec![
+                            " Material Details",
+                            "Z GLASS EQL AFTER",
+                            "0.1700",
+                            "VerySmooth",
+                            "0.0000",
+                            "0.000",
+                            "0.000",
+                            "0.000",
+                            "0.0000",
+                            "0.0000",
+                            "0.0000"
+                        ],
+                    ]
+                && std::str::from_utf8(&eio)
+                    .unwrap()
+                    .lines()
+                    .filter(|line| line.starts_with(" Material:Air,"))
+                    .collect::<Vec<_>>()
+                    == [" Material:Air,MIXED GAP,0.1500"]
+        );
+        let row = &data.window_glazing_equivalent_layer[&MaterialId(3)];
+        assert!(
+            [
+                row.tar.sol.ft.bm[0].bm_tra,
+                row.tar.sol.bk.bm[0].bm_tra,
+                row.tar.sol.ft.bm[0].bm_ref,
+                row.tar.sol.bk.bm[0].bm_ref,
+                row.tar.vis.ft.bm[0].bm_tra,
+                row.tar.vis.bk.bm[0].bm_tra,
+                row.tar.vis.ft.bm[0].bm_ref,
+                row.tar.vis.bk.bm[0].bm_ref,
+                row.tar.sol.ft.bm[0].df_tra,
+                row.tar.sol.bk.bm[0].df_tra,
+                row.tar.sol.ft.bm[0].df_ref,
+                row.tar.sol.bk.bm[0].df_ref,
+                row.tar.vis.ft.bm[0].df_tra,
+                row.tar.vis.bk.bm[0].df_tra,
+                row.tar.vis.ft.bm[0].df_ref,
+                row.tar.vis.bk.bm[0].df_ref,
+                row.tar.sol.ft.df.tra,
+                row.tar.sol.ft.df.refl,
+                row.tar.sol.bk.df.refl,
+                row.tar.vis.ft.df.tra,
+                row.tar.vis.ft.df.refl,
+                row.tar.vis.bk.df.refl,
+                row.tar.ir.ft.tra,
+                row.tar.ir.ft.emi,
+                row.tar.ir.bk.emi,
+                row.resistance
+            ] == [
+                0.61, 0.62, 0.21, 0.22, 0.71, 0.72, 0.11, 0.12, 0.31, 0.32, 0.23, 0.24, 0.41, 0.42,
+                0.13, 0.14, 0.51, 0.25, 0.26, 0.52, 0.15, 0.16, 0.03, 0.81, 0.82, 0.158
+            ] && row.optical_model == 1
+                && row.tar.ir.bk.tra == 0.03
+                && row.tar.sol.bk.df.tra == 0.51
+                && row.tar.vis.bk.df.tra == 0.52
+                && [
+                    row.thermal_absorptance_front,
+                    row.thermal_absorptance_back,
+                    row.thermal_transmittance
+                ] == [0.03; 3]
+                && [
+                    row.thickness,
+                    row.conductivity,
+                    row.density,
+                    row.specific_heat,
+                    row.thermal_absorptance,
+                    row.thermal_absorptance_input,
+                    row.solar_absorptance,
+                    row.solar_absorptance_input,
+                    row.visible_absorptance,
+                    row.visible_absorptance_input,
+                    row.transmittance,
+                    row.visible_transmittance,
+                    row.reflect_solar_beam_back,
+                    row.reflect_solar_beam_front
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+                && [
+                    &row.tar.sol.ft.bm[0],
+                    &row.tar.sol.bk.bm[0],
+                    &row.tar.vis.ft.bm[0],
+                    &row.tar.vis.bk.bm[0]
+                ]
+                .iter()
+                .all(|beam| beam.abs.to_bits() == 0)
+                && [
+                    &row.tar.sol.ft.df,
+                    &row.tar.sol.bk.df,
+                    &row.tar.vis.ft.df,
+                    &row.tar.vis.bk.df
+                ]
+                .iter()
+                .all(|side| [
+                    side.tra_gnd,
+                    side.tra_sky,
+                    side.refl_gnd,
+                    side.refl_sky,
+                    side.abs,
+                    side.abs_gnd,
+                    side.abs_sky
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0))
+                && row.roughness == Some(MaterialSurfaceRoughness::VerySmooth)
+                && matches!(
+                    ep_model::classify_source_json_number("18446744073709551615").unwrap(),
+                    ep_model::SourceJsonNumber::Integer(-1)
+                )
+        );
+        let row = &data.window_glazing_equivalent_layer[&MaterialId(4)];
+        assert!(
+            [
+                row.tar.sol.ft.bm[0].bm_tra,
+                row.tar.sol.bk.bm[0].bm_tra,
+                row.tar.sol.ft.bm[0].bm_ref,
+                row.tar.sol.bk.bm[0].bm_ref,
+                row.tar.vis.ft.bm[0].bm_tra,
+                row.tar.vis.bk.bm[0].bm_tra,
+                row.tar.vis.ft.bm[0].bm_ref,
+                row.tar.vis.bk.bm[0].bm_ref,
+                row.tar.sol.ft.bm[0].df_tra,
+                row.tar.sol.bk.bm[0].df_tra,
+                row.tar.sol.ft.bm[0].df_ref,
+                row.tar.sol.bk.bm[0].df_ref,
+                row.tar.vis.ft.bm[0].df_tra,
+                row.tar.vis.bk.bm[0].df_tra,
+                row.tar.vis.ft.bm[0].df_ref,
+                row.tar.vis.bk.bm[0].df_ref,
+                row.tar.sol.ft.df.tra,
+                row.tar.sol.ft.df.refl,
+                row.tar.sol.bk.df.refl,
+                row.tar.vis.ft.df.tra,
+                row.tar.vis.ft.df.refl,
+                row.tar.vis.bk.df.refl,
+                row.tar.ir.ft.tra,
+                row.tar.ir.ft.emi,
+                row.tar.ir.bk.emi,
+                row.resistance
+            ] == [
+                0.61, 0.62, 0.21, 0.22, 0.71, 0.72, 0.11, 0.12, 0.31, 0.32, 0.23, 0.24, 0.41, 0.42,
+                0.13, 0.14, 0.51, 0.25, 0.26, 0.52, 0.15, 0.16, 0.03, 0.81, 0.82, 0.17
+            ] && row.optical_model == 0
+                && data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && data.nominal_r == [0.05, 0.2, 0.15, 0.0, 0.0]
+                && data.material_groups[&MaterialId(3)] == SourceMaterialGroup::GlassEql
+                && data.material_groups[&MaterialId(4)] == SourceMaterialGroup::GlassEql
+                && data.resistance_only[&MaterialId(3)]
+                && data.resistance_only[&MaterialId(4)]
+        );
+        assert!(
+            names
+                .iter()
+                .all(|name| !input.is_object_unused("WindowMaterial:Glazing:EquivalentLayer", name))
+                && lines.len() == 4
+                && log.matches(" ** Severe  ** ").count() == 2
+                && log.matches(" **   ~~~   ** ").count() == 2
+                && shortcut.numeric_args[..26]
+                    == [
+                        0.61, 0.62, 0.21, 0.22, 0.71, 0.72, 0.11, 0.12, 0.31, 0.32, 0.23, 0.24,
+                        0.41, 0.42, 0.13, 0.14, 0.51, 0.25, 0.26, 0.52, 0.15, 0.16, 0.03, 0.81,
+                        0.82, 0.17
+                    ]
+                && shortcut.numeric_field_names[..26] == numeric_names
+                && shortcut.numeric_field_blanks[..26] == [false; 26]
+                && shortcut.alpha_args[..3] == [names[2], "SPECTRALAVERAGE", ""]
+        );
+    }
+
+    // GlazingEQL B3: real getter and original token custody; no Window owner.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Typed carrier supplies actual ID/kind only; the genuine getter owns every runtime write.
+        let typed_direction = ep_model::WindowGlazingEquivalentLayerDirectionalProperties {
+            front_transmittance: 0.0,
+            back_transmittance: 0.0,
+            front_reflectance: 0.0,
+            back_reflectance: 0.0,
+        };
+        let typed_band = ep_model::WindowGlazingEquivalentLayerOpticalBand {
+            beam_beam: typed_direction,
+            beam_diffuse: typed_direction,
+            diffuse_diffuse: ep_model::WindowGlazingEquivalentLayerDiffuseProperties {
+                transmittance: ep_model::AutoOrNumber::AutoCalculate,
+                front_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+                back_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+            },
+        };
+        let typed_eql = ep_model::WindowGlazingEquivalentLayerMaterial {
+            solar: typed_band,
+            visible: typed_band,
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.84,
+            back_infrared_emissivity: 0.84,
+            thermal_resistance_m2_k_per_w: 0.158,
+        };
+        let names = ["A GLASS EQL BAD", "Z GLASS EQL AFTER"];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowGlazingEquivalentLayer(typed_eql),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "front_side_beam_beam_solar_transmittance",
+            "back_side_beam_beam_solar_transmittance",
+            "front_side_beam_beam_solar_reflectance",
+            "back_side_beam_beam_solar_reflectance",
+            "front_side_beam_beam_visible_solar_transmittance",
+            "back_side_beam_beam_visible_solar_transmittance",
+            "front_side_beam_beam_visible_solar_reflectance",
+            "back_side_beam_beam_visible_solar_reflectance",
+            "front_side_beam_diffuse_solar_transmittance",
+            "back_side_beam_diffuse_solar_transmittance",
+            "front_side_beam_diffuse_solar_reflectance",
+            "back_side_beam_diffuse_solar_reflectance",
+            "front_side_beam_diffuse_visible_solar_transmittance",
+            "back_side_beam_diffuse_visible_solar_transmittance",
+            "front_side_beam_diffuse_visible_solar_reflectance",
+            "back_side_beam_diffuse_visible_solar_reflectance",
+            "diffuse_diffuse_solar_transmittance",
+            "front_side_diffuse_diffuse_solar_reflectance",
+            "back_side_diffuse_diffuse_solar_reflectance",
+            "diffuse_diffuse_visible_solar_transmittance",
+            "front_side_diffuse_diffuse_visible_solar_reflectance",
+            "back_side_diffuse_diffuse_visible_solar_reflectance",
+            "infrared_transmittance_applies_to_front_and_back_",
+            "front_side_infrared_emissivity",
+            "back_side_infrared_emissivity",
+            "thermal_resistance",
+        ];
+        let numeric_tokens: [[Option<&str>; 26]; 2] = [
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                Some("0.71"),
+                Some("0.72"),
+                Some("0.11"),
+                Some("0.12"),
+                Some("0.31"),
+                Some("0.32"),
+                Some("0.23"),
+                Some("0.24"),
+                Some("0.41"),
+                Some("0.42"),
+                Some("0.13"),
+                Some("0.14"),
+                Some("0.51"),
+                Some("0.25"),
+                Some("0.26"),
+                Some("0.52"),
+                Some("0.15"),
+                Some("0.16"),
+                Some("0.03"),
+                Some("0.81"),
+                Some("0.82"),
+                Some("18446744073709551615"),
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                Some("0.71"),
+                Some("0.72"),
+                Some("0.11"),
+                Some("0.12"),
+                Some("0.31"),
+                Some("0.32"),
+                Some("0.23"),
+                Some("0.24"),
+                Some("0.41"),
+                Some("0.42"),
+                Some("0.13"),
+                Some("0.14"),
+                Some("0.51"),
+                Some("0.25"),
+                Some("0.26"),
+                Some("0.52"),
+                Some("0.15"),
+                Some("0.16"),
+                Some("0.03"),
+                Some("0.81"),
+                Some("0.82"),
+                Some("0.17"),
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 2]; 2] = [
+            [Some("Spectral"), Some("unresolved identifier")],
+            [Some("SpectralAverage"), None],
+        ];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .map(|(numbers, alphas)| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| {
+                            (
+                                (*field).into(),
+                                if matches!(token, "" | "Autocalculate") {
+                                    S::String(token.into())
+                                } else {
+                                    S::Number(token.into())
+                                },
+                            )
+                        })
+                    })
+                    .collect();
+                fields.extend(
+                    ["optical_data_type", "window_glass_spectral_data_set_name"]
+                        .iter()
+                        .zip(alphas)
+                        .filter_map(|(field, value)| {
+                            value.map(|value| ((*field).into(), S::String(value.into())))
+                        }),
+                );
+                fields
+            })
+            .collect();
+        raw.window_glazing_equivalent_layer = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Empty genuine Glass/Blind definitions allocate 7A/27N; neither performs positive work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Glazing:EquivalentLayer",
+                &raw.window_glazing_equivalent_layer,
+                3,
+                26,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "WindowMaterial:Glazing:EquivalentLayer" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+        };
+        assert!(
+            matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+            crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+            if *operation == "error header" && source.kind() == std::io::ErrorKind::Other && source.to_string() == "authored IRT diagnostic failure"))
+                && errors_found
+        );
+        let row = &data.window_glazing_equivalent_layer[&MaterialId(3)];
+        assert!(
+            [
+                row.tar.sol.ft.bm[0].bm_tra,
+                row.tar.sol.bk.bm[0].bm_tra,
+                row.tar.sol.ft.bm[0].bm_ref,
+                row.tar.sol.bk.bm[0].bm_ref,
+                row.tar.vis.ft.bm[0].bm_tra,
+                row.tar.vis.bk.bm[0].bm_tra,
+                row.tar.vis.ft.bm[0].bm_ref,
+                row.tar.vis.bk.bm[0].bm_ref,
+                row.tar.sol.ft.bm[0].df_tra,
+                row.tar.sol.bk.bm[0].df_tra,
+                row.tar.sol.ft.bm[0].df_ref,
+                row.tar.sol.bk.bm[0].df_ref,
+                row.tar.vis.ft.bm[0].df_tra,
+                row.tar.vis.bk.bm[0].df_tra,
+                row.tar.vis.ft.bm[0].df_ref,
+                row.tar.vis.bk.bm[0].df_ref,
+                row.tar.sol.ft.df.tra,
+                row.tar.sol.ft.df.refl,
+                row.tar.sol.bk.df.refl,
+                row.tar.vis.ft.df.tra,
+                row.tar.vis.ft.df.refl,
+                row.tar.vis.bk.df.refl,
+                row.tar.ir.ft.tra,
+                row.tar.ir.ft.emi,
+                row.tar.ir.bk.emi,
+                row.resistance
+            ] == [
+                0.61, 0.62, 0.21, 0.22, 0.71, 0.72, 0.11, 0.12, 0.31, 0.32, 0.23, 0.24, 0.41, 0.42,
+                0.13, 0.14, 0.51, 0.25, 0.26, 0.52, 0.15, 0.16, 0.03, 0.81, 0.82, 0.158
+            ] && row.optical_model == 1
+                && row.tar.ir.bk.tra == 0.03
+                && row.tar.sol.bk.df.tra == 0.51
+                && row.tar.vis.bk.df.tra == 0.52
+                && [
+                    row.thermal_absorptance_front,
+                    row.thermal_absorptance_back,
+                    row.thermal_transmittance
+                ] == [0.03; 3]
+                && [
+                    row.thickness,
+                    row.conductivity,
+                    row.density,
+                    row.specific_heat,
+                    row.thermal_absorptance,
+                    row.thermal_absorptance_input,
+                    row.solar_absorptance,
+                    row.solar_absorptance_input,
+                    row.visible_absorptance,
+                    row.visible_absorptance_input,
+                    row.transmittance,
+                    row.visible_transmittance,
+                    row.reflect_solar_beam_back,
+                    row.reflect_solar_beam_front
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+                && [
+                    &row.tar.sol.ft.bm[0],
+                    &row.tar.sol.bk.bm[0],
+                    &row.tar.vis.ft.bm[0],
+                    &row.tar.vis.bk.bm[0]
+                ]
+                .iter()
+                .all(|beam| beam.abs.to_bits() == 0)
+                && [
+                    &row.tar.sol.ft.df,
+                    &row.tar.sol.bk.df,
+                    &row.tar.vis.ft.df,
+                    &row.tar.vis.bk.df
+                ]
+                .iter()
+                .all(|side| [
+                    side.tra_gnd,
+                    side.tra_sky,
+                    side.refl_gnd,
+                    side.refl_sky,
+                    side.abs,
+                    side.abs_gnd,
+                    side.abs_sky
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0))
+                && row.roughness == Some(MaterialSurfaceRoughness::VerySmooth)
+        );
+        assert!(
+            data.num_eql_glazings == 2
+                && data.window_glazing_equivalent_layer.len() == 1
+                && data.materials == [MaterialId(0), MaterialId(1), MaterialId(2), MaterialId(3)]
+                && !input.is_object_unused("WindowMaterial:Glazing:EquivalentLayer", names[0])
+                && input.is_object_unused("WindowMaterial:Glazing:EquivalentLayer", names[1])
+                && !data.material_map.contains_key(names[1])
+                && !data
+                    .window_glazing_equivalent_layer
+                    .contains_key(&MaterialId(4))
+                && shortcut.current_module_object == "WindowMaterial:Glazing:EquivalentLayer"
+                && shortcut.alpha_args[..3] == [names[0], "SPECTRAL", "UNRESOLVED IDENTIFIER"]
+                && shortcut.numeric_args[..25]
+                    == [
+                        0.61, 0.62, 0.21, 0.22, 0.71, 0.72, 0.11, 0.12, 0.31, 0.32, 0.23, 0.24,
+                        0.41, 0.42, 0.13, 0.14, 0.51, 0.25, 0.26, 0.52, 0.15, 0.16, 0.03, 0.81,
+                        0.82
+                    ]
+                && shortcut.numeric_args[25] == -1.0
+                && shortcut.numeric_field_names[..26] == numeric_names
+                && shortcut.numeric_field_blanks[..26] == [false; 26]
+        );
+        assert!(
+            data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && data.nominal_r == [0.05, 0.2, 0.15, 0.0]
+                && data.material_map[names[0]] == 4
+                && data.material_groups[&MaterialId(3)] == SourceMaterialGroup::GlassEql
+                && data.resistance_only[&MaterialId(3)]
+                && state.output_error_header
+                && state.tracking.last_severe_error.is_empty()
+                && console.is_empty()
+                && eio.is_empty()
+        );
+    }
+
+    // GlazingEQL B4: real getter and original token custody; no Window owner.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        // Typed carrier supplies actual ID/kind only; the genuine getter owns every runtime write.
+        let typed_direction = ep_model::WindowGlazingEquivalentLayerDirectionalProperties {
+            front_transmittance: 0.0,
+            back_transmittance: 0.0,
+            front_reflectance: 0.0,
+            back_reflectance: 0.0,
+        };
+        let typed_band = ep_model::WindowGlazingEquivalentLayerOpticalBand {
+            beam_beam: typed_direction,
+            beam_diffuse: typed_direction,
+            diffuse_diffuse: ep_model::WindowGlazingEquivalentLayerDiffuseProperties {
+                transmittance: ep_model::AutoOrNumber::AutoCalculate,
+                front_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+                back_reflectance: ep_model::AutoOrNumber::AutoCalculate,
+            },
+        };
+        let typed_eql = ep_model::WindowGlazingEquivalentLayerMaterial {
+            solar: typed_band,
+            visible: typed_band,
+            infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.84,
+            back_infrared_emissivity: 0.84,
+            thermal_resistance_m2_k_per_w: 0.158,
+        };
+        let names = ["MASS", "Z GLASS EQL AFTER"];
+        model.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName((*name).into()),
+                    definition: MaterialDefinition::WindowGlazingEquivalentLayer(typed_eql),
+                }),
+        );
+        model.ctf_report_names.materials.extend(
+            names
+                .iter()
+                .filter(|name| **name != "MASS")
+                .enumerate()
+                .map(|(index, name)| {
+                    (
+                        MaterialId(3 + u32::try_from(index).unwrap()),
+                        (*name).into(),
+                    )
+                }),
+        );
+        let numeric_names = [
+            "front_side_beam_beam_solar_transmittance",
+            "back_side_beam_beam_solar_transmittance",
+            "front_side_beam_beam_solar_reflectance",
+            "back_side_beam_beam_solar_reflectance",
+            "front_side_beam_beam_visible_solar_transmittance",
+            "back_side_beam_beam_visible_solar_transmittance",
+            "front_side_beam_beam_visible_solar_reflectance",
+            "back_side_beam_beam_visible_solar_reflectance",
+            "front_side_beam_diffuse_solar_transmittance",
+            "back_side_beam_diffuse_solar_transmittance",
+            "front_side_beam_diffuse_solar_reflectance",
+            "back_side_beam_diffuse_solar_reflectance",
+            "front_side_beam_diffuse_visible_solar_transmittance",
+            "back_side_beam_diffuse_visible_solar_transmittance",
+            "front_side_beam_diffuse_visible_solar_reflectance",
+            "back_side_beam_diffuse_visible_solar_reflectance",
+            "diffuse_diffuse_solar_transmittance",
+            "front_side_diffuse_diffuse_solar_reflectance",
+            "back_side_diffuse_diffuse_solar_reflectance",
+            "diffuse_diffuse_visible_solar_transmittance",
+            "front_side_diffuse_diffuse_visible_solar_reflectance",
+            "back_side_diffuse_diffuse_visible_solar_reflectance",
+            "infrared_transmittance_applies_to_front_and_back_",
+            "front_side_infrared_emissivity",
+            "back_side_infrared_emissivity",
+            "thermal_resistance",
+        ];
+        let numeric_tokens: [[Option<&str>; 26]; 2] = [
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+            [
+                Some("0.61"),
+                Some("0.62"),
+                Some("0.21"),
+                Some("0.22"),
+                Some("0.71"),
+                Some("0.72"),
+                Some("0.11"),
+                Some("0.12"),
+                Some("0.31"),
+                Some("0.32"),
+                Some("0.23"),
+                Some("0.24"),
+                Some("0.41"),
+                Some("0.42"),
+                Some("0.13"),
+                Some("0.14"),
+                Some("0.51"),
+                Some("0.25"),
+                Some("0.26"),
+                Some("0.52"),
+                Some("0.15"),
+                Some("0.16"),
+                Some("0.03"),
+                Some("0.81"),
+                Some("0.82"),
+                Some("0.17"),
+            ],
+        ];
+        let alpha_rows: [[Option<&str>; 2]; 2] = [
+            [Some("SpectralAverage"), None],
+            [Some("SpectralAverage"), None],
+        ];
+        let original_fields: Vec<BTreeMap<String, S>> = numeric_tokens
+            .iter()
+            .zip(alpha_rows)
+            .map(|(numbers, alphas)| {
+                let mut fields: BTreeMap<String, S> = numeric_names
+                    .iter()
+                    .zip(numbers)
+                    .filter_map(|(field, token)| {
+                        token.map(|token| {
+                            (
+                                (*field).into(),
+                                if matches!(token, "" | "Autocalculate") {
+                                    S::String(token.into())
+                                } else {
+                                    S::Number(token.into())
+                                },
+                            )
+                        })
+                    })
+                    .collect();
+                fields.extend(
+                    ["optical_data_type", "window_glass_spectral_data_set_name"]
+                        .iter()
+                        .zip(alphas)
+                        .filter_map(|(field, value)| {
+                            value.map(|value| ((*field).into(), S::String(value.into())))
+                        }),
+                );
+                fields
+            })
+            .collect();
+        raw.window_glazing_equivalent_layer = names
+            .iter()
+            .zip(&original_fields)
+            .map(|(name, originals)| {
+                let fields = originals
+                    .iter()
+                    .filter_map(|(field, value)| match value {
+                        S::Number(token) => Some((
+                            field.clone(),
+                            Value::Number(
+                                ep_model::classify_source_json_number(token)
+                                    .unwrap()
+                                    .as_f64(),
+                            ),
+                        )),
+                        S::String(text) => Some((field.clone(), Value::String(text.clone()))),
+                        _ => None,
+                    })
+                    .collect();
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+        // Empty genuine Glass/Blind definitions allocate 7A/27N; neither performs positive work.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Glazing:EquivalentLayer",
+                &raw.window_glazing_equivalent_layer,
+                3,
+                26,
+            ),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, objects, _, _)| {
+                (
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .enumerate()
+                        .map(|(index, object)| {
+                            let fields = if *family == "WindowMaterial:Glazing:EquivalentLayer" {
+                                original_fields[index].clone()
+                            } else {
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect()
+                            };
+                            (object.object_name.clone(), fields)
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+        };
+        assert!(
+            matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+            crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+            if *operation == "error header" && source.kind() == std::io::ErrorKind::Other && source.to_string() == "authored IRT diagnostic failure"))
+                && !errors_found
+        );
+        assert!(
+            data.num_eql_glazings == 2
+                && data.window_glazing_equivalent_layer.is_empty()
+                && data.materials == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.material_map.len() == 3
+                && data.material_map["MASS"] == 1
+                && !data.material_map.contains_key(names[1])
+                && !data
+                    .window_glazing_equivalent_layer
+                    .contains_key(&MaterialId(0))
+        );
+        assert!(
+            !input.is_object_unused("WindowMaterial:Glazing:EquivalentLayer", names[0])
+                && input.is_object_unused("WindowMaterial:Glazing:EquivalentLayer", names[1])
+                && shortcut.current_module_object == "WindowMaterial:Glazing:EquivalentLayer"
+                && shortcut.alpha_args[..3] == [names[0], "SPECTRALAVERAGE", ""]
+                && shortcut.alpha_field_names[..3]
+                    == [
+                        "name",
+                        "optical_data_type",
+                        "window_glass_spectral_data_set_name"
+                    ]
+                && shortcut.alpha_field_blanks[..3] == [false, false, true]
+                && shortcut.numeric_args[..26]
+                    == [
+                        0.61, 0.62, 0.21, 0.22, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, -99999.0, 0.0,
+                        0.84, 0.84, 0.158
+                    ]
+                && shortcut.numeric_field_names[..26] == numeric_names
+                && shortcut.numeric_field_blanks[..26]
+                    == [
+                        false, false, false, false, true, true, true, true, true, true, true, true,
+                        true, true, true, true, true, true, true, true, true, true, true, true,
+                        true, true
+                    ]
+                && shortcut.alpha_args.len() == 7
+                && shortcut.numeric_args.len() == 27
+                && shortcut.alpha_args[3..7].iter().all(String::is_empty)
+                && shortcut.numeric_args[26..27]
+                    .iter()
+                    .all(|value| value.to_bits() == 0)
+        );
+        assert!(
+            data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                && data.material_map["MASS"] == 1
+                && data.material_map["NO MASS"] == 2
+                && data.material_map["MIXED GAP"] == 3
+                && data.material_groups[&MaterialId(0)] == SourceMaterialGroup::Regular
+                && !data.resistance_only[&MaterialId(0)]
+                && data.resistance_only[&MaterialId(1)]
+                && data.resistance_only[&MaterialId(2)]
+                && matches!(model.materials[0].definition, MaterialDefinition::Regular(value)
+                if value.thickness_m == 0.1 && value.conductivity_w_per_m_k == 2.0 && value.surface == OpaqueSurfaceProperties::default())
+                && data.nominal_r == [0.05, 0.2, 0.15]
+                && model.ctf_report_names.materials[..3]
+                    == [
+                        (MaterialId(0), "Mass".into()),
+                        (MaterialId(1), "NO MASS".into()),
+                        (MaterialId(2), "MIXED GAP".into())
+                    ]
+        );
+        assert!(
+            state.output_error_header
+                && state.tracking.last_severe_error.is_empty()
+                && console.is_empty()
+                && eio.is_empty()
+                && matches!(&result, Err(RuntimeError::HeatBalanceInput(_)))
         );
     }
 }

@@ -12726,6 +12726,758 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+
+        // Unused Glazing:EQL extends the existing real positive DSOA/Ideal/OA scene.
+        // Caller observes public definition/Raw/IP/projection custody; private item counts/blanks belong to runtime B1.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            const GLAZING_EQL: &str = "WindowMaterial:Glazing:EquivalentLayer";
+            let mut glazing_eql_value = curve_value.clone();
+            glazing_eql_value[GLAZING_EQL] = json!({
+                "\u{b}":{
+                    "front_side_beam_beam_solar_transmittance":0,"back_side_beam_beam_solar_transmittance":0.62,
+                    "front_side_beam_beam_solar_reflectance":0.21,"back_side_beam_beam_solar_reflectance":0.22,
+                    "thermal_resistance":u64::MAX,"name":false,"idf_order":[],"metadata":null
+                },
+                "\u{a0}":{
+                    "optical_data_type":"SpectralAverage","window_glass_spectral_data_set_name":"Unresolved but ignored set",
+                    "front_side_beam_beam_solar_transmittance":-0.0,"back_side_beam_beam_solar_transmittance":0.62,
+                    "front_side_beam_beam_solar_reflectance":0.21,"back_side_beam_beam_solar_reflectance":0.22,
+                    "front_side_beam_beam_visible_solar_transmittance":0.71,"back_side_beam_beam_visible_solar_transmittance":0.72,
+                    "front_side_beam_beam_visible_solar_reflectance":0.11,"back_side_beam_beam_visible_solar_reflectance":0.12,
+                    "front_side_beam_diffuse_solar_transmittance":0.31,"back_side_beam_diffuse_solar_transmittance":0.32,
+                    "front_side_beam_diffuse_solar_reflectance":0.23,"back_side_beam_diffuse_solar_reflectance":0.24,
+                    "front_side_beam_diffuse_visible_solar_transmittance":0.41,"back_side_beam_diffuse_visible_solar_transmittance":0.42,
+                    "front_side_beam_diffuse_visible_solar_reflectance":0.13,"back_side_beam_diffuse_visible_solar_reflectance":0.14,
+                    "diffuse_diffuse_solar_transmittance":"Autocalculate","front_side_diffuse_diffuse_solar_reflectance":"",
+                    "back_side_diffuse_diffuse_solar_reflectance":0.26,"diffuse_diffuse_visible_solar_transmittance":"",
+                    "front_side_diffuse_diffuse_visible_solar_reflectance":"Autocalculate","back_side_diffuse_diffuse_visible_solar_reflectance":0.16,
+                    "infrared_transmittance_applies_to_front_and_back_":0.03,"front_side_infrared_emissivity":0.81,
+                    "back_side_infrared_emissivity":0.82,"thermal_resistance":1.8446744073709552e19,
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},"idf_max_extensible_fields":null,
+                    "extra_string":"unconsumed","metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}
+                }
+            });
+            // Preserve the actual Integer -0 token; serde_json::Value alone would print integer0.
+            let glazing_eql_text = glazing_eql_value.to_string().replacen(
+                "\"front_side_beam_beam_solar_transmittance\":0,",
+                "\"front_side_beam_beam_solar_transmittance\":-0,",
+                1,
+            );
+            let glazing_eql_raw = ep_raw_model::parse_epjson_str_for_source(&glazing_eql_text)
+                .expect("Source GlazingEQL original tokens");
+            let glazing_eql_compiled = ep_compiler::compile_raw_model_for_source(&glazing_eql_raw);
+            assert!(
+                !glazing_eql_compiled.has_errors(),
+                "{:?}",
+                glazing_eql_compiled.report.diagnostics
+            );
+            let glazing_eql_model = glazing_eql_compiled
+                .model
+                .as_ref()
+                .expect("two Source GlazingEQL materials");
+            let glazing_eql_a = glazing_eql_model
+                .material_names
+                .resolve("\u{b}")
+                .expect("untrimmed A");
+            let glazing_eql_b = glazing_eql_model
+                .material_names
+                .resolve("\u{a0}")
+                .expect("untrimmed B");
+            assert!(
+                glazing_eql_a != glazing_eql_b
+                    && glazing_eql_model.material_names.is_source_exact_namespace()
+                    && glazing_eql_model.material_names.resolve("").is_none()
+                    && glazing_eql_model
+                        .materials
+                        .iter()
+                        .filter(|row| row.kind()
+                            == ep_model::MaterialKind::WindowGlazingEquivalentLayer)
+                        .count()
+                        == 2
+                    && glazing_eql_model
+                        .materials
+                        .iter()
+                        .any(|row| row.id == glazing_eql_a
+                            && row.name.0 == "\u{b}"
+                            && matches!(
+                                row.definition,
+                                ep_model::MaterialDefinition::WindowGlazingEquivalentLayer(_)
+                            ))
+                    && glazing_eql_model
+                        .materials
+                        .iter()
+                        .any(|row| row.id == glazing_eql_b
+                            && row.name.0 == "\u{a0}"
+                            && matches!(
+                                row.definition,
+                                ep_model::MaterialDefinition::WindowGlazingEquivalentLayer(_)
+                            ))
+                    && glazing_eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(glazing_eql_a, "\u{b}".into()))
+                    && glazing_eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(glazing_eql_b, "\u{a0}".into()))
+            );
+            let mut glazing_eql_ip =
+                crate::ordinary_input_processor::resolve_source_b(&glazing_eql_raw)
+                    .expect("real Raw/IP");
+            let glazing_eql_args = glazing_eql_ip
+                .get_object_def_max_args(GLAZING_EQL)
+                .expect("public3A26N definition only, not private item counts");
+            let mut glazing_eql_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            glazing_eql_ip
+                .report_source_idf_records_stats(&mut glazing_eql_stats)
+                .expect("real record statistics");
+            assert!(
+                (
+                    glazing_eql_args.alphas,
+                    glazing_eql_args.numerics,
+                    glazing_eql_args.total().expect("bounded args")
+                ) == (3, 26, 29)
+                    && glazing_eql_ip.get_num_objects_found(GLAZING_EQL) == 2
+                    && glazing_eql_ip
+                        .source_raw_object_names(GLAZING_EQL)
+                        .expect("ordered names")
+                        .iter()
+                        .map(String::as_str)
+                        .eq(["\u{a0}", "\u{b}"])
+                    && glazing_eql_ip.is_object_unused(GLAZING_EQL, "\u{b}")
+                    && glazing_eql_ip.is_object_unused(GLAZING_EQL, "\u{a0}")
+                    && usize::try_from(glazing_eql_stats.number_input_records)
+                        .expect("nonnegative records")
+                        == glazing_eql_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let glazing_eql_original = glazing_eql_ip
+                .source_raw_object_fields(GLAZING_EQL, "\u{a0}")
+                .expect("full original custody");
+            let glazing_eql_minimum = glazing_eql_ip
+                .source_raw_object_fields(GLAZING_EQL, "\u{b}")
+                .expect("minimum original custody");
+            let glazing_eql_min_raw = &glazing_eql_raw.objects
+                [&ep_raw_model::ObjectType(GLAZING_EQL.into())]
+                [&ep_raw_model::ObjectName("\u{b}".into())]
+                .fields;
+            let glazing_eql_full_raw = &glazing_eql_raw.objects
+                [&ep_raw_model::ObjectType(GLAZING_EQL.into())]
+                [&ep_raw_model::ObjectName("\u{a0}".into())]
+                .fields;
+            assert!(
+                matches!(glazing_eql_min_raw.get(&ep_raw_model::FieldName("front_side_beam_beam_solar_transmittance".into())),Some(ep_raw_model::RawValue::Number(token)) if token == "-0")
+                    && matches!(glazing_eql_minimum.get("front_side_beam_beam_solar_transmittance"),Some(S::Number(token)) if token == "-0")
+                    && matches!(
+                        ep_model::classify_source_json_number("-0"),
+                        Ok(ep_model::SourceJsonNumber::Integer(0))
+                    )
+                    && matches!(glazing_eql_original.get("front_side_beam_beam_solar_transmittance"),Some(S::Number(token)) if token == "-0.0")
+                    && matches!(ep_model::classify_source_json_number("-0.0"),Ok(ep_model::SourceJsonNumber::Float(value)) if value.to_bits() == (-0.0_f64).to_bits())
+                    && matches!(glazing_eql_minimum.get("thermal_resistance"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(
+                        ep_model::classify_source_json_number("18446744073709551615"),
+                        Ok(ep_model::SourceJsonNumber::Integer(-1))
+                    )
+                    && matches!(glazing_eql_full_raw.get(&ep_raw_model::FieldName("thermal_resistance".into())),Some(ep_raw_model::RawValue::Number(token))
+                        if matches!(ep_model::classify_source_json_number(token),Ok(ep_model::SourceJsonNumber::Float(value)) if value.to_bits() == 18446744073709551616.0_f64.to_bits()))
+                    && matches!(glazing_eql_original.get("diffuse_diffuse_solar_transmittance"),Some(S::String(text)) if text == "Autocalculate")
+                    && matches!(glazing_eql_original.get("front_side_diffuse_diffuse_solar_reflectance"),Some(S::String(text)) if text.is_empty())
+                    && matches!(glazing_eql_original.get("name"), Some(S::Bool(false)))
+                    && matches!(glazing_eql_original.get("idf_order"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(
+                        glazing_eql_original.get("idf_max_fields"),
+                        Some(S::Object(_))
+                    )
+                    && matches!(
+                        glazing_eql_original.get("idf_max_extensible_fields"),
+                        Some(S::Null)
+                    )
+                    && matches!(glazing_eql_original.get("extra_string"),Some(S::String(text)) if text == "unconsumed")
+                    && matches!(glazing_eql_original.get("metadata"),Some(S::Object(fields)) if matches!(fields.get("retained"),Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let glazing_eql_projection =
+                crate::ordinary_material_input::resolve_source(&glazing_eql_raw, &glazing_eql_ip)
+                    .expect("same Raw/IP projection");
+            let glazing_eql_numeric_keys = [
+                "front_side_beam_beam_solar_transmittance",
+                "back_side_beam_beam_solar_transmittance",
+                "front_side_beam_beam_solar_reflectance",
+                "back_side_beam_beam_solar_reflectance",
+                "front_side_beam_beam_visible_solar_transmittance",
+                "back_side_beam_beam_visible_solar_transmittance",
+                "front_side_beam_beam_visible_solar_reflectance",
+                "back_side_beam_beam_visible_solar_reflectance",
+                "front_side_beam_diffuse_solar_transmittance",
+                "back_side_beam_diffuse_solar_transmittance",
+                "front_side_beam_diffuse_solar_reflectance",
+                "back_side_beam_diffuse_solar_reflectance",
+                "front_side_beam_diffuse_visible_solar_transmittance",
+                "back_side_beam_diffuse_visible_solar_transmittance",
+                "front_side_beam_diffuse_visible_solar_reflectance",
+                "back_side_beam_diffuse_visible_solar_reflectance",
+                "diffuse_diffuse_solar_transmittance",
+                "front_side_diffuse_diffuse_solar_reflectance",
+                "back_side_diffuse_diffuse_solar_reflectance",
+                "diffuse_diffuse_visible_solar_transmittance",
+                "front_side_diffuse_diffuse_visible_solar_reflectance",
+                "back_side_diffuse_diffuse_visible_solar_reflectance",
+                "infrared_transmittance_applies_to_front_and_back_",
+                "front_side_infrared_emissivity",
+                "back_side_infrared_emissivity",
+                "thermal_resistance",
+            ];
+            let projected = &glazing_eql_projection.window_glazing_equivalent_layer;
+            let projected_minimum = projected
+                .iter()
+                .find(|row| row.object_name == "\u{b}")
+                .expect("minimum projection");
+            let projected_full = projected
+                .iter()
+                .find(|row| row.object_name == "\u{a0}")
+                .expect("full projection");
+            let mut count_mismatch_raw = glazing_eql_raw.clone();
+            count_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(GLAZING_EQL.into()))
+                .expect("EQL family")
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()));
+            let mut identity_mismatch_raw = glazing_eql_raw.clone();
+            let identity_rows = identity_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(GLAZING_EQL.into()))
+                .expect("EQL family");
+            let identity_row = identity_rows
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()))
+                .expect("existing row");
+            identity_rows.insert(
+                ep_raw_model::ObjectName("WRONG GLAZING EQL IP NAME".into()),
+                identity_row,
+            );
+            assert!(
+                glazing_eql_projection.source_is_epjson && projected.len() == 2
+                    && crate::ordinary_material_input::resolve_source(&count_mismatch_raw,&glazing_eql_ip).is_err()
+                    && crate::ordinary_material_input::resolve_source(&identity_mismatch_raw,&glazing_eql_ip).is_err()
+                    && projected_minimum.fields.len() == 5 && projected_full.fields.len() == 28
+                    && projected.iter().all(|row|row.idf_max_fields.is_none() && row.fields.keys().all(|field|
+                        crate::ordinary_equipment_input::source_b_glazing_equivalent_layer_known_field(field)))
+                    && glazing_eql_numeric_keys.iter().zip([Some(-0.0_f64),Some(0.62),Some(0.21),Some(0.22),Some(0.71),Some(0.72),Some(0.11),Some(0.12),
+                        Some(0.31),Some(0.32),Some(0.23),Some(0.24),Some(0.41),Some(0.42),Some(0.13),Some(0.14),None,None,Some(0.26),None,None,Some(0.16),
+                        Some(0.03),Some(0.81),Some(0.82),Some(18446744073709551616.0)])
+                        .all(|(field,value)|match value {Some(expected)=>matches!(projected_full.fields.get(*field),Some(P::Number(actual)) if actual.to_bits() == expected.to_bits()),
+                            None=>matches!(projected_full.fields.get(*field),Some(P::String(text)) if matches!(text.as_str(),""|"Autocalculate"))})
+                    && matches!(projected_minimum.fields.get("front_side_beam_beam_solar_transmittance"),Some(P::Number(value)) if value.to_bits() == 0.0_f64.to_bits())
+                    && matches!(projected_minimum.fields.get("thermal_resistance"),Some(P::Number(value)) if value.to_bits() == (-1.0_f64).to_bits())
+                    && matches!(projected_full.fields.get("diffuse_diffuse_solar_transmittance"),Some(P::String(text)) if text == "Autocalculate")
+                    && matches!(projected_full.fields.get("front_side_diffuse_diffuse_solar_reflectance"),Some(P::String(text)) if text.is_empty())
+                    && matches!(projected_full.fields.get("optical_data_type"),Some(P::String(text)) if text == "SpectralAverage")
+                    && matches!(projected_full.fields.get("window_glass_spectral_data_set_name"),Some(P::String(text)) if text == "Unresolved but ignored set")
+                    && glazing_eql_model.materials.iter().find(|row|row.id == glazing_eql_a).expect("same minimum advisory row")
+                        .as_window_glazing_equivalent_layer().is_some_and(|row|row.thermal_resistance_m2_k_per_w.to_bits() == 18446744073709551616.0_f64.to_bits())
+                    && ["","\n"," \t\r\u{c}"].iter().all(|name|{
+                        let mut bad_name = glazing_eql_value.clone();
+                        let row = bad_name[GLAZING_EQL].as_object_mut().expect("family map").remove("\u{b}").expect("minimum row");
+                        bad_name[GLAZING_EQL].as_object_mut().expect("family map").insert((*name).into(),row);
+                        crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&bad_name.to_string()).expect("bad original name Raw"))
+                            .is_err_and(|error|error.contains("Source GlazingEQL requires original RE2 material name"))
+                    })
+            );
+            let mut glazing_eql_trace = inspect_porting_scope(
+                &glazing_eql_raw,
+                &glazing_eql_compiled.report,
+                Some(glazing_eql_model),
+                PortingScope::B,
+            );
+            assert!(
+                glazing_eql_trace.admissible,
+                "{:?}",
+                glazing_eql_trace.violations
+            );
+            glazing_eql_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    glazing_eql_model,
+                    &weather,
+                    "same GlazingEQL Source weather",
+                )
+                .expect("actual Source environment"),
+            );
+            let glazing_eql_admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(
+                    &glazing_eql_raw,
+                    &glazing_eql_trace,
+                )
+                .expect("validated Source GLAZING_EQL scope");
+            let mut permuted_glazing_eql_model = glazing_eql_model.clone();
+            let glazing_eql_a_position = glazing_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == glazing_eql_a)
+                .expect("A arena row");
+            let glazing_eql_b_position = glazing_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == glazing_eql_b)
+                .expect("B arena row");
+            permuted_glazing_eql_model
+                .materials
+                .swap(glazing_eql_a_position, glazing_eql_b_position);
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &glazing_eql_raw,
+                    &glazing_eql_compiled.report,
+                    Some(glazing_eql_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&glazing_eql_admission)
+                )
+                .allows_rust_runtime()
+                    && crate::support::assess_support_with_source_admission(
+                        &glazing_eql_raw,
+                        &glazing_eql_compiled.report,
+                        Some(&permuted_glazing_eql_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&glazing_eql_admission)
+                    )
+                    .allows_rust_runtime()
+            );
+            let glazing_eql_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                r#"{"Zone":{"Zone":{}},"WindowMaterial:Glazing:EquivalentLayer":{"IDF GLASS EQL":{"front_side_beam_beam_solar_transmittance":0.61,"back_side_beam_beam_solar_transmittance":0.62,"front_side_beam_beam_solar_reflectance":0.21,"back_side_beam_beam_solar_reflectance":0.22,"front_side_beam_beam_visible_solar_transmittance":0.71,"back_side_beam_beam_visible_solar_transmittance":0.72,"front_side_beam_beam_visible_solar_reflectance":0.11,"back_side_beam_beam_visible_solar_reflectance":0.12,"front_side_beam_diffuse_solar_transmittance":0.31,"back_side_beam_diffuse_solar_transmittance":0.32,"front_side_beam_diffuse_solar_reflectance":0.23,"back_side_beam_diffuse_solar_reflectance":0.24,"front_side_beam_diffuse_visible_solar_transmittance":0.41,"back_side_beam_diffuse_visible_solar_transmittance":0.42,"front_side_beam_diffuse_visible_solar_reflectance":0.13,"back_side_beam_diffuse_visible_solar_reflectance":0.14,"diffuse_diffuse_solar_transmittance":0.51,"front_side_diffuse_diffuse_solar_reflectance":0.25,"back_side_diffuse_diffuse_solar_reflectance":0.26,"diffuse_diffuse_visible_solar_transmittance":0.52,"front_side_diffuse_diffuse_visible_solar_reflectance":0.15,"back_side_diffuse_diffuse_visible_solar_reflectance":0.16,"infrared_transmittance_applies_to_front_and_back_":0.03,"front_side_infrared_emissivity":0.81,"back_side_infrared_emissivity":0.82,"thermal_resistance":0.17,"optical_data_type":"SpectralAverage","window_glass_spectral_data_set_name":"UNRESOLVED SET"}}}"#,
+                "Zone,Zone;WindowMaterial:Glazing:EquivalentLayer,IDF GLASS EQL,SpectralAverage,UNRESOLVED SET,0.61,0.62,0.21,0.22,0.71,0.72,0.11,0.12,0.31,0.32,0.23,0.24,0.41,0.42,0.13,0.14,0.51,0.25,0.26,0.52,0.15,0.16,0.03,0.81,0.82,0.17;",
+            ).expect("matched Zone+GlazingEQL IDF29materialoperands");
+            let glazing_eql_idf_compiled = ep_compiler::compile_raw_model(&glazing_eql_idf);
+            let source_a_base =
+                ep_raw_model::parse_epjson_str_for_source(&input(PortingScope::A).to_string())
+                    .expect("unchanged valid SourceA baseline");
+            let mut source_a_with_glazing_eql = source_a_base.clone();
+            source_a_with_glazing_eql.objects.insert(
+                ep_raw_model::ObjectType(GLAZING_EQL.into()),
+                glazing_eql_raw
+                    .objects
+                    .get(&ep_raw_model::ObjectType(GLAZING_EQL.into()))
+                    .expect("same genuine GlazingEQL family only")
+                    .clone(),
+            );
+            let mut controlled_glazing_eql = glazing_eql_value.clone();
+            controlled_glazing_eql["WindowShadingControl"] = json!({"EQL GLASS CONTROL":{"shading_type":"ExteriorShade","shading_device_material_name":"\u{b}"}});
+            let mut active_glazing_eql = glazing_eql_value.clone();
+            active_glazing_eql["Construction:WindowEquivalentLayer"] =
+                json!({"ACTIVE EQL GLASS":{"outside_layer":"\u{b}"}});
+            let mut ems_glazing_eql = glazing_eql_value.clone();
+            ems_glazing_eql["EnergyManagementSystem:ConstructionIndexVariable"] =
+                json!({"HELD_EQL_EMS":{"construction_object_name":"Opaque"}});
+            assert!(
+                !crate::support::assess_support_with_source_admission(&glazing_eql_raw,&glazing_eql_compiled.report,Some(glazing_eql_model),RunMode::Compatibility,PartialRunPolicy::Deny,RunOutputFormat::RustNative,TraceLevel::Normal,None).allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&source_a_base).is_ok()
+                    && crate::ordinary_equipment_input::resolve_source_a(&source_a_with_glazing_eql)
+                        .is_err_and(|error|error == "ordinary equipment excludes positive family WindowMaterial:Glazing:EquivalentLayer")
+                    && crate::ordinary_equipment_input::resolve(&glazing_eql_raw).is_err()
+                    && !glazing_eql_idf.is_epjson() && !glazing_eql_idf_compiled.has_errors()
+                    && glazing_eql_idf_compiled.model.as_ref().is_some_and(|model|model.materials.len() == 1
+                        && model.materials[0].kind() == ep_model::MaterialKind::WindowGlazingEquivalentLayer)
+                    && crate::ordinary_equipment_input::resolve_source_b(&glazing_eql_idf)
+                        .is_err_and(|error|error == "Source unused GlazingEQL requires direct epJSON")
+                    && crate::ordinary_equipment_input::resolve_source_a(&glazing_eql_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&controlled_glazing_eql.to_string()).expect("control Raw")).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&active_glazing_eql.to_string()).expect("active EQL Raw")).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&ems_glazing_eql.to_string()).expect("held EMS Raw")).is_err()
+            );
+            for (field, kind, probe) in [
+                ("front_side_beam_beam_solar_transmittance", "kind", 0_usize),
+                ("back_side_beam_beam_solar_transmittance", "kind", 0_usize),
+                ("front_side_beam_beam_solar_reflectance", "kind", 0_usize),
+                ("back_side_beam_beam_solar_reflectance", "kind", 0_usize),
+                (
+                    "front_side_beam_beam_visible_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_beam_beam_visible_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_beam_beam_visible_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_beam_beam_visible_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_beam_diffuse_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_beam_diffuse_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                ("front_side_beam_diffuse_solar_reflectance", "kind", 0_usize),
+                ("back_side_beam_diffuse_solar_reflectance", "kind", 0_usize),
+                (
+                    "front_side_beam_diffuse_visible_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_beam_diffuse_visible_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_beam_diffuse_visible_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_beam_diffuse_visible_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                ("diffuse_diffuse_solar_transmittance", "kind", 0_usize),
+                (
+                    "front_side_diffuse_diffuse_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "diffuse_diffuse_visible_solar_transmittance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "front_side_diffuse_diffuse_visible_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_visible_solar_reflectance",
+                    "kind",
+                    0_usize,
+                ),
+                (
+                    "infrared_transmittance_applies_to_front_and_back_",
+                    "kind",
+                    0_usize,
+                ),
+                ("front_side_infrared_emissivity", "kind", 0_usize),
+                ("back_side_infrared_emissivity", "kind", 0_usize),
+                ("thermal_resistance", "kind", 0_usize),
+                ("optical_data_type", "kind", 0_usize),
+                ("window_glass_spectral_data_set_name", "kind", 0_usize),
+                (
+                    "front_side_beam_beam_solar_transmittance",
+                    "missing",
+                    0_usize,
+                ),
+                (
+                    "back_side_beam_beam_solar_transmittance",
+                    "missing",
+                    0_usize,
+                ),
+                ("front_side_beam_beam_solar_reflectance", "missing", 0_usize),
+                ("back_side_beam_beam_solar_reflectance", "missing", 0_usize),
+                ("diffuse_diffuse_solar_transmittance", "auto", 0_usize),
+                ("diffuse_diffuse_solar_transmittance", "auto", 1_usize),
+                ("diffuse_diffuse_solar_transmittance", "auto", 2_usize),
+                (
+                    "front_side_diffuse_diffuse_solar_reflectance",
+                    "auto",
+                    0_usize,
+                ),
+                (
+                    "front_side_diffuse_diffuse_solar_reflectance",
+                    "auto",
+                    1_usize,
+                ),
+                (
+                    "front_side_diffuse_diffuse_solar_reflectance",
+                    "auto",
+                    2_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_solar_reflectance",
+                    "auto",
+                    0_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_solar_reflectance",
+                    "auto",
+                    1_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_solar_reflectance",
+                    "auto",
+                    2_usize,
+                ),
+                (
+                    "diffuse_diffuse_visible_solar_transmittance",
+                    "auto",
+                    0_usize,
+                ),
+                (
+                    "diffuse_diffuse_visible_solar_transmittance",
+                    "auto",
+                    1_usize,
+                ),
+                (
+                    "diffuse_diffuse_visible_solar_transmittance",
+                    "auto",
+                    2_usize,
+                ),
+                (
+                    "front_side_diffuse_diffuse_visible_solar_reflectance",
+                    "auto",
+                    0_usize,
+                ),
+                (
+                    "front_side_diffuse_diffuse_visible_solar_reflectance",
+                    "auto",
+                    1_usize,
+                ),
+                (
+                    "front_side_diffuse_diffuse_visible_solar_reflectance",
+                    "auto",
+                    2_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_visible_solar_reflectance",
+                    "auto",
+                    0_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_visible_solar_reflectance",
+                    "auto",
+                    1_usize,
+                ),
+                (
+                    "back_side_diffuse_diffuse_visible_solar_reflectance",
+                    "auto",
+                    2_usize,
+                ),
+                ("optical_data_type", "mode", 0_usize),
+                ("optical_data_type", "mode", 1_usize),
+                ("optical_data_type", "mode", 2_usize),
+                ("optical_data_type", "spectral", 0_usize),
+            ] {
+                let mut bad_value = glazing_eql_value.clone();
+                match kind {
+                    "kind" => {
+                        bad_value[GLAZING_EQL]["\u{a0}"][field] = json!(false);
+                    }
+                    "missing" => {
+                        bad_value[GLAZING_EQL]["\u{a0}"]
+                            .as_object_mut()
+                            .expect("full object")
+                            .remove(field);
+                    }
+                    "auto" => {
+                        bad_value[GLAZING_EQL]["\u{a0}"][field] = json!(match probe {
+                            0 => "autocalculate",
+                            1 => " Autocalculate ",
+                            _ => " ",
+                        });
+                    }
+                    "mode" => {
+                        bad_value[GLAZING_EQL]["\u{a0}"][field] = json!(match probe {
+                            0 => "spectralaverage",
+                            1 => " SpectralAverage ",
+                            _ => "UnknownMode",
+                        });
+                    }
+                    _ => {
+                        bad_value[GLAZING_EQL]["\u{a0}"][field] = json!("Spectral");
+                    }
+                }
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string())
+                            .expect("original-invalid Raw")
+                    )
+                    .is_err_and(|error| error.contains("Source GlazingEQL requires")),
+                    "GlazingEQL original boundary {field}/{kind}/{probe}"
+                );
+            }
+            let opaque_glazing_eql = glazing_eql_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowGlazingEquivalentLayer)
+                .expect("held opaque material");
+            for case in 0_usize..12 {
+                let mut bad_model = glazing_eql_model.clone();
+                match case {
+                    0 => bad_model.materials.retain(|row| {
+                        row.kind() != ep_model::MaterialKind::WindowGlazingEquivalentLayer
+                    }),
+                    1 => {
+                        let mut extra = bad_model.materials[glazing_eql_a_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA GLAZING EQL".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[glazing_eql_a_position].id = opaque_glazing_eql.id,
+                    3 => {
+                        bad_model.materials[glazing_eql_a_position].definition =
+                            opaque_glazing_eql.definition
+                    }
+                    4 => {
+                        bad_model.materials[glazing_eql_a_position].name =
+                            ep_model::NormalizedName("WRONG GLAZING EQL".into())
+                    }
+                    5 => {
+                        bad_model.materials[glazing_eql_a_position].id =
+                            ep_model::MaterialId(u32::MAX)
+                    }
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != glazing_eql_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((glazing_eql_a, "\u{b}".into())),
+                    8 => {
+                        let _ = bad_model
+                            .material_names
+                            .insert(" EXTRA GLAZING_EQL ALIAS ", glazing_eql_a);
+                    }
+                    9 => {
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == glazing_eql_a)
+                            .expect("A report tuple")
+                            .1 = "\u{a0}".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == glazing_eql_b)
+                            .expect("B report tuple")
+                            .1 = "\u{b}".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => {
+                        bad_model.material_names = ep_model::NameMap::source_exact_namespace();
+                        bad_model.materials.iter().for_each(|row| {
+                            let id = if row.id == glazing_eql_a {
+                                glazing_eql_b
+                            } else if row.id == glazing_eql_b {
+                                glazing_eql_a
+                            } else {
+                                row.id
+                            };
+                            let _ = bad_model.material_names.insert(&row.name.0, id);
+                        });
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &glazing_eql_raw,
+                        &glazing_eql_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&glazing_eql_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "GlazingEQL custody case {case}"
+                );
+            }
+            let glazing_eql_construction = glazing_eql_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("real opaque Construction");
+            for case in 0_usize..11 {
+                let mut used_value = glazing_eql_value.clone();
+                let mut fields =
+                    serde_json::Map::from_iter([("outside_layer".into(), json!("Opaque"))]);
+                let key = if case == 0 || case == 10 {
+                    "outside_layer".into()
+                } else {
+                    format!("layer_{}", case + 1)
+                };
+                fields.insert(
+                    key,
+                    json!(if case.is_multiple_of(2) {
+                        "\u{b}"
+                    } else {
+                        "\u{a0}"
+                    }),
+                );
+                used_value["Construction"]["GLAZING_EQL USED"] = serde_json::Value::Object(fields);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&used_value.to_string())
+                            .expect("original active GLAZING_EQL layer")
+                    )
+                    .is_err_and(|error| error.contains(
+                        "Source unused GlazingEQL excludes every Construction layer reference"
+                    )),
+                    "Raw GLAZING_EQL layer {case}"
+                );
+                let mut used_model = glazing_eql_model.clone();
+                let construction = &mut used_model.constructions[glazing_eql_construction];
+                if case == 10 {
+                    construction.layers.clear();
+                    construction.outside_layer = Some(glazing_eql_a);
+                } else {
+                    construction.layers.resize(case + 1, opaque_glazing_eql.id);
+                    construction.layers[case] = if case.is_multiple_of(2) {
+                        glazing_eql_a
+                    } else {
+                        glazing_eql_b
+                    };
+                }
+                let used_assessment = crate::support::assess_support_with_source_admission(
+                    &glazing_eql_raw,
+                    &glazing_eql_compiled.report,
+                    Some(&used_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&glazing_eql_admission),
+                );
+                assert!(
+                    !used_assessment.allows_rust_runtime()
+                        && used_assessment
+                            .unsupported_objects
+                            .iter()
+                            .any(|entry| entry.object_type == GLAZING_EQL),
+                    "typed/effective GLAZING_EQL layer {case}"
+                );
+            }
+        }
     }
 }
 

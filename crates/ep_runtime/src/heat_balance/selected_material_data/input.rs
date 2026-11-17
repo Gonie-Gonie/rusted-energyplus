@@ -40,6 +40,8 @@ pub struct SelectedMaterialInput {
     pub window_screen_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine BlindEQL3A21N/min10; original blank guards remain separate from defaults.
     pub window_blind_equivalent_layer: Vec<ProjectInputObject>,
+    /// Genuine MaterialGlassEQL3A26N/min11 operands; six Auto sentinels remain raw.
+    pub window_glazing_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialBlind2A27N/min29 operands.
     pub window_blind: Vec<ProjectInputObject>,
 }
@@ -775,6 +777,125 @@ impl SelectedMaterialInput {
             }
         }
         Ok((1, numbers))
+    }
+
+    pub(super) fn get_window_glazing_equivalent_layer_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners.input.has_object(
+                "WindowMaterial:Glazing:EquivalentLayer",
+                &object.object_name,
+            )
+        {
+            return Err(unavailable(
+                "GlazingEQL owned direct-epJSON raw/IP identity",
+            ));
+        }
+        const FIELDS: [(&str, f64); 26] = [
+            ("front_side_beam_beam_solar_transmittance", 0.0),
+            ("back_side_beam_beam_solar_transmittance", 0.0),
+            ("front_side_beam_beam_solar_reflectance", 0.0),
+            ("back_side_beam_beam_solar_reflectance", 0.0),
+            ("front_side_beam_beam_visible_solar_transmittance", 0.0),
+            ("back_side_beam_beam_visible_solar_transmittance", 0.0),
+            ("front_side_beam_beam_visible_solar_reflectance", 0.0),
+            ("back_side_beam_beam_visible_solar_reflectance", 0.0),
+            ("front_side_beam_diffuse_solar_transmittance", 0.0),
+            ("back_side_beam_diffuse_solar_transmittance", 0.0),
+            ("front_side_beam_diffuse_solar_reflectance", 0.0),
+            ("back_side_beam_diffuse_solar_reflectance", 0.0),
+            ("front_side_beam_diffuse_visible_solar_transmittance", 0.0),
+            ("back_side_beam_diffuse_visible_solar_transmittance", 0.0),
+            ("front_side_beam_diffuse_visible_solar_reflectance", 0.0),
+            ("back_side_beam_diffuse_visible_solar_reflectance", 0.0),
+            ("diffuse_diffuse_solar_transmittance", -99999.0),
+            ("front_side_diffuse_diffuse_solar_reflectance", -99999.0),
+            ("back_side_diffuse_diffuse_solar_reflectance", -99999.0),
+            ("diffuse_diffuse_visible_solar_transmittance", -99999.0),
+            (
+                "front_side_diffuse_diffuse_visible_solar_reflectance",
+                -99999.0,
+            ),
+            (
+                "back_side_diffuse_diffuse_visible_solar_reflectance",
+                -99999.0,
+            ),
+            ("infrared_transmittance_applies_to_front_and_back_", 0.0),
+            ("front_side_infrared_emissivity", 0.84),
+            ("back_side_infrared_emissivity", 0.84),
+            ("thermal_resistance", 0.158),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 3
+            || s.alpha_field_blanks.len() < 3
+            || s.alpha_field_names.len() < 3
+            || s.numeric_args.len() < 26
+            || s.numeric_field_blanks.len() < 26
+            || s.numeric_field_names.len() < 26
+        {
+            return Err(unavailable("actual GlazingEQL3A26N allocation"));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners.input.mark_object_as_used(
+            "WindowMaterial:Glazing:EquivalentLayer",
+            &object.object_name,
+        );
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        for (index, name, default) in [
+            (1_usize, "optical_data_type", "SPECTRALAVERAGE"),
+            (2_usize, "window_glass_spectral_data_set_name", ""),
+        ] {
+            s.alpha_field_names[index] = name.into();
+            s.alpha_args[index] = default.into();
+            match object.fields.get(name) {
+                Some(ProjectInputValue::String(text)) => {
+                    if !text.is_empty() {
+                        s.alpha_args[index] = text.to_ascii_uppercase();
+                        s.alpha_field_blanks[index] = false;
+                    }
+                }
+                None => {}
+                _ => return Err(unavailable("admitted original GlazingEQL alpha")),
+            }
+        }
+        // First11 legacy fields include all3alphas and8numbers; process all26fixed defaults anyway.
+        let mut numbers = 8_usize;
+        for (index, (name, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                    numbers = numbers.max(index + 1);
+                }
+                Some(ProjectInputValue::String(text))
+                    if (16..22).contains(&index)
+                        && matches!(text.as_str(), "" | "Autocalculate") =>
+                {
+                    s.numeric_args[index] = -99999.0;
+                    s.numeric_field_blanks[index] = text.is_empty();
+                    numbers = numbers.max(index + 1);
+                }
+                None => {}
+                _ => {
+                    return Err(unavailable(
+                        "admitted original GlazingEQL numeric/Auto scalar",
+                    ));
+                }
+            }
+        }
+        Ok((3, numbers))
     }
 
     pub(super) fn get_window_blind_equivalent_layer_item(

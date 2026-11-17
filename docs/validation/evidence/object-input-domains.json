@@ -434,6 +434,12 @@
       "Qualified Source compilation defers Native geometry warnings/recovery and four raw beam-sum diagnostics only for original-valid unused input, preserving Legacy. Five ordered warnings/recovery steps and IO flag/commit prefixes remain owned by the same actual Material. N16..18 blank guards copy N13..15 into visible diffuse state; infrared guards are independent. Common base properties and NominalR remain zero, Group16/Rough1 and resistance-only behavior are retained. Static47 assertion sites/6 explicit for loops/4 Material/0 Window owners remain separate from actual8 QA commands/4 current bodies/0 failed-history-reuse; getterbodycreditfalse.",
       "Source188 adds one fixed unused21-Float/two-String row over932 held parent numbers (953total; canonical752+201) without new requests or series. One fresh Native/Source pair with0 reruns passes all158series/75120values and unchanged12+12+8+2 gates. Whole16x11 public MaterialDetails cells match with all15 parent rows/order held. Source same-row geometry binds Group16/id15/typed14/Rough1/NomR+0/commonzeros and six actual physics surfaces. Bibliography121scientificRust+3derivation=124combined current Source citations is distinct from122 current ObjectTypes;37Native+1preexisting primary documentary record and52 separate documentary rows remain distinct.",
       "Actual zero EQL Construction count legitimately skips positive unavailable EQL/ASHWAT initialization; the ordinary same-owner Blind181-angle producer remains required. Active windows/Construction/control, Native-private TAR/optics/pointer parity, SourceA/IDF/Legacy admission changes, full-object and arbitrary valid-combination completion remain held."
+    ],
+    "WindowMaterial:Glazing:EquivalentLayer": [
+      "Source B additionally admits only unused direct epJSON through the genuine3A26N/min11 MaterialGlassEQL getter, Fen-compatible inherited TAR1 and common report/geometry row. Required N1..4, legal NumNums8..26, all26 fixed scratch/default/blank/JSON-label/used effects and unconditional numeric writes remain explicit. A2 defaults to SpectralAverage; unresolved nonempty A3 is retained without a spectral dependency in that mode. Both SourceExact hooks and complete Raw/IP/global-ID0/typed/count/loader/reverse-alias/CTF custody distinguish original numeric kinds from effective signed-i64 operands.",
+      "Original schema bounds and six Autocalculate alternatives remain separate from runtime state: N5..8 missing IP0, N9..16 schema0, N17..22 Auto-99999, N23 zero, N24/25 default0.84 and N26 default0.158. Spectral is schema-legal but the Native getter sets its mode-error flag and performs all writes before one Severe/two Continue diagnostics; only SpectralAverage has the bounded positive route. Duplicate Severe precedes flag/allocation. N17/N20 are shared front/back diffuse transmittance; N23 infrared transmittance also writes both directional thermal absorptances instead of N24/N25 emissivity. Effective N26<=0 silently selects0.158; actual base Resistance updates while NominalR stays ctor+0.",
+      "Source189 fixed26-Float/one-SpectralAverage-String insertion preserves953 parent numeric records (979total; canonical752+227), all requests/series/policies and original/converted DOM custody. One Native and one Source process with0reruns pass158series/75120values and unchanged12+12+8+2 gates. Whole17x11 public MaterialDetails cells match with all16 parent rows/order held; actual VerySmooth Resistance0.1730/commonzeros is distinct from Source Group13/id6/typed5/Rough5/NominalR+0. Same-row Source geometry maps six actual physics surfaces. Static47assert/6for/4Material/0Window facts remain separate from actual8QA/4current/0failed-history-reuse and falsegettercredit.",
+      "Actual zero EQL Construction count skips positive unavailable EQL/ASHWAT work while ordinary same-owner Blind181-angle production and six-surface physics remain required. Input60 ObjectTypes, currentcombined122, retained116 and registry147 remain distinct and held;123scientificRust+3derivation=126current Source citations does not add ObjectTypes. Native-private TAR/optics/pointer parity, active EQL/window/Construction/control, SourceA/IDF/Legacy admission changes, full-object and arbitrary valid-combination completion remain unclaimed."
     ]
   },
   "verification": {
@@ -12611,6 +12617,63 @@
           "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/Root-scientific-review.json",
           "sha256": "f68eff868b6c19790b36153cce157f03006194e15c251196585a9e9ae4c303a1",
           "bytes": 9396
+        }
+      },
+      "unused_window_glazing_equivalent_layer_material_details_and_public_series": {
+        "actual_quality": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/QA01/summary.json",
+          "sha256": "3ad302e58775deb39759fe5133984201740c1917f0a9813353344440bfdc2249",
+          "bytes": 2803
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/evidence01/source-authority.json",
+          "sha256": "39e25db88b729b153709b0e646a53655f36ddba3fde3ae6dcfdff776b22a2e97",
+          "bytes": 69199
+        },
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-GlazingEQL-QA-profile-DATA-DRAFT01/QA-profile.json",
+          "sha256": "a8a0e5b7373df6e4d94679e53ab178b27e6d82fe87741d8345debf53e906eb47",
+          "bytes": 8311
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/QA-profile-binding01.json",
+          "sha256": "2e9b4b1fb74080c5bd54f975cdaad4eb316789f994f76e870e7098408cd11e23",
+          "bytes": 2058
+        },
+        "counts": {
+          "current_QA_commands": 8,
+          "total_actual_QA_commands": 8,
+          "failed_QA_attempts": 0,
+          "current_test_body_executions": 4,
+          "historical_test_bodies": 0,
+          "reused_test_bodies": 0,
+          "current_getter_credit": false
+        },
+        "static_existing_body_CODE": {
+          "assertion_sites": 47,
+          "explicit_for": 6,
+          "fresh_Material_owners": 4,
+          "Window_owners": 0,
+          "new_test_functions": 0
+        },
+        "new_test_functions": 0,
+        "Source_paths_changed": 18,
+        "Source_existing_modified": 16,
+        "Source_added": 2,
+        "Source_held": 4679,
+        "Source_stages": [
+          18,
+          11
+        ],
+        "Root_actual_facts": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/documentation-facts01.json",
+          "sha256": "3b8295ccbb47757e826a77da688d1aa5e6a13c8a008ccc0a4bd53a78ef0b9f47",
+          "bytes": 15837
+        },
+        "Root_scientific_review": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/Root-scientific-review.json",
+          "sha256": "73093da6141764c10ce8d85e291d2f7752178e01069d4e074e4a8d6d61e75142",
+          "bytes": 10246
         }
       }
     },
@@ -84992,12 +85055,647 @@
             "qualification": "121 scientific.primary Rust +3additional derivation Rust =124combined current Source citations;38nonSource primary=37Native+1documentary;52separate documentaryrows held."
           }
         }
+      },
+      {
+        "group": "WindowMaterial:Glazing:EquivalentLayer",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-unused-window-glazing-equivalent-layer",
+        "case_kind": "UNUSED_WINDOW_GLAZING_EQUIVALENT_LAYER",
+        "source_build": "source-unused-window-glazing-equivalent-layer",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "numeric_policy_projection": {
+          "all158_policy_rules_literal": true,
+          "policy_changes": 0,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "new_report_requests": 0,
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/Root-scientific-review.json",
+            "sha256": "73093da6141764c10ce8d85e291d2f7752178e01069d4e074e4a8d6d61e75142",
+            "bytes": 10246
+          }
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v8/release.json",
+            "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+            "bytes": 11634
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/binding.json",
+            "sha256": "0e578c3839a4ee60bcd1bb35756cf2f3f44e38e349d43df1f0d2fc6be1e29fd1",
+            "bytes": 1167
+          },
+          "case_config": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/case-config.json",
+            "sha256": "a38f7b3e4804ef5803c2db34a3f01b3808d659b4017284bdd5632799ab0da291",
+            "bytes": 134383
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/evidence01/source-authority.json",
+            "sha256": "39e25db88b729b153709b0e646a53655f36ddba3fde3ae6dcfdff776b22a2e97",
+            "bytes": 69199
+          },
+          "completion": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/completed.json",
+            "sha256": "9add9ff43e0cbdfa5afaf4a9abd9bedb86cb0d837880f2fd8cd4ea0f61c1ba4c",
+            "bytes": 2362
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/verify-command/receipt.json",
+            "sha256": "975f4da0805d12f0c677df3c589bccac7bc8ad84531ef66a07882341b1412bb5",
+            "bytes": 328644
+          },
+          "actual_build": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/build-row.json",
+            "sha256": "55f9a68de29cb80aa865999af6b6153327c7eb14eca518a0659177b88e070b44",
+            "bytes": 1442
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/QA01/summary.json",
+            "sha256": "3ad302e58775deb39759fe5133984201740c1917f0a9813353344440bfdc2249",
+            "bytes": 2803
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/evidence01/source-authority.json",
+            "sha256": "39e25db88b729b153709b0e646a53655f36ddba3fde3ae6dcfdff776b22a2e97",
+            "bytes": 69199
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "engine_reruns": 0,
+          "new_test_functions": 0,
+          "profile": "ideal_loads.oa_topology.v1",
+          "fixed_input_manifest": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-GlazingEQL-CLOSED-input-DRAFT01/prepared-manifest.json",
+            "sha256": "ed07f30319f68fc823e327e8549f82be4bcb36020e90cb1d39ecf0d002fc43e9",
+            "bytes": 13166
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-GlazingEQL-CLOSED-input-DRAFT01/independent-static-review01.json",
+            "sha256": "2422461f3c1973037b9ce188e45c498755fb3c8210c470d84fd63a2e3fdbaed3",
+            "bytes": 5474
+          },
+          "documentation_actual_facts": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/documentation-facts01.json",
+            "sha256": "3b8295ccbb47757e826a77da688d1aa5e6a13c8a008ccc0a4bd53a78ef0b9f47",
+            "bytes": 15837
+          },
+          "documentation_link_build_DTO": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/documentation-link-build-DTO01.json",
+            "sha256": "57ec81cd7c940035e5e799fdcb25d374c9faa8014b28cc7487df7fa87383a568",
+            "bytes": 12719
+          },
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/Root-scientific-review.json",
+            "sha256": "73093da6141764c10ce8d85e291d2f7752178e01069d4e074e4a8d6d61e75142",
+            "bytes": 10246
+          },
+          "actual_parent_publication": {
+            "path": ".runtime/porting/unused-window-blind-equivalent-layer/publish01/receipt.json",
+            "sha256": "5b250c447421a5632c51fc7e6b3d69166680369e1c056450b3ec5654c3957a2d",
+            "bytes": 155673
+          },
+          "Source_adoption": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/adoption01.json",
+            "sha256": "d12f8ee57af1fa303749a8199404baa201f44ba9f4830b98c986d46567ac9051",
+            "bytes": 29806
+          },
+          "Source_evidence": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/evidence01/source-evidence.json",
+            "sha256": "2318ee00188254dbaac7fbf245b754b168a57a304ac7e0cdae5767ac650475df",
+            "bytes": 33403
+          },
+          "QA_profile": {
+            "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-GlazingEQL-QA-profile-DATA-DRAFT01/QA-profile.json",
+            "sha256": "a8a0e5b7373df6e4d94679e53ab178b27e6d82fe87741d8345debf53e906eb47",
+            "bytes": 8311
+          },
+          "QA_profile_binding": {
+            "path": ".runtime/porting/unused-window-glazing-equivalent-layer/QA-profile-binding01.json",
+            "sha256": "2e9b4b1fb74080c5bd54f975cdaad4eb316789f994f76e870e7098408cd11e23",
+            "bytes": 2058
+          },
+          "Static_preQA_corrections": [
+            "Readonly testplan01 MaterialDetails/common-report cell terminology corrected in plan02 before CODE/QA; numeric vectors/commands/budgets held. No observed Rust/QA/build/actor failure or rerun."
+          ],
+          "Completed_DTO_literal_defaults": {
+            "engines_executed_by_completion": 0,
+            "source_launch_authorized": false,
+            "no_engine_reruns": false,
+            "automatic_retry": false,
+            "original_actor_identities_retained": false
+          },
+          "Completed_DTO": {
+            "schema": "paired.Completed.v1",
+            "case_id": "ideal-loads-unused-window-glazing-equivalent-layer",
+            "mode": "fresh",
+            "release": {
+              "path": "tools/porting/paired/v8/release.json",
+              "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+              "bytes": 11634
+            },
+            "bindings": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/binding.json",
+              "sha256": "0e578c3839a4ee60bcd1bb35756cf2f3f44e38e349d43df1f0d2fc6be1e29fd1",
+              "bytes": 1167
+            },
+            "case_config": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/case-config.json",
+              "sha256": "a38f7b3e4804ef5803c2db34a3f01b3808d659b4017284bdd5632799ab0da291",
+              "bytes": 134383
+            },
+            "source_authority": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/evidence01/source-authority.json",
+              "sha256": "39e25db88b729b153709b0e646a53655f36ddba3fde3ae6dcfdff776b22a2e97",
+              "bytes": 69199
+            },
+            "paired": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/readback.json",
+              "sha256": "056a714dcafafcdbd7008c2e2da545f24a8b94565523a9c487cdf60ceacc821c",
+              "bytes": 540897
+            },
+            "verification_receipt": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/verify-command/receipt.json",
+              "sha256": "975f4da0805d12f0c677df3c589bccac7bc8ad84531ef66a07882341b1412bb5",
+              "bytes": 328644
+            },
+            "native_launch": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/native/launch.json",
+              "sha256": "80870af42583adf44ee8eb0db075e35fc9e9c92277b9f3f7745004f35568004e",
+              "bytes": 9455
+            },
+            "source_launch": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/source/launch.json",
+              "sha256": "1387ca9db411670f79e8e2ea26383a6a45245b77bb19c0fabe567185b2e20bf4",
+              "bytes": 16543
+            },
+            "accepted_for_retention": true,
+            "numeric_parity_accepted": true,
+            "engineering_comparison_completed": true,
+            "scientific_acceptance": true,
+            "qualifying_cases": 1,
+            "qualifying_values": 75120,
+            "engines_executed_by_completion": 0,
+            "actual_Native_engine_calls": 1,
+            "actual_Source_engine_calls": 1,
+            "source_launch_authorized": false,
+            "no_engine_reruns": false,
+            "automatic_retry": false,
+            "new_physical_credit": 1,
+            "original_actor_identities_retained": false
+          }
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/ca/ca0d01313c89c7a7ec79f3a44577ea710cb79c9723be824c569a3abf4282db87",
+          "sha256": "ca0d01313c89c7a7ec79f3a44577ea710cb79c9723be824c569a3abf4282db87"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/frozen/eplus-rs.exe",
+          "sha256": "3ed08aff678d65f3ab86c43f49fe3e96f0ef5d5ed40eda3a1820d3a16121f961",
+          "bytes": 83344412
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/build/receipt.json",
+          "sha256": "d746de6bdc1c7e56a1cb83206916e1cc2b458d213fa6866df715bb12c4ec6cc9",
+          "bytes": 70030
+        },
+        "native_launch": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/native/launch.json",
+          "sha256": "80870af42583adf44ee8eb0db075e35fc9e9c92277b9f3f7745004f35568004e",
+          "bytes": 9455
+        },
+        "source_launch": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/source/launch.json",
+          "sha256": "1387ca9db411670f79e8e2ea26383a6a45245b77bb19c0fabe567185b2e20bf4",
+          "bytes": 16543
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/readback.json",
+          "sha256": "056a714dcafafcdbd7008c2e2da545f24a8b94565523a9c487cdf60ceacc821c",
+          "bytes": 540897
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/Root-scientific-review.json",
+          "sha256": "73093da6141764c10ce8d85e291d2f7752178e01069d4e074e4a8d6d61e75142",
+          "bytes": 10246
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/case-config.json",
+          "sha256": "a38f7b3e4804ef5803c2db34a3f01b3808d659b4017284bdd5632799ab0da291",
+          "bytes": 134383
+        },
+        "coverage_kind": "unused_window_glazing_equivalent_layer_material_details_and_public_series",
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse": 2.039620483986755e-08
+        },
+        "public_response_summary": {
+          "Native": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.03148489327319126,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          },
+          "Source": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.031484893273194814,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          }
+        },
+        "unused_window_glazing_equivalent_layer": {
+          "input_numeric_records": 979,
+          "parent_numeric_records_held": 953,
+          "new_Float_operands": 26,
+          "new_String_operands": 1,
+          "canonical_numeric_records": 752,
+          "canonical_added_numeric_records": 227,
+          "new_report_requests": 0,
+          "QA_counts": {
+            "current_QA_commands": 8,
+            "total_actual_QA_commands": 8,
+            "failed_QA_attempts": 0,
+            "current_test_body_executions": 4,
+            "historical_test_bodies": 0,
+            "reused_test_bodies": 0,
+            "current_getter_credit": false
+          },
+          "static_existing_body_CODE": {
+            "assertion_sites": 47,
+            "explicit_for": 6,
+            "fresh_Material_owners": 4,
+            "Window_owners": 0,
+            "new_test_functions": 0
+          },
+          "Source_inventory": {
+            "before": 4695,
+            "current": 4697,
+            "modified": 16,
+            "added": 2,
+            "held": 4679,
+            "stages": [
+              18,
+              11
+            ]
+          },
+          "whole_public_MaterialDetails": {
+            "rows": 17,
+            "columns": 11,
+            "all_Native_Source_cells_exact": true,
+            "all16parent_rows_cells_order_held": true,
+            "table": [
+              [
+                " Material Details",
+                "Mass Layer",
+                "7.1429E-002",
+                "Rough",
+                "0.1000",
+                "1.400",
+                "2200.000",
+                "900.000",
+                "0.9000",
+                "0.7000",
+                "0.7000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED AVERAGE DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL AND ANGLE",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED REFRACTION DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLAZING EQL UNUSED SCALAR",
+                "0.1730",
+                "VerySmooth",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED CUSTOM NORMAL",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "MIXTURE UNUSED AIR ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "2.0000E-003",
+                "0.100",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.7000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "DRAPE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SCREEN UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "1.0000E-003",
+                "0.250",
+                "0.000",
+                "0.000",
+                "0.3281",
+                "0.3281",
+                "0.2188"
+              ],
+              [
+                " Material Details",
+                "SCREEN EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND EQL UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SGS UNUSED NORMAL",
+                "6.9976E-002",
+                "VerySmooth",
+                "2.0000E-003",
+                "2.858E-002",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ]
+            ]
+          },
+          "Source_geometry": {
+            "artifact": {
+              "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/source/output/geometry-consumers.json",
+              "sha256": "98d497a4b7217c3aa2f87f4482ca4b0087656c092775015ea2deec416f3f0b00",
+              "bytes": 34747
+            },
+            "same_row": {
+              "NominalR": {
+                "value": 0.0,
+                "value_bits": "0000000000000000"
+              },
+              "group": 13,
+              "id": 6,
+              "map_key": "GLAZING EQL UNUSED SCALAR",
+              "typed_id": 5,
+              "validated_typed_properties": {
+                "AbsorpSolar": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "AbsorpThermal": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "AbsorpVisible": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "Roughness": 5
+              }
+            },
+            "surfaces": 6,
+            "phase": "runtime_final_source_geometry",
+            "physics_executed": true,
+            "observer_supplies_inputs": false,
+            "actual_EQL_Construction_input_count": 0
+          },
+          "whole_topology": {
+            "rows": 153,
+            "events": 136,
+            "body_bytes": 12580,
+            "nodes": 10,
+            "nonparent_connections": 36,
+            "outdoor_registry": 5,
+            "suspicious_nodes": 2,
+            "nonconnected_nodes": 0,
+            "whole_prospective_topology_exact": true
+          },
+          "qualified_boundary": "Unused direct-epJSON Glazing:EquivalentLayer3A26N/min11 original/default/count/26unconditionalwrites/SourceIO state with same owned Fen-compatible TAR1/common report and geometry. Positive SpectralAverage mode; Native diagnostic Spectral partition retained. N23 infrared transmittance also writes directional thermal absorptance; actualN26R0.173 vs NomR+0. Six-surface ordinaryphysics/ordinaryBlind181-angle producer retained; genuine zeroEQLConstruction count. No activeEQL/window/ASHWAT/privateNativeTAR/fullobject/everyvalidcombination parity.",
+          "Native_private_TAR_parity_claim": false,
+          "WindowOptical_unit_execution_credit": 0,
+          "full_object_support": false,
+          "Source_bibliography": {
+            "scientific_primary_Rust_paths": 123,
+            "additional_derivation_Rust_paths": 3,
+            "combined_current_Source_paths": 126,
+            "nonSource_primary_records": 38,
+            "Native_primary_records": 37,
+            "preexisting_documentary_primary_records": 1,
+            "separate_documentary_rows": 52,
+            "qualification": "123scientific.primaryRust+3additionalderivationRust=126combinedSourcecitations;38nonSourceprimary=37Native+1documentary;52separatedocrowsheld. Input60/currentcombined122/registry147/retained116 are distinct inventory measures."
+          },
+          "ObjectType_inventory": {
+            "current_whole_scene": 60,
+            "current_combined": 122,
+            "retained_union": 116,
+            "registry_rows": 147,
+            "qualification": "Glazing:EquivalentLayer already belongs to retained116. This unit adds bounded runtime admission of an existing type; currentcombined122/registry147/retained116 held. Actual input has60ObjectTypes. Current Source citations126(123scientific+3derivation) are separate counts; no ObjectTypes inference from citation count."
+          }
+        }
       }
     ],
     "totals": {
-      "paired_cases": 270,
-      "reported_samples": 12224536,
-      "raw_operand_unequal": 3154306,
+      "paired_cases": 271,
+      "reported_samples": 12299656,
+      "raw_operand_unequal": 3177374,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -88541,6 +89239,38 @@
           "sha256": "8c8ded7ffc8e7b16b69fb54a47fa3be6a22e44aa6ed6a88707a94e468e7eda4b",
           "bytes": 71450
         }
+      },
+      {
+        "id": "source-unused-window-glazing-equivalent-layer",
+        "receipt": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/build/receipt.json",
+          "sha256": "d746de6bdc1c7e56a1cb83206916e1cc2b458d213fa6866df715bb12c4ec6cc9",
+          "bytes": 70030
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/ca/ca0d01313c89c7a7ec79f3a44577ea710cb79c9723be824c569a3abf4282db87",
+          "sha256": "ca0d01313c89c7a7ec79f3a44577ea710cb79c9723be824c569a3abf4282db87"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/frozen/eplus-rs.exe",
+          "sha256": "3ed08aff678d65f3ab86c43f49fe3e96f0ef5d5ed40eda3a1820d3a16121f961",
+          "bytes": 83344412
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/frozen/build-receipt.json",
+          "sha256": "c7f8e3c8a467001a7a6b704ec6afcdaf09ceb41c6d6d1fa97461db39843f48e2",
+          "bytes": 1650959
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/QA01/quality-preparation.json",
+          "sha256": "f4441a8cb7b9665c35a6059761d6108108fa43622553444661bd0b9e6503b7e0",
+          "bytes": 21622
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/freeze/receipt.json",
+          "sha256": "c0efac572b78786a4e115a09455c7e40089b16573805701a5712de0c9c246b30",
+          "bytes": 69051
+        }
       }
     ],
     "focused_since_workspace": {
@@ -88987,14 +89717,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 188,
-      "builds_with_accepted_paired_cases": 166,
+      "actual_recorded_builds": 189,
+      "builds_with_accepted_paired_cases": 167,
       "builds_with_only_retained_failed_Source_attempts": 8,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
       "builds_with_only_unaccepted_Source_attempts": 14,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "188 recorded Source builds: 166 retain accepted pairs and 22 have none, including 8 without Source execution. The latest strictly verified paired scene adds one case/75120 values; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "189 recorded Source builds: 167 retain accepted pairs and 22 have none, including 8 without Source execution. The latest strictly verified paired scene adds one case/75120 values; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
@@ -93707,12 +94437,13 @@
         "ideal-loads-unused-window-shade-equivalent-layer",
         "ideal-loads-unused-window-drape-equivalent-layer",
         "ideal-loads-unused-window-screen-equivalent-layer",
-        "ideal-loads-unused-window-blind-equivalent-layer"
+        "ideal-loads-unused-window-blind-equivalent-layer",
+        "ideal-loads-unused-window-glazing-equivalent-layer"
       ],
-      "accepted_paired_cases": 99,
-      "accepted_samples": 7323360,
-      "retained_Scheduled_B_pairs": 98,
-      "retained_Scheduled_B_samples": 7263840,
+      "accepted_paired_cases": 100,
+      "accepted_samples": 7398480,
+      "retained_Scheduled_B_pairs": 99,
+      "retained_Scheduled_B_samples": 7338960,
       "unused_NodeList_A_pairs": 1,
       "unused_NodeList_A_samples": 59520,
       "latest_complete_comparisons": {
@@ -93740,28 +94471,33 @@
           "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/readback.json",
           "sha256": "0ddbd9f34808ffc689ec29ca33a5f097337fc7c74490d5fafdb09db180148c58",
           "bytes": 540806
+        },
+        "UNUSED_WINDOW_GLAZING_EQUIVALENT_LAYER": {
+          "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/readback.json",
+          "sha256": "056a714dcafafcdbd7008c2e2da545f24a8b94565523a9c487cdf60ceacc821c",
+          "bytes": 540897
         }
       },
       "latest_Root_completed_review": {
-        "path": ".runtime/porting/unused-window-blind-equivalent-layer/runtime01/Root-scientific-review.json",
-        "sha256": "f68eff868b6c19790b36153cce157f03006194e15c251196585a9e9ae4c303a1",
-        "bytes": 9396
+        "path": ".runtime/porting/unused-window-glazing-equivalent-layer/runtime01/Root-scientific-review.json",
+        "sha256": "73093da6141764c10ce8d85e291d2f7752178e01069d4e074e4a8d6d61e75142",
+        "bytes": 10246
       },
-      "latest_source_build": "source-unused-window-blind-equivalent-layer",
+      "latest_source_build": "source-unused-window-glazing-equivalent-layer",
       "latest_actual_Source_build": {
-        "path": ".runtime/porting/unused-window-blind-equivalent-layer/build01/build-row.json",
-        "sha256": "ec0fd697685730b858db8929901811d9ccfc672f536715bc8c51b44c73d3fcb6",
-        "bytes": 1430
+        "path": ".runtime/porting/unused-window-glazing-equivalent-layer/build01/build-row.json",
+        "sha256": "55f9a68de29cb80aa865999af6b6153327c7eb14eca518a0659177b88e070b44",
+        "bytes": 1442
       },
       "latest_actual_quality": {
-        "path": ".runtime/porting/unused-window-blind-equivalent-layer/QA01/summary.json",
-        "sha256": "c70050a3c2f5ec37295eb6b2ad1e33590b5be3830c8b2b2ab503eec3c39499de",
-        "bytes": 2775
+        "path": ".runtime/porting/unused-window-glazing-equivalent-layer/QA01/summary.json",
+        "sha256": "3ad302e58775deb39759fe5133984201740c1917f0a9813353344440bfdc2249",
+        "bytes": 2803
       },
       "latest_owner_execution_review": {
-        "path": ".runtime/porting/unused-window-blind-equivalent-layer/evidence01/source-authority.json",
-        "sha256": "b946e8b4751e148fe7de10fe80664a3eebbd8c940b9a7525cd356a78b79e92dc",
-        "bytes": 70796
+        "path": ".runtime/porting/unused-window-glazing-equivalent-layer/evidence01/source-authority.json",
+        "sha256": "39e25db88b729b153709b0e646a53655f36ddba3fde3ae6dcfdff776b22a2e97",
+        "bytes": 69199
       },
       "latest_input_contracts": {
         "UNUSED_WINDOW_BLIND": {
@@ -93788,6 +94524,11 @@
           "path": ".runtime/object-expansion/unit159-prep/unused-BlindEQL-CLOSED-input-parent187-binding01/prepared-manifest.json",
           "sha256": "c0a089e8a353f1eb4086ae57f8e47b3798ead6347a143dab2cc9b99a05d15834",
           "bytes": 13404
+        },
+        "UNUSED_WINDOW_GLAZING_EQUIVALENT_LAYER": {
+          "path": ".runtime/object-expansion/unit159-prep/unused-GlazingEQL-CLOSED-input-DRAFT01/prepared-manifest.json",
+          "sha256": "ed07f30319f68fc823e327e8549f82be4bcb36020e90cb1d39ecf0d002fc43e9",
+          "bytes": 13166
         }
       },
       "latest_retained_evidence": {
@@ -93800,7 +94541,7 @@
         "sha256": "4228fd05d69cbdbbead77a1bf34c56788a0f7df37885830b16eb253802762c64",
         "bytes": 2919
       },
-      "scope": "98 bounded Source B Scheduled/NodeList pairs retain 7,263,840 values. The unused Source A pair adds59,520, giving 99 pairs and 7,323,360 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
+      "scope": "99 bounded Source B Scheduled/NodeList pairs retain 7,338,960 values. The unused Source A pair adds59,520, giving 100 pairs and 7,398,480 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.",
       "capability_or_gate_promotion": false,
       "latest_Source_input_guard_correction": {
         "path": ".runtime/object-expansion/unit139-prep/Root-Source-input-guard-correction01.json",

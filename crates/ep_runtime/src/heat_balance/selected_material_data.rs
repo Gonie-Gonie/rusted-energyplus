@@ -30,6 +30,7 @@ pub(crate) use window_blind::{
 mod window_blind_equivalent_layer;
 mod window_drape_equivalent_layer;
 mod window_gas;
+mod window_glazing_equivalent_layer;
 mod window_screen;
 mod window_screen_equivalent_layer;
 mod window_shade;
@@ -91,6 +92,9 @@ pub(crate) struct SelectedMaterialData {
     /// Genuine MaterialBlindEQL: one inherited TAR1 and four raw/recovered slat operands.
     window_blind_equivalent_layer:
         BTreeMap<MaterialId, window_blind_equivalent_layer::SourceBlindEquivalentLayerMaterial>,
+    /// Genuine MaterialGlassEQL: direct Fen-compatible row using the existing TAR1 type.
+    window_glazing_equivalent_layer:
+        BTreeMap<MaterialId, window_glazing_equivalent_layer::SourceGlazingEquivalentLayerMaterial>,
     /// Same actual MaterialBlind rows and constructor-owned heap TAR tables.
     window_blind: BTreeMap<MaterialId, window_blind::SourceBlindMaterial>,
     pub(crate) num_no_masses: i32,
@@ -427,6 +431,44 @@ impl SelectedMaterialData {
         }
         Ok((
             MaterialSurfaceRoughness::Rough,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    /// Read actual GlassEQL common state by Source ordinal and typed ID.
+    pub(crate) fn source_glazing_equivalent_layer_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native GlazingEQL MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::GlassEql)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual GlazingEQL Source order/group/physical identity",
+            ));
+        }
+        let row = self.window_glazing_equivalent_layer.get(&typed_id).ok_or(
+            HeatBalanceInputError::Unavailable("actual retained GlazingEQL runtime row"),
+        )?;
+        if row.roughness != Some(MaterialSurfaceRoughness::VerySmooth) {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual GlazingEQL getter roughness",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::VerySmooth,
             OpaqueSurfaceProperties {
                 thermal_absorptance: row.thermal_absorptance,
                 solar_absorptance: row.solar_absorptance,
@@ -853,7 +895,7 @@ impl SelectedMaterialData {
         }
         self.get_glazing_data(raw, o)?;
         self.get_refraction_data(raw, o)?;
-        empty!(num_eql_glazings, "WindowMaterial:Glazing:EquivalentLayer");
+        self.get_window_glazing_equivalent_layer_data(raw, o)?;
         self.get_named_window_gas_data(raw, o)?;
         empty!(num_eql_gaps, "WindowMaterial:Gap:EquivalentLayer");
         self.get_window_gas_mixture_data(raw, o)?;
