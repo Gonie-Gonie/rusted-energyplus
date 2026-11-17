@@ -10,9 +10,7 @@ impl SourceWindowOpticalInitialization {
         // In particular no persistent window arrays are fabricated from it.
         self.w5_init_glass_parameters(owners)?; //339
         if owners.materials.num_blinds > 0 {
-            return Err(Error::Unavailable(
-                "InitGlass positive CalcWindowBlindProperties343",
-            ));
+            super::calc_window_blind_properties(&mut *owners.materials, owners.backend)?;
         }
         if owners.materials.num_screens > 0 {
             // WindowManager7490 visits actual final Surface ordinals. Its local

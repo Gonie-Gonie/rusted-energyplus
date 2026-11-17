@@ -81,6 +81,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         window_gas_mixture: Vec::new(),
         window_shade: Vec::new(),
         window_screen: Vec::new(),
+        window_blind: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -4060,6 +4061,666 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
         assert!(
             matches!(input.source_raw_object_fields("WindowMaterial:Screen", "C SCREEN WRAPPED")
             .unwrap().get("conductivity"), Some(S::Number(token)) if token == "18446744073709551615")
+        );
+    }
+    // Blind B1: one genuine Material owner; the same live backend enters the real producer.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+
+        let typed_blind = ep_model::WindowBlindMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.025,
+            slat_separation_m: 0.02,
+            slat_thickness_m: 0.00025,
+            slat_angle_deg: 45.0,
+            slat_conductivity_w_per_m_k: 221.0,
+            solar_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            front_infrared_transmittance: 0.0,
+            back_infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.9,
+            back_infrared_emissivity: 0.9,
+            blind_to_glass_distance_m: 0.05,
+            top_opening_multiplier: 0.5,
+            bottom_opening_multiplier: 0.0,
+            left_side_opening_multiplier: 0.5,
+            right_side_opening_multiplier: 0.5,
+            minimum_slat_angle_deg: 0.0,
+            maximum_slat_angle_deg: 180.0,
+            slat_angle_type: ep_model::WindowBlindSlatAngleType::Fixed,
+            slat_crown_m: 0.0,
+            base_thickness_m: 0.0,
+            base_conductivity_w_per_m_k: 0.0,
+            base_thermal_resistance_m2_k_per_w: 0.0,
+            base_solar_absorptance: 0.0,
+            base_visible_absorptance: 0.0,
+            base_thermal_absorptance: 0.0,
+        };
+        let names = ["A BLIND FULL", "B BLIND DEFAULT"];
+        let typed_names = ["A BLIND FULL", "B BLIND DEFAULT"];
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName::new(name),
+                    definition: MaterialDefinition::WindowBlind(typed_blind),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let wrapped_k = ep_model::classify_source_json_number(&u64::MAX.to_string())
+            .unwrap()
+            .as_f64();
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_thickness",
+            "slat_angle",
+            "slat_conductivity",
+            "slat_beam_solar_transmittance",
+            "front_side_slat_beam_solar_reflectance",
+            "back_side_slat_beam_solar_reflectance",
+            "slat_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_solar_reflectance",
+            "slat_beam_visible_transmittance",
+            "front_side_slat_beam_visible_reflectance",
+            "back_side_slat_beam_visible_reflectance",
+            "slat_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_visible_reflectance",
+            "slat_infrared_hemispherical_transmittance",
+            "front_side_slat_infrared_hemispherical_emissivity",
+            "back_side_slat_infrared_hemispherical_emissivity",
+            "blind_to_glass_distance",
+            "blind_top_opening_multiplier",
+            "blind_bottom_opening_multiplier",
+            "blind_left_side_opening_multiplier",
+            "blind_right_side_opening_multiplier",
+            "minimum_slat_angle",
+            "maximum_slat_angle",
+        ];
+        let numeric_rows: [[f64; 27]; 2] = [
+            [
+                0.025, 0.02, 0.001, 45.0, wrapped_k, 0.1, 0.4, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+            [
+                0.025, 0.02, 0.00025, 45.0, 221.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.9, 0.9, 0.05, 0.5, 0.0, 0.5, 0.5, 0.0, 180.0,
+            ],
+        ];
+        raw.window_blind = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .zip(numeric_rows[index])
+                    .map(|(field, value)| ((*field).into(), Value::Number(value)))
+                    .collect();
+                if index == 1 {
+                    fields.retain(|name, _| {
+                        [
+                            "slat_width",
+                            "slat_separation",
+                            "front_side_slat_beam_solar_reflectance",
+                            "back_side_slat_beam_solar_reflectance",
+                            "front_side_slat_diffuse_solar_reflectance",
+                            "back_side_slat_diffuse_solar_reflectance",
+                            "slat_beam_visible_transmittance",
+                        ]
+                        .contains(&name.as_str())
+                    });
+                    fields.insert("slat_orientation".into(), Value::String(String::new()));
+                } else {
+                    fields.insert("slat_orientation".into(), Value::String("Vertical".into()));
+                }
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        objects
+            .get_mut("WindowMaterial:Blind")
+            .unwrap()
+            .get_mut("A BLIND FULL")
+            .unwrap()
+            .insert("slat_conductivity".into(), S::Number(u64::MAX.to_string()));
+
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        let (getter, producer);
+        let raw_tar_before;
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            {
+                let mut owners = MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                };
+                getter = data.get_material_data(&raw, &mut owners);
+                assert_eq!(
+                    raw.get_window_blind_item(&raw.window_blind[0], &mut owners)
+                        .unwrap(),
+                    (2, 27)
+                );
+                assert_eq!(owners.shortcut.numeric_args[..27], numeric_rows[0]);
+                assert_eq!(
+                    raw.get_window_blind_item(&raw.window_blind[1], &mut owners)
+                        .unwrap(),
+                    (2, 27)
+                );
+            }
+            getter.expect("real Blind getter");
+            assert!(
+                data.window_blind.len() == 2
+                    && data.num_blinds == 2
+                    && names.iter().enumerate().all(|(index, name)| {
+                        let id = MaterialId(3 + u32::try_from(index).unwrap());
+                        data.materials[index + 3] == id
+                            && data.material_map[*name] == i32::try_from(index + 4).unwrap()
+                            && data.material_groups[&id] == SourceMaterialGroup::Blind
+                            && data.resistance_only[&id]
+                            && data.nominal_r[index + 3].to_bits() == 0
+                    })
+            );
+            assert!(data.window_blind.values().all(|row| row.tars.len() == 181
+                && row.tars.iter().all(|tar| tar
+                    == &window_blind::SourceBlindTraAbsRef::<38>::default()
+                    && tar.sol.ft.bm.len() == 38
+                    && tar.sol.bk.bm.len() == 38
+                    && tar.vis.ft.bm.len() == 38
+                    && tar.vis.bk.bm.len() == 38)));
+            // Exactly two 480-byte raw-slat bit snapshots; no computed arena or Material clone.
+            raw_tar_before = data
+                .window_blind
+                .iter()
+                .map(|(id, row)| {
+                    (
+                        *id,
+                        [
+                            row.slat_tar.sol.ft.bm[0].bm_tra,
+                            row.slat_tar.sol.ft.bm[0].df_tra,
+                            row.slat_tar.sol.ft.bm[0].bm_ref,
+                            row.slat_tar.sol.ft.bm[0].df_ref,
+                            row.slat_tar.sol.ft.bm[0].abs,
+                            row.slat_tar.sol.ft.df.tra,
+                            row.slat_tar.sol.ft.df.tra_gnd,
+                            row.slat_tar.sol.ft.df.tra_sky,
+                            row.slat_tar.sol.ft.df.refl,
+                            row.slat_tar.sol.ft.df.refl_gnd,
+                            row.slat_tar.sol.ft.df.refl_sky,
+                            row.slat_tar.sol.ft.df.abs,
+                            row.slat_tar.sol.ft.df.abs_gnd,
+                            row.slat_tar.sol.ft.df.abs_sky,
+                            row.slat_tar.sol.bk.bm[0].bm_tra,
+                            row.slat_tar.sol.bk.bm[0].df_tra,
+                            row.slat_tar.sol.bk.bm[0].bm_ref,
+                            row.slat_tar.sol.bk.bm[0].df_ref,
+                            row.slat_tar.sol.bk.bm[0].abs,
+                            row.slat_tar.sol.bk.df.tra,
+                            row.slat_tar.sol.bk.df.tra_gnd,
+                            row.slat_tar.sol.bk.df.tra_sky,
+                            row.slat_tar.sol.bk.df.refl,
+                            row.slat_tar.sol.bk.df.refl_gnd,
+                            row.slat_tar.sol.bk.df.refl_sky,
+                            row.slat_tar.sol.bk.df.abs,
+                            row.slat_tar.sol.bk.df.abs_gnd,
+                            row.slat_tar.sol.bk.df.abs_sky,
+                            row.slat_tar.vis.ft.bm[0].bm_tra,
+                            row.slat_tar.vis.ft.bm[0].df_tra,
+                            row.slat_tar.vis.ft.bm[0].bm_ref,
+                            row.slat_tar.vis.ft.bm[0].df_ref,
+                            row.slat_tar.vis.ft.bm[0].abs,
+                            row.slat_tar.vis.ft.df.tra,
+                            row.slat_tar.vis.ft.df.tra_gnd,
+                            row.slat_tar.vis.ft.df.tra_sky,
+                            row.slat_tar.vis.ft.df.refl,
+                            row.slat_tar.vis.ft.df.refl_gnd,
+                            row.slat_tar.vis.ft.df.refl_sky,
+                            row.slat_tar.vis.ft.df.abs,
+                            row.slat_tar.vis.ft.df.abs_gnd,
+                            row.slat_tar.vis.ft.df.abs_sky,
+                            row.slat_tar.vis.bk.bm[0].bm_tra,
+                            row.slat_tar.vis.bk.bm[0].df_tra,
+                            row.slat_tar.vis.bk.bm[0].bm_ref,
+                            row.slat_tar.vis.bk.bm[0].df_ref,
+                            row.slat_tar.vis.bk.bm[0].abs,
+                            row.slat_tar.vis.bk.df.tra,
+                            row.slat_tar.vis.bk.df.tra_gnd,
+                            row.slat_tar.vis.bk.df.tra_sky,
+                            row.slat_tar.vis.bk.df.refl,
+                            row.slat_tar.vis.bk.df.refl_gnd,
+                            row.slat_tar.vis.bk.df.refl_sky,
+                            row.slat_tar.vis.bk.df.abs,
+                            row.slat_tar.vis.bk.df.abs_gnd,
+                            row.slat_tar.vis.bk.df.abs_sky,
+                            row.slat_tar.ir.ft.tra,
+                            row.slat_tar.ir.ft.emi,
+                            row.slat_tar.ir.bk.tra,
+                            row.slat_tar.ir.bk.emi,
+                        ]
+                        .map(f64::to_bits),
+                    )
+                })
+                .collect::<Vec<_>>();
+            producer = crate::heat_balance::ordinary_window_optical_initialization::calc_window_blind_properties(
+                &mut data, &mut backend);
+        }
+        producer.expect("same actual Material rows and same real backend enter Blind computation");
+        assert!(
+            !errors_found
+                && state.tracking.total_severe_errors == 0
+                && state.tracking.total_warning_errors == 0
+                && text.is_empty()
+        );
+        let full = &data.window_blind[&MaterialId(3)];
+        let default = &data.window_blind[&MaterialId(4)];
+        assert_eq!(
+            [
+                full.slat_width,
+                full.slat_separation,
+                full.slat_thickness,
+                full.slat_angle,
+                full.slat_conductivity,
+                full.slat_tar.sol.ft.bm[0].df_tra,
+                full.slat_tar.sol.ft.bm[0].df_ref,
+                full.slat_tar.sol.bk.bm[0].df_ref,
+                full.slat_tar.sol.ft.df.tra,
+                full.slat_tar.sol.ft.df.refl,
+                full.slat_tar.sol.bk.df.refl,
+                full.slat_tar.vis.ft.bm[0].df_tra,
+                full.slat_tar.vis.ft.bm[0].df_ref,
+                full.slat_tar.vis.bk.bm[0].df_ref,
+                full.slat_tar.vis.ft.df.tra,
+                full.slat_tar.vis.ft.df.refl,
+                full.slat_tar.vis.bk.df.refl,
+                full.slat_tar.ir.ft.tra,
+                full.slat_tar.ir.ft.emi,
+                full.slat_tar.ir.bk.emi,
+                full.to_glass_distance,
+                full.top_opening,
+                full.bottom_opening,
+                full.left_opening,
+                full.right_opening,
+                full.min_slat_angle,
+                full.max_slat_angle
+            ],
+            numeric_rows[0]
+        );
+        assert_eq!(
+            [
+                default.slat_width,
+                default.slat_separation,
+                default.slat_thickness,
+                default.slat_angle,
+                default.slat_conductivity,
+                default.slat_tar.sol.ft.bm[0].df_tra,
+                default.slat_tar.sol.ft.bm[0].df_ref,
+                default.slat_tar.sol.bk.bm[0].df_ref,
+                default.slat_tar.sol.ft.df.tra,
+                default.slat_tar.sol.ft.df.refl,
+                default.slat_tar.sol.bk.df.refl,
+                default.slat_tar.vis.ft.bm[0].df_tra,
+                default.slat_tar.vis.ft.bm[0].df_ref,
+                default.slat_tar.vis.bk.bm[0].df_ref,
+                default.slat_tar.vis.ft.df.tra,
+                default.slat_tar.vis.ft.df.refl,
+                default.slat_tar.vis.bk.df.refl,
+                default.slat_tar.ir.ft.tra,
+                default.slat_tar.ir.ft.emi,
+                default.slat_tar.ir.bk.emi,
+                default.to_glass_distance,
+                default.top_opening,
+                default.bottom_opening,
+                default.left_opening,
+                default.right_opening,
+                default.min_slat_angle,
+                default.max_slat_angle
+            ],
+            numeric_rows[1]
+        );
+        assert!(
+            full.slat_orientation == 1
+                && default.slat_orientation == 0
+                && data
+                    .window_blind
+                    .values()
+                    .all(|row| row.slat_angle_type == 0
+                        && row.slat_crown.to_bits() == 0
+                        && row.roughness == Some(MaterialSurfaceRoughness::Rough)
+                        && [
+                            row.thickness,
+                            row.conductivity,
+                            row.resistance,
+                            row.density,
+                            row.specific_heat,
+                            row.thermal_absorptance,
+                            row.thermal_absorptance_input,
+                            row.solar_absorptance,
+                            row.solar_absorptance_input,
+                            row.visible_absorptance,
+                            row.visible_absorptance_input,
+                            row.transmittance,
+                            row.visible_transmittance,
+                            row.thermal_transmittance,
+                            row.shade_reflectance,
+                            row.shade_visible_reflectance,
+                            row.airflow_permeability
+                        ]
+                        .iter()
+                        .all(|value| value.to_bits() == 0))
+        );
+        assert!(
+            shortcut.numeric_field_names[..27] == numeric_names
+                && shortcut.alpha_field_names[..2] == ["name", "slat_orientation"]
+                && shortcut.alpha_args[..2] == ["B BLIND DEFAULT", "HORIZONTAL"]
+                && shortcut.alpha_field_blanks[..2] == [false, true]
+                && shortcut.numeric_args[..27] == numeric_rows[1]
+                && shortcut.numeric_field_blanks[..27]
+                    .iter()
+                    .enumerate()
+                    .all(|(index, blank)| *blank != [0, 1, 6, 7, 9, 10, 11].contains(&index))
+        );
+        assert!(
+            matches!(input.source_raw_object_fields("WindowMaterial:Blind", "A BLIND FULL").unwrap()
+            .get("slat_conductivity"), Some(S::Number(token)) if token == "18446744073709551615")
+                && full.slat_conductivity.to_bits() == (-1.0_f64).to_bits()
+                && names
+                    .iter()
+                    .all(|name| !input.is_object_unused("WindowMaterial:Blind", name))
+        );
+        for (id, before) in &raw_tar_before {
+            let row = &data.window_blind[id];
+            assert_eq!(
+                [
+                    row.slat_tar.sol.ft.bm[0].bm_tra,
+                    row.slat_tar.sol.ft.bm[0].df_tra,
+                    row.slat_tar.sol.ft.bm[0].bm_ref,
+                    row.slat_tar.sol.ft.bm[0].df_ref,
+                    row.slat_tar.sol.ft.bm[0].abs,
+                    row.slat_tar.sol.ft.df.tra,
+                    row.slat_tar.sol.ft.df.tra_gnd,
+                    row.slat_tar.sol.ft.df.tra_sky,
+                    row.slat_tar.sol.ft.df.refl,
+                    row.slat_tar.sol.ft.df.refl_gnd,
+                    row.slat_tar.sol.ft.df.refl_sky,
+                    row.slat_tar.sol.ft.df.abs,
+                    row.slat_tar.sol.ft.df.abs_gnd,
+                    row.slat_tar.sol.ft.df.abs_sky,
+                    row.slat_tar.sol.bk.bm[0].bm_tra,
+                    row.slat_tar.sol.bk.bm[0].df_tra,
+                    row.slat_tar.sol.bk.bm[0].bm_ref,
+                    row.slat_tar.sol.bk.bm[0].df_ref,
+                    row.slat_tar.sol.bk.bm[0].abs,
+                    row.slat_tar.sol.bk.df.tra,
+                    row.slat_tar.sol.bk.df.tra_gnd,
+                    row.slat_tar.sol.bk.df.tra_sky,
+                    row.slat_tar.sol.bk.df.refl,
+                    row.slat_tar.sol.bk.df.refl_gnd,
+                    row.slat_tar.sol.bk.df.refl_sky,
+                    row.slat_tar.sol.bk.df.abs,
+                    row.slat_tar.sol.bk.df.abs_gnd,
+                    row.slat_tar.sol.bk.df.abs_sky,
+                    row.slat_tar.vis.ft.bm[0].bm_tra,
+                    row.slat_tar.vis.ft.bm[0].df_tra,
+                    row.slat_tar.vis.ft.bm[0].bm_ref,
+                    row.slat_tar.vis.ft.bm[0].df_ref,
+                    row.slat_tar.vis.ft.bm[0].abs,
+                    row.slat_tar.vis.ft.df.tra,
+                    row.slat_tar.vis.ft.df.tra_gnd,
+                    row.slat_tar.vis.ft.df.tra_sky,
+                    row.slat_tar.vis.ft.df.refl,
+                    row.slat_tar.vis.ft.df.refl_gnd,
+                    row.slat_tar.vis.ft.df.refl_sky,
+                    row.slat_tar.vis.ft.df.abs,
+                    row.slat_tar.vis.ft.df.abs_gnd,
+                    row.slat_tar.vis.ft.df.abs_sky,
+                    row.slat_tar.vis.bk.bm[0].bm_tra,
+                    row.slat_tar.vis.bk.bm[0].df_tra,
+                    row.slat_tar.vis.bk.bm[0].bm_ref,
+                    row.slat_tar.vis.bk.bm[0].df_ref,
+                    row.slat_tar.vis.bk.bm[0].abs,
+                    row.slat_tar.vis.bk.df.tra,
+                    row.slat_tar.vis.bk.df.tra_gnd,
+                    row.slat_tar.vis.bk.df.tra_sky,
+                    row.slat_tar.vis.bk.df.refl,
+                    row.slat_tar.vis.bk.df.refl_gnd,
+                    row.slat_tar.vis.bk.df.refl_sky,
+                    row.slat_tar.vis.bk.df.abs,
+                    row.slat_tar.vis.bk.df.abs_gnd,
+                    row.slat_tar.vis.bk.df.abs_sky,
+                    row.slat_tar.ir.ft.tra,
+                    row.slat_tar.ir.ft.emi,
+                    row.slat_tar.ir.bk.tra,
+                    row.slat_tar.ir.bk.emi,
+                ]
+                .map(f64::to_bits),
+                *before
+            );
+        }
+        assert!(
+            data.window_blind
+                .values()
+                .all(|row| row.tars.iter().all(|tar| {
+                    [
+                        tar.sol.ft.bm[0],
+                        tar.sol.bk.bm[0],
+                        tar.vis.ft.bm[0],
+                        tar.vis.bk.bm[0],
+                    ]
+                    .iter()
+                    .all(|slot| {
+                        [slot.bm_tra, slot.df_tra, slot.bm_ref, slot.df_ref, slot.abs]
+                            .iter()
+                            .all(|value| value.to_bits() == 0)
+                    }) && tar.vis.ft.df.abs.to_bits() == 0
+                        && tar.vis.bk.df.abs.to_bits() == 0
+                        && tar.vis.ft.bm.iter().all(|slot| slot.abs.to_bits() == 0)
+                        && tar.vis.bk.bm.iter().all(|slot| slot.abs.to_bits() == 0)
+                }))
+        );
+        assert!(
+            data.window_blind.values().all(|row| {
+                let tar = &row.tars[90];
+                [
+                    tar.sol.ft.df.tra,
+                    tar.sol.ft.df.refl,
+                    tar.sol.ft.df.abs,
+                    tar.sol.bk.df.tra,
+                    tar.sol.bk.df.refl,
+                    tar.sol.bk.df.abs,
+                    tar.vis.ft.df.tra,
+                    tar.vis.ft.df.refl,
+                    tar.vis.bk.df.refl,
+                    tar.ir.ft.tra,
+                    tar.ir.ft.emi,
+                    tar.ir.bk.tra,
+                    tar.ir.bk.emi,
+                    tar.sol.ft.bm[19].abs,
+                    tar.vis.ft.bm[19].df_ref,
+                ]
+                .iter()
+                .all(|value| value.is_finite())
+                    && tar.sol.ft.df.abs > 0.0
+                    && tar.ir.ft.emi > 0.0
+            }) && full.tars[90].vis.ft.df.refl > 0.0
+        );
+        assert!(
+            data.source_blind_surface_properties(4, MaterialId(3))
+                .unwrap()
+                == (
+                    MaterialSurfaceRoughness::Rough,
+                    OpaqueSurfaceProperties {
+                        thermal_absorptance: 0.0,
+                        solar_absorptance: 0.0,
+                        visible_absorptance: 0.0,
+                    }
+                )
+                && data
+                    .source_blind_surface_properties(4, MaterialId(4))
+                    .is_err()
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let rows = std::str::from_utf8(&eio)
+            .unwrap()
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,") && line.contains("BLIND"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        assert_eq!(
+            rows,
+            names
+                .iter()
+                .map(|name| vec![
+                    " Material Details",
+                    *name,
+                    "0.0000",
+                    "Rough",
+                    "0.0000",
+                    "0.000",
+                    "0.000",
+                    "0.000",
+                    "0.0000",
+                    "0.0000",
+                    "0.0000"
+                ])
+                .collect::<Vec<_>>()
         );
     }
 }
@@ -8093,5 +8754,1070 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
             );
             assert!(format!("{result:?}").contains("authored IRT diagnostic failure"));
         }
+    }
+
+    // Blind B2: one diagnostic owner, then two independent first-IO-stop owners below.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+
+        let typed_blind = ep_model::WindowBlindMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.025,
+            slat_separation_m: 0.02,
+            slat_thickness_m: 0.00025,
+            slat_angle_deg: 45.0,
+            slat_conductivity_w_per_m_k: 221.0,
+            solar_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            front_infrared_transmittance: 0.0,
+            back_infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.9,
+            back_infrared_emissivity: 0.9,
+            blind_to_glass_distance_m: 0.05,
+            top_opening_multiplier: 0.5,
+            bottom_opening_multiplier: 0.0,
+            left_side_opening_multiplier: 0.5,
+            right_side_opening_multiplier: 0.5,
+            minimum_slat_angle_deg: 0.0,
+            maximum_slat_angle_deg: 180.0,
+            slat_angle_type: ep_model::WindowBlindSlatAngleType::Fixed,
+            slat_crown_m: 0.0,
+            base_thickness_m: 0.0,
+            base_conductivity_w_per_m_k: 0.0,
+            base_thermal_resistance_m2_k_per_w: 0.0,
+            base_solar_absorptance: 0.0,
+            base_visible_absorptance: 0.0,
+            base_thermal_absorptance: 0.0,
+        };
+        let names = [
+            "A BLIND WARNING",
+            "B BLIND JOINT",
+            "MASS",
+            "Z BLIND FOLLOWING",
+        ];
+        let typed_names = ["A BLIND WARNING", "B BLIND JOINT", "Z BLIND FOLLOWING"];
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName::new(name),
+                    definition: MaterialDefinition::WindowBlind(typed_blind),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_thickness",
+            "slat_angle",
+            "slat_conductivity",
+            "slat_beam_solar_transmittance",
+            "front_side_slat_beam_solar_reflectance",
+            "back_side_slat_beam_solar_reflectance",
+            "slat_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_solar_reflectance",
+            "slat_beam_visible_transmittance",
+            "front_side_slat_beam_visible_reflectance",
+            "back_side_slat_beam_visible_reflectance",
+            "slat_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_visible_reflectance",
+            "slat_infrared_hemispherical_transmittance",
+            "front_side_slat_infrared_hemispherical_emissivity",
+            "back_side_slat_infrared_hemispherical_emissivity",
+            "blind_to_glass_distance",
+            "blind_top_opening_multiplier",
+            "blind_bottom_opening_multiplier",
+            "blind_left_side_opening_multiplier",
+            "blind_right_side_opening_multiplier",
+            "minimum_slat_angle",
+            "maximum_slat_angle",
+        ];
+        let numeric_rows: [[f64; 27]; 4] = [
+            [
+                0.01, 0.02, 0.001, 45.0, 221.0, 0.1, 0.4, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+            [
+                0.04, 0.02, 0.001, 0.0, 221.0, 0.6, 0.6, 0.7, 0.5, 0.7, 0.8, 0.6, 0.6, 0.7, 0.5,
+                0.7, 0.8, 0.6, 0.6, 0.7, 0.01, 0.1, 0.2, 0.3, 0.4, 170.0, 10.0,
+            ],
+            [
+                0.025, 0.02, 0.001, 45.0, 221.0, 0.1, 0.4, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+            [
+                0.025, 0.02, 0.001, 45.0, 221.0, 0.1, 0.4, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+        ];
+        raw.window_blind = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .zip(numeric_rows[index])
+                    .map(|(field, value)| ((*field).into(), Value::Number(value)))
+                    .collect();
+                fields.insert(
+                    "slat_orientation".into(),
+                    Value::String("Horizontal".into()),
+                );
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut text = Vec::new();
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(
+            result.is_ok()
+                && errors_found
+                && data.num_blinds == 4
+                && state.tracking.total_warning_errors == 1
+                && state.tracking.total_severe_errors == 20
+        );
+        assert!(
+            data.materials
+                == [
+                    MaterialId(0),
+                    MaterialId(1),
+                    MaterialId(2),
+                    MaterialId(3),
+                    MaterialId(4),
+                    MaterialId(5)
+                ]
+                && data.window_blind.len() == 3
+                && data.material_map["MASS"] == 1
+                && data.material_groups[&MaterialId(4)] == SourceMaterialGroup::Blind
+        );
+        assert!(
+            names
+                .iter()
+                .all(|name| !input.is_object_unused("WindowMaterial:Blind", name))
+                && data.window_blind[&MaterialId(5)].slat_angle == 45.0
+        );
+        let bad = &data.window_blind[&MaterialId(4)];
+        assert_eq!(
+            [
+                bad.slat_width,
+                bad.slat_separation,
+                bad.slat_thickness,
+                bad.slat_angle,
+                bad.slat_conductivity,
+                bad.slat_tar.sol.ft.bm[0].df_tra,
+                bad.slat_tar.sol.ft.bm[0].df_ref,
+                bad.slat_tar.sol.bk.bm[0].df_ref,
+                bad.slat_tar.sol.ft.df.tra,
+                bad.slat_tar.sol.ft.df.refl,
+                bad.slat_tar.sol.bk.df.refl,
+                bad.slat_tar.vis.ft.bm[0].df_tra,
+                bad.slat_tar.vis.ft.bm[0].df_ref,
+                bad.slat_tar.vis.bk.bm[0].df_ref,
+                bad.slat_tar.vis.ft.df.tra,
+                bad.slat_tar.vis.ft.df.refl,
+                bad.slat_tar.vis.bk.df.refl,
+                bad.slat_tar.ir.ft.tra,
+                bad.slat_tar.ir.ft.emi,
+                bad.slat_tar.ir.bk.emi,
+                bad.to_glass_distance,
+                bad.top_opening,
+                bad.bottom_opening,
+                bad.left_opening,
+                bad.right_opening,
+                bad.min_slat_angle,
+                bad.max_slat_angle
+            ],
+            numeric_rows[1]
+        );
+        assert!(
+            bad.min_slat_angle == 170.0
+                && bad.max_slat_angle == 10.0
+                && bad.slat_angle_type == 0
+                && data.nominal_r[4].to_bits() == 0
+                && data.resistance_only[&MaterialId(4)]
+                && bad
+                    .tars
+                    .iter()
+                    .all(|row| row == &window_blind::SourceBlindTraAbsRef::<38>::default())
+        );
+        let log = std::str::from_utf8(&text).unwrap();
+        assert!(
+            log.matches(" ** Warning ** ").count() == 1
+                && log.matches(" ** Severe  ** ").count() == 20
+                && log.matches(" **   ~~~   ** ").count() == 22
+                && log
+                    .matches("WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.")
+                    .count()
+                    == 19
+                && log
+                    .matches("GetMaterialData: WindowMaterial:Blind = MASS, duplicate name.")
+                    .count()
+                    == 1
+        );
+        let diagnostic_lines = log
+            .lines()
+            .filter(|line| {
+                line.contains(" ** Warning ** ")
+                    || line.contains(" ** Severe  ** ")
+                    || line.contains(" **   ~~~   ** ")
+            })
+            .collect::<Vec<_>>();
+        let expected_messages = [
+            "WindowMaterial:Blind=\"A BLIND WARNING\", Slat Angles/Widths",
+            "slat_width [1.00E-002] is less than slat_separation [2.00E-002].",
+            "This will allow direct beam to be transmitted when Slat angle = 0.",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_beam_solar_transmittance + front_side_slat_beam_solar_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_beam_solar_transmittance + back_side_slat_beam_solar_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_diffuse_solar_transmittance + front_side_slat_diffuse_solar_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_diffuse_solar_transmittance + back_side_slat_diffuse_solar_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_beam_visible_transmittance + front_side_slat_beam_visible_reflectance not < 1.0 OR",
+            "slat_beam_visible_transmittance + back_side_slat_beam_visible_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_beam_visible_transmittance + front_side_slat_beam_visible_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_beam_visible_transmittance + back_side_slat_beam_visible_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_diffuse_visible_transmittance + front_side_slat_diffuse_visible_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_diffuse_visible_transmittance + back_side_slat_diffuse_visible_reflectance not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_beam_solar_transmittance must equal slat_diffuse_solar_transmittance",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "front_side_slat_beam_solar_reflectance must equal front_side_slat_diffuse_solar_reflectance",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "back_side_slat_beam_solar_reflectance must equal back_side_slat_diffuse_solar_reflectance",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_beam_visible_transmittance must equal slat_diffuse_visible_transmittance",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "front_side_slat_beam_visible_reflectance must equal front_side_slat_diffuse_visible_reflectance",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "back_side_slat_beam_visible_reflectance must equal back_side_slat_diffuse_visible_reflectance",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_infrared_hemispherical_transmittance + front_side_slat_infrared_hemispherical_emissivity not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_infrared_hemispherical_transmittance + back_side_slat_infrared_hemispherical_emissivity not < 1.0",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "blind_to_glass_distance is less than half of the slat_width",
+            "WindowMaterial:Blind=\"B BLIND JOINT\", Illegal value combination.",
+            "slat_angle=[0.0], is less than smallest allowed by slat dimensions and spacing,",
+            "GetMaterialData: WindowMaterial:Blind = MASS, duplicate name.",
+        ];
+        assert_eq!(diagnostic_lines.len(), expected_messages.len());
+        for (line, expected) in diagnostic_lines.iter().zip(expected_messages) {
+            assert!(
+                line.contains(expected),
+                "{line:?} does not contain {expected:?}"
+            );
+        }
+        assert!(data.window_blind.values().all(|row| {
+            [
+                row.resistance,
+                row.thickness,
+                row.conductivity,
+                row.density,
+                row.specific_heat,
+                row.slat_crown,
+            ]
+            .iter()
+            .all(|value| value.to_bits() == 0)
+        }));
+    }
+    // Blind B3: an explicit fresh owner; no parameter loop hides construction.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+
+        let typed_blind = ep_model::WindowBlindMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.025,
+            slat_separation_m: 0.02,
+            slat_thickness_m: 0.00025,
+            slat_angle_deg: 45.0,
+            slat_conductivity_w_per_m_k: 221.0,
+            solar_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            front_infrared_transmittance: 0.0,
+            back_infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.9,
+            back_infrared_emissivity: 0.9,
+            blind_to_glass_distance_m: 0.05,
+            top_opening_multiplier: 0.5,
+            bottom_opening_multiplier: 0.0,
+            left_side_opening_multiplier: 0.5,
+            right_side_opening_multiplier: 0.5,
+            minimum_slat_angle_deg: 0.0,
+            maximum_slat_angle_deg: 180.0,
+            slat_angle_type: ep_model::WindowBlindSlatAngleType::Fixed,
+            slat_crown_m: 0.0,
+            base_thickness_m: 0.0,
+            base_conductivity_w_per_m_k: 0.0,
+            base_thermal_resistance_m2_k_per_w: 0.0,
+            base_solar_absorptance: 0.0,
+            base_visible_absorptance: 0.0,
+            base_thermal_absorptance: 0.0,
+        };
+        let names = ["A BLIND WARNING STOP", "Z BLIND UNREAD"];
+        let typed_names = ["A BLIND WARNING STOP", "Z BLIND UNREAD"];
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName::new(name),
+                    definition: MaterialDefinition::WindowBlind(typed_blind),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_thickness",
+            "slat_angle",
+            "slat_conductivity",
+            "slat_beam_solar_transmittance",
+            "front_side_slat_beam_solar_reflectance",
+            "back_side_slat_beam_solar_reflectance",
+            "slat_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_solar_reflectance",
+            "slat_beam_visible_transmittance",
+            "front_side_slat_beam_visible_reflectance",
+            "back_side_slat_beam_visible_reflectance",
+            "slat_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_visible_reflectance",
+            "slat_infrared_hemispherical_transmittance",
+            "front_side_slat_infrared_hemispherical_emissivity",
+            "back_side_slat_infrared_hemispherical_emissivity",
+            "blind_to_glass_distance",
+            "blind_top_opening_multiplier",
+            "blind_bottom_opening_multiplier",
+            "blind_left_side_opening_multiplier",
+            "blind_right_side_opening_multiplier",
+            "minimum_slat_angle",
+            "maximum_slat_angle",
+        ];
+        let numeric_rows: [[f64; 27]; 2] = [
+            [
+                0.01, 0.02, 0.001, 45.0, 221.0, 0.1, 0.4, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+            [
+                0.025, 0.02, 0.001, 45.0, 221.0, 0.1, 0.4, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+        ];
+        raw.window_blind = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .zip(numeric_rows[index])
+                    .map(|(field, value)| ((*field).into(), Value::Number(value)))
+                    .collect();
+                fields.insert(
+                    "slat_orientation".into(),
+                    Value::String("Horizontal".into()),
+                );
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(
+            result.is_err()
+                && !errors_found
+                && data.num_blinds == 2
+                && data.window_blind.len() == 1
+                && data.materials.last() == Some(&MaterialId(3))
+        );
+        let first = &data.window_blind[&MaterialId(3)];
+        assert_eq!(
+            [
+                first.slat_width,
+                first.slat_separation,
+                first.slat_thickness,
+                first.slat_angle,
+                first.slat_conductivity,
+                first.slat_tar.sol.ft.bm[0].df_tra,
+                first.slat_tar.sol.ft.bm[0].df_ref,
+                first.slat_tar.sol.bk.bm[0].df_ref,
+                first.slat_tar.sol.ft.df.tra,
+                first.slat_tar.sol.ft.df.refl,
+                first.slat_tar.sol.bk.df.refl,
+                first.slat_tar.vis.ft.bm[0].df_tra,
+                first.slat_tar.vis.ft.bm[0].df_ref,
+                first.slat_tar.vis.bk.bm[0].df_ref,
+                first.slat_tar.vis.ft.df.tra,
+                first.slat_tar.vis.ft.df.refl,
+                first.slat_tar.vis.bk.df.refl,
+                first.slat_tar.ir.ft.tra,
+                first.slat_tar.ir.ft.emi,
+                first.slat_tar.ir.bk.emi,
+                first.to_glass_distance,
+                first.top_opening,
+                first.bottom_opening,
+                first.left_opening,
+                first.right_opening,
+                first.min_slat_angle,
+                first.max_slat_angle
+            ],
+            numeric_rows[0]
+        );
+        assert!(
+            !input.is_object_unused("WindowMaterial:Blind", names[0])
+                && input.is_object_unused("WindowMaterial:Blind", "Z BLIND UNREAD")
+                && shortcut.current_module_object == "WindowMaterial:Blind"
+                && shortcut.numeric_field_names[..27] == numeric_names
+                && shortcut.numeric_args[..27] == numeric_rows[0]
+        );
+        assert!(
+            first.tars.len() == 181
+                && first
+                    .tars
+                    .iter()
+                    .all(|row| row == &window_blind::SourceBlindTraAbsRef::<38>::default())
+                && first.roughness == Some(MaterialSurfaceRoughness::Rough)
+                && data.resistance_only[&MaterialId(3)]
+                && data.nominal_r[3].to_bits() == 0
+                && [
+                    first.thickness,
+                    first.conductivity,
+                    first.resistance,
+                    first.density,
+                    first.specific_heat,
+                    first.slat_crown
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+        );
+        assert!(
+            format!("{result:?}").contains("authored IRT diagnostic failure")
+                && state.tracking.total_warning_errors == 1
+                && state.tracking.total_severe_errors == 0
+        );
+    }
+    // Blind B4: an explicit fresh owner; no parameter loop hides construction.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+
+        let typed_blind = ep_model::WindowBlindMaterial {
+            roughness: MaterialSurfaceRoughness::Rough,
+            slat_orientation: ep_model::WindowBlindSlatOrientation::Horizontal,
+            slat_width_m: 0.025,
+            slat_separation_m: 0.02,
+            slat_thickness_m: 0.00025,
+            slat_angle_deg: 45.0,
+            slat_conductivity_w_per_m_k: 221.0,
+            solar_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            solar_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_beam_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            visible_diffuse_diffuse: ep_model::WindowBlindDirectionalOpticalProperties::default(),
+            front_infrared_transmittance: 0.0,
+            back_infrared_transmittance: 0.0,
+            front_infrared_emissivity: 0.9,
+            back_infrared_emissivity: 0.9,
+            blind_to_glass_distance_m: 0.05,
+            top_opening_multiplier: 0.5,
+            bottom_opening_multiplier: 0.0,
+            left_side_opening_multiplier: 0.5,
+            right_side_opening_multiplier: 0.5,
+            minimum_slat_angle_deg: 0.0,
+            maximum_slat_angle_deg: 180.0,
+            slat_angle_type: ep_model::WindowBlindSlatAngleType::Fixed,
+            slat_crown_m: 0.0,
+            base_thickness_m: 0.0,
+            base_conductivity_w_per_m_k: 0.0,
+            base_thermal_resistance_m2_k_per_w: 0.0,
+            base_solar_absorptance: 0.0,
+            base_visible_absorptance: 0.0,
+            base_thermal_absorptance: 0.0,
+        };
+        let names = ["A BLIND SEVERE STOP", "Z BLIND UNREAD"];
+        let typed_names = ["A BLIND SEVERE STOP", "Z BLIND UNREAD"];
+        model.materials.extend(
+            typed_names
+                .iter()
+                .enumerate()
+                .map(|(index, name)| Material {
+                    id: MaterialId(3 + u32::try_from(index).unwrap()),
+                    name: NormalizedName::new(name),
+                    definition: MaterialDefinition::WindowBlind(typed_blind),
+                }),
+        );
+        model
+            .ctf_report_names
+            .materials
+            .extend(typed_names.iter().enumerate().map(|(index, name)| {
+                (
+                    MaterialId(3 + u32::try_from(index).unwrap()),
+                    (*name).into(),
+                )
+            }));
+        let numeric_names = [
+            "slat_width",
+            "slat_separation",
+            "slat_thickness",
+            "slat_angle",
+            "slat_conductivity",
+            "slat_beam_solar_transmittance",
+            "front_side_slat_beam_solar_reflectance",
+            "back_side_slat_beam_solar_reflectance",
+            "slat_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_solar_reflectance",
+            "slat_beam_visible_transmittance",
+            "front_side_slat_beam_visible_reflectance",
+            "back_side_slat_beam_visible_reflectance",
+            "slat_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_visible_reflectance",
+            "slat_infrared_hemispherical_transmittance",
+            "front_side_slat_infrared_hemispherical_emissivity",
+            "back_side_slat_infrared_hemispherical_emissivity",
+            "blind_to_glass_distance",
+            "blind_top_opening_multiplier",
+            "blind_bottom_opening_multiplier",
+            "blind_left_side_opening_multiplier",
+            "blind_right_side_opening_multiplier",
+            "minimum_slat_angle",
+            "maximum_slat_angle",
+        ];
+        let numeric_rows: [[f64; 27]; 2] = [
+            [
+                0.025, 0.02, 0.001, 45.0, 221.0, 0.6, 0.6, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+            [
+                0.025, 0.02, 0.001, 45.0, 221.0, 0.1, 0.4, 0.5, 0.1, 0.4, 0.5, 0.05, 0.3, 0.35,
+                0.05, 0.3, 0.35, 0.0, 0.8, 0.7, 0.05, 0.1, 0.2, 0.3, 0.4, 10.0, 170.0,
+            ],
+        ];
+        raw.window_blind = names
+            .iter()
+            .enumerate()
+            .map(|(index, name)| {
+                let mut fields: BTreeMap<String, Value> = numeric_names
+                    .iter()
+                    .zip(numeric_rows[index])
+                    .map(|(field, value)| ((*field).into(), Value::Number(value)))
+                    .collect();
+                fields.insert(
+                    "slat_orientation".into(),
+                    Value::String("Horizontal".into()),
+                );
+                ProjectInputObject {
+                    object_name: (*name).into(),
+                    idf_max_fields: None,
+                    fields,
+                }
+            })
+            .collect();
+
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+        ];
+        let definitions = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        let shapes = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|row| SourceObjectShape {
+                                object_name: row.object_name.clone(),
+                                field_sizes: row
+                                    .fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|row| {
+                            (
+                                row.object_name.clone(),
+                                row.fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        let object_order = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        let mut broken = BrokenDiagnostic;
+        let result = {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut broken),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            data.get_material_data(
+                &raw,
+                &mut MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                },
+            )
+        };
+        assert!(
+            result.is_err()
+                && errors_found
+                && data.num_blinds == 2
+                && data.window_blind.len() == 1
+                && data.materials.last() == Some(&MaterialId(3))
+        );
+        let first = &data.window_blind[&MaterialId(3)];
+        assert_eq!(
+            [
+                first.slat_width,
+                first.slat_separation,
+                first.slat_thickness,
+                first.slat_angle,
+                first.slat_conductivity,
+                first.slat_tar.sol.ft.bm[0].df_tra,
+                first.slat_tar.sol.ft.bm[0].df_ref,
+                first.slat_tar.sol.bk.bm[0].df_ref,
+                first.slat_tar.sol.ft.df.tra,
+                first.slat_tar.sol.ft.df.refl,
+                first.slat_tar.sol.bk.df.refl,
+                first.slat_tar.vis.ft.bm[0].df_tra,
+                first.slat_tar.vis.ft.bm[0].df_ref,
+                first.slat_tar.vis.bk.bm[0].df_ref,
+                first.slat_tar.vis.ft.df.tra,
+                first.slat_tar.vis.ft.df.refl,
+                first.slat_tar.vis.bk.df.refl,
+                first.slat_tar.ir.ft.tra,
+                first.slat_tar.ir.ft.emi,
+                first.slat_tar.ir.bk.emi,
+                first.to_glass_distance,
+                first.top_opening,
+                first.bottom_opening,
+                first.left_opening,
+                first.right_opening,
+                first.min_slat_angle,
+                first.max_slat_angle
+            ],
+            numeric_rows[0]
+        );
+        assert!(
+            !input.is_object_unused("WindowMaterial:Blind", names[0])
+                && input.is_object_unused("WindowMaterial:Blind", "Z BLIND UNREAD")
+                && shortcut.current_module_object == "WindowMaterial:Blind"
+                && shortcut.numeric_field_names[..27] == numeric_names
+                && shortcut.numeric_args[..27] == numeric_rows[0]
+        );
+        assert!(
+            first.tars.len() == 181
+                && first
+                    .tars
+                    .iter()
+                    .all(|row| row == &window_blind::SourceBlindTraAbsRef::<38>::default())
+                && first.roughness == Some(MaterialSurfaceRoughness::Rough)
+                && data.resistance_only[&MaterialId(3)]
+                && data.nominal_r[3].to_bits() == 0
+                && [
+                    first.thickness,
+                    first.conductivity,
+                    first.resistance,
+                    first.density,
+                    first.specific_heat,
+                    first.slat_crown
+                ]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+        );
+        assert!(
+            format!("{result:?}").contains("authored IRT diagnostic failure")
+                && state.tracking.total_warning_errors == 0
+                && state.tracking.total_severe_errors == 1
+        );
     }
 }

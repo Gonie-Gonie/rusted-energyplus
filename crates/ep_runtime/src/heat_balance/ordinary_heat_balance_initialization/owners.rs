@@ -32,7 +32,7 @@ pub(crate) struct SourceInitHeatBalanceOwners<'a, 'b> {
     pub(crate) shadowing: &'a SourceShadowingInput,
     /// Reborrow the sole process/getter clipping settings for this InitHB call.
     pub(crate) project: &'a crate::heat_balance::selected_project_data::SelectedProjectData,
-    pub(crate) materials: &'a SelectedMaterialData,
+    pub(crate) materials: &'a mut SelectedMaterialData,
     pub(crate) bounds: &'a SelectedConstructionBounds,
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,

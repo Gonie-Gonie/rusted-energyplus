@@ -32,6 +32,8 @@ pub struct SelectedMaterialInput {
     pub window_shade: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialScreen2A12N operands.
     pub window_screen: Vec<ProjectInputObject>,
+    /// Genuine ordered ordinary MaterialBlind2A27N/min29 operands.
+    pub window_blind: Vec<ProjectInputObject>,
 }
 
 /// Genuine scalar projection; empty extension objects retain their array position.
@@ -403,6 +405,96 @@ impl SelectedMaterialInput {
             }
         }
         Ok((alphas, numerics))
+    }
+
+    pub(super) fn get_window_blind_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:Blind", &object.object_name)
+        {
+            return Err(unavailable("Blind owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, f64); 27] = [
+            ("slat_width", 0.0),
+            ("slat_separation", 0.0),
+            ("slat_thickness", 0.00025),
+            ("slat_angle", 45.0),
+            ("slat_conductivity", 221.0),
+            ("slat_beam_solar_transmittance", 0.0),
+            ("front_side_slat_beam_solar_reflectance", 0.0),
+            ("back_side_slat_beam_solar_reflectance", 0.0),
+            ("slat_diffuse_solar_transmittance", 0.0),
+            ("front_side_slat_diffuse_solar_reflectance", 0.0),
+            ("back_side_slat_diffuse_solar_reflectance", 0.0),
+            ("slat_beam_visible_transmittance", 0.0),
+            ("front_side_slat_beam_visible_reflectance", 0.0),
+            ("back_side_slat_beam_visible_reflectance", 0.0),
+            ("slat_diffuse_visible_transmittance", 0.0),
+            ("front_side_slat_diffuse_visible_reflectance", 0.0),
+            ("back_side_slat_diffuse_visible_reflectance", 0.0),
+            ("slat_infrared_hemispherical_transmittance", 0.0),
+            ("front_side_slat_infrared_hemispherical_emissivity", 0.9),
+            ("back_side_slat_infrared_hemispherical_emissivity", 0.9),
+            ("blind_to_glass_distance", 0.05),
+            ("blind_top_opening_multiplier", 0.5),
+            ("blind_bottom_opening_multiplier", 0.0),
+            ("blind_left_side_opening_multiplier", 0.5),
+            ("blind_right_side_opening_multiplier", 0.5),
+            ("minimum_slat_angle", 0.0),
+            ("maximum_slat_angle", 180.0),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 2
+            || s.alpha_field_blanks.len() < 2
+            || s.alpha_field_names.len() < 2
+            || s.numeric_args.len() < 27
+            || s.numeric_field_blanks.len() < 27
+            || s.numeric_field_names.len() < 27
+        {
+            return Err(unavailable(
+                "actual complete Blind2alpha27numeric allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Blind", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        s.alpha_field_names[1] = "slat_orientation".into();
+        match object.fields.get("slat_orientation") {
+            Some(ProjectInputValue::String(value)) if !value.is_empty() => {
+                s.alpha_args[1] = value.to_ascii_uppercase();
+                s.alpha_field_blanks[1] = false;
+            }
+            None | Some(ProjectInputValue::String(_)) => s.alpha_args[1] = "HORIZONTAL".into(),
+            _ => return Err(unavailable("admitted Blind alpha scalar")),
+        }
+        for (index, (name, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                }
+                None => {}
+                _ => return Err(unavailable("admitted Blind numeric scalar")),
+            }
+        }
+        // Original min_fields29 makes all27 fixed numeric slots returned.
+        Ok((2, 27))
     }
 
     pub(super) fn get_window_screen_item(

@@ -23,6 +23,10 @@ mod air_gap_tests;
 mod report;
 mod simple_glazing;
 mod type_group;
+mod window_blind;
+pub(crate) use window_blind::{
+    SOURCE_BLIND_MAX_PROFILE_ANGLES, SOURCE_BLIND_MAX_SLAT_ANGLES, SourceBlindMaterial,
+};
 mod window_gas;
 mod window_screen;
 mod window_shade;
@@ -71,6 +75,8 @@ pub(crate) struct SelectedMaterialData {
     window_shade: BTreeMap<MaterialId, window_shade::SourceShadeMaterial>,
     /// Actual ordinary MaterialScreen scalar rows;typed optical properties are advisory.
     window_screen: BTreeMap<MaterialId, window_screen::SourceScreenMaterial>,
+    /// Same actual MaterialBlind rows and constructor-owned heap TAR tables.
+    window_blind: BTreeMap<MaterialId, window_blind::SourceBlindMaterial>,
     pub(crate) num_no_masses: i32,
     pub(crate) num_irts: i32,
     pub(crate) num_air_gaps: i32,
@@ -250,6 +256,78 @@ impl SelectedMaterialData {
         }
         Ok((
             MaterialSurfaceRoughness::MediumRough,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    pub(crate) fn source_blind_material_mut(
+        &mut self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<&mut SourceBlindMaterial, HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|v| usize::try_from(v).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native Blind MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::Blind)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Blind Source order/group/physical identity",
+            ));
+        }
+        let row =
+            self.window_blind
+                .get_mut(&typed_id)
+                .ok_or(HeatBalanceInputError::Unavailable(
+                    "actual retained Blind runtime row",
+                ))?;
+        if row.tars.len() != SOURCE_BLIND_MAX_SLAT_ANGLES {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Blind181-row owned TAR allocation",
+            ));
+        }
+        Ok(row)
+    }
+
+    pub(crate) fn source_blind_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|v| usize::try_from(v).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native Blind MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::Blind)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Blind Source order/group/physical identity",
+            ));
+        }
+        let row = self
+            .window_blind
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained Blind runtime row",
+            ))?;
+        if row.roughness != Some(MaterialSurfaceRoughness::Rough) {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Blind getter roughness",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::Rough,
             OpaqueSurfaceProperties {
                 thermal_absorptance: row.thermal_absorptance,
                 solar_absorptance: row.solar_absorptance,
@@ -613,7 +691,7 @@ impl SelectedMaterialData {
         empty!(num_eql_drapes, "WindowMaterial:Drape:EquivalentLayer");
         self.get_window_screen_data(raw, o)?;
         empty!(num_eql_screens, "WindowMaterial:Screen:EquivalentLayer");
-        empty!(num_blinds, "WindowMaterial:Blind");
+        self.get_window_blind_data(raw, o)?;
         empty!(num_eql_blinds, "WindowMaterial:Blind:EquivalentLayer");
         empty!(num_eco_roofs, "Material:RoofVegetation");
         empty!(num_tc_glazings, "WindowMaterial:GlazingGroup:Thermochromic");

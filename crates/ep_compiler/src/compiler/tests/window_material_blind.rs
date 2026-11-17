@@ -272,6 +272,434 @@ fn blind_projects_all_source_fields_defaults_and_base_state()
         .ok_or_else(|| std::io::Error::other("missing blind coverage"))?;
     assert_eq!(coverage.status, ObjectCoverageStatus::Typed);
     assert_eq!(coverage.object_count, 2);
+
+    // Source-only unused Blind: all preceding Legacy assertions and helper bodies stay literal.
+    {
+        use super::super::compile_raw_model_for_source;
+        use ep_raw_model::{FieldName, ObjectName, ObjectType, RawValue};
+        let minimal = r#""slat_width":0.02,"slat_separation":0.02,
+            "front_side_slat_beam_solar_reflectance":0.2,
+            "back_side_slat_beam_solar_reflectance":0.3,
+            "front_side_slat_diffuse_solar_reflectance":0.2,
+            "back_side_slat_diffuse_solar_reflectance":0.3,
+            "slat_beam_visible_transmittance":0.0"#;
+        let explicit = blind_fields(&[
+            ("slat_orientation", "\"Vertical\""),
+            ("slat_conductivity", "18446744073709551615"),
+        ]);
+        let positive = format!(
+            r#"{{"WindowMaterial:Blind":{{
+            " BLIND EXACT ":{{{explicit},"name":false,"idf_order":[],
+                "metadata":[null,true,1.25,"opaque",{{"nested":18446744073709551615}}]}},
+            "BLIND DEFAULT":{{{minimal}}},"\u000b":{{{minimal}}},"\u00a0":{{{minimal}}}
+        }}}}"#
+        );
+        let positive_raw = parse_epjson_str(&positive)?;
+        let source = compile_raw_model_for_source(&positive_raw);
+        assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+        let source_model = source.model.as_ref().expect("genuine Source Blind model");
+        let source_id = source_model
+            .material_names
+            .resolve(" BLIND EXACT ")
+            .unwrap();
+        assert!(
+            source_model.material_names.is_source_exact_namespace()
+                && source_model.material_names.resolve("BLIND EXACT").is_none()
+                && source_model.material_names.resolve("\u{000b}").is_some()
+                && source_model.material_names.resolve("\u{00a0}").is_some()
+                && source_model.materials.len() == 4
+                && source_model
+                    .materials
+                    .iter()
+                    .all(|row| row.kind() == MaterialKind::WindowBlind)
+                && source_model
+                    .ctf_report_names
+                    .materials
+                    .contains(&(source_id, " BLIND EXACT ".into()))
+        );
+        let source_blind = source_model
+            .materials
+            .iter()
+            .find(|row| row.id == source_id)
+            .and_then(ep_model::Material::as_window_blind)
+            .unwrap();
+        let source_default = source_model
+            .materials
+            .iter()
+            .find(|row| row.name.0 == "BLIND DEFAULT")
+            .and_then(ep_model::Material::as_window_blind)
+            .unwrap();
+        assert!(
+            source_blind.slat_orientation == WindowBlindSlatOrientation::Vertical
+                && source_blind.slat_conductivity_w_per_m_k.to_bits()
+                    == f64::from_bits(0x43f0_0000_0000_0000).to_bits()
+                && source_blind.slat_angle_type == WindowBlindSlatAngleType::Fixed
+                && source_blind.base_thickness_m == 0.0
+                && source_blind.base_conductivity_w_per_m_k == 0.0
+                && source_blind
+                    .nominal_thermal_resistance_m2_k_per_w()
+                    .is_none()
+                && source_default.slat_orientation == WindowBlindSlatOrientation::Horizontal
+                && [
+                    source_default.slat_thickness_m,
+                    source_default.slat_angle_deg,
+                    source_default.slat_conductivity_w_per_m_k,
+                    source_default.front_infrared_emissivity,
+                    source_default.back_infrared_emissivity,
+                    source_default.blind_to_glass_distance_m,
+                    source_default.top_opening_multiplier,
+                    source_default.bottom_opening_multiplier,
+                    source_default.left_side_opening_multiplier,
+                    source_default.right_side_opening_multiplier,
+                    source_default.minimum_slat_angle_deg,
+                    source_default.maximum_slat_angle_deg
+                ]
+                .map(f64::to_bits)
+                    == [
+                        0.00025_f64,
+                        45.0,
+                        221.0,
+                        0.9,
+                        0.9,
+                        0.05,
+                        0.5,
+                        0.0,
+                        0.5,
+                        0.5,
+                        0.0,
+                        180.0
+                    ]
+                    .map(f64::to_bits)
+                && source_default.visible_beam_diffuse.front_reflectance == 0.0
+                && source_default.visible_beam_diffuse.back_reflectance == 0.0
+                && source_default.visible_diffuse_diffuse.front_reflectance == 0.0
+                && source_default.visible_diffuse_diffuse.back_reflectance == 0.0
+        );
+        let original = &positive_raw.objects[&ObjectType("WindowMaterial:Blind".into())]
+            [&ObjectName(" BLIND EXACT ".into())]
+            .fields;
+        assert!(
+            original.len() == 31
+                && matches!(original.get(&FieldName("slat_conductivity".into())),Some(RawValue::Number(token))
+                if token == "18446744073709551615" && matches!(ep_model::classify_source_json_number(token),Ok(ep_model::SourceJsonNumber::Integer(-1))))
+                && original.get(&FieldName("name".into())) == Some(&RawValue::Bool(false))
+                && matches!(original.get(&FieldName("idf_order".into())),Some(RawValue::Array(rows)) if rows.is_empty())
+                && matches!(original.get(&FieldName("metadata".into())),Some(RawValue::Array(rows)) if rows.len()==5)
+        );
+        let joint_fields = blind_fields(&[
+            ("slat_width", "0.04"),
+            ("slat_angle", "0.0"),
+            ("blind_to_glass_distance", "0.01"),
+            ("slat_beam_solar_transmittance", "0.6"),
+            ("front_side_slat_beam_solar_reflectance", "0.6"),
+            ("back_side_slat_beam_solar_reflectance", "0.7"),
+            ("slat_diffuse_solar_transmittance", "0.5"),
+            ("front_side_slat_diffuse_solar_reflectance", "0.7"),
+            ("back_side_slat_diffuse_solar_reflectance", "0.8"),
+        ]);
+        let joint_raw = parse_epjson_str(&format!(
+            r#"{{"WindowMaterial:Blind":{{"JOINT":{{{joint_fields}}}}}}}"#
+        ))?;
+        let source_joint = compile_raw_model_for_source(&joint_raw);
+        let legacy_joint = compile_raw_model(&joint_raw);
+        assert!(
+            !source_joint.has_errors()
+                && legacy_joint.has_errors()
+                && has_diagnostic(&legacy_joint, "InvalidWindowBlindOpticalSum", "JOINT", None)
+                && has_diagnostic(
+                    &legacy_joint,
+                    "InvalidWindowBlindBeamDiffuseMismatch",
+                    "JOINT",
+                    None
+                )
+                && has_diagnostic(
+                    &legacy_joint,
+                    "InvalidWindowBlindToGlassDistance",
+                    "JOINT",
+                    None
+                )
+                && has_diagnostic(
+                    &legacy_joint,
+                    "InvalidWindowBlindSlatGeometry",
+                    "JOINT",
+                    None
+                )
+        );
+        let warning_fields = blind_fields(&[("slat_width", "0.01")]);
+        let warning_raw = parse_epjson_str(&format!(
+            r#"{{"WindowMaterial:Blind":{{"WARNING":{{{warning_fields}}}}}}}"#
+        ))?;
+        let source_warning = compile_raw_model_for_source(&warning_raw);
+        assert!(
+            !source_warning.has_errors()
+                && !has_diagnostic(
+                    &source_warning,
+                    "WindowBlindSlatWidthLessThanSeparation",
+                    "WARNING",
+                    None
+                )
+                && has_diagnostic(
+                    &compile_raw_model(&warning_raw),
+                    "WindowBlindSlatWidthLessThanSeparation",
+                    "WARNING",
+                    None
+                )
+        );
+        // One finite table:28 wrong kinds,7 required omissions,all original numeric
+        // lower/upper bounds,one invalid orientation andone original-RE2 blank name.
+        let mut invalid_cases: Vec<(&str, Option<RawValue>)> = [
+            "slat_orientation",
+            "slat_width",
+            "slat_separation",
+            "slat_thickness",
+            "slat_angle",
+            "slat_conductivity",
+            "slat_beam_solar_transmittance",
+            "front_side_slat_beam_solar_reflectance",
+            "back_side_slat_beam_solar_reflectance",
+            "slat_diffuse_solar_transmittance",
+            "front_side_slat_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_solar_reflectance",
+            "slat_beam_visible_transmittance",
+            "front_side_slat_beam_visible_reflectance",
+            "back_side_slat_beam_visible_reflectance",
+            "slat_diffuse_visible_transmittance",
+            "front_side_slat_diffuse_visible_reflectance",
+            "back_side_slat_diffuse_visible_reflectance",
+            "slat_infrared_hemispherical_transmittance",
+            "front_side_slat_infrared_hemispherical_emissivity",
+            "back_side_slat_infrared_hemispherical_emissivity",
+            "blind_to_glass_distance",
+            "blind_top_opening_multiplier",
+            "blind_bottom_opening_multiplier",
+            "blind_left_side_opening_multiplier",
+            "blind_right_side_opening_multiplier",
+            "minimum_slat_angle",
+            "maximum_slat_angle",
+        ]
+        .into_iter()
+        .map(|field| (field, Some(RawValue::Bool(false))))
+        .collect();
+        invalid_cases.extend([
+            ("slat_width", None),
+            ("slat_separation", None),
+            ("front_side_slat_beam_solar_reflectance", None),
+            ("back_side_slat_beam_solar_reflectance", None),
+            ("front_side_slat_diffuse_solar_reflectance", None),
+            ("back_side_slat_diffuse_solar_reflectance", None),
+            ("slat_beam_visible_transmittance", None),
+        ]);
+        invalid_cases.extend([
+            ("slat_width", Some(RawValue::Number("0.0".into()))),
+            ("slat_width", Some(RawValue::Number("2.0".into()))),
+            ("slat_separation", Some(RawValue::Number("0.0".into()))),
+            ("slat_separation", Some(RawValue::Number("2.0".into()))),
+            ("slat_thickness", Some(RawValue::Number("0.0".into()))),
+            ("slat_thickness", Some(RawValue::Number("1.1".into()))),
+            ("slat_angle", Some(RawValue::Number("-1.0".into()))),
+            ("slat_angle", Some(RawValue::Number("181.0".into()))),
+            ("slat_conductivity", Some(RawValue::Number("0.0".into()))),
+            (
+                "slat_beam_solar_transmittance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "slat_beam_solar_transmittance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "front_side_slat_beam_solar_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "front_side_slat_beam_solar_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "back_side_slat_beam_solar_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "back_side_slat_beam_solar_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "slat_diffuse_solar_transmittance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "slat_diffuse_solar_transmittance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "front_side_slat_diffuse_solar_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "front_side_slat_diffuse_solar_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "back_side_slat_diffuse_solar_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "back_side_slat_diffuse_solar_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "slat_beam_visible_transmittance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "slat_beam_visible_transmittance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "front_side_slat_beam_visible_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "front_side_slat_beam_visible_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "back_side_slat_beam_visible_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "back_side_slat_beam_visible_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "slat_diffuse_visible_transmittance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "slat_diffuse_visible_transmittance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "front_side_slat_diffuse_visible_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "front_side_slat_diffuse_visible_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "back_side_slat_diffuse_visible_reflectance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "back_side_slat_diffuse_visible_reflectance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "slat_infrared_hemispherical_transmittance",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "slat_infrared_hemispherical_transmittance",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "front_side_slat_infrared_hemispherical_emissivity",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "front_side_slat_infrared_hemispherical_emissivity",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "back_side_slat_infrared_hemispherical_emissivity",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "back_side_slat_infrared_hemispherical_emissivity",
+                Some(RawValue::Number("1.0".into())),
+            ),
+            (
+                "blind_to_glass_distance",
+                Some(RawValue::Number("-0.99".into())),
+            ),
+            (
+                "blind_to_glass_distance",
+                Some(RawValue::Number("2.0".into())),
+            ),
+            (
+                "blind_top_opening_multiplier",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "blind_top_opening_multiplier",
+                Some(RawValue::Number("2.0".into())),
+            ),
+            (
+                "blind_bottom_opening_multiplier",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "blind_bottom_opening_multiplier",
+                Some(RawValue::Number("2.0".into())),
+            ),
+            (
+                "blind_left_side_opening_multiplier",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "blind_left_side_opening_multiplier",
+                Some(RawValue::Number("2.0".into())),
+            ),
+            (
+                "blind_right_side_opening_multiplier",
+                Some(RawValue::Number("-1.0".into())),
+            ),
+            (
+                "blind_right_side_opening_multiplier",
+                Some(RawValue::Number("2.0".into())),
+            ),
+            ("minimum_slat_angle", Some(RawValue::Number("-1.0".into()))),
+            ("minimum_slat_angle", Some(RawValue::Number("181.0".into()))),
+            ("maximum_slat_angle", Some(RawValue::Number("-1.0".into()))),
+            ("maximum_slat_angle", Some(RawValue::Number("181.0".into()))),
+            (
+                "slat_orientation",
+                Some(RawValue::String("Diagonal".into())),
+            ),
+            ("__blank_name", None),
+        ]);
+        for (field, replacement) in invalid_cases {
+            let mut invalid = positive_raw.clone();
+            let rows = invalid
+                .objects
+                .get_mut(&ObjectType("WindowMaterial:Blind".into()))
+                .unwrap();
+            if field == "__blank_name" {
+                let row = rows.remove(&ObjectName(" BLIND EXACT ".into())).unwrap();
+                rows.insert(ObjectName(" \t".into()), row);
+            } else {
+                let object = rows.get_mut(&ObjectName(" BLIND EXACT ".into())).unwrap();
+                if let Some(value) = replacement {
+                    object.fields.insert(FieldName(field.into()), value);
+                } else {
+                    object.fields.remove(&FieldName(field.into()));
+                }
+            }
+            assert!(
+                compile_raw_model_for_source(&invalid).has_errors(),
+                "original schema/name: {field}"
+            );
+        }
+        let mut used_raw = positive_raw.clone();
+        used_raw.objects.extend(
+            parse_epjson_str(
+                r#"{"Construction":{"BLIND USED":{"outside_layer":" BLIND EXACT "}}}"#,
+            )?
+            .objects,
+        );
+        assert!(compile_raw_model_for_source(&used_raw).has_errors());
+    }
     Ok(())
 }
 

@@ -15,6 +15,8 @@ use super::selected_input_processor::{SelectedInputProcessor, SourceInputProcess
 use super::selected_material_data::SelectedMaterialData;
 use super::selected_simulation_startup::SelectedConstructionBounds;
 use ep_model::ReportInputs;
+mod blind;
+pub(crate) use blind::calc_window_blind_properties;
 mod glass;
 mod w5;
 
@@ -32,7 +34,7 @@ pub(crate) struct SourceWindowOpticalOwners<'a, 'b> {
     pub(crate) arrays: &'a mut SourceSurfaceHeatBalanceArrays,
     pub(crate) geometry: &'a mut SurfaceGeometryInputState,
     pub(crate) control: &'a mut SelectedHeatBalanceInputState,
-    pub(crate) materials: &'a SelectedMaterialData,
+    pub(crate) materials: &'a mut SelectedMaterialData,
     pub(crate) bounds: &'a SelectedConstructionBounds,
     pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) shortcut: &'a mut SourceInputProcessorShortCut,

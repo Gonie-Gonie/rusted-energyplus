@@ -431,7 +431,7 @@ fn allocate(
             weather_owner: &f.weather.weather,
             shadowing: &shadowing,
             project: &f.project,
-            materials: &f.ancillary.selected_material_data,
+            materials: &mut f.ancillary.selected_material_data,
             bounds: &f.startup.construction_bounds,
             input: &mut f.input,
             shortcut: &mut f.shortcut,

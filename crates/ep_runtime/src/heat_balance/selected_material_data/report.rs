@@ -195,6 +195,31 @@ impl SelectedMaterialData {
                             },
                         )
                     }
+                    MaterialDefinition::WindowBlind(_) => {
+                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::Blind) {
+                            return Err(unavailable("reported Blind actual group"));
+                        }
+                        let value = self.window_blind.get(id).ok_or_else(|| {
+                            unavailable("reported actual Blind runtime properties")
+                        })?;
+                        (
+                            value.resistance,
+                            value
+                                .roughness
+                                .ok_or_else(|| unavailable("Blind getter roughness"))?,
+                            [
+                                value.thickness,
+                                value.conductivity,
+                                value.density,
+                                value.specific_heat,
+                            ],
+                            OpaqueSurfaceProperties {
+                                thermal_absorptance: value.thermal_absorptance,
+                                solar_absorptance: value.solar_absorptance,
+                                visible_absorptance: value.visible_absorptance,
+                            },
+                        )
+                    }
                     MaterialDefinition::WindowSimpleGlazing(_) => {
                         if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassSimple) {
                             return Err(unavailable("reported SimpleGlazing actual group"));

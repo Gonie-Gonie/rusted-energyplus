@@ -65,7 +65,7 @@ impl SourceHeatBalanceManager {
                     arrays: &mut owners.surface.arrays,
                     geometry: owners.geometry,
                     control: owners.control,
-                    materials: owners.materials,
+                    materials: &mut *owners.materials,
                     bounds: owners.bounds,
                     input: owners.input,
                     shortcut: owners.shortcut,

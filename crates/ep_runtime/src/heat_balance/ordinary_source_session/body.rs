@@ -137,7 +137,7 @@ impl OrdinarySourceSession {
             dictionary_host: &mut dictionary_host,
             eio,
             debug,
-            materials: &reports.selected_material_data,
+            materials: &mut reports.selected_material_data,
             curves: reports.selected_curves.as_ref().ok_or(Error::Unavailable(
                 "same actual CurveManager before HB body",
             ))?,

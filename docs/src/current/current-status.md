@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 265 paired physical cases and 11,848,936 reported values with zero
+contains 266 paired physical cases and 11,924,056 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -64,6 +64,8 @@ Unused SpectralAndAngle Glazing has a bounded Source B direct-epJSON lookup rout
 Unused WindowMaterial:Shade has a bounded Source B direct-epJSON route through the genuine ordered Shade constructor/getter and public material report. All14 numeric fields retain original schema, signed-effective number, default/blank/used and total Raw/IP/name/typed-ID/loader custody; scratch field names use the original JSON keys. ROnly, constructor state, conductivity-dependent NominalR and ordered diagnostic IO remain owner state. One unused Shade adds14 Float operands over845 held parent records, without a new request or series; all158-series/75120-value, whole-current MaterialDetails EIO, BND136-event topology, clock and export criteria stay mandatory. Four existing bodies provide authored42 assertion sites,5 for loops and4 runtime owners; those counts are static coverage, not a QA or paired-result claim. Every active Construction/window/shading consumer, Source A/IDF, Legacy change, private Native state and full-object/every-valid-combination completion remains held.
 
 Unused WindowMaterial:Screen has a bounded Source B direct-epJSON route through the genuine2A12N/min9 getter and public material report. Its13 consumed body keys,JSON-key scratch names,defaults/blanks/used state,signed-effective numbers and total Raw/IP/name/typed-ID/loader custody stay explicit. One unused Screen adds12 Float operands and1 method String over859 held numeric records,without a request or series change. Four existing bodies provide authored45 assertion sites,5 loops and4 fresh Material owners;Window unit-owner credit is0 and glass.rs is a static dependency only. A full normal supported Source completion with nonzero exported Surfaces and authenticated compiled Source annotations is mandatory for the positive Screen BeginSim/BuiltIn/W5/all-false shading-control suffix. That SOURCE_CAUSAL_INFERENCE does not export private flags or prove Native optics. Full ordered11x11 public MaterialDetails,the Source material geometry identity,and all158/75120/BND136-event/clock/export gates remain mandatory after actual acceptance. Active Construction/Screen/shading consumers,Source A/IDF,Legacy changes,Native private fields/TAR/maps and full-object completion remain held.
+
+Unused WindowMaterial:Blind has a bounded Source B direct epJSON route through the real 2A27N getter and same Material-owned CalcWindowBlindProperties. All 181 slat angles, 37 profile angles and both bands remain required for unused Fixed input. Constructor/raw TAR1, defaults, JSON-key scratch, identity custody and diagnostic/IO order stay explicit. One unused Blind adds 27 Float operands and one Horizontal String over 871 held numeric records (898 total), without new requests. Authored 55 assertions, 6 loops and four Material owners in four existing bodies are static CODE facts, with zero Window unit owners. Actual QA/history, full normal Source completion, whole public 12x11 MaterialDetails/Source geometry, compiled producer causal evidence and all inherited 158/75120/BND/clock/export gates require separate genuine evidence. Native-private computed TAR/pointer parity, active window/Construction/control/EMS/variable-slat/daylighting/rating/thermal/EQL consumption, Source A/IDF/Legacy changes and full-object completion remain held.
 
 Direct Source epJSON retains the first comparator-equivalent member spelling
 and last whole subtree, checked by two Native convert-only observations and
@@ -145,8 +147,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 183 recorded Source builds,
-161 with accepted pairs and 22 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 184 recorded Source builds,
+162 with accepted pairs and 22 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.

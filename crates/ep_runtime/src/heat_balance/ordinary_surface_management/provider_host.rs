@@ -98,7 +98,7 @@ pub(crate) struct SourceManageSurfaceOwners<'a, 'backend, H, D> {
     pub(crate) dictionary_host: &'a mut D,
     pub(crate) eio: &'a mut dyn Write,
     pub(crate) debug: &'a mut dyn Write,
-    pub(crate) materials: &'a SelectedMaterialData,
+    pub(crate) materials: &'a mut SelectedMaterialData,
     pub(crate) curves: &'a crate::heat_balance::setup_postludes::SelectedCurves,
     pub(crate) predefined_registry: &'a mut PredefinedRegistry,
     pub(crate) predefined_table: &'a mut PredefinedStringTable,

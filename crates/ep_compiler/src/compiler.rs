@@ -760,6 +760,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_shade(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Screen".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_screen(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Blind".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_blind(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -7296,6 +7298,238 @@ impl<'a> Compiler<'a> {
             })
     }
 
+    fn source_unused_blind(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let valid = |field: &str, value: &RawValue| {
+            if !matches!(
+                field,
+                "slat_orientation"
+                    | "slat_width"
+                    | "slat_separation"
+                    | "slat_thickness"
+                    | "slat_angle"
+                    | "slat_conductivity"
+                    | "slat_beam_solar_transmittance"
+                    | "front_side_slat_beam_solar_reflectance"
+                    | "back_side_slat_beam_solar_reflectance"
+                    | "slat_diffuse_solar_transmittance"
+                    | "front_side_slat_diffuse_solar_reflectance"
+                    | "back_side_slat_diffuse_solar_reflectance"
+                    | "slat_beam_visible_transmittance"
+                    | "front_side_slat_beam_visible_reflectance"
+                    | "back_side_slat_beam_visible_reflectance"
+                    | "slat_diffuse_visible_transmittance"
+                    | "front_side_slat_diffuse_visible_reflectance"
+                    | "back_side_slat_diffuse_visible_reflectance"
+                    | "slat_infrared_hemispherical_transmittance"
+                    | "front_side_slat_infrared_hemispherical_emissivity"
+                    | "back_side_slat_infrared_hemispherical_emissivity"
+                    | "blind_to_glass_distance"
+                    | "blind_top_opening_multiplier"
+                    | "blind_bottom_opening_multiplier"
+                    | "blind_left_side_opening_multiplier"
+                    | "blind_right_side_opening_multiplier"
+                    | "minimum_slat_angle"
+                    | "maximum_slat_angle"
+            ) {
+                return true;
+            }
+            if field == "slat_orientation" {
+                return matches!(value, RawValue::String(value) if matches!(value.as_str(), "" | "Horizontal" | "Vertical"));
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match field {
+                            "slat_width" => {
+                                let bound_0 = value > 0.0;
+                                let bound_1 = value <= 1.0;
+                                bound_0 && bound_1
+                            }
+                            "slat_separation" => {
+                                let bound_0 = value > 0.0;
+                                let bound_1 = value <= 1.0;
+                                bound_0 && bound_1
+                            }
+                            "slat_thickness" => {
+                                let bound_0 = value > 0.0;
+                                let bound_1 = value <= 0.1;
+                                bound_0 && bound_1
+                            }
+                            "slat_angle" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value <= 180.0;
+                                bound_0 && bound_1
+                            }
+                            "slat_conductivity" => value > 0.0,
+                            "slat_beam_solar_transmittance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "front_side_slat_beam_solar_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "back_side_slat_beam_solar_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "slat_diffuse_solar_transmittance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "front_side_slat_diffuse_solar_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "back_side_slat_diffuse_solar_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "slat_beam_visible_transmittance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "front_side_slat_beam_visible_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "back_side_slat_beam_visible_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "slat_diffuse_visible_transmittance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "front_side_slat_diffuse_visible_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "back_side_slat_diffuse_visible_reflectance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "slat_infrared_hemispherical_transmittance" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "front_side_slat_infrared_hemispherical_emissivity" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "back_side_slat_infrared_hemispherical_emissivity" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value < 1.0;
+                                bound_0 && bound_1
+                            }
+                            "blind_to_glass_distance" => {
+                                let bound_0 = value >= 0.01;
+                                let bound_1 = value <= 1.0;
+                                bound_0 && bound_1
+                            }
+                            "blind_top_opening_multiplier" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value <= 1.0;
+                                bound_0 && bound_1
+                            }
+                            "blind_bottom_opening_multiplier" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value <= 1.0;
+                                bound_0 && bound_1
+                            }
+                            "blind_left_side_opening_multiplier" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value <= 1.0;
+                                bound_0 && bound_1
+                            }
+                            "blind_right_side_opening_multiplier" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value <= 1.0;
+                                bound_0 && bound_1
+                            }
+                            "minimum_slat_angle" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value <= 180.0;
+                                bound_0 && bound_1
+                            }
+                            "maximum_slat_angle" => {
+                                let bound_0 = value >= 0.0;
+                                let bound_1 = value <= 180.0;
+                                bound_0 && bound_1
+                            }
+                            _ => true,
+                        }
+                })
+        };
+        if [
+            "slat_width",
+            "slat_separation",
+            "front_side_slat_beam_solar_reflectance",
+            "back_side_slat_beam_solar_reflectance",
+            "front_side_slat_diffuse_solar_reflectance",
+            "back_side_slat_diffuse_solar_reflectance",
+            "slat_beam_visible_transmittance",
+        ]
+        .iter()
+        .any(|field| field_value(object, field).is_none_or(|value| !valid(field, value)))
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !valid(&field.0, value))
+        {
+            return false;
+        }
+        let Some(rows) = self
+            .raw_model
+            .objects
+            .get(&ep_raw_model::ObjectType("WindowMaterial:Blind".into()))
+        else {
+            return false;
+        };
+        !self
+            .raw_model
+            .objects
+            .iter()
+            .filter(|(family, _)| family.0.starts_with("Construction"))
+            .any(|(_, constructions)| {
+                constructions.values().any(|construction| {
+                    construction.fields.iter().any(|(field, value)| {
+                        let layer = field.0 == "outside_layer"
+                            || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                        layer
+                            && matches!(value, RawValue::String(reference)
+                        if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+                    })
+                })
+            })
+    }
+
     fn parse_window_screen_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Screen";
         const MAP_RESOLUTION_FIELD: &str =
@@ -7808,6 +8042,7 @@ impl<'a> Compiler<'a> {
         const BEAM_DIFFUSE_TOLERANCE: f64 = 1.0e-5;
 
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let source_unused_blind = self.source_unused_blind(&name, &object);
             let slat_orientation = self.enum_default(
                 OBJECT_TYPE,
                 &name,
@@ -8073,7 +8308,7 @@ impl<'a> Compiler<'a> {
                 continue;
             };
 
-            if slat_width_m < slat_separation_m {
+            if slat_width_m < slat_separation_m && !source_unused_blind {
                 self.warning(
                     "WindowBlindSlatWidthLessThanSeparation",
                     OBJECT_TYPE,
@@ -8132,7 +8367,7 @@ impl<'a> Compiler<'a> {
             ];
             let mut valid = true;
             for (field, sum) in optical_sums {
-                if sum >= OPTICAL_LIMIT {
+                if sum >= OPTICAL_LIMIT && !source_unused_blind {
                     self.error(
                         "InvalidWindowBlindOpticalSum",
                         OBJECT_TYPE,
@@ -8179,7 +8414,7 @@ impl<'a> Compiler<'a> {
                 ),
             ];
             for (field, beam, diffuse) in beam_diffuse_pairs {
-                if (beam - diffuse).abs() > BEAM_DIFFUSE_TOLERANCE {
+                if (beam - diffuse).abs() > BEAM_DIFFUSE_TOLERANCE && !source_unused_blind {
                     self.error(
                         "InvalidWindowBlindBeamDiffuseMismatch",
                         OBJECT_TYPE,
@@ -8193,7 +8428,7 @@ impl<'a> Compiler<'a> {
                 }
             }
 
-            if blind_to_glass_distance_m < 0.5 * slat_width_m {
+            if blind_to_glass_distance_m < 0.5 * slat_width_m && !source_unused_blind {
                 self.error(
                     "InvalidWindowBlindToGlassDistance",
                     OBJECT_TYPE,
@@ -8206,7 +8441,7 @@ impl<'a> Compiler<'a> {
                 valid = false;
             }
 
-            if slat_separation_m + slat_thickness_m < slat_width_m {
+            if slat_separation_m + slat_thickness_m < slat_width_m && !source_unused_blind {
                 let minimum_geometry_angle_deg = (slat_thickness_m
                     / (slat_thickness_m + slat_separation_m))
                     .asin()
@@ -8236,6 +8471,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if source_unused_blind {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -9803,6 +10044,13 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_screen(name, object));
+        let source_blind_name = object_type == "WindowMaterial:Blind"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_blind(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
@@ -9811,7 +10059,8 @@ impl<'a> Compiler<'a> {
             ) || source_glazing_name
                 || source_refraction_name
                 || source_shade_name
-                || source_screen_name)
+                || source_screen_name
+                || source_blind_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')

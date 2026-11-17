@@ -128,7 +128,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
                 weather_owner: o.weather,
                 shadowing: o.shadowing,
                 project: o.project,
-                materials: o.materials,
+                materials: &mut *o.materials,
                 bounds: &o.startup.construction_bounds,
                 input: o.input,
                 shortcut: o.shortcut,

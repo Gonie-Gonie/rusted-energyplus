@@ -4624,6 +4624,159 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "WindowMaterial:Blind" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_orientation",
+                    default: SchemaDefault::String("Horizontal"),
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_width",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_separation",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_thickness",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_angle",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_conductivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_beam_solar_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_slat_beam_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_slat_beam_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_diffuse_solar_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_slat_diffuse_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_slat_diffuse_solar_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_beam_visible_transmittance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_slat_beam_visible_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_slat_beam_visible_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_diffuse_visible_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_slat_diffuse_visible_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_slat_diffuse_visible_reflectance",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "slat_infrared_hemispherical_transmittance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "front_side_slat_infrared_hemispherical_emissivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "back_side_slat_infrared_hemispherical_emissivity",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "blind_to_glass_distance",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "blind_top_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "blind_bottom_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "blind_left_side_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "blind_right_side_opening_multiplier",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "minimum_slat_angle",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "maximum_slat_angle",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "WindowMaterial:Screen" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

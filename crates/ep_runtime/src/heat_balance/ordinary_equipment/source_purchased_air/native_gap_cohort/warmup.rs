@@ -335,7 +335,7 @@ impl WarmupFactory {
                     weather_owner: &self.weather.weather,
                     shadowing: &self.shadowing,
                     project: &self.project,
-                    materials: &self.reports.selected_material_data,
+                    materials: &mut self.reports.selected_material_data,
                     bounds: &self.startup.construction_bounds,
                     input: &mut self.input,
                     shortcut: &mut self.shortcut,

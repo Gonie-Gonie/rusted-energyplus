@@ -528,6 +528,10 @@ pub(crate) use simple_glazing::{
     validate_unused_refraction as source_b_validate_unused_refraction,
     validate_unused_spectral_average as source_b_validate_unused_spectral_average,
 };
+mod window_blind;
+pub(crate) use window_blind::{
+    known_field as source_b_blind_known_field, validate as source_b_validate_unused_blind,
+};
 mod window_screen;
 pub(crate) use window_screen::{
     known_field as source_b_screen_known_field, validate as source_b_validate_unused_screen,
@@ -621,6 +625,7 @@ fn resolve_raw(
         window_gas::validate_mixture(raw)?;
         window_shade::validate(raw)?;
         window_screen::validate(raw)?;
+        window_blind::validate(raw)?;
     }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
@@ -647,6 +652,7 @@ fn resolve_raw(
         let source_gas_mixture_family = source_b_ingress && family.0 == "WindowMaterial:GasMixture";
         let source_shade_family = source_b_ingress && family.0 == "WindowMaterial:Shade";
         let source_screen_family = source_b_ingress && family.0 == "WindowMaterial:Screen";
+        let source_blind_family = source_b_ingress && family.0 == "WindowMaterial:Blind";
         let source_people_family = source_calendar_ingress && family.0 == "People";
         let source_electric_family =
             source_calendar_ingress && !source_b_ingress && family.0 == "ElectricEquipment";
@@ -720,6 +726,7 @@ fn resolve_raw(
             && !source_gas_mixture_family
             && !source_shade_family
             && !source_screen_family
+            && !source_blind_family
             && !source_calendar_family
             && !source_compact_family
             && !source_people_family
@@ -781,6 +788,7 @@ fn resolve_raw(
                 || source_gas_mixture_family
                 || source_shade_family
                 || source_screen_family
+                || source_blind_family
             {
                 !window_gas::valid_name(&name.0)
             } else if source_design_day_family
@@ -884,6 +892,8 @@ fn resolve_raw(
                         && window_shade::admitted_field(&field.0, value))
                     && !(source_screen_family
                         && window_screen::admitted_field(&field.0, value))
+                    && !(source_blind_family
+                        && window_blind::admitted_field(&field.0, value))
                 {
                     // The connected schedule and OtherEquipment instance schemas
                     // allow additional members. Only an unconsumed top-level member
@@ -1222,6 +1232,7 @@ fn resolve_raw(
                 "WindowMaterial:GasMixture" => source_gas_mixture_family,
                 "WindowMaterial:Shade" => source_shade_family,
                 "WindowMaterial:Screen" => source_screen_family,
+                "WindowMaterial:Blind" => source_blind_family,
                 "People" => {
                     source_people_family
                         && people::admitted_object(raw, object, source_gain_collections)

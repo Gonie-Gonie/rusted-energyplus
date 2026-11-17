@@ -545,17 +545,37 @@ pub(super) fn assess_typed_runtime_boundaries(
             .filter(|material| material.kind() == MaterialKind::WindowScreenEquivalentLayer)
             .count(),
     );
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Blind",
-        typed_model
-            .materials
+    let blind_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowBlind)
+        .count();
+    let blind_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType("WindowMaterial:Blind".into()))
+        .map_or(0, |rows| rows.len());
+    let blind_consumed =
+        source_admission.is_some_and(|admission| admission.consumes_unused_blind(typed_model));
+    let blind_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowBlind)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::WindowBlind
+                })
+            })
+    });
+    if !blind_consumed || blind_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Blind",
+            blind_count.max(blind_raw_count),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,
