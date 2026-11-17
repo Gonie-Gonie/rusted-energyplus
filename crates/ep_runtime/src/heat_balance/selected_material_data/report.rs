@@ -223,6 +223,33 @@ impl SelectedMaterialData {
                             },
                         )
                     }
+                    MaterialDefinition::WindowScreenEquivalentLayer(_) => {
+                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::ScreenEql) {
+                            return Err(unavailable("reported ScreenEQL actual group"));
+                        }
+                        let value =
+                            self.window_screen_equivalent_layer.get(id).ok_or_else(|| {
+                                unavailable("reported actual ScreenEQL runtime properties")
+                            })?;
+                        let value = &value.base;
+                        (
+                            value.resistance,
+                            value
+                                .roughness
+                                .ok_or_else(|| unavailable("ScreenEQL getter roughness"))?,
+                            [
+                                value.thickness,
+                                value.conductivity,
+                                value.density,
+                                value.specific_heat,
+                            ],
+                            OpaqueSurfaceProperties {
+                                thermal_absorptance: value.thermal_absorptance,
+                                solar_absorptance: value.solar_absorptance,
+                                visible_absorptance: value.visible_absorptance,
+                            },
+                        )
+                    }
                     MaterialDefinition::WindowScreen(_) => {
                         if self.material_groups.get(id) != Some(&SourceMaterialGroup::Screen) {
                             return Err(unavailable("reported Screen actual group"));

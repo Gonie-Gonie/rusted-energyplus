@@ -36,6 +36,8 @@ pub struct SelectedMaterialInput {
     pub window_drape_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialScreen2A12N operands.
     pub window_screen: Vec<ProjectInputObject>,
+    /// Genuine ScreenEQL1A10N/min11; Auto sentinel and blank wires are retained.
+    pub window_screen_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialBlind2A27N/min29 operands.
     pub window_blind: Vec<ProjectInputObject>,
 }
@@ -771,6 +773,75 @@ impl SelectedMaterialInput {
             }
         }
         Ok((1, numbers))
+    }
+
+    pub(super) fn get_window_screen_equivalent_layer_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson
+            || !owners
+                .input
+                .has_object("WindowMaterial:Screen:EquivalentLayer", &object.object_name)
+        {
+            return Err(unavailable("ScreenEQL owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, f64); 10] = [
+            ("screen_beam_beam_solar_transmittance", -99999.0),
+            ("screen_beam_diffuse_solar_transmittance", 0.0),
+            ("screen_beam_diffuse_solar_reflectance", 0.0),
+            ("screen_beam_beam_visible_transmittance", 0.0),
+            ("screen_beam_diffuse_visible_transmittance", 0.0),
+            ("screen_beam_diffuse_visible_reflectance", 0.0),
+            ("screen_infrared_transmittance", 0.02),
+            ("screen_infrared_emissivity", 0.93),
+            ("screen_wire_spacing", 0.025),
+            ("screen_wire_diameter", 0.005),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.is_empty()
+            || s.alpha_field_blanks.is_empty()
+            || s.alpha_field_names.is_empty()
+            || s.numeric_args.len() < 10
+            || s.numeric_field_blanks.len() < 10
+            || s.numeric_field_names.len() < 10
+        {
+            return Err(unavailable("actual ScreenEQL1A10N allocation"));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Screen:EquivalentLayer", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        for (index, (name, default)) in FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*name).into();
+            s.numeric_args[index] = *default;
+            match object.fields.get(*name) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                }
+                Some(ProjectInputValue::String(text))
+                    if index == 0 && matches!(text.as_str(), "" | "Autocalculate") =>
+                {
+                    // Native findDefault/Constant::AutoCalculate; never substitute openness.
+                    s.numeric_args[index] = -99999.0;
+                    s.numeric_field_blanks[index] = text.is_empty();
+                }
+                None => {}
+                _ => return Err(unavailable("admitted original ScreenEQL scalar/Auto")),
+            }
+        }
+        // Official min_fields11 includes Name; even missing wires return all ten numbers.
+        Ok((1, 10))
     }
 
     pub(super) fn get_window_shade_item(

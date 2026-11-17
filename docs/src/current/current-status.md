@@ -41,7 +41,7 @@ object types: the original 110-type corpus plus accepted ComfortViewFactorAngles
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 268 paired physical cases and 12,074,296 reported values with zero
+contains 269 paired physical cases and 12,149,416 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -70,6 +70,8 @@ Unused WindowMaterial:Blind has a bounded Source B direct epJSON route through t
 Unused WindowMaterial:Shade:EquivalentLayer now has a bounded Source B direct epJSON route through the genuine1A11N getter and owned TAR1/common Material row. Defaults and blanks beyond legal NumNums5..11, original scalar kinds, total identity custody and five Native joint checks retain their own boundaries. One11-Float unused scene preserves898 parent numeric records and all requests; all158series/75120values pass unchanged policies, the whole13x11 public MaterialDetails table matches exactly and all12parent rows remain. Same-row Source geometry and six real physics surfaces are observed. Actual zero EQL Construction count skips positive unavailable EQL initialization, while ordinary same-owner Blind precomputation remains. Active EQL/window/Construction/control, ASHWAT, Native privateTAR, Source A/IDF/Legacy expansion and full-object or arbitrary-combination parity remain unclaimed.
 
 Unused WindowMaterial:Drape:EquivalentLayer now has a bounded Source B direct epJSON route through the genuine1A13N/min4 getter and same owned TAR1/pleat/common Material row. Legal NumNums5..13, all13 default/blank slots, original versus signed-effective operands, total identity custody and three ordered joint checks retain their own boundaries. One13-Float unused scene preserves909 parent numbers and all requests; all158series/75120values pass unchanged policies, whole14x11 public MaterialDetails matches exactly and all13parent rows remain. Same-row Source geometry and six actual physics surfaces are observed. Authored47assert sites/6for/4Material contexts are separate from actual8-command QA with4current bodies and0fail/history/reuse; there are0Window unit owners. Actual zero EQL Construction count skips positive unavailable EQL work while ordinary Blind precomputation remains. Active EQL/windows/control/ASHWAT, Native privateTAR/optics, Source A/IDF/Legacy expansion and full-object/all-combination parity remain unclaimed.
+
+Unused WindowMaterial:Screen:EquivalentLayer now has a bounded Source B direct epJSON route through the genuine 1A10N/min11 getter and inherited TAR1/common Material row. Required inputs, Auto versus blank state, all 10 scratch slots, signed-effective operands, identity custody and Native wire/openness recovery retain their boundaries. One 10-Float unused scene preserves 922 parent numbers and all requests. One Native/Source pair with zero reruns passes all 158 series/75,120 values and unchanged gates; the whole 15x11 public MaterialDetails table matches exactly and all 14 parent rows remain. Source geometry binds Group17/id13/typed12/Rough2/common zeros with six actual physics surfaces. Static 47 assert sites/6 for loops/4 Material owners are separate from actual 8-command QA/4 current bodies/0 failure-history-reuse and zero getter-body credit. Actual zero EQL Construction count skips positive EQL work while ordinary Blind precomputation remains. Active EQL/windows/control/ASHWAT, Native private TAR/optics, Source A/IDF/Legacy expansion and full-object/every-valid-combination parity remain unclaimed.
 
 Direct Source epJSON retains the first comparator-equivalent member spelling
 and last whole subtree, checked by two Native convert-only observations and
@@ -151,8 +153,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 186 recorded Source builds,
-164 with accepted pairs and 22 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 187 recorded Source builds,
+165 with accepted pairs and 22 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.

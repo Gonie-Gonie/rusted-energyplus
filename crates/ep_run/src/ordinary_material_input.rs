@@ -105,6 +105,7 @@ fn resolve_ordered(
         "WindowMaterial:Shade",
         "WindowMaterial:Shade:EquivalentLayer",
         "WindowMaterial:Drape:EquivalentLayer",
+        "WindowMaterial:Screen:EquivalentLayer",
         "WindowMaterial:Screen",
         "WindowMaterial:Blind",
     ] {
@@ -118,6 +119,7 @@ fn resolve_ordered(
                 | "WindowMaterial:Shade"
                 | "WindowMaterial:Shade:EquivalentLayer"
                 | "WindowMaterial:Drape:EquivalentLayer"
+                | "WindowMaterial:Screen:EquivalentLayer"
                 | "WindowMaterial:Screen"
                 | "WindowMaterial:Blind"
         ) && !source_order
@@ -188,6 +190,14 @@ fn resolve_ordered(
                     continue;
                 }
                 if source_order
+                    && family == "WindowMaterial:Screen:EquivalentLayer"
+                    && !crate::ordinary_equipment_input::source_b_screen_equivalent_layer_known_field(
+                        &field.0,
+                    )
+                {
+                    continue;
+                }
+                if source_order
                     && family == "WindowMaterial:Shade"
                     && !crate::ordinary_equipment_input::source_b_shade_known_field(&field.0)
                 {
@@ -237,6 +247,7 @@ fn resolve_ordered(
                                     | "WindowMaterial:Shade"
                                     | "WindowMaterial:Shade:EquivalentLayer"
                                     | "WindowMaterial:Drape:EquivalentLayer"
+                                    | "WindowMaterial:Screen:EquivalentLayer"
                                     | "WindowMaterial:Screen"
                                     | "WindowMaterial:Blind"
                             ) {
@@ -289,6 +300,9 @@ fn resolve_ordered(
             "WindowMaterial:Shade" => result.window_shade = values,
             "WindowMaterial:Shade:EquivalentLayer" => result.window_shade_equivalent_layer = values,
             "WindowMaterial:Drape:EquivalentLayer" => result.window_drape_equivalent_layer = values,
+            "WindowMaterial:Screen:EquivalentLayer" => {
+                result.window_screen_equivalent_layer = values
+            }
             "WindowMaterial:Screen" => result.window_screen = values,
             "WindowMaterial:Blind" => result.window_blind = values,
             _ => unreachable!("literal selected material family"),

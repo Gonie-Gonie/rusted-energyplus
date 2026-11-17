@@ -580,17 +580,40 @@ pub(super) fn assess_typed_runtime_boundaries(
             screen_count.max(screen_raw_count),
         );
     }
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Screen:EquivalentLayer",
-        typed_model
-            .materials
+    let screen_equivalent_layer_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowScreenEquivalentLayer)
+        .count();
+    let screen_equivalent_layer_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Screen:EquivalentLayer".into(),
+        ))
+        .map_or(0, |rows| rows.len());
+    let screen_equivalent_layer_consumed = source_admission
+        .is_some_and(|admission| admission.consumes_unused_screen_equivalent_layer(typed_model));
+    let screen_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowScreenEquivalentLayer)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id
+                        && material.kind() == MaterialKind::WindowScreenEquivalentLayer
+                })
+            })
+    });
+    if !screen_equivalent_layer_consumed || screen_equivalent_layer_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Screen:EquivalentLayer",
+            screen_equivalent_layer_count.max(screen_equivalent_layer_raw_count),
+        );
+    }
     let blind_count = typed_model
         .materials
         .iter()

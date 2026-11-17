@@ -11660,6 +11660,476 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+
+        // Unused Screen:EQL extends the existing real positive DSOA/Ideal/OA scene.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            const SCREEN_EQL: &str = "WindowMaterial:Screen:EquivalentLayer";
+            let mut screen_eql_value = curve_value.clone();
+            screen_eql_value[SCREEN_EQL] = json!({
+                "\u{b}A SCREEN EQL\u{a0}":{
+                    "screen_beam_beam_solar_transmittance":"",
+                    "screen_beam_diffuse_solar_transmittance":0.2,
+                    "screen_beam_diffuse_solar_reflectance":0.3,
+                    "screen_beam_beam_visible_transmittance":0.05,
+                    "screen_beam_diffuse_visible_transmittance":0.1,
+                    "screen_beam_diffuse_visible_reflectance":0.2,
+                    "name":false,"idf_order":[],"metadata":null
+                },
+                " B SCREEN EQL ":{
+                    "screen_beam_beam_solar_transmittance":0,
+                    "screen_beam_diffuse_solar_transmittance":0.2,
+                    "screen_beam_diffuse_solar_reflectance":0.3,
+                    "screen_beam_beam_visible_transmittance":0.05,
+                    "screen_beam_diffuse_visible_transmittance":0.1,
+                    "screen_beam_diffuse_visible_reflectance":0.2,
+                    "screen_infrared_transmittance":0.9,
+                    "screen_infrared_emissivity":0.9,
+                    "screen_wire_spacing":u64::MAX,"screen_wire_diameter":u64::MAX,
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},
+                    "idf_max_extensible_fields":null,"extra_string":"unconsumed",
+                    "metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}
+                }
+            });
+            let screen_eql_raw =
+                ep_raw_model::parse_epjson_str_for_source(&screen_eql_value.to_string())
+                    .expect("Source ScreenEQL epJSON");
+            let screen_eql_compiled = ep_compiler::compile_raw_model_for_source(&screen_eql_raw);
+            assert!(
+                !screen_eql_compiled.has_errors(),
+                "{:?}",
+                screen_eql_compiled.report.diagnostics
+            );
+            let screen_eql_model = screen_eql_compiled
+                .model
+                .as_ref()
+                .expect("two Source ScreenEQL materials");
+            let screen_eql_a = screen_eql_model
+                .material_names
+                .resolve("\u{b}A SCREEN EQL\u{a0}")
+                .expect("untrimmed A");
+            let screen_eql_b = screen_eql_model
+                .material_names
+                .resolve(" B SCREEN EQL ")
+                .expect("untrimmed B");
+            assert!(
+                screen_eql_a != screen_eql_b
+                    && screen_eql_model.material_names.is_source_exact_namespace()
+                    && screen_eql_model
+                        .material_names
+                        .resolve("A SCREEN EQL")
+                        .is_none()
+                    && screen_eql_model
+                        .materials
+                        .iter()
+                        .filter(
+                            |row| row.kind() == ep_model::MaterialKind::WindowScreenEquivalentLayer
+                        )
+                        .count()
+                        == 2
+                    && screen_eql_model
+                        .materials
+                        .iter()
+                        .any(|row| row.id == screen_eql_a
+                            && row.name.0 == "\u{b}A SCREEN EQL\u{a0}"
+                            && matches!(
+                                row.definition,
+                                ep_model::MaterialDefinition::WindowScreenEquivalentLayer(_)
+                            ))
+                    && screen_eql_model
+                        .materials
+                        .iter()
+                        .any(|row| row.id == screen_eql_b
+                            && row.name.0 == " B SCREEN EQL "
+                            && matches!(
+                                row.definition,
+                                ep_model::MaterialDefinition::WindowScreenEquivalentLayer(_)
+                            ))
+                    && screen_eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(screen_eql_a, "\u{b}A SCREEN EQL\u{a0}".into()))
+                    && screen_eql_model
+                        .ctf_report_names
+                        .materials
+                        .contains(&(screen_eql_b, " B SCREEN EQL ".into()))
+            );
+            let mut screen_eql_ip =
+                crate::ordinary_input_processor::resolve_source_b(&screen_eql_raw)
+                    .expect("real Raw/IP");
+            let screen_eql_args = screen_eql_ip
+                .get_object_def_max_args(SCREEN_EQL)
+                .expect("actual1A10N");
+            let mut screen_eql_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            screen_eql_ip
+                .report_source_idf_records_stats(&mut screen_eql_stats)
+                .expect("real record statistics");
+            assert!(
+                (
+                    screen_eql_args.alphas,
+                    screen_eql_args.numerics,
+                    screen_eql_args.total().expect("bounded args")
+                ) == (1, 10, 11)
+                    && screen_eql_ip.get_num_objects_found(SCREEN_EQL) == 2
+                    && screen_eql_ip
+                        .source_raw_object_names(SCREEN_EQL)
+                        .expect("ordered names")
+                        .iter()
+                        .map(String::as_str)
+                        .eq(["\u{b}A SCREEN EQL\u{a0}", " B SCREEN EQL "])
+                    && screen_eql_ip.is_object_unused(SCREEN_EQL, "\u{b}A SCREEN EQL\u{a0}")
+                    && screen_eql_ip.is_object_unused(SCREEN_EQL, " B SCREEN EQL ")
+                    && usize::try_from(screen_eql_stats.number_input_records)
+                        .expect("nonnegative records")
+                        == screen_eql_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let screen_eql_original = screen_eql_ip
+                .source_raw_object_fields(SCREEN_EQL, " B SCREEN EQL ")
+                .expect("original custody");
+            let screen_eql_raw_fields = &screen_eql_raw.objects
+                [&ep_raw_model::ObjectType(SCREEN_EQL.into())]
+                [&ep_raw_model::ObjectName(" B SCREEN EQL ".into())]
+                .fields;
+            assert!(
+                matches!(screen_eql_raw_fields.get(&ep_raw_model::FieldName("screen_beam_beam_solar_transmittance".into())),Some(ep_raw_model::RawValue::Number(token)) if token == "0")
+                    && matches!(screen_eql_original.get("screen_beam_beam_solar_transmittance"),Some(S::Number(token)) if token == "0")
+                    && matches!(ep_model::classify_source_json_number("0"),Ok(ep_model::SourceJsonNumber::Integer(0)))
+                    && ["screen_wire_spacing","screen_wire_diameter"].iter().all(|field|
+                        matches!(screen_eql_raw_fields.get(&ep_raw_model::FieldName((*field).into())),Some(ep_raw_model::RawValue::Number(token)) if token == "18446744073709551615")
+                            && matches!(screen_eql_original.get(*field),Some(S::Number(token)) if token == "18446744073709551615"))
+                    && matches!(ep_model::classify_source_json_number("18446744073709551615"),Ok(ep_model::SourceJsonNumber::Integer(-1)))
+                    && matches!(screen_eql_original.get("name"),Some(S::Bool(false)))
+                    && matches!(screen_eql_original.get("idf_order"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(screen_eql_original.get("idf_max_fields"),Some(S::Object(_)))
+                    && matches!(screen_eql_original.get("idf_max_extensible_fields"),Some(S::Null))
+                    && matches!(screen_eql_original.get("extra_string"),Some(S::String(text)) if text == "unconsumed")
+                    && matches!(screen_eql_original.get("metadata"),Some(S::Object(fields)) if matches!(fields.get("retained"),Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let screen_eql_projection =
+                crate::ordinary_material_input::resolve_source(&screen_eql_raw, &screen_eql_ip)
+                    .expect("same Raw/IP projection");
+            let screen_eql_keys = [
+                "screen_beam_beam_solar_transmittance",
+                "screen_beam_diffuse_solar_transmittance",
+                "screen_beam_diffuse_solar_reflectance",
+                "screen_beam_beam_visible_transmittance",
+                "screen_beam_diffuse_visible_transmittance",
+                "screen_beam_diffuse_visible_reflectance",
+                "screen_infrared_transmittance",
+                "screen_infrared_emissivity",
+                "screen_wire_spacing",
+                "screen_wire_diameter",
+            ];
+            let projected = &screen_eql_projection.window_screen_equivalent_layer;
+            let mut count_mismatch_raw = screen_eql_raw.clone();
+            count_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(SCREEN_EQL.into()))
+                .expect("EQL family")
+                .remove(&ep_raw_model::ObjectName("\u{b}A SCREEN EQL\u{a0}".into()));
+            let mut identity_mismatch_raw = screen_eql_raw.clone();
+            let identity_rows = identity_mismatch_raw
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(SCREEN_EQL.into()))
+                .expect("EQL family");
+            let identity_row = identity_rows
+                .remove(&ep_raw_model::ObjectName("\u{b}A SCREEN EQL\u{a0}".into()))
+                .expect("existing row");
+            identity_rows.insert(
+                ep_raw_model::ObjectName("WRONG SCREEN EQL IP NAME".into()),
+                identity_row,
+            );
+            let mut exact_auto_scene = screen_eql_value.clone();
+            exact_auto_scene[SCREEN_EQL]["\u{b}A SCREEN EQL\u{a0}"]["screen_beam_beam_solar_transmittance"] =
+                json!("Autocalculate");
+            let exact_auto_raw =
+                ep_raw_model::parse_epjson_str_for_source(&exact_auto_scene.to_string())
+                    .expect("exact Auto Raw");
+            let exact_auto_ip = crate::ordinary_input_processor::resolve_source_b(&exact_auto_raw)
+                .expect("legal exact Auto admission");
+            let exact_auto_projection =
+                crate::ordinary_material_input::resolve_source(&exact_auto_raw, &exact_auto_ip)
+                    .expect("exact Auto projection");
+            assert!(
+                screen_eql_projection.source_is_epjson && projected.len() == 2
+                    && crate::ordinary_material_input::resolve_source(&count_mismatch_raw,&screen_eql_ip).is_err()
+                    && crate::ordinary_material_input::resolve_source(&identity_mismatch_raw,&screen_eql_ip).is_err()
+                    && projected[0].object_name == "\u{b}A SCREEN EQL\u{a0}" && projected[0].fields.len() == 6
+                    && matches!(projected[0].fields.get("screen_beam_beam_solar_transmittance"),Some(P::String(text)) if text.is_empty())
+                    && projected[1].object_name == " B SCREEN EQL " && projected[1].fields.len() == 10
+                    && projected.iter().all(|row|row.idf_max_fields.is_none() && row.fields.keys().all(|field|
+                        crate::ordinary_equipment_input::source_b_screen_equivalent_layer_known_field(field)))
+                    && screen_eql_keys.iter().zip([0.0_f64,0.2,0.3,0.05,0.1,0.2,0.9,0.9,-1.0,-1.0])
+                        .all(|(field,value)|matches!(projected[1].fields.get(*field),Some(P::Number(actual)) if actual.to_bits() == value.to_bits()))
+                    && matches!(exact_auto_projection.window_screen_equivalent_layer[0].fields.get("screen_beam_beam_solar_transmittance"),Some(P::String(text)) if text == "Autocalculate")
+            );
+            let mut screen_eql_trace = inspect_porting_scope(
+                &screen_eql_raw,
+                &screen_eql_compiled.report,
+                Some(screen_eql_model),
+                PortingScope::B,
+            );
+            assert!(
+                screen_eql_trace.admissible,
+                "{:?}",
+                screen_eql_trace.violations
+            );
+            screen_eql_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    screen_eql_model,
+                    &weather,
+                    "same ScreenEQLEQL Source weather",
+                )
+                .expect("actual Source environment"),
+            );
+            let screen_eql_admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(
+                    &screen_eql_raw,
+                    &screen_eql_trace,
+                )
+                .expect("validated Source SCREEN_EQL scope");
+            let mut permuted_screen_eql_model = screen_eql_model.clone();
+            let screen_eql_a_position = screen_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == screen_eql_a)
+                .expect("A arena row");
+            let screen_eql_b_position = screen_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == screen_eql_b)
+                .expect("B arena row");
+            permuted_screen_eql_model
+                .materials
+                .swap(screen_eql_a_position, screen_eql_b_position);
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &screen_eql_raw,
+                    &screen_eql_compiled.report,
+                    Some(screen_eql_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&screen_eql_admission)
+                )
+                .allows_rust_runtime()
+                    && crate::support::assess_support_with_source_admission(
+                        &screen_eql_raw,
+                        &screen_eql_compiled.report,
+                        Some(&permuted_screen_eql_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&screen_eql_admission)
+                    )
+                    .allows_rust_runtime()
+            );
+            let screen_eql_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                &json!({"Zone":{"Zone":{}},"WindowMaterial:Screen:EquivalentLayer":{"IDF EQL SCREEN":{
+                    "screen_beam_beam_solar_transmittance":"Autocalculate",
+                    "screen_beam_diffuse_solar_transmittance":0.1,"screen_beam_diffuse_solar_reflectance":0.2,
+                    "screen_beam_beam_visible_transmittance":0.3,"screen_beam_diffuse_visible_transmittance":0.4,
+                    "screen_beam_diffuse_visible_reflectance":0.2,"screen_infrared_transmittance":0.02,
+                    "screen_infrared_emissivity":0.93,"screen_wire_spacing":0.025,"screen_wire_diameter":0.005
+                }}}).to_string(),
+                "Zone,Zone;WindowMaterial:Screen:EquivalentLayer,IDF EQL SCREEN,Autocalculate,0.1,0.2,0.3,0.4,0.2,0.02,0.93,0.025,0.005;",
+            ).expect("matched Zone+ScreenEQL IDF11operands");
+            let mut controlled_screen_eql = screen_eql_value.clone();
+            controlled_screen_eql["WindowShadingControl"] = json!({"EQL SCREEN CONTROL":{"shading_type":"ExteriorScreen","shading_device_material_name":"\u{b}A SCREEN EQL\u{a0}"}});
+            let mut active_screen_eql = screen_eql_value.clone();
+            active_screen_eql["Construction:WindowEquivalentLayer"] =
+                json!({"ACTIVE EQL SCREEN":{"outside_layer":"\u{b}A SCREEN EQL\u{a0}"}});
+            let mut ems_screen_eql = screen_eql_value.clone();
+            ems_screen_eql["EnergyManagementSystem:ConstructionIndexVariable"] =
+                json!({"HELD_EQL_EMS":{"construction_object_name":"Opaque"}});
+            assert!(
+                !crate::support::assess_support_with_source_admission(&screen_eql_raw,&screen_eql_compiled.report,Some(screen_eql_model),RunMode::Compatibility,PartialRunPolicy::Deny,RunOutputFormat::RustNative,TraceLevel::Normal,None).allows_rust_runtime()
+                    && crate::ordinary_equipment_input::resolve_source_a(&screen_eql_raw).is_err()
+                    && crate::ordinary_equipment_input::resolve(&screen_eql_raw).is_err()
+                    && !screen_eql_idf.is_epjson() && crate::ordinary_equipment_input::resolve_source_b(&screen_eql_idf).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&controlled_screen_eql.to_string()).expect("control Raw")).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&active_screen_eql.to_string()).expect("active EQL Raw")).is_err()
+                    && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&ems_screen_eql.to_string()).expect("held EMS Raw")).is_err()
+                    && ["autocalculate"," Autocalculate "," "].iter().all(|text| {
+                        let mut bad_auto = screen_eql_value.clone();
+                        bad_auto[SCREEN_EQL]["\u{b}A SCREEN EQL\u{a0}"]["screen_beam_beam_solar_transmittance"] = json!(text);
+                        crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&bad_auto.to_string()).expect("nonexact Auto Raw")).is_err()
+                    })
+            );
+            for field in screen_eql_keys {
+                let mut bad_value = screen_eql_value.clone();
+                bad_value[SCREEN_EQL][" B SCREEN EQL "][field] = json!(false);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string())
+                            .expect("wrong-kind Raw")
+                    )
+                    .is_err(),
+                    "ScreenEQLEQL known field {field}"
+                );
+            }
+            let opaque_screen_eql = screen_eql_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowScreenEquivalentLayer)
+                .expect("held opaque material");
+            for case in 0_usize..12 {
+                let mut bad_model = screen_eql_model.clone();
+                match case {
+                    0 => bad_model.materials.retain(|row| {
+                        row.kind() != ep_model::MaterialKind::WindowScreenEquivalentLayer
+                    }),
+                    1 => {
+                        let mut extra = bad_model.materials[screen_eql_a_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA SCREEN EQL".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[screen_eql_a_position].id = opaque_screen_eql.id,
+                    3 => {
+                        bad_model.materials[screen_eql_a_position].definition =
+                            opaque_screen_eql.definition
+                    }
+                    4 => {
+                        bad_model.materials[screen_eql_a_position].name =
+                            ep_model::NormalizedName("WRONG SCREEN EQL".into())
+                    }
+                    5 => {
+                        bad_model.materials[screen_eql_a_position].id =
+                            ep_model::MaterialId(u32::MAX)
+                    }
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != screen_eql_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((screen_eql_a, "\u{b}A SCREEN EQL\u{a0}".into())),
+                    8 => {
+                        let _ = bad_model
+                            .material_names
+                            .insert(" EXTRA SCREEN_EQL ALIAS ", screen_eql_a);
+                    }
+                    9 => {
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == screen_eql_a)
+                            .expect("A report tuple")
+                            .1 = " B SCREEN EQL ".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == screen_eql_b)
+                            .expect("B report tuple")
+                            .1 = "\u{b}A SCREEN EQL\u{a0}".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => {
+                        bad_model.material_names = ep_model::NameMap::source_exact_namespace();
+                        bad_model.materials.iter().for_each(|row| {
+                            let id = if row.id == screen_eql_a {
+                                screen_eql_b
+                            } else if row.id == screen_eql_b {
+                                screen_eql_a
+                            } else {
+                                row.id
+                            };
+                            let _ = bad_model.material_names.insert(&row.name.0, id);
+                        });
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &screen_eql_raw,
+                        &screen_eql_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&screen_eql_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "ScreenEQLEQL custody case {case}"
+                );
+            }
+            let screen_eql_construction = screen_eql_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("real opaque Construction");
+            for case in 0_usize..11 {
+                let mut used_value = screen_eql_value.clone();
+                let mut fields =
+                    serde_json::Map::from_iter([("outside_layer".into(), json!("Opaque"))]);
+                let key = if case == 0 || case == 10 {
+                    "outside_layer".into()
+                } else {
+                    format!("layer_{}", case + 1)
+                };
+                fields.insert(
+                    key,
+                    json!(if case.is_multiple_of(2) {
+                        "\u{b}A SCREEN EQL\u{a0}"
+                    } else {
+                        " b screen eql "
+                    }),
+                );
+                used_value["Construction"]["SCREEN_EQL USED"] = serde_json::Value::Object(fields);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&used_value.to_string())
+                            .expect("original active SCREEN_EQL layer")
+                    )
+                    .is_err(),
+                    "Raw SCREEN_EQL layer {case}"
+                );
+                let mut used_model = screen_eql_model.clone();
+                let construction = &mut used_model.constructions[screen_eql_construction];
+                if case == 10 {
+                    construction.layers.clear();
+                    construction.outside_layer = Some(screen_eql_a);
+                } else {
+                    construction.layers.resize(case + 1, opaque_screen_eql.id);
+                    construction.layers[case] = if case.is_multiple_of(2) {
+                        screen_eql_a
+                    } else {
+                        screen_eql_b
+                    };
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &screen_eql_raw,
+                        &screen_eql_compiled.report,
+                        Some(&used_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&screen_eql_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "typed/effective SCREEN_EQL layer {case}"
+                );
+            }
+        }
     }
 }
 

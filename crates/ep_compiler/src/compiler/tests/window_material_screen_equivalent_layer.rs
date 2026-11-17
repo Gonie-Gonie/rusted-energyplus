@@ -178,6 +178,413 @@ fn screen_equivalent_layer_materializes_all_inputs_defaults_and_source_quirks()
         .ok_or_else(|| std::io::Error::other("missing equivalent-layer screen coverage"))?;
     assert_eq!(coverage.status, ObjectCoverageStatus::Typed);
     assert_eq!(coverage.object_count, 2);
+
+    // Source-only original qualification is separate from the same-owner recovery and joint checks.
+    {
+        use ep_raw_model::{FieldName, ObjectName, ObjectType, RawValue};
+        let source_raw = ep_raw_model::parse_epjson_str_for_source(
+            r#"{
+    "WindowMaterial:Screen:EquivalentLayer": {
+        "\u000bA DEFAULT SCREEN EQL\u00a0": {
+            "screen_beam_diffuse_solar_transmittance":0.2,
+            "screen_beam_diffuse_solar_reflectance":0.3,
+            "screen_beam_beam_visible_transmittance":0.05,
+            "screen_beam_diffuse_visible_transmittance":0.1,
+            "screen_beam_diffuse_visible_reflectance":0.2,
+            "name":false,"idf_order":[],"metadata":null
+        },
+        " Z FULL SCREEN EQL ": {
+            "screen_beam_beam_solar_transmittance":0.25,
+            "screen_beam_diffuse_solar_transmittance":0.2,
+            "screen_beam_diffuse_solar_reflectance":0.3,
+            "screen_beam_beam_visible_transmittance":0.05,
+            "screen_beam_diffuse_visible_transmittance":0.1,
+            "screen_beam_diffuse_visible_reflectance":0.2,
+            "screen_infrared_transmittance":0.9,
+            "screen_infrared_emissivity":0.9,
+            "screen_wire_spacing":0.5,
+            "screen_wire_diameter":0.25,
+            "name":null,"idf_order":false,"idf_max_fields":{"ignored":true},
+            "idf_max_extensible_fields":[],"extra_string":"unconsumed",
+            "extra_number":18446744073709551615,
+            "metadata":{"retained":[null,true,1.25,"mixed"]}
+        }
+    }
+}"#,
+        )?;
+        let source = super::super::compile_raw_model_for_source(&source_raw);
+        assert!(!source.has_errors(), "{:?}", source.report.diagnostics);
+        let source_model = source.model.as_ref().expect("real Source ScreenEQL model");
+        let default_id = source_model
+            .material_names
+            .resolve("\u{b}A DEFAULT SCREEN EQL\u{a0}")
+            .expect("untrimmed default name");
+        let full_id = source_model
+            .material_names
+            .resolve(" Z FULL SCREEN EQL ")
+            .expect("untrimmed full name");
+        assert!(
+            default_id == ep_model::MaterialId(0)
+                && default_id != full_id
+                && source_model.material_names.is_source_exact_namespace()
+                && source_model
+                    .material_names
+                    .resolve("A DEFAULT SCREEN EQL")
+                    .is_none()
+                && source_model.materials.len() == 2
+                && source_model.ctf_report_names.materials
+                    == vec![
+                        (default_id, "\u{b}A DEFAULT SCREEN EQL\u{a0}".into()),
+                        (full_id, " Z FULL SCREEN EQL ".into())
+                    ]
+                && source_model.materials[0].kind() == MaterialKind::WindowScreenEquivalentLayer
+                && source_model.materials[0].family() == MaterialFamily::EquivalentLayer
+        );
+        let source_default = source_model.materials[0]
+            .as_window_screen_equivalent_layer()
+            .expect("Source default payload");
+        let source_full = source_model.materials[1]
+            .as_window_screen_equivalent_layer()
+            .expect("Source full payload");
+        assert!(
+            source_default.front_solar.beam_beam_transmittance == AutoOrNumber::AutoCalculate
+                && source_default.front_solar == source_default.back_solar
+                && source_default.front_visible
+                    == WindowScreenEquivalentLayerVisibleProperties {
+                        beam_beam_transmittance: 0.05,
+                        beam_diffuse_transmittance: 0.1,
+                        beam_diffuse_reflectance: 0.0,
+                        diffuse_diffuse_reflectance: 0.2
+                    }
+                && source_default.back_visible
+                    == WindowScreenEquivalentLayerVisibleProperties::default()
+                && [
+                    source_default.infrared_transmittance,
+                    source_default.front_infrared_emissivity,
+                    source_default.back_infrared_emissivity,
+                    source_default.wire_spacing_m,
+                    source_default.wire_diameter_m,
+                    source_default.base_thermal_absorptance
+                ]
+                .map(f64::to_bits)
+                    == [0.02_f64, 0.93, 0.93, 0.0, 0.0, 0.0].map(f64::to_bits)
+                && source_full.front_solar
+                    == WindowScreenEquivalentLayerSolarProperties {
+                        beam_beam_transmittance: AutoOrNumber::Value(0.25),
+                        beam_diffuse_transmittance: 0.2,
+                        beam_diffuse_reflectance: 0.3
+                    }
+                && source_full.back_solar == source_full.front_solar
+                && source_full.front_visible == source_default.front_visible
+                && source_full.back_visible
+                    == WindowScreenEquivalentLayerVisibleProperties::default()
+                && [
+                    source_full.infrared_transmittance,
+                    source_full.front_infrared_emissivity,
+                    source_full.back_infrared_emissivity,
+                    source_full.front_thermal_absorptance,
+                    source_full.back_thermal_absorptance,
+                    source_full.thermal_transmittance,
+                    source_full.base_thermal_absorptance,
+                    source_full.wire_spacing_m,
+                    source_full.wire_diameter_m
+                ]
+                .map(f64::to_bits)
+                    == [0.9_f64, 0.9, 0.9, 0.9, 0.9, 0.9, 0.0, 0.5, 0.25].map(f64::to_bits)
+                && source_full.roughness == MaterialSurfaceRoughness::MediumRough
+                && source_full.is_resistance_only()
+                && source_full
+                    .nominal_thermal_resistance_m2_k_per_w()
+                    .is_none()
+                && source_model
+                    .materials
+                    .iter()
+                    .all(|row| row.thickness_m().is_none()
+                        && row.conductivity_w_per_m_k().is_none()
+                        && row.thermal_resistance().is_none())
+        );
+        let full_raw = &source_raw.objects[&ObjectType(OBJECT_TYPE.into())]
+            [&ObjectName(" Z FULL SCREEN EQL ".into())];
+        let mut wrapped = source_raw.clone();
+        let wrapped_fields = &mut wrapped
+            .objects
+            .get_mut(&ObjectType(OBJECT_TYPE.into()))
+            .expect("EQL family")
+            .get_mut(&ObjectName(" Z FULL SCREEN EQL ".into()))
+            .expect("full EQL")
+            .fields;
+        wrapped_fields.insert(
+            FieldName("screen_wire_spacing".into()),
+            RawValue::Number("18446744073709551615".into()),
+        );
+        wrapped_fields.insert(
+            FieldName("screen_wire_diameter".into()),
+            RawValue::Number("18446744073709551615".into()),
+        );
+        let wrapped_source = super::super::compile_raw_model_for_source(&wrapped);
+        let wrapped_model = wrapped_source
+            .model
+            .as_ref()
+            .expect("original positive unbounded wires");
+        let wrapped_full = wrapped_model
+            .materials
+            .iter()
+            .find(|row| row.id == full_id)
+            .and_then(|row| row.as_window_screen_equivalent_layer())
+            .expect("same advisory typed row");
+        assert!(
+            matches!(
+                full_raw.fields.get(&FieldName("name".into())),
+                Some(RawValue::Null)
+            ) && matches!(
+                full_raw.fields.get(&FieldName("idf_order".into())),
+                Some(RawValue::Bool(false))
+            ) && matches!(
+                full_raw.fields.get(&FieldName("idf_max_fields".into())),
+                Some(RawValue::Object(_))
+            ) && matches!(
+                full_raw
+                    .fields
+                    .get(&FieldName("idf_max_extensible_fields".into())),
+                Some(RawValue::Array(_))
+            ) && matches!(full_raw.fields.get(&FieldName("extra_string".into())),Some(RawValue::String(value)) if value == "unconsumed")
+                && matches!(full_raw.fields.get(&FieldName("extra_number".into())),Some(RawValue::Number(token)) if token == "18446744073709551615")
+                && matches!(
+                    full_raw.fields.get(&FieldName("metadata".into())),
+                    Some(RawValue::Object(_))
+                )
+                && !wrapped_source.has_errors()
+                && wrapped_full.wire_spacing_m.to_bits()
+                    == "18446744073709551615".parse::<f64>()?.to_bits()
+                && wrapped_full.wire_diameter_m.to_bits() == wrapped_full.wire_spacing_m.to_bits()
+                && matches!(
+                    ep_model::classify_source_json_number("18446744073709551615"),
+                    Ok(ep_model::SourceJsonNumber::Integer(-1))
+                )
+        );
+        let legacy = compile_raw_model(&source_raw);
+        assert!(
+            !legacy.has_errors()
+                && !legacy
+                    .model
+                    .as_ref()
+                    .expect("Legacy model")
+                    .material_names
+                    .is_source_exact_namespace()
+                && legacy
+                    .model
+                    .as_ref()
+                    .expect("Legacy full payload")
+                    .materials[1]
+                    .definition
+                    == source_model.materials[1].definition
+                && compile_raw_model(&wrapped).has_errors()
+        );
+        let mut referenced = source_raw.clone();
+        referenced
+            .objects
+            .get_mut(&ObjectType(OBJECT_TYPE.into()))
+            .expect("EQL family")
+            .get_mut(&ObjectName(" Z FULL SCREEN EQL ".into()))
+            .expect("full EQL")
+            .fields
+            .extend([
+                (
+                    FieldName("screen_beam_beam_solar_transmittance".into()),
+                    RawValue::Number("0.75".into()),
+                ),
+                (
+                    FieldName("screen_beam_diffuse_solar_reflectance".into()),
+                    RawValue::Number("0.3".into()),
+                ),
+            ]);
+        referenced.objects.insert(
+            ObjectType("Construction".into()),
+            std::collections::BTreeMap::from([(
+                ObjectName("EQL ACTIVE".into()),
+                ep_raw_model::RawObject {
+                    fields: std::collections::BTreeMap::from([(
+                        FieldName("outside_layer".into()),
+                        RawValue::String(" Z FULL SCREEN EQL ".into()),
+                    )]),
+                    source_span: None,
+                },
+            )]),
+        );
+        assert!(has_diagnostic(
+            &super::super::compile_raw_model_for_source(&referenced),
+            "InvalidWindowScreenEquivalentLayerOpticalSum",
+            " Z FULL SCREEN EQL ",
+            None
+        ));
+        for (kind, field, probe) in [
+            ("kind", "screen_beam_beam_solar_transmittance", 0_usize),
+            ("kind", "screen_beam_diffuse_solar_transmittance", 0_usize),
+            ("kind", "screen_beam_diffuse_solar_reflectance", 0_usize),
+            ("kind", "screen_beam_beam_visible_transmittance", 0_usize),
+            ("kind", "screen_beam_diffuse_visible_transmittance", 0_usize),
+            ("kind", "screen_beam_diffuse_visible_reflectance", 0_usize),
+            ("kind", "screen_infrared_transmittance", 0_usize),
+            ("kind", "screen_infrared_emissivity", 0_usize),
+            ("kind", "screen_wire_spacing", 0_usize),
+            ("kind", "screen_wire_diameter", 0_usize),
+            (
+                "missing",
+                "screen_beam_diffuse_solar_transmittance",
+                0_usize,
+            ),
+            ("missing", "screen_beam_diffuse_solar_reflectance", 0_usize),
+            ("missing", "screen_beam_beam_visible_transmittance", 0_usize),
+            (
+                "missing",
+                "screen_beam_diffuse_visible_transmittance",
+                0_usize,
+            ),
+            (
+                "missing",
+                "screen_beam_diffuse_visible_reflectance",
+                0_usize,
+            ),
+            ("lower", "screen_beam_beam_solar_transmittance", 0_usize),
+            ("lower", "screen_beam_diffuse_solar_transmittance", 0_usize),
+            ("lower", "screen_beam_diffuse_solar_reflectance", 0_usize),
+            ("lower", "screen_beam_beam_visible_transmittance", 0_usize),
+            (
+                "lower",
+                "screen_beam_diffuse_visible_transmittance",
+                0_usize,
+            ),
+            ("lower", "screen_beam_diffuse_visible_reflectance", 0_usize),
+            ("lower", "screen_infrared_transmittance", 0_usize),
+            ("lower", "screen_infrared_emissivity", 0_usize),
+            ("lower", "screen_wire_spacing", 0_usize),
+            ("lower", "screen_wire_diameter", 0_usize),
+            ("upper", "screen_beam_beam_solar_transmittance", 0_usize),
+            ("upper", "screen_beam_diffuse_solar_transmittance", 0_usize),
+            ("upper", "screen_beam_diffuse_solar_reflectance", 0_usize),
+            ("upper", "screen_beam_beam_visible_transmittance", 0_usize),
+            (
+                "upper",
+                "screen_beam_diffuse_visible_transmittance",
+                0_usize,
+            ),
+            ("upper", "screen_beam_diffuse_visible_reflectance", 0_usize),
+            ("upper", "screen_infrared_transmittance", 0_usize),
+            ("upper", "screen_infrared_emissivity", 0_usize),
+            ("auto", "", 0_usize),
+            ("auto", "", 1_usize),
+            ("auto", "", 2_usize),
+            ("defer", "", 0_usize),
+            ("defer", "", 1_usize),
+            ("defer", "", 2_usize),
+            ("defer", "", 3_usize),
+            ("defer", "", 4_usize),
+        ] {
+            let mut candidate = source_raw.clone();
+            let candidate_fields = &mut candidate
+                .objects
+                .get_mut(&ObjectType(OBJECT_TYPE.into()))
+                .expect("EQL family")
+                .get_mut(&ObjectName(" Z FULL SCREEN EQL ".into()))
+                .expect("full EQL")
+                .fields;
+            match kind {
+                "kind" => {
+                    candidate_fields.insert(FieldName(field.into()), RawValue::Bool(false));
+                }
+                "missing" => {
+                    candidate_fields.remove(&FieldName(field.into()));
+                }
+                "lower" => {
+                    candidate_fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            if matches!(
+                                field,
+                                "screen_infrared_emissivity"
+                                    | "screen_wire_spacing"
+                                    | "screen_wire_diameter"
+                            ) {
+                                "0.0"
+                            } else {
+                                "-0.01"
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "upper" => {
+                    candidate_fields
+                        .insert(FieldName(field.into()), RawValue::Number("1.0".into()));
+                }
+                "auto" => {
+                    candidate_fields.insert(
+                        FieldName("screen_beam_beam_solar_transmittance".into()),
+                        RawValue::String(
+                            match probe {
+                                0 => "autocalculate",
+                                1 => " Autocalculate ",
+                                _ => " ",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                _ => {
+                    let values: &[(&str, &str)] = match probe {
+                        0 => &[
+                            ("screen_wire_spacing", "0.00001"),
+                            ("screen_wire_diameter", "0.00001"),
+                        ],
+                        1 => &[
+                            ("screen_wire_spacing", "0.001"),
+                            ("screen_wire_diameter", "0.002"),
+                        ],
+                        2 => &[
+                            ("screen_beam_beam_solar_transmittance", "0.25"),
+                            ("screen_wire_spacing", "0.025"),
+                            ("screen_wire_diameter", "0.02"),
+                        ],
+                        3 => &[
+                            ("screen_beam_beam_solar_transmittance", "0.75"),
+                            ("screen_beam_diffuse_solar_reflectance", "0.3"),
+                        ],
+                        _ => &[
+                            ("screen_beam_beam_visible_transmittance", "0.8"),
+                            ("screen_beam_diffuse_visible_reflectance", "0.3"),
+                        ],
+                    };
+                    values.iter().for_each(|(key, value)| {
+                        candidate_fields
+                            .insert(FieldName((*key).into()), RawValue::Number((*value).into()));
+                    });
+                }
+            }
+            let checked = super::super::compile_raw_model_for_source(&candidate);
+            assert!(
+                if kind == "auto" {
+                    checked.model.as_ref().is_none_or(|model| {
+                        !model
+                            .ctf_report_names
+                            .materials
+                            .iter()
+                            .any(|(_, name)| name == " Z FULL SCREEN EQL ")
+                    })
+                } else {
+                    checked.has_errors() != (kind == "defer")
+                },
+                "Source schema/qualification row {kind}/{field}/{probe}: {:?}",
+                checked.report.diagnostics
+            );
+            if kind == "defer" {
+                let held_legacy = compile_raw_model(&candidate);
+                assert!(
+                    held_legacy.has_errors(),
+                    "Legacy retains Native recovery/joint fence {probe}"
+                );
+            }
+        }
+    }
     Ok(())
 }
 

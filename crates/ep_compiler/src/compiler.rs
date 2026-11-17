@@ -766,6 +766,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_shade_equivalent_layer(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Drape:EquivalentLayer".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_drape_equivalent_layer(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Screen:EquivalentLayer".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_screen_equivalent_layer(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -7978,6 +7980,89 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    fn source_unused_screen_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let valid = |field: &str, value: &RawValue| {
+            if !matches!(
+                field,
+                "screen_beam_beam_solar_transmittance"
+                    | "screen_beam_diffuse_solar_transmittance"
+                    | "screen_beam_diffuse_solar_reflectance"
+                    | "screen_beam_beam_visible_transmittance"
+                    | "screen_beam_diffuse_visible_transmittance"
+                    | "screen_beam_diffuse_visible_reflectance"
+                    | "screen_infrared_transmittance"
+                    | "screen_infrared_emissivity"
+                    | "screen_wire_spacing"
+                    | "screen_wire_diameter"
+            ) {
+                return true;
+            }
+            if field == "screen_beam_beam_solar_transmittance"
+                && let RawValue::String(text) = value
+            {
+                return matches!(text.as_str(), "" | "Autocalculate");
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match field {
+                            "screen_infrared_emissivity" => value > 0.0 && value < 1.0,
+                            "screen_wire_spacing" | "screen_wire_diameter" => value > 0.0,
+                            _ => (0.0..1.0).contains(&value),
+                        }
+                })
+        };
+        if [
+            "screen_beam_diffuse_solar_transmittance",
+            "screen_beam_diffuse_solar_reflectance",
+            "screen_beam_beam_visible_transmittance",
+            "screen_beam_diffuse_visible_transmittance",
+            "screen_beam_diffuse_visible_reflectance",
+        ]
+        .iter()
+        .any(|field| field_value(object, field).is_none_or(|value| !valid(field, value)))
+            || object
+                .fields
+                .iter()
+                .any(|(field, value)| !valid(&field.0, value))
+        {
+            return false;
+        }
+        let Some(rows) = self.raw_model.objects.get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Screen:EquivalentLayer".into(),
+        )) else {
+            return false;
+        };
+        !self
+            .raw_model
+            .objects
+            .iter()
+            .filter(|(family, _)| family.0.starts_with("Construction"))
+            .any(|(_, constructions)| {
+                constructions.values().any(|construction| {
+                    construction.fields.iter().any(|(field, value)| {
+                        let layer = field.0 == "outside_layer"
+                            || (2..=10).any(|index| field.0 == format!("layer_{index}"));
+                        layer
+                            && matches!(value, RawValue::String(reference)
+                        if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
+                    })
+                })
+            })
+    }
+
     fn parse_window_screen_equivalent_layer_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Screen:EquivalentLayer";
         const SOLAR_BEAM_BEAM_FIELD: &str = "screen_beam_beam_solar_transmittance";
@@ -7995,6 +8080,8 @@ impl<'a> Compiler<'a> {
         const WIRE_DIAMETER_FIELD: &str = "screen_wire_diameter";
 
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let source_unused_screen_equivalent_layer =
+                self.source_unused_screen_equivalent_layer(&name, &object);
             let beam_beam_solar_transmittance = self.auto_bounded_default(
                 OBJECT_TYPE,
                 &name,
@@ -8071,7 +8158,11 @@ impl<'a> Compiler<'a> {
                 &object,
                 WIRE_SPACING_FIELD,
                 0.0,
-                0.00001,
+                if source_unused_screen_equivalent_layer {
+                    0.0
+                } else {
+                    0.00001
+                },
                 false,
             );
             let wire_diameter_m = self.number_minimum_when_present_default(
@@ -8080,7 +8171,11 @@ impl<'a> Compiler<'a> {
                 &object,
                 WIRE_DIAMETER_FIELD,
                 0.0,
-                0.00001,
+                if source_unused_screen_equivalent_layer {
+                    0.0
+                } else {
+                    0.00001
+                },
                 false,
             );
 
@@ -8105,7 +8200,9 @@ impl<'a> Compiler<'a> {
                 continue;
             };
 
-            let geometry_valid = if wire_spacing_m == 0.0 && wire_diameter_m == 0.0 {
+            let geometry_valid = if source_unused_screen_equivalent_layer
+                || (wire_spacing_m == 0.0 && wire_diameter_m == 0.0)
+            {
                 true
             } else if wire_diameter_m >= wire_spacing_m {
                 self.error(
@@ -8124,6 +8221,7 @@ impl<'a> Compiler<'a> {
 
             let mut openness_valid = true;
             if geometry_valid
+                && !source_unused_screen_equivalent_layer
                 && wire_spacing_m > 0.0
                 && let AutoOrNumber::Value(specified_openness) = beam_beam_solar_transmittance
             {
@@ -8149,7 +8247,7 @@ impl<'a> Compiler<'a> {
                 beam_beam_solar_transmittance
             {
                 let sum = beam_beam_solar_transmittance + beam_diffuse_solar_reflectance;
-                if sum >= 1.0 {
+                if sum >= 1.0 && !source_unused_screen_equivalent_layer {
                     self.error(
                         "InvalidWindowScreenEquivalentLayerOpticalSum",
                         OBJECT_TYPE,
@@ -8163,7 +8261,7 @@ impl<'a> Compiler<'a> {
                 }
             }
             let visible_sum = beam_beam_visible_transmittance + diffuse_diffuse_visible_reflectance;
-            if visible_sum >= 1.0 {
+            if visible_sum >= 1.0 && !source_unused_screen_equivalent_layer {
                 self.error(
                     "InvalidWindowScreenEquivalentLayerOpticalSum",
                     OBJECT_TYPE,
@@ -8185,6 +8283,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if source_unused_screen_equivalent_layer {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             let solar = WindowScreenEquivalentLayerSolarProperties {
                 beam_beam_transmittance: beam_beam_solar_transmittance,
                 beam_diffuse_transmittance: beam_diffuse_solar_transmittance,
@@ -10254,6 +10358,14 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_drape_equivalent_layer(name, object));
+        let source_screen_equivalent_layer_name = object_type
+            == "WindowMaterial:Screen:EquivalentLayer"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_screen_equivalent_layer(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
@@ -10265,7 +10377,8 @@ impl<'a> Compiler<'a> {
                 || source_screen_name
                 || source_blind_name
                 || source_shade_equivalent_layer_name
-                || source_drape_equivalent_layer_name)
+                || source_drape_equivalent_layer_name
+                || source_screen_equivalent_layer_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')
