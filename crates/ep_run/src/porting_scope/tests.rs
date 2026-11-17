@@ -13478,6 +13478,659 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+
+        // Unused Gap:EQL uses the existing genuine DSOA/Ideal/OA scene; no Material or Window owner here.
+        // Public3A12N definition, original Raw/IP tokens and plain-f64 projection are distinct observations.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as P;
+            const GAP_EQL: &str = "WindowMaterial:Gap:EquivalentLayer";
+            let mut gap_eql_value = curve_value.clone();
+            gap_eql_value[GAP_EQL] = json!({
+                "\u{b}":{"gas_type":"CUSTOM","thickness":u64::MAX,"gap_vent_type":"VentedIndoor",
+                    "conductivity_coefficient_a":0.5,"viscosity_coefficient_a":0.125,"specific_heat_coefficient_a":2.0,
+                    "molecular_weight":20.0,"specific_heat_ratio":u64::MAX,"name":false,"idf_order":[],"metadata":null},
+                "\u{a0}":{"gas_type":"CUSTOM","thickness":0.125,"gap_vent_type":"VentedOutdoor",
+                    "conductivity_coefficient_a":0.25,"conductivity_coefficient_b":-0.0,"conductivity_coefficient_c":0,
+                    "viscosity_coefficient_a":0.125,"viscosity_coefficient_b":-0.25,"viscosity_coefficient_c":0.0625,
+                    "specific_heat_coefficient_a":2.0,"specific_heat_coefficient_b":-0.5,"specific_heat_coefficient_c":0.25,
+                    "molecular_weight":200.0,"specific_heat_ratio":1.8446744073709552e19,
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},"idf_max_extensible_fields":null,
+                    "extra_string":"unconsumed","metadata":{"retained":[null,true,1.25,"mixed",{"nested":u64::MAX}]}}
+            });
+            let gap_eql_text = gap_eql_value.to_string().replacen(
+                "\"conductivity_coefficient_c\":0,",
+                "\"conductivity_coefficient_c\":-0,",
+                1,
+            );
+            let gap_eql_raw = ep_raw_model::parse_epjson_str_for_source(&gap_eql_text)
+                .expect("original GapEQL Number tokens");
+            let gap_eql_compiled = ep_compiler::compile_raw_model_for_source(&gap_eql_raw);
+            assert!(
+                !gap_eql_compiled.has_errors(),
+                "{:?}",
+                gap_eql_compiled.report.diagnostics
+            );
+            let gap_eql_model = gap_eql_compiled
+                .model
+                .as_ref()
+                .expect("two genuine GapEQL typed identities");
+            let gap_eql_a = gap_eql_model
+                .material_names
+                .resolve("\u{b}")
+                .expect("untrimmed VT identity");
+            let gap_eql_b = gap_eql_model
+                .material_names
+                .resolve("\u{a0}")
+                .expect("untrimmed NBSP identity");
+            assert!(gap_eql_a != gap_eql_b && gap_eql_model.material_names.is_source_exact_namespace()
+                && gap_eql_model.material_names.resolve("").is_none()
+                && gap_eql_model.materials.iter().filter(|row|row.kind() == ep_model::MaterialKind::WindowGapEquivalentLayer).count() == 2
+                && gap_eql_model.materials.iter().any(|row|row.id == gap_eql_a && row.name.0 == "\u{b}" && matches!(row.definition,ep_model::MaterialDefinition::WindowGapEquivalentLayer(_)))
+                && gap_eql_model.materials.iter().any(|row|row.id == gap_eql_b && row.name.0 == "\u{a0}" && matches!(row.definition,ep_model::MaterialDefinition::WindowGapEquivalentLayer(_)))
+                && gap_eql_model.ctf_report_names.materials.contains(&(gap_eql_a,"\u{b}".into())) && gap_eql_model.ctf_report_names.materials.contains(&(gap_eql_b,"\u{a0}".into())));
+            let mut gap_eql_ip = crate::ordinary_input_processor::resolve_source_b(&gap_eql_raw)
+                .expect("actual Raw/IP");
+            let args = gap_eql_ip
+                .get_object_def_max_args(GAP_EQL)
+                .expect("public3A12N definition, not private item counts");
+            let mut stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            gap_eql_ip
+                .report_source_idf_records_stats(&mut stats)
+                .expect("actual object census");
+            assert!(
+                (
+                    args.alphas,
+                    args.numerics,
+                    args.total().expect("fixed max args")
+                ) == (3, 12, 15)
+                    && gap_eql_ip.get_num_objects_found(GAP_EQL) == 2
+                    && gap_eql_ip
+                        .source_raw_object_names(GAP_EQL)
+                        .expect("actual signed-i8 name order")
+                        .iter()
+                        .map(String::as_str)
+                        .eq(["\u{a0}", "\u{b}"])
+                    && gap_eql_ip.is_object_unused(GAP_EQL, "\u{b}")
+                    && gap_eql_ip.is_object_unused(GAP_EQL, "\u{a0}")
+                    && usize::try_from(stats.number_input_records).expect("nonnegative census")
+                        == gap_eql_raw
+                            .objects
+                            .values()
+                            .map(|rows| rows.len())
+                            .sum::<usize>()
+            );
+            let original = gap_eql_ip
+                .source_raw_object_fields(GAP_EQL, "\u{a0}")
+                .expect("full original custody");
+            let minimum = gap_eql_ip
+                .source_raw_object_fields(GAP_EQL, "\u{b}")
+                .expect("partial original custody");
+            let full_raw = &gap_eql_raw.objects[&ep_raw_model::ObjectType(GAP_EQL.into())]
+                [&ep_raw_model::ObjectName("\u{a0}".into())]
+                .fields;
+            let min_raw = &gap_eql_raw.objects[&ep_raw_model::ObjectType(GAP_EQL.into())]
+                [&ep_raw_model::ObjectName("\u{b}".into())]
+                .fields;
+            assert!(
+                matches!(min_raw.get(&ep_raw_model::FieldName("thickness".into())),Some(ep_raw_model::RawValue::Number(token)) if token == "18446744073709551615")
+                    && matches!(minimum.get("thickness"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(minimum.get("specific_heat_ratio"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(
+                        ep_model::classify_source_json_number("18446744073709551615"),
+                        Ok(ep_model::SourceJsonNumber::Integer(-1))
+                    )
+                    && matches!(original.get("conductivity_coefficient_b"),Some(S::Number(token)) if token == "-0.0")
+                    && matches!(original.get("conductivity_coefficient_c"),Some(S::Number(token)) if token == "-0")
+                    && matches!(ep_model::classify_source_json_number("-0.0"),Ok(ep_model::SourceJsonNumber::Float(v)) if v.to_bits() == (-0.0_f64).to_bits())
+                    && matches!(
+                        ep_model::classify_source_json_number("-0"),
+                        Ok(ep_model::SourceJsonNumber::Integer(0))
+                    )
+                    && full_raw.iter().all(|(field, value)| match value {
+                        ep_raw_model::RawValue::Number(token) =>
+                            matches!(original.get(&field.0),Some(S::Number(got)) if got == token),
+                        ep_raw_model::RawValue::String(text) =>
+                            matches!(original.get(&field.0),Some(S::String(got)) if got == text),
+                        _ => true,
+                    })
+                    && matches!(original.get("name"), Some(S::Bool(false)))
+                    && matches!(original.get("idf_order"),Some(S::Number(token)) if token == "18446744073709551615")
+                    && matches!(original.get("idf_max_fields"), Some(S::Object(_)))
+                    && matches!(original.get("idf_max_extensible_fields"), Some(S::Null))
+                    && matches!(original.get("extra_string"),Some(S::String(v)) if v == "unconsumed")
+                    && matches!(original.get("metadata"),Some(S::Object(fields)) if matches!(fields.get("retained"),Some(S::Array(rows)) if rows.len() == 5))
+            );
+            let projection =
+                crate::ordinary_material_input::resolve_source(&gap_eql_raw, &gap_eql_ip)
+                    .expect("real GapEQL Source projection");
+            let full = projection
+                .window_gap_equivalent_layer
+                .iter()
+                .find(|row| row.object_name == "\u{a0}")
+                .expect("full projection");
+            let minimum_projection = projection
+                .window_gap_equivalent_layer
+                .iter()
+                .find(|row| row.object_name == "\u{b}")
+                .expect("partial projection");
+            let numeric_fields = [
+                "thickness",
+                "conductivity_coefficient_a",
+                "conductivity_coefficient_b",
+                "conductivity_coefficient_c",
+                "viscosity_coefficient_a",
+                "viscosity_coefficient_b",
+                "viscosity_coefficient_c",
+                "specific_heat_coefficient_a",
+                "specific_heat_coefficient_b",
+                "specific_heat_coefficient_c",
+                "molecular_weight",
+                "specific_heat_ratio",
+            ];
+            let mut wrong_count = gap_eql_raw.clone();
+            wrong_count
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(GAP_EQL.into()))
+                .expect("family")
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()));
+            let mut wrong_name = gap_eql_raw.clone();
+            let wrong_rows = wrong_name
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(GAP_EQL.into()))
+                .expect("family");
+            let row = wrong_rows
+                .remove(&ep_raw_model::ObjectName("\u{b}".into()))
+                .expect("same row");
+            wrong_rows.insert(
+                ep_raw_model::ObjectName("WRONG GAP EQL IP NAME".into()),
+                row,
+            );
+            assert!(projection.source_is_epjson && projection.window_gap_equivalent_layer.len() == 2 && full.fields.len() == 14 && minimum_projection.fields.len() == 8
+                && crate::ordinary_material_input::resolve_source(&wrong_count,&gap_eql_ip).is_err() && crate::ordinary_material_input::resolve_source(&wrong_name,&gap_eql_ip).is_err()
+                && projection.window_gap_equivalent_layer.iter().all(|row|row.idf_max_fields.is_none() && row.fields.keys().all(|f|crate::ordinary_equipment_input::source_b_gap_equivalent_layer_known_field(f)))
+                && numeric_fields.iter().zip([0.125_f64,0.25,-0.0,0.0,0.125,-0.25,0.0625,2.0,-0.5,0.25,200.0,18446744073709551616.0])
+                    .all(|(field,expected)|matches!(full.fields.get(*field),Some(P::Number(actual)) if actual.to_bits() == expected.to_bits()))
+                && matches!(minimum_projection.fields.get("thickness"),Some(P::Number(value)) if value.to_bits() == (-1.0_f64).to_bits())
+                && matches!(minimum_projection.fields.get("specific_heat_ratio"),Some(P::Number(value)) if value.to_bits() == (-1.0_f64).to_bits())
+                && matches!(full.fields.get("gas_type"),Some(P::String(s)) if s == "CUSTOM") && matches!(full.fields.get("gap_vent_type"),Some(P::String(s)) if s == "VentedOutdoor")
+                && gap_eql_model.materials.iter().find(|r|r.id == gap_eql_a).expect("same advisory A").as_window_gap_equivalent_layer().is_some_and(|r|
+                    r.thickness_m.to_bits() == 18446744073709551616.0_f64.to_bits() && r.properties.specific_heat_ratio.to_bits() == 18446744073709551616.0_f64.to_bits())
+                && ["","\n"," \t\r\u{c}"].iter().all(|name| {
+                    let mut value = gap_eql_value.clone();let row = value[GAP_EQL].as_object_mut().expect("family").remove("\u{b}").expect("row");
+                    value[GAP_EQL].as_object_mut().expect("family").insert((*name).into(),row);
+                    crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&value.to_string()).expect("bad Raw name"))
+                        .is_err_and(|error|error.contains("Source GapEQL requires original RE2 material name"))
+                }));
+            let mut gap_eql_trace = inspect_porting_scope(
+                &gap_eql_raw,
+                &gap_eql_compiled.report,
+                Some(gap_eql_model),
+                PortingScope::B,
+            );
+            assert!(gap_eql_trace.admissible, "{:?}", gap_eql_trace.violations);
+            gap_eql_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    gap_eql_model,
+                    &weather,
+                    "same GapEQL Source weather",
+                )
+                .expect("actual Source environment"),
+            );
+            let gap_eql_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &gap_eql_raw,
+                &gap_eql_trace,
+            )
+            .expect("validated Source GAP_EQL scope");
+            let mut permuted_gap_eql_model = gap_eql_model.clone();
+            let gap_eql_a_position = gap_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == gap_eql_a)
+                .expect("A arena row");
+            let gap_eql_b_position = gap_eql_model
+                .materials
+                .iter()
+                .position(|row| row.id == gap_eql_b)
+                .expect("B arena row");
+            permuted_gap_eql_model
+                .materials
+                .swap(gap_eql_a_position, gap_eql_b_position);
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &gap_eql_raw,
+                    &gap_eql_compiled.report,
+                    Some(gap_eql_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&gap_eql_admission)
+                )
+                .allows_rust_runtime()
+                    && crate::support::assess_support_with_source_admission(
+                        &gap_eql_raw,
+                        &gap_eql_compiled.report,
+                        Some(&permuted_gap_eql_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&gap_eql_admission)
+                    )
+                    .allows_rust_runtime()
+            );
+            let gap_eql_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                r#"{"Zone":{"Zone":{}},"WindowMaterial:Gap:EquivalentLayer":{"IDF GAP EQL":{"gas_type":"AIR","thickness":0.125,"gap_vent_type":"Sealed"}}}"#,
+                "Zone,Zone;WindowMaterial:Gap:EquivalentLayer,IDF GAP EQL,AIR,0.125,Sealed;",
+            ).expect("matched Zone+GapEQL IDF four material operands");
+            let gap_eql_idf_compiled = ep_compiler::compile_raw_model(&gap_eql_idf);
+            let source_a_base =
+                ep_raw_model::parse_epjson_str_for_source(&input(PortingScope::A).to_string())
+                    .expect("valid SourceA control");
+            let mut a_with_gap = source_a_base.clone();
+            a_with_gap.objects.insert(
+                ep_raw_model::ObjectType(GAP_EQL.into()),
+                gap_eql_raw
+                    .objects
+                    .get(&ep_raw_model::ObjectType(GAP_EQL.into()))
+                    .expect("same Gap family only")
+                    .clone(),
+            );
+            let mut controlled = gap_eql_value.clone();
+            controlled["WindowShadingControl"] = json!({"GAP CONTROL":{"shading_type":"ExteriorShade","shading_device_material_name":"\u{b}"}});
+            let mut active = gap_eql_value.clone();
+            active["Construction:WindowEquivalentLayer"] =
+                json!({"ACTIVE GAP EQL":{"outside_layer":"\u{b}"}});
+            let mut ems = gap_eql_value.clone();
+            ems["EnergyManagementSystem:ConstructionIndexVariable"] =
+                json!({"HELD_GAP_EMS":{"construction_object_name":"Opaque"}});
+            assert!(!crate::support::assess_support_with_source_admission(&gap_eql_raw,&gap_eql_compiled.report,Some(gap_eql_model),RunMode::Compatibility,PartialRunPolicy::Deny,RunOutputFormat::RustNative,TraceLevel::Normal,None).allows_rust_runtime()
+                && crate::ordinary_equipment_input::resolve_source_a(&source_a_base).is_ok()
+                && crate::ordinary_equipment_input::resolve_source_a(&a_with_gap).is_err_and(|e|e == "ordinary equipment excludes positive family WindowMaterial:Gap:EquivalentLayer")
+                && crate::ordinary_equipment_input::resolve(&gap_eql_raw).is_err()
+                && !gap_eql_idf.is_epjson() && !gap_eql_idf_compiled.has_errors()
+                && gap_eql_idf_compiled.model.as_ref().is_some_and(|model|model.materials.len() == 1 && model.materials[0].kind() == ep_model::MaterialKind::WindowGapEquivalentLayer)
+                && crate::ordinary_equipment_input::resolve_source_b(&gap_eql_idf).is_err_and(|e|e == "Source unused GapEQL requires direct epJSON")
+                && crate::ordinary_equipment_input::resolve_source_a(&gap_eql_idf).is_err()
+                && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&controlled.to_string()).expect("control Raw")).is_err()
+                && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&active.to_string()).expect("active Raw")).is_err()
+                && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&ems.to_string()).expect("EMS Raw")).is_err());
+            for (field, kind, probe) in [
+                ("thickness", "kind", 0_usize),
+                ("thickness", "kind", 1_usize),
+                ("thickness", "kind", 2_usize),
+                ("thickness", "kind", 3_usize),
+                ("thickness", "kind", 4_usize),
+                ("conductivity_coefficient_a", "kind", 0_usize),
+                ("conductivity_coefficient_a", "kind", 1_usize),
+                ("conductivity_coefficient_a", "kind", 2_usize),
+                ("conductivity_coefficient_a", "kind", 3_usize),
+                ("conductivity_coefficient_a", "kind", 4_usize),
+                ("conductivity_coefficient_b", "kind", 0_usize),
+                ("conductivity_coefficient_b", "kind", 1_usize),
+                ("conductivity_coefficient_b", "kind", 2_usize),
+                ("conductivity_coefficient_b", "kind", 3_usize),
+                ("conductivity_coefficient_b", "kind", 4_usize),
+                ("conductivity_coefficient_c", "kind", 0_usize),
+                ("conductivity_coefficient_c", "kind", 1_usize),
+                ("conductivity_coefficient_c", "kind", 2_usize),
+                ("conductivity_coefficient_c", "kind", 3_usize),
+                ("conductivity_coefficient_c", "kind", 4_usize),
+                ("viscosity_coefficient_a", "kind", 0_usize),
+                ("viscosity_coefficient_a", "kind", 1_usize),
+                ("viscosity_coefficient_a", "kind", 2_usize),
+                ("viscosity_coefficient_a", "kind", 3_usize),
+                ("viscosity_coefficient_a", "kind", 4_usize),
+                ("viscosity_coefficient_b", "kind", 0_usize),
+                ("viscosity_coefficient_b", "kind", 1_usize),
+                ("viscosity_coefficient_b", "kind", 2_usize),
+                ("viscosity_coefficient_b", "kind", 3_usize),
+                ("viscosity_coefficient_b", "kind", 4_usize),
+                ("viscosity_coefficient_c", "kind", 0_usize),
+                ("viscosity_coefficient_c", "kind", 1_usize),
+                ("viscosity_coefficient_c", "kind", 2_usize),
+                ("viscosity_coefficient_c", "kind", 3_usize),
+                ("viscosity_coefficient_c", "kind", 4_usize),
+                ("specific_heat_coefficient_a", "kind", 0_usize),
+                ("specific_heat_coefficient_a", "kind", 1_usize),
+                ("specific_heat_coefficient_a", "kind", 2_usize),
+                ("specific_heat_coefficient_a", "kind", 3_usize),
+                ("specific_heat_coefficient_a", "kind", 4_usize),
+                ("specific_heat_coefficient_b", "kind", 0_usize),
+                ("specific_heat_coefficient_b", "kind", 1_usize),
+                ("specific_heat_coefficient_b", "kind", 2_usize),
+                ("specific_heat_coefficient_b", "kind", 3_usize),
+                ("specific_heat_coefficient_b", "kind", 4_usize),
+                ("specific_heat_coefficient_c", "kind", 0_usize),
+                ("specific_heat_coefficient_c", "kind", 1_usize),
+                ("specific_heat_coefficient_c", "kind", 2_usize),
+                ("specific_heat_coefficient_c", "kind", 3_usize),
+                ("specific_heat_coefficient_c", "kind", 4_usize),
+                ("molecular_weight", "kind", 0_usize),
+                ("molecular_weight", "kind", 1_usize),
+                ("molecular_weight", "kind", 2_usize),
+                ("molecular_weight", "kind", 3_usize),
+                ("molecular_weight", "kind", 4_usize),
+                ("specific_heat_ratio", "kind", 0_usize),
+                ("specific_heat_ratio", "kind", 1_usize),
+                ("specific_heat_ratio", "kind", 2_usize),
+                ("specific_heat_ratio", "kind", 3_usize),
+                ("specific_heat_ratio", "kind", 4_usize),
+                ("gas_type", "alpha_kind", 0_usize),
+                ("gas_type", "alpha_kind", 1_usize),
+                ("gas_type", "alpha_kind", 2_usize),
+                ("gas_type", "alpha_kind", 3_usize),
+                ("gas_type", "alpha_kind", 4_usize),
+                ("gap_vent_type", "alpha_kind", 0_usize),
+                ("gap_vent_type", "alpha_kind", 1_usize),
+                ("gap_vent_type", "alpha_kind", 2_usize),
+                ("gap_vent_type", "alpha_kind", 3_usize),
+                ("gap_vent_type", "alpha_kind", 4_usize),
+                ("gas_type", "missing", 0_usize),
+                ("thickness", "missing", 0_usize),
+                ("gap_vent_type", "missing", 0_usize),
+                ("thickness", "positive", 0_usize),
+                ("thickness", "positive", 1_usize),
+                ("thickness", "positive", 2_usize),
+                ("viscosity_coefficient_a", "positive", 0_usize),
+                ("viscosity_coefficient_a", "positive", 1_usize),
+                ("viscosity_coefficient_a", "positive", 2_usize),
+                ("specific_heat_coefficient_a", "positive", 0_usize),
+                ("specific_heat_coefficient_a", "positive", 1_usize),
+                ("specific_heat_coefficient_a", "positive", 2_usize),
+                ("specific_heat_ratio", "ratio", 0_usize),
+                ("specific_heat_ratio", "ratio", 1_usize),
+                ("specific_heat_ratio", "ratio", 2_usize),
+                ("molecular_weight", "weight", 0_usize),
+                ("molecular_weight", "weight", 1_usize),
+                ("thickness", "auto", 0_usize),
+                ("thickness", "auto", 1_usize),
+                ("thickness", "auto", 2_usize),
+                ("conductivity_coefficient_a", "auto", 0_usize),
+                ("conductivity_coefficient_a", "auto", 1_usize),
+                ("conductivity_coefficient_a", "auto", 2_usize),
+                ("conductivity_coefficient_b", "auto", 0_usize),
+                ("conductivity_coefficient_b", "auto", 1_usize),
+                ("conductivity_coefficient_b", "auto", 2_usize),
+                ("conductivity_coefficient_c", "auto", 0_usize),
+                ("conductivity_coefficient_c", "auto", 1_usize),
+                ("conductivity_coefficient_c", "auto", 2_usize),
+                ("viscosity_coefficient_a", "auto", 0_usize),
+                ("viscosity_coefficient_a", "auto", 1_usize),
+                ("viscosity_coefficient_a", "auto", 2_usize),
+                ("viscosity_coefficient_b", "auto", 0_usize),
+                ("viscosity_coefficient_b", "auto", 1_usize),
+                ("viscosity_coefficient_b", "auto", 2_usize),
+                ("viscosity_coefficient_c", "auto", 0_usize),
+                ("viscosity_coefficient_c", "auto", 1_usize),
+                ("viscosity_coefficient_c", "auto", 2_usize),
+                ("specific_heat_coefficient_a", "auto", 0_usize),
+                ("specific_heat_coefficient_a", "auto", 1_usize),
+                ("specific_heat_coefficient_a", "auto", 2_usize),
+                ("specific_heat_coefficient_b", "auto", 0_usize),
+                ("specific_heat_coefficient_b", "auto", 1_usize),
+                ("specific_heat_coefficient_b", "auto", 2_usize),
+                ("specific_heat_coefficient_c", "auto", 0_usize),
+                ("specific_heat_coefficient_c", "auto", 1_usize),
+                ("specific_heat_coefficient_c", "auto", 2_usize),
+                ("molecular_weight", "auto", 0_usize),
+                ("molecular_weight", "auto", 1_usize),
+                ("molecular_weight", "auto", 2_usize),
+                ("specific_heat_ratio", "auto", 0_usize),
+                ("specific_heat_ratio", "auto", 1_usize),
+                ("specific_heat_ratio", "auto", 2_usize),
+                ("gas_type", "enum", 0_usize),
+                ("gas_type", "enum", 1_usize),
+                ("gas_type", "enum", 2_usize),
+                ("gas_type", "enum", 3_usize),
+                ("gas_type", "enum", 4_usize),
+                ("gap_vent_type", "enum", 0_usize),
+                ("gap_vent_type", "enum", 1_usize),
+                ("gap_vent_type", "enum", 2_usize),
+                ("gap_vent_type", "enum", 3_usize),
+                ("gap_vent_type", "enum", 4_usize),
+            ] {
+                let mut value = gap_eql_value.clone();
+                match kind {
+                    "kind" | "alpha_kind" => {
+                        value[GAP_EQL]["\u{a0}"][field] = match probe {
+                            0 => json!(null),
+                            1 => json!(false),
+                            2 => {
+                                if kind == "kind" {
+                                    json!("0.125")
+                                } else {
+                                    json!(0.125)
+                                }
+                            }
+                            3 => json!([]),
+                            _ => json!({}),
+                        };
+                    }
+                    "missing" => {
+                        value[GAP_EQL]["\u{a0}"]
+                            .as_object_mut()
+                            .expect("row")
+                            .remove(field);
+                    }
+                    "positive" => {
+                        value[GAP_EQL]["\u{a0}"][field] = match probe {
+                            0 => json!(0),
+                            1 => json!(-0.0),
+                            _ => json!(-1),
+                        };
+                    }
+                    "ratio" => {
+                        value[GAP_EQL]["\u{a0}"][field] = match probe {
+                            0 => json!(1),
+                            1 => json!(0),
+                            _ => json!(-1),
+                        };
+                    }
+                    "weight" => {
+                        value[GAP_EQL]["\u{a0}"][field] = if probe == 0 {
+                            json!(19.999)
+                        } else {
+                            json!(200.001)
+                        };
+                    }
+                    "auto" => {
+                        value[GAP_EQL]["\u{a0}"][field] = json!(match probe {
+                            0 => "Autocalculate",
+                            1 => "Autosize",
+                            _ => "",
+                        });
+                    }
+                    _ => {
+                        value[GAP_EQL]["\u{a0}"][field] = json!(if field == "gas_type" {
+                            match probe {
+                                0 => "air",
+                                1 => "Air",
+                                2 => "",
+                                3 => " ",
+                                _ => "STEAM",
+                            }
+                        } else {
+                            match probe {
+                                0 => "sealed",
+                                1 => "VENTEDINDOOR",
+                                2 => "",
+                                3 => " ",
+                                _ => "UnknownVent",
+                            }
+                        });
+                    }
+                }
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&value.to_string())
+                            .expect("original-invalid GapEQL Raw")
+                    )
+                    .is_err_and(|e| e.contains("Source GapEQL requires")),
+                    "GapEQL original {field}/{kind}/{probe}"
+                );
+            }
+            let opaque_gap_eql = gap_eql_model
+                .materials
+                .iter()
+                .find(|row| row.kind() != ep_model::MaterialKind::WindowGapEquivalentLayer)
+                .expect("held opaque material");
+            for case in 0_usize..12 {
+                let mut bad_model = gap_eql_model.clone();
+                match case {
+                    0 => bad_model.materials.retain(|row| {
+                        row.kind() != ep_model::MaterialKind::WindowGapEquivalentLayer
+                    }),
+                    1 => {
+                        let mut extra = bad_model.materials[gap_eql_a_position].clone();
+                        extra.id = ep_model::MaterialId(u32::MAX);
+                        extra.name = ep_model::NormalizedName("EXTRA GAP EQL".into());
+                        bad_model.materials.push(extra);
+                    }
+                    2 => bad_model.materials[gap_eql_a_position].id = opaque_gap_eql.id,
+                    3 => {
+                        bad_model.materials[gap_eql_a_position].definition =
+                            opaque_gap_eql.definition
+                    }
+                    4 => {
+                        bad_model.materials[gap_eql_a_position].name =
+                            ep_model::NormalizedName("WRONG GAP EQL".into())
+                    }
+                    5 => {
+                        bad_model.materials[gap_eql_a_position].id = ep_model::MaterialId(u32::MAX)
+                    }
+                    6 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != gap_eql_a),
+                    7 => bad_model
+                        .ctf_report_names
+                        .materials
+                        .push((gap_eql_a, "\u{b}".into())),
+                    8 => {
+                        let _ = bad_model
+                            .material_names
+                            .insert(" EXTRA GAP_EQL ALIAS ", gap_eql_a);
+                    }
+                    9 => {
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == gap_eql_a)
+                            .expect("A report tuple")
+                            .1 = "\u{a0}".into();
+                        bad_model
+                            .ctf_report_names
+                            .materials
+                            .iter_mut()
+                            .find(|(id, _)| *id == gap_eql_b)
+                            .expect("B report tuple")
+                            .1 = "\u{b}".into();
+                    }
+                    10 => {
+                        bad_model.material_names = ep_model::NameMap::default();
+                        bad_model.materials.iter().for_each(|row| {
+                            let _ = bad_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                    _ => {
+                        bad_model.material_names = ep_model::NameMap::source_exact_namespace();
+                        bad_model.materials.iter().for_each(|row| {
+                            let id = if row.id == gap_eql_a {
+                                gap_eql_b
+                            } else if row.id == gap_eql_b {
+                                gap_eql_a
+                            } else {
+                                row.id
+                            };
+                            let _ = bad_model.material_names.insert(&row.name.0, id);
+                        });
+                    }
+                }
+                assert!(
+                    !crate::support::assess_support_with_source_admission(
+                        &gap_eql_raw,
+                        &gap_eql_compiled.report,
+                        Some(&bad_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&gap_eql_admission)
+                    )
+                    .allows_rust_runtime(),
+                    "GapEQL custody case {case}"
+                );
+            }
+            let gap_eql_construction = gap_eql_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("real opaque Construction");
+            for case in 0_usize..11 {
+                let mut used_value = gap_eql_value.clone();
+                let mut fields =
+                    serde_json::Map::from_iter([("outside_layer".into(), json!("Opaque"))]);
+                let key = if case == 0 || case == 10 {
+                    "outside_layer".into()
+                } else {
+                    format!("layer_{}", case + 1)
+                };
+                fields.insert(
+                    key,
+                    json!(if case.is_multiple_of(2) {
+                        "\u{b}"
+                    } else {
+                        "\u{a0}"
+                    }),
+                );
+                used_value["Construction"]["GAP_EQL USED"] = serde_json::Value::Object(fields);
+                assert!(
+                    crate::ordinary_equipment_input::resolve_source_b(
+                        &ep_raw_model::parse_epjson_str_for_source(&used_value.to_string())
+                            .expect("original active GAP_EQL layer")
+                    )
+                    .is_err_and(|error| error.contains(
+                        "Source unused GapEQL excludes every Construction layer reference"
+                    )),
+                    "Raw GAP_EQL layer {case}"
+                );
+                let mut used_model = gap_eql_model.clone();
+                let construction = &mut used_model.constructions[gap_eql_construction];
+                if case == 10 {
+                    construction.layers.clear();
+                    construction.outside_layer = Some(gap_eql_a);
+                } else {
+                    construction.layers.resize(case + 1, opaque_gap_eql.id);
+                    construction.layers[case] = if case.is_multiple_of(2) {
+                        gap_eql_a
+                    } else {
+                        gap_eql_b
+                    };
+                }
+                let used_assessment = crate::support::assess_support_with_source_admission(
+                    &gap_eql_raw,
+                    &gap_eql_compiled.report,
+                    Some(&used_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&gap_eql_admission),
+                );
+                assert!(
+                    !used_assessment.allows_rust_runtime()
+                        && used_assessment
+                            .unsupported_objects
+                            .iter()
+                            .any(|entry| entry.object_type == GAP_EQL),
+                    "typed/effective GAP_EQL layer {case}"
+                );
+            }
+        }
     }
 }
 

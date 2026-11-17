@@ -442,17 +442,39 @@ pub(super) fn assess_typed_runtime_boundaries(
                 .count(),
         );
     }
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Gap:EquivalentLayer",
-        typed_model
-            .materials
+    let gap_equivalent_layer_count = typed_model
+        .materials
+        .iter()
+        .filter(|material| material.kind() == MaterialKind::WindowGapEquivalentLayer)
+        .count();
+    let gap_equivalent_layer_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType(
+            "WindowMaterial:Gap:EquivalentLayer".into(),
+        ))
+        .map_or(0, |rows| rows.len());
+    let gap_equivalent_layer_consumed = source_admission
+        .is_some_and(|admission| admission.consumes_unused_gap_equivalent_layer(typed_model));
+    let gap_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .layers
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowGapEquivalentLayer)
-            .count(),
-    );
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::WindowGapEquivalentLayer
+                })
+            })
+    });
+    if !gap_equivalent_layer_consumed || gap_equivalent_layer_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Gap:EquivalentLayer",
+            gap_equivalent_layer_count.max(gap_equivalent_layer_raw_count),
+        );
+    }
     let mixture_used = typed_model.constructions.iter().any(|construction| {
         construction.effective_layers().iter().any(|id| {
             typed_model.materials.iter().any(|material| {

@@ -170,6 +170,614 @@ fn equivalent_layer_standard_gaps_use_v261_constants_and_preserve_vent_types()
         );
     }
 
+    // GapEQL Source qualifier and original-schema boundary; no runtime or gas-state seed.
+    {
+        use ep_raw_model::{FieldName, ObjectName, ObjectType, RawValue};
+        const GAP_EQL: &str = "WindowMaterial:Gap:EquivalentLayer";
+        let full_text = r#"{"WindowMaterial:Gap:EquivalentLayer":{" FULL GAP EQL ":{
+            "gas_type":"CUSTOM","thickness":5662.75,"gap_vent_type":"VentedOutdoor",
+            "conductivity_coefficient_a":0.25,"conductivity_coefficient_b":0.125,"conductivity_coefficient_c":0.0625,
+            "viscosity_coefficient_a":0.125,"viscosity_coefficient_b":-0.25,"viscosity_coefficient_c":0.0625,
+            "specific_heat_coefficient_a":2.0,"specific_heat_coefficient_b":-0.5,"specific_heat_coefficient_c":0.25,
+            "molecular_weight":200.0,"specific_heat_ratio":2.0,
+            "name":false,"idf_order":[],"idf_max_fields":null,"metadata":{"held":[null,true,1,"text",[],{}]}
+        }}}"#;
+        let full_raw = ep_raw_model::parse_epjson_str_for_source(full_text)?;
+        let source = super::super::compile_raw_model_for_source(&full_raw);
+        let source_model = source.model.as_ref().expect("full Source GapEQL carrier");
+        let full = source_model.materials[0]
+            .as_window_gap_equivalent_layer()
+            .expect("actual GapEQL typed carrier");
+        assert!(
+            !source.has_errors()
+                && source_model.material_names.is_source_exact_namespace()
+                && source_model.materials.len() == 1
+                && source_model.materials[0].id == MaterialId(0)
+                && source_model.materials[0].name.0 == " FULL GAP EQL "
+                && source_model.material_names.resolve(" full gap eql ") == Some(MaterialId(0))
+                && source_model.ctf_report_names.materials
+                    == [(MaterialId(0), " FULL GAP EQL ".into())]
+                && full.gas_type == WindowGasType::Custom
+                && full.gap_vent_type == WindowGapVentType::VentedOutdoor
+                && [
+                    full.thickness_m,
+                    full.properties.conductivity.coefficient_a,
+                    full.properties.conductivity.coefficient_b,
+                    full.properties.conductivity.coefficient_c,
+                    full.properties.viscosity.coefficient_a,
+                    full.properties.viscosity.coefficient_b,
+                    full.properties.viscosity.coefficient_c,
+                    full.properties.specific_heat.coefficient_a,
+                    full.properties.specific_heat.coefficient_b,
+                    full.properties.specific_heat.coefficient_c,
+                    full.properties.molecular_weight_g_per_mol,
+                    full.properties.specific_heat_ratio
+                ] == [
+                    5662.75, 0.25, 0.125, 0.0625, 0.125, -0.25, 0.0625, 2.0, -0.5, 0.25, 200.0, 2.0
+                ]
+        );
+        let standard = [
+            (
+                "AIR",
+                WindowGasType::Air,
+                [
+                    2.873e-3, 7.760e-5, 0.0, 3.723e-6, 4.940e-8, 0.0, 1002.737, 1.2324e-2, 0.0,
+                    28.97, 1.4,
+                ],
+            ),
+            (
+                "ARGON",
+                WindowGasType::Argon,
+                [
+                    2.285e-3, 5.149e-5, 0.0, 3.379e-6, 6.451e-8, 0.0, 521.929, 0.0, 0.0, 39.948,
+                    1.67,
+                ],
+            ),
+            (
+                "KRYPTON",
+                WindowGasType::Krypton,
+                [
+                    9.443e-4, 2.826e-5, 0.0, 2.213e-6, 7.777e-8, 0.0, 248.091, 0.0, 0.0, 83.8, 1.68,
+                ],
+            ),
+            (
+                "XENON",
+                WindowGasType::Xenon,
+                [
+                    4.538e-4, 1.723e-5, 0.0, 1.069e-6, 7.414e-8, 0.0, 158.340, 0.0, 0.0, 131.3,
+                    1.66,
+                ],
+            ),
+            (
+                "CUSTOM",
+                WindowGasType::Custom,
+                [
+                    0.25, 0.125, 0.0625, 0.125, -0.25, 0.0625, 2.0, -0.5, 0.25, 200.0, 2.0,
+                ],
+            ),
+        ];
+        assert!(standard.iter().all(|(gas, kind, expected)| {
+            ["Sealed", "VentedIndoor", "VentedOutdoor"]
+                .iter()
+                .all(|vent| {
+                    let mut raw = full_raw.clone();
+                    let fields = &mut raw
+                        .objects
+                        .get_mut(&ObjectType(GAP_EQL.into()))
+                        .expect("family")
+                        .get_mut(&ObjectName(" FULL GAP EQL ".into()))
+                        .expect("full GapEQL object")
+                        .fields;
+                    fields.insert(
+                        FieldName("gas_type".into()),
+                        RawValue::String((*gas).into()),
+                    );
+                    fields.insert(
+                        FieldName("gap_vent_type".into()),
+                        RawValue::String((*vent).into()),
+                    );
+                    let result = super::super::compile_raw_model_for_source(&raw);
+                    !result.has_errors()
+                        && result.model.as_ref().is_some_and(|model| {
+                            model.material_names.is_source_exact_namespace()
+                                && model.materials[0]
+                                    .as_window_gap_equivalent_layer()
+                                    .is_some_and(|row| {
+                                        row.gas_type == *kind
+                                            && row.gap_vent_type.energyplus_name() == *vent
+                                            && row.thickness_m == 5662.75
+                                            && [
+                                                row.properties.conductivity.coefficient_a,
+                                                row.properties.conductivity.coefficient_b,
+                                                row.properties.conductivity.coefficient_c,
+                                                row.properties.viscosity.coefficient_a,
+                                                row.properties.viscosity.coefficient_b,
+                                                row.properties.viscosity.coefficient_c,
+                                                row.properties.specific_heat.coefficient_a,
+                                                row.properties.specific_heat.coefficient_b,
+                                                row.properties.specific_heat.coefficient_c,
+                                                row.properties.molecular_weight_g_per_mol,
+                                                row.properties.specific_heat_ratio,
+                                            ] == *expected
+                                    })
+                        })
+                })
+        }));
+        let minimum_text = r#"{"WindowMaterial:Gap:EquivalentLayer":{"MIN GAP":{
+            "gas_type":"CUSTOM","thickness":0.125,"gap_vent_type":"Sealed","conductivity_coefficient_a":0.5,
+            "viscosity_coefficient_a":0.125,"specific_heat_coefficient_a":2.0,"molecular_weight":20.0
+        }}}"#;
+        let minimum_raw = ep_raw_model::parse_epjson_str_for_source(minimum_text)?;
+        let minimum_source = super::super::compile_raw_model_for_source(&minimum_raw);
+        assert!(
+            !minimum_source.has_errors()
+                && minimum_source
+                    .model
+                    .as_ref()
+                    .is_some_and(|model| model.materials[0]
+                        .as_window_gap_equivalent_layer()
+                        .is_some_and(|row| row.properties.specific_heat_ratio.to_bits() == 0
+                            && row.properties.conductivity.coefficient_b.to_bits() == 0
+                            && row.properties.viscosity.coefficient_c.to_bits() == 0))
+                && !compile_raw_model(&minimum_raw).has_errors()
+                && [
+                    "viscosity_coefficient_a",
+                    "specific_heat_coefficient_a",
+                    "molecular_weight",
+                    "ZERO_K",
+                    "NEGATIVE_K"
+                ]
+                .iter()
+                .all(|probe| {
+                    let mut raw = minimum_raw.clone();
+                    let fields = &mut raw
+                        .objects
+                        .get_mut(&ObjectType(GAP_EQL.into()))
+                        .expect("family")
+                        .get_mut(&ObjectName("MIN GAP".into()))
+                        .expect("Custom object")
+                        .fields;
+                    if *probe == "ZERO_K" {
+                        fields.insert(
+                            FieldName("conductivity_coefficient_a".into()),
+                            RawValue::Number("0.0".into()),
+                        );
+                    } else if *probe == "NEGATIVE_K" {
+                        fields.insert(
+                            FieldName("conductivity_coefficient_a".into()),
+                            RawValue::Number("-0.5".into()),
+                        );
+                    } else {
+                        fields.remove(&FieldName((*probe).into()));
+                    }
+                    let source = super::super::compile_raw_model_for_source(&raw);
+                    let legacy = compile_raw_model(&raw);
+                    !source.has_errors()
+                        && legacy.has_errors()
+                        && legacy.report.diagnostics.iter().any(|row| {
+                            row.object_type == GAP_EQL
+                                && row.code
+                                    == if matches!(*probe, "ZERO_K" | "NEGATIVE_K") {
+                                        "InvalidWindowGapEquivalentLayerConductivityAt300K"
+                                    } else {
+                                        "MissingCustomWindowGapEquivalentLayerProperty"
+                                    }
+                        })
+                        && source.model.as_ref().is_some_and(|model| {
+                            model.material_names.is_source_exact_namespace()
+                                && model.ctf_report_names.materials
+                                    == [(MaterialId(0), "MIN GAP".into())]
+                        })
+                })
+        );
+        let mut duplicate = full_raw.clone();
+        let original = duplicate
+            .objects
+            .get(&ObjectType(GAP_EQL.into()))
+            .expect("family")[&ObjectName(" FULL GAP EQL ".into())]
+            .clone();
+        duplicate
+            .objects
+            .get_mut(&ObjectType(GAP_EQL.into()))
+            .expect("family")
+            .insert(ObjectName(" full gap eql ".into()), original);
+        let duplicate = super::super::compile_raw_model_for_source(&duplicate);
+        assert!(
+            duplicate.has_errors()
+                && duplicate
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|row| row.code == "DuplicateName" && row.object_type == GAP_EQL)
+                && duplicate.model.as_ref().is_none_or(|model| model
+                    .ctf_report_names
+                    .materials
+                    .len()
+                    == 1)
+                && ["", "\n", " \t\r\u{c}"].iter().all(|name| {
+                    let mut raw = full_raw.clone();
+                    let rows = raw
+                        .objects
+                        .get_mut(&ObjectType(GAP_EQL.into()))
+                        .expect("family");
+                    let row = rows
+                        .remove(&ObjectName(" FULL GAP EQL ".into()))
+                        .expect("row");
+                    rows.insert(ObjectName((*name).into()), row);
+                    let result = super::super::compile_raw_model_for_source(&raw);
+                    result.has_errors()
+                        && result.model.as_ref().is_none_or(|model| {
+                            !model.material_names.is_source_exact_namespace()
+                                && model.ctf_report_names.materials.is_empty()
+                        })
+                })
+        );
+        let idf_raw = ep_raw_model::parse_epjson_str_with_idf_order(
+            r#"{"Zone":{"Zone":{}},"WindowMaterial:Gap:EquivalentLayer":{"IDF GAP EQL":{"gas_type":"AIR","thickness":0.125,"gap_vent_type":"Sealed"}}}"#,
+            "Zone,Zone;WindowMaterial:Gap:EquivalentLayer,IDF GAP EQL,AIR,0.125,Sealed;",
+        )?;
+        let idf_source = super::super::compile_raw_model_for_source(&idf_raw);
+        let idf_legacy = compile_raw_model(&idf_raw);
+        let mut active = full_raw.clone();
+        let construction = ep_raw_model::parse_epjson_str_for_source(
+            r#"{"Construction":{"ACTIVE GAP":{"outside_layer":" full gap eql "}}}"#,
+        )?;
+        active.objects.extend(construction.objects);
+        let active = super::super::compile_raw_model_for_source(&active);
+        assert!(
+            !idf_raw.is_epjson()
+                && !idf_source.has_errors()
+                && !idf_legacy.has_errors()
+                && idf_source.model.as_ref().is_some_and(|model| !model
+                    .material_names
+                    .is_source_exact_namespace()
+                    && model.ctf_report_names.materials.is_empty()
+                    && model.materials[0].kind() == MaterialKind::WindowGapEquivalentLayer)
+                && !compile_raw_model(&full_raw).has_errors()
+                && active.has_errors()
+                && active
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|row| row.code == "InvalidEquivalentLayerConstruction")
+        );
+        for (field, kind, probe) in [
+            ("thickness", "kind", 0_usize),
+            ("thickness", "kind", 1_usize),
+            ("thickness", "kind", 2_usize),
+            ("thickness", "kind", 3_usize),
+            ("thickness", "kind", 4_usize),
+            ("conductivity_coefficient_a", "kind", 0_usize),
+            ("conductivity_coefficient_a", "kind", 1_usize),
+            ("conductivity_coefficient_a", "kind", 2_usize),
+            ("conductivity_coefficient_a", "kind", 3_usize),
+            ("conductivity_coefficient_a", "kind", 4_usize),
+            ("conductivity_coefficient_b", "kind", 0_usize),
+            ("conductivity_coefficient_b", "kind", 1_usize),
+            ("conductivity_coefficient_b", "kind", 2_usize),
+            ("conductivity_coefficient_b", "kind", 3_usize),
+            ("conductivity_coefficient_b", "kind", 4_usize),
+            ("conductivity_coefficient_c", "kind", 0_usize),
+            ("conductivity_coefficient_c", "kind", 1_usize),
+            ("conductivity_coefficient_c", "kind", 2_usize),
+            ("conductivity_coefficient_c", "kind", 3_usize),
+            ("conductivity_coefficient_c", "kind", 4_usize),
+            ("viscosity_coefficient_a", "kind", 0_usize),
+            ("viscosity_coefficient_a", "kind", 1_usize),
+            ("viscosity_coefficient_a", "kind", 2_usize),
+            ("viscosity_coefficient_a", "kind", 3_usize),
+            ("viscosity_coefficient_a", "kind", 4_usize),
+            ("viscosity_coefficient_b", "kind", 0_usize),
+            ("viscosity_coefficient_b", "kind", 1_usize),
+            ("viscosity_coefficient_b", "kind", 2_usize),
+            ("viscosity_coefficient_b", "kind", 3_usize),
+            ("viscosity_coefficient_b", "kind", 4_usize),
+            ("viscosity_coefficient_c", "kind", 0_usize),
+            ("viscosity_coefficient_c", "kind", 1_usize),
+            ("viscosity_coefficient_c", "kind", 2_usize),
+            ("viscosity_coefficient_c", "kind", 3_usize),
+            ("viscosity_coefficient_c", "kind", 4_usize),
+            ("specific_heat_coefficient_a", "kind", 0_usize),
+            ("specific_heat_coefficient_a", "kind", 1_usize),
+            ("specific_heat_coefficient_a", "kind", 2_usize),
+            ("specific_heat_coefficient_a", "kind", 3_usize),
+            ("specific_heat_coefficient_a", "kind", 4_usize),
+            ("specific_heat_coefficient_b", "kind", 0_usize),
+            ("specific_heat_coefficient_b", "kind", 1_usize),
+            ("specific_heat_coefficient_b", "kind", 2_usize),
+            ("specific_heat_coefficient_b", "kind", 3_usize),
+            ("specific_heat_coefficient_b", "kind", 4_usize),
+            ("specific_heat_coefficient_c", "kind", 0_usize),
+            ("specific_heat_coefficient_c", "kind", 1_usize),
+            ("specific_heat_coefficient_c", "kind", 2_usize),
+            ("specific_heat_coefficient_c", "kind", 3_usize),
+            ("specific_heat_coefficient_c", "kind", 4_usize),
+            ("molecular_weight", "kind", 0_usize),
+            ("molecular_weight", "kind", 1_usize),
+            ("molecular_weight", "kind", 2_usize),
+            ("molecular_weight", "kind", 3_usize),
+            ("molecular_weight", "kind", 4_usize),
+            ("specific_heat_ratio", "kind", 0_usize),
+            ("specific_heat_ratio", "kind", 1_usize),
+            ("specific_heat_ratio", "kind", 2_usize),
+            ("specific_heat_ratio", "kind", 3_usize),
+            ("specific_heat_ratio", "kind", 4_usize),
+            ("gas_type", "alpha_kind", 0_usize),
+            ("gas_type", "alpha_kind", 1_usize),
+            ("gas_type", "alpha_kind", 2_usize),
+            ("gas_type", "alpha_kind", 3_usize),
+            ("gas_type", "alpha_kind", 4_usize),
+            ("gap_vent_type", "alpha_kind", 0_usize),
+            ("gap_vent_type", "alpha_kind", 1_usize),
+            ("gap_vent_type", "alpha_kind", 2_usize),
+            ("gap_vent_type", "alpha_kind", 3_usize),
+            ("gap_vent_type", "alpha_kind", 4_usize),
+            ("gas_type", "missing", 0_usize),
+            ("thickness", "missing", 0_usize),
+            ("gap_vent_type", "missing", 0_usize),
+            ("thickness", "positive", 0_usize),
+            ("thickness", "positive", 1_usize),
+            ("thickness", "positive", 2_usize),
+            ("viscosity_coefficient_a", "positive", 0_usize),
+            ("viscosity_coefficient_a", "positive", 1_usize),
+            ("viscosity_coefficient_a", "positive", 2_usize),
+            ("specific_heat_coefficient_a", "positive", 0_usize),
+            ("specific_heat_coefficient_a", "positive", 1_usize),
+            ("specific_heat_coefficient_a", "positive", 2_usize),
+            ("specific_heat_ratio", "ratio", 0_usize),
+            ("specific_heat_ratio", "ratio", 1_usize),
+            ("specific_heat_ratio", "ratio", 2_usize),
+            ("molecular_weight", "weight", 0_usize),
+            ("molecular_weight", "weight", 1_usize),
+            ("thickness", "auto", 0_usize),
+            ("thickness", "auto", 1_usize),
+            ("thickness", "auto", 2_usize),
+            ("conductivity_coefficient_a", "auto", 0_usize),
+            ("conductivity_coefficient_a", "auto", 1_usize),
+            ("conductivity_coefficient_a", "auto", 2_usize),
+            ("conductivity_coefficient_b", "auto", 0_usize),
+            ("conductivity_coefficient_b", "auto", 1_usize),
+            ("conductivity_coefficient_b", "auto", 2_usize),
+            ("conductivity_coefficient_c", "auto", 0_usize),
+            ("conductivity_coefficient_c", "auto", 1_usize),
+            ("conductivity_coefficient_c", "auto", 2_usize),
+            ("viscosity_coefficient_a", "auto", 0_usize),
+            ("viscosity_coefficient_a", "auto", 1_usize),
+            ("viscosity_coefficient_a", "auto", 2_usize),
+            ("viscosity_coefficient_b", "auto", 0_usize),
+            ("viscosity_coefficient_b", "auto", 1_usize),
+            ("viscosity_coefficient_b", "auto", 2_usize),
+            ("viscosity_coefficient_c", "auto", 0_usize),
+            ("viscosity_coefficient_c", "auto", 1_usize),
+            ("viscosity_coefficient_c", "auto", 2_usize),
+            ("specific_heat_coefficient_a", "auto", 0_usize),
+            ("specific_heat_coefficient_a", "auto", 1_usize),
+            ("specific_heat_coefficient_a", "auto", 2_usize),
+            ("specific_heat_coefficient_b", "auto", 0_usize),
+            ("specific_heat_coefficient_b", "auto", 1_usize),
+            ("specific_heat_coefficient_b", "auto", 2_usize),
+            ("specific_heat_coefficient_c", "auto", 0_usize),
+            ("specific_heat_coefficient_c", "auto", 1_usize),
+            ("specific_heat_coefficient_c", "auto", 2_usize),
+            ("molecular_weight", "auto", 0_usize),
+            ("molecular_weight", "auto", 1_usize),
+            ("molecular_weight", "auto", 2_usize),
+            ("specific_heat_ratio", "auto", 0_usize),
+            ("specific_heat_ratio", "auto", 1_usize),
+            ("specific_heat_ratio", "auto", 2_usize),
+            ("gas_type", "enum", 0_usize),
+            ("gas_type", "enum", 1_usize),
+            ("gas_type", "enum", 2_usize),
+            ("gas_type", "enum", 3_usize),
+            ("gas_type", "enum", 4_usize),
+            ("gap_vent_type", "enum", 0_usize),
+            ("gap_vent_type", "enum", 1_usize),
+            ("gap_vent_type", "enum", 2_usize),
+            ("gap_vent_type", "enum", 3_usize),
+            ("gap_vent_type", "enum", 4_usize),
+            ("", "name", 0_usize),
+            ("", "name", 1_usize),
+            ("", "name", 2_usize),
+            ("", "name", 3_usize),
+            ("thickness", "wire", 0_usize),
+            ("thickness", "wire", 1_usize),
+            ("thickness", "wire", 2_usize),
+            ("thickness", "wire", 3_usize),
+        ] {
+            let mut raw = full_raw.clone();
+            let rows = raw
+                .objects
+                .get_mut(&ObjectType(GAP_EQL.into()))
+                .expect("family");
+            let name = if kind == "name" {
+                match probe {
+                    0 => "\u{b}",
+                    1 => "\u{a0}",
+                    2 => " odd Gap Eql ",
+                    _ => "\t\u{b}\u{a0}",
+                }
+            } else {
+                " FULL GAP EQL "
+            };
+            if kind == "name" {
+                let row = rows
+                    .remove(&ObjectName(" FULL GAP EQL ".into()))
+                    .expect("row");
+                rows.insert(ObjectName(name.into()), row);
+            }
+            let object = rows
+                .get_mut(&ObjectName(name.into()))
+                .expect("selected row");
+            match kind {
+                "kind" | "alpha_kind" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        match probe {
+                            0 => RawValue::Null,
+                            1 => RawValue::Bool(false),
+                            2 => {
+                                if kind == "kind" {
+                                    RawValue::String("0.125".into())
+                                } else {
+                                    RawValue::Number("0.125".into())
+                                }
+                            }
+                            3 => RawValue::Array(Vec::new()),
+                            _ => RawValue::Object(Default::default()),
+                        },
+                    );
+                }
+                "missing" => {
+                    object.fields.remove(&FieldName(field.into()));
+                }
+                "positive" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            match probe {
+                                0 => "0",
+                                1 => "-0.0",
+                                _ => "-1",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "ratio" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            match probe {
+                                0 => "1",
+                                1 => "0",
+                                _ => "-1",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "weight" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(if probe == 0 { "19.999" } else { "200.001" }.into()),
+                    );
+                }
+                "auto" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::String(
+                            match probe {
+                                0 => "Autocalculate",
+                                1 => "Autosize",
+                                _ => "",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "enum" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::String(
+                            if field == "gas_type" {
+                                match probe {
+                                    0 => "air",
+                                    1 => "Air",
+                                    2 => "",
+                                    3 => " ",
+                                    _ => "STEAM",
+                                }
+                            } else {
+                                match probe {
+                                    0 => "sealed",
+                                    1 => "VENTEDINDOOR",
+                                    2 => "",
+                                    3 => " ",
+                                    _ => "UnknownVent",
+                                }
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                "wire" => {
+                    object.fields.insert(
+                        FieldName(field.into()),
+                        RawValue::Number(
+                            match probe {
+                                0 => "18446744073709551615",
+                                1 => "9223372036854775808",
+                                2 => "18446744073709551616",
+                                _ => "1.8446744073709552e19",
+                            }
+                            .into(),
+                        ),
+                    );
+                }
+                _ => {}
+            }
+            let source = super::super::compile_raw_model_for_source(&raw);
+            if kind == "name" {
+                let model = source.model.as_ref().expect("standalone SourceExact row");
+                let expected = name.to_ascii_uppercase();
+                assert!(
+                    !source.has_errors()
+                        && model.material_names.is_source_exact_namespace()
+                        && model.materials.len() == 1
+                        && model.materials[0].id == MaterialId(0)
+                        && model.materials[0].name.0 == expected
+                        && model.material_names.resolve(name) == Some(MaterialId(0))
+                        && model.material_names.len() == 1
+                        && model.material_names.names()
+                            == [ep_model::NormalizedName(expected.clone())]
+                        && model.ctf_report_names.materials == [(MaterialId(0), expected)],
+                    "standalone GapEQL SourceExact {probe}"
+                );
+            } else if kind == "wire" {
+                let model = source.model.as_ref().expect("original-positive thickness");
+                let row = model.materials[0]
+                    .as_window_gap_equivalent_layer()
+                    .expect("advisory thickness");
+                let original_expected = if probe == 1 {
+                    9223372036854775808.0_f64
+                } else {
+                    18446744073709551616.0_f64
+                };
+                assert!(
+                    !source.has_errors()
+                        && model.material_names.is_source_exact_namespace()
+                        && row.thickness_m.to_bits() == original_expected.to_bits()
+                        && row.thickness_m > 0.0
+                        && match (
+                            probe,
+                            ep_model::classify_source_json_number(match probe {
+                                0 => "18446744073709551615",
+                                1 => "9223372036854775808",
+                                2 => "18446744073709551616",
+                                _ => "1.8446744073709552e19",
+                            })
+                        ) {
+                            (0, Ok(ep_model::SourceJsonNumber::Integer(-1)))
+                            | (1, Ok(ep_model::SourceJsonNumber::Integer(i64::MIN))) => true,
+                            (2 | 3, Ok(ep_model::SourceJsonNumber::Float(value))) =>
+                                value.to_bits() == 18446744073709551616.0_f64.to_bits(),
+                            _ => false,
+                        },
+                    "original/advisory/effective GapEQL thickness {probe}"
+                );
+            } else {
+                assert!(
+                    source
+                        .model
+                        .as_ref()
+                        .is_none_or(|model| !model.material_names.is_source_exact_namespace()
+                            && model.ctf_report_names.materials.is_empty())
+                        && source.has_errors(),
+                    "original GapEQL schema {kind}/{field}/{probe}"
+                );
+            }
+        }
+    }
     Ok(())
 }
 

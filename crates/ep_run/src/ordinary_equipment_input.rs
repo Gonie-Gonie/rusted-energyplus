@@ -556,6 +556,11 @@ pub(crate) use window_glazing_equivalent_layer::{
     known_field as source_b_glazing_equivalent_layer_known_field,
     validate as source_b_validate_unused_glazing_equivalent_layer,
 };
+mod window_gap_equivalent_layer;
+pub(crate) use window_gap_equivalent_layer::{
+    known_field as source_b_gap_equivalent_layer_known_field,
+    validate as source_b_validate_unused_gap_equivalent_layer,
+};
 mod window_shade_equivalent_layer;
 pub(crate) use window_shade_equivalent_layer::{
     known_field as source_b_shade_equivalent_layer_known_field,
@@ -654,6 +659,7 @@ fn resolve_raw(
         window_screen_equivalent_layer::validate(raw)?;
         window_blind_equivalent_layer::validate(raw)?;
         window_glazing_equivalent_layer::validate(raw)?;
+        window_gap_equivalent_layer::validate(raw)?;
         window_screen::validate(raw)?;
         window_blind::validate(raw)?;
     }
@@ -691,6 +697,8 @@ fn resolve_raw(
             source_b_ingress && family.0 == "WindowMaterial:Blind:EquivalentLayer";
         let source_glazing_equivalent_layer_family =
             source_b_ingress && family.0 == "WindowMaterial:Glazing:EquivalentLayer";
+        let source_gap_equivalent_layer_family =
+            source_b_ingress && family.0 == "WindowMaterial:Gap:EquivalentLayer";
         let source_screen_family = source_b_ingress && family.0 == "WindowMaterial:Screen";
         let source_blind_family = source_b_ingress && family.0 == "WindowMaterial:Blind";
         let source_people_family = source_calendar_ingress && family.0 == "People";
@@ -770,6 +778,7 @@ fn resolve_raw(
             && !source_screen_equivalent_layer_family
             && !source_blind_equivalent_layer_family
             && !source_glazing_equivalent_layer_family
+            && !source_gap_equivalent_layer_family
             && !source_screen_family
             && !source_blind_family
             && !source_calendar_family
@@ -837,6 +846,7 @@ fn resolve_raw(
                 || source_screen_equivalent_layer_family
                 || source_blind_equivalent_layer_family
                 || source_glazing_equivalent_layer_family
+                || source_gap_equivalent_layer_family
                 || source_screen_family
                 || source_blind_family
             {
@@ -950,6 +960,8 @@ fn resolve_raw(
                         && window_blind_equivalent_layer::admitted_field(&field.0, value))
                     && !(source_glazing_equivalent_layer_family
                         && window_glazing_equivalent_layer::admitted_field(&field.0, value))
+                    && !(source_gap_equivalent_layer_family
+                        && window_gap_equivalent_layer::admitted_field(&field.0, value))
                     && !(source_screen_family
                         && window_screen::admitted_field(&field.0, value))
                     && !(source_blind_family
@@ -1296,6 +1308,7 @@ fn resolve_raw(
                 "WindowMaterial:Screen:EquivalentLayer" => source_screen_equivalent_layer_family,
                 "WindowMaterial:Blind:EquivalentLayer" => source_blind_equivalent_layer_family,
                 "WindowMaterial:Glazing:EquivalentLayer" => source_glazing_equivalent_layer_family,
+                "WindowMaterial:Gap:EquivalentLayer" => source_gap_equivalent_layer_family,
                 "WindowMaterial:Screen" => source_screen_family,
                 "WindowMaterial:Blind" => source_blind_family,
                 "People" => {

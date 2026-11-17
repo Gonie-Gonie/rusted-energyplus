@@ -26,6 +26,8 @@ pub struct SelectedMaterialInput {
     pub spectral_data: Vec<SourceGlazingSpectralInput>,
     /// Actual ordered Source epJSON named Gas getter operands.
     pub window_gas: Vec<ProjectInputObject>,
+    /// Genuine ordered GapEQL3A12N operands, retaining all legal vent types.
+    pub window_gap_equivalent_layer: Vec<ProjectInputObject>,
     /// Genuine ordered GasMixture getObjectItem operands, not typed properties.
     pub window_gas_mixture: Vec<ProjectInputObject>,
     /// Genuine ordered ordinary MaterialShade getObjectItem operands.
@@ -1243,6 +1245,84 @@ impl SelectedMaterialInput {
             }
         }
         Ok((alphas, numerics))
+    }
+
+    pub(super) fn get_window_gap_equivalent_layer_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        if !self.source_is_epjson {
+            return Err(unavailable("GapEQL requires owned direct-epJSON getter"));
+        }
+        if !owners
+            .input
+            .has_object("WindowMaterial:Gap:EquivalentLayer", &object.object_name)
+        {
+            return Err(unavailable("GapEQL raw/IP identity"));
+        }
+        const NUMERIC_FIELDS: [&str; 12] = [
+            "thickness",
+            "conductivity_coefficient_a",
+            "conductivity_coefficient_b",
+            "conductivity_coefficient_c",
+            "viscosity_coefficient_a",
+            "viscosity_coefficient_b",
+            "viscosity_coefficient_c",
+            "specific_heat_coefficient_a",
+            "specific_heat_coefficient_b",
+            "specific_heat_coefficient_c",
+            "molecular_weight",
+            "specific_heat_ratio",
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 3
+            || s.alpha_field_blanks.len() < 3
+            || s.alpha_field_names.len() < 3
+            || s.numeric_args.len() < 12
+            || s.numeric_field_blanks.len() < 12
+            || s.numeric_field_names.len() < 12
+        {
+            return Err(unavailable(
+                "actual complete shared GapEQL3alpha12numeric allocation",
+            ));
+        }
+        s.alpha_args.fill(String::new());
+        s.numeric_args.fill(0.0);
+        s.alpha_field_blanks.fill(true);
+        s.numeric_field_blanks.fill(true);
+        s.alpha_field_names.fill(String::new());
+        s.numeric_field_names.fill(String::new());
+        owners
+            .input
+            .mark_object_as_used("WindowMaterial:Gap:EquivalentLayer", &object.object_name);
+        s.alpha_args[0] = object.object_name.to_ascii_uppercase();
+        s.alpha_field_blanks[0] = object.object_name.is_empty();
+        s.alpha_field_names[0] = "name".into();
+        s.alpha_args[1] = alpha(object, "gas_type")?.to_ascii_uppercase();
+        s.alpha_field_blanks[1] = false;
+        s.alpha_field_names[1] = "gas_type".into();
+        s.alpha_args[2] = alpha(object, "gap_vent_type")?.to_ascii_uppercase();
+        s.alpha_field_blanks[2] = false;
+        s.alpha_field_names[2] = "gap_vent_type".into();
+        let mut numeric_count = 1; // Native schema min_fields=3 includes N1.
+        for (index, field) in NUMERIC_FIELDS.iter().enumerate() {
+            s.numeric_field_names[index] = (*field).into();
+            match object.fields.get(*field) {
+                Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                    s.numeric_args[index] = *value;
+                    s.numeric_field_blanks[index] = false;
+                    numeric_count = numeric_count.max(index + 1);
+                }
+                None if index > 0 => {}
+                _ => {
+                    return Err(unavailable(
+                        "admitted GapEQL numeric scalar/required Thickness",
+                    ));
+                }
+            }
+        }
+        Ok((3, numeric_count))
     }
 
     pub(super) fn get_window_gas_item(

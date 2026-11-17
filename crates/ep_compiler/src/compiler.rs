@@ -772,6 +772,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_blind_equivalent_layer(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing:EquivalentLayer".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_glazing_equivalent_layer(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Gap:EquivalentLayer".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_gap_equivalent_layer(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -6079,6 +6081,77 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Declaration selection only; real GasMix getter owns physical properties and joint diagnostics.
+    fn source_unused_gap_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+        {
+            return false;
+        }
+        let valid = |field: &str, value: &RawValue| {
+            if !matches!(
+                field,
+                "gas_type"
+                    | "gap_vent_type"
+                    | "thickness"
+                    | "conductivity_coefficient_a"
+                    | "conductivity_coefficient_b"
+                    | "conductivity_coefficient_c"
+                    | "viscosity_coefficient_a"
+                    | "viscosity_coefficient_b"
+                    | "viscosity_coefficient_c"
+                    | "specific_heat_coefficient_a"
+                    | "specific_heat_coefficient_b"
+                    | "specific_heat_coefficient_c"
+                    | "molecular_weight"
+                    | "specific_heat_ratio"
+            ) {
+                return true;
+            }
+            if field == "gas_type" {
+                return matches!(value, RawValue::String(text) if matches!(text.as_str(), "AIR" | "ARGON" | "CUSTOM" | "KRYPTON" | "XENON"));
+            }
+            if field == "gap_vent_type" {
+                return matches!(value, RawValue::String(text) if matches!(text.as_str(), "Sealed" | "VentedIndoor" | "VentedOutdoor"));
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match field {
+                            "thickness"
+                            | "viscosity_coefficient_a"
+                            | "specific_heat_coefficient_a" => value > 0.0,
+                            "molecular_weight" => (20.0..=200.0).contains(&value),
+                            "specific_heat_ratio" => value > 1.0,
+                            _ => true,
+                        }
+                })
+        };
+        if !["gas_type", "thickness", "gap_vent_type"]
+            .iter()
+            .all(|field| field_value(object, field).is_some_and(|value| valid(field, value)))
+            || !object
+                .fields
+                .iter()
+                .all(|(field, value)| valid(&field.0, value))
+        {
+            return false;
+        }
+        !self.raw_model.objects.iter().filter(|(family, _)| family.0.starts_with("Construction")).any(|(_, rows)| {
+            rows.values().any(|construction| construction.fields.iter().any(|(field, value)| {
+                (field.0 == "outside_layer" || (2..=10).any(|index| field.0 == format!("layer_{index}")))
+                    && matches!(value, RawValue::String(reference) if reference.eq_ignore_ascii_case(name))
+            }))
+        })
+    }
+
     fn parse_window_gap_equivalent_layer_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Gap:EquivalentLayer";
         const CUSTOM_COEFFICIENT_FIELDS: [&str; 9] = [
@@ -6094,6 +6167,8 @@ impl<'a> Compiler<'a> {
         ];
 
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let source_unused_gap_equivalent_layer =
+                self.source_unused_gap_equivalent_layer(&name, &object);
             let gas_type = self.required_enum(
                 OBJECT_TYPE,
                 &name,
@@ -6188,7 +6263,10 @@ impl<'a> Compiler<'a> {
                     (CUSTOM_COEFFICIENT_FIELDS[6], specific_heat_a),
                     ("molecular_weight", molecular_weight_g_per_mol),
                 ] {
-                    if value.is_none() && field_value(&object, field).is_none() {
+                    if value.is_none()
+                        && field_value(&object, field).is_none()
+                        && !source_unused_gap_equivalent_layer
+                    {
                         self.error(
                             "MissingCustomWindowGapEquivalentLayerProperty",
                             OBJECT_TYPE,
@@ -6232,7 +6310,8 @@ impl<'a> Compiler<'a> {
                 .iter()
                 .all(|(field, value)| field_value(&object, field).is_none() || value.is_some());
                 let conductivity_at_300_k = properties.conductivity.at_300_k();
-                if properties_valid
+                if !source_unused_gap_equivalent_layer
+                    && properties_valid
                     && conductivity_fields_well_typed
                     && conductivity_at_300_k <= 0.0
                 {
@@ -6261,6 +6340,12 @@ impl<'a> Compiler<'a> {
             else {
                 continue;
             };
+            if source_unused_gap_equivalent_layer {
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+            }
             model.materials.push(Material {
                 id,
                 name: normalized_name,
@@ -10625,6 +10710,13 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_glazing_equivalent_layer(name, object));
+        let source_gap_equivalent_layer_name = object_type == "WindowMaterial:Gap:EquivalentLayer"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_gap_equivalent_layer(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
@@ -10639,7 +10731,8 @@ impl<'a> Compiler<'a> {
                 || source_drape_equivalent_layer_name
                 || source_screen_equivalent_layer_name
                 || source_blind_equivalent_layer_name
-                || source_glazing_equivalent_layer_name)
+                || source_glazing_equivalent_layer_name
+                || source_gap_equivalent_layer_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')

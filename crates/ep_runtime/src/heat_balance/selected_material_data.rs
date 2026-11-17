@@ -29,6 +29,7 @@ pub(crate) use window_blind::{
 };
 mod window_blind_equivalent_layer;
 mod window_drape_equivalent_layer;
+mod window_gap_equivalent_layer;
 mod window_gas;
 mod window_glazing_equivalent_layer;
 mod window_screen;
@@ -431,6 +432,51 @@ impl SelectedMaterialData {
         }
         Ok((
             MaterialSurfaceRoughness::Rough,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    /// Actual GapEQL GasMix common state by Source ordinal/typed ID, distinct from Sealed-only ordinary Gas.
+    pub(crate) fn source_gap_equivalent_layer_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native GapEQL MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::WindowGapEql)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual GapEQL Source order/group/physical identity",
+            ));
+        }
+        let row = self
+            .window_gas
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained GapEQL GasMix row",
+            ))?;
+        if row.num_gases != 1
+            || row.gas_fractions != [1.0, 0.0, 0.0, 0.0, 0.0]
+            || row.gases[0].gas_type.is_none()
+            || row.roughness != Some(MaterialSurfaceRoughness::MediumRough)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual GapEQL single GasMix signature",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::MediumRough,
             OpaqueSurfaceProperties {
                 thermal_absorptance: row.thermal_absorptance,
                 solar_absorptance: row.solar_absorptance,
@@ -897,7 +943,7 @@ impl SelectedMaterialData {
         self.get_refraction_data(raw, o)?;
         self.get_window_glazing_equivalent_layer_data(raw, o)?;
         self.get_named_window_gas_data(raw, o)?;
-        empty!(num_eql_gaps, "WindowMaterial:Gap:EquivalentLayer");
+        self.get_window_gap_equivalent_layer_data(raw, o)?;
         self.get_window_gas_mixture_data(raw, o)?;
         self.get_window_shade_data(raw, o)?;
         self.get_window_shade_equivalent_layer_data(raw, o)?;

@@ -302,6 +302,32 @@ impl SelectedMaterialData {
                         },
                     )
                 }
+                MaterialDefinition::WindowGapEquivalentLayer(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::WindowGapEql) {
+                        return Err(unavailable("reported GapEQL actual group"));
+                    }
+                    let value = self
+                        .window_gas
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual GapEQL runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("GapEQL getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
                 MaterialDefinition::WindowScreen(_) => {
                     if self.material_groups.get(id) != Some(&SourceMaterialGroup::Screen) {
                         return Err(unavailable("reported Screen actual group"));

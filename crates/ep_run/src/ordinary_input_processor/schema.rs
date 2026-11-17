@@ -224,6 +224,7 @@ pub(super) fn definitions() -> Vec<SourceObjectDefinition> {
         ("WindowMaterial:Screen:EquivalentLayer", 1, 10, 0, 0, None),
         ("WindowMaterial:Blind:EquivalentLayer", 3, 21, 0, 0, None),
         ("WindowMaterial:Glazing:EquivalentLayer", 3, 26, 0, 0, None),
+        ("WindowMaterial:Gap:EquivalentLayer", 3, 12, 0, 0, None),
         ("WindowMaterial:Screen", 2, 12, 0, 0, None),
         ("WindowMaterial:Blind", 2, 27, 0, 0, None),
         ("OtherEquipment", 6, 7, 0, 0, None),
