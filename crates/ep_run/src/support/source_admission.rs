@@ -55,6 +55,8 @@ pub(crate) struct SourceSupportAdmission {
     gap_equivalent_layer_bindings: BTreeSet<String>,
     /// Validated unused EcoRoof names only; physical moisture recovery belongs to Material.
     roof_vegetation_bindings: BTreeSet<String>,
+    /// Exact Gap doj order and original untrimmed gas references, never copied properties.
+    window_gap_bindings: Vec<(String, String)>,
     /// Validated unused Screen names; no optical coefficients or precomputed arrays.
     screen_bindings: BTreeSet<String>,
     /// Validated unused Blind names;computedTAR belongs only to its actual Material owner.
@@ -467,6 +469,38 @@ impl SourceSupportAdmission {
             }
             covered_objects.insert("WindowMaterial:Gap:EquivalentLayer");
         }
+        let mut window_gap_bindings = Vec::new();
+        if trace.scope == PortingScope::B
+            && crate::ordinary_equipment_input::source_b_validate_unused_window_gap(raw).is_ok()
+        {
+            let mut seen = BTreeSet::new();
+            for (name, object) in raw.source_json_instances("WindowMaterial:Gap").ok()? {
+                let RawValue::String(reference) = object
+                    .fields
+                    .get(&FieldName("gas_or_gas_mixture_".into()))?
+                else {
+                    return None;
+                };
+                let name = name.0.to_ascii_uppercase();
+                if !seen.insert(name.clone()) {
+                    return None;
+                }
+                window_gap_bindings.push((name, reference.to_ascii_uppercase()));
+            }
+            for family in [
+                "WindowMaterial:Gap",
+                "WindowGap:DeflectionState",
+                "WindowGap:SupportPillar",
+            ] {
+                if raw
+                    .objects
+                    .get(&ObjectType(family.into()))
+                    .is_some_and(|rows| !rows.is_empty())
+                {
+                    covered_objects.insert(family);
+                }
+            }
+        }
         let mut roof_vegetation_bindings = BTreeSet::new();
         if trace.scope == PortingScope::B
             && raw
@@ -626,6 +660,7 @@ impl SourceSupportAdmission {
             glazing_equivalent_layer_bindings,
             gap_equivalent_layer_bindings,
             roof_vegetation_bindings,
+            window_gap_bindings,
             screen_bindings,
             blind_bindings,
             refraction_bindings,
@@ -1474,6 +1509,161 @@ impl SourceSupportAdmission {
                 row.definition,
                 ep_model::MaterialDefinition::WindowGapEquivalentLayer(_)
             ) {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub(super) fn consumes_unused_window_gap(&self, model: &ep_model::TypedModel) -> bool {
+        use ep_model::MaterialKind;
+        if !self.consumes("WindowMaterial:Gap") || !model.material_names.is_source_exact_namespace()
+        {
+            return false;
+        }
+        let all_ids: BTreeSet<_> = model.materials.iter().map(|row| row.id).collect();
+        if all_ids.len() != model.materials.len() {
+            return false;
+        }
+        if model.material_names.len() != model.materials.len()
+            || all_ids.iter().any(|id| {
+                usize::try_from(id.0)
+                    .ok()
+                    .is_none_or(|index| index >= model.materials.len())
+            })
+            || model
+                .material_names
+                .names()
+                .iter()
+                .enumerate()
+                .any(|(index, name)| {
+                    model
+                        .material_names
+                        .resolve(&name.0)
+                        .is_none_or(|id| usize::try_from(id.0).ok() != Some(index))
+                })
+        {
+            return false;
+        }
+        let expected: BTreeSet<_> = self
+            .window_gap_bindings
+            .iter()
+            .map(|(name, _)| name.as_str())
+            .collect();
+        let mut gap_rows = BTreeMap::new();
+        for row in &model.materials {
+            if matches!(row.kind(), MaterialKind::WindowComplexGap)
+                && gap_rows.insert(row.id, row).is_some()
+            {
+                return false;
+            }
+        }
+        if gap_rows.len() != expected.len() {
+            return false;
+        }
+        // All admitted material families precede Gap; post-Gap ComplexShade is held.
+        // IDs retain the real loader prefix even if the arena Vec is permuted.
+        let Some(first_gap) = model
+            .materials
+            .len()
+            .checked_sub(self.window_gap_bindings.len())
+        else {
+            return false;
+        };
+        for (rank, (name, _)) in self.window_gap_bindings.iter().enumerate() {
+            if model
+                .material_names
+                .resolve(name)
+                .is_none_or(|id| usize::try_from(id.0).ok() != Some(first_gap + rank))
+            {
+                return false;
+            }
+        }
+        let mut material_map_names: BTreeMap<ep_model::MaterialId, &str> = BTreeMap::new();
+        for name in model.material_names.names() {
+            let id = model.material_names.resolve(&name.0);
+            if id.is_some_and(|id| gap_rows.contains_key(&id)) || expected.contains(name.0.as_str())
+            {
+                let Some(id) = id else {
+                    return false;
+                };
+                if !gap_rows.contains_key(&id)
+                    || !expected.contains(name.0.as_str())
+                    || material_map_names.insert(id, name.0.as_str()).is_some()
+                {
+                    return false;
+                }
+            }
+        }
+        let mut by_name: BTreeMap<&str, Vec<ep_model::MaterialId>> = BTreeMap::new();
+        let mut by_id: BTreeMap<ep_model::MaterialId, Vec<&str>> = BTreeMap::new();
+        for (id, name) in &model.ctf_report_names.materials {
+            if !all_ids.contains(id) {
+                return false;
+            }
+            if gap_rows.contains_key(id) || expected.contains(name.as_str()) {
+                by_name.entry(name.as_str()).or_default().push(*id);
+                by_id.entry(*id).or_default().push(name.as_str());
+            }
+        }
+        for name in expected {
+            let Some(ids) = by_name.get(name) else {
+                return false;
+            };
+            if ids.len() != 1 {
+                return false;
+            }
+            let id = ids[0];
+            let Some(row) = gap_rows.get(&id) else {
+                return false;
+            };
+            if row.name.0 != name
+                || model.material_names.resolve(name) != Some(id)
+                || material_map_names.get(&id).copied() != Some(name)
+                || by_id.get(&id).is_none_or(|names| names.len() != 1)
+            {
+                return false;
+            }
+            let ep_model::MaterialDefinition::WindowComplexGap(gap) = row.definition else {
+                return false;
+            };
+            let Some((_, reference)) = self.window_gap_bindings.iter().find(|(key, _)| key == name)
+            else {
+                return false;
+            };
+            let source = model
+                .material_names
+                .resolve(reference)
+                .and_then(|source_id| model.materials.iter().find(|value| value.id == source_id))
+                .filter(|source| source.id.0 <= id.0);
+            let matches_prefix = if reference.is_empty() || source.is_none() {
+                matches!(gap.gas, ep_model::WindowComplexGapGasComposition::Empty)
+            } else if let Some(source) = source {
+                match (source.definition, gap.gas) {
+                    (
+                        ep_model::MaterialDefinition::WindowGas(_),
+                        ep_model::WindowComplexGapGasComposition::Single {
+                            source_material_id, ..
+                        },
+                    )
+                    | (
+                        ep_model::MaterialDefinition::WindowGasMixture(_),
+                        ep_model::WindowComplexGapGasComposition::Mixture {
+                            source_material_id,
+                            ..
+                        },
+                    )
+                    | (
+                        ep_model::MaterialDefinition::WindowGapEquivalentLayer(_)
+                        | ep_model::MaterialDefinition::WindowComplexGap(_),
+                        ep_model::WindowComplexGapGasComposition::Reference { source_material_id },
+                    ) => source_material_id == source.id,
+                    _ => false,
+                }
+            } else {
+                false
+            };
+            if !matches_prefix {
                 return false;
             }
         }

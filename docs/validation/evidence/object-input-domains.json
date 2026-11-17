@@ -364,21 +364,26 @@
     ],
     "WindowMaterial:SimpleGlazingSystem": [
       "Bounded Source B direct epJSON admits unused WindowMaterial:SimpleGlazingSystem definitions only, with every existing route prerequisite and no reference from any Construction, even an unused one. Raw U-factor must be finite and positive; SHGC and present VT retain their strict schema intervals. Source JSON integer classification uses the Native signed-i64 operand before projection, distinct from raw schema validation; omitted VT remains distinguishable from a supplied value. The actual ordered getter and Setup write a mutable per-MaterialId GlassSimple row, and Materials reporting reads that row rather than typed derived properties. Native conductivity >0, film-resistance warning, severe/fatal order and final error barriers remain owned without an added blanket derived-finiteness guard. Typed properties are advisory on this Source path. Source A, IDF, Legacy changes, every Construction use, window/surface consumers and full-object completion remain excluded.",
-      "One fixed unused SGS UNUSED NORMAL definition uses U-factor4.2, SHGC0.57 and omitted VT, with an explicit new Output:Constructions Materials request. The unchanged158-series/75120-value profile, original twelve engine/eight paired/two export gates, nine-role OA/mixed witnesses and complete EIO comparison remain mandatory. Root separately observes actual Material Details row presence; equal EIO alone is not a presence proof. Material Details does not expose optical SHGC/VT, window physics or private runtime properties. Existing typed classification and historical diagnostic addendum remain unchanged."
+      "One fixed unused SGS UNUSED NORMAL definition uses U-factor4.2, SHGC0.57 and omitted VT, with an explicit new Output:Constructions Materials request. The unchanged158-series/75120-value profile, original twelve engine/eight paired/two export gates, nine-role OA/mixed witnesses and complete EIO comparison remain mandatory. Root separately observes actual Material Details row presence; equal EIO alone is not a presence proof. Material Details does not expose optical SHGC/VT, window physics or private runtime properties. Existing typed classification and historical diagnostic addendum remain unchanged.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Gas": [
       "Bounded Source B direct epJSON admits unused WindowMaterial:Gas definitions of Air, Argon, Krypton or Xenon only. Native-required names, exact gas-type enums, positive raw thickness and every supplied schema-known optional numeric field remain validated; unknown body metadata is retained by Raw/IP and ignored as getter operands. Original JSON schema values and Native signed-i64-effective numeric operands remain distinct. The actual ordered getter owns scratch/default/blank/used state, the per-MaterialId Gas row, constructor-zero base properties, standard species constants and the separate 300K NominalR write under Native K>0/error ordering. Materials reporting and checked geometry properties read that same runtime row; typed derived properties are not substituted. Source-exact material names retain Native case/space identity and real loader IDs. Every Construction reference, Custom Gas, active window physics, Source A/IDF, Legacy changes and full-object completion remain held. Existing owner tests, compile-only integration and one fixed unused-Argon comparison have separate scope; whole EIO equality requires an independently observed Material Details row and proves no gas coefficients, optics or window heat transfer.",
-      "The additional bounded Source B direct-epJSON route admits unused Custom Gas alongside the named route recorded by the preceding Source174 item. All original schema-known fields and Native names remain validated while unknown body metadata stays Raw/IP custody; actual signed-i64-effective operands are separate. The same ordered getter writes all eleven Custom properties, including six B/C coefficients and omitted numeric zero for the ratio, before its Native viscosity-A, specific-heat-A and molecular-weight diagnostics. Those checks set shared ErrorsFound before their diagnostic IO; the conductivity-denominator failure sets it only after Severe, formatting and Continue return. The actual conditional 300K NominalR remains separate from constructor-zero base Resistance and Materials properties. Source-only compiler deferral and total Raw-name/type/count, exact NameMap and loader-ID bijections do not replace the real Raw/IP runtime row with typed advisory coefficients. Existing same-row owner checks, connected admission and the fixed unused-Custom comparison have distinct scope. Whole EIO and geometry-export requirements remain mandatory; the public Material Details row does not expose Custom coefficients or private NominalR and proves no active window behavior. Every Construction reference, Source A/IDF, Legacy changes and arbitrary/full-object completion remain held."
+      "The additional bounded Source B direct-epJSON route admits unused Custom Gas alongside the named route recorded by the preceding Source174 item. All original schema-known fields and Native names remain validated while unknown body metadata stays Raw/IP custody; actual signed-i64-effective operands are separate. The same ordered getter writes all eleven Custom properties, including six B/C coefficients and omitted numeric zero for the ratio, before its Native viscosity-A, specific-heat-A and molecular-weight diagnostics. Those checks set shared ErrorsFound before their diagnostic IO; the conductivity-denominator failure sets it only after Severe, formatting and Continue return. The actual conditional 300K NominalR remains separate from constructor-zero base Resistance and Materials properties. Source-only compiler deferral and total Raw-name/type/count, exact NameMap and loader-ID bijections do not replace the real Raw/IP runtime row with typed advisory coefficients. Existing same-row owner checks, connected admission and the fixed unused-Custom comparison have distinct scope. Whole EIO and geometry-export requirements remain mandatory; the public Material Details row does not expose Custom coefficients or private NominalR and proves no active window behavior. Every Construction reference, Source A/IDF, Legacy changes and arbitrary/full-object completion remain held.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:GasMixture": [
-      "Bounded Source B direct epJSON admits unused WindowMaterial:GasMixture through the genuine MaterialGasMix getter and retained runtime row. Original-schema numeric kinds and Native signed-i64-effective operands remain separate: the active count is Integer1..4, Gas1/Gas2 type and fraction are required even at count1, all supplied inactive known fields remain validated, and unknown JSON body metadata stays Raw/IP custody. The real5-alpha6-numeric primitive retains min_fields7, full scratch/default/blank/count/name/used effects and exact loader identity. The getter resets all five type slots to Invalid, distinct from constructor Custom; fills the declared active named-species prefix and optional active fraction zero; and permits repeated species and non-unit fraction sums without normalization. Thickness diagnostics leave shared ErrorsFound unchanged, while first-gas-only300K NominalR is written unconditionally after successful diagnostic IO, even after an earlier shared error. Base Resistance and generic Materials properties remain constructor zero. Source-exact compiler names and total Raw/typed arena, loader and reverse NameMap bijections bind the same runtime report/geometry row. Missing active type retains an explicit hold for Native undefined record indexing. Every Construction reference, active window/thermal/optical consumers, Source A/IDF, Legacy changes and full-object completion remain held. Whole EIO, topology and export predicates remain mandatory; public Material Details does not expose private species/fractions/NominalR or prove active window behavior."
+      "Bounded Source B direct epJSON admits unused WindowMaterial:GasMixture through the genuine MaterialGasMix getter and retained runtime row. Original-schema numeric kinds and Native signed-i64-effective operands remain separate: the active count is Integer1..4, Gas1/Gas2 type and fraction are required even at count1, all supplied inactive known fields remain validated, and unknown JSON body metadata stays Raw/IP custody. The real5-alpha6-numeric primitive retains min_fields7, full scratch/default/blank/count/name/used effects and exact loader identity. The getter resets all five type slots to Invalid, distinct from constructor Custom; fills the declared active named-species prefix and optional active fraction zero; and permits repeated species and non-unit fraction sums without normalization. Thickness diagnostics leave shared ErrorsFound unchanged, while first-gas-only300K NominalR is written unconditionally after successful diagnostic IO, even after an earlier shared error. Base Resistance and generic Materials properties remain constructor zero. Source-exact compiler names and total Raw/typed arena, loader and reverse NameMap bijections bind the same runtime report/geometry row. Missing active type retains an explicit hold for Native undefined record indexing. Every Construction reference, active window/thermal/optical consumers, Source A/IDF, Legacy changes and full-object completion remain held. Whole EIO, topology and export predicates remain mandatory; public Material Details does not expose private species/fractions/NominalR or prove active window behavior.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Glazing": [
       "Bounded Source B direct epJSON admits unused WindowMaterial:Glazing with exact SpectralAverage through the actual ordinary MaterialGlass getter, distinct GroupGlass and the same retained class as SGS without calling or changing SGS Setup. The actual map key is A1 under the official RE2 name rule; all20 known body fields retain their original schema types, ranges and exact enums, while unknown members of every JSON shape, including body name/idf_* metadata, remain Raw/IP custody and are not getter operands. One spectrum and three angle-table references remain arbitrary schema Strings under this inactive Average branch, without resolving or admitting positive spectral/Curve owners. Original numeric kinds and Native signed-i64-effective values remain separate. The real7A14N/min_fields14 primitive owns full scratch, defaults, blanks, names, returned counts and used state. All14 numeric writes, back-side base thermal absorptance, Young/Poisson and constructor-zero density/Cp/solar/visible absorptance come from this runtime row. Positive conductivity writes both Resistance and NominalR before the six ordered joint optical checks even after an earlier genuine shared error; wrapped conductivity/Young and diagnostic IO failures retain their exact state/error prefixes. The independently schema-valid unused compiler qualifier defers only those six sums, and total Raw/name/kind/count/loader/reverse-NameMap custody rejects missing-all-typed rows as well as aliases. Existing public Materials and checked Source geometry use the same row; they do not expose private Native optics or establish full geometry-unit traversal. Every Construction/window consumer, Source A/IDF, Legacy change, the other three optical modes, positive spectrum/Curve children and full-object completion remain held. A positive-infinite derived resistance reaches an unestablished Native report-formatter partition; no Raw/effective finiteness filter or formatter/diagnostic permission is added.",
-      "An additional bounded unused WindowMaterial:Glazing SpectralAndAngle route on Source B direct epJSON owns an honest Copy scalar/tag payload and the actual ordinary MaterialGlass GroupGlass row. The real7A14N/min14 primitive retains schema/name/raw-number/default/blank/used custody; runtime Angle skips all N2..N8 optical writes and Average-only checks, leaving constructor-zero optical cells while common thermal/R/NominalR/report writes remain real. MaterialDataOwners borrows the same reports.selected_curves owner; three i32 ordinal0-null handles represent actual same-array lookup, without a typed Curve arena or Native private-pointer equivalence claim. All five genuine two-dimensional analytic Curve families are valid lookup dependencies. Ordered blank/not-found/dimension/bounds and diagnostic IO prefixes preserve actual state; the BACK reference stores its own ordinal but intentionally reads FRONT bounds and uses the Native A5-label behavior. Existing-owner tests add41 assertion sites,8 for loops and4 genuine Runtime contexts within four existing bodies; these are authored static coverage, not passed-QA or private Native optical evidence. The separate three-literal old compiler-fixture maintenance and both earlier/new caller negative-fixture boundary updates preserve old assertion expectations. The fixed input adds only one unused Angle Glass and one genuine Biquadratic,11 Float records over834 held parent records, with no Construction/window use, new request or series. All158-series/75120-value, whole-current MaterialDetails EIO table, BND136-event topology, clock and export criteria remain mandatory. This qualifies older other-optical/positive-Curve holds only for the unused lookup route; CurveValue/evaluation, Table/interpolation, active Construction/window/AFN/Duct/EMS consumers, other optical models, Source A/IDF, Legacy change and full-object/every-valid-combination completion remain held. No private Native pointer, optical scalar, Curve evaluation or new Curve-output-series parity follows."
+      "An additional bounded unused WindowMaterial:Glazing SpectralAndAngle route on Source B direct epJSON owns an honest Copy scalar/tag payload and the actual ordinary MaterialGlass GroupGlass row. The real7A14N/min14 primitive retains schema/name/raw-number/default/blank/used custody; runtime Angle skips all N2..N8 optical writes and Average-only checks, leaving constructor-zero optical cells while common thermal/R/NominalR/report writes remain real. MaterialDataOwners borrows the same reports.selected_curves owner; three i32 ordinal0-null handles represent actual same-array lookup, without a typed Curve arena or Native private-pointer equivalence claim. All five genuine two-dimensional analytic Curve families are valid lookup dependencies. Ordered blank/not-found/dimension/bounds and diagnostic IO prefixes preserve actual state; the BACK reference stores its own ordinal but intentionally reads FRONT bounds and uses the Native A5-label behavior. Existing-owner tests add41 assertion sites,8 for loops and4 genuine Runtime contexts within four existing bodies; these are authored static coverage, not passed-QA or private Native optical evidence. The separate three-literal old compiler-fixture maintenance and both earlier/new caller negative-fixture boundary updates preserve old assertion expectations. The fixed input adds only one unused Angle Glass and one genuine Biquadratic,11 Float records over834 held parent records, with no Construction/window use, new request or series. All158-series/75120-value, whole-current MaterialDetails EIO table, BND136-event topology, clock and export criteria remain mandatory. This qualifies older other-optical/positive-Curve holds only for the unused lookup route; CurveValue/evaluation, Table/interpolation, active Construction/window/AFN/Duct/EMS consumers, other optical models, Source A/IDF, Legacy change and full-object/every-valid-combination completion remain held. No private Native pointer, optical scalar, Curve evaluation or new Curve-output-series parity follows.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Glazing:RefractionExtinctionMethod": [
-      "Bounded Source B direct epJSON admits only unused original-schema-valid WindowMaterial:Glazing:RefractionExtinctionMethod through the actual ordered MaterialGlass getter and GroupGlass row, after ordinary SpectralAverage without calling or changing SGS Setup. The official RE2 map key owns A1; all10 known body fields retain original JSON kinds, required fields, bounds and exact No/Yes enum. Unknown members of every JSON shape, including optical_data_type, Young/name/idf_* metadata, remain Raw/IP custody and are not getter operands. The real2A9N/11-slot primitive has no min_fields: required-only returns1A5N, while present solar_diffusing reaches2A9N; full scratch/default/blank/field-name/used effects are retained. Native Material.cc767-855 expression and assignment order is ported, including VisibleBack=SolarFront; original numeric tokens and signed-i64-effective values remain distinct. Runtime optical/base writes and positive-conductivity Resistance/NominalR writes precede the single infrared sum >=1 diagnostic. Nonpositive effective conductivity retains constructor-zero R/NominalR without adding a conductivity diagnostic or setting ErrorsFound; positive conductivity still writes after a genuine prior shared error. The joint IR check sets ErrorsFound before diagnostic IO and final solar_diffusing follows successful IO, preserving failure prefixes. The independent unused original-schema compiler qualifier defers only this joint check; total Raw/name/type/count/loader/reverse-alias closure includes Raw-present with every typed row missing. The safe scalar exp dependency uses a fixed retained System32 UCRT symbol on WindowsGNU and Rust exp elsewhere; this is static boundary custody, not observed Native provider or private optical parity. Existing public Materials and checked Source geometry use the same row but do not establish private Native optics/NominalR, full geometry traversal or window physics. Every Construction/window consumer, Source A/IDF, Legacy changes and additional optical/spectral/Curve admission remain held; existing Average/SGS/Gas domains are unchanged. Derived positive-infinite report-formatting remains Native undefined/unestablished, without a new Raw/effective finiteness filter, formatter or diagnostic permission."
+      "Bounded Source B direct epJSON admits only unused original-schema-valid WindowMaterial:Glazing:RefractionExtinctionMethod through the actual ordered MaterialGlass getter and GroupGlass row, after ordinary SpectralAverage without calling or changing SGS Setup. The official RE2 map key owns A1; all10 known body fields retain original JSON kinds, required fields, bounds and exact No/Yes enum. Unknown members of every JSON shape, including optical_data_type, Young/name/idf_* metadata, remain Raw/IP custody and are not getter operands. The real2A9N/11-slot primitive has no min_fields: required-only returns1A5N, while present solar_diffusing reaches2A9N; full scratch/default/blank/field-name/used effects are retained. Native Material.cc767-855 expression and assignment order is ported, including VisibleBack=SolarFront; original numeric tokens and signed-i64-effective values remain distinct. Runtime optical/base writes and positive-conductivity Resistance/NominalR writes precede the single infrared sum >=1 diagnostic. Nonpositive effective conductivity retains constructor-zero R/NominalR without adding a conductivity diagnostic or setting ErrorsFound; positive conductivity still writes after a genuine prior shared error. The joint IR check sets ErrorsFound before diagnostic IO and final solar_diffusing follows successful IO, preserving failure prefixes. The independent unused original-schema compiler qualifier defers only this joint check; total Raw/name/type/count/loader/reverse-alias closure includes Raw-present with every typed row missing. The safe scalar exp dependency uses a fixed retained System32 UCRT symbol on WindowsGNU and Rust exp elsewhere; this is static boundary custody, not observed Native provider or private optical parity. Existing public Materials and checked Source geometry use the same row but do not establish private Native optics/NominalR, full geometry traversal or window physics. Every Construction/window consumer, Source A/IDF, Legacy changes and additional optical/spectral/Curve admission remain held; existing Average/SGS/Gas domains are unchanged. Derived positive-infinite report-formatting remains Native undefined/unestablished, without a new Raw/effective finiteness filter, formatter or diagnostic permission.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "MaterialProperty:GlazingSpectralData": [
       "Bounded Source B direct epJSON owns positive MaterialProperty:GlazingSpectralData together with linked UNUSED WindowMaterial:Glazing Spectral through the genuine HBM266 dataset getter before Material268, with the same IP/scratch/backend and retained MaterialGlass GroupGlass state. All original known fields and RE2 map-key names are schema-checked; unknown JSON metadata stays Raw/IP and is not a physical operand. The 1A16N+4E/no-min_fields primitive returns highest present fixed position when E=0 and16+4E for every nonempty extension array, including empty or unknown-only item positions. It resets full scratch/names/defaults/blanks and marks actual objects used. Constructor-unallocated arrays differ from valid zero-quartet allocated arrays. Names precede count errors; complete quartets allocate/fill all four actual arrays, including signed-effective Tau clamp to0.001, before ordered integrity diagnostics. Original numeric tokens and signed-i64-effective operands stay distinct. Count-warning/cap IO cutoffs and integrity flag-before-IO prefixes are retained. Case-distinct datasets remain ordered instances with duplicate effective uppercase names and FIRST actual runtime array lookup; comparator-equivalent keys retain first spelling/last subtree before this owner. No unique-name material/Gas bijection is imposed on datasets. Linked Glass has an honest Spectral typed variant, real one-based lookup, common scalar/base writes and skips only Average-specific checks; the three angle references are inactive Strings. Raw/typed/order/ID/namespace-firstlookup and mode/name/loader/reverse-alias custody includes missing-all-typed datasets or Glass, dataset-only and namespace-only mismatches. The unchanged Legacy typed duplicate/count/integrity rejection and inert compatibility lane remain separate. Public linked Material Details and Source checked geometry cannot establish Native private dataset arrays/pointers/optics or active-window behavior. Every Construction/window, Source A/IDF, Legacy change, SpectralAndAngle/BSDF/positive Curve/Table and full-object completion remains held."
@@ -403,57 +408,85 @@
       "The original110-type corpus already contains OutdoorAir:Node (12 original occurrences); its raw_source_getter/raw_only/bounded_b category and all141 prior registry classifications remain unchanged. The additional bounded OutdoorAir:NodeList dependency row raises the current registry to142; it does not change the original116-type example union or establish full-domain support. Numerical evidence is limited to fixed negative-global, point, wind, WB-with-wind, DB-only, combined DB/WB, inactive-WPC and the selected coherent multi/list scenes. The latter adds genuine list/single getter and whole-topology/export custody while preserving the active climate and original science. The inactive fields pass the real getter and positional/default effects; their unused curve String establishes no active AFN reference validity or wind-pressure physics. Private Height/DB/WB/wind/call counts, universal averaged laws and arbitrary/full-object combinations remain unobserved. Existing owner tests and frozen full comparisons provide separate scoped evidence."
     ],
     "WindowMaterial:Shade": [
-      "An additional bounded genuinely unused WindowMaterial:Shade route on Source B direct epJSON uses the actual ordered Shade constructor/getter, ordinary GroupShade row and material report. Original schema validation of14 numeric body fields stays separate from signed-effective numeric operands; additional unknown JSON metadata is retained and unconsumed. The real1A14N/min15 primitive preserves reset/default/blank/used state and JSON-key scratch labels (alpha name and numeric field keys), with exact Raw/IP/typed-name-ID/count/loader/reverse-alias closure including Raw-present/typed0 rejection. All14 Shade operands are written to the real owner; MediumRough, ROnly, constructor-zero base state, thermal/solar absorptance, fixed zero visible absorptance and NominalR=thickness/conductivity for positive effective conductivity or1 otherwise follow Native order. Duplicate-name diagnostic IO precedes its flag mutation; all three solar/visible/IR sum checks set the shared error flag before ordered diagnostic IO and retain failure prefixes. The Source-only qualifier defers those joint checks to the genuine getter without changing Legacy validation. Original, signed-effective and typed Construction references at every layer remain blocked. Four existing bodies contain authored42 added assertion sites,5 explicit for loops and4 genuine runtime owners, with0new test functions/helpers; these are static coverage counts, not passed QA. The separately fixed input inserts only one unused Shade with14 Float records over845 held parent records (859 total;canonical752+107), leaving all prior objects/requests/windows unchanged. All158-series/75120-value, whole-current11-column public MaterialDetails table, checked Source geometry, BND136-event topology, clocks and exports remain mandatory after actual paired acceptance. Public reports/Source geometry do not prove private Native14-field state or optics. Every active Construction/window/shading consumer, Source A/IDF, Legacy change, private Native parity and full-object/every-valid-combination completion remains held."
+      "An additional bounded genuinely unused WindowMaterial:Shade route on Source B direct epJSON uses the actual ordered Shade constructor/getter, ordinary GroupShade row and material report. Original schema validation of14 numeric body fields stays separate from signed-effective numeric operands; additional unknown JSON metadata is retained and unconsumed. The real1A14N/min15 primitive preserves reset/default/blank/used state and JSON-key scratch labels (alpha name and numeric field keys), with exact Raw/IP/typed-name-ID/count/loader/reverse-alias closure including Raw-present/typed0 rejection. All14 Shade operands are written to the real owner; MediumRough, ROnly, constructor-zero base state, thermal/solar absorptance, fixed zero visible absorptance and NominalR=thickness/conductivity for positive effective conductivity or1 otherwise follow Native order. Duplicate-name diagnostic IO precedes its flag mutation; all three solar/visible/IR sum checks set the shared error flag before ordered diagnostic IO and retain failure prefixes. The Source-only qualifier defers those joint checks to the genuine getter without changing Legacy validation. Original, signed-effective and typed Construction references at every layer remain blocked. Four existing bodies contain authored42 added assertion sites,5 explicit for loops and4 genuine runtime owners, with0new test functions/helpers; these are static coverage counts, not passed QA. The separately fixed input inserts only one unused Shade with14 Float records over845 held parent records (859 total;canonical752+107), leaving all prior objects/requests/windows unchanged. All158-series/75120-value, whole-current11-column public MaterialDetails table, checked Source geometry, BND136-event topology, clocks and exports remain mandatory after actual paired acceptance. Public reports/Source geometry do not prove private Native14-field state or optics. Every active Construction/window/shading consumer, Source A/IDF, Legacy change, private Native parity and full-object/every-valid-combination completion remains held.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Screen": [
-      "An additional bounded genuinely unused WindowMaterial:Screen route on Source B direct epJSON uses the real ordered Screen constructor/getter and ordinary GroupScreen material row. Original schema validates13 consumed body keys (A2 reflected-beam method and12 numeric fields;A1 Name is the instance key);unknown body name/idf_* metadata remains retained and unconsumed. Total Raw/IP/name/number/typed-ID/count/loader/reverse-alias custody includes Raw-present/typed0 rejection and all original/effective/typed Construction-layer fences. The genuine2A12N/min9 primitive retains defaults/blanks/used state, JSON-key scratch labels, signed-effective operands, method handling, ordered diagnostics, ROnly and NominalR state. Four existing bodies contain authored45 added assertion sites,5 explicit for loops and4 fresh Material owners with0 new test functions/helpers and0 Window unit owners;glass.rs coverage in these unit checks is STATIC_DEPENDENCY_ONLY. The fixed input adds one unused SCREEN UNUSED SCALAR with12 Float records and1 ModelAsDiffuse method String over859 held parent numeric records (871 total;canonical752+119),without changing requests,windows or other objects. A genuine full normal Source run must complete with nonzero public final Surfaces, physics_executed true and observer_supplies_inputs false. Authenticated compiled Source snapshot annotations tie its positive Screen row to BeginSim/BuiltIn/W5 and the real all-false HasShadeControl traversal,with the first true control still blocked. This is SOURCE_CAUSAL_INFERENCE,not exported HasShadeControl/num_screens/BuiltIn/WindowTypeBSDF telemetry or proof of a private Native window owner. Acceptance also requires the complete ordered Native==Source11-row11-column public MaterialDetails table (all10 parent material names held),the new literal Screen public row and same-row Source map/typed-ID/group7/NominalR.00175 bits/Roughness2/absorptances. All inherited158-series/75120-value,BND136-event topology,clock,43-scientific-field/38-frozen-field and export criteria remain mandatory. Neither public output nor this no-control suffix establishes Native private12 scalar fields,shadow state,general TAR,transmittance-map/precompute output,active Screen/shading/window optics or thermal parity. Source A/IDF,Legacy behavior,active Construction consumers and full-object/every-valid-combination completion remain held."
+      "An additional bounded genuinely unused WindowMaterial:Screen route on Source B direct epJSON uses the real ordered Screen constructor/getter and ordinary GroupScreen material row. Original schema validates13 consumed body keys (A2 reflected-beam method and12 numeric fields;A1 Name is the instance key);unknown body name/idf_* metadata remains retained and unconsumed. Total Raw/IP/name/number/typed-ID/count/loader/reverse-alias custody includes Raw-present/typed0 rejection and all original/effective/typed Construction-layer fences. The genuine2A12N/min9 primitive retains defaults/blanks/used state, JSON-key scratch labels, signed-effective operands, method handling, ordered diagnostics, ROnly and NominalR state. Four existing bodies contain authored45 added assertion sites,5 explicit for loops and4 fresh Material owners with0 new test functions/helpers and0 Window unit owners;glass.rs coverage in these unit checks is STATIC_DEPENDENCY_ONLY. The fixed input adds one unused SCREEN UNUSED SCALAR with12 Float records and1 ModelAsDiffuse method String over859 held parent numeric records (871 total;canonical752+119),without changing requests,windows or other objects. A genuine full normal Source run must complete with nonzero public final Surfaces, physics_executed true and observer_supplies_inputs false. Authenticated compiled Source snapshot annotations tie its positive Screen row to BeginSim/BuiltIn/W5 and the real all-false HasShadeControl traversal,with the first true control still blocked. This is SOURCE_CAUSAL_INFERENCE,not exported HasShadeControl/num_screens/BuiltIn/WindowTypeBSDF telemetry or proof of a private Native window owner. Acceptance also requires the complete ordered Native==Source11-row11-column public MaterialDetails table (all10 parent material names held),the new literal Screen public row and same-row Source map/typed-ID/group7/NominalR.00175 bits/Roughness2/absorptances. All inherited158-series/75120-value,BND136-event topology,clock,43-scientific-field/38-frozen-field and export criteria remain mandatory. Neither public output nor this no-control suffix establishes Native private12 scalar fields,shadow state,general TAR,transmittance-map/precompute output,active Screen/shading/window optics or thermal parity. Source A/IDF,Legacy behavior,active Construction consumers and full-object/every-valid-combination completion remain held.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Blind": [
-      "A bounded genuinely unused ordinary WindowMaterial:Blind route on Source B direct epJSON uses the real ordered 2A27N/min29 getter and the same SelectedMaterialData/backend for CalcWindowBlindProperties. Orientation plus 27 numeric body keys retain original schema/default/token-kind checks, JSON-key labels/blanks/used state and total Raw/IP/untrimmed SourceExact name/typed-ID/count/loader/reverse-alias/CTF custody, including typed ID zero. Unknown body name/idf_* and other metadata remain unconsumed. Original tokens, signed-effective operands and plain-f64 projection remain distinct. Genuine constructor/raw slat TAR1/base-zero/Rough/ROnly/NominalR state and ordered warning, duplicate, joint, equality, geometry and IO prefixes are preserved; the Fixed min/max relationship remains inactive. The same owner retains 181x38 persistent TAR storage, constructor-zero Bm0, all 181 slat angles x37 profiles x2 bands, Native column-major/LU/partial-write order and fallible sin/cos/sqrt/asin. No table seeding, material clone or detached success commit substitutes for the producer. Native zero-row Fatal remains distinct from the Source-only unavailable uninitialized-first-pivot boundary. The fixed input adds one BLIND UNUSED SCALAR with 27 Float records and one Horizontal String over 871 held parent numeric records (898 total; canonical 752+146), with no new requests or series. Authored 55 assert sites, 6 for loops and four Material owners in four existing bodies, with zero Window unit owners, are static CODE facts; actual current/historical QA comes from genuine Authority. Conditional acceptance requires full normal Source completion, nonzero public Surfaces, physics_executed true, observer_supplies_inputs false, the complete ordered 12x11 public MaterialDetails table with all 11 parent rows held, the new Rough/base-zero row, same-row Source geometry and authenticated compiled producer annotations. This SOURCE_CAUSAL_INFERENCE does not export Native-private TAR, flags, pointers or Window unit state. All inherited 158-series/75120-value, BND136-event, clock, policy, 43-science/38-frozen and export criteria remain mandatory. Every original/effective/typed Construction layer, active window/control/EMS/variable-slat/daylighting/rating/thermal/EQL consumer, Source A/IDF/Legacy changes and full-object/all-legal-combination completion remain held."
+      "A bounded genuinely unused ordinary WindowMaterial:Blind route on Source B direct epJSON uses the real ordered 2A27N/min29 getter and the same SelectedMaterialData/backend for CalcWindowBlindProperties. Orientation plus 27 numeric body keys retain original schema/default/token-kind checks, JSON-key labels/blanks/used state and total Raw/IP/untrimmed SourceExact name/typed-ID/count/loader/reverse-alias/CTF custody, including typed ID zero. Unknown body name/idf_* and other metadata remain unconsumed. Original tokens, signed-effective operands and plain-f64 projection remain distinct. Genuine constructor/raw slat TAR1/base-zero/Rough/ROnly/NominalR state and ordered warning, duplicate, joint, equality, geometry and IO prefixes are preserved; the Fixed min/max relationship remains inactive. The same owner retains 181x38 persistent TAR storage, constructor-zero Bm0, all 181 slat angles x37 profiles x2 bands, Native column-major/LU/partial-write order and fallible sin/cos/sqrt/asin. No table seeding, material clone or detached success commit substitutes for the producer. Native zero-row Fatal remains distinct from the Source-only unavailable uninitialized-first-pivot boundary. The fixed input adds one BLIND UNUSED SCALAR with 27 Float records and one Horizontal String over 871 held parent numeric records (898 total; canonical 752+146), with no new requests or series. Authored 55 assert sites, 6 for loops and four Material owners in four existing bodies, with zero Window unit owners, are static CODE facts; actual current/historical QA comes from genuine Authority. Conditional acceptance requires full normal Source completion, nonzero public Surfaces, physics_executed true, observer_supplies_inputs false, the complete ordered 12x11 public MaterialDetails table with all 11 parent rows held, the new Rough/base-zero row, same-row Source geometry and authenticated compiled producer annotations. This SOURCE_CAUSAL_INFERENCE does not export Native-private TAR, flags, pointers or Window unit state. All inherited 158-series/75120-value, BND136-event, clock, policy, 43-science/38-frozen and export criteria remain mandatory. Every original/effective/typed Construction layer, active window/control/EMS/variable-slat/daylighting/rating/thermal/EQL consumer, Source A/IDF/Legacy changes and full-object/all-legal-combination completion remain held.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Shade:EquivalentLayer": [
       "Source B admits only unused direct epJSON through the genuine 1A11N/min6 MaterialShadeEQL getter. Four required fields give legal NumNums5..11; all11 slots, JSON field labels, blanks/defaults and used state are retained, including N9=.05 and N10/N11=.91 outside the returned count. Original schema/kinds remain separate from signed-effective numeric projection and total Raw/IP/name/typed-ID/loader/reverse-alias/CTF custody.",
       "Qualified unused Source compilation defers only the five Native joint checks to the same runtime owner; original required fields/bounds/defaults and Legacy remain held. The actual TAR1 writes front/back solar, front-visible only and directional IR before ordered diagnostics; shared Material base absorptances and nominal resistance remain zero. Four existing bodies ran fresh, with0new test functions,4Material and0Window unit owners.",
       "Source185 adds one fixed unused11-Float row over898 held parent numeric records,909total, with no new output request or series. One fresh Native/Source pair passes all158series/75120values and unchanged12+12+8+2 science/export gates. Whole ordered13x11 public MaterialDetails matches exactly and all12 parent rows remain; same-row Source geometry binds Group14/id10/typed9/roughness2,zero NomR and scalar absorptances across six actual physics surfaces.",
-      "The real zero Construction:WindowEquivalentLayer count skips positive unavailable EQL initialization; ordinary same-owner Blind precomputation remains required and unchanged in the full scene. Active EQL/window/Construction/control/ASHWAT, Native privateTAR or pointer parity, arbitrary legal combinations, Source A/IDF/Legacy expansion and full-object completion remain unclaimed."
+      "The real zero Construction:WindowEquivalentLayer count skips positive unavailable EQL initialization; ordinary same-owner Blind precomputation remains required and unchanged in the full scene. Active EQL/window/Construction/control/ASHWAT, Native privateTAR or pointer parity, arbitrary legal combinations, Source A/IDF/Legacy expansion and full-object completion remain unclaimed.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Drape:EquivalentLayer": [
       "Source B admits only unused direct epJSON through the genuine1A13N/min4 MaterialDrapeEQL getter. Four required N2..N5 fields give legal NumNums5..13; all13 numeric slots, JSON names, blanks/defaults and used state remain genuine. Infrared defaults.05/.87/.87 and original token/kind versus signed-effective operands are distinct; unknown body name/idf_* and other any-kind metadata stay unconsumed. Total Raw/IP/name/typed-ID/count/loader/reverse-alias/CTF custody includes typedID0 and untrimmed SourceExact names.",
       "Qualified Source compilation defers only the three Native joint checks to the same runtime Material owner, preserving original schema/defaults and Legacy. The owned inherited TAR1 stores front/back solar and front-visible-only fields; pleats are retained only when both nonblank and nonzero, including a legal positive original integer with signed-effective-1. Front-solar and visible sums fail at>=1,front-IR only at>1; no invented back checks. Common base fields/absorptances/NomR remainzero. Authored47assert sites,6for and4Material contexts in four existing bodies are static CODE facts,with0Window unit owners; actual8-command QA executes4current bodies with0fail/history/reuse.",
       "Source186 adds one fixed unused13-Float row over909 held parent numbers,922total,without new requests or series. One fresh Native/Source pair passes all158series/75120values and unchanged12+12+8+2 gates. Whole ordered14x11 public MaterialDetails matches exactly and all13parent rows remain; Source same-row geometry binds Group15/id11/typed10/roughness2,zero NomR and common absorptances across six actual physics surfaces.",
-      "The real zero Construction:WindowEquivalentLayer count skips positive unavailable EQL initialization; ordinary same-owner Blind precomputation remains required. Active EQL/windows/Construction/control/ASHWAT, Native-private TAR or pleat/optics/pointer parity, arbitrary legal combinations, Source A/IDF/Legacy admission changes and full-object completion remain held."
+      "The real zero Construction:WindowEquivalentLayer count skips positive unavailable EQL initialization; ordinary same-owner Blind precomputation remains required. Active EQL/windows/Construction/control/ASHWAT, Native-private TAR or pleat/optics/pointer parity, arbitrary legal combinations, Source A/IDF/Legacy admission changes and full-object completion remain held.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Screen:EquivalentLayer": [
       "Source B additionally admits only unused direct epJSON through the genuine1A10N/min11 MaterialScreenEQL getter and one inheritedTAR1/common row. RequiredN2..N6,exactN1Auto/default-99999 blank distinction,all10 JSON labels/defaults/blanks/used and total Raw/IP/name/typed-ID/count/loader/reverse-alias/CTF custody remain checked. Original positive wire numbers and signed-effective operands are distinct;missing .025/.005 scratch defaults leave blank-guarded row wires at constructor0.",
       "Qualified Source compilation defers Native wire thresholds/relationship/openness and joint diagnostics to the same actual runtime owner, preserving Legacy. Ordered repair Severe/Continue messages,one-sidedopenness test,existing sqrt followed bysame-row write thenround4/finalContinue retain Native IO prefixes and no-error-flag rules. N6 writes visiblefrontDf.Ref,backvisible/commonbaseabsorptances/NomR remainzero. Static47assert/6for/4Material/0Window CODE facts are separate from actual8QA/4current/0fail-history-reuse;getterbodycreditfalse.",
       "Source187 adds one fixed unused10-Float row over922 held parent numbers (932total),without new requests/series. One fresh Native/Source pair passes all158series/75120values and unchanged12+12+8+2 gates;whole15x11 public MaterialDetails cells match andall14parent rows/order remain. Source same-row geometry binds Group17/id13/typed12/Rough2/NomR+0/commonzeros with six actualphysics surfaces. Bibliography119scientificRust+3derivation=122combined;37Native+1preexistingprimarydocument and52separate documentaryrows remain distinct.",
-      "Actual zero EQL Construction count legitimately skips positive unavailable EQL/ASHWAT initialization;ordinary same-owner Blind precompute remains required. Active windows/Construction/control,Native-privateTAR/wire-optics/pointer parity,SourceA/IDF/Legacy admission changes,full-object and arbitrary valid-combination completion remain held."
+      "Actual zero EQL Construction count legitimately skips positive unavailable EQL/ASHWAT initialization;ordinary same-owner Blind precompute remains required. Active windows/Construction/control,Native-privateTAR/wire-optics/pointer parity,SourceA/IDF/Legacy admission changes,full-object and arbitrary valid-combination completion remain held.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Blind:EquivalentLayer": [
       "Source B additionally admits only unused direct epJSON through the genuine 3A21N/min10 MaterialBlindEQL getter and one inherited TAR1/common row. Required N1/N2/N7/N8/N14/N15, Horizontal/FixedSlatAngle defaults, legal NumNums15..21, original field kinds/bounds and all21 fixed default/blank/used slots remain checked. Both SourceExact name hooks and total Raw/IP/global-name/typed-ID/count/loader/reverse-alias/CTF custody retain whitespace and source ordering; original positive UInt operands and signed-effective Real64 operands remain distinct.",
       "Qualified Source compilation defers Native geometry warnings/recovery and four raw beam-sum diagnostics only for original-valid unused input, preserving Legacy. Five ordered warnings/recovery steps and IO flag/commit prefixes remain owned by the same actual Material. N16..18 blank guards copy N13..15 into visible diffuse state; infrared guards are independent. Common base properties and NominalR remain zero, Group16/Rough1 and resistance-only behavior are retained. Static47 assertion sites/6 explicit for loops/4 Material/0 Window owners remain separate from actual8 QA commands/4 current bodies/0 failed-history-reuse; getterbodycreditfalse.",
       "Source188 adds one fixed unused21-Float/two-String row over932 held parent numbers (953total; canonical752+201) without new requests or series. One fresh Native/Source pair with0 reruns passes all158series/75120values and unchanged12+12+8+2 gates. Whole16x11 public MaterialDetails cells match with all15 parent rows/order held. Source same-row geometry binds Group16/id15/typed14/Rough1/NomR+0/commonzeros and six actual physics surfaces. Bibliography121scientificRust+3derivation=124combined current Source citations is distinct from122 current ObjectTypes;37Native+1preexisting primary documentary record and52 separate documentary rows remain distinct.",
-      "Actual zero EQL Construction count legitimately skips positive unavailable EQL/ASHWAT initialization; the ordinary same-owner Blind181-angle producer remains required. Active windows/Construction/control, Native-private TAR/optics/pointer parity, SourceA/IDF/Legacy admission changes, full-object and arbitrary valid-combination completion remain held."
+      "Actual zero EQL Construction count legitimately skips positive unavailable EQL/ASHWAT initialization; the ordinary same-owner Blind181-angle producer remains required. Active windows/Construction/control, Native-private TAR/optics/pointer parity, SourceA/IDF/Legacy admission changes, full-object and arbitrary valid-combination completion remain held.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Glazing:EquivalentLayer": [
       "Source B additionally admits only unused direct epJSON through the genuine3A26N/min11 MaterialGlassEQL getter, Fen-compatible inherited TAR1 and common report/geometry row. Required N1..4, legal NumNums8..26, all26 fixed scratch/default/blank/JSON-label/used effects and unconditional numeric writes remain explicit. A2 defaults to SpectralAverage; unresolved nonempty A3 is retained without a spectral dependency in that mode. Both SourceExact hooks and complete Raw/IP/global-ID0/typed/count/loader/reverse-alias/CTF custody distinguish original numeric kinds from effective signed-i64 operands.",
       "Original schema bounds and six Autocalculate alternatives remain separate from runtime state: N5..8 missing IP0, N9..16 schema0, N17..22 Auto-99999, N23 zero, N24/25 default0.84 and N26 default0.158. Spectral is schema-legal but the Native getter sets its mode-error flag and performs all writes before one Severe/two Continue diagnostics; only SpectralAverage has the bounded positive route. Duplicate Severe precedes flag/allocation. N17/N20 are shared front/back diffuse transmittance; N23 infrared transmittance also writes both directional thermal absorptances instead of N24/N25 emissivity. Effective N26<=0 silently selects0.158; actual base Resistance updates while NominalR stays ctor+0.",
       "Source189 fixed26-Float/one-SpectralAverage-String insertion preserves953 parent numeric records (979total; canonical752+227), all requests/series/policies and original/converted DOM custody. One Native and one Source process with0reruns pass158series/75120values and unchanged12+12+8+2 gates. Whole17x11 public MaterialDetails cells match with all16 parent rows/order held; actual VerySmooth Resistance0.1730/commonzeros is distinct from Source Group13/id6/typed5/Rough5/NominalR+0. Same-row Source geometry maps six actual physics surfaces. Static47assert/6for/4Material/0Window facts remain separate from actual8QA/4current/0failed-history-reuse and falsegettercredit.",
-      "Actual zero EQL Construction count skips positive unavailable EQL/ASHWAT work while ordinary same-owner Blind181-angle production and six-surface physics remain required. Input60 ObjectTypes, currentcombined122, retained116 and registry147 remain distinct and held;123scientificRust+3derivation=126current Source citations does not add ObjectTypes. Native-private TAR/optics/pointer parity, active EQL/window/Construction/control, SourceA/IDF/Legacy admission changes, full-object and arbitrary valid-combination completion remain unclaimed."
+      "Actual zero EQL Construction count skips positive unavailable EQL/ASHWAT work while ordinary same-owner Blind181-angle production and six-surface physics remain required. Input60 ObjectTypes, currentcombined122, retained116 and registry147 remain distinct and held;123scientificRust+3derivation=126current Source citations does not add ObjectTypes. Native-private TAR/optics/pointer parity, active EQL/window/Construction/control, SourceA/IDF/Legacy admission changes, full-object and arbitrary valid-combination completion remain unclaimed.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "WindowMaterial:Gap:EquivalentLayer": [
       "Source B additionally admits original-valid unused direct epJSON through the genuine3A12N/min3 GapEQL getter and existing five-slot MaterialGasMix owner. Required original gas_type/thickness/gap_vent_type, strict enums and all12 original scalar kinds/bounds remain distinct from effective SourceJsonNumber signed-i64 operands. Returned3A/NumNums1..12, optional IPzero/blank slots, actualJSON labels/used state and all Raw/IP/global-name/typed-ID/loader/reverse-alias/CTF identity checks remain explicit. No invented Air-only gas/vent restriction is added.",
       "Named gases copy the exact first standard record before the A2-blank guard reads A3 vent. Custom repeats nine coefficient assignments three times, then writes weight/ratio; visA/cpA/weight checks set shared ErrorsFound before Severe/Continue. Only a false shared flag computes exact c0+c1*300+c2*90000 and Thickness/positiveDenom to NomR; base Resistance stays0. Duplicate Severe precedes flag/allocation; denominator Severe/.3R/Continue precedes its flag. Original-valid positive thickness can have distinct signed-effective operands; no finite-result/effective-positive clamp or typed-resistance fallback is invented. Four named gases×threevents and bounded Custom default/error partitions have existing-body QA, not Cartesian completion.",
       "Source190 fixed12-Float/two-String CUSTOM/VentedOutdoor insertion holds979 parent numbers (991total; canonical752+239/36alpha), all requests/series/policies and original/converted DOM custody. One Native/one Source process with0reruns pass158series/75120values and12+12+8+2 gates. Whole18x11 public MaterialDetails cells match with17 parent rows/order held. CommonResistance0/MediumRough/Thickness0.0125/commonzeros is distinct from actual Source-only NomR0.47169811320754723, Group18/id9/typed8/Rough2 on six actual physics surfaces; no Native-private NomR/gas/TAR parity follows.",
       "Static48assert/6for/4Material/0Window facts differ from8current/13total QA commands:1 QA01 compiler E0433 failure before that body,4current/2historical/0reused bodies and falsegettercredit. Root two-file correction used existing RawModel/RawValue and publicfield rustdoc with no Cargo/math/physics change; all8QA02 commands passed. The retained command failure is not a failed Source build or engine failure. A separate unresolved static limitation misses independently mutated typed outside_layer when typed layers is nonempty; Raw original Construction references and typed layers/effective/empty fallback remain fenced, with no outside-only mutation execution credit. Same-input science acceptance stays unchanged.",
-      "Actual zero EQL Construction input skips positive unavailable EQL/ASHWAT work while ordinary Blind181-angle production and six-surface physics remain required. Actualinput61/currentcombined122/retained116/registry147 are separate from125scientificRust+3derivation=128Sourcecitations. Active EQL/window/Construction/control, SourceA/IDF/Legacy admission changes, Native-private state/full-object and arbitrary valid-combination parity remain unclaimed."
+      "Actual zero EQL Construction input skips positive unavailable EQL/ASHWAT work while ordinary Blind181-angle production and six-surface physics remain required. Actualinput61/currentcombined122/retained116/registry147 are separate from125scientificRust+3derivation=128Sourcecitations. Active EQL/window/Construction/control, SourceA/IDF/Legacy admission changes, Native-private state/full-object and arbitrary valid-combination parity remain unclaimed.",
+      "Source193 now independently fences actual typed original outside_layer even when layers is nonempty, plus ordered/effective layers and empty fallback. Raw/IP Source B admission and42 finite support assessments retain the declared unused scope. This unit/static correction contributes zero standalone pair/build credit; active Construction/window and SourceA/IDF/Legacy/full-object holds remain."
     ],
     "Material:RoofVegetation": [
       "Source B additionally admits only original-valid unused direct epJSON Material:RoofVegetation through the genuine4A15N/min19 getter and same retained EcoRoof material row. All15 original numeric kinds/bounds, six roughness enums and Simple/Advanced methods remain distinct from signed-effective SourceJsonNumber operands. Defaults/blanks/used state, actual JSON-key scratch, exact names and total Raw/IP/global-ID/typed-ID/loader/reverse-alias/CTF custody remain checked. Soil Layer Name is type-checked, preserves exact empty-versus-whitespace handling and is source-inactive; no soil material is invented.",
       "The constructor retains five input/directional absorptance zeros until real getter writes. Group8/ROnlyfalse, actual scalar assignments and report/accessor row stay owned state. Positive K computes Thickness/K into both Resistance and NominalR regardless of an earlier shared ErrorsFound flag. Nonpositive K preserves Severe/Continue/flag order. Initial moisture above Porosity emits Warning plus five Continues before its late clamp; interrupted IO retains the preceding writes and unclamped value. No extra residual/initial relation, provider, seeded resistance or finite-result gate is added.",
       "Source191 fixed15-Float/three-String insertion holds991 parent numbers (1006total; canonical752+254/39alpha) and all requests/policies. Root reports one Native and one Source process with0reruns,158series/75120values and12+12+8+2 gates accepted. Whole19x11 public MaterialDetails cells are exact with all18 parent rows/order held. Public Roof row R0.3514/MediumSmooth/thickness0.1300/K0.370/density1130/Cp1230/absorptances0.93,0.73,0.77 joins actual Source Group8/id18/typed17/Rough3/NomR0.35135135135135137 bits3fd67c8a60dd67c9. Full-precision Native-private NomR or plant/soil state parity is not observed.",
       "Static48assert/6for/4Material/0Window/0newtestfn facts differ from actual8current/8total QA commands,0failed,4current/0historical/0reused bodies and falsegettercredit. Roof original typed outside_layer was corrected before QA; InputDATA01 zero-count patch failed frozen-ledger preflight and DATA02 changed context only. Both are retained static/DATA histories,not QA/build/engine failures. Source190 compiler QA failure remains unchanged in its historical case/build. The shared fourteen-family original-outside prototype remains ignored and unadopted; prior14 limitation is not closed by this Roof case.",
-      "Six ordinary physics surfaces and ordinary Blind production remain required. Input62ObjectTypes,currentcombined122,retained116 and registry147 are distinct from127scientificRust+3derivation=130currentSourcecitations. This unused constructor/getter/common-report route does not admit active EcoRoof water/energy/soil evolution, Construction consumption, SourceA/IDF/Legacy changes, Native-private state, full-object or every-valid-combination parity."
+      "Six ordinary physics surfaces and ordinary Blind production remain required. Input62ObjectTypes,currentcombined122,retained116 and registry147 are distinct from127scientificRust+3derivation=130currentSourcecitations. This unused constructor/getter/common-report route does not admit active EcoRoof water/energy/soil evolution, Construction consumption, SourceA/IDF/Legacy changes, Native-private state, full-object or every-valid-combination parity.",
+      "The preceding Source191 statements retain their historical QA, inventory and then-unadopted shared14 status. Current Source193 now adopts the shared14 original typed-outside/layers/effective/fallback fence correction with bounded unit/static checks and zero standalone pair/build credit. RoofVegetation own unused Source B getter/common-report boundary and every activeEcoRoof water/energy/soil, Construction/SourceA/IDF/Legacy/privateNative/full-object hold remain unchanged. The current combined inventory is123 after the alreadyaccepted OutdoorAir:NodeList documentation-key correction; retained116 and registry147 remain unchanged."
+    ],
+    "WindowMaterial:Gap": [
+      "Only original-valid unused Source B direct epJSON reaches the genuine4A2N/min0 WindowMaterial:Gap getter and its retained MaterialComplexWindowGap/MaterialGasMix row. Original schema kinds/bounds and SourceJsonNumber signed-effective operands remain distinct. Thickness is required and originally positive; Pressure has no original-schema positive bound, defaults to101325 and retains the real getter nonpositive diagnostic. Exact names, default/blank/used state, JSON-key scratch and Raw/IP/Source ordinal/global-ID/typed-ID/loader custody remain checked. Every raw or typed Construction layer reference is fenced; general typed/Legacy support is not promoted.",
+      "The actual allocated Group12/ROnly/Rough row owns its Thickness and Pressure before lookup. Blank reference preserves constructor state; a genuine reference copies all five gas slots, fraction slots, NumGases and vent type from an available Gas/GasMixture, earlier EQL Gap, allocated self or earlier Gap owner, including transitive and earlier-blank state. Names, Thickness, Pressure, Resistance and NominalR are not copied as gas properties. Undefined Native non-GasMix references and unavailable later-owner partitions remain held. Ordered diagnostics and partial-write/SourceIO effects are existing-owner checks, not private Native state observations.",
+      "One fixed scene adds eight unused Gap definitions and two helper definitions with20 Float and12 String operands. It retains1026 numeric records (canonical752held+274added),51 alpha changes and the original requests/policies. The fresh corrected Source193 pair uses1Native/1Source process with0reruns; all158series/75120values and12+12+8+2 frozen gates pass. Whole27x11 public MaterialDetails cells and all19 parent rows/order are exact. Actual Source Gap rows Group12/SourceIDs20..27/typed19..26/Rough1 retain positive-zero NomR and all three absorptances through the same runtime geometry accessor on six ordinary physics surfaces.",
+      "Final static coverage is34 added assertions (32original+2geometry),6 explicit for loops in4 existing bodies,2 Material declaration sites/11 finite instances and0 Window owners; no new test function exists. Actual QA is8current/30total commands with2failures,4current/11historical/0reused bodies and falsegettercredit. Source192 first completed CTF but CLIexit6 at required geometry export, receiving0case/0sample credit; Source193 separately corrects the missing retained-row accessor/dispatch and passes. That runtime failure remains distinct from the two earlier QA failures. Native-private gas/fraction/vent/pressure/helper/fullprecisionNomR parity and activewindow/CFS/SourceA/IDF/Legacy/full-object/every-valid-combination support remain unestablished."
+    ],
+    "WindowGap:DeflectionState": [
+      "Bounded unused Source B direct-epJSON WindowMaterial:Gap may resolve this raw-only helper through actual first-doj raw alias lookup and mark-before-fields direct getRealFieldValue custody. Generic1A3N input statistics are not three direct helper reads: only deflected_thickness is consumed, defaulting to0. Initial temperature and initial pressure retain original nonnegative schema validation but remain unread. The helper has no invented MaterialID, typed arena or public material row of its own.",
+      "The fixed Source193 scene includes the helper and retains the same158series/75120values, all frozen gates and exact27x11 common MaterialDetails table. Existing-body checks cover direct API defaults/aliases/used and error order; public report and Source geometry expose Gap rows, not Native-private deflected thickness or initialT/P. Physical deflection algorithms, activewindow/CFS, SourceA/IDF/Legacy, full-object and arbitrary combinations remain held."
+    ],
+    "WindowGap:SupportPillar": [
+      "Bounded unused Source B direct-epJSON WindowMaterial:Gap may resolve this raw-only helper through actual first-doj raw alias lookup and mark-before-fields direct getRealFieldValue custody. Generic1A2N statistics remain distinct from direct spacing/radius reads. Original schema requires positive supplied operands; the direct API retains spacing0.04 and radius0.0004 defaults and original signed-effective number behavior. The helper has no invented MaterialID, typed arena or public material row of its own.",
+      "The fixed Source193 scene includes the helper and retains the same158series/75120values, all frozen gates and exact27x11 common MaterialDetails table. Existing-body checks cover direct API defaults/aliases/used and error order; public report and Source geometry expose Gap rows, not Native-private pillar state. Pillar heat-transfer/deflection algorithms, activewindow/CFS, SourceA/IDF/Legacy, full-object and arbitrary combinations remain held."
+    ],
+    "OutdoorAir:NodeList": [
+      "This own reviewed-domain key records the already accepted bounded ordinary no-AFN Source B direct-epJSON OutdoorAir:NodeList dependency described with OutdoorAir:Node. It uses every existing positive-OA/DSOA prerequisite and the real list-before-single owner. Instance keys retain input order/used-object identity rather than supplying an A1 node name. Omitted or empty nodes arrays and exact-empty node_or_nodelist_name values retain the genuine zero-node route; whitespace remains a real name. Membership allocation/reference and advancing streams remain ordered, while only the final outdoor registry deduplicates node numbers. Existing whole BND/general-list/Scheduled-manager exports and inherited numerical/scientific policies remain authoritative. SourceA/IDF/Legacy, AFN, unsafe Native zero-index partitions, arbitrary list/consumer combinations and full-object completion remain held.",
+      "This Source193 documentation inventory correction adds no case, sample, calibration, runtime implementation or scientific credit. The old generated122 omitted this already accepted name; its own reviewed_domains key restores the current combined inventory to123. Retained original110 plus six accepted additions remains116. WindowMaterial:Gap and both WindowGap helper families already occur in original110 and add zero union names."
     ]
   },
   "verification": {
@@ -12874,6 +12907,189 @@
           "bytes": 1744
         },
         "shared14_future_CODE_not_adopted": true
+      },
+      "unused_window_gap_material_details_Source_geometry_and_public_series": {
+        "actual_quality": {
+          "path": ".runtime/porting/unused-window-gap/quality04/summary.json",
+          "sha256": "0ad1817074efb871b1f809a9412a26bd0548fe3fe1c776591e9be7007d3faedc",
+          "bytes": 2669
+        },
+        "retained_quality_history": [
+          {
+            "path": ".runtime/porting/unused-window-gap/quality01/summary.json",
+            "sha256": "6674fdb6298c0e69888c913553e1d3c5c1b5a9a20c5aa20d6d33b0ad215a5b60",
+            "bytes": 2031
+          },
+          {
+            "path": ".runtime/porting/unused-window-gap/quality02/summary.json",
+            "sha256": "163e0342686572c069bbd6999b815b0ad8cedeffb847b06c5a4117973c65f125",
+            "bytes": 2673
+          },
+          {
+            "path": ".runtime/porting/unused-window-gap/quality03/summary.json",
+            "sha256": "e709587cdcd6182d35b11b33a3675c0f8c475ce2531d1cf05d212efa45ee2f71",
+            "bytes": 2669
+          },
+          {
+            "path": ".runtime/porting/unused-window-gap/quality04/summary.json",
+            "sha256": "0ad1817074efb871b1f809a9412a26bd0548fe3fe1c776591e9be7007d3faedc",
+            "bytes": 2669
+          }
+        ],
+        "retained_failed_QA_attempts": [
+          {
+            "path": ".runtime/porting/unused-window-gap/Root-QA01-failure-and-number-kind-root-cause01.json",
+            "sha256": "d2e04156004d0097b8607df161bbec187fd74488b151195566306642598cb9b1",
+            "bytes": 1344
+          },
+          {
+            "path": ".runtime/porting/unused-window-gap/Root-QA02-clippy-failure-facts01.json",
+            "sha256": "90325725278d88454d23bb256261d5f83814e3cce46325ea37a91dc3936f7a00",
+            "bytes": 1244
+          }
+        ],
+        "actual_QA_commands_DTO": {
+          "path": ".runtime/porting/unused-window-gap/documentation-link-build-DTO01.json",
+          "sha256": "145578c38b3a6be3a7563642150e110508ea551e26ad4ed69e9ccdf1d2e87649",
+          "bytes": 26735
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-window-gap/evidence02/source-authority.json",
+          "sha256": "cc9dbb459b4fbcffbe858badf44f21a39578fbef86d29555ffb87769543191a1",
+          "bytes": 114587
+        },
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-Gap-QA-profile-DATA-DRAFT03/QA-profile.json",
+          "sha256": "76edec3759beca369885e4a87ec00f922ac8b80e7b21339d64d923c4664fc254",
+          "bytes": 8237
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/unused-window-gap/QA-profile-binding04.json",
+          "sha256": "ce81231f5bfa7a771fc87aa9b63098d8d21e79b7fab1dacb5ab58c1637d541d3",
+          "bytes": 5090
+        },
+        "counts": {
+          "current_QA_commands": 8,
+          "total_actual_QA_commands": 30,
+          "failed_QA_attempts": 2,
+          "current_test_body_executions": 4,
+          "historical_test_bodies": 11,
+          "reused_test_bodies": 0,
+          "current_getter_credit": false
+        },
+        "static_existing_body_CODE": {
+          "new_test_functions": 0,
+          "original_Source18_added_assertions": 32,
+          "geometry_correction_added_assertions": 2,
+          "total_added_assertions": 34,
+          "explicit_for": 6,
+          "existing_bodies": 4,
+          "Material_declaration_sites": 2,
+          "finite_Material_instances": 11,
+          "Window_instances": 0,
+          "all_old2740asserts_preserved": true,
+          "final_asserts2774": true
+        },
+        "new_test_functions": 0,
+        "Source_paths_changed": 19,
+        "Source_existing_modified": 17,
+        "Source_added": 2,
+        "Source_held": 4684,
+        "Source_stages": [
+          18,
+          13,
+          1,
+          0,
+          2,
+          1,
+          3,
+          1
+        ],
+        "Root_actual_facts": {
+          "path": ".runtime/porting/unused-window-gap/documentation-facts01.json",
+          "sha256": "f2b9275f9791291a784e0ae1b8c3a8bd066c1329671195e6c57064f5cbf53496",
+          "bytes": 28863
+        },
+        "Root_scientific_review": {
+          "path": ".runtime/porting/unused-window-gap/runtime02/Root-scientific-review.json",
+          "sha256": "08dcb6724b574a1bd5516afeda26df5dc1fd8e6ae78c6f2983738c2be3b15aef",
+          "bytes": 17016
+        },
+        "Static_preQA_corrections": [
+          "Source18 candidate placement/copy/schema adjustments remain static history distinct from actual QA/runtime failures"
+        ],
+        "actual_Source_correction_reviews": [
+          {
+            "path": ".runtime/porting/unused-window-gap/correction01.json",
+            "sha256": "b0ca8c23fb0826c02e9e2234af4f0ea6bf4cadd1dc6baeb17f0c92443fa842d8",
+            "bytes": 2858
+          },
+          {
+            "path": ".runtime/porting/unused-window-gap/correction02.json",
+            "sha256": "3e69a0fbb7e8e098e908babf425a8934003cc437acf6d2307c8f36d2a113a1c1",
+            "bytes": 3564
+          },
+          {
+            "path": ".runtime/porting/unused-window-gap/correction03.json",
+            "sha256": "df097c8457c7a29e0c495f5695b58b13afe91c940c296eb62554a7470e418ad6",
+            "bytes": 5027
+          }
+        ],
+        "retained_failed_Source_attempts": [
+          {
+            "path": ".runtime/porting/unused-window-gap/failed-attempt01.json",
+            "sha256": "4db9774427e052791089426ee6b1d514c3049ded4091a1a4a4bbe6abc5bf1d16",
+            "bytes": 4729
+          }
+        ],
+        "shared14_correction_now_adopted": {
+          "families": [
+            "WindowMaterial:Glazing:RefractionExtinctionMethod",
+            "WindowMaterial:Glazing:EquivalentLayer",
+            "WindowMaterial:Gas",
+            "WindowMaterial:Gap:EquivalentLayer",
+            "WindowMaterial:GasMixture",
+            "WindowMaterial:Shade",
+            "WindowMaterial:Shade:EquivalentLayer",
+            "WindowMaterial:Drape:EquivalentLayer",
+            "WindowMaterial:Screen",
+            "WindowMaterial:Screen:EquivalentLayer",
+            "WindowMaterial:Blind",
+            "WindowMaterial:Blind:EquivalentLayer",
+            "WindowMaterial:Glazing",
+            "WindowMaterial:SimpleGlazingSystem"
+          ],
+          "Root_adoption": {
+            "path": ".runtime/porting/unused-window-gap/adoption01.json",
+            "sha256": "6ea9d9a671fe39e78a2a72dedcba6080f61efe108bfcef4f0f35dd90c2328608",
+            "bytes": 13996
+          },
+          "Root_closure": {
+            "path": ".runtime/object-expansion/unit159-prep/Root-WindowGap-Source18-literal-closure-audit01.json",
+            "sha256": "f8535cb7e4ef6e23584eaaff8e4551397a6ef130bdad66889d390c1ee503f0d4",
+            "bytes": 1316
+          },
+          "independent_review": {
+            "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowGap-Source18-proposal02-static-review01.json",
+            "sha256": "b7ae912d2551a909c86621e9386eb8c5ff6950606f4a5181ee9e0147bb52cbcd",
+            "bytes": 7999
+          },
+          "semantics": "Shared unused14 families now fence actual typed original outside_layer, ordered layers, effective layers and empty fallback, not effective layers alone. Genuine Raw/IP/SourceB admission and42finite support assessments validate same boundaries; SourceA/ordinary/Legacy negatives retained.",
+          "unit_static_only": true,
+          "standalone_new_pair_or_build_credit": 0
+        },
+        "whole_unit_actuals": {
+          "Native_engine_calls": 2,
+          "Source_engine_calls": 2,
+          "failed_Source_runtime_attempts": 1,
+          "successful_attempt_Native": 1,
+          "successful_attempt_Source": 1,
+          "successful_attempt_reruns": 0,
+          "explicit_corrective_revalidation_Native": 1,
+          "explicit_corrective_revalidation_Source": 1,
+          "automatic_retry": false
+        },
+        "qualification": "Two QA failures and one subsequent Source192 runtime/export failure are distinct. Current Source193 QA04 has eight successful commands; all thirty QA commands and eleven historical bodies remain retained. Whole-unit2Native/2Source counts include the failed first attempt; the accepted fresh runtime02 is1Native/1Source with zero reruns. No QA, static correction, inventory repair or failed attempt contributes paired samples."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -87303,12 +87519,1084 @@
             "qualification": "RoofVegetation already in retained116; bounded unused route only. currentcombined122/registry147/retained116 held. Input62ObjectTypes and130Sourcecitations(127scientific+3deriv) distinct."
           }
         }
+      },
+      {
+        "group": "WindowMaterial:Gap",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-unused-window-gap",
+        "case_kind": "UNUSED_WINDOW_GAP",
+        "source_build": "source-unused-window-gap-geometry-correction",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 23068,
+          "parsed_binary64_unequal": 23068,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "numeric_policy_projection": {
+          "all158_policy_rules_literal": true,
+          "policy_changes": 0,
+          "new_rules": 0,
+          "new_outputs": 0,
+          "new_report_requests": 0,
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-window-gap/runtime02/Root-scientific-review.json",
+            "sha256": "08dcb6724b574a1bd5516afeda26df5dc1fd8e6ae78c6f2983738c2be3b15aef",
+            "bytes": 17016
+          }
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v8/release.json",
+            "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+            "bytes": 11634
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/unused-window-gap/runtime02/binding.json",
+            "sha256": "02d3ca0a53e42d6cf1c57a961db67fd582b3ac8ba2b8c35ef27f29d6de38fd75",
+            "bytes": 1084
+          },
+          "case_config": {
+            "path": ".runtime/porting/unused-window-gap/runtime02/case-config.json",
+            "sha256": "f5e9f7a7c7d959aaf6c518442443c7c2930dfc21843c2a34cc2df23381983588",
+            "bytes": 141527
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/unused-window-gap/evidence02/source-authority.json",
+            "sha256": "cc9dbb459b4fbcffbe858badf44f21a39578fbef86d29555ffb87769543191a1",
+            "bytes": 114587
+          },
+          "completion": {
+            "path": ".runtime/porting/unused-window-gap/runtime02/completed.json",
+            "sha256": "441921d293aadd9dc034ed1609e18a40d32e10c41245330c5938aed6b6a2555c",
+            "bytes": 2195
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/unused-window-gap/runtime02/verify-command/receipt.json",
+            "sha256": "4db3890447c88fa7db82b5821c38d67e9d86c9225f6d8a27e3a4c36af38202c6",
+            "bytes": 411443
+          },
+          "actual_build": {
+            "path": ".runtime/porting/unused-window-gap/build02/build-row.json",
+            "sha256": "844de4b3b93e73d7b7e3439e12db4832738b92f76030a2f618265a80b3a033fe",
+            "bytes": 1341
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/unused-window-gap/quality04/summary.json",
+            "sha256": "0ad1817074efb871b1f809a9412a26bd0548fe3fe1c776591e9be7007d3faedc",
+            "bytes": 2669
+          },
+          "actual_quality_history": [
+            {
+              "path": ".runtime/porting/unused-window-gap/quality01/summary.json",
+              "sha256": "6674fdb6298c0e69888c913553e1d3c5c1b5a9a20c5aa20d6d33b0ad215a5b60",
+              "bytes": 2031
+            },
+            {
+              "path": ".runtime/porting/unused-window-gap/quality02/summary.json",
+              "sha256": "163e0342686572c069bbd6999b815b0ad8cedeffb847b06c5a4117973c65f125",
+              "bytes": 2673
+            },
+            {
+              "path": ".runtime/porting/unused-window-gap/quality03/summary.json",
+              "sha256": "e709587cdcd6182d35b11b33a3675c0f8c475ce2531d1cf05d212efa45ee2f71",
+              "bytes": 2669
+            },
+            {
+              "path": ".runtime/porting/unused-window-gap/quality04/summary.json",
+              "sha256": "0ad1817074efb871b1f809a9412a26bd0548fe3fe1c776591e9be7007d3faedc",
+              "bytes": 2669
+            }
+          ],
+          "actual_QA_counts": {
+            "current_QA_commands": 8,
+            "total_actual_QA_commands": 30,
+            "failed_QA_attempts": 2,
+            "current_test_body_executions": 4,
+            "historical_test_bodies": 11,
+            "reused_test_bodies": 0,
+            "current_getter_credit": false
+          },
+          "retained_failed_QA_attempts": [
+            {
+              "path": ".runtime/porting/unused-window-gap/Root-QA01-failure-and-number-kind-root-cause01.json",
+              "sha256": "d2e04156004d0097b8607df161bbec187fd74488b151195566306642598cb9b1",
+              "bytes": 1344
+            },
+            {
+              "path": ".runtime/porting/unused-window-gap/Root-QA02-clippy-failure-facts01.json",
+              "sha256": "90325725278d88454d23bb256261d5f83814e3cce46325ea37a91dc3936f7a00",
+              "bytes": 1244
+            }
+          ],
+          "owner_execution_review": {
+            "path": ".runtime/porting/unused-window-gap/evidence02/source-authority.json",
+            "sha256": "cc9dbb459b4fbcffbe858badf44f21a39578fbef86d29555ffb87769543191a1",
+            "bytes": 114587
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "engine_reruns": 0,
+          "new_test_functions": 0,
+          "profile": "ideal_loads.oa_topology.v1",
+          "fixed_input_manifest": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-WindowGap-CLOSED-input-DRAFT01/prepared-manifest.json",
+            "sha256": "bdd95cd8ba57c3bfce4aef2d4904cd987cfdbc882d3ce81e0a50f03d2ca566de",
+            "bytes": 14799
+          },
+          "independent_input_review": {
+            "path": ".runtime/object-expansion/unit159-prep/unused-WindowGap-CLOSED-input-DRAFT01/independent-static-review01.json",
+            "sha256": "cfe6634df6afbbc1cd3ad28c8a43bca37726ebf60bb05e17f3846bebb9fa1546",
+            "bytes": 12250
+          },
+          "documentation_actual_facts": {
+            "path": ".runtime/porting/unused-window-gap/documentation-facts01.json",
+            "sha256": "f2b9275f9791291a784e0ae1b8c3a8bd066c1329671195e6c57064f5cbf53496",
+            "bytes": 28863
+          },
+          "documentation_link_build_DTO": {
+            "path": ".runtime/porting/unused-window-gap/documentation-link-build-DTO01.json",
+            "sha256": "145578c38b3a6be3a7563642150e110508ea551e26ad4ed69e9ccdf1d2e87649",
+            "bytes": 26735
+          },
+          "Root_scientific_review": {
+            "path": ".runtime/porting/unused-window-gap/runtime02/Root-scientific-review.json",
+            "sha256": "08dcb6724b574a1bd5516afeda26df5dc1fd8e6ae78c6f2983738c2be3b15aef",
+            "bytes": 17016
+          },
+          "actual_parent_publication": {
+            "path": ".runtime/porting/unused-roof-vegetation/publish01/receipt.json",
+            "sha256": "8196932ea0b4ae86d59c2a5f0420a0ba38fe50f08327740273328a0d8b0cc7b1",
+            "bytes": 155077
+          },
+          "Source_adoption": {
+            "path": ".runtime/porting/unused-window-gap/adoption01.json",
+            "sha256": "6ea9d9a671fe39e78a2a72dedcba6080f61efe108bfcef4f0f35dd90c2328608",
+            "bytes": 13996
+          },
+          "Source_evidence": {
+            "path": ".runtime/porting/unused-window-gap/evidence02/source-evidence.json",
+            "sha256": "25926bcd35ed8b4f897f8f0ffc50a0a05d8a53657df24e1ae2b491ff7ed1a760",
+            "bytes": 63823
+          },
+          "QA_profile": {
+            "path": ".runtime/object-expansion/unit159-prep/WindowMaterial-Gap-QA-profile-DATA-DRAFT03/QA-profile.json",
+            "sha256": "76edec3759beca369885e4a87ec00f922ac8b80e7b21339d64d923c4664fc254",
+            "bytes": 8237
+          },
+          "QA_profile_binding": {
+            "path": ".runtime/porting/unused-window-gap/QA-profile-binding04.json",
+            "sha256": "ce81231f5bfa7a771fc87aa9b63098d8d21e79b7fab1dacb5ab58c1637d541d3",
+            "bytes": 5090
+          },
+          "Static_preQA_corrections": [
+            "Source18 candidate placement/copy/schema adjustments remain static history distinct from actual QA/runtime failures"
+          ],
+          "actual_Source_correction_reviews": [
+            {
+              "path": ".runtime/porting/unused-window-gap/correction01.json",
+              "sha256": "b0ca8c23fb0826c02e9e2234af4f0ea6bf4cadd1dc6baeb17f0c92443fa842d8",
+              "bytes": 2858
+            },
+            {
+              "path": ".runtime/porting/unused-window-gap/correction02.json",
+              "sha256": "3e69a0fbb7e8e098e908babf425a8934003cc437acf6d2307c8f36d2a113a1c1",
+              "bytes": 3564
+            },
+            {
+              "path": ".runtime/porting/unused-window-gap/correction03.json",
+              "sha256": "df097c8457c7a29e0c495f5695b58b13afe91c940c296eb62554a7470e418ad6",
+              "bytes": 5027
+            }
+          ],
+          "Completed_DTO_literal_defaults": {
+            "engines_executed_by_completion": 0,
+            "source_launch_authorized": false,
+            "no_engine_reruns": false,
+            "automatic_retry": false,
+            "original_actor_identities_retained": false
+          },
+          "Completed_DTO": {
+            "schema": "paired.Completed.v1",
+            "case_id": "ideal-loads-unused-window-gap",
+            "mode": "fresh",
+            "release": {
+              "path": "tools/porting/paired/v8/release.json",
+              "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+              "bytes": 11634
+            },
+            "bindings": {
+              "path": ".runtime/porting/unused-window-gap/runtime02/binding.json",
+              "sha256": "02d3ca0a53e42d6cf1c57a961db67fd582b3ac8ba2b8c35ef27f29d6de38fd75",
+              "bytes": 1084
+            },
+            "case_config": {
+              "path": ".runtime/porting/unused-window-gap/runtime02/case-config.json",
+              "sha256": "f5e9f7a7c7d959aaf6c518442443c7c2930dfc21843c2a34cc2df23381983588",
+              "bytes": 141527
+            },
+            "source_authority": {
+              "path": ".runtime/porting/unused-window-gap/evidence02/source-authority.json",
+              "sha256": "cc9dbb459b4fbcffbe858badf44f21a39578fbef86d29555ffb87769543191a1",
+              "bytes": 114587
+            },
+            "paired": {
+              "path": ".runtime/porting/unused-window-gap/runtime02/readback.json",
+              "sha256": "fbccb7d7fa988d4ec0098c7b17665db82c2dbfd81269d82473581a8746cbe265",
+              "bytes": 539987
+            },
+            "verification_receipt": {
+              "path": ".runtime/porting/unused-window-gap/runtime02/verify-command/receipt.json",
+              "sha256": "4db3890447c88fa7db82b5821c38d67e9d86c9225f6d8a27e3a4c36af38202c6",
+              "bytes": 411443
+            },
+            "native_launch": {
+              "path": ".runtime/porting/unused-window-gap/runtime02/native/launch.json",
+              "sha256": "16838fdbe164f834813baa8de832f8857b8c3f3e190da79308d4406424eba597",
+              "bytes": 9035
+            },
+            "source_launch": {
+              "path": ".runtime/porting/unused-window-gap/runtime02/source/launch.json",
+              "sha256": "b47f95da2a5346ca59fde213d89e01cbfd9906dff319ddad4d57f0465aab97e4",
+              "bytes": 15492
+            },
+            "accepted_for_retention": true,
+            "numeric_parity_accepted": true,
+            "engineering_comparison_completed": true,
+            "scientific_acceptance": true,
+            "qualifying_cases": 1,
+            "qualifying_values": 75120,
+            "engines_executed_by_completion": 0,
+            "actual_Native_engine_calls": 1,
+            "actual_Source_engine_calls": 1,
+            "source_launch_authorized": false,
+            "no_engine_reruns": false,
+            "automatic_retry": false,
+            "new_physical_credit": 1,
+            "original_actor_identities_retained": false
+          }
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/82/8256a09e852cec175d50da7d6413883585850fb71d37162bf943b57e5c934769",
+          "sha256": "8256a09e852cec175d50da7d6413883585850fb71d37162bf943b57e5c934769"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/unused-window-gap/build02/frozen/eplus-rs.exe",
+          "sha256": "40c7d0d507038e2820157d165909feec8e189cf5d35a55eb0b609509e1f9da60",
+          "bytes": 83802832
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/unused-window-gap/build02/build/receipt.json",
+          "sha256": "c199482ca91927d65ef9b6a96bafd060143958636edb3c655a198afe52206c2f",
+          "bytes": 93202
+        },
+        "native_launch": {
+          "path": ".runtime/porting/unused-window-gap/runtime02/native/launch.json",
+          "sha256": "16838fdbe164f834813baa8de832f8857b8c3f3e190da79308d4406424eba597",
+          "bytes": 9035
+        },
+        "source_launch": {
+          "path": ".runtime/porting/unused-window-gap/runtime02/source/launch.json",
+          "sha256": "b47f95da2a5346ca59fde213d89e01cbfd9906dff319ddad4d57f0465aab97e4",
+          "bytes": 15492
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/unused-window-gap/runtime02/readback.json",
+          "sha256": "fbccb7d7fa988d4ec0098c7b17665db82c2dbfd81269d82473581a8746cbe265",
+          "bytes": 539987
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/unused-window-gap/runtime02/Root-scientific-review.json",
+          "sha256": "08dcb6724b574a1bd5516afeda26df5dc1fd8e6ae78c6f2983738c2be3b15aef",
+          "bytes": 17016
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/unused-window-gap/runtime02/case-config.json",
+          "sha256": "f5e9f7a7c7d959aaf6c518442443c7c2930dfc21843c2a34cc2df23381983588",
+          "bytes": 141527
+        },
+        "coverage_kind": "unused_window_gap_material_details_Source_geometry_and_public_series",
+        "physical_metrics": {
+          "max_abs_delta": 2.1845335140824318e-07,
+          "max_rmse": 2.039620483986755e-08
+        },
+        "public_response_summary": {
+          "Native": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.03148489327319126,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          },
+          "Source": {
+            "outdoor_air_mixing": {
+              "full_clock_context_operand_joins": 4320,
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 281,
+              "mixed_humidity_response_samples": 360,
+              "max_abs_candidate_temperature_difference": 0.031484893273194814,
+              "max_abs_candidate_humidity_difference": 0.00012480081842757354
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "completed_diagnostics": {
+              "warnings": 6,
+              "severe": 0
+            }
+          }
+        },
+        "unused_window_gap": {
+          "domain_contract": {
+            "families": [
+              "WindowMaterial:Gap",
+              "WindowGap:SupportPillar",
+              "WindowGap:DeflectionState"
+            ],
+            "Gap": "4A2N/min0; Source order/group/ROnly, Blank/Single/Mixture/Reference/self/prefix semantics; real Source row then report/geometry",
+            "helper": "Generic1A3N/1A2N stats not direct helper consumption. first-doj aliases/getRealFieldValue defaults/mark-before-fields; initialT/P unread; no fake helperMaterialID",
+            "scene_input_numbers": 1026,
+            "held_numbers": 752,
+            "added_numbers": 274,
+            "Gap_scene_added_Float_records": 20,
+            "changed_alpha": 51,
+            "new_alpha": 12
+          },
+          "new_String_operands": 12,
+          "new_report_requests": 0,
+          "QA_counts": {
+            "current_QA_commands": 8,
+            "total_actual_QA_commands": 30,
+            "failed_QA_attempts": 2,
+            "current_test_body_executions": 4,
+            "historical_test_bodies": 11,
+            "reused_test_bodies": 0,
+            "current_getter_credit": false
+          },
+          "static_existing_body_CODE": {
+            "new_test_functions": 0,
+            "original_Source18_added_assertions": 32,
+            "geometry_correction_added_assertions": 2,
+            "total_added_assertions": 34,
+            "explicit_for": 6,
+            "existing_bodies": 4,
+            "Material_declaration_sites": 2,
+            "finite_Material_instances": 11,
+            "Window_instances": 0,
+            "all_old2740asserts_preserved": true,
+            "final_asserts2774": true
+          },
+          "Source_inventory": {
+            "before": 4701,
+            "current": 4703,
+            "modified": 17,
+            "added": 2,
+            "held": 4684,
+            "stages": [
+              18,
+              13,
+              1,
+              0,
+              2,
+              1,
+              3,
+              1
+            ]
+          },
+          "whole_public_MaterialDetails": {
+            "rows": 27,
+            "columns": 11,
+            "all_Native_Source_cells_exact": true,
+            "all19parent_rows_cells_order_held": true,
+            "table": [
+              [
+                " Material Details",
+                "Mass Layer",
+                "7.1429E-002",
+                "Rough",
+                "0.1000",
+                "1.400",
+                "2200.000",
+                "900.000",
+                "0.9000",
+                "0.7000",
+                "0.7000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED AVERAGE DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL AND ANGLE",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED SPECTRAL DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLASS UNUSED REFRACTION DEFAULT",
+                "3.3333E-003",
+                "VerySmooth",
+                "3.0000E-003",
+                "0.900",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GLAZING EQL UNUSED SCALAR",
+                "0.1730",
+                "VerySmooth",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAS UNUSED CUSTOM NORMAL",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP EQL UNUSED CUSTOM",
+                "0.0000",
+                "MediumRough",
+                "1.2500E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "MIXTURE UNUSED AIR ARGON",
+                "0.0000",
+                "MediumRough",
+                "1.2000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "2.0000E-003",
+                "0.100",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.7000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SHADE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "DRAPE EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "SCREEN UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "1.0000E-003",
+                "0.250",
+                "0.000",
+                "0.000",
+                "0.3281",
+                "0.3281",
+                "0.2188"
+              ],
+              [
+                " Material Details",
+                "SCREEN EQL UNUSED SCALAR",
+                "0.0000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "BLIND EQL UNUSED SCALAR",
+                "0.0000",
+                "Rough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "ROOF VEGETATION UNUSED SCALAR",
+                "0.3514",
+                "MediumSmooth",
+                "0.1300",
+                "0.370",
+                "1130.000",
+                "1230.000",
+                "0.9300",
+                "0.7300",
+                "0.7700"
+              ],
+              [
+                " Material Details",
+                "SGS UNUSED NORMAL",
+                "6.9976E-002",
+                "VerySmooth",
+                "2.0000E-003",
+                "2.858E-002",
+                "0.000",
+                "0.000",
+                "0.8400",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 00 EMPTY",
+                "0.0000",
+                "Rough",
+                "1.2700E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 01 CUSTOM",
+                "0.0000",
+                "Rough",
+                "1.2700E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 02 MIXTURE",
+                "0.0000",
+                "Rough",
+                "9.5000E-003",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 03 EQL",
+                "0.0000",
+                "Rough",
+                "6.0000E-003",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 04 SELF",
+                "0.0000",
+                "Rough",
+                "1.0000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 05 FROM EMPTY",
+                "0.0000",
+                "Rough",
+                "1.1000E-002",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 06 FROM CUSTOM",
+                "0.0000",
+                "Rough",
+                "7.0000E-003",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ],
+              [
+                " Material Details",
+                "GAP UNUSED 07 TRANSITIVE",
+                "0.0000",
+                "Rough",
+                "8.0000E-003",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.0000",
+                "0.0000",
+                "0.0000"
+              ]
+            ]
+          },
+          "Source_geometry": {
+            "artifact": {
+              "path": ".runtime/porting/unused-window-gap/runtime02/source/output/geometry-consumers.json",
+              "sha256": "c6994f4189e4b77be035532abb832c777d7e06dbf6044cc56f0b7ddafb16343d",
+              "bytes": 38617
+            },
+            "actual_Source_Gap_rows": [
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 20,
+                "map_key": "GAP UNUSED 00 EMPTY",
+                "typed_id": 19,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              },
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 21,
+                "map_key": "GAP UNUSED 01 CUSTOM",
+                "typed_id": 20,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              },
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 22,
+                "map_key": "GAP UNUSED 02 MIXTURE",
+                "typed_id": 21,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              },
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 23,
+                "map_key": "GAP UNUSED 03 EQL",
+                "typed_id": 22,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              },
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 24,
+                "map_key": "GAP UNUSED 04 SELF",
+                "typed_id": 23,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              },
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 25,
+                "map_key": "GAP UNUSED 05 FROM EMPTY",
+                "typed_id": 24,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              },
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 26,
+                "map_key": "GAP UNUSED 06 FROM CUSTOM",
+                "typed_id": 25,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              },
+              {
+                "NominalR": {
+                  "value": 0.0,
+                  "value_bits": "0000000000000000"
+                },
+                "group": 12,
+                "id": 27,
+                "map_key": "GAP UNUSED 07 TRANSITIVE",
+                "typed_id": 26,
+                "validated_typed_properties": {
+                  "AbsorpSolar": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpThermal": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "AbsorpVisible": {
+                    "value": 0.0,
+                    "value_bits": "0000000000000000"
+                  },
+                  "Roughness": 1
+                }
+              }
+            ],
+            "all19_parent_material_rows_literal": true,
+            "actual_map_ordinal_typed_ID_group_joins": true,
+            "surfaces": 6,
+            "phase": "runtime_final_source_geometry",
+            "physics_executed": true,
+            "observer_supplies_inputs": false,
+            "qualification": "Public27x11 common report is paired; Source-owned Gap8 geometry rows are observed. Legacy validated_typed_properties/property_origin labels do not replace actual retained Gap accessor provenance. Native private exactNomR/gas5slots/fractions/vent/pressure/helper/initialT/P are not exposed or paired. No activewindow/CFS/SourceA/IDF/Legacy/fullobject/everyvalidcombination support inferred; existing ordinary physics only."
+          },
+          "whole_topology": {
+            "rows": 153,
+            "events": 136,
+            "body_bytes": 12580,
+            "nodes": 10,
+            "nonparent_connections": 36,
+            "outdoor_registry": 5,
+            "suspicious_nodes": 2,
+            "nonconnected_nodes": 0,
+            "whole_prospective_topology_exact": true
+          },
+          "qualified_boundary": "Unused SourceB direct-epJSON WindowMaterial:Gap4A2N/min0 plus WindowGap:SupportPillar/DeflectionState direct-helper custody. Eight fixed Gap rows exercise blank/custom/mixture/earlierEQL/self/earlierblank/earliercustom/transitive branches; full5slot/fraction/vent copy and original signed-effective number partitions have bounded existing-body unit/caller checks. Helpers use first-doj raw alias lookup/mark-before-fields; initialT/P remain validated but unread. Public27x11 common MaterialDetails table is exact/all19parent rows held; actual Source8 rows Group12/SourceIDs20..27/typed19..26/Rough1/NomR+0 and3absorptances+0 observed. Native private gas/fraction/vent/pressure/helper and exact privateNomR are not paired. Existing six ordinary physics surfaces/ordinaryBlind producer retained; no activewindow/CFS/SourceA/IDF/Legacy/fullobject/everyvalidcombination claim.",
+          "Native_private_gas_pressure_helper_NomR_parity_claim": false,
+          "WindowOptical_unit_execution_credit": 0,
+          "full_object_support": false,
+          "shared14_correction_now_adopted": {
+            "families": [
+              "WindowMaterial:Glazing:RefractionExtinctionMethod",
+              "WindowMaterial:Glazing:EquivalentLayer",
+              "WindowMaterial:Gas",
+              "WindowMaterial:Gap:EquivalentLayer",
+              "WindowMaterial:GasMixture",
+              "WindowMaterial:Shade",
+              "WindowMaterial:Shade:EquivalentLayer",
+              "WindowMaterial:Drape:EquivalentLayer",
+              "WindowMaterial:Screen",
+              "WindowMaterial:Screen:EquivalentLayer",
+              "WindowMaterial:Blind",
+              "WindowMaterial:Blind:EquivalentLayer",
+              "WindowMaterial:Glazing",
+              "WindowMaterial:SimpleGlazingSystem"
+            ],
+            "Root_adoption": {
+              "path": ".runtime/porting/unused-window-gap/adoption01.json",
+              "sha256": "6ea9d9a671fe39e78a2a72dedcba6080f61efe108bfcef4f0f35dd90c2328608",
+              "bytes": 13996
+            },
+            "Root_closure": {
+              "path": ".runtime/object-expansion/unit159-prep/Root-WindowGap-Source18-literal-closure-audit01.json",
+              "sha256": "f8535cb7e4ef6e23584eaaff8e4551397a6ef130bdad66889d390c1ee503f0d4",
+              "bytes": 1316
+            },
+            "independent_review": {
+              "path": ".runtime/object-expansion/unit159-prep/independent-unused-WindowGap-Source18-proposal02-static-review01.json",
+              "sha256": "b7ae912d2551a909c86621e9386eb8c5ff6950606f4a5181ee9e0147bb52cbcd",
+              "bytes": 7999
+            },
+            "semantics": "Shared unused14 families now fence actual typed original outside_layer, ordered layers, effective layers and empty fallback, not effective layers alone. Genuine Raw/IP/SourceB admission and42finite support assessments validate same boundaries; SourceA/ordinary/Legacy negatives retained.",
+            "unit_static_only": true,
+            "standalone_new_pair_or_build_credit": 0
+          },
+          "Source_bibliography": {
+            "Source_primary": 129,
+            "additional_unique_Source_derivation": 3,
+            "combined_Source_citations": 132,
+            "nonSource_primary": 38,
+            "documentary": 52
+          },
+          "ObjectType_inventory": {
+            "current_whole_scene": 65,
+            "current_combined": 123,
+            "retained_union": 116,
+            "registry_rows": 147,
+            "qualification": "Retained188-example original110 +6accepted additions=116 unchanged. Current65 input types combined with retained116=123. Prior generated122 omitted alreadyaccepted OutdoorAir:NodeList;3Gapfamilies were alreadyoriginal110, so this input adds0union names."
+          },
+          "canonical_inventory_correction": {
+            "Root_audit": {
+              "path": ".runtime/porting/unused-window-gap/Root-object-type-union-inventory-review01.json",
+              "sha256": "043f461537e25d6f16a706b1379718ad1af25d4c13ec859ff65f0e469bd86c36",
+              "bytes": 1118
+            },
+            "missing_reviewed_domain_key": "OutdoorAir:NodeList",
+            "old_generated122": 122,
+            "corrected_generated123": 123,
+            "retained116": 116,
+            "Gap_union_delta": 0,
+            "physics_credit": 0
+          }
+        }
       }
     ],
     "totals": {
-      "paired_cases": 273,
-      "reported_samples": 12449896,
-      "raw_operand_unequal": 3223510,
+      "paired_cases": 274,
+      "reported_samples": 12525016,
+      "raw_operand_unequal": 3246578,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -90948,6 +92236,70 @@
           "sha256": "cab414a5990d22f98add4b323e9668dff0ed99f0954568a40593e65d14b3ce18",
           "bytes": 69117
         }
+      },
+      {
+        "id": "source-unused-window-gap",
+        "receipt": {
+          "path": ".runtime/porting/unused-window-gap/build01/build/receipt.json",
+          "sha256": "641c54833ed7ec9850793ab7b85382bbf7a78c6c36f90ed90c6076b8d2ac89b1",
+          "bytes": 79978
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/51/513247db326a794eaad8ffbca4fd5f9ee6132602764cf28012972e72314f7413",
+          "sha256": "513247db326a794eaad8ffbca4fd5f9ee6132602764cf28012972e72314f7413"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-window-gap/build01/frozen/eplus-rs.exe",
+          "sha256": "8de9e7183282ab6bc8ad130d63c73924a6b268528854e2c343705d4b826b46e4",
+          "bytes": 83787253
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-window-gap/build01/frozen/build-receipt.json",
+          "sha256": "77156924fdedc308f099647bed382584cd55c3206ad60d3d420a44639ae6d534",
+          "bytes": 1652647
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-window-gap/quality03/quality-preparation.json",
+          "sha256": "7899895209c547e77ddbeee425ded3483b5f93f97248e3872c276cb44643ba1a",
+          "bytes": 28386
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-window-gap/build01/freeze/receipt.json",
+          "sha256": "3e960fbbbcb323d4015024f3b846c95c9c5b4bd65356d24fd89efa5ae3b43e8e",
+          "bytes": 78957
+        }
+      },
+      {
+        "id": "source-unused-window-gap-geometry-correction",
+        "receipt": {
+          "path": ".runtime/porting/unused-window-gap/build02/build/receipt.json",
+          "sha256": "c199482ca91927d65ef9b6a96bafd060143958636edb3c655a198afe52206c2f",
+          "bytes": 93202
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/82/8256a09e852cec175d50da7d6413883585850fb71d37162bf943b57e5c934769",
+          "sha256": "8256a09e852cec175d50da7d6413883585850fb71d37162bf943b57e5c934769"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/unused-window-gap/build02/frozen/eplus-rs.exe",
+          "sha256": "40c7d0d507038e2820157d165909feec8e189cf5d35a55eb0b609509e1f9da60",
+          "bytes": 83802832
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/unused-window-gap/build02/frozen/build-receipt.json",
+          "sha256": "0551d5ddcee466c9c9d5835986df75937a94e0fb1453ae1ef35f959e8f23d8f1",
+          "bytes": 1652647
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/unused-window-gap/quality04/quality-preparation.json",
+          "sha256": "4c7b68f2ecf48558d24dc25ee37b31a7b26c35944e91cf9814e7b598309c04ca",
+          "bytes": 32911
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/unused-window-gap/build02/freeze/receipt.json",
+          "sha256": "2a0165fd4a623f2ccbafeda576a8fee650ed7d588c4d128d448ba0e9a900db25",
+          "bytes": 92183
+        }
       }
     ],
     "focused_since_workspace": {
@@ -91391,21 +92743,68 @@
           "sha256": "8ee0055e07cc880f773c178e1bb2569445c0b023dcbc38e79baaf5d77c94e7d1",
           "bytes": 4189
         }
+      },
+      {
+        "scope": "B",
+        "source_build": "source-unused-window-gap",
+        "build_row": {
+          "path": ".runtime/porting/unused-window-gap/build01/build-row.json",
+          "sha256": "8f0a7684ae7f16048b1879131d475fde630e1f1bbd306e26506c2fb9c3eb7e11",
+          "bytes": 1321
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/unused-window-gap/evidence01/source-authority.json",
+          "sha256": "7247cf5c3a6b83cb1aada4a5af05607b4b90aaab097d7733ad49a209aeb8433c",
+          "bytes": 94079
+        },
+        "Source_launch": {
+          "path": ".runtime/porting/unused-window-gap/runtime01/source/launch.json",
+          "sha256": "abb0c1155736513762a0d142f49d048253b5da5714f3f4b02b67534cbb3717fb",
+          "bytes": 15083
+        },
+        "actual_Source_receipt": {
+          "path": ".runtime/porting/unused-window-gap/runtime01/source/command/receipt.json",
+          "sha256": "72d8c3965526adcc546ae8cb95ce2c58040710a3e7e70d2fbab5acafb3bad8f6",
+          "bytes": 378942
+        },
+        "Native_launch": {
+          "path": ".runtime/porting/unused-window-gap/runtime01/native/launch.json",
+          "sha256": "9b74480154757a14b5d1aaa48077fadceb82f7a6999c5babce89e3579d8247a4",
+          "bytes": 9035
+        },
+        "Native_precheck": {
+          "path": ".runtime/porting/unused-window-gap/runtime01/native-precheck.json",
+          "sha256": "baacc640e46110e57d00346b280b4d4a9b8e371dade9b407cf9b7b14b5d6233e",
+          "bytes": 21590
+        },
+        "actual_Source_executions": 1,
+        "actual_Native_executions": 1,
+        "exit_code": 6,
+        "accepted_pair": false,
+        "admitted_cases": 0,
+        "admitted_samples": 0,
+        "historical_live_authorities_replayed": false,
+        "classification": "Source192 CTF simulation completed6warnings0severe and emitted the27x11 Material Details table, but required post-runtime ordinary geometry export lacked a WindowComplexGap same-owner branch and applied typed opaque-only surface_properties. CLI exit6; no accepted comparison/series/sample credit. Correction03 adds the actual retained Gap base accessor+dispatch and receives distinct Source193 build02/fresh runtime02 validation.",
+        "retained_failure": {
+          "path": ".runtime/porting/unused-window-gap/failed-attempt01.json",
+          "sha256": "4db9774427e052791089426ee6b1d514c3049ded4091a1a4a4bbe6abc5bf1d16",
+          "bytes": 4729
+        }
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 191,
-      "builds_with_accepted_paired_cases": 169,
-      "builds_with_only_retained_failed_Source_attempts": 8,
+      "actual_recorded_builds": 193,
+      "builds_with_accepted_paired_cases": 170,
+      "builds_with_only_retained_failed_Source_attempts": 9,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 2,
-      "builds_with_only_unaccepted_Source_attempts": 14,
+      "builds_with_only_unaccepted_Source_attempts": 15,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "191 recorded Source builds:169 retain accepted pairs and22 have none,including8 without Source execution. The latest strictly verified paired scene adds one case/75120 values; prior failed/unaccepted history and zero-credit retained migrations remain unchanged.",
+      "qualification": "193 actual Source builds:170 retain accepted pairs and23 have none;9 have only retained failed Source attempts,15 only unaccepted Source attempts,8 have no Source execution. Current unit records failed-to-accept Source192 then corrected accepted Source193; historical counts and zero-credit rows remain.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
-      "builds_without_accepted_paired_cases": 22
+      "builds_without_accepted_paired_cases": 23
     },
     "current_ScheduleFile_leap_day_DST_live_pair": {
       "source_build": "schedule-file-leap-dst-71",

@@ -48,6 +48,8 @@ pub struct SelectedMaterialInput {
     pub window_blind: Vec<ProjectInputObject>,
     /// Genuine ordered EcoRoof4A15N/min19 operands; active EcoRoof remains excluded.
     pub roof_vegetation: Vec<ProjectInputObject>,
+    /// Genuine final-family Gap4A2N operands; helpers remain original raw statistics.
+    pub window_gap: Vec<ProjectInputObject>,
 }
 
 /// Genuine scalar projection; empty extension objects retain their array position.
@@ -88,6 +90,90 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn get_window_gap_item(
+        &self,
+        object: &ProjectInputObject,
+        owners: &mut MaterialDataOwners<'_, '_>,
+    ) -> Result<(usize, usize), RuntimeError> {
+        const FAMILY: &str = "WindowMaterial:Gap";
+        if !self.source_is_epjson || !owners.input.has_object(FAMILY, &object.object_name) {
+            return Err(unavailable("Gap owned direct-epJSON raw/IP identity"));
+        }
+        const FIELDS: [(&str, bool); 6] = [
+            ("name", true),
+            ("thickness", false),
+            ("gas_or_gas_mixture_", true),
+            ("pressure", false),
+            ("deflection_state", true),
+            ("support_pillar", true),
+        ];
+        let s = &mut owners.shortcut;
+        if s.alpha_args.len() < 4
+            || s.alpha_field_names.len() < 4
+            || s.alpha_field_blanks.len() < 4
+            || s.numeric_args.len() < 2
+            || s.numeric_field_names.len() < 2
+            || s.numeric_field_blanks.len() < 2
+        {
+            return Err(unavailable("actual complete Gap4A2N allocation"));
+        }
+        s.alpha_args.fill(String::new());
+        s.alpha_field_names.fill(String::new());
+        s.alpha_field_blanks.fill(true);
+        s.numeric_args.fill(0.0);
+        s.numeric_field_names.fill(String::new());
+        s.numeric_field_blanks.fill(true);
+        owners
+            .input
+            .mark_object_as_used(FAMILY, &object.object_name);
+        let maximum = FIELDS
+            .iter()
+            .enumerate()
+            .filter(|(_, (field, _))| object.fields.contains_key(*field))
+            .map(|(index, _)| index + 1)
+            .max()
+            .unwrap_or(0);
+        let (mut a, mut n, mut alphas, mut numerics) = (0, 0, 0, 0);
+        for (position, (field, is_alpha)) in FIELDS.iter().enumerate() {
+            if *is_alpha {
+                s.alpha_field_names[a] = (*field).into();
+                if position == 0 {
+                    s.alpha_args[a] = object.object_name.to_ascii_uppercase();
+                    s.alpha_field_blanks[a] = object.object_name.is_empty();
+                    alphas = 1; // Native counts the instance Name independently.
+                } else {
+                    match object.fields.get(*field) {
+                        Some(ProjectInputValue::String(value)) => {
+                            s.alpha_args[a] = value.to_ascii_uppercase();
+                            s.alpha_field_blanks[a] = value.is_empty();
+                        }
+                        None if *field != "gas_or_gas_mixture_" => {}
+                        _ => return Err(unavailable("admitted Gap alpha scalar")),
+                    }
+                }
+                a += 1;
+                if position < maximum {
+                    alphas = a;
+                }
+            } else {
+                s.numeric_field_names[n] = (*field).into();
+                match object.fields.get(*field) {
+                    Some(ProjectInputValue::Number(value)) if value.is_finite() => {
+                        s.numeric_args[n] = *value;
+                        s.numeric_field_blanks[n] = false;
+                    }
+                    None if *field == "pressure" => s.numeric_args[n] = 101325.0,
+                    _ => return Err(unavailable("admitted Gap numeric scalar")),
+                }
+                n += 1;
+                if position < maximum {
+                    numerics = n;
+                }
+            }
+        }
+        Ok((alphas, numerics))
+    }
+
     pub(super) fn get_roof_vegetation_item(
         &self,
         object: &ProjectInputObject,

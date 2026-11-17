@@ -370,11 +370,16 @@ pub(super) fn assess_typed_runtime_boundaries(
     let refraction_consumed =
         source_admission.is_some_and(|admission| admission.consumes_unused_refraction(typed_model));
     let refraction_used = typed_model.constructions.iter().any(|construction| {
-        construction.effective_layers().iter().any(|id| {
-            typed_model.materials.iter().any(|row| {
-                row.id == *id && row.kind() == MaterialKind::WindowGlazingRefractionExtinction
+        construction
+            .outside_layer
+            .iter()
+            .chain(construction.layers.iter())
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|row| {
+                    row.id == *id && row.kind() == MaterialKind::WindowGlazingRefractionExtinction
+                })
             })
-        })
     });
     if !refraction_consumed || refraction_used {
         push_typed_unsupported_object(
@@ -400,8 +405,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         .is_some_and(|admission| admission.consumes_unused_glazing_equivalent_layer(typed_model));
     let glazing_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -422,12 +428,16 @@ pub(super) fn assess_typed_runtime_boundaries(
     let gas_consumed = source_admission
         .is_some_and(|admission| admission.consumes_window_gas_materials(typed_model));
     let named_gas_used = typed_model.constructions.iter().any(|construction| {
-        construction.effective_layers().iter().any(|id| {
-            typed_model
-                .materials
-                .iter()
-                .any(|material| material.id == *id && material.kind() == MaterialKind::WindowGas)
-        })
+        construction
+            .outside_layer
+            .iter()
+            .chain(construction.layers.iter())
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::WindowGas
+                })
+            })
     });
     if !gas_consumed || named_gas_used {
         push_typed_unsupported_object(
@@ -457,8 +467,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         .is_some_and(|admission| admission.consumes_unused_gap_equivalent_layer(typed_model));
     let gap_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -476,11 +487,16 @@ pub(super) fn assess_typed_runtime_boundaries(
         );
     }
     let mixture_used = typed_model.constructions.iter().any(|construction| {
-        construction.effective_layers().iter().any(|id| {
-            typed_model.materials.iter().any(|material| {
-                material.id == *id && material.kind() == MaterialKind::WindowGasMixture
+        construction
+            .outside_layer
+            .iter()
+            .chain(construction.layers.iter())
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::WindowGasMixture
+                })
             })
-        })
     });
     if !gas_consumed || mixture_used {
         push_typed_unsupported_object(
@@ -508,8 +524,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         source_admission.is_some_and(|admission| admission.consumes_unused_shade(typed_model));
     let shade_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -541,8 +558,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         .is_some_and(|admission| admission.consumes_unused_shade_equivalent_layer(typed_model));
     let shade_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -575,8 +593,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         .is_some_and(|admission| admission.consumes_unused_drape_equivalent_layer(typed_model));
     let drape_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -607,8 +626,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         source_admission.is_some_and(|admission| admission.consumes_unused_screen(typed_model));
     let screen_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -640,8 +660,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         .is_some_and(|admission| admission.consumes_unused_screen_equivalent_layer(typed_model));
     let screen_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -672,8 +693,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         source_admission.is_some_and(|admission| admission.consumes_unused_blind(typed_model));
     let blind_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -705,8 +727,9 @@ pub(super) fn assess_typed_runtime_boundaries(
         .is_some_and(|admission| admission.consumes_unused_blind_equivalent_layer(typed_model));
     let blind_equivalent_layer_used = typed_model.constructions.iter().any(|construction| {
         construction
-            .layers
+            .outside_layer
             .iter()
+            .chain(construction.layers.iter())
             .chain(construction.effective_layers().iter())
             .any(|id| {
                 typed_model.materials.iter().any(|material| {
@@ -802,12 +825,17 @@ pub(super) fn assess_typed_runtime_boundaries(
     let glazing_consumed =
         source_admission.is_some_and(|admission| admission.consumes_unused_glazing(typed_model));
     let glazing_used = typed_model.constructions.iter().any(|construction| {
-        construction.effective_layers().iter().any(|id| {
-            typed_model
-                .materials
-                .iter()
-                .any(|row| row.id == *id && row.kind() == MaterialKind::WindowGlazing)
-        })
+        construction
+            .outside_layer
+            .iter()
+            .chain(construction.layers.iter())
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model
+                    .materials
+                    .iter()
+                    .any(|row| row.id == *id && row.kind() == MaterialKind::WindowGlazing)
+            })
     });
     if !glazing_consumed || glazing_used {
         // Raw presence must still reject a failed bijection when every typed
@@ -823,11 +851,16 @@ pub(super) fn assess_typed_runtime_boundaries(
     let simple_glazing_consumed = source_admission
         .is_some_and(|admission| admission.consumes("WindowMaterial:SimpleGlazingSystem"));
     let simple_glazing_used = typed_model.constructions.iter().any(|construction| {
-        construction.layers.iter().any(|id| {
-            typed_model.materials.iter().any(|material| {
-                material.id == *id && material.kind() == MaterialKind::WindowSimpleGlazing
+        construction
+            .outside_layer
+            .iter()
+            .chain(construction.layers.iter())
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model.materials.iter().any(|material| {
+                    material.id == *id && material.kind() == MaterialKind::WindowSimpleGlazing
+                })
             })
-        })
     });
     if !simple_glazing_consumed || simple_glazing_used {
         push_typed_unsupported_object(
@@ -842,17 +875,39 @@ pub(super) fn assess_typed_runtime_boundaries(
                 .count(),
         );
     }
-    push_typed_unsupported_object(
-        registry,
-        unsupported_objects,
-        diagnostics,
-        "WindowMaterial:Gap",
-        typed_model
-            .materials
+    let window_gap_count = typed_model
+        .materials
+        .iter()
+        .filter(|row| row.kind() == MaterialKind::WindowComplexGap)
+        .count();
+    let window_gap_raw_count = raw_model
+        .objects
+        .get(&ep_raw_model::ObjectType("WindowMaterial:Gap".into()))
+        .map_or(0, |rows| rows.len());
+    let window_gap_consumed =
+        source_admission.is_some_and(|admission| admission.consumes_unused_window_gap(typed_model));
+    let window_gap_used = typed_model.constructions.iter().any(|construction| {
+        construction
+            .outside_layer
             .iter()
-            .filter(|material| material.kind() == MaterialKind::WindowComplexGap)
-            .count(),
-    );
+            .chain(construction.layers.iter())
+            .chain(construction.effective_layers().iter())
+            .any(|id| {
+                typed_model
+                    .materials
+                    .iter()
+                    .any(|row| row.id == *id && row.kind() == MaterialKind::WindowComplexGap)
+            })
+    });
+    if !window_gap_consumed || window_gap_used {
+        push_typed_unsupported_object(
+            registry,
+            unsupported_objects,
+            diagnostics,
+            "WindowMaterial:Gap",
+            window_gap_count.max(window_gap_raw_count),
+        );
+    }
     push_typed_unsupported_object(
         registry,
         unsupported_objects,

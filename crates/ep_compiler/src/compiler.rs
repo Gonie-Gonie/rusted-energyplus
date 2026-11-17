@@ -776,6 +776,8 @@ impl<'a> Compiler<'a> {
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_gap_equivalent_layer(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("Material:RoofVegetation".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_roof_vegetation(&name.0, object)))
+                || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Gap".into()))
+                    .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_window_gap(&name.0, object)))
             {
                 model.material_names = NameMap::source_exact_namespace();
             }
@@ -10242,10 +10244,260 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Original constraints only; object_list is an annotation in the pinned validation path.
+    fn source_window_gap_original_fields_valid(family: &str, object: &RawObject) -> bool {
+        let valid = |field: &str, value: &RawValue| {
+            let known = match family {
+                "WindowMaterial:Gap" => matches!(
+                    field,
+                    "thickness"
+                        | "gas_or_gas_mixture_"
+                        | "pressure"
+                        | "deflection_state"
+                        | "support_pillar"
+                ),
+                "WindowGap:DeflectionState" => matches!(
+                    field,
+                    "deflected_thickness" | "initial_temperature" | "initial_pressure"
+                ),
+                "WindowGap:SupportPillar" => matches!(field, "spacing" | "radius"),
+                _ => return false,
+            };
+            if !known {
+                return true;
+            }
+            if family == "WindowMaterial:Gap"
+                && matches!(
+                    field,
+                    "gas_or_gas_mixture_" | "deflection_state" | "support_pillar"
+                )
+            {
+                return matches!(value, RawValue::String(_));
+            }
+            let RawValue::Number(token) = value else {
+                return false;
+            };
+            ep_model::classify_source_json_number(token).is_ok()
+                && token.parse::<f64>().ok().is_some_and(|value| {
+                    value.is_finite()
+                        && match (family, field) {
+                            ("WindowMaterial:Gap", "thickness")
+                            | ("WindowGap:SupportPillar", _) => value > 0.0,
+                            ("WindowGap:DeflectionState", _) => value >= 0.0,
+                            _ => true,
+                        }
+                })
+        };
+        (family != "WindowMaterial:Gap"
+            || ["thickness", "gas_or_gas_mixture_"]
+                .iter()
+                .all(|field| field_value(object, field).is_some_and(|value| valid(field, value))))
+            && object
+                .fields
+                .iter()
+                .all(|(field, value)| valid(&field.0, value))
+    }
+
+    fn source_unused_window_gap(&self, name: &str, object: &RawObject) -> bool {
+        if !self.source_file_declarations
+            || !self.raw_model.is_epjson()
+            || name.contains('\n')
+            || name
+                .bytes()
+                .all(|b| matches!(b, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            || !Self::source_window_gap_original_fields_valid("WindowMaterial:Gap", object)
+        {
+            return false;
+        }
+        for family in ["WindowGap:DeflectionState", "WindowGap:SupportPillar"] {
+            let Ok(rows) = self.raw_model.source_json_instances(family) else {
+                return false;
+            };
+            if rows.iter().any(|(key, row)| {
+                key.0.contains('\n')
+                    || key
+                        .0
+                        .bytes()
+                        .all(|b| matches!(b, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+                    || !Self::source_window_gap_original_fields_valid(family, row)
+            }) {
+                return false;
+            }
+        }
+        !self.raw_model.objects.iter().filter(|(family, _)| family.0.starts_with("Construction")).any(|(_, rows)| {
+            rows.values().any(|row| row.fields.iter().any(|(field, value)| {
+                let layer = field.0 == "outside_layer" || (2..=11).any(|n| field.0 == format!("layer_{n}"))
+                    || field.0 == "outside_layer_name" || (2..=5).any(|n| field.0 == format!("layer_{n}_name"))
+                    || (1..=4).any(|n| field.0 == format!("gap_{n}_name"));
+                layer && matches!(value, RawValue::String(reference) if reference.eq_ignore_ascii_case(name))
+            }))
+        })
+    }
+
+    // Advisory only: actual ordered lookup/use/read/write belongs to the runtime row.
+    fn source_window_gap_helper_real(
+        &self,
+        family: &str,
+        reference: &str,
+        field: &str,
+    ) -> Option<f64> {
+        let default = match (family, field) {
+            ("WindowGap:DeflectionState", "deflected_thickness") => 0.0,
+            ("WindowGap:SupportPillar", "spacing") => 0.04,
+            ("WindowGap:SupportPillar", "radius") => 0.0004,
+            _ => return None,
+        };
+        let rows = self.raw_model.source_json_instances(family).ok()?;
+        let (_, object) = rows
+            .into_iter()
+            .find(|(key, _)| key.0.eq_ignore_ascii_case(reference))?;
+        match field_value(object, field) {
+            None => Some(default),
+            Some(RawValue::Number(token)) => ep_model::classify_source_json_number(token)
+                .ok()
+                .map(ep_model::SourceJsonNumber::as_f64),
+            _ => None,
+        }
+    }
+
     fn parse_window_complex_gap_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "WindowMaterial:Gap";
 
+        if self.source_file_declarations && self.raw_model.is_epjson() {
+            for family in ["WindowGap:DeflectionState", "WindowGap:SupportPillar"] {
+                for (name, object) in self.objects(family) {
+                    if name.contains('\n')
+                        || name
+                            .bytes()
+                            .all(|b| matches!(b, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+                        || !Self::source_window_gap_original_fields_valid(family, &object)
+                    {
+                        self.error("InvalidOriginalSourceWindowGapHelper", family, Some(&name), None,
+                            "Source WindowGap helper requires original name, kinds and numeric bounds".into());
+                    }
+                }
+            }
+        }
         for (name, object) in self.objects(OBJECT_TYPE) {
+            if self.source_file_declarations
+                && self.raw_model.is_epjson()
+                && (name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|b| matches!(b, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+                    || !Self::source_window_gap_original_fields_valid(OBJECT_TYPE, &object))
+            {
+                self.error("InvalidOriginalSourceWindowGapField", OBJECT_TYPE, Some(&name), None,
+                    "Source WindowGap requires original name, required fields, kinds and numeric bounds".into());
+                continue;
+            }
+            if self.source_unused_window_gap(&name, &object) {
+                let Some((id, normalized_name)) =
+                    self.reserve_material_identity(model, OBJECT_TYPE, &name)
+                else {
+                    continue;
+                };
+                model
+                    .ctf_report_names
+                    .materials
+                    .push((id, name.to_ascii_uppercase()));
+                let material_index = model.materials.len();
+                model.materials.push(Material {
+                    id,
+                    name: normalized_name,
+                    definition: MaterialDefinition::WindowComplexGap(WindowComplexGapMaterial {
+                        thickness_m: 0.0,
+                        pressure_pa: 0.0,
+                        gas: WindowComplexGapGasComposition::Empty,
+                        deflected_thickness_m: 0.0,
+                        support_pillar: None,
+                    }),
+                });
+                let number = |field: &str, default| match field_value(&object, field) {
+                    Some(RawValue::Number(token)) => ep_model::classify_source_json_number(token)
+                        .ok()
+                        .map(ep_model::SourceJsonNumber::as_f64)
+                        .unwrap_or(default),
+                    _ => default,
+                };
+                let alpha = |field: &str| match field_value(&object, field) {
+                    Some(RawValue::String(value)) => value.as_str(),
+                    _ => "",
+                };
+                let reference = alpha("gas_or_gas_mixture_");
+                let gas = if reference.is_empty() {
+                    WindowComplexGapGasComposition::Empty
+                } else if let Some(source_material_id) = model.material_names.resolve(reference) {
+                    match model
+                        .materials
+                        .iter()
+                        .find(|row| row.id == source_material_id)
+                        .map(|row| row.definition)
+                    {
+                        Some(MaterialDefinition::WindowGas(source)) => {
+                            WindowComplexGapGasComposition::Single {
+                                source_material_id,
+                                gas_type: source.gas_type,
+                                properties: source.properties,
+                            }
+                        }
+                        Some(MaterialDefinition::WindowGasMixture(source)) => {
+                            WindowComplexGapGasComposition::Mixture {
+                                source_material_id,
+                                gases: source.gases,
+                            }
+                        }
+                        Some(
+                            MaterialDefinition::WindowGapEquivalentLayer(_)
+                            | MaterialDefinition::WindowComplexGap(_),
+                        ) => WindowComplexGapGasComposition::Reference { source_material_id },
+                        _ => {
+                            self.error(
+                                "UnsafeSourceWindowGapGasReference",
+                                OBJECT_TYPE,
+                                Some(&name),
+                                Some("gas_or_gas_mixture_"),
+                                "Source WindowGap excludes Native undefined non-GasMix reference"
+                                    .into(),
+                            );
+                            continue;
+                        }
+                    }
+                } else {
+                    WindowComplexGapGasComposition::Empty
+                };
+                let deflected_thickness_m = self
+                    .source_window_gap_helper_real(
+                        "WindowGap:DeflectionState",
+                        alpha("deflection_state"),
+                        "deflected_thickness",
+                    )
+                    .unwrap_or(0.0);
+                let support_pillar = self
+                    .source_window_gap_helper_real(
+                        "WindowGap:SupportPillar",
+                        alpha("support_pillar"),
+                        "spacing",
+                    )
+                    .zip(self.source_window_gap_helper_real(
+                        "WindowGap:SupportPillar",
+                        alpha("support_pillar"),
+                        "radius",
+                    ))
+                    .map(|(spacing_m, radius_m)| WindowComplexGapSupportPillar {
+                        spacing_m,
+                        radius_m,
+                    });
+                model.materials[material_index].definition =
+                    MaterialDefinition::WindowComplexGap(WindowComplexGapMaterial {
+                        thickness_m: number("thickness", 0.0),
+                        pressure_pa: number("pressure", 101325.0),
+                        gas,
+                        deflected_thickness_m,
+                        support_pillar,
+                    });
+                continue;
+            }
             let thickness_m =
                 self.required_number_minimum(OBJECT_TYPE, &name, &object, "thickness", 0.0, false);
             // EnergyPlus 26.1's epJSON key includes the trailing underscore.
@@ -10849,6 +11101,13 @@ impl<'a> Compiler<'a> {
                 .get(&ep_raw_model::ObjectType(object_type.into()))
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_roof_vegetation(name, object));
+        let source_window_gap_name = object_type == "WindowMaterial:Gap"
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(object_type.into()))
+                .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
+                .is_some_and(|object| self.source_unused_window_gap(name, object));
         let blank_name = if self.source_file_declarations
             && self.raw_model.is_epjson()
             && (matches!(
@@ -10865,7 +11124,8 @@ impl<'a> Compiler<'a> {
                 || source_blind_equivalent_layer_name
                 || source_glazing_equivalent_layer_name
                 || source_gap_equivalent_layer_name
-                || source_roof_vegetation_name)
+                || source_roof_vegetation_name
+                || source_window_gap_name)
             && model.material_names.is_source_exact_namespace()
         {
             name.contains('\n')

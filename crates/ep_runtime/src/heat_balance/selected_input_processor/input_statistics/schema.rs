@@ -5491,6 +5491,95 @@ pub(super) fn definition(name: &str) -> Option<SchemaDefinition> {
             extension: None,
             extensible: &[],
         },
+        "WindowMaterial:Gap" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "thickness",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "gas_or_gas_mixture_",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "pressure",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "deflection_state",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "support_pillar",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
+        "WindowGap:DeflectionState" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "deflected_thickness",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "initial_temperature",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "initial_pressure",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
+        "WindowGap:SupportPillar" => SchemaDefinition {
+            has_name: true,
+            name_has_default: false,
+            regular: &[
+                SchemaField {
+                    name: "name",
+                    default: SchemaDefault::Absent,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "spacing",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+                SchemaField {
+                    name: "radius",
+                    default: SchemaDefault::NonString,
+                    automatic: &[],
+                },
+            ],
+            extension: None,
+            extensible: &[],
+        },
         "Material:RoofVegetation" => SchemaDefinition {
             has_name: true,
             name_has_default: false,

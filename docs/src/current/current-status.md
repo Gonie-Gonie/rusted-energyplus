@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-11-15
+last_reviewed: 2026-11-18
 ---
 
 # Current Status
@@ -39,9 +39,12 @@ at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
 The [example-object union](../generated/example-object-union.md) contains 116
 object types: the original 110-type corpus plus accepted ComfortViewFactorAngles,
 ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
+The current generated domain inventory contains123 names after restoring the
+already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122.
+This inventory correction adds no physical evidence; retained116 is unchanged.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 273 paired physical cases and 12,449,896 reported values with zero
+contains 274 paired physical cases and 12,525,016 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -78,9 +81,11 @@ Unused WindowMaterial:Shade:EquivalentLayer, Drape:EquivalentLayer, Screen:Equiv
 | Glazing | 3A26N/min11; NumNums8..26; 26 writes, N23 thermal quirk and N26 fallback | 26 Float operands over953 held numbers; 979 total; 17x11 table |
 | Gap | 3A12N/min3; NumNums1..12; five-slot GasMix and shared-error-gated NomR | 12 Float operands over979 held numbers; 991 total; 18x11 table |
 
-The latest Gap EQL pair uses one Native and one Source process with zero reruns. Its18x11 public table holds all17 parent rows; common Resistance0 differs from Source-only NomR0.47169811320754723 (Group18/id9/typed8/Rough2) on six physics surfaces. Static48 assertions/6 for loops/4 Material/0 Window owners differ from8 current QA commands/13 total: one QA01 compiler E0433 failure before its body,4 current and2 historical bodies,0 reuse and false getter-body credit. Root corrected two files before all8 QA02 commands passed; this was no failed Source build or engine failure. A separate static limitation remains: independently mutating typed outside_layer is not checked when typed layers is nonempty; Raw references and typed layers/effective/empty fallback remain fenced. Input61/currentcombined122/retained116/registry147 remain distinct from128 Source citations (125scientific+3derivation).
+The accepted Source190 Gap EQL pair uses one Native and one Source process with zero reruns. Its18x11 public table holds all17 parent rows; common Resistance0 differs from Source-only NomR0.47169811320754723 (Group18/id9/typed8/Rough2) on six physics surfaces. Static48 assertions/6 for loops/4 Material/0 Window owners differ from8 current QA commands/13 total: one QA01 compiler E0433 failure before its body,4 current and2 historical bodies,0 reuse and false getter-body credit. Root corrected two files before all8 QA02 commands passed; this was no failed Source build or engine failure. Current Source193 closes its independently mutated typed outside_layer limitation for all fourteen shared unused families, including nonempty layers; Raw/original typed outside/layers/effective/empty fallback fences now retain bounded unit/static checks with no standalone pair/build credit. Its Source190 inventory was Input61/publishedcombined122/retained116/registry147 with128 Source citations (125scientific+3derivation); the current combined inventory is123 after the alreadyaccepted OutdoorAir:NodeList key correction.
 
-Unused Material:RoofVegetation now has a bounded Source B direct-epJSON4A15N/min19 getter/common-report route. The fixed15-Float/three-String input holds991 parent numbers (1006total); all158series/75120values and12+12+8+2 gates pass with one Native/one Source process and0reruns. Whole19x11 MaterialDetails holds all18 parent rows; Source Group8/id18/typed17/Rough3/NomR0.35135135135135137 joins six physics surfaces. Static48assert/6for/4Material/0Window differs from actual8QA/4current bodies with0failure/history/reuse and falsegettercredit. Roof typed outside was fixed before QA; Input01 ledger-context preflight was a separate DATA correction. Prior14-family typed-outside limits remain; their shared fix is ignored,not adopted. Soil/plant constructor/getter custody does not establish active EcoRoof water/energy/soil calculation, Construction/SourceA/IDF/Legacy or full-object/all-combination parity. Input62/currentcombined122/retained116/registry147 differs from130Sourcecitations.
+Unused Material:RoofVegetation now has a bounded Source B direct-epJSON4A15N/min19 getter/common-report route. The fixed15-Float/three-String input holds991 parent numbers (1006total); all158series/75120values and12+12+8+2 gates pass with one Native/one Source process and0reruns. Whole19x11 MaterialDetails holds all18 parent rows; Source Group8/id18/typed17/Rough3/NomR0.35135135135135137 joins six physics surfaces. Static48assert/6for/4Material/0Window differs from actual8QA/4current bodies with0failure/history/reuse and falsegettercredit. Roof typed outside was fixed before QA; Input01 ledger-context preflight was a separate DATA correction. Source193 now adopts the shared14 original typed-outside fence correction with unit/static checks and no standalone pair/build credit. Soil/plant constructor/getter custody does not establish active EcoRoof water/energy/soil calculation, Construction/SourceA/IDF/Legacy or full-object/all-combination parity. Its Source191 inventory was Input62/publishedcombined122/retained116/registry147 with130Sourcecitations; current Input65/combined123/retained116/registry147 differs from132Sourcecitations (129primary+3derivation).
+
+Unused WindowMaterial:Gap and its raw-only DeflectionState/SupportPillar helpers now have a bounded Source B direct-epJSON getter/report route. Eight Gap definitions and two helpers add20 Float/12 String operands; the fixed input has1026 numbers (752held+274added). The corrected Source193 pair passes all158series/75120values and34 frozen gates. Its27x11 MaterialDetails table holds all19 parent rows; actual Source Group12/id20..27/typed19..26/Rough1 Gap rows retain positive-zero NomR/absorptances through the same runtime geometry accessor on six ordinary physics surfaces. Public rows do not pair Native-private gas/fraction/vent/pressure/helper state. Static34assert/6for/4existing bodies/11finite Material instances/0Window owners differ from8current/30total QA commands,2QA failures and4current/11historical bodies. Failed Source192 CLIexit6 at final geometry export has zero case/sample credit; corrected Source193 uses a fresh1Native/1Source pair with0reruns. Activewindow/CFS, SourceA/IDF/Legacy, full-object and every-valid-combination support remain held.
 
 These routes use the same retained Material owners and real report/geometry path. Actual zero EQL Construction count skips positive unavailable EQL/ASHWAT work; ordinary Blind181-angle production and six-surface physics remain required. Active windows/Construction/control, Source A/IDF/Legacy admission changes, Native-private TAR/optics/pointer parity, full-object and arbitrary valid-combination completion remain held.
 
@@ -164,8 +169,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 191 recorded Source builds,
-169 with accepted pairs and 22 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 193 recorded Source builds,
+170 with accepted pairs and 23 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.

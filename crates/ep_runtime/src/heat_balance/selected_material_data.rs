@@ -30,6 +30,7 @@ pub(crate) use window_blind::{
 };
 mod window_blind_equivalent_layer;
 mod window_drape_equivalent_layer;
+mod window_gap;
 mod window_gap_equivalent_layer;
 mod window_gas;
 mod window_glazing_equivalent_layer;
@@ -78,6 +79,8 @@ pub(crate) struct SelectedMaterialData {
     simple_glazing: BTreeMap<MaterialId, simple_glazing::SourceSimpleGlazingMaterial>,
     /// Actual named MaterialGasMix/base rows; typed gas properties are advisory.
     window_gas: BTreeMap<MaterialId, window_gas::SourceWindowGasMaterial>,
+    /// Actual MaterialComplexWindowGap row, including its inherited GasMix/base.
+    window_gap: BTreeMap<MaterialId, window_gap::SourceWindowGapMaterial>,
     /// Genuine MaterialEcoRoof/base row; typed moisture recovery is advisory.
     roof_vegetation: BTreeMap<MaterialId, roof_vegetation::SourceRoofVegetationMaterial>,
     /// Actual MaterialShade rows; typed optical derivations remain advisory.
@@ -474,6 +477,49 @@ impl SelectedMaterialData {
         ))?;
         Ok((
             roughness,
+            OpaqueSurfaceProperties {
+                thermal_absorptance: row.thermal_absorptance,
+                solar_absorptance: row.solar_absorptance,
+                visible_absorptance: row.visible_absorptance,
+            },
+        ))
+    }
+
+    /// Read the same MaterialComplexWindowGap base by Source ordinal and typed ID.
+    pub(crate) fn source_window_gap_surface_properties(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<(MaterialSurfaceRoughness, OpaqueSurfaceProperties), HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "native Gap MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::ComplexWindowGap)
+            || self.resistance_only.get(&typed_id) != Some(&true)
+            || usize::try_from(self.num_w7_gaps).ok() != Some(self.window_gap.len())
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Gap Source order/group/count/physical identity",
+            ));
+        }
+        let row = &self
+            .window_gap
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained Gap runtime row",
+            ))?
+            .base;
+        if row.roughness != Some(MaterialSurfaceRoughness::Rough) {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual Gap getter roughness",
+            ));
+        }
+        Ok((
+            MaterialSurfaceRoughness::Rough,
             OpaqueSurfaceProperties {
                 thermal_absorptance: row.thermal_absorptance,
                 solar_absorptance: row.solar_absorptance,
@@ -997,7 +1043,7 @@ impl SelectedMaterialData {
         self.get_roof_vegetation_data(raw, o)?;
         empty!(num_tc_glazings, "WindowMaterial:GlazingGroup:Thermochromic");
         self.get_simple_glazing_data(raw, o)?;
-        empty!(num_w7_gaps, "WindowMaterial:Gap");
+        self.get_window_gap_data(raw, o)?;
         o.shortcut.current_module_object = "WindowMaterial:ComplexShade".into();
         require_zero(
             count(o.input, "WindowMaterial:ComplexShade")?,

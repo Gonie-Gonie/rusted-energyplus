@@ -556,6 +556,10 @@ pub(crate) use window_glazing_equivalent_layer::{
     known_field as source_b_glazing_equivalent_layer_known_field,
     validate as source_b_validate_unused_glazing_equivalent_layer,
 };
+mod window_gap;
+pub(crate) use window_gap::{
+    known_field as source_b_window_gap_known_field, validate as source_b_validate_unused_window_gap,
+};
 mod roof_vegetation;
 pub(crate) use roof_vegetation::{
     known_field as source_b_roof_vegetation_known_field,
@@ -666,6 +670,7 @@ fn resolve_raw(
         window_glazing_equivalent_layer::validate(raw)?;
         window_gap_equivalent_layer::validate(raw)?;
         roof_vegetation::validate(raw)?;
+        window_gap::validate(raw)?;
         window_screen::validate(raw)?;
         window_blind::validate(raw)?;
     }
@@ -705,6 +710,11 @@ fn resolve_raw(
             source_b_ingress && family.0 == "WindowMaterial:Glazing:EquivalentLayer";
         let source_gap_equivalent_layer_family =
             source_b_ingress && family.0 == "WindowMaterial:Gap:EquivalentLayer";
+        let source_window_gap_family = source_b_ingress
+            && matches!(
+                family.0.as_str(),
+                "WindowMaterial:Gap" | "WindowGap:DeflectionState" | "WindowGap:SupportPillar"
+            );
         let source_roof_vegetation_family =
             source_b_ingress && family.0 == "Material:RoofVegetation";
         let source_screen_family = source_b_ingress && family.0 == "WindowMaterial:Screen";
@@ -788,6 +798,7 @@ fn resolve_raw(
             && !source_glazing_equivalent_layer_family
             && !source_gap_equivalent_layer_family
             && !source_roof_vegetation_family
+            && !source_window_gap_family
             && !source_screen_family
             && !source_blind_family
             && !source_calendar_family
@@ -857,6 +868,7 @@ fn resolve_raw(
                 || source_glazing_equivalent_layer_family
                 || source_gap_equivalent_layer_family
                 || source_roof_vegetation_family
+                || source_window_gap_family
                 || source_screen_family
                 || source_blind_family
             {
@@ -974,6 +986,8 @@ fn resolve_raw(
                         && window_gap_equivalent_layer::admitted_field(&field.0, value))
                     && !(source_roof_vegetation_family
                         && roof_vegetation::admitted_field(&field.0, value))
+                    && !(source_window_gap_family
+                        && window_gap::admitted_field(&family.0, &field.0, value))
                     && !(source_screen_family
                         && window_screen::admitted_field(&field.0, value))
                     && !(source_blind_family
@@ -1322,6 +1336,9 @@ fn resolve_raw(
                 "WindowMaterial:Glazing:EquivalentLayer" => source_glazing_equivalent_layer_family,
                 "WindowMaterial:Gap:EquivalentLayer" => source_gap_equivalent_layer_family,
                 "Material:RoofVegetation" => source_roof_vegetation_family,
+                "WindowMaterial:Gap" | "WindowGap:DeflectionState" | "WindowGap:SupportPillar" => {
+                    source_window_gap_family
+                }
                 "WindowMaterial:Screen" => source_screen_family,
                 "WindowMaterial:Blind" => source_blind_family,
                 "People" => {

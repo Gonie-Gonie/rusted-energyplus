@@ -14864,6 +14864,774 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 );
             }
         }
+        // Shared unused-material fence: real SourceB admission, then only typed Construction carrier mutations.
+        for (shared_family, shared_kind, shared_definition) in [
+            (
+                "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                ep_model::MaterialKind::WindowGlazingRefractionExtinction,
+                json!({"thickness":0.003,"solar_index_of_refraction":1.5,"solar_extinction_coefficient":20.0,"visible_index_of_refraction":1.7,"visible_extinction_coefficient":100.0}),
+            ),
+            (
+                "WindowMaterial:Glazing:EquivalentLayer",
+                ep_model::MaterialKind::WindowGlazingEquivalentLayer,
+                json!({"optical_data_type":"SpectralAverage","front_side_beam_beam_solar_transmittance":0.1,"back_side_beam_beam_solar_transmittance":0.12,"front_side_beam_beam_solar_reflectance":0.2,"back_side_beam_beam_solar_reflectance":0.22}),
+            ),
+            (
+                "WindowMaterial:Gas",
+                ep_model::MaterialKind::WindowGas,
+                json!({"gas_type":"Argon","thickness":0.012}),
+            ),
+            (
+                "WindowMaterial:Gap:EquivalentLayer",
+                ep_model::MaterialKind::WindowGapEquivalentLayer,
+                json!({"gas_type":"AIR","thickness":0.0125,"gap_vent_type":"Sealed"}),
+            ),
+            (
+                "WindowMaterial:GasMixture",
+                ep_model::MaterialKind::WindowGasMixture,
+                json!({"thickness":0.012,"number_of_gases_in_mixture":2,"gas_1_type":"Air","gas_1_fraction":0.5,"gas_2_type":"Argon","gas_2_fraction":0.5}),
+            ),
+            (
+                "WindowMaterial:Shade",
+                ep_model::MaterialKind::WindowShade,
+                json!({"solar_transmittance":0.15,"solar_reflectance":0.35,"visible_transmittance":0.1,"visible_reflectance":0.4,"infrared_hemispherical_emissivity":0.8,"infrared_transmittance":0.1,"thickness":0.002,"conductivity":0.2}),
+            ),
+            (
+                "WindowMaterial:Shade:EquivalentLayer",
+                ep_model::MaterialKind::WindowShadeEquivalentLayer,
+                json!({"front_side_shade_beam_diffuse_solar_transmittance":0.1,"back_side_shade_beam_diffuse_solar_transmittance":0.12,"front_side_shade_beam_diffuse_solar_reflectance":0.2,"back_side_shade_beam_diffuse_solar_reflectance":0.22}),
+            ),
+            (
+                "WindowMaterial:Drape:EquivalentLayer",
+                ep_model::MaterialKind::WindowDrapeEquivalentLayer,
+                json!({"front_side_drape_beam_diffuse_solar_transmittance":0.1,"back_side_drape_beam_diffuse_solar_transmittance":0.12,"front_side_drape_beam_diffuse_solar_reflectance":0.2,"back_side_drape_beam_diffuse_solar_reflectance":0.22}),
+            ),
+            (
+                "WindowMaterial:Screen",
+                ep_model::MaterialKind::WindowScreen,
+                json!({"diffuse_solar_reflectance":0.2,"diffuse_visible_reflectance":0.3,"screen_material_spacing":0.025,"screen_material_diameter":0.001}),
+            ),
+            (
+                "WindowMaterial:Screen:EquivalentLayer",
+                ep_model::MaterialKind::WindowScreenEquivalentLayer,
+                json!({"screen_beam_diffuse_solar_transmittance":0.1,"screen_beam_diffuse_solar_reflectance":0.2,"screen_beam_beam_visible_transmittance":0.05,"screen_beam_diffuse_visible_transmittance":0.12,"screen_beam_diffuse_visible_reflectance":0.22}),
+            ),
+            (
+                "WindowMaterial:Blind",
+                ep_model::MaterialKind::WindowBlind,
+                json!({"slat_width":0.02,"slat_separation":0.015,"front_side_slat_beam_solar_reflectance":0.2,"back_side_slat_beam_solar_reflectance":0.22,"front_side_slat_diffuse_solar_reflectance":0.25,"back_side_slat_diffuse_solar_reflectance":0.28,"slat_beam_visible_transmittance":0.1}),
+            ),
+            (
+                "WindowMaterial:Blind:EquivalentLayer",
+                ep_model::MaterialKind::WindowBlindEquivalentLayer,
+                json!({"slat_width":0.02,"slat_separation":0.015,"front_side_slat_beam_diffuse_solar_reflectance":0.2,"back_side_slat_beam_diffuse_solar_reflectance":0.22,"front_side_slat_diffuse_diffuse_solar_reflectance":0.25,"back_side_slat_diffuse_diffuse_solar_reflectance":0.28}),
+            ),
+            (
+                "WindowMaterial:Glazing",
+                ep_model::MaterialKind::WindowGlazing,
+                json!({"optical_data_type":"SpectralAverage","thickness":0.003}),
+            ),
+            (
+                "WindowMaterial:SimpleGlazingSystem",
+                ep_model::MaterialKind::WindowSimpleGlazing,
+                json!({"u_factor":4.2,"solar_heat_gain_coefficient":0.57}),
+            ),
+        ] {
+            let mut shared_value = curve_value.clone();
+            shared_value[shared_family] = json!({"SHARED UNUSED FENCE":shared_definition});
+            let shared_raw = ep_raw_model::parse_epjson_str_for_source(&shared_value.to_string())
+                .expect("real original SourceB shared-fence fixture");
+            let shared_compiled = ep_compiler::compile_raw_model_for_source(&shared_raw);
+            let shared_model = shared_compiled
+                .model
+                .as_ref()
+                .expect("real shared-fence compiler Material arena");
+            let shared_ip = crate::ordinary_input_processor::resolve_source_b(&shared_raw)
+                .expect("real shared-fence Raw/IP admission");
+            let _shared_material_input =
+                crate::ordinary_material_input::resolve_source(&shared_raw, &shared_ip)
+                    .expect("real shared-fence Material projection");
+            let mut shared_trace = inspect_porting_scope(
+                &shared_raw,
+                &shared_compiled.report,
+                Some(shared_model),
+                PortingScope::B,
+            );
+            shared_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    shared_model,
+                    &weather,
+                    "shared unused-material fence weather",
+                )
+                .expect("same weather-derived shared-fence environment"),
+            );
+            let shared_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &shared_raw,
+                &shared_trace,
+            )
+            .expect("genuine validated shared-fence SourceB admission");
+            let shared_target = shared_model
+                .material_names
+                .resolve("SHARED UNUSED FENCE")
+                .expect("actual shared-fence Material name/ID");
+            let shared_material = shared_model
+                .materials
+                .iter()
+                .find(|row| row.id == shared_target)
+                .expect("same actual shared-fence Material arena row");
+            let shared_construction_index = shared_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("actual ordinary opaque nonempty Construction host");
+            let shared_host = &shared_model.constructions[shared_construction_index];
+            let shared_original_layers = shared_host.layers.clone();
+            let shared_baseline = crate::support::assess_support_with_source_admission(
+                &shared_raw,
+                &shared_compiled.report,
+                Some(shared_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&shared_admission),
+            );
+            assert!(
+                shared_trace.admissible
+                    && shared_trace.violations.is_empty()
+                    && shared_material.id == shared_target
+                    && shared_material.name.0 == "SHARED UNUSED FENCE"
+                    && shared_material.kind() == shared_kind
+                    && !shared_original_layers.is_empty()
+                    && shared_original_layers.iter().all(|id| *id != shared_target)
+                    && shared_host
+                        .outside_layer
+                        .is_some_and(|id| id != shared_target)
+                    && shared_baseline.allows_rust_runtime(),
+                "unchanged original-valid shared-fence baseline {shared_family}"
+            );
+            let mut shared_outside_only = shared_model.clone();
+            shared_outside_only.constructions[shared_construction_index].outside_layer =
+                Some(shared_target);
+            let shared_outside_assessment = crate::support::assess_support_with_source_admission(
+                &shared_raw,
+                &shared_compiled.report,
+                Some(&shared_outside_only),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&shared_admission),
+            );
+            let mut shared_empty_fallback = shared_model.clone();
+            shared_empty_fallback.constructions[shared_construction_index]
+                .layers
+                .clear();
+            shared_empty_fallback.constructions[shared_construction_index].outside_layer =
+                Some(shared_target);
+            let shared_fallback_assessment = crate::support::assess_support_with_source_admission(
+                &shared_raw,
+                &shared_compiled.report,
+                Some(&shared_empty_fallback),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&shared_admission),
+            );
+            assert!(
+                shared_outside_only.constructions[shared_construction_index].layers
+                    == shared_original_layers
+                    && !shared_outside_only.constructions[shared_construction_index]
+                        .layers
+                        .is_empty()
+                    && shared_outside_only.constructions[shared_construction_index].outside_layer
+                        == Some(shared_target)
+                    && !shared_outside_assessment.allows_rust_runtime()
+                    && shared_outside_assessment
+                        .unsupported_objects
+                        .iter()
+                        .any(|entry| entry.object_type == shared_family)
+                    && shared_empty_fallback.constructions[shared_construction_index]
+                        .layers
+                        .is_empty()
+                    && shared_empty_fallback.constructions[shared_construction_index].outside_layer
+                        == Some(shared_target)
+                    && !shared_fallback_assessment.allows_rust_runtime()
+                    && shared_fallback_assessment
+                        .unsupported_objects
+                        .iter()
+                        .any(|entry| entry.object_type == shared_family),
+                "original outside-only and independent empty fallback must reject exact family {shared_family}"
+            );
+        }
+
+        // Source WindowGap joins the same actual DSOA/Ideal/OA fixture; no material owner is constructed here.
+        {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as GapRaw;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as GapValue;
+            const WINDOW_GAP: &str = "WindowMaterial:Gap";
+            const GAP_DEFLECTION: &str = "WindowGap:DeflectionState";
+            const GAP_PILLAR: &str = "WindowGap:SupportPillar";
+            let mut window_gap_value = curve_value.clone();
+            window_gap_value["WindowMaterial:Gas"] = json!({"WG GAS":{
+                "gas_type":"Custom","thickness":0.012,"conductivity_coefficient_a":0.02,
+                "viscosity_coefficient_a":0.00001,"specific_heat_coefficient_a":1000.0,
+                "molecular_weight":28.0,"specific_heat_ratio":1.4
+            }});
+            window_gap_value["WindowMaterial:GasMixture"] = json!({"WG MIX":{
+                "thickness":0.012,"number_of_gases_in_mixture":2,
+                "gas_1_type":"Air","gas_1_fraction":0.5,"gas_2_type":"Argon","gas_2_fraction":0.5
+            }});
+            window_gap_value["WindowMaterial:Gap:EquivalentLayer"] = json!({"WG EQL":{
+                "gas_type":"ARGON","thickness":0.012,"gap_vent_type":"VentedOutdoor"
+            }});
+            window_gap_value["Material:RoofVegetation"] = json!({"WG ORDER ROOF":{}});
+            window_gap_value[GAP_DEFLECTION] = json!({
+                "ALIAS DEF":{"deflected_thickness":0.004,"initial_temperature":20.0,
+                    "initial_pressure":90000.0,"name":false,"metadata":{"held":[null,true,1.25]}},
+                "alias def":{"deflected_thickness":0.008}
+            });
+            window_gap_value[GAP_PILLAR] = json!({" PILLAR ":{
+                "spacing":0.03,"radius":0.0003,"idf_order":[],"extra":{"retained":true}
+            }});
+            window_gap_value[WINDOW_GAP] = json!({
+                "WG 00 EMPTY":{"thickness":0.0127,"gas_or_gas_mixture_":""},
+                "WG 01 SINGLE":{"thickness":0.0127,"gas_or_gas_mixture_":"WG GAS","pressure":90000.0,
+                    "deflection_state":"aLiAs DeF","support_pillar":" PILLAR ",
+                    "name":false,"idf_order":u64::MAX,"idf_max_fields":{"ignored":true},
+                    "idf_max_extensible_fields":null,"metadata":{"held":[null,true,u64::MAX,"text",{"n":1.25}]}},
+                "WG 02 MIXTURE":{"thickness":0.0095,"gas_or_gas_mixture_":"WG MIX","pressure":95000.0},
+                "WG 03 EQL":{"thickness":0.006,"gas_or_gas_mixture_":"WG EQL","pressure":120000.0},
+                "WG 04 SELF":{"thickness":0.010,"gas_or_gas_mixture_":"WG 04 SELF","pressure":101800.0},
+                "WG 05 FROM EMPTY":{"thickness":0.011,"gas_or_gas_mixture_":"WG 00 EMPTY","pressure":98000.0},
+                "WG 06 FROM SINGLE":{"thickness":0.007,"gas_or_gas_mixture_":"WG 01 SINGLE","pressure":99000.0},
+                "WG 07 TRANSITIVE":{"thickness":0.008,"gas_or_gas_mixture_":"WG 06 FROM SINGLE","pressure":100000.0}
+            });
+            let window_gap_raw =
+                ep_raw_model::parse_epjson_str_for_source(&window_gap_value.to_string())
+                    .expect("real SourceB Gap Raw");
+            let window_gap_compiled = ep_compiler::compile_raw_model_for_source(&window_gap_raw);
+            let window_gap_model = window_gap_compiled
+                .model
+                .as_ref()
+                .expect("Source Gap typed model");
+            let mut window_gap_ip =
+                crate::ordinary_input_processor::resolve_source_b(&window_gap_raw)
+                    .expect("actual SourceB IP including raw helpers");
+            let gap_definition = window_gap_ip
+                .get_object_def_max_args(WINDOW_GAP)
+                .expect("Gap schema");
+            let def_definition = window_gap_ip
+                .get_object_def_max_args(GAP_DEFLECTION)
+                .expect("Deflection schema");
+            let pillar_definition = window_gap_ip
+                .get_object_def_max_args(GAP_PILLAR)
+                .expect("Pillar schema");
+            let window_gap_projection =
+                crate::ordinary_material_input::resolve_source(&window_gap_raw, &window_gap_ip)
+                    .expect("actual Gap material projection");
+            let mut window_gap_trace = inspect_porting_scope(
+                &window_gap_raw,
+                &window_gap_compiled.report,
+                Some(window_gap_model),
+                PortingScope::B,
+            );
+            window_gap_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    window_gap_model,
+                    &weather,
+                    "same WindowGap Source weather",
+                )
+                .expect("same actual Source environment"),
+            );
+            let window_gap_admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(
+                    &window_gap_raw,
+                    &window_gap_trace,
+                )
+                .expect("validated real SourceB WindowGap admission");
+            let window_gap_assessment = crate::support::assess_support_with_source_admission(
+                &window_gap_raw,
+                &window_gap_compiled.report,
+                Some(window_gap_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&window_gap_admission),
+            );
+            assert!(
+                !window_gap_compiled.has_errors()
+                    && window_gap_trace.admissible
+                    && window_gap_assessment.allows_rust_runtime()
+                    && window_gap_model.material_names.is_source_exact_namespace()
+                    && window_gap_projection.source_is_epjson
+                    && window_gap_projection.window_gap.len() == 8
+                    && window_gap_model
+                        .materials
+                        .iter()
+                        .filter(|row| row.kind() == ep_model::MaterialKind::WindowComplexGap)
+                        .count()
+                        == 8
+                    && window_gap_model.materials.len() == 13
+                    && (gap_definition.alphas, gap_definition.numerics) == (4, 2)
+                    && (def_definition.alphas, def_definition.numerics) == (1, 3)
+                    && (pillar_definition.alphas, pillar_definition.numerics) == (1, 2),
+                "actual SourceB Raw/compiler/IP/projection/admission baseline"
+            );
+            let full_gap = window_gap_projection
+                .window_gap
+                .iter()
+                .find(|row| row.object_name == "WG 01 SINGLE")
+                .expect("same full Gap projection");
+            let empty_gap = window_gap_projection
+                .window_gap
+                .iter()
+                .find(|row| row.object_name == "WG 00 EMPTY")
+                .expect("same minimal Gap projection");
+            let original_gap = window_gap_ip
+                .source_raw_object_fields(WINDOW_GAP, "WG 01 SINGLE")
+                .expect("retained original Gap fields");
+            let original_def = window_gap_ip
+                .source_raw_object_fields(GAP_DEFLECTION, "ALIAS DEF")
+                .expect("exact retained helper fields");
+            let mut huge_gap_value = window_gap_value.clone();
+            huge_gap_value[WINDOW_GAP]["WG 01 SINGLE"]["pressure"] = json!(u64::MAX);
+            let huge_gap_raw =
+                ep_raw_model::parse_epjson_str_for_source(&huge_gap_value.to_string())
+                    .expect("original u64 Gap pressure");
+            let huge_gap_ip = crate::ordinary_input_processor::resolve_source_b(&huge_gap_raw)
+                .expect("same huge original IP");
+            let huge_gap_projection =
+                crate::ordinary_material_input::resolve_source(&huge_gap_raw, &huge_gap_ip)
+                    .expect("signed effective Gap projection");
+            assert!(
+                full_gap.fields.len() == 5 && empty_gap.fields.len() == 2
+                    && full_gap.idf_max_fields.is_none()
+                    && full_gap.fields.keys().all(|field| {
+                        crate::ordinary_equipment_input::source_b_window_gap_known_field(WINDOW_GAP, field)
+                    })
+                    && matches!(original_gap.get("name"), Some(GapRaw::Bool(false)))
+                    && matches!(original_gap.get("idf_order"), Some(GapRaw::Number(t)) if t == "18446744073709551615")
+                    && matches!(original_gap.get("idf_max_fields"), Some(GapRaw::Object(_)))
+                    && matches!(original_gap.get("idf_max_extensible_fields"), Some(GapRaw::Null))
+                    && matches!(original_gap.get("metadata"), Some(GapRaw::Object(_)))
+                    && matches!(original_def.get("name"), Some(GapRaw::Bool(false)))
+                    && window_gap_ip.is_object_unused(GAP_DEFLECTION, "ALIAS DEF")
+                    && window_gap_ip.is_object_unused(GAP_DEFLECTION, "alias def")
+                    && window_gap_ip.is_object_unused(GAP_PILLAR, " PILLAR ")
+                    && huge_gap_projection.window_gap.iter()
+                        .find(|row| row.object_name == "WG 01 SINGLE")
+                        .is_some_and(|row| matches!(row.fields.get("pressure"), Some(GapValue::Number(v)) if v.to_bits() == (-1.0_f64).to_bits()))
+                    && huge_gap_raw.objects[&ep_raw_model::ObjectType(WINDOW_GAP.into())]
+                        [&ep_raw_model::ObjectName("WG 01 SINGLE".into())].fields
+                        [&ep_raw_model::FieldName("pressure".into())]
+                        == ep_raw_model::RawValue::Number("18446744073709551615".into()),
+                "only known operands project; original kinds/Any metadata/helpers stay on their genuine owners"
+            );
+
+            // Actual admission-none output order catches both the historical duplicate and early Gap push.
+            let no_gap_admission = crate::support::assess_support_with_source_admission(
+                &window_gap_raw,
+                &window_gap_compiled.report,
+                Some(window_gap_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                None,
+            );
+            assert!(
+                !no_gap_admission.allows_rust_runtime()
+                    && no_gap_admission
+                        .unsupported_objects
+                        .iter()
+                        .filter(|row| matches!(
+                            row.object_type.as_str(),
+                            "Material:RoofVegetation" | "WindowMaterial:Gap"
+                        ))
+                        .map(|row| row.object_type.as_str())
+                        .collect::<Vec<_>>()
+                        == ["Material:RoofVegetation", "WindowMaterial:Gap"],
+                "real no-admission Gap+Roof must emit one each at the original Roof-then-Gap positions"
+            );
+            let gap_rows = window_gap_model
+                .materials
+                .iter()
+                .filter_map(|row| {
+                    row.as_window_complex_gap()
+                        .map(|gap| (row.name.0.as_str(), (row.id, *gap)))
+                })
+                .collect::<std::collections::BTreeMap<_, _>>();
+            assert!(
+                gap_rows["WG 00 EMPTY"].1.source_material_id().is_none()
+                    && gap_rows["WG 00 EMPTY"].1.active_gas_count() == Some(0)
+                    && gap_rows["WG 00 EMPTY"].1.pressure_pa.to_bits() == 101325.0_f64.to_bits()
+                    && gap_rows["WG 01 SINGLE"].1.source_material_id()
+                        == window_gap_model.material_names.resolve("WG GAS")
+                    && gap_rows["WG 02 MIXTURE"].1.source_material_id()
+                        == window_gap_model.material_names.resolve("WG MIX")
+                    && gap_rows["WG 03 EQL"].1.source_material_id()
+                        == window_gap_model.material_names.resolve("WG EQL")
+                    && gap_rows["WG 03 EQL"].1.active_gas_count().is_none()
+                    && gap_rows["WG 04 SELF"].1.source_material_id()
+                        == Some(gap_rows["WG 04 SELF"].0)
+                    && gap_rows["WG 05 FROM EMPTY"].1.source_material_id()
+                        == Some(gap_rows["WG 00 EMPTY"].0)
+                    && gap_rows["WG 06 FROM SINGLE"].1.source_material_id()
+                        == Some(gap_rows["WG 01 SINGLE"].0)
+                    && gap_rows["WG 07 TRANSITIVE"].1.source_material_id()
+                        == Some(gap_rows["WG 06 FROM SINGLE"].0)
+                    && gap_rows["WG 01 SINGLE"].1.deflected_thickness_m.to_bits()
+                        == 0.004_f64.to_bits()
+                    && gap_rows["WG 01 SINGLE"].1.support_pillar.is_some_and(|p| {
+                        p.spacing_m.to_bits() == 0.03_f64.to_bits()
+                            && p.radius_m.to_bits() == 0.0003_f64.to_bits()
+                    }),
+                "actual Source prefix IDs/defaults and first-doj/no-trim helper advisory state"
+            );
+
+            for case in 0_usize..38 {
+                let mut bad_value = window_gap_value.clone();
+                if case <= 10 {
+                    let field = if case == 0 {
+                        "outside_layer".into()
+                    } else {
+                        format!("layer_{}", case + 1)
+                    };
+                    bad_value["Construction"]["WG USED"] = json!({(field):"WG 00 EMPTY"});
+                } else if case <= 19 {
+                    let field = [
+                        "outside_layer_name",
+                        "gap_1_name",
+                        "layer_2_name",
+                        "gap_2_name",
+                        "layer_3_name",
+                        "gap_3_name",
+                        "layer_4_name",
+                        "gap_4_name",
+                        "layer_5_name",
+                    ][case - 11];
+                    bad_value["Construction:ComplexFenestrationState"]["WG CFS USED"] =
+                        json!({(field):"WG 00 EMPTY"});
+                } else {
+                    match case {
+                        20 => {
+                            bad_value[WINDOW_GAP]["WG 00 EMPTY"]
+                                .as_object_mut()
+                                .expect("Gap")
+                                .remove("thickness");
+                        }
+                        21 => {
+                            bad_value[WINDOW_GAP]["WG 00 EMPTY"]
+                                .as_object_mut()
+                                .expect("Gap")
+                                .remove("gas_or_gas_mixture_");
+                        }
+                        22 => bad_value[WINDOW_GAP]["WG 00 EMPTY"]["thickness"] = json!(0.0),
+                        23 => bad_value[WINDOW_GAP]["WG 00 EMPTY"]["thickness"] = json!("0.012"),
+                        24 => {
+                            bad_value[WINDOW_GAP]["WG 00 EMPTY"]["pressure"] =
+                                json!("Autocalculate")
+                        }
+                        25 => {
+                            bad_value[WINDOW_GAP]["WG 00 EMPTY"]["gas_or_gas_mixture_"] = json!(1.0)
+                        }
+                        26 => {
+                            bad_value[WINDOW_GAP]["WG 00 EMPTY"]["deflection_state"] = json!(true)
+                        }
+                        27 => bad_value[WINDOW_GAP]["WG 00 EMPTY"]["support_pillar"] = json!(null),
+                        28 => {
+                            bad_value[GAP_DEFLECTION]["ALIAS DEF"]["initial_temperature"] =
+                                json!(-1.0)
+                        }
+                        29 => {
+                            bad_value[GAP_DEFLECTION]["ALIAS DEF"]["initial_pressure"] = json!(-1.0)
+                        }
+                        30 => {
+                            bad_value[GAP_DEFLECTION]["ALIAS DEF"]["deflected_thickness"] =
+                                json!(-1.0)
+                        }
+                        31 => bad_value[GAP_PILLAR][" PILLAR "]["spacing"] = json!(0.0),
+                        32 => bad_value[GAP_PILLAR][" PILLAR "]["radius"] = json!(0.0),
+                        33 => {
+                            bad_value[GAP_DEFLECTION]["ALIAS DEF"]["deflected_thickness"] =
+                                json!("Autosize")
+                        }
+                        34 => bad_value[GAP_PILLAR][" PILLAR "]["spacing"] = json!("0.03"),
+                        35 => {
+                            let rows = bad_value[GAP_DEFLECTION]
+                                .as_object_mut()
+                                .expect("helper family");
+                            let row = rows.remove("ALIAS DEF").expect("old key");
+                            rows.insert("\n".into(), row);
+                        }
+                        36 => {
+                            let rows = bad_value[WINDOW_GAP].as_object_mut().expect("Gap family");
+                            let row = rows.remove("WG 00 EMPTY").expect("old key");
+                            rows.insert(" \t\r\u{c}".into(), row);
+                        }
+                        _ => {
+                            bad_value[WINDOW_GAP]["WG 00 EMPTY"]["gas_or_gas_mixture_"] =
+                                json!("Opaque")
+                        }
+                    }
+                }
+                let bad_raw = ep_raw_model::parse_epjson_str_for_source(&bad_value.to_string())
+                    .expect("actual changed original Raw");
+                let rejected = crate::ordinary_equipment_input::resolve_source_b(&bad_raw);
+                assert!(
+                    if case <= 19 {
+                        rejected.is_err_and(|e| e == "Source unused WindowGap excludes every Construction layer reference")
+                            && ["Construction:WindowEquivalentLayer","Construction:AirBoundary","Construction:InternalSource"]
+                                .iter().all(|family| {
+                                    let mut prefixed = window_gap_value.clone();
+                                    let field = if case == 0 { "outside_layer".into() }
+                                        else if case <= 10 { format!("layer_{}", case + 1) }
+                                        else { "outside_layer_name".into() };
+                                    prefixed[*family]["WG PREFIX USED"] = json!({(field):"WG 00 EMPTY"});
+                                    crate::ordinary_equipment_input::resolve_source_b(
+                                        &ep_raw_model::parse_epjson_str_for_source(&prefixed.to_string()).expect("prefix Raw"),
+                                    ).is_err_and(|e| e == "Source unused WindowGap excludes every Construction layer reference")
+                                })
+                    } else {
+                        rejected.is_err()
+                    },
+                    "actual Raw schema/name/class/Construction-prefix partition {case}"
+                );
+            }
+            let gap_id = gap_rows["WG 00 EMPTY"].0;
+            let gap_position = window_gap_model
+                .materials
+                .iter()
+                .position(|row| row.id == gap_id)
+                .expect("actual Gap arena row");
+            let other_gap_position = window_gap_model
+                .materials
+                .iter()
+                .position(|row| row.id == gap_rows["WG 07 TRANSITIVE"].0)
+                .expect("other Gap arena row");
+            let host = window_gap_model
+                .constructions
+                .iter()
+                .position(|row| row.is_ordinary_opaque() && !row.layers.is_empty())
+                .expect("actual opaque host");
+            let opaque_id = window_gap_model.constructions[host].layers[0];
+            let opaque_definition = window_gap_model
+                .materials
+                .iter()
+                .find(|row| row.id == opaque_id)
+                .expect("actual opaque material")
+                .definition;
+            for case in 0_usize..27 {
+                let mut changed_model = window_gap_model.clone();
+                match case {
+                    0 => changed_model
+                        .materials
+                        .swap(gap_position, other_gap_position),
+                    1 => {
+                        let a = changed_model
+                            .ctf_report_names
+                            .materials
+                            .iter()
+                            .position(|(id, _)| *id == gap_id)
+                            .expect("Gap tuple");
+                        let b = changed_model
+                            .ctf_report_names
+                            .materials
+                            .iter()
+                            .position(|(id, _)| *id == gap_rows["WG 07 TRANSITIVE"].0)
+                            .expect("other tuple");
+                        changed_model.ctf_report_names.materials.swap(a, b);
+                    }
+                    2 => changed_model.constructions[host].outside_layer = Some(gap_id),
+                    3 => {
+                        changed_model.constructions[host].layers.clear();
+                        changed_model.constructions[host].outside_layer = Some(gap_id);
+                    }
+                    4..=14 => {
+                        let layer = case - 4;
+                        let row = &mut changed_model.constructions[host];
+                        row.layers.resize(layer + 1, opaque_id);
+                        row.layers[layer] = gap_id;
+                    }
+                    15 => changed_model.materials[gap_position].id = opaque_id,
+                    16 => {
+                        changed_model.materials.remove(gap_position);
+                    }
+                    17 => changed_model.materials[gap_position].definition = opaque_definition,
+                    18 => {
+                        changed_model.materials[gap_position].name =
+                            ep_model::NormalizedName("WRONG GAP".into())
+                    }
+                    19 => {
+                        let _ = changed_model
+                            .material_names
+                            .insert("EXTRA GAP ALIAS", gap_id);
+                    }
+                    20 => changed_model
+                        .ctf_report_names
+                        .materials
+                        .retain(|(id, _)| *id != gap_id),
+                    21 => changed_model
+                        .ctf_report_names
+                        .materials
+                        .push((gap_id, "WG 00 EMPTY".into())),
+                    22 => changed_model
+                        .ctf_report_names
+                        .materials
+                        .push((ep_model::MaterialId(u32::MAX), "WG 00 EMPTY".into())),
+                    23 => changed_model.materials[gap_position].id = ep_model::MaterialId(u32::MAX),
+                    24 | 26 => {
+                        let target = if case == 24 {
+                            gap_position
+                        } else {
+                            changed_model
+                                .materials
+                                .iter()
+                                .position(|row| row.id == gap_rows["WG 06 FROM SINGLE"].0)
+                                .expect("earlier referenced Gap")
+                        };
+                        let mut value = *changed_model.materials[target]
+                            .as_window_complex_gap()
+                            .expect("actual Gap kind");
+                        value.gas = ep_model::WindowComplexGapGasComposition::Reference {
+                            source_material_id: if case == 24 {
+                                opaque_id
+                            } else {
+                                gap_rows["WG 07 TRANSITIVE"].0
+                            },
+                        };
+                        changed_model.materials[target].definition =
+                            ep_model::MaterialDefinition::WindowComplexGap(value);
+                    }
+                    _ => {
+                        changed_model.material_names = Default::default();
+                        changed_model.materials.iter().for_each(|row| {
+                            let _ = changed_model.material_names.insert(&row.name.0, row.id);
+                        });
+                    }
+                }
+                let assessed = crate::support::assess_support_with_source_admission(
+                    &window_gap_raw,
+                    &window_gap_compiled.report,
+                    Some(&changed_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&window_gap_admission),
+                );
+                assert!(
+                    if case < 2 {
+                        assessed.allows_rust_runtime()
+                    } else {
+                        !assessed.allows_rust_runtime()
+                            && assessed
+                                .unsupported_objects
+                                .iter()
+                                .any(|row| row.object_type == WINDOW_GAP)
+                            && (case != 2
+                                || changed_model.constructions[host].layers
+                                    == window_gap_model.constructions[host].layers)
+                    },
+                    "actual typed identity/prefix/permutation/original-outside/layers/fallback partition {case}"
+                );
+            }
+
+            let source_a_control =
+                ep_raw_model::parse_epjson_str_for_source(&input(PortingScope::A).to_string())
+                    .expect("matched real SourceA baseline");
+            let gap_idf = ep_raw_model::parse_epjson_str_with_idf_order(
+                r#"{"Zone":{"Zone":{}},"WindowMaterial:Gas":{"IDF GAS":{"gas_type":"Air","thickness":0.012}},
+                    "WindowMaterial:Gap":{"IDF GAP":{"thickness":0.012,"gas_or_gas_mixture_":"IDF GAS"}}}"#,
+                "Zone,Zone;WindowMaterial:Gas,IDF GAS,Air,0.012;WindowMaterial:Gap,IDF GAP,0.012,IDF GAS;",
+            ).expect("matched actual converted IDF declarations");
+            let gap_idf_legacy = ep_compiler::compile_raw_model(&gap_idf);
+            assert!(
+                crate::ordinary_equipment_input::resolve_source_a(&source_a_control).is_ok()
+                    && [WINDOW_GAP, GAP_DEFLECTION, GAP_PILLAR]
+                        .iter()
+                        .all(|family| {
+                            let mut blocked = source_a_control.clone();
+                            blocked.objects.insert(
+                                ep_raw_model::ObjectType((*family).into()),
+                                window_gap_raw.objects[&ep_raw_model::ObjectType((*family).into())]
+                                    .clone(),
+                            );
+                            crate::ordinary_equipment_input::resolve_source_a(&blocked).is_err()
+                        })
+                    && crate::ordinary_equipment_input::resolve(&window_gap_raw).is_err()
+                    && !gap_idf.is_epjson()
+                    && !gap_idf_legacy.has_errors()
+                    && crate::ordinary_equipment_input::source_b_validate_unused_window_gap(
+                        &gap_idf
+                    )
+                    .is_err_and(|e| e == "Source unused WindowGap requires direct epJSON")
+                    && crate::ordinary_equipment_input::resolve_source_b(&gap_idf).is_err(),
+                "positive Legacy IDF is held outside SourceB while all three new families stay out of SourceA"
+            );
+            let mut future_value = window_gap_value.clone();
+            future_value[WINDOW_GAP]["WG 08 FORWARD"] =
+                json!({"thickness":0.012,"gas_or_gas_mixture_":"WG 09 FUTURE"});
+            future_value[WINDOW_GAP]["WG 09 FUTURE"] =
+                json!({"thickness":0.012,"gas_or_gas_mixture_":""});
+            future_value[WINDOW_GAP]["WG 10 MISSING"] =
+                json!({"thickness":0.012,"gas_or_gas_mixture_":"NOT DEFINED"});
+            let future_raw = ep_raw_model::parse_epjson_str_for_source(&future_value.to_string())
+                .expect("actual future-name Raw");
+            let future_compiled = ep_compiler::compile_raw_model_for_source(&future_raw);
+            let future_model = future_compiled
+                .model
+                .as_ref()
+                .expect("deferred prefix model");
+            let mut future_trace = inspect_porting_scope(
+                &future_raw,
+                &future_compiled.report,
+                Some(future_model),
+                PortingScope::B,
+            );
+            future_trace.environment = Some(
+                super::environment::environment_from_weather(
+                    future_model,
+                    &weather,
+                    "same deferred Gap weather",
+                )
+                .expect("same real environment"),
+            );
+            let future_admission = crate::support::SourceSupportAdmission::from_validated_scope(
+                &future_raw,
+                &future_trace,
+            )
+            .expect("Source admission preserves recoverable Native missing-reference branch");
+            assert!(
+                !future_compiled.has_errors()
+                    && ["WG 08 FORWARD", "WG 10 MISSING"].iter().all(|name| {
+                        future_model
+                            .material_names
+                            .resolve(name)
+                            .and_then(|id| future_model.materials.iter().find(|row| row.id == id))
+                            .and_then(ep_model::Material::as_window_complex_gap)
+                            .is_some_and(|gap| {
+                                matches!(gap.gas, ep_model::WindowComplexGapGasComposition::Empty)
+                                    && gap.source_material_id().is_none()
+                            })
+                    })
+                    && crate::support::assess_support_with_source_admission(
+                        &future_raw,
+                        &future_compiled.report,
+                        Some(future_model),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&future_admission),
+                    )
+                    .allows_rust_runtime(),
+                "admission must retain actual earlier/self prefix, not bind a future definition prematurely"
+            );
+        }
     }
 }
 

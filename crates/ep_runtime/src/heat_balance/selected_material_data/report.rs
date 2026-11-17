@@ -65,374 +65,403 @@ impl SelectedMaterialData {
                 .map_err(io)?;
                 continue;
             }
-            let (resistance, rough, geometry, surface) =
-                match material.definition {
-                    MaterialDefinition::Regular(value) => (
-                        value.thermal_resistance_m2_k_per_w,
-                        value.roughness,
+            let (resistance, rough, geometry, surface) = match material.definition {
+                MaterialDefinition::Regular(value) => (
+                    value.thermal_resistance_m2_k_per_w,
+                    value.roughness,
+                    [
+                        value.thickness_m,
+                        value.conductivity_w_per_m_k,
+                        value.density_kg_per_m3,
+                        value.specific_heat_j_per_kg_k,
+                    ],
+                    value.surface,
+                ),
+                MaterialDefinition::RoofVegetation(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::EcoRoof) {
+                        return Err(unavailable("reported EcoRoof actual group"));
+                    }
+                    let value = self
+                        .roof_vegetation
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual EcoRoof runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("EcoRoof getter roughness"))?,
                         [
-                            value.thickness_m,
-                            value.conductivity_w_per_m_k,
-                            value.density_kg_per_m3,
-                            value.specific_heat_j_per_kg_k,
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
                         ],
-                        value.surface,
-                    ),
-                    MaterialDefinition::RoofVegetation(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::EcoRoof) {
-                            return Err(unavailable("reported EcoRoof actual group"));
-                        }
-                        let value = self.roof_vegetation.get(id).ok_or_else(|| {
-                            unavailable("reported actual EcoRoof runtime properties")
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::NoMass(value) => (
+                    value.thermal_resistance_m2_k_per_w,
+                    value.roughness,
+                    [0.0; 4],
+                    value.surface,
+                ),
+                MaterialDefinition::WindowComplexGap(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::ComplexWindowGap)
+                    {
+                        return Err(unavailable("reported Gap actual group"));
+                    }
+                    let value = &self
+                        .window_gap
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual Gap runtime base"))?
+                        .base;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("Gap getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowGas(_) | MaterialDefinition::WindowGasMixture(_) => {
+                    let expected = if matches!(
+                        &material.definition,
+                        MaterialDefinition::WindowGasMixture(_)
+                    ) {
+                        SourceMaterialGroup::GasMixture
+                    } else {
+                        SourceMaterialGroup::Gas
+                    };
+                    if self.material_groups.get(id) != Some(&expected) {
+                        return Err(unavailable("reported Gas actual group"));
+                    }
+                    let value = self.window_gas.get(id).ok_or_else(|| {
+                        unavailable("reported actual Gas runtime base properties")
+                    })?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("Gas getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowGlazingSpectralAndAngle(_)
+                | MaterialDefinition::WindowGlazingSpectral(_)
+                | MaterialDefinition::WindowGlazingSpectralAverage(_)
+                | MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::Glass) {
+                        return Err(unavailable("reported ordinary Glass actual group"));
+                    }
+                    let value = self
+                        .simple_glazing
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual Glass runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("Glass getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowShade(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::Shade) {
+                        return Err(unavailable("reported Shade actual group"));
+                    }
+                    let value = self
+                        .window_shade
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual Shade runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("Shade getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowShadeEquivalentLayer(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::ShadeEql) {
+                        return Err(unavailable("reported ShadeEQL actual group"));
+                    }
+                    let value = self.window_shade_equivalent_layer.get(id).ok_or_else(|| {
+                        unavailable("reported actual ShadeEQL runtime properties")
+                    })?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("ShadeEQL getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowDrapeEquivalentLayer(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::DrapeEql) {
+                        return Err(unavailable("reported DrapeEQL actual group"));
+                    }
+                    let value = self.window_drape_equivalent_layer.get(id).ok_or_else(|| {
+                        unavailable("reported actual DrapeEQL runtime properties")
+                    })?;
+                    let value = &value.base;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("DrapeEQL getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowScreenEquivalentLayer(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::ScreenEql) {
+                        return Err(unavailable("reported ScreenEQL actual group"));
+                    }
+                    let value = self.window_screen_equivalent_layer.get(id).ok_or_else(|| {
+                        unavailable("reported actual ScreenEQL runtime properties")
+                    })?;
+                    let value = &value.base;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("ScreenEQL getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowBlindEquivalentLayer(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::BlindEql) {
+                        return Err(unavailable("reported BlindEQL actual group"));
+                    }
+                    let value = self.window_blind_equivalent_layer.get(id).ok_or_else(|| {
+                        unavailable("reported actual BlindEQL runtime properties")
+                    })?;
+                    let value = &value.base;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("BlindEQL getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowGlazingEquivalentLayer(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassEql) {
+                        return Err(unavailable("reported GlazingEQL actual group"));
+                    }
+                    let value = self
+                        .window_glazing_equivalent_layer
+                        .get(id)
+                        .ok_or_else(|| {
+                            unavailable("reported actual GlazingEQL runtime properties")
                         })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("EcoRoof getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("GlazingEQL getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowGapEquivalentLayer(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::WindowGapEql) {
+                        return Err(unavailable("reported GapEQL actual group"));
                     }
-                    MaterialDefinition::NoMass(value) => (
-                        value.thermal_resistance_m2_k_per_w,
-                        value.roughness,
-                        [0.0; 4],
-                        value.surface,
-                    ),
-                    MaterialDefinition::WindowGas(_) | MaterialDefinition::WindowGasMixture(_) => {
-                        let expected = if matches!(
-                            &material.definition,
-                            MaterialDefinition::WindowGasMixture(_)
-                        ) {
-                            SourceMaterialGroup::GasMixture
-                        } else {
-                            SourceMaterialGroup::Gas
-                        };
-                        if self.material_groups.get(id) != Some(&expected) {
-                            return Err(unavailable("reported Gas actual group"));
-                        }
-                        let value = self.window_gas.get(id).ok_or_else(|| {
-                            unavailable("reported actual Gas runtime base properties")
-                        })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("Gas getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
+                    let value = self
+                        .window_gas
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual GapEQL runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("GapEQL getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowScreen(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::Screen) {
+                        return Err(unavailable("reported Screen actual group"));
                     }
-                    MaterialDefinition::WindowGlazingSpectralAndAngle(_)
-                    | MaterialDefinition::WindowGlazingSpectral(_)
-                    | MaterialDefinition::WindowGlazingSpectralAverage(_)
-                    | MaterialDefinition::WindowGlazingRefractionExtinction(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::Glass) {
-                            return Err(unavailable("reported ordinary Glass actual group"));
-                        }
-                        let value = self.simple_glazing.get(id).ok_or_else(|| {
-                            unavailable("reported actual Glass runtime properties")
-                        })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("Glass getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
+                    let value = self
+                        .window_screen
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual Screen runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("Screen getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowBlind(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::Blind) {
+                        return Err(unavailable("reported Blind actual group"));
                     }
-                    MaterialDefinition::WindowShade(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::Shade) {
-                            return Err(unavailable("reported Shade actual group"));
-                        }
-                        let value = self.window_shade.get(id).ok_or_else(|| {
-                            unavailable("reported actual Shade runtime properties")
-                        })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("Shade getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
+                    let value = self
+                        .window_blind
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported actual Blind runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("Blind getter roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                MaterialDefinition::WindowSimpleGlazing(_) => {
+                    if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassSimple) {
+                        return Err(unavailable("reported SimpleGlazing actual group"));
                     }
-                    MaterialDefinition::WindowShadeEquivalentLayer(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::ShadeEql) {
-                            return Err(unavailable("reported ShadeEQL actual group"));
-                        }
-                        let value =
-                            self.window_shade_equivalent_layer.get(id).ok_or_else(|| {
-                                unavailable("reported actual ShadeEQL runtime properties")
-                            })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("ShadeEQL getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowDrapeEquivalentLayer(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::DrapeEql) {
-                            return Err(unavailable("reported DrapeEQL actual group"));
-                        }
-                        let value =
-                            self.window_drape_equivalent_layer.get(id).ok_or_else(|| {
-                                unavailable("reported actual DrapeEQL runtime properties")
-                            })?;
-                        let value = &value.base;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("DrapeEQL getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowScreenEquivalentLayer(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::ScreenEql) {
-                            return Err(unavailable("reported ScreenEQL actual group"));
-                        }
-                        let value =
-                            self.window_screen_equivalent_layer.get(id).ok_or_else(|| {
-                                unavailable("reported actual ScreenEQL runtime properties")
-                            })?;
-                        let value = &value.base;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("ScreenEQL getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowBlindEquivalentLayer(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::BlindEql) {
-                            return Err(unavailable("reported BlindEQL actual group"));
-                        }
-                        let value =
-                            self.window_blind_equivalent_layer.get(id).ok_or_else(|| {
-                                unavailable("reported actual BlindEQL runtime properties")
-                            })?;
-                        let value = &value.base;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("BlindEQL getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowGlazingEquivalentLayer(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassEql) {
-                            return Err(unavailable("reported GlazingEQL actual group"));
-                        }
-                        let value =
-                            self.window_glazing_equivalent_layer
-                                .get(id)
-                                .ok_or_else(|| {
-                                    unavailable("reported actual GlazingEQL runtime properties")
-                                })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("GlazingEQL getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowGapEquivalentLayer(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::WindowGapEql)
-                        {
-                            return Err(unavailable("reported GapEQL actual group"));
-                        }
-                        let value = self.window_gas.get(id).ok_or_else(|| {
-                            unavailable("reported actual GapEQL runtime properties")
-                        })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("GapEQL getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowScreen(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::Screen) {
-                            return Err(unavailable("reported Screen actual group"));
-                        }
-                        let value = self.window_screen.get(id).ok_or_else(|| {
-                            unavailable("reported actual Screen runtime properties")
-                        })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("Screen getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowBlind(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::Blind) {
-                            return Err(unavailable("reported Blind actual group"));
-                        }
-                        let value = self.window_blind.get(id).ok_or_else(|| {
-                            unavailable("reported actual Blind runtime properties")
-                        })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("Blind getter roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    MaterialDefinition::WindowSimpleGlazing(_) => {
-                        if self.material_groups.get(id) != Some(&SourceMaterialGroup::GlassSimple) {
-                            return Err(unavailable("reported SimpleGlazing actual group"));
-                        }
-                        let value = self.simple_glazing.get(id).ok_or_else(|| {
-                            unavailable("reported SimpleGlazing runtime properties")
-                        })?;
-                        (
-                            value.resistance,
-                            value
-                                .roughness
-                                .ok_or_else(|| unavailable("SimpleGlazing Setup roughness"))?,
-                            [
-                                value.thickness,
-                                value.conductivity,
-                                value.density,
-                                value.specific_heat,
-                            ],
-                            OpaqueSurfaceProperties {
-                                thermal_absorptance: value.thermal_absorptance,
-                                solar_absorptance: value.solar_absorptance,
-                                visible_absorptance: value.visible_absorptance,
-                            },
-                        )
-                    }
-                    _ => return Err(unavailable("reported selected material family")),
-                };
+                    let value = self
+                        .simple_glazing
+                        .get(id)
+                        .ok_or_else(|| unavailable("reported SimpleGlazing runtime properties"))?;
+                    (
+                        value.resistance,
+                        value
+                            .roughness
+                            .ok_or_else(|| unavailable("SimpleGlazing Setup roughness"))?,
+                        [
+                            value.thickness,
+                            value.conductivity,
+                            value.density,
+                            value.specific_heat,
+                        ],
+                        OpaqueSurfaceProperties {
+                            thermal_absorptance: value.thermal_absorptance,
+                            solar_absorptance: value.solar_absorptance,
+                            visible_absorptance: value.visible_absorptance,
+                        },
+                    )
+                }
+                _ => return Err(unavailable("reported selected material family")),
+            };
             let values = [
                 rounded(resistance, 4)?,
                 rounded(geometry[0], 4)?,

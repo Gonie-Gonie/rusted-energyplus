@@ -1,13 +1,20 @@
 use super::{WindowGasMixture, WindowGasProperties, WindowGasType};
 use crate::MaterialId;
 
-/// Source-copied gas state for a `WindowMaterial:Gap` object.
+/// Advisory gas identity for a `WindowMaterial:Gap` object.
 ///
-/// EnergyPlus resolves the referenced ordinary gas or gas-mixture material
-/// before storing this complex-fenestration gap. Both the source material ID
-/// and the copied gas payload are retained here.
+/// Legacy Single/Mixture retain their copied payload. Explicit Source may keep
+/// Empty or an actual already-reserved Reference, including self/earlier Gap;
+/// the genuine runtime Material owner performs the physical copy.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum WindowComplexGapGasComposition {
+    /// No copied gas yet: a blank or deferred unresolved Source reference.
+    Empty,
+    /// Actual already-reserved Source material identity; runtime owns gas copy.
+    Reference {
+        /// Source prefix may include the newly allocated Gap itself.
+        source_material_id: MaterialId,
+    },
     /// One gas copied from a `WindowMaterial:Gas` definition.
     Single {
         /// Referenced source material.
@@ -27,25 +34,29 @@ pub enum WindowComplexGapGasComposition {
 }
 
 impl WindowComplexGapGasComposition {
-    /// Returns the referenced ordinary gas or gas-mixture material.
+    /// Returns an actual source-prefix identity, or None for blank/missing gas.
     #[must_use]
-    pub const fn source_material_id(&self) -> MaterialId {
+    pub const fn source_material_id(&self) -> Option<MaterialId> {
         match self {
-            Self::Single {
+            Self::Empty => None,
+            Self::Reference { source_material_id }
+            | Self::Single {
                 source_material_id, ..
             }
             | Self::Mixture {
                 source_material_id, ..
-            } => *source_material_id,
+            } => Some(*source_material_id),
         }
     }
 
-    /// Returns the number of active gases in the copied state.
+    /// Returns advisory copied count, or None for a Reference whose count belongs to runtime.
     #[must_use]
-    pub const fn active_gas_count(&self) -> usize {
+    pub const fn active_gas_count(&self) -> Option<usize> {
         match self {
-            Self::Single { .. } => 1,
-            Self::Mixture { gases, .. } => gases.len(),
+            Self::Empty => Some(0),
+            Self::Reference { .. } => None,
+            Self::Single { .. } => Some(1),
+            Self::Mixture { gases, .. } => Some(gases.len()),
         }
     }
 }
@@ -59,9 +70,10 @@ pub struct WindowComplexGapSupportPillar {
     pub radius_m: f64,
 }
 
-/// Fully resolved source state for a complex-fenestration `WindowMaterial:Gap`.
+/// Advisory typed state for a complex-fenestration `WindowMaterial:Gap`.
 ///
-/// This payload preserves the copied gas definition and geometric inputs. It
+/// Legacy copied gas and geometry stay available; Source Empty/Reference waits
+/// for the actual runtime owner and must not seed physical copied properties. It
 /// does not claim an ordinary-gap nominal resistance or runtime consumer.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WindowComplexGapMaterial {
@@ -78,15 +90,15 @@ pub struct WindowComplexGapMaterial {
 }
 
 impl WindowComplexGapMaterial {
-    /// Returns the ordinary gas material from which this gap copied its state.
+    /// Returns the actual optional Source-prefix identity, including self/earlier Gap.
     #[must_use]
-    pub const fn source_material_id(&self) -> MaterialId {
+    pub const fn source_material_id(&self) -> Option<MaterialId> {
         self.gas.source_material_id()
     }
 
-    /// Returns the number of active gases in the copied state.
+    /// Returns advisory copied count, or None for a Reference whose count belongs to runtime.
     #[must_use]
-    pub const fn active_gas_count(&self) -> usize {
+    pub const fn active_gas_count(&self) -> Option<usize> {
         self.gas.active_gas_count()
     }
 }
@@ -112,8 +124,8 @@ mod tests {
                 properties,
             };
 
-            assert_eq!(gas.source_material_id(), MaterialId(3));
-            assert_eq!(gas.active_gas_count(), 1);
+            assert_eq!(gas.source_material_id(), Some(MaterialId(3)));
+            assert_eq!(gas.active_gas_count(), Some(1));
             assert_eq!(
                 gas,
                 WindowComplexGapGasComposition::Single {
@@ -155,8 +167,8 @@ mod tests {
             definition: MaterialDefinition::WindowComplexGap(payload),
         };
 
-        assert_eq!(payload.source_material_id(), MaterialId(5));
-        assert_eq!(payload.active_gas_count(), 2);
+        assert_eq!(payload.source_material_id(), Some(MaterialId(5)));
+        assert_eq!(payload.active_gas_count(), Some(2));
         assert_eq!(material.kind(), MaterialKind::WindowComplexGap);
         assert_eq!(material.family(), MaterialFamily::ComplexFenestration);
         assert_eq!(material.family().id(), "complex-fenestration");

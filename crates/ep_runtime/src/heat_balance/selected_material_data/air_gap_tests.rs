@@ -89,6 +89,7 @@ fn fixture(epjson: bool, resistance: f64) -> (TypedModel, SelectedMaterialInput)
         window_gap_equivalent_layer: Vec::new(),
         window_blind: Vec::new(),
         roof_vegetation: Vec::new(),
+        window_gap: Vec::new(),
         air_gaps: vec![ProjectInputObject {
             object_name: "MiXeD gap".into(),
             idf_max_fields: (!epjson).then_some(2),
@@ -11692,6 +11693,745 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                     .filter(|line| line.starts_with(" Material:Air,"))
                     .collect::<Vec<_>>()
                     == [" Material:Air,MIXED GAP,0.1500"]
+        );
+    }
+
+    // One genuine WindowMaterial:Gap owner. Gas donors and all helpers are read
+    // by the actual getter; advisory copied properties deliberately differ.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        use ep_model::{
+            WindowComplexGapGasComposition, WindowComplexGapMaterial,
+            WindowComplexGapSupportPillar, WindowGapEquivalentLayerMaterial, WindowGapVentType,
+            WindowGasMaterial, WindowGasMixture, WindowGasMixtureComponent,
+            WindowGasMixtureMaterial, WindowGasType, WindowStandardGasType,
+        };
+        let (mut model, mut raw) = fixture(true, 0.15);
+        let mut advisory = WindowGasType::Argon.standard_properties().unwrap();
+        advisory.conductivity.coefficient_a = 999.0;
+        let mixture = WindowGasMixture::Two([
+            WindowGasMixtureComponent {
+                gas_type: WindowStandardGasType::Air,
+                fraction: 0.6,
+            },
+            WindowGasMixtureComponent {
+                gas_type: WindowStandardGasType::Argon,
+                fraction: 0.4,
+            },
+        ]);
+        model.materials.extend([
+            Material {
+                id: MaterialId(3),
+                name: NormalizedName::new("GAS CUSTOM"),
+                definition: MaterialDefinition::WindowGas(WindowGasMaterial {
+                    gas_type: WindowGasType::Custom,
+                    thickness_m: 9.0,
+                    properties: advisory,
+                }),
+            },
+            Material {
+                id: MaterialId(4),
+                name: NormalizedName::new("GAS EQL"),
+                definition: MaterialDefinition::WindowGapEquivalentLayer(
+                    WindowGapEquivalentLayerMaterial {
+                        gas_type: WindowGasType::Argon,
+                        thickness_m: 9.0,
+                        gap_vent_type: WindowGapVentType::Sealed,
+                        properties: advisory,
+                    },
+                ),
+            },
+            Material {
+                id: MaterialId(5),
+                name: NormalizedName::new("GAS MIX"),
+                definition: MaterialDefinition::WindowGasMixture(WindowGasMixtureMaterial {
+                    thickness_m: 9.0,
+                    gases: mixture,
+                }),
+            },
+        ]);
+        model.ctf_report_names.materials.extend([
+            (MaterialId(3), "GAS CUSTOM".into()),
+            (MaterialId(4), "GAS EQL".into()),
+            (MaterialId(5), "GAS MIX".into()),
+        ]);
+        raw.window_gas.push(ProjectInputObject {
+            object_name: "GAS CUSTOM".into(),
+            idf_max_fields: None,
+            fields: BTreeMap::from([
+                ("gas_type".into(), Value::String("Custom".into())),
+                ("thickness".into(), Value::Number(0.015)),
+                ("conductivity_coefficient_a".into(), Value::Number(0.025)),
+                ("conductivity_coefficient_b".into(), Value::Number(0.0)),
+                ("conductivity_coefficient_c".into(), Value::Number(0.0)),
+                ("viscosity_coefficient_a".into(), Value::Number(0.000018)),
+                ("viscosity_coefficient_b".into(), Value::Number(0.0)),
+                ("viscosity_coefficient_c".into(), Value::Number(0.0)),
+                ("specific_heat_coefficient_a".into(), Value::Number(1005.0)),
+                ("specific_heat_coefficient_b".into(), Value::Number(0.0)),
+                ("specific_heat_coefficient_c".into(), Value::Number(0.0)),
+                ("molecular_weight".into(), Value::Number(28.97)),
+                ("specific_heat_ratio".into(), Value::Number(1.4)),
+            ]),
+        });
+        raw.window_gap_equivalent_layer.push(ProjectInputObject {
+            object_name: "GAS EQL".into(),
+            idf_max_fields: None,
+            fields: BTreeMap::from([
+                ("gas_type".into(), Value::String("ARGON".into())),
+                ("thickness".into(), Value::Number(0.03)),
+                (
+                    "gap_vent_type".into(),
+                    Value::String("VentedOutdoor".into()),
+                ),
+            ]),
+        });
+        raw.window_gas_mixture.push(ProjectInputObject {
+            object_name: "GAS MIX".into(),
+            idf_max_fields: None,
+            fields: BTreeMap::from([
+                ("thickness".into(), Value::Number(0.0095)),
+                ("number_of_gases_in_mixture".into(), Value::Number(2.0)),
+                ("gas_1_type".into(), Value::String("Air".into())),
+                ("gas_1_fraction".into(), Value::Number(0.6)),
+                ("gas_2_type".into(), Value::String("Argon".into())),
+                ("gas_2_fraction".into(), Value::Number(0.4)),
+            ]),
+        });
+        let rows = [
+            ("G0 BLANK", 0.0127, "", None, None, None),
+            (
+                "G1 CUSTOM",
+                0.02,
+                "GAS CUSTOM",
+                Some(90000.0),
+                Some("EXPLICIT DEF"),
+                Some("EXPLICIT PILLAR"),
+            ),
+            (
+                "G2 MIX",
+                0.025,
+                "GAS MIX",
+                None,
+                Some("DEFAULT DEF"),
+                Some("DEFAULT PILLAR"),
+            ),
+            (
+                "G3 EQL",
+                0.03,
+                "GAS EQL",
+                None,
+                Some("alias def"),
+                Some("DEFAULT PILLAR"),
+            ),
+            ("G4 SELF", 0.04, "G4 SELF", None, None, None),
+            (
+                "G5 EARLIER BLANK",
+                0.05,
+                "G0 BLANK",
+                Some(77777.0),
+                None,
+                None,
+            ),
+            ("G6 EARLIER CUSTOM", 0.06, "G1 CUSTOM", None, None, None),
+            (
+                "G7 TRANSITIVE",
+                0.07,
+                "G6 EARLIER CUSTOM",
+                None,
+                Some("WRAPPED DEF"),
+                Some("WRAPPED PILLAR"),
+            ),
+        ];
+        raw.window_gap = rows
+            .iter()
+            .enumerate()
+            .map(
+                |(index, (name, thickness, gas, pressure, deflection, pillar))| {
+                    let id = MaterialId(6 + u32::try_from(index).unwrap());
+                    let reference = match index {
+                        1 => Some(3),
+                        2 => Some(5),
+                        3 => Some(4),
+                        4 => Some(10),
+                        5 => Some(6),
+                        6 => Some(7),
+                        7 => Some(12),
+                        _ => None,
+                    };
+                    model.materials.push(Material {
+                        id,
+                        name: NormalizedName::new(name),
+                        definition: MaterialDefinition::WindowComplexGap(
+                            WindowComplexGapMaterial {
+                                thickness_m: 8.0,
+                                pressure_pa: 8.0,
+                                gas: reference.map_or(
+                                    WindowComplexGapGasComposition::Empty,
+                                    |number| WindowComplexGapGasComposition::Reference {
+                                        source_material_id: MaterialId(number),
+                                    },
+                                ),
+                                deflected_thickness_m: 8.0,
+                                support_pillar: Some(WindowComplexGapSupportPillar {
+                                    spacing_m: 8.0,
+                                    radius_m: 8.0,
+                                }),
+                            },
+                        ),
+                    });
+                    model.ctf_report_names.materials.push((id, (*name).into()));
+                    let mut fields = BTreeMap::from([
+                        ("thickness".into(), Value::Number(*thickness)),
+                        ("gas_or_gas_mixture_".into(), Value::String((*gas).into())),
+                    ]);
+                    if let Some(value) = pressure {
+                        fields.insert("pressure".into(), Value::Number(*value));
+                    }
+                    if let Some(value) = deflection {
+                        fields.insert("deflection_state".into(), Value::String((*value).into()));
+                    }
+                    if let Some(value) = pillar {
+                        fields.insert("support_pillar".into(), Value::String((*value).into()));
+                    }
+                    ProjectInputObject {
+                        object_name: (*name).into(),
+                        idf_max_fields: None,
+                        fields,
+                    }
+                },
+            )
+            .collect();
+        let deflections: BTreeMap<String, BTreeMap<String, S>> = BTreeMap::from([
+            (
+                "EXPLICIT DEF".into(),
+                BTreeMap::from([
+                    ("deflected_thickness".into(), S::Number("0.011".into())),
+                    (
+                        "initial_temperature".into(),
+                        S::Number("18446744073709551615".into()),
+                    ),
+                    (
+                        "initial_pressure".into(),
+                        S::Number("18446744073709551615".into()),
+                    ),
+                ]),
+            ),
+            ("DEFAULT DEF".into(), BTreeMap::new()),
+            (
+                "ALIAS DEF".into(),
+                BTreeMap::from([("deflected_thickness".into(), S::Number("0.013".into()))]),
+            ),
+            (
+                "alias def".into(),
+                BTreeMap::from([("deflected_thickness".into(), S::Number("0.023".into()))]),
+            ),
+            (
+                "WRAPPED DEF".into(),
+                BTreeMap::from([(
+                    "deflected_thickness".into(),
+                    S::Number("18446744073709551615".into()),
+                )]),
+            ),
+        ]);
+        let pillars: BTreeMap<String, BTreeMap<String, S>> = BTreeMap::from([
+            (
+                "EXPLICIT PILLAR".into(),
+                BTreeMap::from([
+                    ("spacing".into(), S::Number("0.03".into())),
+                    ("radius".into(), S::Number("0.0003".into())),
+                ]),
+            ),
+            ("DEFAULT PILLAR".into(), BTreeMap::new()),
+            (
+                "WRAPPED PILLAR".into(),
+                BTreeMap::from([
+                    ("spacing".into(), S::Number("18446744073709551615".into())),
+                    ("radius".into(), S::Number("18446744073709551615".into())),
+                ]),
+            ),
+        ]);
+        // Empty real Glazing/Blind definitions provide nonempty scratch tails.
+        let families = [
+            ("Material", &raw.regular, 2, 7),
+            ("Material:NoMass", &raw.no_mass, 2, 4),
+            ("Material:AirGap", &raw.air_gaps, 1, 1),
+            ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+            ("WindowMaterial:Glazing", &raw.glazing, 7, 14),
+            ("WindowMaterial:Blind", &raw.window_blind, 2, 27),
+            (
+                "WindowMaterial:Gap:EquivalentLayer",
+                &raw.window_gap_equivalent_layer,
+                3,
+                12,
+            ),
+            ("WindowMaterial:GasMixture", &raw.window_gas_mixture, 5, 6),
+            ("WindowMaterial:Gap", &raw.window_gap, 4, 2),
+        ];
+        let mut definitions: Vec<_> = families
+            .iter()
+            .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                object_type: (*family).into(),
+                alpha_fields: *alphas,
+                numeric_fields: *numerics,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            })
+            .collect();
+        definitions.extend([
+            SourceObjectDefinition {
+                object_type: "WindowGap:DeflectionState".into(),
+                alpha_fields: 1,
+                numeric_fields: 3,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            },
+            SourceObjectDefinition {
+                object_type: "WindowGap:SupportPillar".into(),
+                alpha_fields: 1,
+                numeric_fields: 2,
+                alpha_extensions: 0,
+                numeric_extensions: 0,
+                extension: None,
+            },
+        ]);
+        let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter()
+                        .map(|object| {
+                            (
+                                object.object_name.clone(),
+                                object
+                                    .fields
+                                    .iter()
+                                    .map(|(field, value)| {
+                                        (
+                                            field.clone(),
+                                            match value {
+                                                Value::String(value) => S::String(value.clone()),
+                                                Value::Number(value) => {
+                                                    S::Number(format!("{value:?}"))
+                                                }
+                                            },
+                                        )
+                                    })
+                                    .collect(),
+                            )
+                        })
+                        .collect(),
+                )
+            })
+            .collect();
+        objects.insert("WindowGap:DeflectionState".into(), deflections.clone());
+        objects.insert("WindowGap:SupportPillar".into(), pillars.clone());
+        let shapes = objects
+            .iter()
+            .map(|(family, rows)| {
+                (
+                    family.clone(),
+                    SourceInputFamily::Objects(
+                        rows.iter()
+                            .map(|(name, fields)| SourceObjectShape {
+                                object_name: name.clone(),
+                                field_sizes: fields
+                                    .keys()
+                                    .map(|field| (field.clone(), 1))
+                                    .collect(),
+                            })
+                            .collect(),
+                    ),
+                )
+            })
+            .collect();
+        let mut object_order: BTreeMap<String, Vec<String>> = families
+            .iter()
+            .map(|(family, rows, _, _)| {
+                (
+                    (*family).into(),
+                    rows.iter().map(|row| row.object_name.clone()).collect(),
+                )
+            })
+            .collect();
+        object_order.insert(
+            "WindowGap:DeflectionState".into(),
+            [
+                "EXPLICIT DEF",
+                "DEFAULT DEF",
+                "ALIAS DEF",
+                "alias def",
+                "WRAPPED DEF",
+            ]
+            .map(String::from)
+            .to_vec(),
+        );
+        object_order.insert(
+            "WindowGap:SupportPillar".into(),
+            ["EXPLICIT PILLAR", "DEFAULT PILLAR", "WRAPPED PILLAR"]
+                .map(String::from)
+                .to_vec(),
+        );
+        let mut input = SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+        input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects,
+                object_order,
+            })
+            .unwrap();
+        let mut shortcut = SourceInputProcessorShortCut::default();
+        shortcut.allocate_from_input(&input).unwrap();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let clock = crate::weather::day::WeatherGlobalState::default();
+        let developer = false;
+        let flags = SourceDiagnosticFlags {
+            kickoff: &globals.kickoff_simulation,
+            developer: &developer,
+            warmup: &clock.warmup_flag,
+            doing_sizing: &globals.doing_sizing,
+        };
+        let mut state = error_state();
+        let mut console = Vec::new();
+        let mut text = Vec::new();
+        let mut eio = Vec::new();
+        let mut scan = ReportScanState::default();
+        let mut errors_found = false;
+        let mut data = SelectedMaterialData::default();
+        {
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: Some(flags),
+            };
+            data.get_material_data(&raw, &mut owners)
+                .expect("actual Gap getter and actual runtime donors");
+            for (index, object) in raw.window_gap.iter().enumerate() {
+                let id = MaterialId(6 + u32::try_from(index).unwrap());
+                let row = &data.window_gap[&id];
+                let donor = match index {
+                    1 => Some(&data.window_gas[&MaterialId(3)]),
+                    2 => Some(&data.window_gas[&MaterialId(5)]),
+                    3 => Some(&data.window_gas[&MaterialId(4)]),
+                    4 => Some(&data.window_gap[&id].base),
+                    5 => Some(&data.window_gap[&MaterialId(6)].base),
+                    6 => Some(&data.window_gap[&MaterialId(7)].base),
+                    7 => Some(&data.window_gap[&MaterialId(12)].base),
+                    _ => None,
+                };
+                assert!(
+                    data.materials[index + 6] == id
+                        && data.material_map[rows[index].0] == i32::try_from(index + 7).unwrap()
+                        && model.ctf_report_names.materials[index + 6]
+                            == (id, rows[index].0.into())
+                        && data.material_groups[&id] == SourceMaterialGroup::ComplexWindowGap
+                        && data.resistance_only[&id]
+                        && row.base.roughness == Some(MaterialSurfaceRoughness::Rough)
+                        && row.base.thickness.to_bits() == rows[index].1.to_bits()
+                        && row.pressure.to_bits()
+                            == rows[index].3.unwrap_or(101325.0_f64).to_bits()
+                        && [
+                            row.base.conductivity,
+                            row.base.density,
+                            row.base.resistance,
+                            row.base.specific_heat,
+                            row.base.thermal_absorptance,
+                            row.base.solar_absorptance,
+                            row.base.visible_absorptance,
+                            data.nominal_r[index + 6]
+                        ]
+                        .iter()
+                        .all(|value| value.to_bits() == 0)
+                );
+                assert!(
+                    donor.is_none_or(|source| row.base.num_gases == source.num_gases
+                        && row.base.gas_fractions.map(f64::to_bits)
+                            == source.gas_fractions.map(f64::to_bits)
+                        && row.base.gases.iter().zip(source.gases).all(
+                            |(actual, expected)| actual.gas_type == expected.gas_type
+                                && [
+                                    actual.properties.conductivity.coefficient_a,
+                                    actual.properties.conductivity.coefficient_b,
+                                    actual.properties.conductivity.coefficient_c,
+                                    actual.properties.viscosity.coefficient_a,
+                                    actual.properties.viscosity.coefficient_b,
+                                    actual.properties.viscosity.coefficient_c,
+                                    actual.properties.specific_heat.coefficient_a,
+                                    actual.properties.specific_heat.coefficient_b,
+                                    actual.properties.specific_heat.coefficient_c,
+                                    actual.properties.molecular_weight_g_per_mol,
+                                    actual.properties.specific_heat_ratio
+                                ]
+                                .map(f64::to_bits)
+                                    == [
+                                        expected.properties.conductivity.coefficient_a,
+                                        expected.properties.conductivity.coefficient_b,
+                                        expected.properties.conductivity.coefficient_c,
+                                        expected.properties.viscosity.coefficient_a,
+                                        expected.properties.viscosity.coefficient_b,
+                                        expected.properties.viscosity.coefficient_c,
+                                        expected.properties.specific_heat.coefficient_a,
+                                        expected.properties.specific_heat.coefficient_b,
+                                        expected.properties.specific_heat.coefficient_c,
+                                        expected.properties.molecular_weight_g_per_mol,
+                                        expected.properties.specific_heat_ratio
+                                    ]
+                                    .map(f64::to_bits)
+                        )
+                        && row.base.gap_vent_type == source.gap_vent_type)
+                        && (!matches!(index, 0 | 4 | 5)
+                            || (row.base.num_gases == 0
+                                && row
+                                    .base
+                                    .gas_fractions
+                                    .iter()
+                                    .all(|value| value.to_bits() == 0)
+                                && row.base.gases.iter().all(|gas| gas.gas_type
+                                    == Some(WindowGasType::Custom)
+                                    && [
+                                        gas.properties.conductivity.coefficient_a,
+                                        gas.properties.conductivity.coefficient_b,
+                                        gas.properties.conductivity.coefficient_c,
+                                        gas.properties.viscosity.coefficient_a,
+                                        gas.properties.viscosity.coefficient_b,
+                                        gas.properties.viscosity.coefficient_c,
+                                        gas.properties.specific_heat.coefficient_a,
+                                        gas.properties.specific_heat.coefficient_b,
+                                        gas.properties.specific_heat.coefficient_c,
+                                        gas.properties.molecular_weight_g_per_mol,
+                                        gas.properties.specific_heat_ratio
+                                    ]
+                                    .iter()
+                                    .all(|value| value.to_bits() == 0))))
+                        && (index != 2
+                            || row.base.gases[2..].iter().all(|gas| gas.gas_type.is_none()))
+                        && (index != 3
+                            || row.base.gap_vent_type == WindowGapVentType::VentedOutdoor)
+                        && (index != 1
+                            || row.base.gases[0]
+                                .properties
+                                .conductivity
+                                .coefficient_a
+                                .to_bits()
+                                == 0.025_f64.to_bits())
+                );
+                assert!(
+                    [
+                        row.deflected_thickness,
+                        row.pillar_spacing,
+                        row.pillar_radius
+                    ]
+                    .map(f64::to_bits)
+                        == [
+                            [0.0_f64, 0.0, 0.0],
+                            [0.011, 0.03, 0.0003],
+                            [0.0, 0.04, 0.0004],
+                            [0.013, 0.04, 0.0004],
+                            [0.0, 0.0, 0.0],
+                            [0.0, 0.0, 0.0],
+                            [0.0, 0.0, 0.0],
+                            [-1.0, -1.0, -1.0]
+                        ][index]
+                            .map(f64::to_bits)
+                );
+                owners.shortcut.alpha_args.fill("stale".into());
+                owners.shortcut.numeric_args.fill(-123.0);
+                owners.shortcut.alpha_field_names.fill("stale".into());
+                owners.shortcut.numeric_field_names.fill("stale".into());
+                owners.shortcut.alpha_field_blanks.fill(false);
+                owners.shortcut.numeric_field_blanks.fill(false);
+                let counts = raw.get_window_gap_item(object, &mut owners).unwrap();
+                assert!(
+                    counts
+                        == [
+                            (2, 1),
+                            (4, 2),
+                            (4, 2),
+                            (4, 2),
+                            (2, 1),
+                            (2, 2),
+                            (2, 1),
+                            (4, 2)
+                        ][index]
+                        && owners.shortcut.alpha_args[..4]
+                            == [
+                                rows[index].0,
+                                rows[index].2,
+                                rows[index].4.unwrap_or("").to_ascii_uppercase().as_str(),
+                                rows[index].5.unwrap_or("")
+                            ]
+                        && owners.shortcut.alpha_field_names[..4]
+                            == [
+                                "name",
+                                "gas_or_gas_mixture_",
+                                "deflection_state",
+                                "support_pillar"
+                            ]
+                        && owners.shortcut.alpha_field_blanks[..4]
+                            == [
+                                false,
+                                rows[index].2.is_empty(),
+                                rows[index].4.is_none(),
+                                rows[index].5.is_none()
+                            ]
+                        && owners.shortcut.numeric_args[..2]
+                            .iter()
+                            .map(|value| value.to_bits())
+                            .eq([
+                                rows[index].1.to_bits(),
+                                rows[index].3.unwrap_or(101325.0_f64).to_bits()
+                            ])
+                        && owners.shortcut.numeric_field_names[..2] == ["thickness", "pressure"]
+                        && owners.shortcut.numeric_field_blanks[..2]
+                            == [false, rows[index].3.is_none()]
+                );
+                assert!(
+                    owners.shortcut.alpha_args[4..].iter().all(String::is_empty)
+                        && owners.shortcut.alpha_field_names[4..]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.alpha_field_blanks[4..]
+                            .iter()
+                            .all(|blank| *blank)
+                        && owners.shortcut.numeric_args[2..]
+                            .iter()
+                            .all(|value| value.to_bits() == 0)
+                        && owners.shortcut.numeric_field_names[2..]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.numeric_field_blanks[2..]
+                            .iter()
+                            .all(|blank| *blank)
+                        && !owners
+                            .input
+                            .is_object_unused("WindowMaterial:Gap", rows[index].0)
+                );
+            }
+        }
+        assert!(
+            !errors_found
+                && state.tracking.total_severe_errors == 0
+                && state.tracking.total_warning_errors == 0
+                && text.is_empty()
+                && console.is_empty()
+                && data.num_w7_gaps == 8
+                && data.window_gap.len() == 8
+                && data.materials.len() == 14
+                && deflections.keys().all(|name| input
+                    .is_object_unused("WindowGap:DeflectionState", name)
+                    == (name == "alias def"))
+                && pillars
+                    .keys()
+                    .all(|name| !input.is_object_unused("WindowGap:SupportPillar", name))
+                && input
+                    .source_raw_object_fields("WindowGap:DeflectionState", "EXPLICIT DEF")
+                    .unwrap()
+                    == &deflections["EXPLICIT DEF"]
+                && input
+                    .source_raw_object_fields("WindowGap:DeflectionState", "WRAPPED DEF")
+                    .unwrap()
+                    == &deflections["WRAPPED DEF"]
+                && matches!(
+                    ep_model::classify_source_json_number("18446744073709551615").unwrap(),
+                    ep_model::SourceJsonNumber::Integer(-1)
+                )
+        );
+        data.write_material_reports(&model, &mut eio).unwrap();
+        let report = std::str::from_utf8(&eio).unwrap();
+        let report_rows: Vec<_> = report
+            .lines()
+            .filter(|line| line.starts_with(" Material Details,"))
+            .map(|line| line.split(',').collect::<Vec<_>>())
+            .collect();
+        assert!(
+            report_rows.len() == 13
+                && report_rows[..2]
+                    .iter()
+                    .map(|row| row[1])
+                    .eq(["Mass", "NO MASS"])
+                && report
+                    .lines()
+                    .filter(|line| line.starts_with(" Material:Air,"))
+                    .collect::<Vec<_>>()
+                    == [" Material:Air,MIXED GAP,0.1500"]
+                && report_rows[5..]
+                    .iter()
+                    .map(|row| row[1])
+                    .eq(rows.iter().map(|row| row.0))
+                && report_rows[5..]
+                    .iter()
+                    .zip([
+                        "1.2700E-002",
+                        "2.0000E-002",
+                        "2.5000E-002",
+                        "3.0000E-002",
+                        "4.0000E-002",
+                        "5.0000E-002",
+                        "6.0000E-002",
+                        "7.0000E-002"
+                    ])
+                    .all(|(row, thickness)| row.len() == 11
+                        && row[2..]
+                            == [
+                                "0.0000", "Rough", thickness, "0.000", "0.000", "0.000", "0.0000",
+                                "0.0000", "0.0000"
+                            ])
+        );
+        assert!(data.window_gap[&MaterialId(10)].base.num_gases == 0 && data.window_gap[&MaterialId(11)].base.num_gases == 0
+            && data.window_gas[&MaterialId(3)].thickness.to_bits() == 0.015_f64.to_bits()
+            && data.window_gap[&MaterialId(7)].base.thickness.to_bits() == 0.02_f64.to_bits()
+            && data.window_gap[&MaterialId(12)].base.thickness.to_bits() == 0.06_f64.to_bits()
+            && data.window_gap[&MaterialId(13)].base.thickness.to_bits() == 0.07_f64.to_bits()
+            && model.materials.iter().skip(6).all(|material| matches!(material.definition, MaterialDefinition::WindowComplexGap(value) if value.thickness_m.to_bits() == 8.0_f64.to_bits() && value.pressure_pa.to_bits() == 8.0_f64.to_bits() && value.deflected_thickness_m.to_bits() == 8.0_f64.to_bits())));
+        // Common geometry properties come from these same real Gap getter rows,
+        // including blank/self and copied non-Sealed GasMix states.
+        assert!(rows.iter().enumerate().all(
+            |(index, _)| data.source_window_gap_surface_properties(
+                data.material_map[rows[index].0],
+                MaterialId(6 + u32::try_from(index).unwrap()),
+            ) == Ok((
+                MaterialSurfaceRoughness::Rough,
+                OpaqueSurfaceProperties {
+                    thermal_absorptance: 0.0,
+                    solar_absorptance: 0.0,
+                    visible_absorptance: 0.0,
+                },
+            ))
+        ));
+        assert!(
+            data.source_window_gap_surface_properties(0, MaterialId(6))
+                .is_err()
+                && data
+                    .source_window_gap_surface_properties(6, MaterialId(6))
+                    .is_err()
+                && data
+                    .source_window_gap_surface_properties(7, MaterialId(7))
+                    .is_err()
+                && data
+                    .source_window_gap_surface_properties(4, MaterialId(3))
+                    .is_err()
         );
     }
 }
@@ -24831,5 +25571,667 @@ fn air_gap_getter_rejects_missing_resistance_and_wrong_scalar_or_typed_custody()
                 && eio.is_empty()
                 && matches!(&result, Err(RuntimeError::HeatBalanceInput(_)))
         );
+    }
+
+    // Ten finite, explicit dynamic contexts share one source-level Material
+    // owner declaration. No invalid getter result invokes a later producer.
+    {
+        use crate::heat_balance::selected_input_processor::{
+            SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+        };
+        use ep_model::{WindowComplexGapGasComposition, WindowComplexGapMaterial};
+        for case in 0usize..10 {
+            let (mut model, mut raw) = fixture(true, 0.15);
+            let wrapped = ep_model::classify_source_json_number("18446744073709551615")
+                .unwrap()
+                .as_f64();
+            let rows = match case {
+                0 => vec![
+                    ("Mass", 0.01, 101325.0, "", "", ""),
+                    (
+                        "D1 BAD NUMBERS",
+                        wrapped,
+                        0.0,
+                        "",
+                        "WRAPPED DEF",
+                        "WRAPPED PILLAR",
+                    ),
+                    (
+                        "D2 FUTURE",
+                        0.02,
+                        70002.0,
+                        "Z9 LATER",
+                        "SKIPPED DEF",
+                        "SKIPPED PILLAR",
+                    ),
+                    (
+                        "D3 MISSING DEF",
+                        0.03,
+                        70003.0,
+                        "",
+                        "ABSENT DEF",
+                        "SKIPPED PILLAR",
+                    ),
+                    (
+                        "D4 MISSING PILLAR",
+                        0.04,
+                        70004.0,
+                        "",
+                        "SHARED DEF",
+                        "ABSENT PILLAR",
+                    ),
+                    (
+                        "Z9 LATER",
+                        0.05,
+                        70005.0,
+                        "",
+                        "SHARED DEF",
+                        "DEFAULT PILLAR",
+                    ),
+                ],
+                1 => vec![(
+                    "MISSING DEF FAMILY",
+                    0.02,
+                    77.0,
+                    "",
+                    "SHARED DEF",
+                    "SKIPPED PILLAR",
+                )],
+                2 => vec![(
+                    "MISSING PILLAR FAMILY",
+                    0.02,
+                    77.0,
+                    "",
+                    "SHARED DEF",
+                    "DEFAULT PILLAR",
+                )],
+                3..=5 => vec![("CUSTODY", 0.02, 77.0, "", "", "")],
+                6 => vec![
+                    (
+                        "IO NUMBER",
+                        wrapped,
+                        77.0,
+                        "",
+                        "SHARED DEF",
+                        "DEFAULT PILLAR",
+                    ),
+                    ("Z IO LATER", 0.02, 88.0, "", "", ""),
+                ],
+                7 | 8 => vec![
+                    ("IO MISSING", 0.02, 77.0, "", "SHARED DEF", "DEFAULT PILLAR"),
+                    ("Z IO LATER", 0.02, 88.0, "", "", ""),
+                ],
+                _ => vec![
+                    ("Mass", 0.01, 77.0, "", "SHARED DEF", "DEFAULT PILLAR"),
+                    ("Z IO LATER", 0.02, 88.0, "", "", ""),
+                ],
+            };
+            raw.window_gap = rows
+                .iter()
+                .map(|(name, thickness, pressure, gas, deflection, pillar)| {
+                    if *name != "Mass" {
+                        let id = MaterialId(u32::try_from(model.materials.len()).unwrap());
+                        model.materials.push(Material {
+                            id,
+                            name: NormalizedName::new(name),
+                            definition: MaterialDefinition::WindowComplexGap(
+                                WindowComplexGapMaterial {
+                                    thickness_m: 9.0,
+                                    pressure_pa: 9.0,
+                                    gas: WindowComplexGapGasComposition::Empty,
+                                    deflected_thickness_m: 9.0,
+                                    support_pillar: None,
+                                },
+                            ),
+                        });
+                        model.ctf_report_names.materials.push((id, (*name).into()));
+                    }
+                    ProjectInputObject {
+                        object_name: (*name).into(),
+                        idf_max_fields: None,
+                        fields: BTreeMap::from([
+                            ("thickness".into(), Value::Number(*thickness)),
+                            ("gas_or_gas_mixture_".into(), Value::String((*gas).into())),
+                            ("pressure".into(), Value::Number(*pressure)),
+                            (
+                                "deflection_state".into(),
+                                Value::String((*deflection).into()),
+                            ),
+                            ("support_pillar".into(), Value::String((*pillar).into())),
+                        ]),
+                    }
+                })
+                .collect();
+            let deflections: BTreeMap<String, BTreeMap<String, S>> = BTreeMap::from([
+                (
+                    "SHARED DEF".into(),
+                    BTreeMap::from([("deflected_thickness".into(), S::Number("0.013".into()))]),
+                ),
+                (
+                    "SKIPPED DEF".into(),
+                    BTreeMap::from([("deflected_thickness".into(), S::Number("0.023".into()))]),
+                ),
+                (
+                    "WRAPPED DEF".into(),
+                    BTreeMap::from([(
+                        "deflected_thickness".into(),
+                        S::Number("18446744073709551615".into()),
+                    )]),
+                ),
+            ]);
+            let pillars: BTreeMap<String, BTreeMap<String, S>> = BTreeMap::from([
+                ("DEFAULT PILLAR".into(), BTreeMap::new()),
+                (
+                    "SKIPPED PILLAR".into(),
+                    BTreeMap::from([("spacing".into(), S::Number("0.123".into()))]),
+                ),
+                (
+                    "WRAPPED PILLAR".into(),
+                    BTreeMap::from([
+                        ("spacing".into(), S::Number("18446744073709551615".into())),
+                        ("radius".into(), S::Number("18446744073709551615".into())),
+                    ]),
+                ),
+            ]);
+            let families = [
+                ("Material", &raw.regular, 2, 7),
+                ("Material:NoMass", &raw.no_mass, 2, 4),
+                ("Material:AirGap", &raw.air_gaps, 1, 1),
+                ("WindowMaterial:Gap", &raw.window_gap, 4, 2),
+            ];
+            let mut definitions: Vec<_> = families
+                .iter()
+                .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                    object_type: (*family).into(),
+                    alpha_fields: *alphas,
+                    numeric_fields: *numerics,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                })
+                .collect();
+            let mut objects: BTreeMap<String, BTreeMap<String, BTreeMap<String, S>>> = families
+                .iter()
+                .map(|(family, rows, _, _)| {
+                    (
+                        (*family).into(),
+                        rows.iter()
+                            .map(|object| {
+                                (
+                                    object.object_name.clone(),
+                                    object
+                                        .fields
+                                        .iter()
+                                        .map(|(field, value)| {
+                                            (
+                                                field.clone(),
+                                                match value {
+                                                    Value::String(value) => {
+                                                        S::String(value.clone())
+                                                    }
+                                                    Value::Number(value) => {
+                                                        S::Number(format!("{value:?}"))
+                                                    }
+                                                },
+                                            )
+                                        })
+                                        .collect(),
+                                )
+                            })
+                            .collect(),
+                    )
+                })
+                .collect();
+            if case == 0 || case == 6 {
+                objects
+                    .get_mut("WindowMaterial:Gap")
+                    .unwrap()
+                    .get_mut(if case == 0 {
+                        "D1 BAD NUMBERS"
+                    } else {
+                        "IO NUMBER"
+                    })
+                    .unwrap()
+                    .insert("thickness".into(), S::Number("18446744073709551615".into()));
+            }
+            if !matches!(case, 1 | 7) {
+                definitions.push(SourceObjectDefinition {
+                    object_type: "WindowGap:DeflectionState".into(),
+                    alpha_fields: 1,
+                    numeric_fields: 3,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                });
+                objects.insert("WindowGap:DeflectionState".into(), deflections.clone());
+            }
+            if !matches!(case, 2 | 8) {
+                definitions.push(SourceObjectDefinition {
+                    object_type: "WindowGap:SupportPillar".into(),
+                    alpha_fields: 1,
+                    numeric_fields: 2,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                });
+                objects.insert("WindowGap:SupportPillar".into(), pillars.clone());
+            }
+            let shapes = objects
+                .iter()
+                .map(|(family, objects)| {
+                    (
+                        family.clone(),
+                        SourceInputFamily::Objects(
+                            objects
+                                .iter()
+                                .map(|(name, fields)| SourceObjectShape {
+                                    object_name: name.clone(),
+                                    field_sizes: fields
+                                        .keys()
+                                        .map(|field| (field.clone(), 1))
+                                        .collect(),
+                                })
+                                .collect(),
+                        ),
+                    )
+                })
+                .collect();
+            let mut object_order: BTreeMap<String, Vec<String>> = families
+                .iter()
+                .map(|(family, rows, _, _)| {
+                    (
+                        (*family).into(),
+                        rows.iter().map(|row| row.object_name.clone()).collect(),
+                    )
+                })
+                .collect();
+            if !matches!(case, 1 | 7) {
+                object_order.insert(
+                    "WindowGap:DeflectionState".into(),
+                    deflections.keys().cloned().collect(),
+                );
+            }
+            if !matches!(case, 2 | 8) {
+                object_order.insert(
+                    "WindowGap:SupportPillar".into(),
+                    pillars.keys().cloned().collect(),
+                );
+            }
+            let mut input =
+                SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+            input
+                .retain_source_input_statistics(SourceInputStatisticsInput {
+                    objects,
+                    object_order,
+                })
+                .unwrap();
+            // Each custody mutation occurs AFTER genuine IP/statistics retention.
+            match case {
+                3 => raw.window_gap[0].object_name = "WRONG IP NAME".into(),
+                4 => {
+                    raw.window_gap[0]
+                        .fields
+                        .insert("thickness".into(), Value::String("0.02".into()));
+                }
+                5 => model.materials[3].definition = model.materials[0].definition,
+                _ => {}
+            }
+            let mut shortcut = SourceInputProcessorShortCut::default();
+            shortcut.allocate_from_input(&input).unwrap();
+            let globals = SelectedHeatBalanceGlobals::default();
+            let clock = crate::weather::day::WeatherGlobalState::default();
+            let developer = false;
+            let flags = SourceDiagnosticFlags {
+                kickoff: &globals.kickoff_simulation,
+                developer: &developer,
+                warmup: &clock.warmup_flag,
+                doing_sizing: &globals.doing_sizing,
+            };
+            // This is initial configuration, not an error-latch reset.
+            let mut state = SourceErrorState {
+                output_error_header: !matches!(case, 7 | 8),
+                print_console_output: false,
+                ..error_state()
+            };
+            let mut console = Vec::new();
+            let mut text = Vec::new();
+            let mut eio = Vec::new();
+            let mut scan = ReportScanState::default();
+            let mut errors_found = false;
+            let mut data = SelectedMaterialData::default();
+            let mut broken = BrokenDiagnostic;
+            // One exact unbuffered Severe line fits. Its following Continue
+            // fails at the first two-space write; no backend type is invented.
+            let severe_line =
+                b"   ** Severe  ** GetMaterialData: WindowMaterial:Gap = IO MISSING\n";
+            let mut bounded = [0_u8;
+                b"   ** Severe  ** GetMaterialData: WindowMaterial:Gap = IO MISSING\n".len()];
+            let mut remaining = &mut bounded[..];
+            let result = {
+                let stream: &mut dyn std::io::Write = match case {
+                    6 | 9 => &mut broken,
+                    7 | 8 => &mut remaining,
+                    _ => &mut text,
+                };
+                let mut backend = SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(stream),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                let mut owners = MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: Some(flags),
+                };
+                data.get_material_data(&raw, &mut owners)
+            };
+            if case <= 2 {
+                let messages: Vec<_> = std::str::from_utf8(&text)
+                    .unwrap()
+                    .lines()
+                    .filter(|line| line.contains(" ** "))
+                    .map(str::trim_start)
+                    .collect();
+                let expected = match case {
+                    0 => vec![
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = MASS, duplicate name.",
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = D1 BAD NUMBERS",
+                        "**   ~~~   ** thickness must be > 0, entered -1.00",
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = D1 BAD NUMBERS",
+                        "**   ~~~   ** pressure must be > 0, entered 0.00",
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = D2 FUTURE",
+                        "**   ~~~   ** gas_or_gas_mixture_ = Z9 LATER, item not found.",
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = D3 MISSING DEF",
+                        "**   ~~~   ** deflection_state = ABSENT DEF, item not found.",
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = D4 MISSING PILLAR",
+                        "**   ~~~   ** support_pillar = ABSENT PILLAR, item not found.",
+                    ],
+                    1 => vec![
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = MISSING DEF FAMILY",
+                        "**   ~~~   ** deflection_state = SHARED DEF, item not found.",
+                    ],
+                    _ => vec![
+                        "** Severe  ** GetMaterialData: WindowMaterial:Gap = MISSING PILLAR FAMILY",
+                        "**   ~~~   ** support_pillar = DEFAULT PILLAR, item not found.",
+                    ],
+                };
+                assert!(
+                    result.is_ok()
+                        && errors_found
+                        && messages == expected
+                        && state.tracking.total_severe_errors == if case == 0 { 6 } else { 1 }
+                        && state.tracking.total_warning_errors == 0
+                        && console.is_empty()
+                        && data.materials[..3] == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                        && data.material_map["MASS"] == 1
+                        && data.material_map["NO MASS"] == 2
+                        && data.material_map["MIXED GAP"] == 3
+                        && data.nominal_r[..3] == [0.05, 0.2, 0.15]
+                        && data.num_w7_gaps == i32::try_from(rows.len()).unwrap()
+                );
+                assert!(
+                    data.window_gap.len() == if case == 0 { 5 } else { 1 }
+                        && data.materials.len() == if case == 0 { 8 } else { 4 }
+                        && data
+                            .window_gap
+                            .iter()
+                            .all(|(id, row)| data.material_groups[id]
+                                == SourceMaterialGroup::ComplexWindowGap
+                                && data.resistance_only[id]
+                                && row.base.roughness == Some(MaterialSurfaceRoughness::Rough)
+                                && row.base.num_gases == 0
+                                && row
+                                    .base
+                                    .gas_fractions
+                                    .iter()
+                                    .all(|value| value.to_bits() == 0)
+                                && row.base.gases.iter().all(
+                                    |gas| gas.gas_type == Some(ep_model::WindowGasType::Custom)
+                                )
+                                && [
+                                    row.base.conductivity,
+                                    row.base.density,
+                                    row.base.specific_heat,
+                                    row.base.resistance,
+                                    row.base.thermal_absorptance,
+                                    row.base.solar_absorptance,
+                                    row.base.visible_absorptance,
+                                    data.nominal_r[data
+                                        .materials
+                                        .iter()
+                                        .position(|value| value == id)
+                                        .unwrap()]
+                                ]
+                                .iter()
+                                .all(|value| value.to_bits() == 0))
+                        && if case == 0 {
+                            let bad = &data.window_gap[&MaterialId(3)];
+                            let future = &data.window_gap[&MaterialId(4)];
+                            let missing_def = &data.window_gap[&MaterialId(5)];
+                            let missing_pillar = &data.window_gap[&MaterialId(6)];
+                            let later = &data.window_gap[&MaterialId(7)];
+                            [
+                                bad.base.thickness,
+                                bad.pressure,
+                                bad.deflected_thickness,
+                                bad.pillar_spacing,
+                                bad.pillar_radius,
+                            ]
+                            .map(f64::to_bits)
+                                == [-1.0_f64, 0.0, -1.0, -1.0, -1.0].map(f64::to_bits)
+                                && [
+                                    future.base.thickness,
+                                    future.pressure,
+                                    future.deflected_thickness,
+                                    future.pillar_spacing,
+                                    future.pillar_radius,
+                                ]
+                                .map(f64::to_bits)
+                                    == [0.02_f64, 70002.0, 0.0, 0.0, 0.0].map(f64::to_bits)
+                                && [
+                                    missing_def.base.thickness,
+                                    missing_def.pressure,
+                                    missing_def.deflected_thickness,
+                                    missing_def.pillar_spacing,
+                                    missing_def.pillar_radius,
+                                ]
+                                .map(f64::to_bits)
+                                    == [0.03_f64, 70003.0, 0.0, 0.0, 0.0].map(f64::to_bits)
+                                && [
+                                    missing_pillar.base.thickness,
+                                    missing_pillar.pressure,
+                                    missing_pillar.deflected_thickness,
+                                    missing_pillar.pillar_spacing,
+                                    missing_pillar.pillar_radius,
+                                ]
+                                .map(f64::to_bits)
+                                    == [0.04_f64, 70004.0, 0.013, 0.0, 0.0].map(f64::to_bits)
+                                && [
+                                    later.base.thickness,
+                                    later.pressure,
+                                    later.deflected_thickness,
+                                    later.pillar_spacing,
+                                    later.pillar_radius,
+                                ]
+                                .map(f64::to_bits)
+                                    == [0.05_f64, 70005.0, 0.013, 0.04, 0.0004].map(f64::to_bits)
+                                && !input.is_object_unused("WindowMaterial:Gap", "Z9 LATER")
+                        } else {
+                            let row = &data.window_gap[&MaterialId(3)];
+                            [
+                                row.base.thickness,
+                                row.pressure,
+                                row.deflected_thickness,
+                                row.pillar_spacing,
+                                row.pillar_radius,
+                            ]
+                            .map(f64::to_bits)
+                                == [
+                                    0.02_f64,
+                                    77.0,
+                                    if case == 1 { 0.0 } else { 0.013 },
+                                    0.0,
+                                    0.0,
+                                ]
+                                .map(f64::to_bits)
+                        }
+                );
+                assert!(
+                    (case == 1
+                        || input.is_object_unused("WindowGap:DeflectionState", "SKIPPED DEF"))
+                        && (case == 2
+                            || input.is_object_unused("WindowGap:SupportPillar", "SKIPPED PILLAR"))
+                        && (case != 1
+                            || input
+                                .find_exact_family("WindowGap:DeflectionState")
+                                .is_none())
+                        && (case != 2
+                            || input.find_exact_family("WindowGap:SupportPillar").is_none())
+                        && (case == 1
+                            || !input.is_object_unused("WindowGap:DeflectionState", "SHARED DEF"))
+                        && (case != 0
+                            || (!input
+                                .is_object_unused("WindowGap:DeflectionState", "WRAPPED DEF")
+                                && !input.is_object_unused(
+                                    "WindowGap:SupportPillar",
+                                    "WRAPPED PILLAR"
+                                )
+                                && !input.is_object_unused(
+                                    "WindowGap:SupportPillar",
+                                    "DEFAULT PILLAR"
+                                )
+                                && input
+                                    .source_raw_object_fields(
+                                        "WindowMaterial:Gap",
+                                        "D1 BAD NUMBERS"
+                                    )
+                                    .unwrap()["thickness"]
+                                    == S::Number("18446744073709551615".into())
+                                && matches!(
+                                    ep_model::classify_source_json_number("18446744073709551615")
+                                        .unwrap(),
+                                    ep_model::SourceJsonNumber::Integer(-1)
+                                )))
+                );
+            } else if case <= 5 {
+                let expected = match case {
+                    3 => "Gap owned direct-epJSON raw/IP identity",
+                    4 => "admitted Gap numeric scalar",
+                    _ => "material family/typed ID",
+                };
+                assert!(
+                    result
+                        .as_ref()
+                        .is_err_and(|error| error.to_string().contains(expected))
+                        && !errors_found
+                        && data.materials.len() == 3
+                        && data.window_gap.is_empty()
+                        && state.tracking.total_severe_errors == 0
+                        && state.tracking.total_warning_errors == 0
+                        && text.is_empty()
+                        && console.is_empty()
+                        && input.is_object_unused("WindowMaterial:Gap", "CUSTODY") == (case == 3)
+                );
+            } else if matches!(case, 6 | 9) {
+                assert!(
+                    matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+                    crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                        crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+                    if *operation == "error header" && source.kind() == std::io::ErrorKind::Other && source.to_string() == "authored IRT diagnostic failure"))
+                        && errors_found == (case == 6)
+                        && state.output_error_header
+                        && state.tracking.total_severe_errors == 1
+                        && state.tracking.total_warning_errors == 0
+                        && state.tracking.last_severe_error.is_empty()
+                        && text.is_empty()
+                        && console.is_empty()
+                        && input.is_object_unused("WindowMaterial:Gap", "Z IO LATER")
+                        && input.is_object_unused("WindowGap:DeflectionState", "SHARED DEF")
+                        && input.is_object_unused("WindowGap:SupportPillar", "DEFAULT PILLAR")
+                );
+                assert!(if case == 6 {
+                    let row = &data.window_gap[&MaterialId(3)];
+                    data.materials.len() == 4
+                        && data.window_gap.len() == 1
+                        && row.base.thickness.to_bits() == (-1.0_f64).to_bits()
+                        && [
+                            row.pressure,
+                            row.deflected_thickness,
+                            row.pillar_spacing,
+                            row.pillar_radius,
+                            data.nominal_r[3],
+                        ]
+                        .iter()
+                        .all(|value| value.to_bits() == 0)
+                        && shortcut.numeric_args[..2] == [-1.0, 77.0]
+                } else {
+                    data.materials.len() == 3
+                        && data.window_gap.is_empty()
+                        && data.material_map["MASS"] == 1
+                });
+            } else {
+                assert!(
+                    matches!(&result, Err(RuntimeError::HeatBalanceInput(cause)) if matches!(cause.as_ref(),
+                    crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::Backend(
+                        crate::heat_balance::error_backend::SourceErrorBackendFailure::Effect { operation, source })
+                    if *operation == "error message" && source.kind() == std::io::ErrorKind::WriteZero))
+                        && !errors_found
+                        && !state.output_error_header
+                        && bounded == *severe_line
+                        && state.tracking.total_severe_errors == 1
+                        && state.tracking.total_warning_errors == 0
+                        && state.tracking.last_severe_error
+                            == "GetMaterialData: WindowMaterial:Gap = IO MISSING"
+                        && data.materials.len() == 4
+                        && data.window_gap.len() == 1
+                        && input.is_object_unused("WindowMaterial:Gap", "Z IO LATER")
+                        && text.is_empty()
+                        && console.is_empty()
+                );
+                let row = &data.window_gap[&MaterialId(3)];
+                assert!(
+                    [
+                        row.base.thickness,
+                        row.pressure,
+                        row.deflected_thickness,
+                        row.pillar_spacing,
+                        row.pillar_radius,
+                        data.nominal_r[3]
+                    ]
+                    .map(f64::to_bits)
+                        == [
+                            0.02_f64,
+                            77.0,
+                            if case == 7 { 0.0 } else { 0.013 },
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                        .map(f64::to_bits)
+                        && (case == 7
+                            || !input.is_object_unused("WindowGap:DeflectionState", "SHARED DEF"))
+                        && (case == 7
+                            || input.find_exact_family("WindowGap:SupportPillar").is_none())
+                        && (case == 8
+                            || input.is_object_unused("WindowGap:SupportPillar", "DEFAULT PILLAR"))
+                        && shortcut.alpha_args[..4]
+                            == ["IO MISSING", "", "SHARED DEF", "DEFAULT PILLAR"]
+                        && shortcut.numeric_args[..2] == [0.02, 77.0]
+                );
+            }
+        }
     }
 }

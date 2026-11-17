@@ -487,6 +487,7 @@ impl GainFactory {
             window_gap_equivalent_layer: Vec::new(),
             window_blind: Vec::new(),
             roof_vegetation: Vec::new(),
+            window_gap: Vec::new(),
             regular: project_objects(factory, &["Material"])?
                 .remove("Material")
                 .unwrap_or_default(),

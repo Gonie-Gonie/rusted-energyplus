@@ -140,7 +140,7 @@ fn window_complex_gap_copies_single_custom_and_mixture_state_in_source_order()
     assert_eq!(standard.pressure_pa, 101_325.0);
     assert_eq!(standard.deflected_thickness_m, 0.0);
     assert_eq!(standard.support_pillar, None);
-    assert_eq!(standard.source_material_id(), MaterialId(1));
+    assert_eq!(standard.source_material_id(), Some(MaterialId(1)));
     let WindowComplexGapGasComposition::Single {
         source_material_id,
         gas_type,
@@ -176,7 +176,7 @@ fn window_complex_gap_copies_single_custom_and_mixture_state_in_source_order()
     assert_eq!(mixture.thickness_m, 0.008);
     assert_ne!(mixture.thickness_m, mixture_source.thickness_m);
     assert_eq!(mixture.pressure_pa, 1.0);
-    assert_eq!(mixture.active_gas_count(), 2);
+    assert_eq!(mixture.active_gas_count(), Some(2));
     assert_eq!(
         mixture.gas,
         WindowComplexGapGasComposition::Mixture {
@@ -203,6 +203,363 @@ fn window_complex_gap_copies_single_custom_and_mixture_state_in_source_order()
     }
     assert_eq!(model.constructions.len(), 1);
     assert_eq!(model.constructions[0].kind, ConstructionKind::Fenestration);
+    // Source WindowGap: real standalone namespace and original/converted operands.
+    {
+        use super::super::compile_raw_model_for_source;
+        use ep_raw_model::{
+            FieldName as GapField, ObjectName as GapName, ObjectType as GapType, RawObject,
+            RawValue,
+        };
+        let standalone = r#"{"WindowMaterial:Gap":{"REPLACE NAME":{"thickness":0.012,"gas_or_gas_mixture_":""}}}"#;
+        assert!(
+            [
+                (r"\u000b", "\u{b}"),
+                (r"\u00a0", "\u{a0}"),
+                (" mixed gap ", " mixed gap ")
+            ]
+            .iter()
+            .all(|(encoded, name)| {
+                let raw = ep_raw_model::parse_epjson_str_for_source(
+                    &standalone.replace("REPLACE NAME", encoded),
+                )
+                .expect("standalone original Source name");
+                let compiled = compile_raw_model_for_source(&raw);
+                compiled.model.as_ref().is_some_and(|model| {
+                    !compiled.has_errors()
+                        && model.material_names.is_source_exact_namespace()
+                        && model.materials.len() == 1
+                        && model.material_names.resolve(name) == Some(MaterialId(0))
+                        && model.ctf_report_names.materials
+                            == [(MaterialId(0), name.to_ascii_uppercase())]
+                        && model.materials[0]
+                            .as_window_complex_gap()
+                            .is_some_and(|gap| {
+                                matches!(gap.gas, WindowComplexGapGasComposition::Empty)
+                                    && gap.source_material_id().is_none()
+                                    && gap.active_gas_count() == Some(0)
+                                    && gap.pressure_pa.to_bits() == 101325.0_f64.to_bits()
+                            })
+                }) && compile_raw_model(&raw).has_errors()
+            }),
+            "standalone Gap must select both SourceExact hooks without another Source family"
+        );
+
+        let source_raw = ep_raw_model::parse_epjson_str_for_source(
+            r#"{
+            "WindowMaterial:Gas":{"CUSTOM SOURCE":{"gas_type":"Custom","thickness":0.012,
+                "conductivity_coefficient_a":0.02,"viscosity_coefficient_a":0.00001,
+                "specific_heat_coefficient_a":1000.0,"molecular_weight":28.0,"specific_heat_ratio":1.4}},
+            "WindowMaterial:GasMixture":{"MIX SOURCE":{"thickness":0.012,"number_of_gases_in_mixture":2,
+                "gas_1_type":"Air","gas_1_fraction":0.5,"gas_2_type":"Argon","gas_2_fraction":0.5}},
+            "WindowMaterial:Gap:EquivalentLayer":{"EQL SOURCE":{"gas_type":"ARGON","thickness":0.012,
+                "gap_vent_type":"VentedOutdoor"}},
+            "WindowGap:DeflectionState":{
+                "ALIAS DEF":{"deflected_thickness":18446744073709551615,
+                    "initial_temperature":18446744073709551615,"initial_pressure":18446744073709551615},
+                "alias def":{"deflected_thickness":0.009},
+                "DEFAULT DEF":{}
+            },
+            "WindowGap:SupportPillar":{
+                " PILLAR ":{"spacing":18446744073709551615,"radius":0.0003},
+                "DEFAULT PILLAR":{}
+            },
+            "WindowMaterial:Gap":{
+                "00 EMPTY":{"thickness":0.012,"gas_or_gas_mixture_":""},
+                "01 SINGLE":{"thickness":18446744073709551615,"gas_or_gas_mixture_":"CUSTOM SOURCE",
+                    "pressure":-0.0,"deflection_state":"aLiAs DeF","support_pillar":" PILLAR ",
+                    "name":false,"idf_order":[1],"metadata":{"retained":[null,true,1.25]}},
+                "02 MIXTURE":{"thickness":0.013,"gas_or_gas_mixture_":"MIX SOURCE","pressure":-1.0},
+                "03 EQL":{"thickness":0.014,"gas_or_gas_mixture_":"EQL SOURCE"},
+                "04 SELF":{"thickness":0.015,"gas_or_gas_mixture_":"04 SELF"},
+                "05 FROM EMPTY":{"thickness":0.016,"gas_or_gas_mixture_":"00 EMPTY"},
+                "06 FROM SINGLE":{"thickness":0.017,"gas_or_gas_mixture_":"01 SINGLE"},
+                "07 TRANSITIVE":{"thickness":0.018,"gas_or_gas_mixture_":"06 FROM SINGLE"},
+                "08 FUTURE REF":{"thickness":0.019,"gas_or_gas_mixture_":"09 FUTURE"},
+                "09 FUTURE":{"thickness":0.020,"gas_or_gas_mixture_":""},
+                "10 MISSING":{"thickness":0.021,"gas_or_gas_mixture_":"NOT DEFINED",
+                    "deflection_state":"MISSING DEF","support_pillar":"MISSING PILLAR"},
+                "11 DEFAULT HELPERS":{"thickness":0.022,"gas_or_gas_mixture_":"",
+                    "deflection_state":"DEFAULT DEF","support_pillar":"DEFAULT PILLAR"}
+            }
+        }"#,
+        )?;
+        let source = compile_raw_model_for_source(&source_raw);
+        let source_model = source
+            .model
+            .as_ref()
+            .ok_or_else(|| std::io::Error::other("real Source WindowGap model"))?;
+        let source_empty = complex_gap(source_model, "00 EMPTY")?;
+        let source_single = complex_gap(source_model, "01 SINGLE")?;
+        let source_mix = complex_gap(source_model, "02 MIXTURE")?;
+        let source_eql = complex_gap(source_model, "03 EQL")?;
+        let source_self = complex_gap(source_model, "04 SELF")?;
+        let source_earlier = complex_gap(source_model, "05 FROM EMPTY")?;
+        let source_transitive = complex_gap(source_model, "07 TRANSITIVE")?;
+        assert!(
+            !source.has_errors()
+                && source_model.materials.len() == 15
+                && source_model.material_names.len() == 15
+                && source_model.ctf_report_names.materials.len() == 15
+                && matches!(source_empty.gas, WindowComplexGapGasComposition::Empty)
+                && source_empty.source_material_id().is_none()
+                && source_empty.active_gas_count() == Some(0)
+                && matches!(
+                    source_single.gas,
+                    WindowComplexGapGasComposition::Single { .. }
+                )
+                && source_single.source_material_id()
+                    == source_model.material_names.resolve("CUSTOM SOURCE")
+                && source_single.active_gas_count() == Some(1)
+                && matches!(
+                    source_mix.gas,
+                    WindowComplexGapGasComposition::Mixture { .. }
+                )
+                && source_mix.source_material_id()
+                    == source_model.material_names.resolve("MIX SOURCE")
+                && source_mix.active_gas_count() == Some(2)
+                && matches!(
+                    source_eql.gas,
+                    WindowComplexGapGasComposition::Reference { .. }
+                )
+                && source_eql.source_material_id()
+                    == source_model.material_names.resolve("EQL SOURCE")
+                && source_eql.active_gas_count().is_none()
+                && source_self.source_material_id()
+                    == source_model.material_names.resolve("04 SELF")
+                && source_self.active_gas_count().is_none()
+                && source_earlier.source_material_id()
+                    == source_model.material_names.resolve("00 EMPTY")
+                && source_transitive.source_material_id()
+                    == source_model.material_names.resolve("06 FROM SINGLE")
+                && complex_gap(source_model, "08 FUTURE REF")?
+                    .source_material_id()
+                    .is_none()
+                && complex_gap(source_model, "10 MISSING")?
+                    .source_material_id()
+                    .is_none(),
+            "blank/self/earlier/EQL/future references need honest prefix identities, not fake IDs/counts"
+        );
+        let defaults = complex_gap(source_model, "11 DEFAULT HELPERS")?;
+        let mut changed_unread = source_raw.clone();
+        let def = changed_unread
+            .objects
+            .get_mut(&GapType("WindowGap:DeflectionState".into()))
+            .expect("retained helper family")
+            .get_mut(&GapName("ALIAS DEF".into()))
+            .expect("exact chosen helper");
+        def.fields.insert(
+            GapField("initial_temperature".into()),
+            RawValue::Number("0.0".into()),
+        );
+        def.fields.insert(
+            GapField("initial_pressure".into()),
+            RawValue::Number("0.0".into()),
+        );
+        let changed = compile_raw_model_for_source(&changed_unread);
+        assert!(
+            source_single.thickness_m.to_bits() == (-1.0_f64).to_bits()
+                && source_single.pressure_pa.to_bits() == (-0.0_f64).to_bits()
+                && source_mix.pressure_pa.to_bits() == (-1.0_f64).to_bits()
+                && source_single.deflected_thickness_m.to_bits() == (-1.0_f64).to_bits()
+                && source_single.support_pillar.is_some_and(|p| {
+                    p.spacing_m.to_bits() == (-1.0_f64).to_bits()
+                        && p.radius_m.to_bits() == 0.0003_f64.to_bits()
+                })
+                && defaults.deflected_thickness_m.to_bits() == 0.0_f64.to_bits()
+                && defaults.support_pillar.is_some_and(|p| {
+                    p.spacing_m.to_bits() == 0.04_f64.to_bits()
+                        && p.radius_m.to_bits() == 0.0004_f64.to_bits()
+                })
+                && !changed.has_errors()
+                && changed
+                    .model
+                    .as_ref()
+                    .is_some_and(|model| model.materials == source_model.materials),
+            "original u64 bounds precede signed effective values; first-doj alias and unread fields remain real"
+        );
+
+        let alias_raw = ep_raw_model::parse_epjson_str_for_source(
+            r#"{
+            "WindowMaterial:Gas":{"G":{"gas_type":"Air","thickness":0.012}},
+            "WindowGap:DeflectionState":{"DEF":{"deflected_thickness":0.004},
+                "def":{"deflected_thickness":0.008}},
+            "WindowGap:SupportPillar":{" P ":{}},
+            "WindowMaterial:Gap":{"GAP":{"thickness":0.012,"gas_or_gas_mixture_":"G",
+                "deflection_state":"dEf","support_pillar":" P "}}
+        }"#,
+        )?;
+        let source_alias = compile_raw_model_for_source(&alias_raw);
+        let legacy_alias = compile_raw_model(&alias_raw);
+        assert!(
+            !source_alias.has_errors()
+                && source_alias.model.as_ref().is_some_and(|model| {
+                    complex_gap(model, "GAP").is_ok_and(|gap| {
+                        gap.deflected_thickness_m.to_bits() == 0.004_f64.to_bits()
+                            && gap.support_pillar.is_some()
+                    })
+                })
+                && legacy_alias
+                    .report
+                    .diagnostics
+                    .iter()
+                    .any(|d| d.code == "AmbiguousReference")
+                && compile_raw_model(&source_raw).has_errors(),
+            "Source first-doj/no-trim helpers must not replace Legacy ambiguity/pressure checks"
+        );
+        let unsafe_raw = ep_raw_model::parse_epjson_str_for_source(
+            r#"{
+            "Material:NoMass":{"SOLID":{"roughness":"MediumRough","thermal_resistance":2.0}},
+            "WindowMaterial:Gap":{"GAP":{"thickness":0.012,"gas_or_gas_mixture_":"SOLID"}}
+        }"#,
+        )?;
+        let unsafe_source = compile_raw_model_for_source(&unsafe_raw);
+        assert!(
+            unsafe_source
+                .report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "UnsafeSourceWindowGapGasReference")
+                && source_raw
+                    .objects
+                    .get(&GapType("WindowMaterial:Gap".into()))
+                    .and_then(|r| r.get(&GapName("01 SINGLE".into())))
+                    .and_then(|r| r.fields.get(&GapField("thickness".into())))
+                    == Some(&RawValue::Number("18446744073709551615".into()))
+                && source_raw
+                    .objects
+                    .get(&GapType("WindowGap:DeflectionState".into()))
+                    .is_some_and(|rows| rows.len() == 3),
+            "undefined non-GasMix references stay closed; original operands/helpers remain Raw"
+        );
+        let minimal =
+            ep_raw_model::parse_epjson_str_for_source(&standalone.replace("REPLACE NAME", "GAP"))?;
+        for case in 0_usize..20 {
+            let mut invalid = minimal.clone();
+            let fields = &mut invalid
+                .objects
+                .get_mut(&GapType(OBJECT_TYPE.into()))
+                .expect("actual Gap family")
+                .get_mut(&GapName("GAP".into()))
+                .expect("Gap row")
+                .fields;
+            match case {
+                0 => {
+                    fields.remove(&GapField("thickness".into()));
+                }
+                1 => {
+                    fields.remove(&GapField("gas_or_gas_mixture_".into()));
+                }
+                2 => {
+                    fields.insert(GapField("thickness".into()), RawValue::Number("0".into()));
+                }
+                3 => {
+                    fields.insert(
+                        GapField("thickness".into()),
+                        RawValue::Number("-1.0".into()),
+                    );
+                }
+                4 => {
+                    fields.insert(
+                        GapField("thickness".into()),
+                        RawValue::String("0.012".into()),
+                    );
+                }
+                5 => {
+                    fields.insert(
+                        GapField("pressure".into()),
+                        RawValue::String("Autosize".into()),
+                    );
+                }
+                6 => {
+                    fields.insert(
+                        GapField("gas_or_gas_mixture_".into()),
+                        RawValue::Number("1".into()),
+                    );
+                }
+                7 => {
+                    fields.insert(GapField("deflection_state".into()), RawValue::Null);
+                }
+                8 => {
+                    fields.insert(GapField("support_pillar".into()), RawValue::Bool(true));
+                }
+                9..=17 => {
+                    let (family, field, value) = match case {
+                        9 => (
+                            "WindowGap:DeflectionState",
+                            "deflected_thickness",
+                            RawValue::Number("-0.1".into()),
+                        ),
+                        10 => (
+                            "WindowGap:DeflectionState",
+                            "initial_temperature",
+                            RawValue::Number("-1.0".into()),
+                        ),
+                        11 => (
+                            "WindowGap:DeflectionState",
+                            "initial_pressure",
+                            RawValue::Number("-1.0".into()),
+                        ),
+                        12 => (
+                            "WindowGap:SupportPillar",
+                            "spacing",
+                            RawValue::Number("0.0".into()),
+                        ),
+                        13 => (
+                            "WindowGap:SupportPillar",
+                            "radius",
+                            RawValue::Number("0.0".into()),
+                        ),
+                        14 => (
+                            "WindowGap:DeflectionState",
+                            "deflected_thickness",
+                            RawValue::String("Autocalculate".into()),
+                        ),
+                        15 => ("WindowGap:SupportPillar", "spacing", RawValue::Bool(true)),
+                        16 => (
+                            "WindowGap:DeflectionState",
+                            "initial_pressure",
+                            RawValue::Null,
+                        ),
+                        _ => (
+                            "WindowGap:SupportPillar",
+                            "radius",
+                            RawValue::String("0.0004".into()),
+                        ),
+                    };
+                    invalid.objects.insert(
+                        GapType(family.into()),
+                        std::collections::BTreeMap::from([(
+                            GapName("HELPER".into()),
+                            RawObject {
+                                fields: std::collections::BTreeMap::from([(
+                                    GapField(field.into()),
+                                    value,
+                                )]),
+                                source_span: None,
+                            },
+                        )]),
+                    );
+                }
+                _ => {
+                    let rows = invalid
+                        .objects
+                        .get_mut(&GapType(OBJECT_TYPE.into()))
+                        .expect("Gap");
+                    let row = rows.remove(&GapName("GAP".into())).expect("old name");
+                    rows.insert(
+                        GapName(if case == 18 { "\n" } else { " \t\r\u{c}" }.into()),
+                        row,
+                    );
+                }
+            }
+            let rejected = compile_raw_model_for_source(&invalid);
+            assert!(
+                rejected.has_errors(),
+                "original schema/name rejection case {case}"
+            );
+        }
+    }
+
     Ok(())
 }
 

@@ -566,6 +566,9 @@ impl CtfInitializationReports {
                     } else if material.kind() == ep_model::MaterialKind::WindowGapEquivalentLayer {
                         let (roughness, surface) = material_owner.source_gap_equivalent_layer_surface_properties(source_number, *id)?;
                         (roughness_code(roughness), surface)
+                    } else if material.kind() == ep_model::MaterialKind::WindowComplexGap {
+                        let (roughness, surface) = material_owner.source_window_gap_surface_properties(source_number, *id)?;
+                        (roughness_code(roughness), surface)
                     } else if material.kind() == ep_model::MaterialKind::RoofVegetation {
                         let (roughness, surface) = material_owner.source_roof_vegetation_surface_properties(source_number, *id)?;
                         (roughness_code(roughness), surface)
