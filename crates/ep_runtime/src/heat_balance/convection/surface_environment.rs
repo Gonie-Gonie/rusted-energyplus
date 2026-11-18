@@ -53,6 +53,45 @@ impl SurfaceOutdoorEnvironmentParameters {
         }
     }
 
+    /// DataEnvironment::OutDryBulbTempAt71-116 on the actual point operands.
+    pub(crate) fn point_dry_bulb_temperature_at_height(
+        self,
+        outdoor_temperature_c: f64,
+        height_m: f64,
+        backend: &mut crate::heat_balance::error_backend::SourceErrorBackend<'_>,
+        flags: &crate::heat_balance::error_backend::SourceDiagnosticFlags<'_>,
+    ) -> Result<f64, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+        use crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError as Error;
+        let base_temperature_c = outdoor_temperature_c + self.weather_file_temperature_modifier_c;
+        let local_temperature_c = if self.site_temperature_gradient_k_per_m == 0.0 {
+            outdoor_temperature_c
+        } else if height_m <= 0.0 {
+            base_temperature_c
+        } else {
+            base_temperature_c
+                - self.site_temperature_gradient_k_per_m * EARTH_RADIUS_M * height_m
+                    / (EARTH_RADIUS_M + height_m)
+        };
+        if local_temperature_c < -100.0 {
+            backend.show_source_severe_error(
+                "OutDryBulbTempAt: outdoor drybulb temperature < -100 C",
+                flags,
+            )?;
+            let height =
+                crate::heat_balance::source_round_format::round(height_m, 0).map_err(|error| {
+                    Error::Format(format!("OutDryBulbTempAt Native .0R: {error:?}"))
+                })?;
+            backend.show_continue_error(&format!("...check heights, this height=[{height}]."))?;
+            return match backend
+                .show_source_fatal_error("Program terminates due to preceding condition(s).", flags)
+            {
+                Ok(never) => match never {},
+                Err(error) => Err(error),
+            };
+        }
+        Ok(local_temperature_c)
+    }
+
     /// The selected setter's temperature operand, not DataEnvironment's distinct
     /// point getter (whose zero-gradient branch differs in its base handling).
     #[must_use]
@@ -64,6 +103,28 @@ impl SurfaceOutdoorEnvironmentParameters {
                 outdoor_temperature_c + self.weather_file_temperature_modifier_c;
             self.temperature_from_base(base_temperature_c, height_m)
         }
+    }
+
+    /// DataEnvironment::WindSpeedAt point getter, distinct from the surface setter.
+    /// Height is tested before the zero-exponent branch; the nonzero path uses
+    /// one platform pow on the height/boundary-layer ratio in original association.
+    pub fn point_wind_speed_at_height(
+        self,
+        wind_speed_m_per_s: f64,
+        height_m: f64,
+    ) -> Result<f64, ep_platform_math::MathProviderError> {
+        if height_m <= 0.0 {
+            return Ok(0.0);
+        }
+        if self.site_wind_exponent == 0.0 {
+            return Ok(wind_speed_m_per_s);
+        }
+        Ok(wind_speed_m_per_s
+            * self.weather_file_wind_modifier
+            * ep_platform_math::pow(
+                height_m / self.site_wind_boundary_layer_height_m,
+                self.site_wind_exponent,
+            )?)
     }
 
     /// Wind-exposed row of SetSurfaceWindSpeedAt, preserving its multiplication
@@ -192,11 +253,29 @@ fn set_surface_wind_speed_rows<R: SurfaceOutdoorSetterRow>(
     wind_speed_m_per_s: f64,
     rows: impl Iterator<Item = R>,
 ) {
+    match set_surface_wind_speed_rows_with_pow(
+        parameters,
+        wind_speed_m_per_s,
+        rows,
+        |base, exponent| Ok::<f64, std::convert::Infallible>(base.powf(exponent)),
+    ) {
+        Ok(()) => (),
+        Err(never) => match never {},
+    }
+}
+
+fn set_surface_wind_speed_rows_with_pow<R: SurfaceOutdoorSetterRow, E>(
+    parameters: SurfaceOutdoorEnvironmentParameters,
+    wind_speed_m_per_s: f64,
+    rows: impl Iterator<Item = R>,
+    mut pow: impl FnMut(f64, f64) -> Result<f64, E>,
+) -> Result<(), E> {
     let factor = wind_speed_m_per_s
         * parameters.weather_file_wind_modifier
-        * parameters
-            .site_wind_boundary_layer_height_m
-            .powf(-parameters.site_wind_exponent);
+        * pow(
+            parameters.site_wind_boundary_layer_height_m,
+            -parameters.site_wind_exponent,
+        )?;
     if parameters.site_wind_exponent == 0.0 {
         for mut row in rows {
             row.fields().wind_speed_m_per_s = wind_speed_m_per_s;
@@ -211,10 +290,11 @@ fn set_surface_wind_speed_rows<R: SurfaceOutdoorSetterRow>(
                 row.fields().wind_speed_m_per_s = 0.0;
             } else {
                 row.fields().wind_speed_m_per_s =
-                    factor * height_m.powf(parameters.site_wind_exponent);
+                    factor * pow(height_m, parameters.site_wind_exponent)?;
             }
         }
     }
+    Ok(())
 }
 
 /// SetSurfaceWindDirAt: no normalization or exposure filtering.
@@ -279,6 +359,48 @@ mod tests {
         for value in rows {
             assert_eq!(value.wind_speed_m_per_s.to_bits(), (-0.0_f64).to_bits());
         }
+
+        // Point getters test height first and preserve the exact zero-exponent
+        // return. A nontrivial ratio exercises the real platform pow ABI.
+        let point_parameters = SurfaceOutdoorEnvironmentParameters {
+            site_wind_boundary_layer_height_m: f64::NAN,
+            weather_file_wind_modifier: f64::NAN,
+            ..parameters
+        };
+        let nonzero_point_parameters = SurfaceOutdoorEnvironmentParameters {
+            site_wind_exponent: 0.5,
+            site_wind_boundary_layer_height_m: 16.0,
+            weather_file_wind_modifier: 2.0,
+            ..parameters
+        };
+        assert!(
+            [(-1.0, 0.0_f64), (-0.0, 0.0), (3.0, -0.0)]
+                .iter()
+                .all(|(height, expected)| point_parameters
+                    .point_wind_speed_at_height(-0.0, *height)
+                    .is_ok_and(|value| value.to_bits() == expected.to_bits()))
+                && nonzero_point_parameters
+                    .point_wind_speed_at_height(4.0, 4.0)
+                    .is_ok_and(|value| value.to_bits() == 4.0_f64.to_bits())
+        );
+
+        assert_eq!(
+            ep_platform_math::log(1.0).expect("platform log").to_bits(),
+            0.0_f64.to_bits()
+        );
+        for (base, exponent, expected) in [
+            (2.0, 3.0, 8.0_f64),
+            (3.0, 2.0, 9.0),
+            (4.0, 0.5, 2.0),
+            (2.0, -2.0, 0.25),
+        ] {
+            assert_eq!(
+                ep_platform_math::pow(base, exponent)
+                    .expect("platform pow")
+                    .to_bits(),
+                expected.to_bits()
+            );
+        }
     }
 
     #[test]
@@ -301,6 +423,101 @@ mod tests {
             assert_eq!(value.wet_bulb_c.to_bits(), weather.wet_bulb_c.to_bits());
             assert_eq!(value.wind_direction_deg.to_bits(), 123.0_f64.to_bits());
         }
+        let mut state = crate::heat_balance::error_backend::SourceErrorState {
+            output_error_header: true,
+            version_string: "focused point getter".into(),
+            idd_version_string: "declared test IDD".into(),
+            doing_input_processing: false,
+            print_console_output: false,
+            kickoff_simulation: false,
+            developer_flag: false,
+            warmup_flag: false,
+            doing_sizing: false,
+            tracking: crate::heat_balance::error_backend::SourceErrorTracking {
+                ask_for_plant_check_on_abort: false,
+                exit_during_simulations: false,
+                match_counts: [0; 20],
+                abort_processing: false,
+                ask_for_connections_report: false,
+                ask_for_surfaces_report: false,
+                total_multiplied_windows: 0,
+                total_coincident_vertices: 0,
+                total_degenerate_surfaces: 0,
+                total_receiving_non_convex_surfaces: 0,
+                total_casting_non_convex_surfaces: 0,
+                total_severe_errors: 0,
+                total_severe_errors_during_warmup: 0,
+                total_severe_errors_during_sizing: 0,
+                last_severe_error: String::new(),
+                total_warning_errors: 0,
+                total_warning_errors_during_warmup: 0,
+                total_warning_errors_during_sizing: 0,
+            },
+        };
+        let phase = false;
+        let flags = crate::heat_balance::error_backend::SourceDiagnosticFlags {
+            kickoff: &phase,
+            developer: &phase,
+            warmup: &phase,
+            doing_sizing: &phase,
+        };
+        let mut error_text = Vec::new();
+        let mut console = Vec::new();
+        let exact_boundary = {
+            let mut backend = crate::heat_balance::error_backend::SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut error_text),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            assert!(
+                parameters
+                    .point_dry_bulb_temperature_at_height(
+                        weather.dry_bulb_c,
+                        9.0,
+                        &mut backend,
+                        &flags,
+                    )
+                    .is_ok_and(|value| value.to_bits() == (-0.0_f64).to_bits())
+            );
+            let gradient_parameters = SurfaceOutdoorEnvironmentParameters {
+                site_temperature_gradient_k_per_m: 0.0065,
+                ..parameters
+            };
+            assert!(
+                gradient_parameters
+                    .point_dry_bulb_temperature_at_height(-6.0, -5.0, &mut backend, &flags,)
+                    .is_ok_and(|value| value.to_bits() == 44.0_f64.to_bits())
+            );
+            let analytic_parameters = SurfaceOutdoorEnvironmentParameters {
+                site_temperature_gradient_k_per_m: 0.00000095367431640625,
+                weather_file_temperature_modifier_c: 2.0,
+                ..parameters
+            };
+            assert!(
+                analytic_parameters
+                    .point_dry_bulb_temperature_at_height(20.0, 6_356_000.0, &mut backend, &flags,)
+                    .is_ok_and(|value| value.to_bits() == 0x4032_f81f_0000_0000_u64)
+            );
+            gradient_parameters.point_dry_bulb_temperature_at_height(
+                -150.0,
+                0.0,
+                &mut backend,
+                &flags,
+            )
+        };
+        assert!(
+            exact_boundary.is_ok_and(|value| value.to_bits() == (-100.0_f64).to_bits())
+                && state.tracking.total_severe_errors == 0
+                && state.output_error_header
+                && error_text.is_empty()
+                && console.is_empty()
+        );
     }
 
     #[test]

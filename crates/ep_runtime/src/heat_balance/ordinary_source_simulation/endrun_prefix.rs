@@ -359,6 +359,7 @@ impl SourceInitializationFiles {
                 &reports.registry,
                 &mut reports.table,
                 &reports.heat_balance_input_state,
+                &session.eco_roof,
             )
             .map_err(hb_input_error)?;
         if session

@@ -32,7 +32,17 @@ fn series(coefficients: [f64; 9], sine: f64, cosine: f64) -> f64 {
 }
 
 pub(super) fn daily_coefficients(day: i32, latitude: f64) -> Coefficients {
-    calculate_daily_coefficients(day, latitude, |_, _| {})
+    match calculate_daily_coefficients(
+        day,
+        latitude,
+        |_, _| {},
+        |value| Ok::<f64, std::convert::Infallible>(value.sin()),
+        |value| Ok::<f64, std::convert::Infallible>(value.cos()),
+        |value| Ok::<f64, std::convert::Infallible>(value.sqrt()),
+    ) {
+        Ok(values) => values,
+        Err(never) => match never {},
+    }
 }
 #[derive(Clone, Copy)]
 enum DailySolarField {
@@ -43,18 +53,37 @@ enum DailySolarField {
 pub(in super::super) fn source_daily_coefficients(
     day: &mut super::super::DailyWeatherVariables,
     latitude: f64,
-) -> Coefficients {
-    calculate_daily_coefficients(day.day_of_year, latitude, |field, value| match field {
-        DailySolarField::SineDeclination => day.sin_solar_declin_angle = value,
-        DailySolarField::CosineDeclination => day.cos_solar_declin_angle = value,
-        DailySolarField::EquationOfTime => day.equation_of_time = value,
+) -> Result<Coefficients, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+    calculate_daily_coefficients(
+        day.day_of_year,
+        latitude,
+        |field, value| match field {
+            DailySolarField::SineDeclination => day.sin_solar_declin_angle = value,
+            DailySolarField::CosineDeclination => day.cos_solar_declin_angle = value,
+            DailySolarField::EquationOfTime => day.equation_of_time = value,
+        },
+        ep_platform_math::sin,
+        ep_platform_math::cos,
+        ep_platform_math::sqrt,
+    )
+    .map_err(|error| {
+        crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::SourceInput(
+            Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                crate::WarmupOutputError::Unavailable(format!(
+                    "actual Source CalculateDailySolarCoeffs: {error}"
+                )),
+            ))),
+        )
     })
 }
-fn calculate_daily_coefficients(
+fn calculate_daily_coefficients<E>(
     day: i32,
     latitude: f64,
     mut write_field: impl FnMut(DailySolarField, f64),
-) -> Coefficients {
+    mut sin: impl FnMut(f64) -> Result<f64, E>,
+    mut cos: impl FnMut(f64) -> Result<f64, E>,
+    sqrt: impl FnOnce(f64) -> Result<f64, E>,
+) -> Result<Coefficients, E> {
     const DECLINATION: [f64; 9] = [
         0.00561800,
         0.0657911,
@@ -104,11 +133,11 @@ fn calculate_daily_coefficients(
     ];
     let correction = std::f64::consts::PI * 2.0 / 366.0;
     let mut angle = correction * f64::from(day);
-    let mut sine = angle.sin();
-    let mut cosine = angle.cos();
+    let mut sine = sin(angle)?;
+    let mut cosine = cos(angle)?;
     let sin_declination = series(DECLINATION, sine, cosine);
     write_field(DailySolarField::SineDeclination, sin_declination);
-    let cos_declination = (1.0 - sin_declination * sin_declination).sqrt();
+    let cos_declination = sqrt(1.0 - sin_declination * sin_declination)?;
     write_field(DailySolarField::CosineDeclination, cos_declination);
     let equation_of_time = series(EQUATION, sine, cosine);
     write_field(DailySolarField::EquationOfTime, equation_of_time);
@@ -116,10 +145,10 @@ fn calculate_daily_coefficients(
     let a = series(A, sine, cosine);
     if latitude < 0.0 {
         angle -= std::f64::consts::PI;
-        sine = angle.sin();
-        cosine = angle.cos();
+        sine = sin(angle)?;
+        cosine = cos(angle)?;
     }
-    Coefficients {
+    Ok(Coefficients {
         a,
         b: series(B, sine, cosine),
         c: series(C, sine, cosine),
@@ -127,7 +156,7 @@ fn calculate_daily_coefficients(
         equation_of_time,
         sin_declination,
         cos_declination,
-    }
+    })
 }
 
 pub(super) fn cosine_zenith(
@@ -155,9 +184,25 @@ pub(in super::super) fn clear_sky_radiation(
     sky_clear: f64,
     coefficients: Coefficients,
 ) -> (f64, f64) {
+    match clear_sky_radiation_with_exp(cosine_zenith, sky_clear, coefficients, |value| {
+        Ok::<f64, std::convert::Infallible>(value.exp())
+    }) {
+        Ok(values) => values,
+        Err(never) => match never {},
+    }
+}
+
+// One production formula body; the callback is reached only below the original
+// horizon and exponent guards, at the original scalar exponential operation.
+fn clear_sky_radiation_with_exp<E>(
+    cosine_zenith: f64,
+    sky_clear: f64,
+    coefficients: Coefficients,
+    exp: impl FnOnce(f64) -> Result<f64, E>,
+) -> Result<(f64, f64), E> {
     // DataEnvironment.hh SunIsUpValue; no substituted horizon threshold.
     if cosine_zenith < 0.00001 {
-        return (0.0, 0.0);
+        return Ok((0.0, 0.0));
     }
     let exponent = coefficients.b / cosine_zenith;
     let total = if exponent > 700.0 {
@@ -166,7 +211,7 @@ pub(in super::super) fn clear_sky_radiation(
         sky_clear
             * coefficients.a
             * (coefficients.c + cosine_zenith)
-            * (-coefficients.b / cosine_zenith).exp()
+            * exp(-coefficients.b / cosine_zenith)?
     };
     let extraterrestrial = 1367.0 * coefficients.annual_variation * cosine_zenith;
     let mut kt = total / extraterrestrial;
@@ -180,19 +225,46 @@ pub(in super::super) fn clear_sky_radiation(
     // Literal max(0.0,value), whose first operand wins an unordered/tied pair.
     diffuse = if 0.0 < diffuse { diffuse } else { 0.0 };
     beam = if 0.0 < beam { beam } else { 0.0 };
-    (beam, diffuse)
+    Ok((beam, diffuse))
+}
+
+/// Actual Source design-day calls select the existing platform exponential and
+/// retain the established Source weather-child error transport.
+pub(in super::super) fn source_clear_sky_radiation(
+    cosine_zenith: f64,
+    sky_clear: f64,
+    coefficients: Coefficients,
+) -> Result<(f64, f64), crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+    clear_sky_radiation_with_exp(
+        cosine_zenith,
+        sky_clear,
+        coefficients,
+        ep_platform_math::exp,
+    )
+    .map_err(|error| {
+        crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::SourceInput(
+            Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                crate::WarmupOutputError::Unavailable(format!(
+                    "actual Source SetUpDesignDay ASHRAEClearSky exp: {error}"
+                )),
+            ))),
+        )
+    })
 }
 
 // Native WeatherManager4025-4060 AirMass; SunIsUpValue is handled by the caller
 // and again by ASHRAETauModel, retaining both genuine guards.
-fn air_mass(cosine_zenith: f64) -> f64 {
+fn air_mass(cosine_zenith: f64) -> Result<f64, ep_platform_math::MathProviderError> {
     if cosine_zenith <= 0.001 {
-        37.07837343
+        Ok(37.07837343)
     } else if cosine_zenith >= 1.0 {
-        1.0
+        Ok(1.0)
     } else {
-        let sun_altitude_degrees = cosine_zenith.asin() / (std::f64::consts::PI / 180.0);
-        1.0 / (cosine_zenith + 0.50572 * (6.07995 + sun_altitude_degrees).powf(-1.6364))
+        let sun_altitude_degrees =
+            ep_platform_math::asin(cosine_zenith)? / (std::f64::consts::PI / 180.0);
+        Ok(1.0
+            / (cosine_zenith
+                + 0.50572 * ep_platform_math::pow(6.07995 + sun_altitude_degrees, -1.6364)?))
     }
 }
 
@@ -204,9 +276,9 @@ pub(in super::super) fn tau_radiation(
     cosine_zenith: f64,
     tau_beam: f64,
     tau_diffuse: f64,
-) -> (f64, f64, f64) {
+) -> Result<(f64, f64, f64), ep_platform_math::MathProviderError> {
     if cosine_zenith < 0.00001 || tau_beam <= 0.0 || tau_diffuse <= 0.0 {
-        (0.0, 0.0, 0.0)
+        Ok((0.0, 0.0, 0.0))
     } else {
         let (ab, ad) = if model == 3 {
             (
@@ -219,11 +291,13 @@ pub(in super::super) fn tau_radiation(
                 0.507 + 0.205 * tau_beam - 0.080 * tau_diffuse - 0.190 * tau_beam * tau_diffuse,
             )
         };
-        let mass = air_mass(cosine_zenith);
-        let beam = extraterrestrial * (-tau_beam * mass.powf(ab)).exp();
-        let diffuse = extraterrestrial * (-tau_diffuse * mass.powf(ad)).exp();
+        let mass = air_mass(cosine_zenith)?;
+        let beam =
+            extraterrestrial * ep_platform_math::exp(-tau_beam * ep_platform_math::pow(mass, ab)?)?;
+        let diffuse = extraterrestrial
+            * ep_platform_math::exp(-tau_diffuse * ep_platform_math::pow(mass, ad)?)?;
         let global = beam * cosine_zenith + diffuse;
-        (beam, diffuse, global)
+        Ok((beam, diffuse, global))
     }
 }
 
@@ -272,10 +346,14 @@ pub(in super::super) fn zhang_huang_radiation(
 // Narrow cfg-only transport to the actual full Source daily function.
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 impl crate::weather::day::WeatherDayState {
-    pub(crate) fn native_gap_daily_solar_coefficients(&mut self, day: i32) -> [f64; 7] {
+    pub(crate) fn native_gap_daily_solar_coefficients(
+        &mut self,
+        day: i32,
+    ) -> Result<[f64; 7], crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError>
+    {
         self.today_variables.day_of_year = day;
-        let v = source_daily_coefficients(&mut self.today_variables, self.environment.latitude);
-        [
+        let v = source_daily_coefficients(&mut self.today_variables, self.environment.latitude)?;
+        Ok([
             v.a,
             v.b,
             v.c,
@@ -283,6 +361,6 @@ impl crate::weather::day::WeatherDayState {
             v.equation_of_time,
             v.sin_declination,
             v.cos_declination,
-        ]
+        ])
     }
 }

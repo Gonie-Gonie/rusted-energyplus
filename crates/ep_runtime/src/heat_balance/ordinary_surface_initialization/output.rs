@@ -112,6 +112,26 @@ impl SourceRealOutputOwners for SourceSurfaceOutputOwners<'_> {
                 .surf_opaq_storage_cond_flux
                 .as_ref()
                 .and_then(|values| values.get(i)),
+            SourceSurfaceOutputField::SurfOutDryBulbTemp => {
+                Some(&self.physical_surface(i)?.outdoor_environment.row.dry_bulb_c)
+            }
+            SourceSurfaceOutputField::SurfOutWetBulbTemp => {
+                Some(&self.physical_surface(i)?.outdoor_environment.row.wet_bulb_c)
+            }
+            SourceSurfaceOutputField::SurfOutWindSpeed => Some(
+                &self
+                    .physical_surface(i)?
+                    .outdoor_environment
+                    .row
+                    .wind_speed_m_per_s,
+            ),
+            SourceSurfaceOutputField::SurfOutWindDir => Some(
+                &self
+                    .physical_surface(i)?
+                    .outdoor_environment
+                    .row
+                    .wind_direction_deg,
+            ),
         };
         value.ok_or_else(|| Unavailable::StorageDomain.into())
     }

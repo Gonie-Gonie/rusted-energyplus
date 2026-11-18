@@ -226,7 +226,7 @@ pub(super) fn process_source_hour(
         let _scratch = super::super::design_day::solar::source_daily_coefficients(
             &mut state.tomorrow_variables,
             state.environment.latitude,
-        );
+        )?;
         if state.weather.cur_day_of_week <= 7 {
             state.weather.cur_day_of_week = state.weather.cur_day_of_week % 7 + 1;
         }

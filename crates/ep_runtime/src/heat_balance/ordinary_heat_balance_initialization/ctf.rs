@@ -551,7 +551,8 @@ fn source_layer_inputs(
             | (
                 Some(SourceMaterialGroup::IrTransparent),
                 MaterialDefinition::InfraredTransparent(_),
-            ) => {}
+            )
+            | (Some(SourceMaterialGroup::EcoRoof), MaterialDefinition::RoofVegetation(_)) => {}
             _ => {
                 return Err(Error::Unavailable(
                     "actual opaque Material group/physical property view",
@@ -560,7 +561,38 @@ fn source_layer_inputs(
         }
         rows.push(material);
     }
-    let mut inputs = material_layer_inputs(&rows).map_err(Error::Loading)?;
+    let mut inputs = if rows
+        .iter()
+        .any(|material| material.kind() == ep_model::MaterialKind::RoofVegetation)
+    {
+        rows.iter()
+            .enumerate()
+            .map(|(layer, material)| {
+                if material.kind() == ep_model::MaterialKind::RoofVegetation {
+                    let row = materials
+                        .source_roof_vegetation_material(usage.layer_points[layer], material.id)
+                        .map_err(|_| Error::Unavailable("actual EcoRoof CTF Material row"))?;
+                    Ok(CtfLayerInput {
+                        material_id: material.id,
+                        thickness: row.thickness,
+                        conductivity: row.conductivity,
+                        density: row.density,
+                        specific_heat: row.specific_heat,
+                        resistance: row.resistance,
+                        resistance_only: false,
+                    })
+                } else {
+                    material_layer_inputs(&[*material])
+                        .map_err(Error::Loading)?
+                        .into_iter()
+                        .next()
+                        .ok_or(Error::Unavailable("actual ordinary CTF layer input"))
+                }
+            })
+            .collect::<Result<Vec<_>, Error>>()?
+    } else {
+        material_layer_inputs(&rows).map_err(Error::Loading)?
+    };
     for input in &mut inputs {
         // Construction.cc298 consumes the actual MaterialBase::ROnly written
         // by GetMaterialData, independently of the later ResLayer predicate.

@@ -151,10 +151,10 @@ impl GainFactory {
             .update_source_schedule_values(&self.weather.global, &self.weather.environment)?;
         let daily = self
             .weather
-            .native_gap_daily_solar_coefficients(int(member(primary, "day_of_year")?)?);
+            .native_gap_daily_solar_coefficients(int(member(primary, "day_of_year")?)?)?;
         let direction = self
             .weather
-            .native_gap_sun_direction_cosines(real(member(primary, "time")?)?);
+            .native_gap_sun_direction_cosines(real(member(primary, "time")?)?)?;
         self.radiation.solar_timestep.complex.sun_costs.set(
             [
                 usize::try_from(self.weather.global.time_step)?,

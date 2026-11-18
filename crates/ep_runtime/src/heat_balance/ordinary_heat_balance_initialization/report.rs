@@ -83,6 +83,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost + SourceOutputReport
     fn zone_child(&mut self, child: ZoneChild) -> Result<(), Error> {
         let o = &mut self.owners;
         let mut output = SourceHvacOutputContext {
+            eco_roof: &*o.eco_roof,
             registration: o.registration,
             report_flags: o.report_flags,
             output_control: o.output_control,

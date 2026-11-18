@@ -78,9 +78,17 @@ pub(super) fn set_wind_speeds(
     let parameters = env.outdoor_environment_parameters;
     let fac = env.current_weather.wind_speed
         * parameters.weather_file_wind_modifier
-        * parameters
-            .site_wind_boundary_layer_height_m
-            .powf(-parameters.site_wind_exponent);
+        * ep_platform_math::pow(
+            parameters.site_wind_boundary_layer_height_m,
+            -parameters.site_wind_exponent,
+        )
+        .map_err(|error| {
+            Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                crate::WarmupOutputError::Unavailable(format!(
+                    "actual Source SetZoneWindSpeedAt pow: {error}"
+                )),
+            ))))
+        })?;
     let rows = owners.zones.as_mut().ok_or(Error::Unavailable(
         "same actual Zone array for outdoor wind",
     ))?;
@@ -94,7 +102,13 @@ pub(super) fn set_wind_speeds(
             row.wind_speed = if z <= 0.0 {
                 0.0
             } else {
-                fac * z.powf(parameters.site_wind_exponent)
+                fac * ep_platform_math::pow(z, parameters.site_wind_exponent).map_err(|error| {
+                    Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                        crate::WarmupOutputError::Unavailable(format!(
+                            "actual Source SetZoneWindSpeedAt pow: {error}"
+                        )),
+                    ))))
+                })?
             };
         }
     }

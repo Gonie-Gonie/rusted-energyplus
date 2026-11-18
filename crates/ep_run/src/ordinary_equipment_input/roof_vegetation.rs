@@ -1,4 +1,4 @@
-//! Original-schema unused EcoRoof input prerequisite; active EcoRoof physics remains excluded.
+//! Original-schema EcoRoof input prerequisite; Construction custody is checked at Source admission.
 use ep_raw_model::{ObjectType, RawModel, RawValue};
 pub(crate) fn known_field(field: &str) -> bool {
     matches!(
@@ -93,11 +93,5 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
             return Err("Source RoofVegetation requires every supplied known field to remain original-schema-valid".into());
         }
     }
-    if raw.objects.iter().filter(|(family, _)| family.0.starts_with("Construction")).any(|(_, constructions)| {
-        constructions.values().any(|construction| construction.fields.iter().any(|(field, value)| {
-            (field.0 == "outside_layer" || (2..=10).any(|index| field.0 == format!("layer_{index}")))
-                && matches!(value, RawValue::String(reference) if rows.keys().any(|key| key.0.eq_ignore_ascii_case(reference)))
-        }))
-    }) { return Err("Source unused RoofVegetation excludes every Construction layer reference".into()); }
     Ok(())
 }

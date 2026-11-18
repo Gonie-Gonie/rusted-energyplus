@@ -174,11 +174,11 @@ fn coefficient(
             "actual CeilingDiffuser ISO15099 window child",
         ));
     }
-    let natural = super::super::natural_coefficient_w_per_m2_k(
+    let natural = super::super::source_natural_coefficient_w_per_m2_k(
         surface_temperature,
         air_temperature,
         -cos_tilt,
-    );
+    )?;
     if ach <= 0.5 {
         return Ok(natural);
     }

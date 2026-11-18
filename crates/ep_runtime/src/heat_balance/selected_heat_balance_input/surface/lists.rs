@@ -4,6 +4,7 @@ use super::{
     Error, SourceErrorBackend, SurfaceClass, SurfaceGeometryInputState, SurfaceGetterOwners,
 };
 use crate::heat_balance::error_backend::SourceDiagnosticFlags;
+use crate::heat_balance::selected_material_data::SelectedMaterialData;
 
 // Native enum Invalid=-1 is not an array index; Num=11 is its length.
 #[derive(Clone, Copy)]
@@ -89,6 +90,10 @@ impl SurfaceGeometryInputState {
     fn set_surface_eco_roof_flags(
         &mut self,
         control: &SelectedHeatBalanceInputState,
+        materials: &SelectedMaterialData,
+        backend: &mut SourceErrorBackend<'_>,
+        errors_found: &mut bool,
+        flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
         let rows = self
             .final_surfaces
@@ -117,11 +122,21 @@ impl SurfaceGeometryInputState {
                 continue;
             }
             if outside_layer != layer {
-                // Positive EcoRoof producers are excluded. Retain prior flags
-                // and stop before the unported real material-name diagnostics.
-                return Err(Error::Unavailable(
-                    "positive conflicting EcoRoof material diagnostics",
-                ));
+                let flags = flags.ok_or(Error::Unavailable(
+                    "actual EcoRoof surface severe phase owners",
+                ))?;
+                backend.show_source_severe_error(
+                    "GetSurfaceData: Only one EcoRoof Material is currently allowed for all constructions.",
+                    flags,
+                )?;
+                let first_name = materials.source_material_name(outside_layer)?;
+                backend.show_continue_error(&format!("... first material={first_name}"))?;
+                let construction_name = &construction(control, row.construction)?.name;
+                let name = materials.source_material_name(layer)?;
+                backend.show_continue_error(&format!(
+                    "... conflicting Construction={construction_name} uses material={name}",
+                ))?;
+                *errors_found = true;
             }
         }
         Ok(())
@@ -379,17 +394,18 @@ impl SurfaceGeometryInputState {
     pub(crate) fn build_opaque_surface_lists(
         &mut self,
         owners: &mut SurfaceGetterOwners<'_>,
+        materials: &SelectedMaterialData,
         backend: &mut SourceErrorBackend<'_>,
-        errors_found: bool,
+        errors_found: &mut bool,
         flags: Option<&SourceDiagnosticFlags<'_>>,
     ) -> Result<(), Error> {
-        self.set_surface_eco_roof_flags(owners.control)?;
+        self.set_surface_eco_roof_flags(owners.control, materials, backend, errors_found, flags)?;
         let total = usize::try_from(self.total_surfaces)
             .map_err(|_| Error::Unavailable("Source TotSurfaces list reserve"))?;
         let windows = usize::try_from(self.total_windows)
             .map_err(|_| Error::Unavailable("Source TotWindows list reserve"))?;
         self.surface_lists.reserve_source_lists(total, windows)?;
-        self.populate_opaque_surface_lists(owners, errors_found)?;
+        self.populate_opaque_surface_lists(owners, *errors_found)?;
         self.check_surface_irt_uses(owners, backend, flags)?;
         self.populate_source_surface_filters(owners.control, total)
     }

@@ -22,6 +22,7 @@ pub use input::{SelectedMaterialInput, SourceGlazingSpectralInput};
 mod air_gap_tests;
 mod report;
 mod roof_vegetation;
+pub(crate) use roof_vegetation::SourceRoofVegetationMaterial;
 mod simple_glazing;
 mod type_group;
 mod window_blind;
@@ -192,6 +193,91 @@ fn typed_id(
 }
 
 impl SelectedMaterialData {
+    /// Borrow the same getter-owned EcoRoof row without reading common properties.
+    pub(crate) fn source_roof_vegetation_material(
+        &self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<&SourceRoofVegetationMaterial, HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "EcoRoof MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::EcoRoof)
+            || self.resistance_only.get(&typed_id) != Some(&false)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual EcoRoof Source order/group/physical identity",
+            ));
+        }
+        self.roof_vegetation
+            .get(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained EcoRoof runtime row",
+            ))
+    }
+
+    /// Mutably borrow that same row; wet updates never replace its owner.
+    pub(crate) fn source_roof_vegetation_material_mut(
+        &mut self,
+        source_number: i32,
+        typed_id: MaterialId,
+    ) -> Result<&mut SourceRoofVegetationMaterial, HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "EcoRoof MaterialNum bounds",
+            ))?;
+        if self.materials.get(index) != Some(&typed_id)
+            || self.material_groups.get(&typed_id) != Some(&SourceMaterialGroup::EcoRoof)
+            || self.resistance_only.get(&typed_id) != Some(&false)
+        {
+            return Err(HeatBalanceInputError::Unavailable(
+                "actual EcoRoof Source order/group/physical identity",
+            ));
+        }
+        self.roof_vegetation
+            .get_mut(&typed_id)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "actual retained EcoRoof runtime row",
+            ))
+    }
+
+    /// Borrow the actual getter-written Material.Name key at its Source ordinal.
+    pub(crate) fn source_material_name(
+        &self,
+        source_number: i32,
+    ) -> Result<&str, HeatBalanceInputError> {
+        let index = source_number
+            .checked_sub(1)
+            .and_then(|value| usize::try_from(value).ok())
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "Material.Name Source bounds",
+            ))?;
+        self.materials
+            .get(index)
+            .ok_or(HeatBalanceInputError::Unavailable(
+                "Material.Name actual material-order bounds",
+            ))?;
+        let mut names = self
+            .material_map
+            .iter()
+            .filter(|(_, number)| **number == source_number);
+        let (name, _) = names.next().ok_or(HeatBalanceInputError::Unavailable(
+            "actual getter Material.Name",
+        ))?;
+        if names.next().is_some() {
+            return Err(HeatBalanceInputError::Unavailable(
+                "unique getter Material.Name",
+            ));
+        }
+        Ok(name)
+    }
+
     /// Same retained Gas row for common reports and post-runtime geometry.
     pub(crate) fn source_window_gas_surface_properties(
         &self,

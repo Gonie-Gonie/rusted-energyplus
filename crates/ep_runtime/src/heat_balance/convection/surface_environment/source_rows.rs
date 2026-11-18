@@ -154,11 +154,19 @@ pub(crate) fn set_source_surface_wind_speeds(
     environment: &WeatherEnvironmentState,
 ) -> Result<(), Error> {
     require_station_site(environment)?;
-    super::set_surface_wind_speed_rows(
+    super::set_surface_wind_speed_rows_with_pow(
         environment.outdoor_environment_parameters,
         environment.current_weather.wind_speed,
         source_rows(geometry, physical_surfaces)?.into_iter(),
-    );
+        ep_platform_math::pow,
+    )
+    .map_err(|error| {
+        Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+            crate::WarmupOutputError::Unavailable(format!(
+                "actual Source SetSurfaceWindSpeedAt pow: {error}"
+            )),
+        ))))
+    })?;
     Ok(())
 }
 

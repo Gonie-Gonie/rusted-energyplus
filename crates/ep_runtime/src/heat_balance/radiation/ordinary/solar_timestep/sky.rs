@@ -15,18 +15,51 @@ const D_THETA_D_PHI: f64 = D_THETA * D_PHI;
 impl OrdinarySolarRadiation {
     /// InitSolarCalculations364-377. Called on each actual manager invocation,
     /// including BeginEnvrn calls; Source uses push_back, not replace/clear.
-    pub(crate) fn append_source_sky_patch_angles(&mut self) {
+    pub(crate) fn append_source_sky_patch_angles(&mut self) -> Result<(), Error> {
         for phi in 1..=6 {
             let angle = 0.5 * D_PHI + f64::from(phi - 1) * D_PHI;
-            self.solar_timestep.sin_phi.push(angle.sin());
-            self.solar_timestep.cos_phi.push(angle.cos());
+            self.solar_timestep
+                .sin_phi
+                .push(ep_platform_math::sin(angle).map_err(|error| {
+                    Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                        crate::WarmupOutputError::Unavailable(format!(
+                            "actual Source InitSolarCalculations sin(Phi): {error}"
+                        )),
+                    ))))
+                })?);
+            self.solar_timestep
+                .cos_phi
+                .push(ep_platform_math::cos(angle).map_err(|error| {
+                    Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                        crate::WarmupOutputError::Unavailable(format!(
+                            "actual Source InitSolarCalculations cos(Phi): {error}"
+                        )),
+                    ))))
+                })?);
         }
         for theta in 1..=24 {
             let angle = f64::from(theta - 1) * D_THETA;
-            self.solar_timestep.sin_theta.push(angle.sin());
-            self.solar_timestep.cos_theta.push(angle.cos());
+            self.solar_timestep
+                .sin_theta
+                .push(ep_platform_math::sin(angle).map_err(|error| {
+                    Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                        crate::WarmupOutputError::Unavailable(format!(
+                            "actual Source InitSolarCalculations sin(Theta): {error}"
+                        )),
+                    ))))
+                })?);
+            self.solar_timestep
+                .cos_theta
+                .push(ep_platform_math::cos(angle).map_err(|error| {
+                    Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                        crate::WarmupOutputError::Unavailable(format!(
+                            "actual Source InitSolarCalculations cos(Theta): {error}"
+                        )),
+                    ))))
+                })?);
         }
         self.solar_timestep.first_time = false;
+        Ok(())
     }
 
     pub(crate) fn source_anisotropic_sky_view_factors(
@@ -65,14 +98,31 @@ impl OrdinarySolarRadiation {
         ];
         let weather = &environment.current_weather;
         let cos_zenith = weather.solar_direction_cosines[2];
-        let zenith = cos_zenith.acos();
+        let zenith = ep_platform_math::acos(cos_zenith).map_err(|error| {
+            Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                crate::WarmupOutputError::Unavailable(format!(
+                    "actual Source AnisoSkyViewFactors acos: {error}"
+                )),
+            ))))
+        })?;
         let zenith_degrees = zenith / (PI / 180.0);
         self.solar_timestep.shading.surf_aniso_sky_mult.fill(0.0)?;
         let air_mass_h = 1.0 - 0.1 * environment.elevation / 1000.0;
         let air_mass = if zenith_degrees <= 75.0 {
             air_mass_h / cos_zenith
         } else {
-            air_mass_h / (cos_zenith + 0.15 * (93.9 - zenith_degrees).powf(-1.253))
+            air_mass_h
+                / (cos_zenith
+                    + 0.15
+                        * ep_platform_math::pow(93.9 - zenith_degrees, -1.253).map_err(
+                            |error| {
+                                Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(
+                                    Box::new(crate::WarmupOutputError::Unavailable(format!(
+                                        "actual Source AnisoSkyViewFactors pow: {error}"
+                                    ))),
+                                )))
+                            },
+                        )?)
         };
         let kappa_z3 = 1.041 * (zenith * zenith * zenith);
         let epsilon = ((weather.beam_solar_rad + weather.dif_solar_rad) / weather.dif_solar_rad

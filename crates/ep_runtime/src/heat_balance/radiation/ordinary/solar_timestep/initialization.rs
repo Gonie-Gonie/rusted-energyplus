@@ -129,7 +129,7 @@ impl OrdinarySolarRadiation {
         if globals.begin_envrn_flag {
             self.source_reset_solar_environment(geometry, zones, arrays)?;
         }
-        self.append_source_sky_patch_angles();
+        self.append_source_sky_patch_angles()?;
         Ok(())
     }
 

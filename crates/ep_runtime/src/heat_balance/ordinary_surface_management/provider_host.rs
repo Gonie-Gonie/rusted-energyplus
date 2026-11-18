@@ -15,10 +15,12 @@ use crate::heat_balance::ordinary_air_heat_balance::{
     predictor_corrector::SourceZoneAirPredictorCorrector,
 };
 use crate::heat_balance::ordinary_daylighting::SourceDaylighting;
+use crate::heat_balance::ordinary_eco_roof::SourceEcoRoofOutsideOwners;
 use crate::heat_balance::ordinary_equipment::OrdinaryEquipment;
 use crate::heat_balance::ordinary_heat_balance_initialization::{
     SourceHeatBalanceManager, ctf::SourceCtfInitialization,
 };
+use crate::heat_balance::ordinary_hvac_manager::water_manager::SourceWaterManager;
 use crate::heat_balance::ordinary_surface_initialization::{
     OrdinarySurfaceInitialization, SourceInitSurfaceOwners, SourceThermalHistoryOwners,
     outside_driver::SourceOutsideCtfOwners, provider_host::SourceOrdinaryInitSurfaceHost,
@@ -57,6 +59,7 @@ use std::io::Write;
 
 /// Per-call disjoint references; no constructor, copied numeric state or readiness flag.
 pub(crate) struct SourceManageSurfaceOwners<'a, 'backend, H, D> {
+    pub(crate) eco_roof: &'a mut crate::weather::day::source_current_weather::SourceEcoRoofData,
     pub(crate) geometry: &'a mut SurfaceGeometryInputState,
     pub(crate) physical_surfaces: &'a mut [SourceSurfaceOutdoorState],
     pub(crate) zones: &'a mut SelectedZoneInputOwners,
@@ -130,6 +133,7 @@ pub(crate) struct SourceManageSurfaceOwners<'a, 'backend, H, D> {
 /// No successful default: an actual ManageAir/HVAC provider must be supplied.
 /// Surface arrays remain a single owner, reborrowed only during this child call.
 pub(crate) trait SourceManageSurfaceAirChild<H, D> {
+    fn eco_roof_water(&mut self) -> &mut SourceWaterManager;
     fn manage_air_heat_balance(
         &mut self,
         surface: &mut OrdinarySurfaceInitialization,
@@ -259,8 +263,21 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
         #[allow(clippy::redundant_closure_call)]
         let cadence_result = (|| {
             let o = &mut self.owners;
-            self.surface
-                .calculate_source_outside_surface_balance(&mut SourceOutsideCtfOwners {
+            let mut eco_roof = SourceEcoRoofOutsideOwners {
+                eco_roof: o.eco_roof,
+                materials: o.materials,
+                water: self.air_child.eco_roof_water(),
+                recurring_errors: o.recurring_errors,
+                registration: o.registration,
+                prescan: o.prescan,
+                minimum_report_frequency: o.minimum_report_frequency,
+                developer: &o.project.system.developer_flag,
+                output_host: o.output_host,
+                dictionary_host: o.dictionary_host,
+                eio: o.eio,
+            };
+            self.surface.calculate_source_outside_surface_balance(
+                &mut SourceOutsideCtfOwners {
                     geometry: o.geometry,
                     zones: o.zones,
                     air: o.air,
@@ -278,7 +295,9 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, A: SourceManageSurf
                     scan: o.scan,
                     carroll_method: o.project.carroll_method,
                     backend: o.backend,
-                })
+                },
+                &mut eco_roof,
+            )
         })();
         if cadence_result.is_ok() {
             crate::heat_balance::source_surface_cadence::record(

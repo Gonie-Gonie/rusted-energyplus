@@ -9691,12 +9691,7 @@ impl<'a> Compiler<'a> {
         if !Self::source_roof_vegetation_original_fields_valid(object) {
             return false;
         }
-        !self.raw_model.objects.iter().filter(|(family, _)| family.0.starts_with("Construction")).any(|(_, rows)| {
-            rows.values().any(|construction| construction.fields.iter().any(|(field, value)| {
-                (field.0 == "outside_layer" || (2..=10).any(|index| field.0 == format!("layer_{index}")))
-                    && matches!(value, RawValue::String(reference) if reference.eq_ignore_ascii_case(name))
-            }))
-        })
+        true
     }
 
     fn parse_roof_vegetation_materials(&mut self, model: &mut TypedModel) {
@@ -12062,6 +12057,39 @@ impl<'a> Compiler<'a> {
                 continue;
             };
             if matches!(material.definition, MaterialDefinition::RoofVegetation(_)) {
+                let source_roof_eligible = self.source_file_declarations
+                    && self.raw_model.is_epjson()
+                    && model.material_names.is_source_exact_namespace()
+                    && {
+                        let mut source_names = model
+                            .ctf_report_names
+                            .materials
+                            .iter()
+                            .filter(|(id, _)| *id == *material_id);
+                        source_names.next().is_some_and(|(_, source_name)| {
+                            source_names.next().is_none()
+                                && model.material_names.resolve(source_name) == Some(*material_id)
+                                && self
+                                    .raw_model
+                                    .objects
+                                    .get(&ep_raw_model::ObjectType(
+                                        "Material:RoofVegetation".into(),
+                                    ))
+                                    .is_some_and(|rows| {
+                                        let mut originals = rows.iter().filter(|(name, _)| {
+                                            name.0.to_ascii_uppercase() == *source_name
+                                        });
+                                        originals.next().is_some_and(|(name, object)| {
+                                            originals.next().is_none()
+                                                && self
+                                                    .source_unused_roof_vegetation(&name.0, object)
+                                        })
+                                    })
+                        })
+                    };
+                if source_roof_eligible {
+                    continue;
+                }
                 let layer_field = construction_layer_field(layer_index);
                 self.error(
                     "InvalidRoofVegetationLayerPosition",

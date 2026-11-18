@@ -68,6 +68,7 @@ impl OrdinarySourceSession {
             &mut reports.source_results_output_variables,
         );
         let mut owners = SourceManageSurfaceOwners {
+            eco_roof: &mut self.eco_roof,
             geometry: &mut reports.surface_geometry_input,
             physical_surfaces: &mut surface_owners.outdoor,
             zones: reports

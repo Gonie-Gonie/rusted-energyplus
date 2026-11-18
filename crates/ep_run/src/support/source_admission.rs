@@ -53,8 +53,11 @@ pub(crate) struct SourceSupportAdmission {
     glazing_equivalent_layer_bindings: BTreeSet<String>,
     /// Original-schema unused GapEQL names; physical records belong to actual GasMix.
     gap_equivalent_layer_bindings: BTreeSet<String>,
-    /// Validated unused EcoRoof names only; physical moisture recovery belongs to Material.
+    /// Validated EcoRoof names only; physical moisture recovery belongs to Material.
     roof_vegetation_bindings: BTreeSet<String>,
+    /// Every ordinary raw Construction recipe; first entry is its original outside layer.
+    /// Names preserve Source uppercase/untrimmed identity, never physical properties.
+    roof_vegetation_construction_bindings: BTreeMap<String, Vec<String>>,
     /// Exact Gap doj order and original untrimmed gas references, never copied properties.
     window_gap_bindings: Vec<(String, String)>,
     /// Validated unused Screen names; no optical coefficients or precomputed arrays.
@@ -521,6 +524,41 @@ impl SourceSupportAdmission {
             }
             covered_objects.insert("Material:RoofVegetation");
         }
+        let mut roof_vegetation_construction_bindings = BTreeMap::new();
+        if !roof_vegetation_bindings.is_empty()
+            && let Some(rows) = raw.objects.get(&ObjectType("Construction".into()))
+        {
+            for (name, object) in rows {
+                let Some(RawValue::String(outside)) =
+                    object.fields.get(&FieldName("outside_layer".into()))
+                else {
+                    return None;
+                };
+                if outside.trim().is_empty() {
+                    return None;
+                }
+                let mut layers = vec![outside.to_ascii_uppercase()];
+                let mut ended = false;
+                for index in 2..=10 {
+                    match object.fields.get(&FieldName(format!("layer_{index}"))) {
+                        Some(RawValue::String(reference)) if !reference.trim().is_empty() => {
+                            if ended {
+                                return None;
+                            }
+                            layers.push(reference.to_ascii_uppercase());
+                        }
+                        None | Some(RawValue::String(_)) => ended = true,
+                        _ => return None,
+                    }
+                }
+                if roof_vegetation_construction_bindings
+                    .insert(name.0.to_ascii_uppercase(), layers)
+                    .is_some()
+                {
+                    return None;
+                }
+            }
+        }
         let mut screen_bindings = BTreeSet::new();
         if trace.scope == PortingScope::B
             && raw
@@ -660,6 +698,7 @@ impl SourceSupportAdmission {
             glazing_equivalent_layer_bindings,
             gap_equivalent_layer_bindings,
             roof_vegetation_bindings,
+            roof_vegetation_construction_bindings,
             window_gap_bindings,
             screen_bindings,
             blind_bindings,
@@ -1747,6 +1786,67 @@ impl SourceSupportAdmission {
                 row.definition,
                 ep_model::MaterialDefinition::RoofVegetation(_)
             ) {
+                return false;
+            }
+        }
+        // Keep every genuine ordinary recipe, not just recipes that mention
+        // EcoRoof or are referenced by an active Surface. This also rejects
+        // typed-only layer/outside changes in otherwise unchanged constructions.
+        let construction_ids: BTreeSet<_> = model.constructions.iter().map(|row| row.id).collect();
+        if construction_ids.len() != model.constructions.len()
+            || model.constructions.len() != self.roof_vegetation_construction_bindings.len()
+            || model.construction_names.len() != model.constructions.len()
+        {
+            return false;
+        }
+        let mut construction_by_name = BTreeMap::new();
+        let mut construction_report_ids = BTreeSet::new();
+        for (id, name) in &model.ctf_report_names.constructions {
+            if !construction_ids.contains(id)
+                || !self
+                    .roof_vegetation_construction_bindings
+                    .contains_key(name)
+                || !construction_report_ids.insert(*id)
+                || construction_by_name.insert(name.as_str(), *id).is_some()
+            {
+                return false;
+            }
+        }
+        if construction_by_name.len() != self.roof_vegetation_construction_bindings.len() {
+            return false;
+        }
+        for (name, recipe) in &self.roof_vegetation_construction_bindings {
+            let Some(id) = construction_by_name.get(name.as_str()).copied() else {
+                return false;
+            };
+            let Some(construction) = model.constructions.iter().find(|row| row.id == id) else {
+                return false;
+            };
+            if construction.name != ep_model::NormalizedName::new(name)
+                || model.construction_names.resolve(name) != Some(id)
+                || !construction.is_ordinary_opaque()
+                || construction.has_internal_heat_source()
+                || construction.thermochromic_master.is_some()
+                || construction.air_boundary.is_some()
+                || construction.complex_fenestration.is_some()
+                || construction.window_equivalent_layer.is_some()
+            {
+                return false;
+            }
+            let mut expected_layers = Vec::with_capacity(recipe.len());
+            for reference in recipe {
+                let Some(id) = model.material_names.resolve(reference) else {
+                    return false;
+                };
+                if !all_ids.contains(&id) {
+                    return false;
+                }
+                expected_layers.push(id);
+            }
+            if construction.outside_layer != expected_layers.first().copied()
+                || (!construction.layers.is_empty() && construction.layers != expected_layers)
+                || construction.effective_layers() != expected_layers.as_slice()
+            {
                 return false;
             }
         }

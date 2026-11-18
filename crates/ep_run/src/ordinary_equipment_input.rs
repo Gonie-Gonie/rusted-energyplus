@@ -1145,18 +1145,21 @@ fn resolve_raw(
                     || source_empty_gain
                 {
                     !matches!(field(object, required), Some(RawValue::String(_)))
-                } else if source_calendar_ingress
-                    && (matches!(
-                        (family.0.as_str(), required),
-                        (
-                            "Exterior:Lights" | "OtherEquipment" | "ElectricEquipment",
-                            "schedule_name"
-                        )
-                    ) || (family.0 == "ElectricEquipment"
-                        && required == "zone_or_zonelist_or_space_or_spacelist_name")
-                        || (source_gain_collections
-                            && family.0 == "OtherEquipment"
-                            && required == "zone_or_zonelist_or_space_or_spacelist_name"))
+                } else if (source_b_ingress
+                    && family.0 == "Construction"
+                    && required == "outside_layer")
+                    || (source_calendar_ingress
+                        && (matches!(
+                            (family.0.as_str(), required),
+                            (
+                                "Exterior:Lights" | "OtherEquipment" | "ElectricEquipment",
+                                "schedule_name"
+                            )
+                        ) || (family.0 == "ElectricEquipment"
+                            && required == "zone_or_zonelist_or_space_or_spacelist_name")
+                            || (source_gain_collections
+                                && family.0 == "OtherEquipment"
+                                && required == "zone_or_zonelist_or_space_or_spacelist_name")))
                 {
                     !matches!(field(object, required), Some(RawValue::String(value)) if !value.is_empty())
                 } else {

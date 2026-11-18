@@ -235,8 +235,9 @@ impl CtfInitializationContext<'_> {
         state
             .build_opaque_surface_lists(
                 &mut owners,
+                &reports.selected_material_data,
                 &mut self.backend,
-                reports.heat_balance_input_errors_found,
+                &mut reports.heat_balance_input_errors_found,
                 surface_diagnostic_flags.as_ref(),
             )
             .map_err(hb_input_error)?;

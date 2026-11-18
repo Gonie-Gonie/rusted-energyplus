@@ -238,11 +238,17 @@ impl WeatherSession {
                 Error::Unavailable("actual positive GetWeatherStation object getter").into(),
             );
         }
-        self.state.environment.outdoor_environment_parameters.initialize_absent_weather_station(owners.eio)
-            .map_err(|error| match error {
+        self.state.environment.outdoor_environment_parameters.initialize_absent_weather_station_with_pow(
+            owners.eio,
+            ep_platform_math::pow,
+            |error| Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                crate::WarmupOutputError::Unavailable(format!("actual Source GetWeatherStation pow: {error}")),
+            )))),
+            |error| match error {
                 crate::heat_balance::convection::surface_environment::SurfaceOutdoorInitializationError::Io(error)=>Error::Io(error),
                 crate::heat_balance::convection::surface_environment::SurfaceOutdoorInitializationError::Format(reason)=>Error::Format(reason),
-            })?;
+            },
+        )?;
         // Rust call-return witness follows actual Station profile/EIO completion.
         // It never substitutes for the parent weather getter or Native flags.
         self.state.environment.source_weather_station_initialized = true;

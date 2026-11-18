@@ -59,25 +59,40 @@ fn prepare<'a>(
             (
                 Some(SourceMaterialGroup::IrTransparent),
                 MaterialDefinition::InfraredTransparent(_),
-            ) => false,
+            )
+            | (Some(SourceMaterialGroup::EcoRoof), MaterialDefinition::RoofVegetation(_)) => false,
             _ => return Err(CtfReportUnavailable::Material(id)),
         };
-        let input =
-            material_layer_inputs(&[material]).map_err(|_| CtfReportUnavailable::Material(id))?;
-        let values = input.first().ok_or(CtfReportUnavailable::Material(id))?;
+        let values = if material.kind() == ep_model::MaterialKind::RoofVegetation {
+            let row = materials
+                .source_roof_vegetation_material(number, id)
+                .map_err(|_| CtfReportUnavailable::Material(id))?;
+            [
+                row.thickness,
+                row.conductivity,
+                row.density,
+                row.specific_heat,
+                row.resistance,
+            ]
+        } else {
+            let input = material_layer_inputs(&[material])
+                .map_err(|_| CtfReportUnavailable::Material(id))?;
+            let values = input.first().ok_or(CtfReportUnavailable::Material(id))?;
+            [
+                values.thickness,
+                values.conductivity,
+                values.density,
+                values.specific_heat,
+                values.resistance,
+            ]
+        };
         layers.push(CtfMaterialReport {
             material_id: id,
             name: crate::heat_balance::ctf_initialization_context::original_material_name(
                 model, id,
             )?,
             air_gap,
-            values: [
-                values.thickness,
-                values.conductivity,
-                values.density,
-                values.specific_heat,
-                values.resistance,
-            ],
+            values,
         });
     }
     Ok(CtfConstructionReport {

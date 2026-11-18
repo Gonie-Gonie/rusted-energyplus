@@ -758,19 +758,7 @@ pub(super) fn assess_typed_runtime_boundaries(
         .map_or(0, |rows| rows.len());
     let roof_vegetation_consumed = source_admission
         .is_some_and(|admission| admission.consumes_unused_roof_vegetation(typed_model));
-    let roof_vegetation_used = typed_model.constructions.iter().any(|construction| {
-        construction
-            .layers
-            .iter()
-            .chain(construction.effective_layers().iter())
-            .chain(construction.outside_layer.iter())
-            .any(|id| {
-                typed_model.materials.iter().any(|material| {
-                    material.id == *id && material.kind() == MaterialKind::RoofVegetation
-                })
-            })
-    });
-    if !roof_vegetation_consumed || roof_vegetation_used {
+    if !roof_vegetation_consumed {
         push_typed_unsupported_object(
             registry,
             unsupported_objects,

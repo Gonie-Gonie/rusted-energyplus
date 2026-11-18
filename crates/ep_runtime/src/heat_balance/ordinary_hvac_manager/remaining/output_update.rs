@@ -53,6 +53,7 @@ impl SourceOrdinaryHvacRemaining {
             weather_outputs: Some(&weather),
             schedules: o.schedules,
             curves: output.curves,
+            eco_roof: output.eco_roof,
             arrays: o.surface_arrays,
             surface_heat_emission: o.surface_heat_emission,
             geometry: o.geometry,

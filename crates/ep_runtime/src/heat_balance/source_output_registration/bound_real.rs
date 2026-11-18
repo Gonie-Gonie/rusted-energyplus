@@ -23,11 +23,18 @@ pub(crate) enum SourceSurfaceOutputField {
     SurfOpaqOutFaceCondFlux,
     SurfOpaqStorageCond,
     SurfOpaqStorageCondFlux,
+    SurfOutDryBulbTemp,
+    SurfOutWetBulbTemp,
+    SurfOutWindSpeed,
+    SurfOutWindDir,
 }
 
 /// Stable actual field identity; Source ordinals remain independent of typed IDs.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum SourceRealOutputTarget {
+    EcoRoof {
+        field: crate::heat_balance::ordinary_eco_roof::SourceEcoRoofOutputField,
+    },
     Curve {
         field: crate::heat_balance::setup_postludes::SourceCurveOutputField,
         index: i32,

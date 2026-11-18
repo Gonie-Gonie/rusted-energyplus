@@ -14803,6 +14803,236 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                     "Roof custody {case}"
                 );
             }
+            // Genuine raw recipes cover both layer positions, with and without surface use.
+            for (outside_roof, used) in [(true, true), (true, false), (false, true), (false, false)]
+            {
+                let mut composition_value = roof_value.clone();
+                composition_value[ROOF]["FOCUSED ROOF"] = json!({});
+                composition_value["Construction"]["ECO COMPOSITION"] = if outside_roof {
+                    json!({"outside_layer":"FOCUSED ROOF"})
+                } else {
+                    json!({"outside_layer":"Opaque","layer_2":"FOCUSED ROOF"})
+                };
+                if used {
+                    let surface = composition_value["BuildingSurface:Detailed"]
+                        .as_object_mut()
+                        .expect("real Source surfaces")
+                        .values_mut()
+                        .find(|row| {
+                            row["outside_boundary_condition"]
+                                .as_str()
+                                .is_some_and(|value| value.eq_ignore_ascii_case("Outdoors"))
+                        })
+                        .expect("real exterior surface");
+                    surface["construction_name"] = json!("ECO COMPOSITION");
+                }
+                let composition_raw =
+                    ep_raw_model::parse_epjson_str_for_source(&composition_value.to_string())
+                        .expect("genuine ordinary EcoRoof composition");
+                assert!(
+                    composition_raw.is_epjson()
+                        && crate::ordinary_equipment_input::resolve_source_b(&composition_raw)
+                            .is_ok()
+                );
+                let composition_compiled =
+                    ep_compiler::compile_raw_model_for_source(&composition_raw);
+                let composition_model = composition_compiled
+                    .model
+                    .as_ref()
+                    .expect("ordinary Source Roof identities");
+                assert!(
+                    !composition_compiled.has_errors()
+                        && composition_model.material_names.is_source_exact_namespace()
+                );
+                let focused_roof = composition_model
+                    .material_names
+                    .resolve("FOCUSED ROOF")
+                    .expect("same Source Roof name");
+                let composition_id = composition_model
+                    .construction_names
+                    .resolve("ECO COMPOSITION")
+                    .expect("same ordinary Construction name");
+                let composition = composition_model
+                    .constructions
+                    .iter()
+                    .find(|row| row.id == composition_id)
+                    .expect("same ordinary Construction");
+                let expected_layers = if outside_roof {
+                    vec![focused_roof]
+                } else {
+                    vec![
+                        composition_model
+                            .material_names
+                            .resolve("Opaque")
+                            .expect("existing ordinary material"),
+                        focused_roof,
+                    ]
+                };
+                assert!(
+                    composition.is_ordinary_opaque()
+                        && composition.outside_layer == expected_layers.first().copied()
+                        && composition.layers == expected_layers
+                        && composition.effective_layers() == expected_layers.as_slice()
+                        && composition_model
+                            .ctf_report_names
+                            .constructions
+                            .contains(&(composition_id, "ECO COMPOSITION".into()))
+                        && composition_model
+                            .surfaces
+                            .iter()
+                            .any(|surface| surface.construction == composition_id)
+                            == used
+                );
+                let composition_ip =
+                    crate::ordinary_input_processor::resolve_source_b(&composition_raw)
+                        .expect("actual Source composition IP");
+                let construction_fields = composition_ip
+                    .source_raw_object_fields("Construction", "ECO COMPOSITION")
+                    .expect("actual retained Construction fields");
+                assert!(
+                    composition_ip.get_num_objects_found("Construction")
+                        == composition_model.constructions.len()
+                        && construction_fields.get("outside_layer")
+                            == Some(&S::String(
+                                if outside_roof {
+                                    "FOCUSED ROOF"
+                                } else {
+                                    "Opaque"
+                                }
+                                .into()
+                            ))
+                        && (if outside_roof {
+                            construction_fields.get("layer_2").is_none()
+                        } else {
+                            construction_fields.get("layer_2")
+                                == Some(&S::String("FOCUSED ROOF".into()))
+                        })
+                );
+                let composition_materials = crate::ordinary_material_input::resolve_source(
+                    &composition_raw,
+                    &composition_ip,
+                )
+                .expect("same Source Material projection");
+                assert!(
+                    composition_materials.roof_vegetation.len() == 3
+                        && composition_materials
+                            .roof_vegetation
+                            .iter()
+                            .any(|row| row.object_name == "FOCUSED ROOF" && row.fields.is_empty())
+                );
+                let composition_hb = crate::ordinary_heat_balance_input::resolve_source(
+                    &composition_raw,
+                    &composition_ip,
+                )
+                .expect("same Source Construction projection");
+                let projected_construction = composition_hb.objects["Construction"]
+                    .iter()
+                    .find(|row| row.object_name == "ECO COMPOSITION")
+                    .expect("same raw Construction recipe");
+                assert!(
+                    projected_construction.fields.get("outside_layer")
+                        == Some(&P::String(
+                            if outside_roof {
+                                "FOCUSED ROOF"
+                            } else {
+                                "Opaque"
+                            }
+                            .into()
+                        ))
+                        && (if outside_roof {
+                            !projected_construction.fields.contains_key("layer_2")
+                        } else {
+                            projected_construction.fields.get("layer_2")
+                                == Some(&P::String("FOCUSED ROOF".into()))
+                        })
+                );
+                let mut composition_trace = inspect_porting_scope(
+                    &composition_raw,
+                    &composition_compiled.report,
+                    Some(composition_model),
+                    PortingScope::B,
+                );
+                assert!(
+                    composition_trace.admissible,
+                    "{:?}",
+                    composition_trace.violations
+                );
+                composition_trace.environment = Some(
+                    super::environment::environment_from_weather(
+                        composition_model,
+                        &weather,
+                        "focused ordinary Roof composition",
+                    )
+                    .expect("same actual weather environment"),
+                );
+                let composition_admission =
+                    crate::support::SourceSupportAdmission::from_validated_scope(
+                        &composition_raw,
+                        &composition_trace,
+                    )
+                    .expect("complete Source recipe custody");
+                let composition_support = crate::support::assess_support_with_source_admission(
+                    &composition_raw,
+                    &composition_compiled.report,
+                    Some(composition_model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&composition_admission),
+                );
+                assert!(
+                    composition_support.allows_rust_runtime(),
+                    "ordinary Roof {outside_roof}/{used}"
+                );
+                let mut fallback = composition_model.clone();
+                fallback
+                    .constructions
+                    .iter_mut()
+                    .find(|row| row.id == composition_id)
+                    .expect("same fallback identity")
+                    .layers
+                    .clear();
+                let fallback_support = crate::support::assess_support_with_source_admission(
+                    &composition_raw,
+                    &composition_compiled.report,
+                    Some(&fallback),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&composition_admission),
+                );
+                assert!(
+                    fallback_support.allows_rust_runtime() == outside_roof
+                        && (outside_roof
+                            || fallback_support
+                                .unsupported_objects
+                                .iter()
+                                .any(|row| row.object_type == ROOF))
+                );
+            }
+            let mut ordinary_fallback = roof_model.clone();
+            ordinary_fallback
+                .constructions
+                .iter_mut()
+                .find(|row| row.is_ordinary_opaque() && row.layers.len() == 1)
+                .expect("genuine original outside-only recipe")
+                .layers
+                .clear();
+            assert!(
+                crate::support::assess_support_with_source_admission(
+                    &roof_raw,
+                    &roof_compiled.report,
+                    Some(&ordinary_fallback),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    Some(&roof_admission),
+                )
+                .allows_rust_runtime()
+            );
             let construction_index = roof_model
                 .constructions
                 .iter()
@@ -14810,13 +15040,51 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 .expect("real opaque Construction");
             // U11/U12: actual Raw outside/layers2..10 and typed original/effective/nonempty/empty-fallback positions.
             for case in 0_usize..11 {
-                assert!(["Construction","Construction:WindowEquivalentLayer","Construction:AirBoundary","Construction:InternalSource"].iter().all(|family| {
-                    let mut used=roof_value.clone();let mut fields=serde_json::Map::from_iter([("outside_layer".into(),json!("Opaque"))]);
-                    let field=if case==0 || case==10 {"outside_layer".into()}else{format!("layer_{}",case+1)};
-                    fields.insert(field,json!(if case.is_multiple_of(2){"\u{b}"}else{"\u{a0}"}));used[*family]["ROOF USED"]=serde_json::Value::Object(fields);
-                    crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&used.to_string()).expect("Raw Construction-prefix Roof use"))
-                        .is_err_and(|e|e=="Source unused RoofVegetation excludes every Construction layer reference")
-                }),"Raw Roof Construction position {case}");
+                assert!(
+                    [
+                        "Construction",
+                        "Construction:WindowEquivalentLayer",
+                        "Construction:AirBoundary",
+                        "Construction:InternalSource"
+                    ]
+                    .iter()
+                    .all(|family| {
+                        let mut used = roof_value.clone();
+                        let mut fields =
+                            serde_json::Map::from_iter([("outside_layer".into(), json!("Opaque"))]);
+                        let field = if case == 0 || case == 10 {
+                            "outside_layer".into()
+                        } else {
+                            format!("layer_{}", case + 1)
+                        };
+                        if *family == "Construction" && (1..=9).contains(&case) {
+                            fields.extend(
+                                (2..=case).map(|index| (format!("layer_{index}"), json!("Opaque"))),
+                            );
+                        }
+                        fields.insert(
+                            field,
+                            json!(if case.is_multiple_of(2) {
+                                "\u{b}"
+                            } else {
+                                "\u{a0}"
+                            }),
+                        );
+                        used[*family]["ROOF USED"] = serde_json::Value::Object(fields);
+                        let resolved = crate::ordinary_equipment_input::resolve_source_b(
+                            &ep_raw_model::parse_epjson_str_for_source(&used.to_string())
+                                .expect("Raw Construction-prefix Roof use"),
+                        );
+                        if *family == "Construction" {
+                            resolved.is_ok()
+                        } else {
+                            resolved.is_err_and(|e| {
+                                e == format!("ordinary equipment excludes positive family {family}")
+                            })
+                        }
+                    }),
+                    "Raw Roof Construction position {case}"
+                );
                 let mut used = roof_model.clone();
                 let construction = &mut used.constructions[construction_index];
                 if case == 10 {

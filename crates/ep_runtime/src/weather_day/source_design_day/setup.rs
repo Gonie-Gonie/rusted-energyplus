@@ -113,7 +113,7 @@ impl SourceDesignDayInputState {
         let coefficients = super::super::design_day::solar::source_daily_coefficients(
             design_day,
             o.environment.latitude,
-        );
+        )?;
         reports::write(
             input,
             inputs,

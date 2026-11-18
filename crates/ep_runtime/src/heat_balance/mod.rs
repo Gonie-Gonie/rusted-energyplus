@@ -44,6 +44,7 @@ pub mod longwave;
 pub mod manager;
 pub(crate) mod ordinary_air_heat_balance;
 pub(crate) mod ordinary_daylighting;
+pub(crate) mod ordinary_eco_roof;
 pub(crate) mod ordinary_ems_plugin;
 pub mod ordinary_equipment;
 pub(crate) mod ordinary_exterior_energy_use;

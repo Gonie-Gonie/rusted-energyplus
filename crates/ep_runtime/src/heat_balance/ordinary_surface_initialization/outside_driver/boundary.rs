@@ -1,7 +1,7 @@
 //! Exact per-surface outside boundary dispatch on the same live history/coefficient cells.
 use super::{
-    Error, OrdinarySurfaceInitialization, SourceOutsideCtfOwners, index, outdoor, outside_history,
-    set, value, write_outside_history,
+    Error, OrdinarySurfaceInitialization, SourceOutsideCtfOwners, SourceOutsideSurfaceOutcome,
+    index, outdoor, outside_history, set, value, write_outside_history,
 };
 use crate::heat_balance::inside_convection_dispatcher::source::{
     SourceExternalConvectionCall, SourceExternalConvectionOwners,
@@ -14,7 +14,8 @@ pub(super) fn calculate(
     number: i32,
     space: i32,
     construction: i32,
-) -> Result<(), Error> {
+    eco_roof: &mut impl crate::heat_balance::ordinary_eco_roof::SourceEcoRoofOutsideChild,
+) -> Result<SourceOutsideSurfaceOutcome, Error> {
     let i = index(number)?;
     let actual = o
         .geometry
@@ -76,9 +77,8 @@ pub(super) fn calculate(
                 .and_then(|a| a.surf_ext_eco_roof.get(i))
                 .ok_or(Error::Unavailable("outside actual SurfExtEcoRoof"))?;
             if eco {
-                return Err(Error::Unavailable(
-                    "outside actual positive CalcEcoRoof7439",
-                ));
+                let _temp_ext = eco_roof.calculate(surface, o, number, space, construction)?;
+                return Ok(SourceOutsideSurfaceOutcome::ContinueSurface);
             }
             let roughness = surface
                 .arrays
@@ -129,7 +129,7 @@ pub(super) fn calculate(
                     arrays: &mut surface.arrays,
                     physical: o.physical,
                     environment: o.environment,
-                    input: o.input,
+                    input: &*o.input,
                     reports: o.reports,
                     scan: o.scan,
                     backend: o.backend,
@@ -205,5 +205,5 @@ pub(super) fn calculate(
             }
         }
     }
-    Ok(())
+    Ok(SourceOutsideSurfaceOutcome::FinishSurface)
 }

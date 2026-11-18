@@ -342,15 +342,26 @@ pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) -> Result<(), W
     };
     let h = weather.hour_angle * DEG_TO_RAD;
     let cos_zenith = env.sin_latitude * daily.sin_solar_declin_angle
-        + env.cos_latitude * daily.cos_solar_declin_angle * h.cos();
+        + env.cos_latitude
+            * daily.cos_solar_declin_angle
+            * ep_platform_math::cos(h).map_err(|error| {
+                WeatherDayError::admission(format!("DetermineSunUpDown cos: {error}"))
+            })?;
     let solar_zenith = ep_platform_math::acos(cos_zenith)
         .map_err(|error| WeatherDayError::admission(format!("DetermineSunUpDown acos: {error}")))?;
-    let sin_altitude = env.cos_latitude * daily.cos_solar_declin_angle * h.cos()
+    let sin_altitude = env.cos_latitude
+        * daily.cos_solar_declin_angle
+        * ep_platform_math::cos(h).map_err(|error| {
+            WeatherDayError::admission(format!("DetermineSunUpDown cos: {error}"))
+        })?
         + env.sin_latitude * daily.sin_solar_declin_angle;
     let solar_altitude = ep_platform_math::asin(sin_altitude)
         .map_err(|error| WeatherDayError::admission(format!("DetermineSunUpDown asin: {error}")))?;
     let cos_azimuth = -(env.sin_latitude * cos_zenith - daily.sin_solar_declin_angle)
-        / (env.cos_latitude * solar_zenith.sin());
+        / (env.cos_latitude
+            * ep_platform_math::sin(solar_zenith).map_err(|error| {
+                WeatherDayError::admission(format!("DetermineSunUpDown sin: {error}"))
+            })?);
     // Source max(CosAzimuth,-1), then min(1,CosAzimuth), without new clamps.
     let cos_azimuth = if cos_azimuth < -1.0 {
         -1.0
@@ -375,8 +386,15 @@ pub(super) fn determine_sun_up_down(state: &mut WeatherDayState) -> Result<(), W
     } else {
         current.sun_is_up = true;
         current.solar_direction_cosines[1] = daily.sin_solar_declin_angle * env.cos_latitude
-            - daily.cos_solar_declin_angle * env.sin_latitude * h.cos();
-        current.solar_direction_cosines[0] = daily.cos_solar_declin_angle * h.sin();
+            - daily.cos_solar_declin_angle
+                * env.sin_latitude
+                * ep_platform_math::cos(h).map_err(|error| {
+                    WeatherDayError::admission(format!("DetermineSunUpDown cos: {error}"))
+                })?;
+        current.solar_direction_cosines[0] = daily.cos_solar_declin_angle
+            * ep_platform_math::sin(h).map_err(|error| {
+                WeatherDayError::admission(format!("DetermineSunUpDown sin: {error}"))
+            })?;
     }
     Ok(())
 }

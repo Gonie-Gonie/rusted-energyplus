@@ -702,7 +702,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         let cen_surface_input_checkpoint = raw.clone();
         assert!(cen_surface_input_checkpoint.surface_tmp.is_some());
         raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None, None)?;
-        raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
+        raw.build_opaque_surface_lists(&mut owners, &context.reports.selected_material_data, &mut context.backend, &mut errors, None)?;
         let wind_surfaces = raw.final_surfaces.as_ref().ok_or("same mapped wind Surface owner")?;
         assert_eq!(wind_surfaces.len(), 6);
         assert!(wind_surfaces.iter().all(|row| row.linked_outdoor_air_node == 0
@@ -754,7 +754,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
                 error_callback: None, sqlite: None,
             };
             let result = warning_raw.build_opaque_surface_lists(
-                &mut warning_owners, &mut warning_backend, false, (mode != 3).then_some(&flags),
+                &mut warning_owners, &context.reports.selected_material_data, &mut warning_backend, &mut false, (mode != 3).then_some(&flags),
             );
             let warnings = if mode == 1 { i32::try_from(total)? } else { i32::from(mode != 3) };
             assert_eq!(warning_backend.state.tracking.total_warning_errors, warnings);
@@ -10417,7 +10417,7 @@ fn replay_cen_final_mapping(
     // and subsequent range loop produce associations on THESE actual GetZone owners.
     raw.copy_final_opaque_surfaces(&mut owners, &mut context.backend, &mut errors, 3, None, None)?;
     assert!(!errors);
-    raw.build_opaque_surface_lists(&mut owners, &mut context.backend, errors, None)?;
+    raw.build_opaque_surface_lists(&mut owners, &r.selected_material_data, &mut context.backend, &mut errors, None)?;
     raw.bind_typed_surfaces(&owners)?;
     // Actual GetSurfaceData return-suffix writer initializes representative
     // surface numbers and active constructions needed by radiant initialization.

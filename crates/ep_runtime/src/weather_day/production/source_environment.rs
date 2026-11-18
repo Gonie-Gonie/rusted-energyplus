@@ -103,8 +103,16 @@ impl ProductionWeatherTimestepSeries {
             .state
             .environment
             .outdoor_environment_parameters
-            .initialize_absent_weather_station(context.eio)
-            .map_err(output_error)?;
+            .initialize_absent_weather_station_with_pow(
+                context.eio,
+                ep_platform_math::pow,
+                |error| {
+                    RuntimeError::WarmupOutput(Box::new(WarmupOutputError::Unavailable(format!(
+                        "actual Source GetWeatherStation pow: {error}"
+                    ))))
+                },
+                output_error,
+            )?;
         if errors_found {
             // Keep all actual severe/EIO/Station prefix effects. The omitted
             // SetupEnvironmentTypes/GetWeatherProperties/fatal suffix must

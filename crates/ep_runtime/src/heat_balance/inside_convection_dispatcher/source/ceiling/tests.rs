@@ -182,7 +182,8 @@ fn source_ceiling_correlations_keep_class_thresholds_blend_and_objexx_ach_limits
         (0.0, 3.17299636062606),
         (1.0, 9.35711423763866),
     ] {
-        let natural = super::super::super::natural_coefficient_w_per_m2_k(24.0, 20.0, -cosine);
+        let natural =
+            super::super::super::source_natural_coefficient_w_per_m2_k(24.0, 20.0, -cosine)?;
         for ach in [0.0, 0.5] {
             assert_eq!(
                 coefficient(ach, 24.0, 20.0, cosine, 0.008, 3.0, false)?.to_bits(),

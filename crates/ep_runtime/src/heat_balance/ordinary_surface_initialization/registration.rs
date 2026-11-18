@@ -499,12 +499,14 @@ pub(crate) fn register_source_surface_outputs(
             eio,
         )?;
         if surface.row.exterior_boundary == 0 || advanced_report_variables {
-            let _actual: &f64 = &owners
-                .physical_surface(i)?
-                .outdoor_environment
-                .row
-                .dry_bulb_c;
-            registration.setup_unmetered_zone_real(
+            let binding = SourceRealOutputBinding::new(
+                SourceRealOutputTarget::SurfaceHeatBalance {
+                    field: SourceSurfaceOutputField::SurfOutDryBulbTemp,
+                    index: number,
+                },
+                owners,
+            )?;
+            registration.setup_bound_unmetered_zone_real(
                 input,
                 prescan,
                 SourceRealOutputDeclaration {
@@ -516,13 +518,17 @@ pub(crate) fn register_source_surface_outputs(
                 minutes_in_time_step,
                 host,
                 eio,
+                binding,
+                dictionary_host,
             )?;
-            let _actual: &f64 = &owners
-                .physical_surface(i)?
-                .outdoor_environment
-                .row
-                .wet_bulb_c;
-            registration.setup_unmetered_zone_real(
+            let binding = SourceRealOutputBinding::new(
+                SourceRealOutputTarget::SurfaceHeatBalance {
+                    field: SourceSurfaceOutputField::SurfOutWetBulbTemp,
+                    index: number,
+                },
+                owners,
+            )?;
+            registration.setup_bound_unmetered_zone_real(
                 input,
                 prescan,
                 SourceRealOutputDeclaration {
@@ -534,13 +540,17 @@ pub(crate) fn register_source_surface_outputs(
                 minutes_in_time_step,
                 host,
                 eio,
+                binding,
+                dictionary_host,
             )?;
-            let _actual: &f64 = &owners
-                .physical_surface(i)?
-                .outdoor_environment
-                .row
-                .wind_speed_m_per_s;
-            registration.setup_unmetered_zone_real(
+            let binding = SourceRealOutputBinding::new(
+                SourceRealOutputTarget::SurfaceHeatBalance {
+                    field: SourceSurfaceOutputField::SurfOutWindSpeed,
+                    index: number,
+                },
+                owners,
+            )?;
+            registration.setup_bound_unmetered_zone_real(
                 input,
                 prescan,
                 SourceRealOutputDeclaration {
@@ -552,13 +562,17 @@ pub(crate) fn register_source_surface_outputs(
                 minutes_in_time_step,
                 host,
                 eio,
+                binding,
+                dictionary_host,
             )?;
-            let _actual: &f64 = &owners
-                .physical_surface(i)?
-                .outdoor_environment
-                .row
-                .wind_direction_deg;
-            registration.setup_unmetered_zone_real(
+            let binding = SourceRealOutputBinding::new(
+                SourceRealOutputTarget::SurfaceHeatBalance {
+                    field: SourceSurfaceOutputField::SurfOutWindDir,
+                    index: number,
+                },
+                owners,
+            )?;
+            registration.setup_bound_unmetered_zone_real(
                 input,
                 prescan,
                 SourceRealOutputDeclaration {
@@ -570,6 +584,8 @@ pub(crate) fn register_source_surface_outputs(
                 minutes_in_time_step,
                 host,
                 eio,
+                binding,
+                dictionary_host,
             )?;
             let _actual: &f64 = owners
                 .arrays

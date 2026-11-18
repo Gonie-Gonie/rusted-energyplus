@@ -171,7 +171,8 @@ impl SelectedHeatBalanceInputState {
                     MaterialKind::Mass
                     | MaterialKind::NoMass
                     | MaterialKind::AirGap
-                    | MaterialKind::InfraredTransparent => {}
+                    | MaterialKind::InfraredTransparent
+                    | MaterialKind::RoofVegetation => {}
                     _ => {
                         return Err(HeatBalanceInputError::Unavailable(
                             "unadmitted construction material family",
@@ -264,7 +265,7 @@ impl SelectedHeatBalanceInputState {
             }
             // Same actual MaterialNum/property owners at1795; window optical
             // calculations and positive diagnostic branches stay unavailable.
-            row.write_selected_opaque_properties(&materials)?;
+            row.write_selected_opaque_properties(&materials, backend, errors_found)?;
         }
         Ok(())
     }

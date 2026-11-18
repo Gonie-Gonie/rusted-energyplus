@@ -96,6 +96,30 @@ pub fn sqrt(value: f64) -> Result<f64, MathProviderError> {
     }
 }
 
+/// Evaluate natural logarithm using the selected platform's actual scalar math provider.
+pub fn log(value: f64) -> Result<f64, MathProviderError> {
+    #[cfg(all(target_os = "windows", target_env = "gnu"))]
+    {
+        windows_gnu::log(value)
+    }
+    #[cfg(not(all(target_os = "windows", target_env = "gnu")))]
+    {
+        Ok(value.ln())
+    }
+}
+
+/// Raise base to exponent using the selected platform's actual scalar math provider.
+pub fn pow(base: f64, exponent: f64) -> Result<f64, MathProviderError> {
+    #[cfg(all(target_os = "windows", target_env = "gnu"))]
+    {
+        windows_gnu::pow(base, exponent)
+    }
+    #[cfg(not(all(target_os = "windows", target_env = "gnu")))]
+    {
+        Ok(base.powf(exponent))
+    }
+}
+
 // This crate does not inherit the workspace forbid policy. Its own deny policy
 // permits unsafe code only inside this reviewed OS/CRT boundary. All exported
 // APIs above are safe, and ep_runtime keeps its inherited unsafe-code forbid.
@@ -109,6 +133,7 @@ mod windows_gnu {
     use std::{ffi::c_void, sync::OnceLock};
 
     type Unary = unsafe extern "C" fn(f64) -> f64;
+    type Binary = unsafe extern "C" fn(f64, f64) -> f64;
     static MODULE: OnceLock<Result<usize, MathProviderError>> = OnceLock::new();
     static ASIN: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
     static ACOS: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
@@ -116,6 +141,8 @@ mod windows_gnu {
     static SIN: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
     static COS: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
     static SQRT: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
+    static LOG: OnceLock<Result<Unary, MathProviderError>> = OnceLock::new();
+    static POW: OnceLock<Result<Binary, MathProviderError>> = OnceLock::new();
 
     #[link(name = "kernel32")]
     unsafe extern "system" {
@@ -154,7 +181,7 @@ mod windows_gnu {
         *cache.get_or_init(|| {
             let handle = module()? as *mut c_void;
             // SAFETY: handle is the retained successful System32 module above;
-            // the only callers provide the fixed NUL-terminated asin/acos/exp/sin/cos/sqrt names.
+            // the only callers provide the fixed NUL-terminated asin/acos/exp/sin/cos/sqrt/log names.
             let symbol = unsafe { GetProcAddress(handle, name.as_ptr()) };
             if symbol.is_null() {
                 // SAFETY: same argument-free OS error accessor as above.
@@ -163,7 +190,7 @@ mod windows_gnu {
                     win32_code: unsafe { GetLastError() },
                 });
             }
-            // SAFETY: the System32 UCRT exports asin, acos, exp, sin, cos and sqrt with the documented
+            // SAFETY: the System32 UCRT exports asin, acos, exp, sin, cos, sqrt and log with the documented
             // C ABI double(double), and a Windows function pointer has this size.
             // No arbitrary symbol name, library or signature reaches this helper.
             Ok(unsafe { std::mem::transmute::<*mut c_void, Unary>(symbol) })
@@ -199,5 +226,31 @@ mod windows_gnu {
         let function = resolve(&SQRT, b"sqrt\0", "GetProcAddress(sqrt)")?;
         // SAFETY: resolve returns that exact retained C ABI scalar function.
         Ok(unsafe { function(value) })
+    }
+
+    pub(super) fn log(value: f64) -> Result<f64, MathProviderError> {
+        let function = resolve(&LOG, b"log\0", "GetProcAddress(log)")?;
+        // SAFETY: resolve returns that exact retained C ABI scalar function.
+        Ok(unsafe { function(value) })
+    }
+    pub(super) fn pow(base: f64, exponent: f64) -> Result<f64, MathProviderError> {
+        let function = (*POW.get_or_init(|| {
+            let handle = module()? as *mut c_void;
+            // SAFETY: the handle is retained for process lifetime and the fixed
+            // name is the NUL-terminated System32 UCRT pow export.
+            let symbol = unsafe { GetProcAddress(handle, c"pow".as_ptr().cast()) };
+            if symbol.is_null() {
+                // SAFETY: GetLastError has no pointer arguments or preconditions.
+                return Err(MathProviderError {
+                    stage: "GetProcAddress(pow)",
+                    win32_code: unsafe { GetLastError() },
+                });
+            }
+            // SAFETY: UCRT pow has C ABI double(double, double), and Windows
+            // function pointers have this size. No arbitrary symbol is resolved.
+            Ok(unsafe { std::mem::transmute::<*mut c_void, Binary>(symbol) })
+        }))?;
+        // SAFETY: the cache holds the exact retained C ABI pow function.
+        Ok(unsafe { function(base, exponent) })
     }
 }

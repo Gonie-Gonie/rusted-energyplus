@@ -57,18 +57,61 @@ pub fn natural_coefficient_w_per_m2_k(
     air_temperature_c: f64,
     cos_tilt: f64,
 ) -> f64 {
+    match natural_coefficient_with_pow(
+        surface_temperature_c,
+        air_temperature_c,
+        cos_tilt,
+        |base, exponent| Ok::<f64, std::convert::Infallible>(base.powf(exponent)),
+    ) {
+        Ok(value) => value,
+        Err(never) => match never {},
+    }
+}
+
+// One formula body serves both callers; select the original branch before its
+// single power call, preserving multiplication/division and error timing.
+fn natural_coefficient_with_pow<E>(
+    surface_temperature_c: f64,
+    air_temperature_c: f64,
+    cos_tilt: f64,
+    mut pow: impl FnMut(f64, f64) -> Result<f64, E>,
+) -> Result<f64, E> {
     let delta_temperature_c = surface_temperature_c - air_temperature_c;
-    match branch_from_delta(delta_temperature_c, cos_tilt) {
+    Ok(match branch_from_delta(delta_temperature_c, cos_tilt) {
         TarpNaturalConvectionBranch::VerticalWall => {
-            1.31 * delta_temperature_c.abs().powf(1.0 / 3.0)
+            1.31 * pow(delta_temperature_c.abs(), 1.0 / 3.0)?
         }
         TarpNaturalConvectionBranch::UnstableHorizontalOrTilt => {
-            9.482 * delta_temperature_c.abs().powf(1.0 / 3.0) / (7.238 - cos_tilt.abs())
+            9.482 * pow(delta_temperature_c.abs(), 1.0 / 3.0)? / (7.238 - cos_tilt.abs())
         }
         TarpNaturalConvectionBranch::StableHorizontalOrTilt => {
-            1.810 * delta_temperature_c.abs().powf(1.0 / 3.0) / (1.382 + cos_tilt.abs())
+            1.810 * pow(delta_temperature_c.abs(), 1.0 / 3.0)? / (1.382 + cos_tilt.abs())
         }
-    }
+    })
+}
+
+/// Genuine Source calls use the selected platform provider without a numeric
+/// fallback. The public compatibility entry retains its ordinary Rust power.
+pub(crate) fn source_natural_coefficient_w_per_m2_k(
+    surface_temperature_c: f64,
+    air_temperature_c: f64,
+    cos_tilt: f64,
+) -> Result<f64, crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError> {
+    natural_coefficient_with_pow(
+        surface_temperature_c,
+        air_temperature_c,
+        cos_tilt,
+        ep_platform_math::pow,
+    )
+    .map_err(|error| {
+        crate::heat_balance::selected_heat_balance_input::HeatBalanceInputError::SourceInput(
+            Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                crate::WarmupOutputError::Unavailable(format!(
+                    "actual Source CalcASHRAETARPNatural pow: {error}"
+                )),
+            ))),
+        )
+    })
 }
 
 /// Non-Kiva CalcASHRAEDetailedIntConvCoeff output assignment. LowHConvLimit is

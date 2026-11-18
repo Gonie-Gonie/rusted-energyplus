@@ -28,6 +28,12 @@ use crate::heat_balance::selected_input_processor::SelectedInputProcessor;
 use crate::weather::day::{WeatherEnvironmentState, WeatherGlobalState};
 use ep_model::ReportInputs;
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum SourceOutsideSurfaceOutcome {
+    ContinueSurface,
+    FinishSurface,
+}
+
 /// Disjoint temporary borrows; this bundle owns no numerical state or fallback values.
 pub(crate) struct SourceOutsideCtfOwners<'a, 'backend> {
     pub(crate) geometry: &'a mut SurfaceGeometryInputState,
@@ -42,7 +48,7 @@ pub(crate) struct SourceOutsideCtfOwners<'a, 'backend> {
     pub(crate) clock: &'a WeatherGlobalState,
     pub(crate) environment: &'a WeatherEnvironmentState,
     pub(crate) convection: &'a mut SourceInsideConvection,
-    pub(crate) input: &'a SelectedInputProcessor,
+    pub(crate) input: &'a mut SelectedInputProcessor,
     pub(crate) reports: &'a ReportInputs,
     pub(crate) scan: &'a mut ReportScanState,
     pub(crate) carroll_method: bool,
@@ -116,6 +122,7 @@ impl OrdinarySurfaceInitialization {
     pub(crate) fn calculate_source_outside_surface_balance(
         &mut self,
         o: &mut SourceOutsideCtfOwners<'_, '_>,
+        eco_roof: &mut impl crate::heat_balance::ordinary_eco_roof::SourceEcoRoofOutsideChild,
     ) -> Result<(), Error> {
         local_environment::ground_temperature_average(o.geometry, o.globals)?;
         local_environment::surrounding_temperature_average(o.geometry, o.globals)?;
@@ -191,7 +198,11 @@ impl OrdinarySurfaceInitialization {
                     set(&mut self.arrays.surf_h_grd_ext, i, 0.0)?;
                     set(&mut self.arrays.surf_q_rad_lw_out_srd_surfs, i, 0.0)?;
                     set(&mut self.arrays.surf_h_srd_surf_ext, i, 0.0)?;
-                    boundary::calculate(self, o, number, space_number, construction)?;
+                    if boundary::calculate(self, o, number, space_number, construction, eco_roof)?
+                        == SourceOutsideSurfaceOutcome::ContinueSurface
+                    {
+                        continue;
+                    }
                     let oscm = o
                         .geometry
                         .final_surfaces

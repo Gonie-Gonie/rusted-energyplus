@@ -117,7 +117,7 @@ impl WeatherDayState {
             )?;
             let coefficients = owner.native_gap_daily_solar_coefficients(i32::try_from(
                 case["day_of_year"].as_i64().ok_or("Julian day absent")?,
-            )?);
+            )?)?;
             for (value, key) in coefficients.into_iter().zip([
                 "A",
                 "B",
@@ -151,7 +151,8 @@ impl WeatherDayState {
                     return Err("Weather3 current time input differs".into());
                 }
                 owner.global.current_time = real(time)?;
-                let direction = owner.native_gap_sun_direction_cosines(owner.global.current_time);
+                let direction =
+                    owner.native_gap_sun_direction_cosines(owner.global.current_time)?;
                 contextual(
                     values(
                         &direction,

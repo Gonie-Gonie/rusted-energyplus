@@ -1,7 +1,7 @@
 //! Genuine InitExtConvCoeff with same shared getter and live output cells.
 use super::SourceInsideConvection;
 use crate::heat_balance::convection::surface_environment::source_rows::SourceSurfaceOutdoorState;
-use crate::heat_balance::convection::tarp_inside::natural_coefficient_w_per_m2_k;
+use crate::heat_balance::convection::tarp_inside::source_natural_coefficient_w_per_m2_k;
 use crate::heat_balance::convection::{
     energyplus_roughness_multiplier, energyplus_surface_is_windward,
 };
@@ -80,11 +80,31 @@ fn simple(roughness: Roughness, wind: f64) -> f64 {
     let f = [0.0, 0.028, 0.0, -0.057, 0.0, -0.036];
     d[i] + e[i] * wind + f[i] * (wind * wind)
 }
-fn forced_smooth(windward: bool, wind: f64) -> f64 {
+fn math(
+    operation: &'static str,
+    value: Result<f64, ep_platform_math::MathProviderError>,
+) -> Result<f64, Error> {
+    value.map_err(|error| {
+        Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+            crate::WarmupOutputError::Unavailable(format!(
+                "actual Source exterior {operation}: {error}",
+            )),
+        ))))
+    })
+}
+fn forced_smooth(windward: bool, wind: f64) -> Result<f64, Error> {
     if windward {
-        3.26 * wind.powf(0.89)
+        Ok(3.26
+            * math(
+                "CalcMoWITTForcedWindward pow",
+                ep_platform_math::pow(wind, 0.89),
+            )?)
     } else {
-        3.55 * wind.powf(0.617)
+        Ok(3.55
+            * math(
+                "CalcMoWITTForcedLeeward pow",
+                ep_platform_math::pow(wind, 0.617),
+            )?)
     }
 }
 fn doe2_forced(
@@ -94,12 +114,15 @@ fn doe2_forced(
     windward: bool,
     wind: f64,
     roughness: Roughness,
-) -> f64 {
+) -> Result<f64, Error> {
     // Source6114: forced smooth is computed BEFORE CalcDOE2Forced natural.
-    let smooth = forced_smooth(windward, wind);
-    let natural = natural_coefficient_w_per_m2_k(surface, air, cos);
-    let combined = (natural * natural + smooth * smooth).sqrt();
-    energyplus_roughness_multiplier(roughness) * (combined - natural)
+    let smooth = forced_smooth(windward, wind)?;
+    let natural = source_natural_coefficient_w_per_m2_k(surface, air, cos)?;
+    let combined = math(
+        "CalcDOE2Forced sqrt",
+        ep_platform_math::sqrt(natural * natural + smooth * smooth),
+    )?;
+    Ok(energyplus_roughness_multiplier(roughness) * (combined - natural))
 }
 fn pow4(value: f64) -> f64 {
     let square = value * value;
@@ -225,7 +248,7 @@ impl SourceInsideConvection {
                     temperature=(call.h_movable_insulation*temperature+forced*air)/(call.h_movable_insulation+forced);
                 }
                 let cos=surface.row.vertex_progress.properties.ok_or(Error::Unavailable("actual InitExt natural CosTilt"))?.cos_tilt;
-                let natural=natural_coefficient_w_per_m2_k(temperature,air,cos);
+                let natural=source_natural_coefficient_w_per_m2_k(temperature,air,cos)?;
                 set(&mut owners.arrays.surf_h_conv_ext,i,natural+forced)?;
             },
             6=>{
@@ -235,7 +258,7 @@ impl SourceInsideConvection {
                 let properties=surface.row.vertex_progress.properties.ok_or(Error::Unavailable("actual InitExt MoWITT geometry"))?;
                 let windward=energyplus_surface_is_windward(properties.cos_tilt,properties.azimuth_deg,wind_direction);
                 let natural=0.84*(air-temperature).abs().powf(1.0/3.0);
-                let forced=forced_smooth(windward,wind);
+                let forced=forced_smooth(windward,wind)?;
                 set(&mut owners.arrays.surf_h_conv_ext,i,(natural*natural+forced*forced).sqrt())?;
             },
             7=>{
@@ -244,11 +267,11 @@ impl SourceInsideConvection {
                 }
                 let properties=surface.row.vertex_progress.properties.ok_or(Error::Unavailable("actual InitExt DOE2 geometry"))?;
                 let windward=energyplus_surface_is_windward(properties.cos_tilt,properties.azimuth_deg,wind_direction);
-                let forced=doe2_forced(temperature,air,properties.cos_tilt,windward,wind,call.roughness);
+                let forced=doe2_forced(temperature,air,properties.cos_tilt,windward,wind,call.roughness)?;
                 if call.h_movable_insulation>0.0 {
                     temperature=(call.h_movable_insulation*temperature+forced*air)/(call.h_movable_insulation+forced);
                 }
-                let natural=natural_coefficient_w_per_m2_k(temperature,air,properties.cos_tilt);
+                let natural=source_natural_coefficient_w_per_m2_k(temperature,air,properties.cos_tilt)?;
                 set(&mut owners.arrays.surf_h_conv_ext,i,natural+forced)?;
             },
             9=>return Err(Error::Unavailable("actual InitExt positive ManageExtAdaptiveConvAlgo")),

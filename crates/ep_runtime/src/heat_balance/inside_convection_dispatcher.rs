@@ -8,7 +8,7 @@ mod geometry;
 pub(crate) mod source;
 use super::convection::simple_inside;
 use super::convection::tarp_inside::{
-    detailed_inside_coefficient_w_per_m2_k, natural_coefficient_w_per_m2_k,
+    detailed_inside_coefficient_w_per_m2_k, source_natural_coefficient_w_per_m2_k,
 };
 use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure};
 use super::inside_convection_layout::{
@@ -1364,11 +1364,12 @@ fn initialize_inside_convection_surfaces<
                 // value into the same Source cell BEFORE either clamp read.
                 coefficients.set_coefficient(
                     index,
-                    natural_coefficient_w_per_m2_k(
+                    source_natural_coefficient_w_per_m2_k(
                         *temperatures.borrow_temperature(index)?,
                         mat,
                         -surfaces[index].outward_cos_tilt,
-                    ),
+                    )
+                    .map_err(|error| InsideConvectionError::SourceChild(Box::new(error)))?,
                 );
                 if *coefficients.borrow_coefficient(index)? < actual_low_limit {
                     coefficients.set_coefficient(index, actual_low_limit); //1973

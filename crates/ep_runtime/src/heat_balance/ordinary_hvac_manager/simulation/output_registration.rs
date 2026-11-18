@@ -49,6 +49,7 @@ impl SourceRealOutputOwners for SourceHvacOutputOwners<'_> {
 
 /// Report/IP/backend/EIO/clock operands are borrowed afresh per actual declaration call.
 pub(crate) struct SourceHvacOutputContext<'a, H, D> {
+    pub(crate) eco_roof: &'a crate::weather::day::source_current_weather::SourceEcoRoofData,
     pub(crate) registration: &'a mut SourceOutputRegistration,
     pub(crate) report_flags:
         &'a mut crate::heat_balance::radiation::ordinary::source_children::SourceSolarReportFlags,

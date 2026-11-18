@@ -6,7 +6,7 @@ use ep_model::{MaterialKind, MaterialSurfaceRoughness};
 
 // Reached MaterialBase and MaterialEcoRoof state; no active EcoRoof physics cache.
 #[derive(Clone, Debug, PartialEq)]
-pub(super) struct SourceRoofVegetationMaterial {
+pub(crate) struct SourceRoofVegetationMaterial {
     pub roughness: Option<MaterialSurfaceRoughness>,
     pub resistance: f64,
     pub thickness: f64,

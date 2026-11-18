@@ -11694,6 +11694,54 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                     .collect::<Vec<_>>()
                     == [" Material:Air,MIXED GAP,0.1500"]
         );
+        // Both accessors borrow the same already-loaded getter row; neither makes a property copy.
+        assert!(names.iter().enumerate().all(|(index, _)| {
+            let id = MaterialId(3 + u32::try_from(index).unwrap());
+            let number = i32::try_from(index + 4).unwrap();
+            let address = std::ptr::from_ref(&data.roof_vegetation[&id]);
+            data.source_roof_vegetation_material(number, id)
+                .is_ok_and(|row| {
+                    std::ptr::eq(row, address)
+                        && row.roughness == Some(expected_roughness[index])
+                        && row.thermal_absorptance.to_bits() == expected_numbers[index][9].to_bits()
+                        && row.solar_absorptance.to_bits() == expected_numbers[index][10].to_bits()
+                        && row.visible_absorptance.to_bits()
+                            == expected_numbers[index][11].to_bits()
+                })
+                && data
+                    .source_roof_vegetation_material_mut(number, id)
+                    .is_ok_and(|row| {
+                        std::ptr::eq(row, address)
+                            && row.conductivity.to_bits() == expected_numbers[index][6].to_bits()
+                            && row.density.to_bits() == expected_numbers[index][7].to_bits()
+                            && row.specific_heat.to_bits() == expected_numbers[index][8].to_bits()
+                    })
+        }));
+        assert!(
+            data.source_roof_vegetation_material(0, MaterialId(3))
+                .is_err()
+                && data
+                    .source_roof_vegetation_material(3, MaterialId(3))
+                    .is_err()
+                && data
+                    .source_roof_vegetation_material(4, MaterialId(4))
+                    .is_err()
+                && data
+                    .source_roof_vegetation_material(1, MaterialId(0))
+                    .is_err()
+                && data
+                    .source_roof_vegetation_material_mut(0, MaterialId(3))
+                    .is_err()
+                && data
+                    .source_roof_vegetation_material_mut(3, MaterialId(3))
+                    .is_err()
+                && data
+                    .source_roof_vegetation_material_mut(4, MaterialId(4))
+                    .is_err()
+                && data
+                    .source_roof_vegetation_material_mut(1, MaterialId(0))
+                    .is_err()
+        );
     }
 
     // One genuine WindowMaterial:Gap owner. Gas donors and all helpers are read

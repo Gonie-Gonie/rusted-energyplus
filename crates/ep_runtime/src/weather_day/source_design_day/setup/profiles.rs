@@ -6,7 +6,7 @@ use super::{
 };
 use crate::weather::day::WeatherVars;
 use crate::weather::day::design_day::solar::{
-    Coefficients, clear_sky_radiation, tau_radiation, zhang_huang_radiation,
+    Coefficients, source_clear_sky_radiation, tau_radiation, zhang_huang_radiation,
 };
 use crate::weather::day::source_design_day::state::SourceDesignDayModifierGrid;
 #[derive(Clone, Copy)]
@@ -47,23 +47,36 @@ fn sun_direction_cosines(
     time: f64,
     day: &DailyWeatherVariables,
     environment: &WeatherEnvironmentState,
-) -> [f64; 3] {
+) -> Result<[f64; 3], Error> {
     let hour_angle = (15.0 * (12.0 - (time + day.equation_of_time))
         + (environment.time_zone_meridian - environment.longitude))
         * (std::f64::consts::PI / 180.0);
-    let cosine = hour_angle.cos();
+    let cosine = ep_platform_math::cos(hour_angle).map_err(|error| {
+        Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+            crate::WarmupOutputError::Unavailable(format!(
+                "actual Source CalculateSunDirectionCosines cos: {error}"
+            )),
+        ))))
+    })?;
     let z = day.sin_solar_declin_angle * environment.sin_latitude
         + day.cos_solar_declin_angle * environment.cos_latitude * cosine;
     let (x, y);
     if z >= 0.00001 {
         y = day.sin_solar_declin_angle * environment.cos_latitude
             - day.cos_solar_declin_angle * environment.sin_latitude * cosine;
-        x = day.cos_solar_declin_angle * hour_angle.sin();
+        x = day.cos_solar_declin_angle
+            * ep_platform_math::sin(hour_angle).map_err(|error| {
+                Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(Box::new(
+                    crate::WarmupOutputError::Unavailable(format!(
+                        "actual Source CalculateSunDirectionCosines sin: {error}"
+                    )),
+                ))))
+            })?;
     } else {
         x = 0.0;
         y = 0.0;
     }
-    [x, y, z]
+    Ok([x, y, z])
 }
 // These are the real independently borrowed Native operands; do not hide them in a copied owner DTO.
 #[allow(clippy::too_many_arguments)]
@@ -190,18 +203,18 @@ pub(super) fn write(
                 } else {
                     f64::from(hour) + environment.one_step_solar_time_offset
                 };
-                let sun = sun_direction_cosines(current_time, day, environment);
+                let sun = sun_direction_cosines(current_time, day, environment)?;
                 let cosine_zenith = sun[2];
                 if cosine_zenith < 0.00001 {
                     (Some(0.0), Some(0.0))
                 } else {
                     match input.solar_model {
                         0 => {
-                            let (beam, diffuse) = clear_sky_radiation(
+                            let (beam, diffuse) = source_clear_sky_radiation(
                                 cosine_zenith,
                                 input.sky_clearness,
                                 coefficients,
-                            );
+                            )?;
                             (Some(beam), Some(diffuse))
                         }
                         3 | 4 => {
@@ -212,7 +225,14 @@ pub(super) fn write(
                                 cosine_zenith,
                                 input.tau_beam,
                                 input.tau_diffuse,
-                            );
+                            )
+                            .map_err(|error| {
+                                Error::SourceInput(Box::new(crate::RuntimeError::WarmupOutput(
+                                    Box::new(crate::WarmupOutputError::Unavailable(format!(
+                                        "actual Source SetUpDesignDay ASHRAETauModel math: {error}"
+                                    ))),
+                                )))
+                            })?;
                             (Some(beam), Some(diffuse))
                         }
                         1 => {
@@ -256,7 +276,7 @@ pub(super) fn write(
 // Reuse the actual production CalculateSunDirectionCosines body; no test math.
 #[cfg(all(test, feature = "native-controlled-air-cohort"))]
 impl crate::weather::day::WeatherDayState {
-    pub(crate) fn native_gap_sun_direction_cosines(&self, time: f64) -> [f64; 3] {
+    pub(crate) fn native_gap_sun_direction_cosines(&self, time: f64) -> Result<[f64; 3], Error> {
         sun_direction_cosines(time, &self.today_variables, &self.environment)
     }
 }

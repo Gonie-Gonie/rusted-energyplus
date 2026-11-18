@@ -35,6 +35,12 @@ struct SourceManageAirCall<'a, 'o, 'backend, H, D, R> {
 impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemainingChildren<H, D>>
     SourceManageSurfaceAirChild<H, D> for SourceOrdinaryAirProvider<'_, R>
 {
+    fn eco_roof_water(
+        &mut self,
+    ) -> &mut crate::heat_balance::ordinary_hvac_manager::water_manager::SourceWaterManager {
+        &mut self.hvac.ancillary.water
+    }
+
     fn manage_air_heat_balance(
         &mut self,
         surface: &mut OrdinarySurfaceInitialization,
@@ -110,6 +116,7 @@ impl<H: SourceOutputFileHost, D: SourceOutputDictionaryHost, R: SourceHvacRemain
         }
         let mut children = SourceHvacProviderHost {
             output: SourceHvacOutputContext {
+                eco_roof: &*o.eco_roof,
                 registration: o.registration,
                 report_flags: o.report_flags,
                 output_control: o.output_control,

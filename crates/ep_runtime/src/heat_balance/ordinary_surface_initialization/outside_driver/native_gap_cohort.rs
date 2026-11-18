@@ -542,7 +542,7 @@ impl Factory {
             clock: &self.clock,
             environment: &self.environment,
             convection: &mut self.convection,
-            input: &self.input,
+            input: &mut self.input,
             reports: &self.reports,
             scan: &mut self.scan,
             carroll_method: false,

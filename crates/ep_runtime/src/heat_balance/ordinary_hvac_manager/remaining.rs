@@ -70,6 +70,7 @@ struct LiveReadView<'a> {
     nodes: &'a OrdinaryEquipment,
     gains: &'a crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains,
     weather_outputs: Option<&'a dyn SourceRealOutputOwners>,
+    eco_roof: &'a crate::weather::day::source_current_weather::SourceEcoRoofData,
     schedules: &'a SelectedScheduleManager,
     curves: &'a crate::heat_balance::setup_postludes::SelectedCurves,
     surface: &'a dyn SourceRealOutputOwners,
@@ -89,6 +90,7 @@ impl SourceRealOutputOwners for LiveReadView<'_> {
         match target {
             #[cfg(all(test, feature = "native-controlled-air-cohort"))]
             T::CohortReal { .. } => Err(OrdinaryRadiationUnavailable::StorageDomain.into()),
+            T::EcoRoof { .. } => self.eco_roof.real_output(target),
             T::InternalGain { .. } => self.gains.real_output(target),
             T::Node { .. } | T::PurchasedAir { .. } => self.nodes.real_output(target),
             T::Weather { .. } => self
@@ -121,6 +123,7 @@ struct LiveReadFields<'a> {
     nodes: &'a OrdinaryEquipment,
     gains: &'a crate::heat_balance::ctf_initialization_context::internal_heat_gains_input::SelectedInternalHeatGains,
     weather_outputs: Option<&'a dyn SourceRealOutputOwners>,
+    eco_roof: &'a crate::weather::day::source_current_weather::SourceEcoRoofData,
     schedules: &'a SelectedScheduleManager,
     curves: &'a crate::heat_balance::setup_postludes::SelectedCurves,
     arrays: &'a SourceSurfaceHeatBalanceArrays,
@@ -175,6 +178,7 @@ impl LiveReadFields<'_> {
             weather_outputs: self.weather_outputs,
             schedules: self.schedules,
             curves: self.curves,
+            eco_roof: self.eco_roof,
             surface: &surface,
             solar: &solar,
             air: &air,
@@ -205,6 +209,7 @@ impl SourceOrdinaryHvacRemaining {
             weather_outputs: None,
             schedules: o.schedules,
             curves: output.curves,
+            eco_roof: output.eco_roof,
             arrays: o.surface_arrays,
             surface_heat_emission: o.surface_heat_emission,
             geometry: o.geometry,
@@ -359,6 +364,7 @@ impl<
                     weather_outputs: None,
                     schedules: o.schedules,
                     curves: output.curves,
+                    eco_roof: output.eco_roof,
                     arrays: o.surface_arrays,
                     surface_heat_emission: o.surface_heat_emission,
                     geometry: o.geometry,

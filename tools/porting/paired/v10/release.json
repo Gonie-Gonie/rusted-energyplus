@@ -1,0 +1,378 @@
+{
+  "schema": "paired.Release.v10",
+  "version": 10,
+  "profile": "ideal_loads.oa_topology.v1",
+  "files": {
+    "__main__.py": {
+      "path": "tools/porting/paired/v10/__main__.py",
+      "sha256": "42c2bed3a01e3a38d9bfebfbb3273dd509f7dfd916fc5df7b16c5949adcf4abd",
+      "bytes": 11065
+    },
+    "contracts.py": {
+      "path": "tools/porting/paired/v10/contracts.py",
+      "sha256": "ca3a47c6c78533290e8889ddddf4b39fdb1e8a534c82e5898be69fa862e5e078",
+      "bytes": 123645
+    },
+    "catalogue.py": {
+      "path": "tools/porting/paired/v4/catalogue.py",
+      "sha256": "6890d94d49b00b5e25a563bd83cfd0d22f5b2235b2d9d341cde7a8053cc95569",
+      "bytes": 71637
+    },
+    "runner.py": {
+      "path": "tools/porting/paired/v10/runner.py",
+      "sha256": "f0cb54a00230e821099c0ca36bca4282fe88f6fdba8147963f99bcd73ded6014",
+      "bytes": 29556
+    },
+    "common116.py": {
+      "path": "tools/porting/paired/v1/common116.py",
+      "sha256": "684f119b048917f36aec70288990b9c1ef2500b4c72c5490b83828e1c448caec",
+      "bytes": 23372
+    }
+  },
+  "recorder": {
+    "path": "tools/porting/record_command.py",
+    "sha256": "3dbaf8f78af809a6c11e195800c9a04d5ef961ff6ff49d567fc05cd4c4ee0c32",
+    "bytes": 11614
+  },
+  "scientific_fields": [
+    "controls",
+    "additional_output_controls",
+    "new_exhaust_node",
+    "new_target_list",
+    "nodelist_order",
+    "new_return_node",
+    "new_return_list",
+    "original_return_node",
+    "return_nodes_original_order",
+    "new_basis_name",
+    "new_basis_members",
+    "raw_basis_members",
+    "return_fraction_schedule",
+    "public_return_flow_gate",
+    "physical_inlet_raw_name",
+    "physical_inlet_public_name",
+    "IdealLoads_raw_name",
+    "IdealLoads_public_name",
+    "selected_supply_list_raw_name",
+    "current_Source_primary_review",
+    "new_schedule_name",
+    "new_output_name",
+    "cooling_public_gates",
+    "heating_availability_public_gates",
+    "winter_weather_activation_supplement",
+    "actual_summary_contract",
+    "full_clock_and_activation_contract",
+    "ordered_environment_clock_basis",
+    "warning_phase_contract",
+    "heating_efficiency_policy_index",
+    "heating_availability_policy_index",
+    "new_heating_availability_schedule",
+    "new_heating_efficiency_schedule",
+    "heating_fuel_public_gates",
+    "structural_prediction",
+    "outdoor_air_method",
+    "outdoor_air_node_name",
+    "DSOA_name",
+    "public_outdoor_air_mixing_gate",
+    "physical_output_requests",
+    "primary_pins",
+    "psychrometric_primary",
+    "primary"
+  ],
+  "constant_scientific_fields": [
+    "controls",
+    "additional_output_controls",
+    "new_exhaust_node",
+    "new_target_list",
+    "nodelist_order",
+    "new_return_node",
+    "new_return_list",
+    "original_return_node",
+    "return_nodes_original_order",
+    "new_basis_name",
+    "new_basis_members",
+    "raw_basis_members",
+    "return_fraction_schedule",
+    "public_return_flow_gate",
+    "physical_inlet_raw_name",
+    "physical_inlet_public_name",
+    "IdealLoads_raw_name",
+    "IdealLoads_public_name",
+    "selected_supply_list_raw_name",
+    "new_schedule_name",
+    "new_output_name",
+    "cooling_public_gates",
+    "heating_availability_public_gates",
+    "winter_weather_activation_supplement",
+    "actual_summary_contract",
+    "full_clock_and_activation_contract",
+    "ordered_environment_clock_basis",
+    "warning_phase_contract",
+    "heating_efficiency_policy_index",
+    "heating_availability_policy_index",
+    "new_heating_availability_schedule",
+    "new_heating_efficiency_schedule",
+    "heating_fuel_public_gates",
+    "outdoor_air_method",
+    "outdoor_air_node_name",
+    "DSOA_name",
+    "public_outdoor_air_mixing_gate",
+    "physical_output_requests"
+  ],
+  "constant_scientific_sha256": "5001fea5f9aa3b6b98d6bd3df47dcd6b72da725f249f2f3d98f3efd6a7be5536",
+  "retained_scientific_fields": [
+    "controls",
+    "additional_output_controls",
+    "new_exhaust_node",
+    "new_target_list",
+    "nodelist_order",
+    "new_return_node",
+    "new_return_list",
+    "original_return_node",
+    "return_nodes_original_order",
+    "new_basis_name",
+    "new_basis_members",
+    "raw_basis_members",
+    "return_fraction_schedule",
+    "public_return_flow_gate",
+    "physical_inlet_raw_name",
+    "physical_inlet_public_name",
+    "IdealLoads_raw_name",
+    "IdealLoads_public_name",
+    "selected_supply_list_raw_name",
+    "current_Source_primary_review",
+    "new_schedule_name",
+    "new_output_name",
+    "cooling_public_gates",
+    "heating_availability_public_gates",
+    "winter_weather_activation_supplement",
+    "actual_summary_contract",
+    "full_clock_and_activation_contract",
+    "ordered_environment_clock_basis",
+    "warning_phase_contract",
+    "heating_efficiency_policy_index",
+    "heating_availability_policy_index",
+    "new_heating_availability_schedule",
+    "new_heating_efficiency_schedule",
+    "heating_fuel_public_gates",
+    "structural_prediction",
+    "outdoor_air_method",
+    "outdoor_air_node_name",
+    "DSOA_name",
+    "public_outdoor_air_mixing_gate",
+    "physical_output_requests"
+  ],
+  "policy": {
+    "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/derived158-policy.json",
+    "sha256": "90ebe10b8759eec4fe6f7d575c6b0976d6b1673f4ebb7fb382320b6b0350d151",
+    "bytes": 43660
+  },
+  "baseline_input": {
+    "path": ".runtime/object-expansion/unit144-prep/basic-positive-OA-six-case-input-proposal01/SUM/input.epJSON",
+    "sha256": "77ef04a141fd87bdb12bb600accfcfad7c5f25d297d8023013d7578e75359615",
+    "bytes": 101674
+  },
+  "original_exhaust_recipe": {
+    "path": ".runtime/object-expansion/unit130-prep/science-final01/POSITIVE.recipe.json",
+    "sha256": "80248e6cc3e798f6229265859fa291ef0e9cdaa7db72e9b99e0ccc7626cd2f20",
+    "bytes": 46157
+  },
+  "counts": {
+    "output_variable_requests": 151,
+    "meter_file_only_requests": 2,
+    "ESO_series": 156,
+    "MTR_series": 2,
+    "total_series": 158,
+    "variable_values": 74880,
+    "meter_values": 240,
+    "total_values": 75120,
+    "DesignDays": 5,
+    "reporting_hours": 120,
+    "zone_steps_per_variable": 480,
+    "meter_hour_samples": 120,
+    "batch_cases": 1,
+    "batch_values": 75120
+  },
+  "gate_counts": {
+    "engine": 12,
+    "paired": 8,
+    "exports": 2
+  },
+  "full_retained_migration_units": [],
+  "partial_shared_kernel_units": [],
+  "release_self_hash_in_inventory": false,
+  "gate_ids": {
+    "engine": [
+      "actual_status",
+      "actual_cen",
+      "scheduled_setpoint",
+      "actual_exhaust",
+      "public_return_flow",
+      "public_cooling_availability",
+      "public_heating_availability",
+      "public_heating_fuel_efficiency",
+      "winter_weather_activation",
+      "adaptive_summary",
+      "error_diagnostics",
+      "public_outdoor_air_mixing"
+    ],
+    "paired": [
+      "status_arrays_exact",
+      "warmup_days_exact",
+      "whole_BND_body_exact",
+      "whole_table_exact",
+      "warning_semantics_exact",
+      "ancillary",
+      "actual_Source_epJSON_input_projection",
+      "Source_scope_and_run_summary"
+    ],
+    "exports": [
+      "eso",
+      "mtr"
+    ]
+  },
+  "frozen_v1_release": {
+    "path": "tools/porting/paired/v1/release.json",
+    "sha256": "bc74f5e874b22bfb373ff2bcda55c8961ab078c284f774fe85276b64332cff61",
+    "bytes": 7167
+  },
+  "structure_schema": "paired.OATopologyStructure.v1",
+  "Source_metadata_schema": 2,
+  "Source_evidence_schema": 3,
+  "QA_descriptor_schema": "paired.SourceQAProfile.v1",
+  "QA_binding_schema": "paired.SourceQAProfileBinding.v1",
+  "qa_reuse_mode": "disabled",
+  "compatible_parent_releases": [
+    {
+      "path": "tools/porting/paired/v5/release.json",
+      "sha256": "89aabe3af3993118c4f0f38c073648d746e424ed4d4a27ccdfcde78a8c5953ea",
+      "bytes": 8924
+    },
+    {
+      "path": "tools/porting/paired/v6/release.json",
+      "sha256": "fad05d195e3969372afbcbff8451aff70b70484e3b12683c1890c51ac5c01754",
+      "bytes": 9106
+    },
+    {
+      "path": "tools/porting/paired/v7/release.json",
+      "sha256": "22b0757b755b71403d2bf5bd65b1a25b647b36c790c8477e96a4fdd622b7de15",
+      "bytes": 10330
+    },
+    {
+      "path": "tools/porting/paired/v8/release.json",
+      "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+      "bytes": 11634
+    }
+  ],
+  "frozen_v2_release": {
+    "path": "tools/porting/paired/v2/release.json",
+    "sha256": "9de2f4016a3081c070dacc8144788444ce817c2d23ed84f051405ef95563c3fa",
+    "bytes": 8007
+  },
+  "frozen_v3_release": {
+    "path": "tools/porting/paired/v3/release.json",
+    "sha256": "7db47ee8c24d7742e8f69317876135515602b37bd059d6b529de42b7278adfd0",
+    "bytes": 7398
+  },
+  "tools": {
+    "source_production.py": {
+      "path": "tools/porting/paired/v10/source_production.py",
+      "sha256": "3b013a97b847d9e3e3f2d8504487e82118f8fc664db12cbb4f05ada7e75efd95",
+      "bytes": 19725
+    },
+    "coordinate.py": {
+      "path": "tools/porting/paired/v10/coordinate.py",
+      "sha256": "d1e116b976320e6e71d238bddc0021ba13ae45b809e64f2e5587e3f0e19f9430",
+      "bytes": 5953
+    },
+    "publish.py": {
+      "path": "tools/porting/paired/v10/publish.py",
+      "sha256": "c3dd62cbed644f2d96865622566b1423c052cde375a2161cf46396502ea97076",
+      "bytes": 23332
+    }
+  },
+  "frozen_v4_release": {
+    "path": "tools/porting/paired/v4/release.json",
+    "sha256": "a68819407a41647cb506cc9a959242e0b592073e7b043c9c68bfdeb7ce4eb8f5",
+    "bytes": 8742
+  },
+  "frozen_v5_release": {
+    "path": "tools/porting/paired/v5/release.json",
+    "sha256": "89aabe3af3993118c4f0f38c073648d746e424ed4d4a27ccdfcde78a8c5953ea",
+    "bytes": 8924
+  },
+  "frozen_v6_release": {
+    "path": "tools/porting/paired/v6/release.json",
+    "sha256": "fad05d195e3969372afbcbff8451aff70b70484e3b12683c1890c51ac5c01754",
+    "bytes": 9106
+  },
+  "normalization_validation_epoch": {
+    "schema": "paired.NormalizationValidationEpoch.v1",
+    "owner": "authority_from_evidence",
+    "lifetime": "one_invocation_only",
+    "stable_read_only_path_layout_required": true,
+    "stable_pinned_evidence_required": true,
+    "path_resolution": "first_observation_per_logical_name",
+    "JSON_parse_key": "actual_read_SHA256_and_length",
+    "Rust_mask_key": "exact_authenticated_source_text",
+    "bytes_authentication": "fresh_at_every_existing_auth_call",
+    "current_Source_membership_and_executable_checks": "fresh_existing_inspect_snapshot_and_command_boundaries",
+    "cross_invocation_actor_or_command_reuse": false,
+    "concurrent_path_replacement_or_ABA": "unsupported",
+    "success_cleanup": "clear_close_detach",
+    "exception_lifetime": "unreturned_local_or_traceback_only_no_prompt_erasure_guarantee"
+  },
+  "frozen_v7_release": {
+    "path": "tools/porting/paired/v7/release.json",
+    "sha256": "22b0757b755b71403d2bf5bd65b1a25b647b36c790c8477e96a4fdd622b7de15",
+    "bytes": 10330
+  },
+  "quality_preflight_observation_epoch": {
+    "schema": "paired.QAPreflightObservationEpoch.v1",
+    "owner": "source_production.main_quality_preflight",
+    "lifetime": "one_invocation_read_only_prefix_until_first_record",
+    "stable_read_only_path_layout_required": true,
+    "stable_pinned_evidence_required": true,
+    "observations": "existing_path_JSON_Rust_text_memo_only",
+    "per_stage_and_binding_snapshot_tables": "independent",
+    "bytes_authentication": "fresh_at_every_existing_auth_call",
+    "current_Source_checks": "no_epoch_for_source_ref_or_snapshot",
+    "cleanup": "close_clear_setNone_detach_before_every_record_and_input_authentication",
+    "build_and_evidence_epoch": null,
+    "after_first_record_epoch": null,
+    "cross_invocation_actor_or_command_reuse": false,
+    "concurrent_path_replacement_or_ABA": "unsupported",
+    "exception_lifetime": "unreturned_local_or_traceback_only_no_prompt_erasure_guarantee"
+  },
+  "frozen_v8_release": {
+    "path": "tools/porting/paired/v8/release.json",
+    "sha256": "fa2d45b0ab6696e726f97ad1555589d138112ab151f0f753dc0b15b9ab476dc0",
+    "bytes": 11634
+  },
+  "Source_recorder_invocation": {
+    "schema": "paired.SourceRecorderInvocation.v1",
+    "owner": "source_production.main.record",
+    "invocation": "fixed_trusted_runpy_same_process",
+    "recorder_schema": "recorded-porting-command.v1",
+    "recorder": "tools/porting/record_command.py",
+    "recorder_bytes": "unchanged_frozen_v8_recorder",
+    "recorder_arguments": "full_real_sys.argv_with_every_ordered_explicit_input",
+    "recorder_OS_subprocess_created": false,
+    "command_launch": "unchanged_recorder_subprocess.run",
+    "Python_preconditions": [
+      "assertions_enabled",
+      "utf8_mode_1",
+      "dont_write_bytecode_true"
+    ],
+    "stdin_precondition": "producer_outer_OS_stdin_DEVNULL_inherited_by_unchanged_recorder_command_child",
+    "stdin_precondition_runtime_enforced": false,
+    "environment": "temporary_exact_prior_child_env_including_PATH_restored_in_finally",
+    "arguments_restoration": "original_sys.argv_object_restored_in_finally",
+    "diagnostic_print_capture": "UTF8_text_newline_empty_exclusive_recorder.stdout_and_recorder.stderr",
+    "command_stdout_stderr": "unchanged_binary_recorder_owned_files",
+    "exit": "integer_SystemExit_code_only_other_SystemExit_failure_no_return_is_error",
+    "fresh_input_authentication": "all_existing_ordered_leaf_auth_calls_after_epoch_close_unchanged",
+    "epoch_cleanup": "close_clear_setNone_detach_before_input_authentication",
+    "schema_science_actor_or_gate_change": false
+  }
+}

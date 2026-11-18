@@ -21,6 +21,7 @@ impl SourceWaterManager {
         registry: &PredefinedRegistry,
         table: &mut PredefinedStringTable,
         control: &SelectedHeatBalanceInputState,
+        eco_roof: &crate::weather::day::source_current_weather::SourceEcoRoofData,
     ) -> Result<(), Error> {
         const MONTHS: [&str; 12] = [
             "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -65,12 +66,14 @@ impl SourceWaterManager {
         }
         for construction in &control.construction_usage {
             if construction.type_is_eco_roof {
-                // This selected EcoRoof compartment has only the genuine
-                // CurrentPrecipitation member, not MonthlyIrrigation. Preserve
-                // every earlier table write and stop before the first read.
-                return Err(Error::Unavailable(
-                    "actual positive EcoRoof MonthlyIrrigation1710",
-                ));
+                for (i, &month) in MONTHS.iter().enumerate() {
+                    table.fixed_real_entry_2(
+                        column(registry, "pdchMonthlyTotalIrrDep")?,
+                        month,
+                        eco_roof.monthly_irrigation[i],
+                    )?;
+                }
+                break;
             }
         }
         Ok(())
