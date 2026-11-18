@@ -54,6 +54,46 @@ class ComparisonBoundaryTests(unittest.TestCase):
             with self.subTest(command=changed), self.assertRaises(ValueError):
                 e.native_files(changed, e.ROOT)
 
+        # Public metadata boundaries only; no kernel, manifest or engine is run.
+        import hashlib
+        import check_completed_reported_streams_v2 as v2
+
+        allowed = {"--weather", "--output-directory", "--output-prefix"}
+        self.assertEqual(v2.options(cmd, allowed), ({"--weather": "weather.epw", "--output-directory": "out", "--output-prefix": "chosen"}, ["input.idf"]))
+        for changed in (cmd + ["--output-prefix", "again"], cmd + ["--unknown", "value"], ["energyplus", "--weather"], cmd + [True]):
+            with self.subTest(v2_command=changed), self.assertRaises(ValueError):
+                v2.options(changed, allowed)
+
+        document = {"schema": "reported-stream-policy.v1", "variables": [
+            {"key": "*", "variable": "Surface Outside Face Temperature", "units": "C", "frequency": "TimeStep", "atol": 0, "rtol": 0, "rmse_max": 0},
+            {"key": "*", "variable": "Surface Inside Face Temperature", "units": "C", "frequency": "TimeStep", "atol": 0, "rtol": 0, "rmse_max": 0}],
+            "meters": [{"meter": "Heating:EnergyTransfer", "units": "J", "frequency": "Hourly", "atol": 0, "rtol": 0, "rmse_max": 0}]}
+        with tempfile.TemporaryDirectory() as td:
+            path = (Path(td) / "policy.json").resolve()
+            name = path.relative_to(e.ROOT).as_posix() if path.is_relative_to(e.ROOT) else path.as_posix()
+            raw = json.dumps(document).encode("utf8")
+            path.write_bytes(raw)
+            pin = {"path": name, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+            self.assertEqual(v2.auth(pin), path)
+            self.assertEqual(v2.policy(pin), document)
+            for changed in (dict(pin, bytes=True), dict(pin, path=name.rsplit("/", 1)[0] + "/./policy.json")):
+                with self.subTest(v2_reference=changed), self.assertRaises(ValueError):
+                    v2.auth(changed)
+            path.write_bytes(raw + b" ")
+            with self.assertRaisesRegex(ValueError, "Changed referenced file"):
+                v2.auth(pin)
+            for group, field, value in (("variables", "atol", False), ("variables", "rtol", float("nan")),
+                                        ("meters", "rmse_max", float("inf")), ("meters", "atol", -1),
+                                        ("variables", "frequency", "Daily"), ("variables", "frequency", "Hourly"),
+                                        ("meters", "frequency", "TimeStep")):
+                changed = json.loads(json.dumps(document))
+                changed[group][0][field] = value
+                raw = json.dumps(changed).encode("utf8")
+                path.write_bytes(raw)
+                pin = {"path": name, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+                with self.subTest(v2_policy=(group, field, value)), self.assertRaises(ValueError):
+                    v2.policy(pin)
+
     def test_changed_idf_is_rejected_before_any_comparison(self):
         case = json.loads(e.DEFAULT_CASE.read_text(encoding="utf8"))
         with tempfile.TemporaryDirectory() as td:
