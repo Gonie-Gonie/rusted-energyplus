@@ -6676,6 +6676,65 @@ fn building_surface_ground_months_preserve_numbers_defaults_and_type_boundary() 
 fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
     const FAMILY: &str = "Material:AirGap";
     let weather = single_day_weather_fixture();
+    // U07 shares one genuine Source original-IDF load/compile with the retained custody checks.
+    let source_idf_roof = "Material:RoofVegetation";
+    let source_idf_z_name = "Z UNUSED DEFAULT ROOF VEGETATION";
+    let source_idf_a_name = "A EOF DEFAULT ROOF VEGETATION";
+    let source_idf_home = std::env::temp_dir().join(format!(
+        "ep-run-source-roof-original-idf-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("Source IDF fixture clock")
+            .as_nanos()
+    ));
+    std::fs::create_dir(&source_idf_home).expect("Source IDF fixture directory");
+    let source_idf_epjson_path = source_idf_home.join("converted.epJSON");
+    let source_idf_original_path = source_idf_home.join("original.idf");
+    std::fs::write(
+        &source_idf_epjson_path,
+        r#"{"Zone":{"Zone":{}},"Material:RoofVegetation":{"A EOF DEFAULT ROOF VEGETATION":{},"Z UNUSED DEFAULT ROOF VEGETATION":{}}}"#,
+    )
+    .expect("coherent Name-only converted-shape Source input");
+    std::fs::write(
+        &source_idf_original_path,
+        "Zone,Zone;Material:RoofVegetation,Z UNUSED DEFAULT ROOF VEGETATION;Material:RoofVegetation,A EOF DEFAULT ROOF VEGETATION",
+    )
+    .expect("Z semicolon then A literal EOF without terminal CRLF");
+    let source_idf_raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+        &source_idf_epjson_path,
+        &source_idf_original_path,
+    )
+    .expect("actual Source file loader and staged declaration overlay");
+    std::fs::remove_file(&source_idf_epjson_path).expect("remove Source converted fixture");
+    std::fs::remove_file(&source_idf_original_path).expect("remove Source original fixture");
+    std::fs::remove_dir(&source_idf_home).expect("remove empty Source fixture directory");
+    let source_idf_compiled = ep_compiler::compile_raw_model_for_source(&source_idf_raw);
+    let source_idf_model = source_idf_compiled
+        .model
+        .as_ref()
+        .expect("same Source IDF typed material identities");
+    let source_idf_z = source_idf_model
+        .material_names
+        .resolve(source_idf_z_name)
+        .expect("same original Z typed ID");
+    let source_idf_a = source_idf_model
+        .material_names
+        .resolve(source_idf_a_name)
+        .expect("same original A typed ID");
+    let source_idf_order = source_idf_raw
+        .source_ordered_instances(source_idf_roof)
+        .expect("actual recovered Source Roof declaration order");
+    let mut source_idf_missing_count = source_idf_raw.clone();
+    let source_idf_removed_count = source_idf_missing_count
+        .objects
+        .get_mut(&ep_raw_model::ObjectType(source_idf_roof.into()))
+        .expect("actual Source Roof family")
+        .get_mut(&ep_raw_model::ObjectName(source_idf_a_name.into()))
+        .expect("actual final EOF A row")
+        .fields
+        .remove(&ep_raw_model::FieldName("idf_max_fields".into()))
+        .expect("remove only the actual final-row max-field custody");
     for scope in [PortingScope::A, PortingScope::B] {
         let mut value = input(scope);
         value["Material"] = json!({"Solid":{"roughness":"MediumRough","thickness":0.1,"conductivity":1.7,"density":2200,"specific_heat":840}});
@@ -14442,12 +14501,58 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
             )
             .expect("matched Zone and Name plus18 blank Roof operands");
             let idf_legacy = ep_compiler::compile_raw_model(&roof_idf);
-            // U07: matched SourceA differs only by this family; matched IDF is Legacy-positive before its format fence.
+            let mut source_idf_ip =
+                crate::ordinary_input_processor::resolve_source_b(&source_idf_raw)
+                    .expect("selected A/B IP from the same real loaded Source IDF");
+            let source_idf_args = source_idf_ip
+                .get_object_def_max_args(ROOF)
+                .expect("observed fixed Roof definition capacity");
+            let source_idf_total = source_idf_args.total().expect("fixed definition total");
+            let source_idf_names = source_idf_ip
+                .source_raw_object_names(ROOF)
+                .expect("same actual Source IDF order");
+            let source_idf_projection =
+                crate::ordinary_material_input::resolve_source(&source_idf_raw, &source_idf_ip)
+                    .expect("projection of the same Source Raw/IP");
+            let source_idf_generic_negative =
+                crate::ordinary_equipment_input::resolve_source_b(&roof_idf);
+            let source_idf_count_negative =
+                crate::ordinary_equipment_input::resolve_source_b(&source_idf_missing_count);
+            // U07: SourceA and real file custody; generic IDF stays Legacy-positive and Source-negative.
             assert!(crate::ordinary_equipment_input::resolve_source_a(&source_a_base).is_ok()
-                && crate::ordinary_equipment_input::resolve_source_a(&a_with_roof).is_err_and(|e|e=="ordinary equipment excludes positive family Material:RoofVegetation")
+                && crate::ordinary_equipment_input::resolve_source_a(&a_with_roof).is_ok()
+                && crate::ordinary_equipment_input::resolve_source_a(&source_idf_raw).is_ok()
                 && !roof_idf.is_epjson() && !idf_legacy.has_errors()
                 && idf_legacy.model.as_ref().is_some_and(|model|model.materials.len()==1 && model.materials[0].kind()==ep_model::MaterialKind::RoofVegetation)
-                && crate::ordinary_equipment_input::resolve_source_b(&roof_idf).is_err_and(|e|e=="Source unused RoofVegetation requires direct epJSON"));
+                && !source_idf_raw.is_epjson() && source_idf_raw.has_idf_declaration_order(ROOF)
+                && source_idf_order.len()==2 && source_idf_order[0].0.0==source_idf_z_name && source_idf_order[1].0.0==source_idf_a_name
+                && matches!(source_idf_order[0].1.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),Some(ep_raw_model::RawValue::Number(token)) if token=="19")
+                && matches!(source_idf_order[1].1.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),Some(ep_raw_model::RawValue::Number(token)) if token=="0")
+                && matches!(source_idf_order[0].1.fields.get(&ep_raw_model::FieldName("idf_max_extensible_fields".into())),Some(ep_raw_model::RawValue::Number(token)) if token=="0")
+                && matches!(source_idf_order[1].1.fields.get(&ep_raw_model::FieldName("idf_max_extensible_fields".into())),Some(ep_raw_model::RawValue::Number(token)) if token=="0")
+                && !source_idf_compiled.has_errors() && source_idf_z!=source_idf_a
+                && source_idf_model.material_names.is_source_exact_namespace()
+                && source_idf_model.materials.len()==2
+                && source_idf_model.materials[0].id==source_idf_z && source_idf_model.materials[0].name.0==source_idf_z_name
+                && source_idf_model.materials[1].id==source_idf_a && source_idf_model.materials[1].name.0==source_idf_a_name
+                && source_idf_model.materials[0].kind()==ep_model::MaterialKind::RoofVegetation
+                && source_idf_model.materials[1].kind()==ep_model::MaterialKind::RoofVegetation
+                && source_idf_model.ctf_report_names.materials.len()==2
+                && source_idf_model.ctf_report_names.materials[0]==(source_idf_z,source_idf_z_name.into())
+                && source_idf_model.ctf_report_names.materials[1]==(source_idf_a,source_idf_a_name.into())
+                && (source_idf_args.alphas,source_idf_args.numerics,source_idf_total)==(4,15,19)
+                && source_idf_ip.get_num_objects_found(ROOF)==2 && source_idf_names.len()==2
+                && source_idf_names[0]==source_idf_z_name && source_idf_names[1]==source_idf_a_name
+                && !source_idf_projection.source_is_epjson && source_idf_projection.roof_vegetation.len()==2
+                && source_idf_projection.roof_vegetation[0].object_name==source_idf_z_name
+                && source_idf_projection.roof_vegetation[1].object_name==source_idf_a_name
+                && source_idf_projection.roof_vegetation[0].idf_max_fields==Some(19)
+                && source_idf_projection.roof_vegetation[1].idf_max_fields==Some(0)
+                && source_idf_projection.roof_vegetation[0].fields.is_empty()
+                && source_idf_projection.roof_vegetation[1].fields.is_empty()
+                && matches!(&source_idf_removed_count,ep_raw_model::RawValue::Number(token) if token=="0")
+                && source_idf_generic_negative.is_err_and(|e|e=="Source RoofVegetation original IDF requires recovered declaration order")
+                && source_idf_count_negative.is_err_and(|e|e=="Source RoofVegetation original IDF requires idf_max_fields for every object"));
             // U08: invalid original names cannot fall through either Source loader; bounded values do not license UIntMAX.
             assert!(
                 ["", "\n", " \t\r\u{c}", "BAD\nNAME"].iter().all(|name| {

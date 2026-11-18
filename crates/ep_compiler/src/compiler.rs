@@ -9680,7 +9680,14 @@ impl<'a> Compiler<'a> {
     // Selection only: actual EcoRoof getter owns warning, resistance and late moisture reset.
     fn source_unused_roof_vegetation(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || (!self.raw_model.is_epjson()
+                && (!self
+                    .raw_model
+                    .has_idf_declaration_order("Material:RoofVegetation")
+                    || !matches!(
+                        object.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),
+                        Some(RawValue::Number(token)) if token.parse::<usize>().is_ok()
+                    )))
             || name.contains('\n')
             || name
                 .bytes()
@@ -9704,9 +9711,49 @@ impl<'a> Compiler<'a> {
         const INITIAL_MOISTURE_FIELD: &str =
             "initial_volumetric_moisture_content_of_the_soil_layer";
 
+        let source_idf_roof = self.source_file_declarations
+            && !self.raw_model.is_epjson()
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(OBJECT_TYPE.into()))
+                .is_some_and(|rows| !rows.is_empty());
+        if source_idf_roof && !self.raw_model.has_idf_declaration_order(OBJECT_TYPE) {
+            self.error(
+                "MissingOriginalSourceRoofVegetationOrder",
+                OBJECT_TYPE,
+                None,
+                None,
+                "Source RoofVegetation original IDF requires recovered declaration order".into(),
+            );
+            return;
+        }
+        if source_idf_roof
+            && self
+                .raw_model
+                .objects
+                .get(&ep_raw_model::ObjectType(OBJECT_TYPE.into()))
+                .is_some_and(|rows| {
+                    rows.values().any(|object| {
+                        !matches!(
+                            object.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),
+                            Some(RawValue::Number(token)) if token.parse::<usize>().is_ok()
+                        )
+                    })
+                })
+        {
+            self.error(
+                "MissingOriginalSourceRoofVegetationFieldCount",
+                OBJECT_TYPE,
+                None,
+                None,
+                "Source RoofVegetation original IDF requires idf_max_fields for every object"
+                    .into(),
+            );
+            return;
+        }
         for (name, object) in self.objects(OBJECT_TYPE) {
             if self.source_file_declarations
-                && self.raw_model.is_epjson()
                 && (name.contains('\n')
                     || name
                         .bytes()
@@ -11104,7 +11151,7 @@ impl<'a> Compiler<'a> {
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_window_gap(name, object));
         let blank_name = if self.source_file_declarations
-            && self.raw_model.is_epjson()
+            && (self.raw_model.is_epjson() || source_roof_vegetation_name)
             && (matches!(
                 object_type,
                 "WindowMaterial:Gas" | "WindowMaterial:GasMixture"
@@ -12058,7 +12105,6 @@ impl<'a> Compiler<'a> {
             };
             if matches!(material.definition, MaterialDefinition::RoofVegetation(_)) {
                 let source_roof_eligible = self.source_file_declarations
-                    && self.raw_model.is_epjson()
                     && model.material_names.is_source_exact_namespace()
                     && {
                         let mut source_names = model

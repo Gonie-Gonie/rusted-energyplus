@@ -468,7 +468,7 @@
       "Source191 fixed15-Float/three-String insertion holds991 parent numbers (1006total; canonical752+254/39alpha) and all requests/policies. Root reports one Native and one Source process with0reruns,158series/75120values and12+12+8+2 gates accepted. Whole19x11 public MaterialDetails cells are exact with all18 parent rows/order held. Public Roof row R0.3514/MediumSmooth/thickness0.1300/K0.370/density1130/Cp1230/absorptances0.93,0.73,0.77 joins actual Source Group8/id18/typed17/Rough3/NomR0.35135135135135137 bits3fd67c8a60dd67c9. Full-precision Native-private NomR or plant/soil state parity is not observed.",
       "Static48assert/6for/4Material/0Window/0newtestfn facts differ from actual8current/8total QA commands,0failed,4current/0historical/0reused bodies and falsegettercredit. Roof original typed outside_layer was corrected before QA; InputDATA01 zero-count patch failed frozen-ledger preflight and DATA02 changed context only. Both are retained static/DATA histories,not QA/build/engine failures. Source190 compiler QA failure remains unchanged in its historical case/build. The shared fourteen-family original-outside prototype remains ignored and unadopted; prior14 limitation is not closed by this Roof case.",
       "Six ordinary physics surfaces and ordinary Blind production remain required. Input62ObjectTypes,currentcombined122,retained116 and registry147 are distinct from127scientificRust+3derivation=130currentSourcecitations. This unused constructor/getter/common-report route does not admit active EcoRoof water/energy/soil evolution, Construction consumption, SourceA/IDF/Legacy changes, Native-private state, full-object or every-valid-combination parity.",
-      "The preceding Source191/193 strings retain their historical getter/report, QA, inventory and shared14 status. Source199 adds bounded active Source B direct-epJSON ordinary CTF evidence using the same retained Roof row and complete ordinary Construction recipe custody. One fresh fixed Simple Native/Source pair with zero reruns passes158series/75120values and all34gates under unchanged numerical/scientific policies; all reported Roof/meters are raw-exact, with only three HorizontalIR raw operands unequal by at most1.71e-13. Advanced passes all75120 comparisons under the unchanged numeric policy, with the same three tiny raw HorizontalIR differences. ERR/END match under the inherited program-version/elapsed-runtime boundary; Advanced remains unqualified at31/34gates because frozen v10 rejects its legitimate stability warning, so it adds zero qualifying cases or samples. No physics-failure or warning-waiver claim follows. Shared75QA/six failures/34existing-body executions have six current commands/three current bodies/31historical bodies, no reuse/getter/new-test credit. Original names/IDs/aliases and ordinary outside/ordered-layer/effective/legitimate-empty fallback custody remain; unsupported Construction families keep their gates. SourceA/original-IDF/Legacy, arbitrary values/combinations, Native-private state, annual-run and full-object support remain pending. Generated current combined123, retained current_object_union116 and registry147 remain distinct and unchanged."
+      "The preceding Source191/193 strings retain their historical getter/report, QA, inventory and shared14 status. Source199 retains the accepted fixed Simple Source B direct-epJSON ordinary CTF case; its v10 Advanced attempt remains historical at31/34gates with zero qualifying credit. Source200 separately accepts one fresh fixed Advanced direct-epJSON pair under the unchanged numerical policy and reviewed v11 typed warning contract:158series/75120values, all34gates, zero tolerance/RMSE failures, and three HorizontalIR raw/binary64 differences (max1.7053025658242404e-13; maxRMSE1.1309316871492875e-14). Reported Roof/meters are raw-exact. Complete ordinary Construction recipes and exact live Roof material/soil/water/energy ownership remain. Source200 also enables explicit Source A/B original-IDF Roof input/order/count/label custody; existing-body coverage checks B Raw/IP/typed identity and A Raw admission. That input/unit scope is not an accepted original-IDF physics pair, and no Window/Curve/Spectral IDF extension is promoted. Source200 has4current/7total QA commands, one failed pre-body compile and one current existing-body execution; no new test/getter/reuse credit. Legacy, arbitrary values/combinations, Native-private state, annual-run and full-object support remain pending. Combined123, retained current_object_union116 and registry147 remain distinct and unchanged."
     ],
     "WindowMaterial:Gap": [
       "Only original-valid unused Source B direct epJSON reaches the genuine4A2N/min0 WindowMaterial:Gap getter and its retained MaterialComplexWindowGap/MaterialGasMix row. Original schema kinds/bounds and SourceJsonNumber signed-effective operands remain distinct. Thickness is required and originally positive; Pressure has no original-schema positive bound, defaults to101325 and retains the real getter nonpositive diagnostic. Exact names, default/blank/used state, JSON-key scratch and Raw/IP/Source ordinal/global-ID/typed-ID/loader custody remain checked. Every raw or typed Construction layer reference is fenced; general typed/Legacy support is not promoted.",
@@ -13199,6 +13199,69 @@
           "path": ".runtime/porting/active-eco-roof/evidence06/source-evidence.json",
           "sha256": "5a1603d6221d99cb6a7bf09fe8a1ae03c44bdfdd75b41aa62193c4ac0c5f2d0b",
           "bytes": 142995
+        }
+      },
+      "active_eco_roof_advanced_and_original_idf_roof": {
+        "actual_quality": {
+          "path": ".runtime/porting/original-idf-roof/quality02/summary.json",
+          "sha256": "542bf3bc75264b537dae8640001e9ce146b0b52777bb8f5c38d9d61dba54a6a7",
+          "bytes": 1349
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/original-idf-roof/evidence01/quality-ledger.json",
+          "sha256": "8bd0e7dbbf3deaebe973fda4f18d830408f19bd97204872cdd96d19e2b981eee",
+          "bytes": 4103
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/original-idf-roof/quality02/quality-preparation.json",
+          "sha256": "73bbb43e908f0d698ca95dd80bbdb1a870991d019804ca390d5d5164ffe2f1fa",
+          "bytes": 16964
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/original-idf-roof/evidence01/source-authority.json",
+          "sha256": "e0610fddb0c1ba3c9580b94107d201e79ed33c64dd883391457ca7939cc3189d",
+          "bytes": 52348
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/porting/original-idf-roof/evidence01/independent-Source-review01.json",
+          "sha256": "7ccb1e31f6ae34267cd62b31f93838139abea331812430a5161067a9fd29d223",
+          "bytes": 9530
+        },
+        "total_actual_QA_commands": 7,
+        "current_QA_commands": 4,
+        "failed_QA_attempts": 1,
+        "current_test_body_executions": 1,
+        "historical_test_body_executions": 0,
+        "total_actual_test_body_executions": 1,
+        "distinct_existing_test_functions": 1,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "correction_reviews": [
+          {
+            "path": ".runtime/porting/original-idf-roof/correction01.json",
+            "sha256": "7545b9f81db1fb55e91ca75d0b1345bb3f4c2ca7d08762b84747801cbfc0e28b",
+            "bytes": 2715
+          }
+        ],
+        "actual_test_execution_evidence": {
+          "path": ".runtime/porting/original-idf-roof/evidence01/source-evidence.json",
+          "sha256": "b99970af9748e2a88dc24d17bb7456d1502d5de8b5f947ce86d5954cc17912de",
+          "bytes": 23495
+        },
+        "integration_attempt": {
+          "Root_copied_facts": {
+            "path": ".runtime/porting/original-idf-roof/integration01/Root-copied-integration-attempt-DATA01.json",
+            "sha256": "2de7e79d6611b44088d5d415f0d99fcd50803067df0b00836f8086e614491f4e",
+            "bytes": 2242
+          },
+          "workspace_passed": false,
+          "unresolved_assertions": 2,
+          "completed_whole_workspace": false,
+          "workspace_clippy_executed": false,
+          "outside_bounded_Source_QA_profile": true,
+          "qualification": "Root reports one whole-workspace test attempt exited101 after two existing compiler assertion failures (761passed); CODE audit/correction is pending and no cause is presumed. Workspace Clippy has not run. This attempt is separate from the Source200 four-command/seven-total QA profile and from its independently accepted34-gate Advanced case; no whole-workspace pass or added physical credit is claimed."
         }
       }
     },
@@ -88969,12 +89032,351 @@
           "new_test_functions": 0,
           "no_replay": true
         }
+      },
+      {
+        "group": "Material:RoofVegetation",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-source200-v11-active-eco-roof-advanced",
+        "case_kind": "ACTIVE_ECO_ROOF_ADVANCED",
+        "source_build": "source-original-idf-roof-vegetation",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/active-EcoRoof-Advanced-input-DRAFT01/input.epJSON",
+          "sha256": "e3132a494137407e7f13f8baec4762b58ec29d4a8fbcb8c41314a5b8dbf09f8b",
+          "bytes": 123493
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/native/command/receipt.json",
+          "sha256": "22c968f5e2a043a89004530b5d88aeaba1fdfe6e7f3f331711879b9a8de71b85",
+          "bytes": 337358
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/source/command/receipt.json",
+          "sha256": "74bbd27d3784ba36bb27db6917a12ebbb39ede08a63ebe7d1f3480a9a900b87c",
+          "bytes": 338686
+        },
+        "source_summary": {
+          "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/source/output/run-summary.json",
+          "sha256": "ef84cee9d568d0ef649c849056b6389962e0ceeada58997bbdc30a300717961c",
+          "bytes": 64359
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/49/4929881c1cbb5a4b152eb8e6c9a0f67c16a5296f3a2c4e46d309fdf4c5eddb3a",
+          "sha256": "4929881c1cbb5a4b152eb8e6c9a0f67c16a5296f3a2c4e46d309fdf4c5eddb3a"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/original-idf-roof/build01/frozen/eplus-rs.exe",
+          "sha256": "d25dd82613d2c2f4ad25c87bd6c24356531867efb98e5cf1511764bdada76a24",
+          "bytes": 84087266
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/original-idf-roof/build01/build/receipt.json",
+          "sha256": "fb324669cbb99c0da6709947417db2770d1db51eaa1fc7ef54d691d470d34f2f",
+          "bytes": 61100
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/readback.json",
+          "sha256": "e4252c5daa684aae129f4aeaf1c1fd69006bf0ca0d4837720cf0dec4bba63d6c",
+          "bytes": 537644
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/Root-scientific-review01.json",
+          "sha256": "91cbcdb65d506beb0161a86f33ebacbfe09616eaf6f5e74ac08992684f20eb41",
+          "bytes": 10925
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/case-config.json",
+          "sha256": "1f31282e8f954208b4066e5dd7c395c19e71fd11cd5df76d607a20f225afcec7",
+          "bytes": 141871
+        },
+        "coverage_kind": "active_eco_roof_advanced_and_original_idf_roof",
+        "public_response_summary": {
+          "Native": {
+            "warmup_days": [
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "series": 158,
+            "values": 75120,
+            "ASHRAE_pair_counts": {
+              "(-1, -1)": 288,
+              "(0, 0)": 73,
+              "(0, 1)": 20,
+              "(1, 1)": 99
+            },
+            "CEN_triple_counts": {
+              "(-1, -1, -1)": 288,
+              "(0, 0, 0)": 64,
+              "(0, 0, 1)": 14,
+              "(0, 1, 1)": 27,
+              "(1, 1, 1)": 87
+            },
+            "cooling": {
+              "off_potential_samples": 48,
+              "on_potential_samples": 336,
+              "positive_on_service_samples": 336
+            },
+            "heating": {
+              "winter_off_potential_samples": 12,
+              "winter_on_potential_samples": 24,
+              "winter_positive_on_service_samples": 24
+            },
+            "outdoor_air": {
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 228,
+              "mixed_humidity_response_samples": 360,
+              "activation_accepted": true
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "warning_accounting": {
+              "immediate_warning_heads": 7,
+              "uncounted_psychrometric_first_heads": 0,
+              "counted_immediate_warning_heads": 7,
+              "recurring_total": 0,
+              "completed": 7
+            },
+            "EcoRoof_AdvancedStability": {
+              "family": "EcoRoof.AdvancedStability.v1",
+              "count": 1,
+              "eligibility": {
+                "input": {
+                  "path": ".runtime/object-expansion/unit159-prep/active-EcoRoof-Advanced-input-DRAFT01/input.epJSON",
+                  "sha256": "e3132a494137407e7f13f8baec4762b58ec29d4a8fbcb8c41314a5b8dbf09f8b",
+                  "bytes": 123493
+                },
+                "ordinary_external_surfaces": [
+                  {
+                    "surface": "ROOF",
+                    "construction": "ACTIVE ECO ROOF CONSTRUCTION",
+                    "material": "ACTIVE ECO ROOF SIMPLE"
+                  }
+                ],
+                "material": "ACTIVE ECO ROOF SIMPLE",
+                "method": "ADVANCED",
+                "eligible": true
+              },
+              "effective_timesteps_per_hour": 4,
+              "effective_integer_minutes": 15,
+              "required_frequency": 32,
+              "reported_integer_tokens": [
+                "4",
+                "32"
+              ],
+              "branch": "le60",
+              "position": 1,
+              "immediate_continuations": [
+                "   **   ~~~   ** ...Entered Timesteps per hour=[4], Change to some value greater than or equal to [32] for assured stability.",
+                "   **   ~~~   ** ...Note that EnergyPlus has a maximum of 60 timesteps per hour",
+                "   **   ~~~   ** ...The program will continue, but if the simulation fails due to too low/high temperatures, instability here could be the reason."
+              ],
+              "recurring_count": 0,
+              "phase_from_head": "unobserved_untimestamped_family",
+              "trigger_from_input": "not_recomputed"
+            }
+          },
+          "Source": {
+            "warmup_days": [
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "series": 158,
+            "values": 75120,
+            "ASHRAE_pair_counts": {
+              "(-1, -1)": 288,
+              "(0, 0)": 73,
+              "(0, 1)": 20,
+              "(1, 1)": 99
+            },
+            "CEN_triple_counts": {
+              "(-1, -1, -1)": 288,
+              "(0, 0, 0)": 64,
+              "(0, 0, 1)": 14,
+              "(0, 1, 1)": 27,
+              "(1, 1, 1)": 87
+            },
+            "cooling": {
+              "off_potential_samples": 48,
+              "on_potential_samples": 336,
+              "positive_on_service_samples": 336
+            },
+            "heating": {
+              "winter_off_potential_samples": 12,
+              "winter_on_potential_samples": 24,
+              "winter_positive_on_service_samples": 24
+            },
+            "outdoor_air": {
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 228,
+              "mixed_humidity_response_samples": 360,
+              "activation_accepted": true
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "warning_accounting": {
+              "immediate_warning_heads": 7,
+              "uncounted_psychrometric_first_heads": 0,
+              "counted_immediate_warning_heads": 7,
+              "recurring_total": 0,
+              "completed": 7
+            },
+            "EcoRoof_AdvancedStability": {
+              "family": "EcoRoof.AdvancedStability.v1",
+              "count": 1,
+              "eligibility": {
+                "input": {
+                  "path": ".runtime/object-expansion/unit159-prep/active-EcoRoof-Advanced-input-DRAFT01/input.epJSON",
+                  "sha256": "e3132a494137407e7f13f8baec4762b58ec29d4a8fbcb8c41314a5b8dbf09f8b",
+                  "bytes": 123493
+                },
+                "ordinary_external_surfaces": [
+                  {
+                    "surface": "ROOF",
+                    "construction": "ACTIVE ECO ROOF CONSTRUCTION",
+                    "material": "ACTIVE ECO ROOF SIMPLE"
+                  }
+                ],
+                "material": "ACTIVE ECO ROOF SIMPLE",
+                "method": "ADVANCED",
+                "eligible": true
+              },
+              "effective_timesteps_per_hour": 4,
+              "effective_integer_minutes": 15,
+              "required_frequency": 32,
+              "reported_integer_tokens": [
+                "4",
+                "32"
+              ],
+              "branch": "le60",
+              "position": 1,
+              "immediate_continuations": [
+                "   **   ~~~   ** ...Entered Timesteps per hour=[4], Change to some value greater than or equal to [32] for assured stability.",
+                "   **   ~~~   ** ...Note that EnergyPlus has a maximum of 60 timesteps per hour",
+                "   **   ~~~   ** ...The program will continue, but if the simulation fails due to too low/high temperatures, instability here could be the reason."
+              ],
+              "recurring_count": 0,
+              "phase_from_head": "unobserved_untimestamped_family",
+              "trigger_from_input": "not_recomputed"
+            }
+          }
+        },
+        "effective_state": "One fresh fixed Source B direct-epJSON active EcoRoof Advanced ordinary CTF case, five design days and inherited151requests/158series/75120values; all34gates and unchanged numerical policies passed. All9reportedRoof and2meter series raw-exact. Three HorizontalIR operands differ by at most1.71e-13 within unchanged policy. Source200 also adds original-IDF Roof SourceA/B Raw/getter/typed admission verified by one existing unit body; this pair itself does not execute original-IDF or SourceA. No private Native soil/getter-state, annual, every-valid-combination or full-object equivalence claim.",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 3,
+          "parsed_binary64_unequal": 3,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.7053025658242404e-13,
+          "max_rmse_delta": 1.1309316871492875e-14
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v11/release.json",
+            "sha256": "b0222c884418cbad11e8478ff0942087b4897b9078c7746abbf27e8e50ad24af",
+            "bytes": 14731
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/binding.json",
+            "sha256": "b6f6e2d317f283bd7b1a7d39b9af71bcabc81e441caaf1865de122b33865184c",
+            "bytes": 1113
+          },
+          "case_config": {
+            "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/case-config.json",
+            "sha256": "1f31282e8f954208b4066e5dd7c395c19e71fd11cd5df76d607a20f225afcec7",
+            "bytes": 141871
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/original-idf-roof/evidence01/source-authority.json",
+            "sha256": "e0610fddb0c1ba3c9580b94107d201e79ed33c64dd883391457ca7939cc3189d",
+            "bytes": 52348
+          },
+          "completion": {
+            "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/completed.json",
+            "sha256": "18c9861b1e7b22686a4d5d5c63d5cd246e5fd9cf60176a47f0704d22eb891be0",
+            "bytes": 2270
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/verify-command/receipt.json",
+            "sha256": "00b2cbe5149ea2cad17c36822e87c1c0a15e4ee86bdd314e2525e7a3d88a6609",
+            "bytes": 338452
+          },
+          "Native_precheck": {
+            "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/native-precheck.json",
+            "sha256": "0d9855a94e03aa13d899133674076f73fcfeabe6ceacadc5078b2d582dc3319a",
+            "bytes": 21664
+          },
+          "Native_precheck_receipt": {
+            "path": ".runtime/porting/original-idf-roof/Advanced-runtime01/precheck-command/receipt.json",
+            "sha256": "0278850b8bdc15a9e27a45cd0e3a3458ae3c31f460a1653eb3cbbd21a65676fe",
+            "bytes": 337715
+          },
+          "actual_build": {
+            "path": ".runtime/porting/original-idf-roof/build01/build-row.json",
+            "sha256": "da8b3cdb900824931d9ac1269dc3bb486101b5dc6cd2a9974e5bd6d523cda014",
+            "bytes": 1332
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/original-idf-roof/quality02/summary.json",
+            "sha256": "542bf3bc75264b537dae8640001e9ce146b0b52777bb8f5c38d9d61dba54a6a7",
+            "bytes": 1349
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/original-idf-roof/evidence01/source-authority.json",
+            "sha256": "e0610fddb0c1ba3c9580b94107d201e79ed33c64dd883391457ca7939cc3189d",
+            "bytes": 52348
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true
+        },
+        "active_eco_roof_advanced": {
+          "method": "Advanced",
+          "active_material": "ACTIVE ECO ROOF SIMPLE",
+          "ordinary_construction": "ACTIVE ECO ROOF CONSTRUCTION",
+          "active_surface": "ROOF",
+          "boundary": "One fresh fixed Source B direct-epJSON active EcoRoof Advanced ordinary CTF case, five design days and inherited151requests/158series/75120values; all34gates and unchanged numerical policies passed. All9reportedRoof and2meter series raw-exact. Three HorizontalIR operands differ by at most1.71e-13 within unchanged policy. Source200 also adds original-IDF Roof SourceA/B Raw/getter/typed admission verified by one existing unit body; this pair itself does not execute original-IDF or SourceA. No private Native soil/getter-state, annual, every-valid-combination or full-object equivalence claim."
+        }
       }
     ],
     "totals": {
-      "paired_cases": 275,
-      "reported_samples": 12600136,
-      "raw_operand_unequal": 3246581,
+      "paired_cases": 276,
+      "reported_samples": 12675256,
+      "raw_operand_unequal": 3246584,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -92870,6 +93272,38 @@
           "sha256": "076cf648156e90a646caf3eb896f69eda09b778b2b36122ad5d114fb5f108056",
           "bytes": 177533
         }
+      },
+      {
+        "id": "source-original-idf-roof-vegetation",
+        "receipt": {
+          "path": ".runtime/porting/original-idf-roof/build01/build/receipt.json",
+          "sha256": "fb324669cbb99c0da6709947417db2770d1db51eaa1fc7ef54d691d470d34f2f",
+          "bytes": 61100
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/49/4929881c1cbb5a4b152eb8e6c9a0f67c16a5296f3a2c4e46d309fdf4c5eddb3a",
+          "sha256": "4929881c1cbb5a4b152eb8e6c9a0f67c16a5296f3a2c4e46d309fdf4c5eddb3a"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/original-idf-roof/build01/frozen/eplus-rs.exe",
+          "sha256": "d25dd82613d2c2f4ad25c87bd6c24356531867efb98e5cf1511764bdada76a24",
+          "bytes": 84087266
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/original-idf-roof/build01/frozen/build-receipt.json",
+          "sha256": "bf38bb5d40d0d2e97f8ebb489d78161a515922327d92877cd33db5a2ae3937d3",
+          "bytes": 1652944
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/original-idf-roof/quality02/quality-preparation.json",
+          "sha256": "73bbb43e908f0d698ca95dd80bbdb1a870991d019804ca390d5d5164ffe2f1fa",
+          "bytes": 16964
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/original-idf-roof/build01/freeze/receipt.json",
+          "sha256": "e76ea7246ca909e5fe46bf031534de454d17950f78d5fc777849b69d2aaa8f36",
+          "bytes": 60081
+        }
       }
     ],
     "focused_since_workspace": {
@@ -93392,14 +93826,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 199,
-      "builds_with_accepted_paired_cases": 171,
+      "actual_recorded_builds": 200,
+      "builds_with_accepted_paired_cases": 172,
       "builds_with_only_retained_failed_Source_attempts": 9,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 6,
       "builds_with_only_unaccepted_Source_attempts": 20,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "199 actual Source builds: 171 retain accepted pairs and 28 have none. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. This batch adds 1 accepted cases on one shared Source build.",
+      "qualification": "200 actual Source builds: 172 retain accepted pairs and 28 have none. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; retained histories add zero accepted cases or values. One fresh Advanced case adds75,120values on Source200; earlier unaccepted Advanced comparisons remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,

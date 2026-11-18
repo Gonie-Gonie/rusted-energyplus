@@ -1,5 +1,5 @@
 //! Original-schema EcoRoof input prerequisite; Construction custody is checked at Source admission.
-use ep_raw_model::{ObjectType, RawModel, RawValue};
+use ep_raw_model::{FieldName, ObjectType, RawModel, RawValue};
 pub(crate) fn known_field(field: &str) -> bool {
     matches!(
         field,
@@ -79,7 +79,22 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
         return Ok(());
     }
     if !raw.is_epjson() {
-        return Err("Source unused RoofVegetation requires direct epJSON".into());
+        if !raw.has_idf_declaration_order("Material:RoofVegetation") {
+            return Err(
+                "Source RoofVegetation original IDF requires recovered declaration order".into(),
+            );
+        }
+        if rows.values().any(|object| {
+            !matches!(
+                object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(RawValue::Number(token)) if token.parse::<usize>().is_ok()
+            )
+        }) {
+            return Err(
+                "Source RoofVegetation original IDF requires idf_max_fields for every object"
+                    .into(),
+            );
+        }
     }
     for (name, object) in rows {
         if !super::window_gas::valid_name(&name.0) {

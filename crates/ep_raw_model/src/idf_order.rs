@@ -495,6 +495,7 @@ pub fn apply_idf_declaration_order(
                     "Material:NoMass"
                         | "Material:AirGap"
                         | "Material:InfraredTransparent"
+                        | "Material:RoofVegetation"
                         | "Building"
                         | "Construction"
                         | "Zone"
@@ -540,6 +541,10 @@ pub fn apply_idf_declaration_order(
                         }
                         // Native END neither advances the last field nor min-pads.
                         "People" => idf_object.max_fields.saturating_sub(1),
+                        "Material:RoofVegetation" if idf_object.semicolon_terminated => {
+                            idf_object.max_fields.max(19)
+                        }
+                        "Material:RoofVegetation" => idf_object.max_fields.saturating_sub(1),
                         "Site:Location" => idf_object.max_fields.max(5),
                         "RunPeriod" => idf_object.max_fields.max(7),
                         "Schedule:Day:Hourly" => idf_object.max_fields.max(26),
@@ -577,7 +582,7 @@ pub fn apply_idf_declaration_order(
                         "Schedule:Day:Interval" => Some(idf_object.max_fields.saturating_sub(3)),
                         "Schedule:Day:List" => Some(idf_object.max_fields.saturating_sub(4)),
                         "Schedule:Week:Compact" => Some(idf_object.max_fields.saturating_sub(1)),
-                        "SetpointManager:Scheduled" => Some(0),
+                        "SetpointManager:Scheduled" | "Material:RoofVegetation" => Some(0),
                         _ => None,
                     },
                 ));
@@ -638,6 +643,19 @@ pub(crate) fn apply_idf_declaration_order_bytes(
     // Lossy decoding therefore keeps token boundaries while reconciliation still
     // fails closed if replacement bytes occur in a targeted object name.
     apply_idf_declaration_order(model, &String::from_utf8_lossy(idf), targets)
+}
+
+/// One transaction keeps every common order target and adds only Source Roof.
+pub(crate) fn apply_source_idf_declaration_order_bytes(
+    model: &mut RawModel,
+    idf: &[u8],
+) -> Result<(), IdfOrderError> {
+    let mut targets = IDF_ORDER_TARGETS.to_vec();
+    targets.push(IdfOrderTarget {
+        object_type: "Material:RoofVegetation",
+        name_field_index: 0,
+    });
+    apply_idf_declaration_order_bytes(model, idf, &targets)
 }
 
 fn validate_targets(targets: &[IdfOrderTarget]) -> Result<(), IdfOrderError> {

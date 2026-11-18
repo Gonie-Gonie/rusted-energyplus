@@ -19,6 +19,7 @@ use ep_model::{AutosizeOrNumber, SimulationModel, TypedModel};
 use ep_oracle::default_oracle_release;
 use ep_raw_model::{
     RawModel, load_epjson_file, load_epjson_file_for_source, load_epjson_file_with_idf_order,
+    load_epjson_file_with_idf_order_for_source,
 };
 use ep_runtime::weather::day::{ProductionWeatherTimestepSeries, WeatherEnvironmentConfiguration};
 use ep_runtime::{
@@ -1117,6 +1118,14 @@ fn run_with_optional_porting_scope_impl(
 
     let raw_start = Instant::now();
     let raw_model_result = match prepared_input.input_kind {
+        OracleInputKind::Idf
+            if matches!(scope, Some(crate::PortingScope::A | crate::PortingScope::B)) =>
+        {
+            load_epjson_file_with_idf_order_for_source(
+                &prepared_input.converted_epjson_path,
+                &prepared_input.original_path,
+            )
+        }
         OracleInputKind::Idf => load_epjson_file_with_idf_order(
             &prepared_input.converted_epjson_path,
             &prepared_input.original_path,

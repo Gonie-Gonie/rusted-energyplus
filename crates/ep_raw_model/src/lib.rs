@@ -495,6 +495,23 @@ pub fn load_epjson_file_with_idf_order(
     Ok(model)
 }
 
+/// Loads converted epJSON with the explicit Source-only IDF order overlay.
+///
+/// The generic loader and its target set retain their existing identity policy.
+pub fn load_epjson_file_with_idf_order_for_source(
+    epjson_path: impl AsRef<Path>,
+    idf_path: impl AsRef<Path>,
+) -> Result<RawModel, EpJsonError> {
+    let mut model = load_epjson_file(epjson_path)?;
+    let idf_path = idf_path.as_ref();
+    let idf = std::fs::read(idf_path).map_err(|source| EpJsonError::IdfIo {
+        path: idf_path.to_path_buf(),
+        source,
+    })?;
+    idf_order::apply_source_idf_declaration_order_bytes(&mut model, &idf)?;
+    Ok(model)
+}
+
 /// Parses epJSON text into a RawModel.
 pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
     parse_epjson_str_with_source_dom(contents, false)

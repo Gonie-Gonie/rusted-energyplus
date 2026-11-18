@@ -674,6 +674,9 @@ fn resolve_raw(
         window_screen::validate(raw)?;
         window_blind::validate(raw)?;
     }
+    if source_calendar_ingress && !source_b_ingress {
+        roof_vegetation::validate(raw)?;
+    }
     for (family, objects) in &raw.objects {
         if objects.is_empty() {
             continue;
@@ -716,7 +719,7 @@ fn resolve_raw(
                 "WindowMaterial:Gap" | "WindowGap:DeflectionState" | "WindowGap:SupportPillar"
             );
         let source_roof_vegetation_family =
-            source_b_ingress && family.0 == "Material:RoofVegetation";
+            source_calendar_ingress && family.0 == "Material:RoofVegetation";
         let source_screen_family = source_b_ingress && family.0 == "WindowMaterial:Screen";
         let source_blind_family = source_b_ingress && family.0 == "WindowMaterial:Blind";
         let source_people_family = source_calendar_ingress && family.0 == "People";

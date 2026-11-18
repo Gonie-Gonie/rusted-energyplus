@@ -340,7 +340,12 @@ fn permitted_object(kind: &str, scope: PortingScope) -> bool {
     ) || (scope == PortingScope::A
         && matches!(
             kind,
-            "ZoneList" | "ZoneGroup" | "Space" | "SpaceList" | "ElectricEquipment"
+            "ZoneList"
+                | "ZoneGroup"
+                | "Space"
+                | "SpaceList"
+                | "ElectricEquipment"
+                | "Material:RoofVegetation"
         ))
         || (scope == PortingScope::B
             && matches!(

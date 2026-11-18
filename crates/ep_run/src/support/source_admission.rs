@@ -505,7 +505,7 @@ impl SourceSupportAdmission {
             }
         }
         let mut roof_vegetation_bindings = BTreeSet::new();
-        if trace.scope == PortingScope::B
+        if matches!(trace.scope, PortingScope::A | PortingScope::B)
             && raw
                 .objects
                 .get(&ObjectType("Material:RoofVegetation".into()))

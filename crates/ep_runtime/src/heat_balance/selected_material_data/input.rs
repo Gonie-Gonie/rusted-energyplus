@@ -180,11 +180,18 @@ impl SelectedMaterialInput {
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
         let family = "Material:RoofVegetation";
-        if !self.source_is_epjson || !owners.input.has_object(family, &object.object_name) {
+        if !owners.input.has_object(family, &object.object_name) {
             return Err(unavailable(
                 "RoofVegetation owned direct-epJSON raw/IP identity",
             ));
         }
+        let max_fields = if self.source_is_epjson {
+            19
+        } else {
+            object
+                .idf_max_fields
+                .ok_or_else(|| unavailable("missing actual RoofVegetation IDF field count"))?
+        };
         let s = &mut owners.shortcut;
         if s.alpha_args.len() < 4
             || s.alpha_field_names.len() < 4
@@ -205,14 +212,29 @@ impl SelectedMaterialInput {
             .input
             .mark_object_as_used(family, &object.object_name);
         s.alpha_args[0] = object.object_name.to_ascii_uppercase();
-        s.alpha_field_names[0] = "name".into();
+        s.alpha_field_names[0] = if self.source_is_epjson {
+            "name"
+        } else {
+            "Name"
+        }
+        .into();
         s.alpha_field_blanks[0] = object.object_name.is_empty();
-        for (index, name, default) in [
-            (1_usize, "soil_layer_name", "GREEN ROOF SOIL"),
-            (2_usize, "roughness", "MEDIUMROUGH"),
-            (3_usize, "moisture_diffusion_calculation_method", "ADVANCED"),
+        for (index, name, legacy, default) in [
+            (
+                1_usize,
+                "soil_layer_name",
+                "Soil Layer Name",
+                "GREEN ROOF SOIL",
+            ),
+            (2_usize, "roughness", "Roughness", "MEDIUMROUGH"),
+            (
+                3_usize,
+                "moisture_diffusion_calculation_method",
+                "Moisture Diffusion Calculation Method",
+                "ADVANCED",
+            ),
         ] {
-            s.alpha_field_names[index] = name.into();
+            s.alpha_field_names[index] = if self.source_is_epjson { name } else { legacy }.into();
             s.alpha_args[index] = default.into();
             match object.fields.get(name) {
                 Some(ProjectInputValue::String(text)) => {
@@ -248,8 +270,30 @@ impl SelectedMaterialInput {
             ),
             ("initial_volumetric_moisture_content_of_the_soil_layer", 0.1),
         ];
+        const IDF_LABELS: [&str; 15] = [
+            "Height of Plants",
+            "Leaf Area Index",
+            "Leaf Reflectivity",
+            "Leaf Emissivity",
+            "Minimum Stomatal Resistance",
+            "Thickness",
+            "Conductivity of Dry Soil",
+            "Density of Dry Soil",
+            "Specific Heat of Dry Soil",
+            "Thermal Absorptance",
+            "Solar Absorptance",
+            "Visible Absorptance",
+            "Saturation Volumetric Moisture Content of the Soil Layer",
+            "Residual Volumetric Moisture Content of the Soil Layer",
+            "Initial Volumetric Moisture Content of the Soil Layer",
+        ];
         for (index, (name, default)) in FIELDS.iter().enumerate() {
-            s.numeric_field_names[index] = (*name).into();
+            s.numeric_field_names[index] = if self.source_is_epjson {
+                *name
+            } else {
+                IDF_LABELS[index]
+            }
+            .into();
             s.numeric_args[index] = *default;
             match object.fields.get(*name) {
                 Some(ProjectInputValue::Number(value)) if value.is_finite() => {
@@ -264,8 +308,17 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        // min_fields19 forces all four alphas and fifteen numeric defaults, even for {}.
-        Ok((4, 15))
+        // All capacity cells above are filled independently of the returned counts.
+        // Name counts even at END max_fields0; other fields count only within F.
+        let alphas = 1
+            + usize::from(6 < max_fields)
+            + usize::from(7 < max_fields)
+            + usize::from(18 < max_fields);
+        let numerics = [1_usize, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+            .into_iter()
+            .filter(|position| *position < max_fields)
+            .count();
+        Ok((alphas, numerics))
     }
 
     pub(super) fn get_spectral_data_item(

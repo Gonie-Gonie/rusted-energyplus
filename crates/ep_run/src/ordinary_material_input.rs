@@ -31,6 +31,9 @@ fn resolve_ordered(
         ..SelectedMaterialInput::default()
     };
     if source_order {
+        if !raw.is_epjson() {
+            crate::ordinary_equipment_input::source_b_validate_unused_roof_vegetation(raw)?;
+        }
         let family = "MaterialProperty:GlazingSpectralData";
         let rows = raw.source_ordered_instances(family)?;
         if rows.len() != input.get_num_objects_found(family) {
@@ -134,7 +137,7 @@ fn resolve_ordered(
                 | "WindowMaterial:Blind"
         ) && !source_order
         {
-            // No new Legacy or Source A admission is granted by this projection.
+            // Source A/B admission is checked separately; Legacy projection stays held.
             continue;
         }
         let rows = if source_order {
@@ -241,6 +244,20 @@ fn resolve_ordered(
                     continue;
                 }
                 if source_order
+                    && !raw.is_epjson()
+                    && family == "Material:RoofVegetation"
+                    && field.0 == "idf_max_fields"
+                {
+                    let RawValue::Number(text) = value else {
+                        return Err("Material idf_max_fields numeric custody".into());
+                    };
+                    idf_max_fields = Some(
+                        text.parse::<usize>()
+                            .map_err(|_| "Material idf_max_fields usize custody")?,
+                    );
+                    continue;
+                }
+                if source_order
                     && family == "Material:RoofVegetation"
                     && !crate::ordinary_equipment_input::source_b_roof_vegetation_known_field(
                         &field.0,
@@ -331,7 +348,10 @@ fn resolve_ordered(
             if !raw.is_epjson()
                 && matches!(
                     family,
-                    "Material:NoMass" | "Material:AirGap" | "Material:InfraredTransparent"
+                    "Material:NoMass"
+                        | "Material:AirGap"
+                        | "Material:InfraredTransparent"
+                        | "Material:RoofVegetation"
                 )
                 && idf_max_fields.is_none()
             {
