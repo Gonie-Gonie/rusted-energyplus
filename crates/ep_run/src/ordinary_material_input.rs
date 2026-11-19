@@ -174,19 +174,20 @@ fn resolve_ordered(
             let mut fields = BTreeMap::new();
             let mut idf_max_fields = None;
             for (field, value) in &row.fields {
-                let source_json_no_mass =
-                    source_order && raw.is_epjson() && family == "Material:NoMass";
-                let projected_key = if source_json_no_mass {
+                let source_json_material_fields = source_order
+                    && raw.is_epjson()
+                    && matches!(family, "Material:NoMass" | "Material:AirGap");
+                let projected_key = if source_json_material_fields {
                     ep_model::source_json_c_string_prefix(&field.0)
                 } else {
                     field.0.as_str()
                 };
-                // Native direct JSON reads only the declared NoMass operands.
+                // Native direct JSON reads only declared NoMass/AirGap operands.
                 // This includes ignoring idf_* lookalikes and a nested name;
                 // genuine Original-IDF custody still follows the existing path.
                 if source_order
                     && raw.is_epjson()
-                    && family == "Material:NoMass"
+                    && matches!(family, "Material:NoMass" | "Material:AirGap")
                     && ep_raw_model::source_idf_object_layout(family).is_some_and(
                         |(_, fixed, _)| {
                             fixed
@@ -381,9 +382,14 @@ fn resolve_ordered(
                         ));
                     }
                 };
-                if source_json_no_mass {
+                if source_json_material_fields {
                     if fields.insert(projected_key.into(), value).is_some() {
-                        return Err("uncoalesced Source NoMass field aliases".into());
+                        return Err(if family == "Material:NoMass" {
+                            "uncoalesced Source NoMass field aliases"
+                        } else {
+                            "uncoalesced Source AirGap field aliases"
+                        }
+                        .into());
                     }
                 } else {
                     fields.insert(field.0.clone(), value);

@@ -570,7 +570,7 @@ pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
 /// Each map retains the first decoded key spelling and the last whole value
 /// for comparator-equivalent keys. Schedule reference strings are untouched.
 /// Retained family and other-family field NUL keys stay an explicit lookup
-/// boundary. Direct NoMass declared-value queries own their field aliases;
+/// boundary. Direct NoMass/AirGap declared-value queries own their field aliases;
 /// finite comparator quotients remain strict. This is not a general Native JSON or
 /// schema implementation; generic syntax/number admission stays unchanged.
 pub fn parse_epjson_str_for_source(contents: &str) -> Result<RawModel, EpJsonError> {
@@ -614,7 +614,10 @@ fn parse_epjson_str_with_source_dom(
             // A stale overwritten subtree is still token-validated, but its
             // family/field operands must not be admitted or rejected as live.
             if source_dom
-                && object_type_name != "Material:NoMass"
+                && !matches!(
+                    object_type_name.as_str(),
+                    "Material:NoMass" | "Material:AirGap"
+                )
                 && matches!(&fields_value, RawValue::Object(_))
             {
                 validate_source_field_keys(&fields_value)?;

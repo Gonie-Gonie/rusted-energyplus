@@ -125,7 +125,8 @@
       "real interior CTF layer preprocessing, ordered nominal-U/report bridges and actual Source postlude AirGap row selection",
       "used Regular/AirGap/Regular three-layer nine-term same-input Source completion under original58 policies",
       "existing endpoint validation and genuine used low-resistance CTF error boundary retained; dedicated Material:Air writer checked at unit boundary because physical case requests Constructions only",
-      "Genuine Source B original-IDF shared-layout EOF F1 returnsN0 but fills N1; public Native IP and the existing Source body check the same count-independent material parent/report owner. No-layout/epJSON guards are retained, with no new active AirGap pair or general EOF-combination claim."
+      "Genuine Source B original-IDF shared-layout EOF F1 returnsN0 but fills N1; public Native IP and the existing Source body check the same count-independent material parent/report owner. No-layout/epJSON guards are retained, with no new active AirGap pair or general EOF-combination claim.",
+      "Source211 adds one five-DesignDay Source B direct-epJSON pair with four distinct internal AirGap names (NBSP-padded GAP, VT-only, ASCII-padded GAP and GAP), required resistance queried through a field-NUL alias, and ignored nonnumeric/nested field-NUL extras. All four public Material:Air rows report R 0.1500 identically in Native and Source; three retained NoMass Material Details rows also match. Four full four-layer Wall recipes exercise the real getter, Construction, CTF and report owners. All34 gates/158 series/75,120 values pass unchanged policies, with only three HorizontalIR operands unequal within policy. Private Native F/NumNums/TotLayers/default counters remain CODE-derived; no Construction Details rows were observed. Existing positive-R/type and inside/outside bans, Original/Legacy and other-family/comparator fences remain; no arbitrary valid-combination or full-object completion."
     ],
     "Building": [
       "opaque FullInteriorAndExterior admission now follows real retained solar enum and existing consumers",
@@ -14716,6 +14717,262 @@
           "Source_build_or_actor_or_paired_credit": 0,
           "qualification": "Different unused-resistance input; Native schema rejects integer u64MAX as -1 below0.001 before simulation. Source format moved concurrently, honestly excluded from all Source/QAgate/paired credit; no new failed Source inventory row."
         }
+      },
+      "direct_epjson_air_gap_native_names_field_aliases_and_four_layer_walls": {
+        "actual_quality": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence01/quality-ledger.json",
+          "sha256": "ad8c780e4104b5a4aff9e9a00f9e14399a6e8086ae373315efe3aff6b0ed1e36",
+          "bytes": 3715
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/Root-complete-unit-QA-executions03.json",
+          "sha256": "22d1d241dcc14a94fc4bda159968c5b117321070aec3da46c395d2cc172daac4",
+          "bytes": 17050
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/quality03/quality-preparation.json",
+          "sha256": "13f782d3ac320802fa7f93f99fb14cee2e8e9d54da74f9a0df6f0966ce560b8d",
+          "bytes": 15285
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence02/validation02/Source-authority.json",
+          "sha256": "8f30f7a87d09464c924aa34cb530f8891d3704fc908b43163413394a3ba3092d",
+          "bytes": 62148
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence02/independent-Source-review01.json",
+          "sha256": "ac02ec6d3ae80812923b5e1147be2d49b0e0c3071f240664cb5efa17a6f1c254",
+          "bytes": 31876
+        },
+        "total_actual_QA_commands": 10,
+        "current_QA_commands": 5,
+        "failed_QA_attempts": 3,
+        "qualified_profile_actual_commands": 5,
+        "qualified_profile_failed_attempts": 0,
+        "current_test_body_executions": 2,
+        "historical_named_body_executions": 0,
+        "historical_zero_match_test_records": 0,
+        "reused_body_credit": 0,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "actual_material_getter_body_executed": true,
+        "actual_test_execution_evidence": [
+          {
+            "kind": "targeted_existing_test",
+            "role": "current",
+            "test_names": [
+              "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/AirGap-native-names-extra-members-source/quality03/airgap-input-tests/receipt.json",
+              "sha256": "d4002913a0cdc58b1ea226dfa4de2b101721badf08c9ef112d3a30ad8d6223be",
+              "bytes": 78357
+            },
+            "actual_exit_code": 0,
+            "lineage": []
+          },
+          {
+            "kind": "targeted_existing_test",
+            "role": "current",
+            "test_names": [
+              "heat_balance::selected_material_data::air_gap_tests::air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/AirGap-native-names-extra-members-source/quality03/airgap-getter-tests/receipt.json",
+              "sha256": "98329c39067c8b3a087c83302e968da5d65f49388f413fd17b93afb1b2e055e2",
+              "bytes": 78403
+            },
+            "actual_exit_code": 0,
+            "lineage": []
+          }
+        ],
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-minimal-QA-DATA01/QA-profile.json",
+          "sha256": "74bd9217bed8e4f16e2b0a3907e64cbcf803964b6658e6308f94d7e1a5a48f2d",
+          "bytes": 3673
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/QA-profile-binding03.json",
+          "sha256": "b77ada2f985d3e4ff715d44c43947610302f9a0d7f87c64ce9eae174b54e0f93",
+          "bytes": 4248
+        },
+        "current_required_test_names": [
+          "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support",
+          "heat_balance::selected_material_data::air_gap_tests::air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report"
+        ],
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "new_recorded_Source_builds": 1,
+        "retained_failed_builds": [],
+        "retained_failed_Source_attempts": [],
+        "retained_preparation_ledger": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/Root-all-retained-preparation-executions02.json",
+          "sha256": "1860383bbe772e6c06b7a1e55c64848aa1db19b5f245c9a8d83b0052672dc5f8",
+          "bytes": 15278
+        },
+        "retained_preparation_commands": 5,
+        "retained_preparation_failures": 3,
+        "retained_failed_exact_body_invocations": 2,
+        "retained_successful_format_contexts": [
+          {
+            "receipt": {
+              "path": ".runtime/porting/AirGap-native-names-extra-members-source/quality02/format/receipt.json",
+              "sha256": "95b2093af5b53eec9031dac9713980b97213721462385e35ea3f8e6c08d382d9",
+              "bytes": 55576
+            },
+            "plan": {
+              "path": ".runtime/porting/AirGap-native-names-extra-members-source/plan02.json",
+              "sha256": "07fb9b834ec5da27b23660f6dde2610846f781dda28c5901ef8a1801b0c4f0d1",
+              "bytes": 10797
+            },
+            "format_check": {
+              "path": ".runtime/porting/AirGap-native-names-extra-members-source/quality02/format-check/receipt.json",
+              "sha256": "838f86dc701bfa212893a6c6956a0e60baf421a4adcc726644f182831eeae056",
+              "bytes": 55617
+            }
+          }
+        ],
+        "correction_reviews": [
+          {
+            "path": ".runtime/object-expansion/unit159-prep/Source211-syntax-and-partial-format-COMPOSITION01/independent-static-review01.json",
+            "sha256": "1048ab28ffe2597a8100469a8ee82546906f61c2f847e4b79e6d1e3649281680",
+            "bytes": 6364
+          },
+          {
+            "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-U07-statistics-policy-CORRECTION02/independent-static-review01.json",
+            "sha256": "942859de9349b7b03a8a25c660c17ca42585fdad951edcd2a41d63b4cdc6f298",
+            "bytes": 4727
+          }
+        ],
+        "integration_attempt": {
+          "Root_workspace02": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/Root-workspace02-actual-readback.json",
+            "sha256": "c1f9e4d733da2cf1b141a0de5f201f0438ccf7f580df60fcec6917fc2d8d3f13",
+            "bytes": 2913
+          },
+          "retained_workspace01_infrastructure_failure": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/Root-workspace01-infrastructure-failure-readback.json",
+            "sha256": "759bbed352f07b9ba40c7ce18ffb7e3c8b8bfaa6722a40b4c00773c5327cc729",
+            "bytes": 15197
+          },
+          "workspace_passed": true,
+          "passed": 5051,
+          "failed": 0,
+          "ignored": 2,
+          "target_summaries": 23,
+          "whole_workspace": true,
+          "workspace_attempts": 2,
+          "workspace_infrastructure_failures": 1,
+          "current_Clippy_packages": [
+            "ep_compiler",
+            "ep_raw_model",
+            "ep_run",
+            "ep_runtime"
+          ],
+          "all11_package_all_target_Clippy_current_profile": false,
+          "additional_whole_workspace_Clippy": false,
+          "Root_QA03": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/Root-QA03-actual-readback.json",
+            "sha256": "470727fb0a7c15247602f1953b91e6b2079f316d835baa6007f05bff19c9ff53",
+            "bytes": 1865
+          },
+          "qualification": "Successful workspace02 follows retained workspace01 disk-space linker failure with no executed body. Four-package all-target Clippy and two exact existing bodies are the five current profile commands; no additional workspace Clippy is required or credited."
+        },
+        "current_Source_CODE": [
+          {
+            "path": "crates/ep_compiler/src/compiler.rs",
+            "sha256": "04ff39ef0d1f094a9c3c44c59e432e07a9235fe7ed1e1762b268dcc5ca7f8b06",
+            "bytes": 976535
+          },
+          {
+            "path": "crates/ep_raw_model/src/lib.rs",
+            "sha256": "4f2e294d7ab2499df4f0e387af9dcddb4f695a2bf51c16952b1b5a796239a06c",
+            "bytes": 45224
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+            "sha256": "816f58d84a4f75f8e76e10c92bb4bf649f23cbce3b1db629cdb9d7329fdd65dc",
+            "bytes": 292936
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_material_input.rs",
+            "sha256": "7225b7550fea3057284162d10b6a33e2a0319b05c0f7c4799177366efd2ddf70",
+            "bytes": 19718
+          },
+          {
+            "path": "crates/ep_run/src/porting_scope/tests.rs",
+            "sha256": "ed5c1b12eff89d2fcb7911bb2eceac58d030e1d0e5df5c4de28de2260ad6190b",
+            "bytes": 952563
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/selected_material_data/air_gap_tests.rs",
+            "sha256": "bf8bd375df708f9aa09a3d9f2b9eb19d51faf38d4526e0885ae4c7ddde9667fb",
+            "bytes": 1170052
+          }
+        ],
+        "generic_reported_comparer_v3": {
+          "schema": "Root.GenericComparerDirectJSONScope.v1",
+          "accepted": false,
+          "status": "not-applicable-to-direct-epJSON",
+          "engines_launched": 0,
+          "new_qualifying_cases": 0,
+          "new_qualifying_values": 0,
+          "qualification": "Published reusable V3 compares original-IDF actor inputs only. No invocation or format retry for current211 directJSON. ReviewedpairedV14withunchangedfrozenreader supplies the accepted full current comparison; historical Source207 original-IDF public example stays separate."
+        },
+        "whole_input_and_prospective_peer": {
+          "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-four-layer-prospective-DATA-DRAFT01/independent-static-review01.json",
+          "sha256": "1e319f2ed15a0fed14a76fad685753ae33abb42f76293753fca419d51238425d",
+          "bytes": 18703
+        },
+        "retained_raw_input_peer": {
+          "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-native-names-field-aliases-INPUT-DRAFT01/independent-input-static-review01.json",
+          "sha256": "4dc3a4d95eb059c0d556aaefc4b94b17d540f48ca9d5d41b62bf74881c65a8ac",
+          "bytes": 12306
+        },
+        "current_Source_forecast_binding_peer": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/prospective01/independent-current-Source-binding-audit01.json",
+          "sha256": "72bd678845028d9b0b63d6daff6bdfebbce50f3572e18fd52f4a84d449c40a41",
+          "bytes": 11739
+        },
+        "current_Runtime_peer": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/independent-runtime-review01.json",
+          "sha256": "267d9d7e104610881da5fc0b7588d3b3e9f8853be488dfe4f0516cbb1f916dcc",
+          "bytes": 7609
+        },
+        "V14_metadata_representation": {
+          "release": {
+            "path": "tools/porting/paired/v14/release.json",
+            "sha256": "5239ba00d7381f28cdd35664a7fc09e34521bcd04ed9a4e689de8b6fdd60680c",
+            "bytes": 18367
+          },
+          "initial_tooling_dependency": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/v14-tooling-dependency01.json",
+            "sha256": "e718d06faefa78b4058022f97fbe7dc60170556e4b4dd4e26a01e24fe576c939",
+            "bytes": 1690
+          },
+          "actual_initial_API_readback": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/v14-initial-tooling-use02.json",
+            "sha256": "846b53752ec5f8aa08beb46cc76e9ca4623e952c8e096c9cc924e9e7c6ea3684",
+            "bytes": 9127
+          },
+          "actual_qualified_validation": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence02/validation02/tooling-validation.json",
+            "sha256": "1f59e8a6b07e119a748f071aa4b2203ea86041d95891f20afdefd84b7d5ddcae",
+            "bytes": 2626
+          },
+          "actual_retained_format_validation": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence02/validation02/retained-format-validation.json",
+            "sha256": "fee073fb4aa9ee9c731566444cbb60b53b5718fa0c8c009bec64720f36e41b49",
+            "bytes": 2521
+          },
+          "helper_attempts": 2,
+          "helper_failures": 1,
+          "seven_installation_and_ten_retained_categories_passed": true,
+          "actual_rejections": 21,
+          "normalizer_science_or_Source_credit": 0,
+          "qualification": "Genuine earlier successful format/check custody is separate from current qualified QA. Original failed V13 normalization and failed first V14 Ref2 validation remain retained; corrected V14 validates the same Rust Source/build without repeating QA/build. Initial API01 raw-Ref2 predicate mistake is retained, API02 canonical assertions pass; no SDK or actor rerun for that readback correction."
+        },
+        "qualification": "Five qualified current commands pass two exact existing bodies with four-package all-target Clippy and zero qualified failures. The complete unit history is ten commands/three failures, including five preparation commands/three failures and two failed U07 invocations. No historical/reused/OA-getter credit or new functions. Successful workspace02 is 5,051/0/2 after the retained disk-only workspace01 failure; one default build211 is recorded. Actual paired Native/Source runs occur once each. The unchanged scientific reader under reviewed V14 supplies all 34 gates; public V3 is not applicable and not invoked. Separate raw-input/prospective/runtime/Source/CODE peers retain their disclosed authorship qualifications."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -93112,12 +93369,371 @@
           },
           "qualification": "Public EIO effective property rows and complete physical streams are observed; exact private counts/fullfill/default presence are primary-CODE derivations. No comparator/family alias or other-family policy widening."
         }
+      },
+      {
+        "group": "Material:AirGap",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-source211-v14-AirGap-native-names-field-aliases",
+        "case_kind": "direct-epJSON-AirGap-native-names-known-field-aliases-and-active-four-layer-walls",
+        "source_build": "source211-native-AirGap-input-handling",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-native-names-field-aliases-INPUT-DRAFT01/input.epJSON",
+          "sha256": "3cff3481ab89a66dd3dd89a922ebb33e6fb62c6771ce40464388bf7509bfabea",
+          "bytes": 145288
+        },
+        "scientific_dom": {
+          "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-native-names-field-aliases-INPUT-DRAFT01/input.epJSON",
+          "sha256": "3cff3481ab89a66dd3dd89a922ebb33e6fb62c6771ce40464388bf7509bfabea",
+          "bytes": 145288
+        },
+        "fixed_input_manifest": {
+          "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-four-layer-prospective-DATA-DRAFT01/fixed-input-manifest.json",
+          "sha256": "fff05ecb270b109c8d046f2b110d75a5ed3278c4053c21047204340ead2eaa56",
+          "bytes": 3970
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/native/command/receipt.json",
+          "sha256": "ecf5d274895ade69e84ef72f64a98532bacac9a7344b62ed92631ed9fea0b1ce",
+          "bytes": 400767
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/source/command/receipt.json",
+          "sha256": "6b1feb85622bc5e279ec5536bbf17145a824791ae6837b283f6e069f4e70a76d",
+          "bytes": 402203
+        },
+        "source_summary": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/source/output/run-summary.json",
+          "sha256": "8b4ae9004724073febec619e1d49b547c26c7e7cf8e01bd175197f4728e209a4",
+          "bytes": 64736
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/8f/8fe1398d69100ff2b1d031d20450df6c306bad9a228731ebfd47e6fd5e80d16d",
+          "sha256": "8fe1398d69100ff2b1d031d20450df6c306bad9a228731ebfd47e6fd5e80d16d"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/build01/frozen/eplus-rs.exe",
+          "sha256": "a1d7fea6674bb537d4f6fd87972b28e92ce65c884fa22be4adfa3d6b8fe4aedc",
+          "bytes": 84298058
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/build01/build/receipt.json",
+          "sha256": "2c07cb7ca422f5d9f7ad267fc58da9bb852f94f464f93c96f69de3b830bfe2af",
+          "bytes": 79675
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/readback.json",
+          "sha256": "9331acefe2ffb73d106ec628a1a6d90fcb8fed169c6fcd59023d050ba306c1cf",
+          "bytes": 539473
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/Root-scientific-review01.json",
+          "sha256": "0b5d025d7f9683f739f679b53761a20b6bd6f7c4d805e7dc17c187be37701b7f",
+          "bytes": 13203
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-four-layer-prospective-DATA-DRAFT01/proposal.json",
+          "sha256": "eab069a9e240c9927f086bf59bee6a6ed7f066dd5482a0bb3734c344750f598d",
+          "bytes": 17492
+        },
+        "coverage_kind": "direct_epjson_air_gap_native_names_field_aliases_and_four_layer_walls",
+        "effective_state": "One fresh Source211 Source B direct-epJSON pair spans five DesignDays, with one official Native and one Source run and no reruns. Identical 3cff physical/scientific DOM retains all 1,332 parent numeric records and adds four required AirGap R 0.15 values. Four distinct names use required thermal_resistance NUL-tail fields and ignored nonnumeric/nested field-NUL metadata. Each is internal to one full four-layer Wall: outside NBSP NoMass, AirGap, Mass Layer, PLAIN NoMass. All five Construction names/surface references, real EcoRoof and nine Node/OA drivers remain held. Seven public rows match exactly: three NoMass Material Details and four Material:Air rows, each AirGap R 0.1500. No Construction Details rows exist; private Native F/NumNums/TotLayers/default counters remain CODE-derived. All 34 gates and 158 series/75,120 values pass unchanged policies; only three report10 HorizontalIR operands differ, maximum 1.7053025658242404e-13 within the existing 1e-5 policy. Other 157 series and meter bodies are raw-exact. This finite Source B scene does not establish SourceA/Original physical equivalence, arbitrary valid names/values, annual use or whole-object completion.",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 3,
+          "parsed_binary64_unequal": 3,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.7053025658242404e-13,
+          "max_rmse_delta": 1.1309316871492875e-14
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v14/release.json",
+            "sha256": "5239ba00d7381f28cdd35664a7fc09e34521bcd04ed9a4e689de8b6fdd60680c",
+            "bytes": 18367
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/binding.json",
+            "sha256": "818f620c1031e262302fffcb89212f79bde3f8112bca74054ce344997f7eba21",
+            "bytes": 1193
+          },
+          "case_config": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/case-config.json",
+            "sha256": "30eb85c82a6f76bbfc23bf481be62f046296a7d545d8f431726107c6391ef245",
+            "bytes": 181503
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence02/validation02/Source-authority.json",
+            "sha256": "8f30f7a87d09464c924aa34cb530f8891d3704fc908b43163413394a3ba3092d",
+            "bytes": 62148
+          },
+          "completion": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/completed.json",
+            "sha256": "1992ac6c0ff3e4acd6018ec7d176adeb9034d9dcaba3161482084fbc391ac85e",
+            "bytes": 2399
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/verify-command/receipt.json",
+            "sha256": "22dc2eaa1be202a2b2339bd1a151edc8995e0a0ec5c0447b19eff6b2c987678b",
+            "bytes": 401928
+          },
+          "actual_build": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/build01/build-row.json",
+            "sha256": "1862d0fab1f25c941ad0fee018dc23f0ac68371f7cf0296b26536af3ec31e7c4",
+            "bytes": 1450
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence01/quality-ledger.json",
+            "sha256": "ad8c780e4104b5a4aff9e9a00f9e14399a6e8086ae373315efe3aff6b0ed1e36",
+            "bytes": 3715
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/evidence02/validation02/Source-authority.json",
+            "sha256": "8f30f7a87d09464c924aa34cb530f8891d3704fc908b43163413394a3ba3092d",
+            "bytes": 62148
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "Root_physical_truth": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/Root-scientific-review01.json",
+            "sha256": "0b5d025d7f9683f739f679b53761a20b6bd6f7c4d805e7dc17c187be37701b7f",
+            "bytes": 13203
+          }
+        },
+        "public_observations_and_scope": {
+          "seven_exact_NoMass_AirGap_public_rows": {
+            "Native": {
+              "artifact": {
+                "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/native/output/nativeout.eio",
+                "sha256": "4868b51135bc2ce7604de8a6714faa01368d1f80f50acc854a086fa65677d272",
+                "bytes": 22305
+              },
+              "rows": [
+                [
+                  " Material Details",
+                  " ",
+                  "0.2000",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  " PLAIN ",
+                  "5.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  "PLAIN",
+                  "3.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.8125",
+                  "0.7000",
+                  "0.5000"
+                ],
+                [
+                  " Material:Air",
+                  " GAP ",
+                  "0.1500"
+                ],
+                [
+                  " Material:Air",
+                  "\u000b",
+                  "0.1500"
+                ],
+                [
+                  " Material:Air",
+                  " GAP ",
+                  "0.1500"
+                ],
+                [
+                  " Material:Air",
+                  "GAP",
+                  "0.1500"
+                ]
+              ]
+            },
+            "Source": {
+              "artifact": {
+                "path": ".runtime/porting/AirGap-native-names-extra-members-source/runtime01/source/output/eplusrs.eio",
+                "sha256": "21c66d40292ea8a69c9fe2a7026e8f4938bee74f023d6967d42afefb165d740a",
+                "bytes": 22269
+              },
+              "rows": [
+                [
+                  " Material Details",
+                  " ",
+                  "0.2000",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  " PLAIN ",
+                  "5.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  "PLAIN",
+                  "3.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.8125",
+                  "0.7000",
+                  "0.5000"
+                ],
+                [
+                  " Material:Air",
+                  " GAP ",
+                  "0.1500"
+                ],
+                [
+                  " Material:Air",
+                  "\u000b",
+                  "0.1500"
+                ],
+                [
+                  " Material:Air",
+                  " GAP ",
+                  "0.1500"
+                ],
+                [
+                  " Material:Air",
+                  "GAP",
+                  "0.1500"
+                ]
+              ]
+            }
+          },
+          "material_rows_raw_equal": true,
+          "all34_gates_passed": true,
+          "reported_series": 158,
+          "reported_values": 75120,
+          "unequal_series": [
+            {
+              "stream": "eso",
+              "index": 58,
+              "report_id": 10,
+              "name": "Site Horizontal Infrared Radiation Rate per Area",
+              "key": "Environment",
+              "units": "W/m2",
+              "policy": {
+                "key": "Environment",
+                "variable": "Site Horizontal Infrared Radiation Rate per Area",
+                "units": "W/m2",
+                "frequency": "Timestep",
+                "sampling_stage": "zone",
+                "atol": 1e-05,
+                "rtol": 0.0,
+                "rmse_max": 1e-05
+              },
+              "producer": {
+                "stage": "Zone",
+                "store": "Average",
+                "units": "W/m2",
+                "raw": "Zone,Average,Site Horizontal Infrared Radiation Rate per Area [W/m2]"
+              },
+              "samples": 480,
+              "raw_operand_unequal": 3,
+              "parsed_binary64_unequal": 3,
+              "sum_squared_delta": 6.139231108792002e-26,
+              "max_abs_delta": 1.7053025658242404e-13,
+              "rmse": 1.1309316871492875e-14,
+              "tolerance_failures": 0,
+              "rmse_limit_met": true
+            }
+          ],
+          "direct_epJSON_full_four_layer_Construction": true,
+          "qualification": "Source-reviewed direct epJSON full four-layer Wall path is physically exercised; EIO material rows are public observations and no private Native Construction TotLayers trace is claimed."
+        },
+        "AirGap_name_query_and_four_layer_scope": {
+          "parent_numeric_records_held": 1332,
+          "new_required_resistance_records": 4,
+          "child_numeric_records": 1336,
+          "public_NoMass_Material_Details_rows": 3,
+          "public_AirGap_Material_Air_rows": 4,
+          "Construction_Details_rows_observed": 0,
+          "private_Native_F_NumNums_TotLayers_observed": false,
+          "private_count_query_and_ctor_claim_basis": "Reviewed Native/Source CODE plus authored direct-input custody; public EIO rows and whole physical pair are separate observations.",
+          "whole_input_and_prospective_peer": {
+            "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-four-layer-prospective-DATA-DRAFT01/independent-static-review01.json",
+            "sha256": "1e319f2ed15a0fed14a76fad685753ae33abb42f76293753fca419d51238425d",
+            "bytes": 18703
+          },
+          "raw_input_peer": {
+            "path": ".runtime/object-expansion/unit159-prep/Source211-AirGap-active-native-names-field-aliases-INPUT-DRAFT01/independent-input-static-review01.json",
+            "sha256": "4dc3a4d95eb059c0d556aaefc4b94b17d540f48ca9d5d41b62bf74881c65a8ac",
+            "bytes": 12306
+          },
+          "current_Source_binding_peer": {
+            "path": ".runtime/porting/AirGap-native-names-extra-members-source/prospective01/independent-current-Source-binding-audit01.json",
+            "sha256": "72bd678845028d9b0b63d6daff6bdfebbce50f3572e18fd52f4a84d449c40a41",
+            "bytes": 11739
+          },
+          "generic_reported_comparer_v3": {
+            "schema": "Root.GenericComparerDirectJSONScope.v1",
+            "accepted": false,
+            "status": "not-applicable-to-direct-epJSON",
+            "engines_launched": 0,
+            "new_qualifying_cases": 0,
+            "new_qualifying_values": 0,
+            "qualification": "Published reusable V3 compares original-IDF actor inputs only. No invocation or format retry for current211 directJSON. ReviewedpairedV14withunchangedfrozenreader supplies the accepted full current comparison; historical Source207 original-IDF public example stays separate."
+          }
+        }
       }
     ],
     "totals": {
-      "paired_cases": 282,
-      "reported_samples": 13125976,
-      "raw_operand_unequal": 3246603,
+      "paired_cases": 283,
+      "reported_samples": 13201096,
+      "raw_operand_unequal": 3246606,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -97365,6 +97981,38 @@
           "sha256": "074ed75cc401b9a6d99932e6c5829ab14ba37d94dca4c4b8ff47d94705afe056",
           "bytes": 52988
         }
+      },
+      {
+        "id": "source211-native-AirGap-input-handling",
+        "receipt": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/build01/build/receipt.json",
+          "sha256": "2c07cb7ca422f5d9f7ad267fc58da9bb852f94f464f93c96f69de3b830bfe2af",
+          "bytes": 79675
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/8f/8fe1398d69100ff2b1d031d20450df6c306bad9a228731ebfd47e6fd5e80d16d",
+          "sha256": "8fe1398d69100ff2b1d031d20450df6c306bad9a228731ebfd47e6fd5e80d16d"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/build01/frozen/eplus-rs.exe",
+          "sha256": "a1d7fea6674bb537d4f6fd87972b28e92ce65c884fa22be4adfa3d6b8fe4aedc",
+          "bytes": 84298058
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/build01/frozen/build-receipt.json",
+          "sha256": "18270ecbe1e5802acf36c084c70f367d1e346248e1204dc6ea6e2445b9b8a2ef",
+          "bytes": 1653151
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/quality03/quality-preparation.json",
+          "sha256": "13f782d3ac320802fa7f93f99fb14cee2e8e9d54da74f9a0df6f0966ce560b8d",
+          "bytes": 15285
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/AirGap-native-names-extra-members-source/build01/freeze/receipt.json",
+          "sha256": "9b2ff76700129dc45a0d5add8663a530d1e9667758d18a375801743bdf0a4140",
+          "bytes": 78702
+        }
       }
     ],
     "focused_since_workspace": {
@@ -98033,14 +98681,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 210,
-      "builds_with_accepted_paired_cases": 178,
+      "actual_recorded_builds": 211,
+      "builds_with_accepted_paired_cases": 179,
       "builds_with_only_retained_failed_Source_attempts": 13,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 6,
       "builds_with_only_unaccepted_Source_attempts": 24,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "210 actual Source builds: 178 retain accepted pairs and 32 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. Failed builds 201/202/205/206 remain zero-credit. One fresh Source210 direct-epJSON NoMass known-field query/count case adds 75,120 values; all earlier accepted cases, builds and unaccepted histories remain unchanged. Original-IDF-only V3 is skipped without invocation. The separate invalid u64 resistance Native-only probe adds no Source/build/case/value/failure-inventory credit.",
+      "qualification": "211 actual Source builds: 179 retain accepted pairs and 32 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. Failed builds201/202/205/206 remain zero-credit. One fresh Source211 direct-epJSON internal AirGap four-layer scene adds 75,120 values; all earlier 282 cases/210 builds and unaccepted histories remain unchanged. Qualified current 5/0 is separate from all-unit QA 10/3 and workspace2/1 infrastructure history. Metadata normalization/API predicate corrections add no Source builds, actors or paired credit. Original-IDF-only V3 is skipped without invocation.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,

@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-11-19
+last_reviewed: 2026-11-20
 ---
 
 # Current Status
@@ -44,7 +44,7 @@ already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122
 This inventory correction adds no physical evidence; retained116 is unchanged.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 282 paired physical cases and 13,125,976 reported values with zero
+contains 283 paired physical cases and 13,201,096 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -74,21 +74,21 @@ The original-IDF route supplies the same physical IDF to both actors and uses th
 
 Source199 Simple and Source200 Advanced remain accepted direct-epJSON pairs; Source203 retains its accepted Input04 original-IDF Advanced pair. The older Source199 v10 Advanced attempt remains at 31/34 gates with zero credit, and failed builds 201 (import parsing) and 202 (DSOA sizing input) remain separate zero-credit history.
 
-Source204/207 original-IDF count/default witnesses, Source208 NoMass extras and Source209 Construction-name/reference evidence remain retained. Source210 adds one direct-epJSON NoMass field-query/count pair across five DesignDays, with one Native and one Source run. All 34 gates and 158 series/75,120 values pass unchanged policies. Only three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meters are raw-exact.
+Source204/207 original-IDF count/default witnesses, Source208 NoMass extras, Source209 Construction names and Source210 NoMass field-query/count evidence remain retained. Source211 adds one Source B direct-epJSON internal-AirGap pair across five DesignDays, with one official Native and one Source run and no reruns. All 34 gates and 158 series/75,120 values pass unchanged policies. Only three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meter bodies are raw-exact.
 
-Canonical `Material:NoMass` known fields now use Native C-string-prefix lookup while counts inspect exact retained keys and raw statistics retain field presence. Required aliases and ignored nested field-NUL metadata stay raw-owned; known kinds/ranges are validated before effective defaults. Matching public Material Details rows report thermal/solar/visible absorptances of 0.9/0.7/0.7 for NBSP-only and NBSP-padded `PLAIN`, and 0.8125/0.7/0.5 for `PLAIN`. The filled-but-uncounted values and private Native F/NumNums/default counters are explained by reviewed CODE, not private observations.
+Four distinct AirGap names (NBSP-padded `GAP`, VT-only, ASCII-padded `GAP` and `GAP`) retain required resistance field-NUL aliases and ignored nonnumeric/nested metadata. Public EIO rows match exactly: four `Material:Air` rows each report resistance 0.1500, and the three NoMass `Material Details` rows retain Source210 properties. Four full four-layer Wall recipes place the AirGap internally between outside NoMass and the retained Mass Layer/inside NoMass. The paired solver exercises that reviewed path; no Construction Details rows or private Native F/NumNums/TotLayers/default counters are observed. Those counts remain CODE-derived.
 
-The current Source210 snapshot passes once workspace tests (5,051 passed, zero failed, two ignored), five current QA commands with two existing bodies and five-package all-target Clippy, plus separate once workspace all-target Clippy. The material getter body executes; OA-getter, historical and reused-body credits remain zero, with no new test functions. The separate u64 resistance Native probe is invalid before simulation and adds no Source build, paired case, value or failed-Source credit.
+The current snapshot passes five qualified QA commands with two existing bodies and four-package all-target Clippy. The complete unit history retains ten commands/three failures, including the failed first formatter and two failed preparation U07 invocations. Workspace02 passes 5,051/0/2 after a retained disk-space linker failure in workspace01; there is one default build 211. Material-getter execution is real; OA-getter, historical and reused-body credits remain zero, with no new test functions. Reviewed V14 preserves the genuine earlier successful format/check and metadata failure history separately, without repeating Rust QA/build or changing science.
 
-All five ordinary Construction recipes, exact active aliases, full three-layer Walls, real EcoRoof and nine topology drivers remain held. The earlier original-IDF F3 two-layer/raw-tail case stays distinct. Family-NUL, other-family field-NUL, Original/Legacy and comparator-order fences remain; six other Construction:* families plus ConstructionProperty:InternalHeatSource, positive-OA Humidistat, active window/CFS/EQL/shading, Source A expansion, annual runs and full-object conformance remain outside this new physical qualification.
+Real EcoRoof, all five ordinary Construction names/surface links and nine topology drivers remain held. The earlier original-IDF F3 two-layer/raw-tail case stays distinct. Existing positive-resistance/type checks and inside/outside AirGap bans, Original/Legacy, family-NUL, other-family field-NUL and comparator-order fences remain. Six other Construction:* families plus ConstructionProperty:InternalHeatSource, positive-OA Humidistat, active window/CFS/EQL/shading, Source A physical expansion, annual runs and full-object conformance remain outside this new physical qualification.
 
 Complete current streams and per-series results are retained in
-`.runtime/porting/NoMass-direct-JSON-field-NUL-source/runtime01/`: `readback.json`,
+`.runtime/porting/AirGap-native-names-extra-members-source/runtime01/`: `readback.json`,
 `native/output/nativeout.eso`, `native/output/nativeout.mtr`,
 `source/output/eplusrs.eso` and `source/output/eplusrs.mtr`.
-The frozen V13 reader supplies the accepted current comparison. The installed
-[v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py) is
-original-IDF-only and was skipped without invocation for this direct-epJSON case;
+The unchanged scientific reader under reviewed V14 supplies the accepted current
+comparison. The installed [v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py)
+is original-IDF-only and was skipped without invocation for this direct-epJSON case;
 it adds no case, value or failure credit.
 
 The following historical Source207 original-IDF example remains valid. Its

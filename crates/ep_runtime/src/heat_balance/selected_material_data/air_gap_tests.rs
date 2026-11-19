@@ -247,6 +247,61 @@ fn get_materials(
 
 #[test]
 fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report() {
+    let air_gap_source_name_matches = ["\u{b}", "\u{a0}", " GAP ", "GAP"].iter().all(|name| {
+        let (mut model, mut raw) = fixture(true, 0.15);
+        model.material_names = ep_model::NameMap::source_exact_namespace();
+        raw.air_gaps[0].object_name = (*name).into();
+        model.materials[2].name = model.material_names.normalized_name(name);
+        model.ctf_report_names.materials[2].1 = name.to_ascii_uppercase();
+        for (id, loader) in &model.ctf_report_names.materials {
+            if model.material_names.insert(loader, *id).is_some() {
+                return false;
+            }
+        }
+        let (data, input, shortcut) = get_materials(&model, &raw)
+            .expect("actual AirGap parent under the real Source name-map policy");
+        let mut eio = Vec::new();
+        data.write_material_reports(&model, &mut eio)
+            .expect("same AirGap report owner");
+        let text = String::from_utf8(eio).unwrap();
+        let layers = material_layer_inputs(&[
+            &model.materials[0],
+            &model.materials[2],
+            &model.materials[0],
+        ])
+        .expect("same real internal AirGap CTF adapter");
+        let ctf = preprocess_ctf_layers(
+            &layers,
+            CtfLayerContext {
+                is_used_ctf: true,
+                errors_found: false,
+                source_sink_present: false,
+                solution_dimensions: 1,
+            },
+        )
+        .expect("same existing internal-layer preprocessing");
+        let mut wrong = model.clone();
+        wrong.ctf_report_names.materials[2].1 = "WRONG GAP OWNER".into();
+        model.material_names.resolve(name) == Some(MaterialId(2))
+            && data.material_map.get(&name.to_ascii_uppercase()) == Some(&3)
+            && data.material_groups[&MaterialId(2)] == SourceMaterialGroup::AirGap
+            && data.resistance_only[&MaterialId(2)]
+            && data.nominal_r[2] == 0.15
+            && !input.is_object_unused("Material:AirGap", name)
+            && shortcut.alpha_args[0] == name.to_ascii_uppercase()
+            && shortcut.alpha_field_names[0] == "name"
+            && !shortcut.alpha_field_blanks[0]
+            && shortcut.numeric_args[0].to_bits() == 0.15f64.to_bits()
+            && shortcut.numeric_field_names[0] == "thermal_resistance"
+            && !shortcut.numeric_field_blanks[0]
+            && !ctf.errors_found
+            && ctf.after_conversion.is_some()
+            && text.ends_with(&format!(
+                " Material:Air,{},0.1500\n",
+                name.to_ascii_uppercase()
+            ))
+            && get_materials(&wrong, &raw).is_err()
+    });
     for epjson in [false, true] {
         for resistance in [0.15, 0.001, 0.0005] {
             let (model, raw) = fixture(epjson, resistance);
@@ -271,7 +326,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 ("Material:NoMass", "No mass"),
                 ("Material:AirGap", "MiXeD gap"),
             ] {
-                assert!(!input.is_object_unused(family, name));
+                assert!(air_gap_source_name_matches && !input.is_object_unused(family, name));
             }
             assert_eq!(shortcut.alpha_args, ["MIXED GAP", ""]);
             assert_eq!(shortcut.numeric_args[0].to_bits(), resistance.to_bits());

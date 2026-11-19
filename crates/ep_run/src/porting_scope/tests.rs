@@ -8395,6 +8395,175 @@ MaterialProperty:GlazingSpectralData,
         };
         // Native required-name RE2 excludes LF and ASCII-only blanks, not VT/NBSP/NUL.
         // Reuse these actual staged files; no SourceSession or new fixture owner.
+        // AirGap owns the same Native A1 pattern and actual shared material map.
+        // Original spellings below survive Native IDF whitespace/rtrim; ASCII
+        // padded aliases are tested only as direct JSON map keys.
+        let air_gap_native_domain_matches = [
+            (["\u{b}", "GAP OTHER"], true),
+            (["\u{a0}", "GAP OTHER"], true),
+            (["GAP", "GAP\u{a0}"], true),
+            (["GAP", " GAP "], false),
+        ].iter().all(|(names, original)| {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            let family = "Material:AirGap";
+            let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+            value["Material"] = serde_json::json!({"QA GAP SOLID":{
+                "roughness":"Rough","thickness":0.1,"conductivity":1.7,
+                "density":2200,"specific_heat":840}});
+            value[family] = serde_json::json!({
+                (names[0]):{"thermal_resistance":0.15},
+                (names[1]):{"thermal_resistance":0.2}});
+            value["Construction"] = serde_json::json!({
+                "QA GAP FIRST":{"outside_layer":"QA GAP SOLID","layer_2":names[0],"layer_3":"QA GAP SOLID"},
+                "QA GAP SECOND":{"outside_layer":"QA GAP SOLID","layer_2":names[1],"layer_3":"QA GAP SOLID"}});
+            let original_ok = if *original {
+                std::fs::write(&converted_path,value.to_string()).unwrap();
+                std::fs::write(&original_path,format!(
+                    "{preamble}\nMaterial,QA GAP SOLID,Rough,0.1,1.7,2200,840;\n{family},{},0.15;\n{family},{},0.2;\nConstruction,QA GAP FIRST,QA GAP SOLID,{},QA GAP SOLID;\nConstruction,QA GAP SECOND,QA GAP SOLID,{},QA GAP SOLID;",
+                    names[0],names[1],names[0],names[1])).unwrap();
+                let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+                    &converted_path,&original_path).expect("genuine Original AirGap names and declarations");
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                let mut input = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("same Original AirGap order/F/IP handoff");
+                let capacity = input.get_object_def_max_args(family).unwrap();
+                let projected = crate::ordinary_material_input::resolve_source(&raw,&input).unwrap();
+                !compiled.has_errors() && !raw.is_epjson()
+                    && raw.validate_source_idf_object_custody(family).is_ok()
+                    && (capacity.alphas,capacity.numerics,capacity.total().unwrap())==(1,1,2)
+                    && raw.source_ordered_instances(family).unwrap().iter().zip(names).all(|((actual,row),name)|
+                        actual.0==*name && matches!(row.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),
+                            Some(ep_raw_model::RawValue::Number(token)) if token=="2"))
+                    && projected.air_gaps.len()==2 && names.iter().all(|name|
+                        projected.air_gaps.iter().any(|row|row.object_name==*name && row.idf_max_fields==Some(2)))
+                    && ["idf_order","idf_max_fields","idf_max_extensible_fields"].iter().all(|key| {
+                        let mut bad=raw.clone();
+                        bad.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                            .get_mut(&ep_raw_model::ObjectName(names[0].into())).unwrap().fields
+                            .insert(ep_raw_model::FieldName((*key).into()),ep_raw_model::RawValue::String("not custody".into()));
+                        crate::ordinary_input_processor::resolve_source_b(&bad).is_err()
+                    })
+            } else { true };
+            for name in names {
+                for (key,extra) in [
+                    ("source_null",serde_json::json!(null)),("source_bool",serde_json::json!(true)),
+                    ("source_number",serde_json::json!(17)),("source_string",serde_json::json!("kept")),
+                    ("source_array",serde_json::json!([null,true])),("source_object",serde_json::json!({"x":"kept"})),
+                    ("roughness",serde_json::json!("ignored")),("name",serde_json::json!([false])),
+                    ("idf_order",serde_json::json!(null)),("idf_max_fields",serde_json::json!("not custody")),
+                    ("idf_max_extensible_fields",serde_json::json!({})),
+                ] { value[family][*name][key]=extra; }
+            }
+            let canonical_raw = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+            for name in names {
+                let fields=value[family][*name].as_object_mut().unwrap();
+                let resistance=fields.remove("thermal_resistance").unwrap();
+                fields.insert("thermal_resistance\u{0}tail".into(),resistance);
+            }
+            let raw = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+            let raw_objects=raw.objects.clone();
+            let compiled=ep_compiler::compile_raw_model_for_source(&raw);
+            let typed_ok=compiled.model.as_ref().is_some_and(|model| {
+                let ids=names.map(|name|model.material_names.resolve(name));
+                model.material_names.is_source_exact_namespace() && ids[0].is_some()
+                    && ids[1].is_some() && ids[0]!=ids[1]
+                    && names.iter().zip(ids).all(|(name,id)|model.materials.iter().any(|row|
+                        Some(row.id)==id && row.kind()==ep_model::MaterialKind::AirGap
+                        && row.name.0==name.to_ascii_uppercase()
+                        && matches!(row.definition,ep_model::MaterialDefinition::AirGap(value)
+                            if value.thermal_resistance_m2_k_per_w.to_bits()
+                                ==(if *name==names[0] {0.15_f64} else {0.2_f64}).to_bits()))
+                        && model.ctf_report_names.materials.iter().any(|(actual,loader)|
+                            Some(*actual)==id && *loader==name.to_ascii_uppercase()))
+                    && ["QA GAP FIRST","QA GAP SECOND"].iter().zip(ids).all(|(name,id)|
+                        model.constructions.iter().any(|row|row.name.0==*name
+                            && row.layers.len()==3 && Some(row.layers[1])==id))
+            });
+            let transport_ok=[false,true].iter().all(|source_b| {
+                let mut input=if *source_b { crate::ordinary_input_processor::resolve_source_b(&raw) }
+                    else { crate::ordinary_input_processor::resolve_source_a(&raw) }
+                    .expect("Source A/B AirGap extra members remain raw metadata");
+                let capacity=input.get_object_def_max_args(family).unwrap();
+                let projected=crate::ordinary_material_input::resolve_source(&raw,&input).unwrap();
+                let baseline_input=if *source_b { crate::ordinary_input_processor::resolve_source_b(&canonical_raw) }
+                    else { crate::ordinary_input_processor::resolve_source_a(&canonical_raw) }.unwrap();
+                let mut statistics=ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                let mut baseline_statistics=ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                input.report_source_idf_records_stats(&mut statistics).unwrap();
+                baseline_input.report_source_idf_records_stats(&mut baseline_statistics).unwrap();
+                statistics.number_defaulted_fields==baseline_statistics.number_defaulted_fields
+                    && statistics.total_fields_with_defaults==baseline_statistics.total_fields_with_defaults
+                    && statistics.number_input_records==baseline_statistics.number_input_records
+                    && statistics.number_autosized_fields==baseline_statistics.number_autosized_fields
+                    && statistics.total_autosizable_fields==baseline_statistics.total_autosizable_fields
+                    && statistics.number_autocalculated_fields==baseline_statistics.number_autocalculated_fields
+                    && statistics.total_autocalculatable_fields==baseline_statistics.total_autocalculatable_fields
+                    && (capacity.alphas,capacity.numerics,capacity.total().unwrap())==(1,1,2)
+                    && projected.air_gaps.len()==2 && names.iter().all(|name| {
+                        let stats=input.source_raw_object_fields(family,name).unwrap();
+                        !stats.contains_key("thermal_resistance")
+                            && stats.get("thermal_resistance\u{0}tail")==Some(&if *source_b {
+                                S::Number((if *name==names[0] {"0.15"} else {"0.2"}).into())
+                            } else { S::OtherScalar })
+                            && stats.get("source_null")==Some(&S::Null)
+                            && stats.get("source_bool")==Some(&if *source_b { S::Bool(true) } else { S::OtherScalar })
+                            && stats.get("source_number")==Some(&if *source_b { S::Number("17".into()) } else { S::OtherScalar })
+                            && stats.get("source_array")==Some(&S::Array(vec![
+                                S::Null, if *source_b { S::Bool(true) } else { S::OtherScalar }]))
+                            && stats.get("idf_max_fields")==Some(&S::String("not custody".into()))
+                            && projected.air_gaps.iter().any(|row|row.object_name==*name
+                                && row.idf_max_fields.is_none() && row.fields.len()==1
+                                && row.fields.get("thermal_resistance")==Some(
+                                    &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::Number(
+                                        if *name==names[0] {0.15} else {0.2})))
+                    })
+            });
+            let mut nested=value.clone();
+            nested[family][names[0]]["source_object"]=serde_json::json!({"x\u{0}tail":[null,true]});
+            let nested=ep_raw_model::parse_epjson_str_for_source(&nested.to_string()).unwrap();
+            let nested_input=crate::ordinary_input_processor::resolve_source_b(&nested).unwrap();
+            let nested_projection=crate::ordinary_material_input::resolve_source(&nested,&nested_input).unwrap();
+            let nested_matches=nested_input.source_raw_object_fields(family,names[0]).unwrap()
+                .get("source_object")==Some(&S::Object(std::collections::BTreeMap::from([
+                    ("x\u{0}tail".into(),S::Array(vec![S::Null,S::Bool(true)]))])))
+                && nested_projection.air_gaps.iter().all(|row|row.fields.len()==1
+                    && row.fields.contains_key("thermal_resistance"));
+            let ok=original_ok && !compiled.has_errors() && typed_ok && transport_ok && nested_matches
+                && raw.objects==raw_objects
+                && crate::ordinary_input_processor::resolve(&raw).is_err()
+                && ep_compiler::compile_raw_model(&raw).has_errors();
+            if !ok {
+                eprintln!(
+                    "AirGap native name/extra custody mismatch for {names:?}: original_ok={original_ok}, compiled_has_errors={}, diagnostics={:?}, typed_ok={typed_ok}, transport_ok={transport_ok}, nested_matches={nested_matches}, raw_held={}, legacy_resolver_rejected={}, legacy_compiler_rejected={}",
+                    compiled.has_errors(),
+                    compiled.report.diagnostics,
+                    raw.objects == raw_objects,
+                    crate::ordinary_input_processor::resolve(&raw).is_err(),
+                    ep_compiler::compile_raw_model(&raw).has_errors(),
+                );
+            }
+            ok
+        }) && [serde_json::json!(null),serde_json::json!(true),serde_json::json!(""),
+            serde_json::json!("0.15"),serde_json::json!([]),serde_json::json!({}),
+            serde_json::json!(0),serde_json::json!(-0.15)].iter().all(|bad| {
+            let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
+            value["Material:AirGap"]=serde_json::json!({"QA BAD ALIASED GAP":{"thermal_resistance\u{0}tail":bad}});
+            let raw=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+            ep_compiler::compile_raw_model_for_source(&raw).has_errors()
+                && crate::ordinary_input_processor::resolve_source_a(&raw).is_err()
+                && crate::ordinary_input_processor::resolve_source_b(&raw).is_err()
+        }) && {
+            let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
+            value["Material:AirGap\u{0}tail"]=serde_json::json!({"QA FAMILY ALIAS":{"thermal_resistance":0.15}});
+            ep_raw_model::parse_epjson_str_for_source(&value.to_string()).is_err()
+        } && [""," \t\r\u{c}","bad\nname"].iter().all(|name| {
+            let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
+            value["Material:AirGap"]=serde_json::json!({(*name):{"thermal_resistance":0.15}});
+            let raw=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+            ep_compiler::compile_raw_model_for_source(&raw).has_errors()
+                && crate::ordinary_input_processor::resolve_source_a(&raw).is_err()
+                && crate::ordinary_input_processor::resolve_source_b(&raw).is_err()
+        });
         let no_mass_native_name_matches = [
             ["\u{b}", "NM NATIVE OTHER"],
             ["\u{a0}", "NM NATIVE OTHER"],
@@ -9198,7 +9367,7 @@ MaterialProperty:GlazingSpectralData,
         std::fs::remove_file(converted_path).unwrap();
         std::fs::remove_file(original_path).unwrap();
         std::fs::remove_dir(home).unwrap();
-        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_extra_members_matches && no_mass_nul_fields_match && construction_original_names_match && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
+        matches && dsoa_ingress_matches && air_gap_eof_matches && air_gap_native_domain_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_extra_members_matches && no_mass_nul_fields_match && construction_original_names_match && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
             // This table proves its original 24 material/curve layouts. The two
             // OA layouts and DSOA have separate original-IDF existing-body cases.
             && observed_families.len() == 24
@@ -9338,12 +9507,18 @@ MaterialProperty:GlazingSpectralData,
             let mut boundary = value.clone();
             boundary[FAMILY]["MiXeD Gap"] = fields;
             let raw = parse_epjson_str(&boundary.to_string()).expect("missing/unknown field raw");
+            // Missing R still fails both lanes. An undeclared member is ignored
+            // only by Source; the existing Legacy resolver keeps its negative.
             assert!(
                 match scope {
                     PortingScope::A => crate::ordinary_input_processor::resolve(&raw),
                     PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
                 }
                 .is_err()
+                    == (boundary[FAMILY]["MiXeD Gap"]
+                        .get("thermal_resistance")
+                        .is_none()
+                        || matches!(scope, PortingScope::A))
             );
         }
         for key in ["", " "] {

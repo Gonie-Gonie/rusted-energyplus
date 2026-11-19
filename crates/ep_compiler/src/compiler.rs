@@ -776,10 +776,12 @@ impl<'a> Compiler<'a> {
                         });
                         name_valid && (named || self.source_unused_custom_window_gas(&name.0, object)) && thickness && supplied
                     }))
-                || (self.raw_model.is_epjson()
-                    || self.raw_model.validate_source_idf_object_custody("Material:NoMass").is_ok())
-                    && self.raw_model.objects.get(&ep_raw_model::ObjectType("Material:NoMass".into()))
-                        .is_some_and(|rows| !rows.is_empty())
+                || ["Material:NoMass", "Material:AirGap"].iter().any(|family| {
+                    (self.raw_model.is_epjson()
+                        || self.raw_model.validate_source_idf_object_custody(family).is_ok())
+                        && self.raw_model.objects.get(&ep_raw_model::ObjectType((*family).into()))
+                            .is_some_and(|rows| !rows.is_empty())
+                })
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:GasMixture".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_window_gas_mixture(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
@@ -4598,6 +4600,36 @@ impl<'a> Compiler<'a> {
     fn parse_air_gap_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "Material:AirGap";
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let object = if self.source_file_declarations && self.raw_model.is_epjson() {
+                let mut queried = RawObject {
+                    fields: std::collections::BTreeMap::new(),
+                    source_span: object.source_span.clone(),
+                };
+                let mut ambiguous = false;
+                for (field, value) in &object.fields {
+                    if ep_model::source_json_c_string_prefix(&field.0) == "thermal_resistance"
+                        && queried
+                            .fields
+                            .insert(FieldName("thermal_resistance".into()), value.clone())
+                            .is_some()
+                    {
+                        self.error(
+                            "SourceFieldLookupUnavailable",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some(&field.0),
+                            "uncoalesced Source AirGap field aliases".into(),
+                        );
+                        ambiguous = true;
+                    }
+                }
+                if ambiguous {
+                    continue;
+                }
+                queried
+            } else {
+                object
+            };
             let Some(thermal_resistance_m2_k_per_w) = self.required_number_minimum(
                 OBJECT_TYPE,
                 &name,
@@ -11342,7 +11374,10 @@ impl<'a> Compiler<'a> {
                     .is_ok())
             && (matches!(
                 object_type,
-                "WindowMaterial:Gas" | "WindowMaterial:GasMixture" | "Material:NoMass"
+                "WindowMaterial:Gas"
+                    | "WindowMaterial:GasMixture"
+                    | "Material:NoMass"
+                    | "Material:AirGap"
             ) || source_glazing_name
                 || source_refraction_name
                 || source_shade_name
@@ -11456,7 +11491,11 @@ impl<'a> Compiler<'a> {
                         && model.material_names.resolve(value).is_some_and(|id| {
                             model.materials.iter().any(|material| {
                                 material.id == id
-                                    && matches!(material.definition, MaterialDefinition::NoMass(_))
+                                    && matches!(
+                                        material.definition,
+                                        MaterialDefinition::NoMass(_)
+                                            | MaterialDefinition::AirGap(_)
+                                    )
                             })
                         }) =>
                 {
@@ -11481,6 +11520,7 @@ impl<'a> Compiler<'a> {
                                         && matches!(
                                             material.definition,
                                             MaterialDefinition::NoMass(_)
+                                                | MaterialDefinition::AirGap(_)
                                         )
                                 })
                             }) =>

@@ -904,7 +904,10 @@ fn resolve_raw(
             let blank_name = if source_analytic_curve_family
                 || source_spectral_data_family
                 || source_calendar_ingress
-                    && matches!(family.0.as_str(), "Material:NoMass" | "Construction")
+                    && matches!(
+                        family.0.as_str(),
+                        "Material:NoMass" | "Material:AirGap" | "Construction"
+                    )
                     && (raw.is_epjson() || source_original_idf_metadata)
                 || source_refraction_family
                 || source_glazing_family
@@ -978,10 +981,11 @@ fn resolve_raw(
             {
                 return Err(format!("blank ordinary {} name", family.0));
             }
-            let source_json_no_mass =
-                source_calendar_ingress && raw.is_epjson() && family.0 == "Material:NoMass";
+            let source_json_material_fields = source_calendar_ingress
+                && raw.is_epjson()
+                && matches!(family.0.as_str(), "Material:NoMass" | "Material:AirGap");
             for (field, value) in &object.fields {
-                let field_name = if source_json_no_mass {
+                let field_name = if source_json_material_fields {
                     ep_model::source_json_c_string_prefix(&field.0)
                 } else {
                     field.0.as_str()
@@ -1063,7 +1067,7 @@ fn resolve_raw(
                     // The three actual IDF metadata predicates stay unchanged.
                     let metadata = (source_calendar_ingress
                         && raw.is_epjson()
-                        && family.0 == "Material:NoMass"
+                        && matches!(family.0.as_str(), "Material:NoMass" | "Material:AirGap")
                         && ep_raw_model::source_idf_object_layout(&family.0).is_some_and(
                             |(_, fixed, _)| {
                                 // Name is the object-map key, not an instance operand.
@@ -1214,7 +1218,7 @@ fn resolve_raw(
             for &required in required_fields(&family.0) {
                 // Meter keys are required strings but the schema has no
                 // minLength: an authored empty key reaches the real not-found warning.
-                let required_value = if source_json_no_mass {
+                let required_value = if source_json_material_fields {
                     object
                         .fields
                         .iter()
@@ -1223,7 +1227,7 @@ fn resolve_raw(
                 } else {
                     field(object, required)
                 };
-                let required_is_missing = if source_json_no_mass {
+                let required_is_missing = if source_json_material_fields {
                     required_value.is_none_or(blank)
                 } else if (matches!(
                     family.0.as_str(),
