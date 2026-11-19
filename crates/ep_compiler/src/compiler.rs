@@ -747,6 +747,10 @@ impl<'a> Compiler<'a> {
                         });
                         name_valid && (named || self.source_unused_custom_window_gas(&name.0, object)) && thickness && supplied
                     }))
+                || (self.raw_model.is_epjson()
+                    || self.raw_model.validate_source_idf_object_custody("Material:NoMass").is_ok())
+                    && self.raw_model.objects.get(&ep_raw_model::ObjectType("Material:NoMass".into()))
+                        .is_some_and(|rows| !rows.is_empty())
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:GasMixture".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_window_gas_mixture(&name.0, object)))
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Glazing".into()))
@@ -11248,7 +11252,7 @@ impl<'a> Compiler<'a> {
                     .is_ok())
             && (matches!(
                 object_type,
-                "WindowMaterial:Gas" | "WindowMaterial:GasMixture"
+                "WindowMaterial:Gas" | "WindowMaterial:GasMixture" | "Material:NoMass"
             ) || source_glazing_name
                 || source_refraction_name
                 || source_shade_name
@@ -11345,8 +11349,21 @@ impl<'a> Compiler<'a> {
             // Read every layer field before deciding whether the object can be
             // materialized. This keeps malformed optional references distinct
             // from blanks and preserves all useful diagnostics on one pass.
-            let outside_layer_name =
-                self.required_string(OBJECT_TYPE, &name, &object, "outside_layer");
+            let outside_layer_name = match field_value(&object, "outside_layer") {
+                Some(RawValue::String(value))
+                    if self.source_file_declarations
+                        && model.material_names.is_source_exact_namespace()
+                        && model.material_names.resolve(value).is_some_and(|id| {
+                            model.materials.iter().any(|material| {
+                                material.id == id
+                                    && matches!(material.definition, MaterialDefinition::NoMass(_))
+                            })
+                        }) =>
+                {
+                    Some(value.clone())
+                }
+                _ => self.required_string(OBJECT_TYPE, &name, &object, "outside_layer"),
+            };
             if outside_layer_name.is_none() {
                 fields_valid = false;
             }
@@ -11354,13 +11371,51 @@ impl<'a> Compiler<'a> {
             layer_names.push(outside_layer_name);
             for layer_number in 2..=MAX_OPAQUE_CONSTRUCTION_LAYERS {
                 let field = format!("layer_{layer_number}");
-                match self.optional_reference_name_checked(OBJECT_TYPE, &name, &object, &field) {
+                let layer_name = match field_value(&object, &field) {
+                    Some(RawValue::String(value))
+                        if self.source_file_declarations
+                            && model.material_names.is_source_exact_namespace()
+                            && model.material_names.resolve(value).is_some_and(|id| {
+                                model.materials.iter().any(|material| {
+                                    material.id == id
+                                        && matches!(
+                                            material.definition,
+                                            MaterialDefinition::NoMass(_)
+                                        )
+                                })
+                            }) =>
+                    {
+                        Some(Some(value.clone()))
+                    }
+                    _ => self.optional_reference_name_checked(OBJECT_TYPE, &name, &object, &field),
+                };
+                match layer_name {
                     Some(layer_name) => layer_names.push(layer_name),
                     None => {
                         fields_valid = false;
                         layer_names.push(None);
                     }
                 }
+            }
+
+            // All supplied layer primitives were checked above. Native
+            // GetConstructData consumes only the returned alpha prefix; a final
+            // EOF layer remains in raw/getter storage without becoming LayerPoint.
+            if let Some(maximum) = self.source_original_fixed_maximum(OBJECT_TYPE, &object) {
+                let returned_layers = maximum.saturating_sub(1);
+                if returned_layers == 0 {
+                    self.error(
+                        "InvalidConstructionLayerCount",
+                        OBJECT_TYPE,
+                        Some(&name),
+                        Some("outside_layer"),
+                        format!(
+                            "{OBJECT_TYPE}/{name} requires at least one returned material layer"
+                        ),
+                    );
+                    fields_valid = false;
+                }
+                layer_names.truncate(returned_layers);
             }
 
             let mut first_missing_layer_index = None;

@@ -102,8 +102,13 @@ impl SelectedHeatBalanceInputState {
                 .name
                 .clone_from(&values.alphas[0]);
             let mut matches = model.constructions.iter().filter(|c| {
-                original_loader_name(&model.ctf_report_names.constructions, c.id, &c.name)
-                    .is_ok_and(|name| name.to_ascii_uppercase() == values.alphas[0])
+                original_loader_name(
+                    &model.ctf_report_names.constructions,
+                    c.id,
+                    &c.name,
+                    &model.construction_names,
+                )
+                .is_ok_and(|name| name.to_ascii_uppercase() == values.alphas[0])
             });
             let construction = matches.next().ok_or(HeatBalanceInputError::Unavailable(
                 "actual typed construction identity",

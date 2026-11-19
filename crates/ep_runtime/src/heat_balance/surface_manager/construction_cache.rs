@@ -229,6 +229,7 @@ impl ConstructionThermalDataCache {
                     &model.ctf_report_names.constructions,
                     construction.id,
                     &construction.name,
+                    &model.construction_names,
                 )
                 .map_err(|error| RuntimeError::from(CtfInitializationError::Owner(error)))?
             } else {

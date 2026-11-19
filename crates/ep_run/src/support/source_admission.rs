@@ -528,20 +528,33 @@ impl SourceSupportAdmission {
         if !roof_vegetation_bindings.is_empty()
             && let Some(rows) = raw.objects.get(&ObjectType("Construction".into()))
         {
+            if !raw.is_epjson() {
+                raw.validate_source_idf_object_custody("Construction")
+                    .ok()?;
+            }
             for (name, object) in rows {
                 let Some(RawValue::String(outside)) =
                     object.fields.get(&FieldName("outside_layer".into()))
                 else {
                     return None;
                 };
-                if outside.trim().is_empty() {
+                if outside.contains('\n')
+                    || outside
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+                {
                     return None;
                 }
                 let mut layers = vec![outside.to_ascii_uppercase()];
                 let mut ended = false;
                 for index in 2..=10 {
                     match object.fields.get(&FieldName(format!("layer_{index}"))) {
-                        Some(RawValue::String(reference)) if !reference.trim().is_empty() => {
+                        Some(RawValue::String(reference))
+                            if !reference.contains('\n')
+                                && !reference.bytes().all(|byte| {
+                                    matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' ')
+                                }) =>
+                        {
                             if ended {
                                 return None;
                             }
@@ -550,6 +563,18 @@ impl SourceSupportAdmission {
                         None | Some(RawValue::String(_)) => ended = true,
                         _ => return None,
                     }
+                }
+                if !raw.is_epjson() {
+                    let Some(RawValue::Number(maximum)) =
+                        object.fields.get(&FieldName("idf_max_fields".into()))
+                    else {
+                        return None;
+                    };
+                    let returned_layers = maximum.parse::<usize>().ok()?.saturating_sub(1);
+                    if returned_layers == 0 {
+                        return None;
+                    }
+                    layers.truncate(returned_layers);
                 }
                 if roof_vegetation_construction_bindings
                     .insert(name.0.to_ascii_uppercase(), layers)

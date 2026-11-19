@@ -8341,6 +8341,168 @@ MaterialProperty:GlazingSpectralData,
                 && matches!(ip.source_raw_object_fields(family, name).unwrap().get("idf_max_fields"),
                     Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == "1")
         };
+        // Native required-name RE2 excludes LF and ASCII-only blanks, not VT/NBSP/NUL.
+        // Reuse these actual staged files; no SourceSession or new fixture owner.
+        let no_mass_native_name_matches = [
+            ["\u{b}", "NM NATIVE OTHER"],
+            ["\u{a0}", "NM NATIVE OTHER"],
+            ["Kept\0suffix", "NM NATIVE OTHER"],
+            ["A", "\u{a0}A"],
+            ["A", "A\u{a0}"],
+            ["A", "\u{b}A"],
+        ].iter().all(|names| {
+            let family = "Material:NoMass";
+            let fields = serde_json::json!({"roughness":"Rough","thermal_resistance":0.001});
+            let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+            value[family] = serde_json::Value::Object(serde_json::Map::from_iter(
+                names.iter().map(|name| ((*name).into(), fields.clone()))));
+            value["Construction"]["NM NAME OUTSIDE"] = serde_json::json!({
+                "outside_layer":names[0],"layer_2":names[1]});
+            value["Construction"]["NM NAME INSIDE"] = serde_json::json!({
+                "outside_layer":names[1],"layer_2":names[0]});
+            std::fs::write(&converted_path, value.to_string()).unwrap();
+            std::fs::write(&original_path, format!(
+                "{preamble}\n{family},{},Rough,0.001;\n{family},{},Rough,0.001;\nConstruction,NM NAME OUTSIDE,{},{};\nConstruction,NM NAME INSIDE,{},{};",
+                names[0], names[1], names[0], names[1], names[1], names[0])).unwrap();
+            let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+                &converted_path, &original_path).expect("genuine NoMass native-name declaration custody");
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                .expect("genuine Source NoMass native-name admission");
+            let projected = crate::ordinary_material_input::resolve_source(&raw, &ip)
+                .expect("same retained NoMass native-name projection");
+            let generic = ep_raw_model::load_epjson_file_with_idf_order(
+                &converted_path, &original_path).expect("held generic Original-IDF loader");
+            let generic_order = generic.source_ordered_instances(family)
+                .expect("generic fixed-family recovered order");
+            let generic_ip = crate::ordinary_input_processor::resolve_source_b(&generic)
+                .expect("generic recovered NoMass order/F satisfy the existing Source IP contract");
+            let direct = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+            let json_source = ep_compiler::compile_raw_model_for_source(&direct);
+            let legacy = ep_compiler::compile_raw_model(&direct);
+            let legacy_rejects = names.iter().any(|name| name.trim().is_empty())
+                || names[0].trim().eq_ignore_ascii_case(names[1].trim());
+            let ok = !compiled.has_errors() && !json_source.has_errors()
+                && legacy.has_errors() == legacy_rejects
+                && !raw.is_epjson() && raw.validate_source_idf_object_custody(family).is_ok()
+                && generic.validate_source_idf_object_custody(family).is_ok()
+                && generic.has_idf_declaration_order(family)
+                && generic_order.len() == names.len()
+                && generic_order.iter().zip(names).all(|((actual, row), name)| {
+                    actual.0 == *name
+                        && matches!(row.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),
+                            Some(ep_raw_model::RawValue::Number(token)) if token == "3")
+                        && !row.fields.contains_key(&ep_raw_model::FieldName("idf_order".into()))
+                        && !row.fields.contains_key(&ep_raw_model::FieldName("idf_max_extensible_fields".into()))
+                })
+                && generic_ip.get_num_objects_found(family) == 2
+                && projected.no_mass.len() == 2
+                && names.iter().all(|name| projected.no_mass.iter().any(|row|
+                    row.object_name == *name && row.idf_max_fields == Some(3)))
+                && [&compiled, &json_source].iter().all(|result| result.model.as_ref().is_some_and(|model| {
+                    let ids = (*names).map(|name| model.material_names.resolve(name));
+                    model.material_names.is_source_exact_namespace()
+                        && ids[0].is_some() && ids[1].is_some() && ids[0] != ids[1]
+                        && names.iter().zip(ids).all(|(name,id)| {
+                            let id = id.expect("actual NoMass name ID");
+                            model.materials.iter().any(|row| row.id == id
+                                && row.kind() == ep_model::MaterialKind::NoMass
+                                && row.name.0 == name.to_ascii_uppercase())
+                                && model.ctf_report_names.materials.contains(&(id, name.to_ascii_uppercase()))
+                        })
+                        && ["NM NAME OUTSIDE", "NM NAME INSIDE"].iter().all(|name|
+                            model.constructions.iter().any(|row| row.name.0 == *name
+                                && row.layers.len() == 2 && row.layers.iter().all(|id| ids.contains(&Some(*id)))))
+                }));
+            if !ok { eprintln!("NoMass native-name custody failed for {names:?}"); }
+            ok
+        }) && [
+            ("\0", true), (" Kept ", true), ("Kept ", true),
+            ("", false), (" \t\r\u{c}", false), ("Bad\nName", false),
+        ].iter().all(|(name, valid)| {
+            // JSON preserves leading/trailing bytes. Native IDF rtrim instead
+            // removes terminal space/HT/NUL, so do not invent the same IDF key.
+            let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+            value["Material:NoMass"] = serde_json::Value::Object(serde_json::Map::from_iter([(
+                (*name).into(), serde_json::json!({"roughness":"Rough","thermal_resistance":0.001}))]));
+            let raw = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            let admission = crate::ordinary_input_processor::resolve_source_b(&raw);
+            let legacy = ep_compiler::compile_raw_model(&raw);
+            let ok = compiled.has_errors() != *valid && admission.is_ok() == *valid
+                && legacy.has_errors() == name.trim().is_empty()
+                && (!*valid || compiled.model.as_ref().is_some_and(|model|
+                    model.material_names.is_source_exact_namespace()
+                        && model.material_names.resolve(name).is_some_and(|id|
+                            model.ctf_report_names.materials.contains(&(id, name.to_ascii_uppercase())))));
+            if !ok { eprintln!("NoMass JSON name boundary failed for {name:?}"); }
+            ok
+        });
+        // Native Construction TotLayers is returned NumAlphas minus Name.
+        // Real original files retain an uncounted final alpha in raw storage.
+        let construction_eof_matches = [("", 2usize, 1usize), (";", 3, 2), (",", 3, 2)]
+            .iter().all(|(ending, maximum, returned_layers)| {
+                let family = "Construction";
+                let name = "QA COUNTED CONSTRUCTION";
+                let materials = ["QA COUNTED NO MASS", "QA TAIL NO MASS"];
+                let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+                value["Material:NoMass"] = serde_json::json!({
+                    "QA COUNTED NO MASS":{"roughness":"Rough","thermal_resistance":0.2},
+                    "QA TAIL NO MASS":{"roughness":"Smooth","thermal_resistance":0.3}});
+                value[family] = serde_json::json!({"QA COUNTED CONSTRUCTION":{
+                    "outside_layer":materials[0],"layer_2":materials[1]}});
+                std::fs::write(&converted_path, value.to_string()).unwrap();
+                std::fs::write(&original_path, format!(
+                    "{preamble}\nMaterial:NoMass,{},Rough,0.2;\nMaterial:NoMass,{},Smooth,0.3;\nConstruction,{name},{},{}{ending}",
+                    materials[0], materials[1], materials[0], materials[1])).unwrap();
+                let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+                    &converted_path, &original_path).expect("genuine Construction final-alpha custody");
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                let mut ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                    .expect("actual Source original Construction admission");
+                let capacity = ip.get_object_def_max_args(family)
+                    .expect("retained formal Construction11-alpha definition");
+                let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+                    .expect("full Construction raw operands survive projection");
+                let original = raw.source_ordered_instances(family).unwrap();
+                let row = projected.objects[family].iter().find(|row|row.object_name==name).unwrap();
+                let legacy = ep_compiler::compile_raw_model(&raw);
+                let direct = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+                let direct = ep_compiler::compile_raw_model_for_source(&direct);
+                let mut wrong_type = raw.clone();
+                wrong_type.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                    .get_mut(&ep_raw_model::ObjectName(name.into())).unwrap().fields
+                    .insert(ep_raw_model::FieldName("layer_2".into()),ep_raw_model::RawValue::Number("1".into()));
+                let mut unresolved = raw.clone();
+                unresolved.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                    .get_mut(&ep_raw_model::ObjectName(name.into())).unwrap().fields
+                    .insert(ep_raw_model::FieldName("layer_2".into()),ep_raw_model::RawValue::String("MISSING COUNTED MATERIAL".into()));
+                let ok = !raw.is_epjson() && !projected.source_is_epjson && !compiled.has_errors()
+                    && raw.has_idf_declaration_order(family)
+                    && raw.validate_source_idf_object_custody(family).is_ok()
+                    && (capacity.alphas,capacity.numerics,capacity.total().unwrap())==(11,0,11)
+                    && original.len()==1 && original[0].0.0==name
+                    && matches!(original[0].1.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),
+                        Some(ep_raw_model::RawValue::Number(token)) if token==&maximum.to_string())
+                    && original[0].1.fields.get(&ep_raw_model::FieldName("layer_2".into()))
+                        == Some(&ep_raw_model::RawValue::String(materials[1].into()))
+                    && row.idf_max_fields==Some(*maximum)
+                    && row.fields.get("layer_2")==Some(&ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(materials[1].into()))
+                    && compiled.model.as_ref().is_some_and(|model| {
+                        let expected=materials[..*returned_layers].iter()
+                            .map(|name|model.material_names.resolve(name).unwrap()).collect::<Vec<_>>();
+                        model.constructions.iter().any(|row|row.name.0==name
+                            && row.layers==expected && row.outside_layer==expected.first().copied())
+                    })
+                    && [&legacy,&direct].iter().all(|result| !result.has_errors()
+                        && result.model.as_ref().is_some_and(|model|model.constructions.iter()
+                            .any(|row|row.name.0==name && row.layers.len()==2)))
+                    && ep_compiler::compile_raw_model_for_source(&wrong_type).has_errors()
+                    && ep_compiler::compile_raw_model_for_source(&unresolved).has_errors()==(*returned_layers==2)
+                    && ep_compiler::compile_raw_model(&unresolved).has_errors();
+                if !ok { eprintln!("Construction final-alpha custody failed for ending {ending:?}"); }
+                ok
+            });
         // The raw final EOF absorptance stays present, while actual Source
         // compilation supplies the effective NoMass owner selected by Native
         // Material286/293/300 returned-count guards. JSON/Legacy stay raw-valued.
@@ -8462,16 +8624,254 @@ MaterialProperty:GlazingSpectralData,
                 && crate::ordinary_input_processor::resolve_source_b(&wrong_type).is_err()
                 && ep_compiler::compile_raw_model_for_source(&wrong_type).has_errors()
         });
+        // This complete existing Source B scene reaches the real EcoRoof ancillary
+        // Construction caller, including the NBSP outside name and uncounted EOF tail.
+        let no_mass_support_matches = {
+            let mut value = input(PortingScope::B);
+            value["Version"] = json!({"Version 1":{"version_identifier":"26.1"}});
+            value["Building"] = json!({"Building":{
+                "north_axis":0.0,"terrain":"Suburbs","loads_convergence_tolerance_value":0.04,
+                "temperature_convergence_tolerance_value":0.4,"solar_distribution":"FullExterior",
+                "maximum_number_of_warmup_days":25,"minimum_number_of_warmup_days":6}});
+            value["SimulationControl"] = json!({"SimulationControl 1":{
+                "do_zone_sizing_calculation":"No","do_system_sizing_calculation":"No",
+                "do_plant_sizing_calculation":"No","run_simulation_for_sizing_periods":"No",
+                "run_simulation_for_weather_file_run_periods":"Yes",
+                "do_hvac_sizing_simulation_for_sizing_periods":"No",
+                "maximum_number_of_hvac_sizing_simulation_passes":1}});
+            value["GlobalGeometryRules"] = json!({"GlobalGeometryRules 1":{
+                "starting_vertex_position":"UpperLeftCorner","vertex_entry_direction":"Counterclockwise",
+                "coordinate_system":"World"}});
+            value["Zone"]["Zone"] = json!({"direction_of_relative_north":0,"x_origin":0,
+                "y_origin":0,"z_origin":0,"type":1,"multiplier":1,"volume":1,"floor_area":1});
+            value["Material"] = json!({"Mass Layer":{"roughness":"MediumRough",
+                "thickness":0.1,"conductivity":0.8,"density":1800,"specific_heat":900}});
+            value["Material:NoMass"] = json!({
+                "\u{a0}":{"roughness":"MediumRough","thermal_resistance":0.2,"thermal_absorptance":0.8125},
+                "PLAIN":{"roughness":"MediumRough","thermal_resistance":0.03},
+                "\u{a0}PLAIN\u{a0}":{"roughness":"MediumRough","thermal_resistance":0.05}});
+            value["Material:RoofVegetation"] = json!({"REPAIR ROOF":{}});
+            value["Construction"] = json!({
+                "ECO":{"outside_layer":"REPAIR ROOF","layer_2":"Mass Layer"},
+                "Wall":{"outside_layer":"\u{a0}","layer_2":"Mass Layer","layer_3":"PLAIN"}});
+            value["ZoneHVAC:EquipmentConnections"] = json!({"ZoneHVAC:EquipmentConnections 1":{
+                "zone_name":"Zone","zone_conditioning_equipment_list_name":"Equipment",
+                "zone_air_inlet_node_or_nodelist_name":"Supply","zone_air_node_name":"Air",
+                "zone_return_air_node_or_nodelist_name":"Return"}});
+            value["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["demand_controlled_ventilation_type"] =
+                json!("None");
+            value["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["outdoor_air_economizer_type"] =
+                json!("NoEconomizer");
+            value["ZoneHVAC:IdealLoadsAirSystem"]["Ideal"]["heat_recovery_type"] = json!("None");
+            value["BuildingSurface:Detailed"]
+                .as_object_mut()
+                .unwrap()
+                .iter_mut()
+                .for_each(|(name, row)| {
+                    row["construction_name"] = json!(if name == "Roof" { "ECO" } else { "Wall" });
+                    row["number_of_vertices"] = json!(4);
+                });
+            let surfaces = value["BuildingSurface:Detailed"].as_object().unwrap().iter()
+                .map(|(name, row)| {
+                    let coordinates = row["vertices"].as_array().unwrap().iter()
+                        .flat_map(|vertex| ["vertex_x_coordinate","vertex_y_coordinate","vertex_z_coordinate"]
+                            .map(|field| vertex[field].to_string()))
+                        .collect::<Vec<_>>().join(",");
+                    format!("BuildingSurface:Detailed,{name},{},{},Zone,,Outdoors,,NoSun,NoWind,,4,{coordinates};\n",
+                        row["surface_type"].as_str().unwrap(), row["construction_name"].as_str().unwrap())
+                }).collect::<String>();
+            let ideal_fields = [
+                "Ideal",
+                "On",
+                "Supply",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "NoLimit",
+                "",
+                "",
+                "NoLimit",
+                "",
+                "",
+                "",
+                "",
+                "None",
+                "",
+                "None",
+                "",
+                "",
+                "None",
+                "NoEconomizer",
+                "None",
+                "",
+                "",
+            ];
+            let original = format!(
+                concat!(
+                    "Version,26.1;\nBuilding,Building,0,Suburbs,0.04,0.4,FullExterior,25,6;\n",
+                    "SimulationControl,No,No,No,No,Yes,No,1;\n",
+                    "GlobalGeometryRules,UpperLeftCorner,Counterclockwise,World;\n",
+                    "RunPeriod,Period,1,1,2013,1,1,2013;\nZone,Zone,0,0,0,0,1,1,,1,1;\n",
+                    "Schedule:Constant,On,,1;\nSchedule:Constant,Type,,4;\n",
+                    "Schedule:Constant,Heat,,19;\nSchedule:Constant,Cool,,25;\n",
+                    "Material,Mass Layer,MediumRough,0.1,0.8,1800,900;\n",
+                    "Material:NoMass,\u{a0},MediumRough,0.2,0.8125;\n",
+                    "Material:NoMass,PLAIN,MediumRough,0.03;\n",
+                    "Material:NoMass,\u{a0}PLAIN\u{a0},MediumRough,0.05;\n",
+                    "Material:RoofVegetation,REPAIR ROOF;\nConstruction,ECO,REPAIR ROOF,Mass Layer;\n",
+                    "ThermostatSetpoint:DualSetpoint,Dual,Heat,Cool;\n",
+                    "ZoneControl:Thermostat,Thermostat,Zone,Type,ThermostatSetpoint:DualSetpoint,Dual;\n",
+                    "ZoneHVAC:IdealLoadsAirSystem,{};\n",
+                    "ZoneHVAC:EquipmentList,Equipment,SequentialLoad,ZoneHVAC:IdealLoadsAirSystem,Ideal,1,1;\n",
+                    "ZoneHVAC:EquipmentConnections,Zone,Equipment,Supply,,Air,Return;\n",
+                    "{}Construction,Wall,\u{a0},Mass Layer,PLAIN"
+                ),
+                ideal_fields.join(","),
+                surfaces
+            );
+            std::fs::write(&converted_path, value.to_string()).unwrap();
+            std::fs::write(&original_path, original).unwrap();
+            let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+                &converted_path,
+                &original_path,
+            )
+            .expect("genuine complete Original Source B scene");
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            let model = compiled
+                .model
+                .as_ref()
+                .expect("real ordinary Source B model");
+            let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                .expect("real Original Source B admission and statistics");
+            let projected = crate::ordinary_heat_balance_input::resolve_source(&raw, &ip)
+                .expect("full actual Construction getter operands");
+            let wall = model
+                .construction_names
+                .resolve("Wall")
+                .expect("same Wall identity");
+            let outside = model
+                .material_names
+                .resolve("\u{a0}")
+                .expect("same NBSP material");
+            let mass = model
+                .material_names
+                .resolve("Mass Layer")
+                .expect("same counted layer");
+            let plain = model
+                .material_names
+                .resolve("PLAIN")
+                .expect("same filled tail material");
+            let projected_wall = projected.objects["Construction"]
+                .iter()
+                .find(|row| row.object_name == "Wall")
+                .expect("same raw Wall projection");
+            let mut selected =
+                inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B);
+            selected.environment = Some(
+                super::environment::environment_from_weather(
+                    model,
+                    &weather,
+                    "Original NBSP and Construction EOF support regression",
+                )
+                .expect("same real U07 weather environment"),
+            );
+            let admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&raw, &selected)
+                    .expect("genuine Original support admission with EcoRoof ancillary recipes");
+            let supported = crate::support::assess_support_with_source_admission(
+                &raw,
+                &compiled.report,
+                Some(model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission),
+            );
+            let mut appended = model.clone();
+            appended
+                .constructions
+                .iter_mut()
+                .find(|row| row.id == wall)
+                .unwrap()
+                .layers
+                .push(plain);
+            let mut removed = model.clone();
+            removed
+                .constructions
+                .iter_mut()
+                .find(|row| row.id == wall)
+                .unwrap()
+                .layers
+                .pop();
+            !compiled.has_errors()
+                && selected.admissible
+                && !raw.is_epjson()
+                && raw
+                    .validate_source_idf_object_custody("Construction")
+                    .is_ok()
+                && raw
+                    .validate_source_idf_object_custody("Material:NoMass")
+                    .is_ok()
+                && model.material_names.is_source_exact_namespace()
+                && projected_wall.idf_max_fields == Some(3)
+                && projected_wall.fields.get("outside_layer")
+                    == Some(
+                        &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                            "\u{a0}".into(),
+                        ),
+                    )
+                && projected_wall.fields.get("layer_3")
+                    == Some(
+                        &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(
+                            "PLAIN".into(),
+                        ),
+                    )
+                && model.constructions.iter().any(|row| {
+                    row.id == wall
+                        && row.outside_layer == Some(outside)
+                        && row.layers == [outside, mass]
+                        && row.effective_layers() == [outside, mass]
+                })
+                && supported.allows_rust_runtime()
+                && [&appended, &removed].iter().all(|changed| {
+                    !crate::support::assess_support_with_source_admission(
+                        &raw,
+                        &compiled.report,
+                        Some(changed),
+                        RunMode::Compatibility,
+                        PartialRunPolicy::Deny,
+                        RunOutputFormat::RustNative,
+                        TraceLevel::Normal,
+                        Some(&admission),
+                    )
+                    .allows_rust_runtime()
+                })
+                && !crate::support::assess_support_with_source_admission(
+                    &raw,
+                    &compiled.report,
+                    Some(model),
+                    RunMode::Compatibility,
+                    PartialRunPolicy::Deny,
+                    RunOutputFormat::RustNative,
+                    TraceLevel::Normal,
+                    None,
+                )
+                .allows_rust_runtime()
+        };
         std::fs::remove_file(converted_path).unwrap();
         std::fs::remove_file(original_path).unwrap();
         std::fs::remove_dir(home).unwrap();
-        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_effective_matches && dsoa_uncounted_reference_matches
+        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
             // This table proves its original 24 material/curve layouts. The two
             // OA layouts and DSOA have separate original-IDF existing-body cases.
             && observed_families.len() == 24
-            && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.len() == 29
+            && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.len() == 30
             && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.iter().all(|family| {
-                matches!(*family, "OutdoorAir:Node" | "OutdoorAir:NodeList" | "DesignSpecification:OutdoorAir" | "Material:AirGap" | "Material:NoMass")
+                matches!(*family, "OutdoorAir:Node" | "OutdoorAir:NodeList" | "DesignSpecification:OutdoorAir" | "Material:AirGap" | "Material:NoMass" | "Construction")
                     || observed_families.contains(*family)
             })
     };

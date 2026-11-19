@@ -2,9 +2,10 @@
 
 use super::ctf_public_initialization::ConstructionCtfPublicInitialization;
 use super::surface_manager::ctf_public_storage::CtfPublicCoefficientStorage;
+#[cfg(test)]
+use ep_model::NormalizedName;
 use ep_model::{
-    ConstructionId, Material, MaterialDefinition, MaterialId, MaterialSurfaceRoughness,
-    NormalizedName, TypedModel,
+    ConstructionId, Material, MaterialDefinition, MaterialId, MaterialSurfaceRoughness, TypedModel,
 };
 use std::io::{self, Write};
 
@@ -308,7 +309,7 @@ fn material_report<'a>(
     material: &'a Material,
 ) -> Result<CtfMaterialReport<'a>, CtfReportUnavailable> {
     let name = loader_name(&model.ctf_report_names.materials, material.id)?;
-    if NormalizedName::new(name) != material.name {
+    if model.material_names.normalized_name(name) != material.name {
         return Err(CtfReportUnavailable::Association);
     }
     let (air_gap, values) = match material.definition {
@@ -377,7 +378,7 @@ pub fn prepare_ctf_construction_report<'a>(
         return Err(CtfReportUnavailable::UnsupportedConstruction);
     }
     let name = loader_name(&model.ctf_report_names.constructions, construction.id)?;
-    if NormalizedName::new(name) != construction.name {
+    if model.construction_names.normalized_name(name) != construction.name {
         return Err(CtfReportUnavailable::Association);
     }
     let public = &row

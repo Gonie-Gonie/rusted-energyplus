@@ -640,11 +640,41 @@ fn gas_mixture_follows_source_order_shares_names_and_validates_construction_laye
         compile_raw_model(&exact).has_errors(),
         "Legacy still trims duplicate spaced names"
     );
-    let mut no_mixture = exact.clone();
-    no_mixture
+    // Isolate Mixture as the namespace owner: NoMass now independently
+    // selects exact Source names, so removing only Mixture is not negative.
+    let mut mixture_only = exact.clone();
+    mixture_only
         .objects
-        .remove(&ep_raw_model::ObjectType(OBJECT_TYPE.into()));
-    assert!(crate::compile_raw_model_for_source(&no_mixture).has_errors());
+        .remove(&ep_raw_model::ObjectType("Material:NoMass".into()));
+    mixture_only
+        .objects
+        .remove(&ep_raw_model::ObjectType("Construction".into()));
+    let mixture_only = crate::compile_raw_model_for_source(&mixture_only);
+    assert!(
+        !mixture_only.has_errors()
+            && mixture_only.model.as_ref().is_some_and(|model| {
+                let spaced = model.material_names.resolve(" Mix ");
+                let bare = model.material_names.resolve("Mix");
+                model.material_names.is_source_exact_namespace()
+                    && spaced.is_some()
+                    && bare.is_some()
+                    && spaced != bare
+                    && [" Mix ", "Mix", "\u{a0}", "\u{b}"].iter().all(|name| {
+                        model.material_names.resolve(name).is_some_and(|id| {
+                            model
+                                .materials
+                                .iter()
+                                .any(|row| row.id == id && row.as_window_gas_mixture().is_some())
+                                && model
+                                    .ctf_report_names
+                                    .materials
+                                    .contains(&(id, name.to_ascii_uppercase()))
+                        })
+                    })
+            }),
+        "{:?}",
+        mixture_only.report.diagnostics
+    );
     let invalid_only = parse_epjson_str(
         r#"{
         "WindowMaterial:GasMixture":{"Bad":{"thickness":0.012,"number_of_gases_in_mixture":0,

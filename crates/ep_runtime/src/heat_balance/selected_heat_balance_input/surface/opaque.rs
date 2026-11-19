@@ -91,6 +91,7 @@ impl SurfaceGeometryInputState {
                 &owners.model.ctf_report_names.constructions,
                 *id,
                 &construction.name,
+                &owners.model.construction_names,
             )
             .map_err(|_| Error::Unavailable("actual construction loader name"))?;
             if actual_name.eq_ignore_ascii_case(&args[2]) {

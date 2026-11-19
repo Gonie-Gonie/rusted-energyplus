@@ -13,7 +13,7 @@ use super::error_backend::{SourceErrorBackend, SourceErrorBackendFailure, Source
 use super::predefined_tables::PredefinedRegistry;
 use super::report_scan::ReportScanState;
 use super::surface_manager::ctf_layer_preprocessing::CtfLayerDiagnostic;
-use ep_model::{Construction, MaterialId, NormalizedName, TypedModel};
+use ep_model::{Construction, MaterialId, NameMap, NormalizedName, TypedModel};
 use std::io::{self, Write};
 
 pub(crate) mod internal_heat_gains_input;
@@ -492,18 +492,24 @@ pub(crate) fn original_material_name(
         .iter()
         .find(|material| material.id == id)
         .ok_or(CtfReportUnavailable::Material(id))?;
-    original_loader_name(&model.ctf_report_names.materials, id, &material.name)
+    original_loader_name(
+        &model.ctf_report_names.materials,
+        id,
+        &material.name,
+        &model.material_names,
+    )
 }
 pub(crate) fn original_loader_name<'a, I: Copy + Eq>(
     names: &'a [(I, String)],
     id: I,
     normalized: &NormalizedName,
+    name_map: &NameMap<I>,
 ) -> Result<&'a str, CtfReportUnavailable> {
     let mut found = names.iter().filter(|(actual, _)| *actual == id);
     let (_, name) = found
         .next()
         .ok_or(CtfReportUnavailable::LoaderNameUnavailable)?;
-    if found.next().is_some() || NormalizedName::new(name) != *normalized {
+    if found.next().is_some() || name_map.normalized_name(name) != *normalized {
         return Err(CtfReportUnavailable::Association);
     }
     Ok(name)

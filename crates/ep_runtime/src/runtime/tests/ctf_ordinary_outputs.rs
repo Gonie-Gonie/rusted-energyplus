@@ -49,6 +49,193 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
         CtfInitializationContext, CtfInitializationReports,
     };
     use crate::heat_balance::error_backend::SourceErrorBackend;
+    // Authored runtime operands, not a new Source session or Native outcome.
+    // The actual Material and Construction getters feed the same cache/report
+    // owners. Original F3 counts two layers while retaining the filled tail.
+    let selected_name_policy_matches = {
+        use std::collections::BTreeMap;
+        use crate::heat_balance::ctf_reports::{
+            CtfReportUnavailable, prepare_ctf_construction_report,
+        };
+        use crate::heat_balance::selected_heat_balance_input::SelectedHeatBalanceInput;
+        use crate::heat_balance::selected_input_processor::{
+            SelectedInputProcessor, SourceInputFamily, SourceObjectDefinition, SourceObjectShape,
+        };
+        use crate::heat_balance::selected_material_data::SelectedMaterialInput;
+        use crate::heat_balance::selected_project_data::{ProjectInputObject, ProjectInputValue as V};
+        let mut matches = true;
+        for (source_exact, outside_name) in [(true, "\u{a0}"), (false, " LEGACY NO MASS ")] {
+            let names = [outside_name, "COUNTED INNER", "UNCOUNTED TAIL"];
+            let mut typed = ctf_ordinary_output_test_model();
+            typed.material_names = if source_exact {
+                ep_model::NameMap::source_exact_namespace()
+            } else {
+                ep_model::NameMap::default()
+            };
+            let template = typed.materials[0].clone();
+            typed.materials.clear();
+            for (index, name) in names.into_iter().enumerate() {
+                let id = MaterialId(u32::try_from(index)?);
+                let mut material = template.clone();
+                material.id = id;
+                material.name = typed.material_names.normalized_name(name);
+                let ep_model::MaterialDefinition::NoMass(value) = &mut material.definition else {
+                    return Err("existing resistance-only runtime fixture".into());
+                };
+                value.thermal_resistance_m2_k_per_w = [0.2, 0.3, 0.05][index];
+                value.roughness = MaterialSurfaceRoughness::MediumRough;
+                value.surface = ep_model::OpaqueSurfaceProperties::default();
+                matches &= typed.material_names.insert(name, id).is_none();
+                typed.materials.push(material);
+            }
+            typed.ctf_report_names.materials = names.into_iter().enumerate()
+                .map(|(index, name)| Ok((MaterialId(u32::try_from(index)?), name.into())))
+                .collect::<Result<Vec<_>, std::num::TryFromIntError>>()?;
+            let construction_name = " WALL ";
+            typed.construction_names = ep_model::NameMap::default();
+            typed.constructions[0].name = typed.construction_names.normalized_name(construction_name);
+            typed.constructions[0].outside_layer = Some(MaterialId(0));
+            typed.constructions[0].layers = vec![MaterialId(0), MaterialId(1)];
+            matches &= typed.construction_names.insert(construction_name, ConstructionId(0)).is_none();
+            typed.ctf_report_names.constructions = vec![(ConstructionId(0), construction_name.into())];
+            let no_mass = names.into_iter().enumerate().map(|(index, name)| ProjectInputObject {
+                object_name: name.into(), idf_max_fields: Some(3),
+                fields: BTreeMap::from([
+                    ("roughness".into(), V::String("MediumRough".into())),
+                    ("thermal_resistance".into(), V::Number([0.2, 0.3, 0.05][index])),
+                ]),
+            }).collect::<Vec<_>>();
+            let construction = ProjectInputObject {
+                object_name: construction_name.into(), idf_max_fields: Some(3),
+                fields: BTreeMap::from([
+                    ("outside_layer".into(), V::String(names[0].into())),
+                    ("layer_2".into(), V::String(names[1].into())),
+                    ("layer_3".into(), V::String(names[2].into())),
+                ]),
+            };
+            let input = SelectedInputProcessor::from_admitted_input(
+                [("Material:NoMass", 2, 4), ("Construction", 11, 0)].into_iter()
+                    .map(|(family, alpha_fields, numeric_fields)| SourceObjectDefinition {
+                        object_type: family.into(), alpha_fields, numeric_fields,
+                        alpha_extensions: 0, numeric_extensions: 0, extension: None,
+                    }).collect(),
+                [("Material:NoMass", no_mass.as_slice()), ("Construction", std::slice::from_ref(&construction))]
+                    .into_iter().map(|(family, objects)| (family.into(), SourceInputFamily::Objects(
+                        objects.iter().map(|object| SourceObjectShape {
+                            object_name: object.object_name.clone(),
+                            field_sizes: object.fields.keys().map(|name| (name.clone(), 1)).collect(),
+                        }).collect(),
+                    ))).collect(),
+            )?;
+            let mut reached = CtfInitializationReports::default();
+            reached.initialize_input_processor(input)?;
+            reached.selected_material_input = Some(SelectedMaterialInput {
+                source_is_epjson: false, no_mass, ..Default::default()
+            });
+            reached.heat_balance_input = Some(SelectedHeatBalanceInput {
+                source_is_epjson: false,
+                objects: BTreeMap::from([("Construction".into(), vec![construction])]),
+                ..Default::default()
+            });
+            reached.selected_heat_balance_globals = Some(Default::default());
+            reached.selected_simulation_startup = Some(Default::default());
+            reached.selected_simulation_startup.as_mut().ok_or("actual startup bound owner")?
+                .construction_bounds.set_preconstruction_input_parameters(
+                    reached.selected_input_processor.as_ref().ok_or("same runtime IP")?,
+                )?;
+            let (mut state, mut error, mut console, mut eio) = (
+                ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new(),
+            );
+            let cache = {
+                let mut context = CtfInitializationContext {
+                    reports: &mut reached, eio: &mut eio,
+                    backend: SourceErrorBackend {
+                        state: &mut state, error_stream: Some(&mut error), console: &mut console,
+                        out_unit1: None, out_unit2: None, f_message: None,
+                        message_callback: None, error_callback: None, sqlite: None,
+                    },
+                };
+                context.get_selected_material_data(&typed, None)?;
+                context.read_selected_construction_arguments(&typed)?;
+                context.prepare_registry(&typed)?;
+                crate::heat_balance::surface_manager::ConstructionThermalDataCache::build_with_initialization_context(
+                    &typed, &BTreeMap::new(), &mut context,
+                )?
+            };
+            let public = cache.public_initialization().ok_or("actual returned public cache")?;
+            let row = public.constructions.first().ok_or("actual construction public row")?;
+            let report = prepare_ctf_construction_report(&typed, row)?;
+            let usage = &reached.heat_balance_input_state.construction_usage[0];
+            matches &= report.name == construction_name
+                && report.layers.iter().map(|layer| layer.name).collect::<Vec<_>>() == names[..2]
+                && report.layers.iter().map(|layer| layer.material_id).collect::<Vec<_>>() == [MaterialId(0), MaterialId(1)]
+                && row.original_material_ids == [MaterialId(0), MaterialId(1)]
+                && usage.total_layers == 2 && usage.layer_points[..2] == [1, 2]
+                && reached.heat_balance_input_state.nominal_r_for_u == Some(vec![0.5])
+                && reached.selected_material_data.materials == [MaterialId(0), MaterialId(1), MaterialId(2)]
+                && reached.selected_material_data.material_map.get(&outside_name.to_ascii_uppercase()) == Some(&1)
+                && reached.progress.postlude_returned
+                && reached.progress.layer_report_declared_indices == [0]
+                && !reached.heat_balance_input_errors_found
+                && state.tracking.total_warning_errors == 1
+                && state.tracking.total_warning_errors_during_warmup == 0
+                && state.tracking.total_warning_errors_during_sizing == 0
+                && state.tracking.total_severe_errors == 0
+                && std::str::from_utf8(&error)?.matches(" ** Warning ** This building has no thermal mass which can cause an unstable solution.").count() == 1
+                && std::str::from_utf8(&error)?.matches("Use Material object for all opaque material definitions except very light insulation layers.").count() == 1;
+            let entries = reached.table.entries.as_ref().ok_or("actual layer-report table")?;
+            matches &= entries[..usize::try_from(reached.table.num_table_entry)?].iter()
+                .filter(|entry| entry.object_name == construction_name)
+                .map(|entry| entry.char_entry.as_slice()).collect::<Vec<_>>()
+                == names[..2].iter().map(|name| name.as_bytes()).collect::<Vec<_>>();
+            // Independently corrupt each existing report-name owner. No private
+            // getter or name-policy replacement supplies a successful result.
+            for construction_owner in [false, true] {
+                for fault in 0..3 {
+                    let mut invalid = typed.clone();
+                    if construction_owner {
+                        match fault {
+                            0 => { invalid.ctf_report_names.constructions.clear(); }
+                            1 => { invalid.ctf_report_names.constructions.push((ConstructionId(0), construction_name.into())); }
+                            _ => { invalid.ctf_report_names.constructions[0].1 = "WRONG OWNER".into(); }
+                        }
+                    } else {
+                        match fault {
+                            0 => { invalid.ctf_report_names.materials.remove(0); }
+                            1 => { invalid.ctf_report_names.materials.push((MaterialId(0), outside_name.into())); }
+                            _ => { invalid.ctf_report_names.materials[0].1 = "WRONG OWNER".into(); }
+                        }
+                    }
+                    matches &= matches!(prepare_ctf_construction_report(&invalid, row),
+                        Err(CtfReportUnavailable::Association | CtfReportUnavailable::LoaderNameUnavailable));
+                    let mut rejected = reached.clone();
+                    rejected.heat_balance_input_state = Default::default();
+                    rejected.heat_balance_input_errors_found = false;
+                    let (mut state, mut error, mut console, mut eio) = (
+                        ctf_ordinary_output_test_state(), Vec::new(), Vec::new(), Vec::new(),
+                    );
+                    let mut context = CtfInitializationContext {
+                        reports: &mut rejected, eio: &mut eio,
+                        backend: SourceErrorBackend {
+                            state: &mut state, error_stream: Some(&mut error), console: &mut console,
+                            out_unit1: None, out_unit2: None, f_message: None,
+                            message_callback: None, error_callback: None, sqlite: None,
+                        },
+                    };
+                    matches &= context.read_selected_construction_arguments(&invalid).is_err();
+                    matches &= matches!(
+                        crate::heat_balance::surface_manager::ConstructionThermalDataCache::build_with_initialization_context(
+                            &invalid, &BTreeMap::new(), &mut context,
+                        ),
+                        Err(crate::RuntimeError::CtfInitialization(error)) if matches!(*error,
+                            crate::heat_balance::ctf_initialization_context::CtfInitializationError::Owner(
+                                CtfReportUnavailable::Association | CtfReportUnavailable::LoaderNameUnavailable))
+                    );
+                }
+            }
+        }
+        matches
+    };
     let model = ctf_ordinary_output_test_model();
     let mut reports = CtfInitializationReports::default();
     let mut state = ctf_ordinary_output_test_state();
@@ -77,6 +264,7 @@ fn ordinary_cache_uses_real_registry_columns_and_postlude_before_lifecycle()
             .transpose()
             .map_err(crate::RuntimeError::CtfSurfaceLifecycle)?
             .is_some()
+            && selected_name_policy_matches
     );
     assert!(reports.progress.postlude_returned);
     assert_eq!(reports.progress.layer_report_declared_indices, [0]);

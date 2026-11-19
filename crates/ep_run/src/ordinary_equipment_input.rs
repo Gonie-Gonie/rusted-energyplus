@@ -903,6 +903,9 @@ fn resolve_raw(
             // or Unicode whitespace. Other families keep their old boundary.
             let blank_name = if source_analytic_curve_family
                 || source_spectral_data_family
+                || source_calendar_ingress
+                    && family.0 == "Material:NoMass"
+                    && (raw.is_epjson() || source_original_idf_metadata)
                 || source_refraction_family
                 || source_glazing_family
                 || source_named_gas_family
