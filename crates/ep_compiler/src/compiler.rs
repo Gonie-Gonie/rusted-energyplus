@@ -713,6 +713,35 @@ impl<'a> Compiler<'a> {
             model.space_list_names = NameMap::source_exact_namespace();
             model.node_names = NameMap::source_exact_namespace();
             model.node_list_names = NameMap::source_exact_namespace();
+            if (self.raw_model.is_epjson()
+                || self
+                    .raw_model
+                    .validate_source_idf_object_custody("Construction")
+                    .is_ok())
+                && self
+                    .raw_model
+                    .objects
+                    .get(&ep_raw_model::ObjectType("Construction".into()))
+                    .is_some_and(|rows| !rows.is_empty())
+                && [
+                    "Construction:AirBoundary",
+                    "Construction:FfactorGroundFloor",
+                    "Construction:CfactorUndergroundWall",
+                    "Construction:ComplexFenestrationState",
+                    "Construction:WindowDataFile",
+                    "Construction:WindowEquivalentLayer",
+                    "ConstructionProperty:InternalHeatSource",
+                ]
+                .iter()
+                .all(|family| {
+                    self.raw_model
+                        .objects
+                        .get(&ep_raw_model::ObjectType((*family).into()))
+                        .is_none_or(|rows| rows.is_empty())
+                })
+            {
+                model.construction_names = NameMap::source_exact_namespace();
+            }
             // Selected single-Gas Source declarations share Native's exact
             // material namespace with opaque dependencies. Legacy/no-Gas/
             // invalid-only inputs retain their policy; unused Custom is independent.
@@ -11335,7 +11364,17 @@ impl<'a> Compiler<'a> {
 
         for (name, object) in self.objects(OBJECT_TYPE) {
             let mut fields_valid = true;
-            if name.trim().is_empty() {
+            let blank_name = if self.source_file_declarations
+                && model.construction_names.is_source_exact_namespace()
+            {
+                name.contains('\n')
+                    || name
+                        .bytes()
+                        .all(|byte| matches!(byte, b'\t' | b'\n' | 0x0c | b'\r' | b' '))
+            } else {
+                name.trim().is_empty()
+            };
+            if blank_name {
                 self.error(
                     "MissingRequiredField",
                     OBJECT_TYPE,
@@ -11486,7 +11525,7 @@ impl<'a> Compiler<'a> {
                 .push((id, name.to_ascii_uppercase()));
             model.constructions.push(Construction {
                 id,
-                name: NormalizedName::new(&name),
+                name: model.construction_names.normalized_name(&name),
                 kind,
                 outside_layer: Some(outside_layer),
                 layers,
@@ -16988,12 +17027,22 @@ impl<'a> Compiler<'a> {
             ) else {
                 continue;
             };
-            let Some(construction_name) = self.required_string(
-                "BuildingSurface:Detailed",
-                &name,
-                &object,
-                "construction_name",
-            ) else {
+            let construction_name = match field_value(&object, "construction_name") {
+                Some(RawValue::String(value))
+                    if self.source_file_declarations
+                        && model.construction_names.is_source_exact_namespace()
+                        && model.construction_names.resolve(value).is_some() =>
+                {
+                    Some(value.clone())
+                }
+                _ => self.required_string(
+                    "BuildingSurface:Detailed",
+                    &name,
+                    &object,
+                    "construction_name",
+                ),
+            };
+            let Some(construction_name) = construction_name else {
                 continue;
             };
             let Some(construction) = self.resolve_name(

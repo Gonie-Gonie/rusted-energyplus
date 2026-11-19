@@ -1847,7 +1847,7 @@ impl SourceSupportAdmission {
             let Some(construction) = model.constructions.iter().find(|row| row.id == id) else {
                 return false;
             };
-            if construction.name != ep_model::NormalizedName::new(name)
+            if construction.name != model.construction_names.normalized_name(name)
                 || model.construction_names.resolve(name) != Some(id)
                 || !construction.is_ordinary_opaque()
                 || construction.has_internal_heat_source()

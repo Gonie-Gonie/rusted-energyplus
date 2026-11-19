@@ -44,7 +44,7 @@ already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122
 This inventory correction adds no physical evidence; retained116 is unchanged.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 280 paired physical cases and 12,975,736 reported values with zero
+contains 281 paired physical cases and 13,050,856 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -74,20 +74,20 @@ The original-IDF route supplies the same physical IDF to both actors and uses th
 
 Source199 Simple and Source200 Advanced remain accepted direct-epJSON pairs; Source203 retains its accepted Input04 original-IDF Advanced pair. The older Source199 v10 Advanced attempt remains at 31/34 gates with zero credit, and failed builds 201 (import parsing) and 202 (DSOA sizing input) remain separate zero-credit history.
 
-Source204 retains its active NoMass EOF default witness; Source207 retains its corrected original-IDF names/Construction pair. Source208 adds one direct-epJSON pair across five DesignDays, with one Native and one Source run, all 34 gates and 158 series/75,120 values passing unchanged policies. Three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meters are raw-exact. Matching Material Details rows retain the three distinct NoMass names and active NBSP thermal absorptance 0.8125.
+Source204 retains its NoMass EOF default witness; Source207 retains the original-IDF name/count case, and Source208 retains direct-JSON NoMass extras. Source209 adds one direct-epJSON Construction-name/reference pair across five DesignDays, with one Native and one Source run and all 34 gates/158 series/75,120 values passing unchanged policies. Three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meters are raw-exact.
 
-The current Source208 snapshot passes workspace tests (5,051 passed, zero failed, two ignored). Four current QA commands execute one existing body and ep_run all-target Clippy, with no historical/reused body credit or new test functions. The earlier Source207 all-package Clippy, partial workspace failure and Source205 support-stop/Source206 initialization-stop attempts retain their separate histories.
+The current Source209 snapshot passes workspace tests (5,051 passed, zero failed, two ignored). Five current QA commands execute two existing bodies plus all-target Clippy for ep_compiler and ep_run, with no historical/reused body credit or new test functions. Earlier QA, workspace and failed Source205/206 attempts retain their separate histories.
 
-Genuine original-IDF Construction F3 selects two effective layers while its complete raw final `PLAIN` tail remains held; no private Native TotLayers observation or format equivalence is claimed. Source208 direct epJSON instead consumes the full three-layer Wall recipe. Its ten undeclared primitive/nested/body-metadata NoMass members stay raw-owned and are ignored by projection; the five known properties remain strict, and body `name`/`idf_*` lookalikes do not replace map-key identity or counts. Earlier count-default, DSOA, AirGap and selected-map initialization boundaries remain held. Construction-name widening, field-NUL/comparator-order widening, ComplexShade, positive-OA Humidistat, active window/CFS/EQL/shading, Source A expansion, annual runs, arbitrary legal combinations and full-object conformance remain outside this publication.
+Eligible Source ordinary Construction names and actual BuildingSurface references now use the same exact selected-name map. The fixed case actively uses NBSP-only, VT-only and ASCII-padded `Wall` aliases alongside unpadded `Wall`; all use the full three-layer recipe, and the real EcoRoof remains active. Existing primitive/reference/contiguity and geometry checks stay held. The prior original-IDF F3 two-layer/raw-tail case remains distinct, without a private Native TotLayers observation or format-equivalence claim. Source208 NoMass undeclared-member admission, counted defaults, DSOA/AirGap and selected runtime owners retain their recorded boundaries. The six other Construction:* families and ConstructionProperty:InternalHeatSource, field-NUL/comparator-order widening, broader name/value combinations, ComplexShade, positive-OA Humidistat, active window/CFS/EQL/shading, Source A expansion, annual runs and full-object conformance remain outside this new physical qualification.
 
-Complete streams and per-series results for Source208 are retained in
-`.runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/`: `readback.json`,
+Complete streams and per-series results for Source209 are retained in
+`.runtime/porting/Construction-exact-names-source/runtime01/`: `readback.json`,
 `native/output/nativeout.eso`, `native/output/nativeout.mtr`,
 `source/output/eplusrs.eso` and `source/output/eplusrs.mtr`.
 The frozen V13 reader supplies the accepted current comparison. The installed
 [v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py) is
-original-IDF-only and correctly rejects this direct-epJSON input before reading
-streams; that auxiliary attempt adds no case, value or Source failure credit.
+original-IDF-only and was skipped for this direct-epJSON case; there was no
+comparer invocation or additional case, value or failure credit.
 
 The following historical Source207 original-IDF example remains valid. Its
 same-actor reread covers 158 series/75,120 values, four raw differences and zero
@@ -100,7 +100,7 @@ python -B tools/porting/check_completed_reported_streams_v3.py --manifest ".runt
 
 The output includes `report.md`, `comparison.json`, `series.csv`,
 `all-raw-differences.jsonl` and `all-tolerance-failures.jsonl`. This command
-rereads the recorded pair; it does not run either engine. For a different
+rereads the recorded pair; it does not run either engine. For another original-IDF
 input/run, supply its own pinned v2-schema manifest, input, clock, policy and
 both actors' receipts and ESO/MTR/RDD/MDD artifacts. Local `.runtime` evidence
 is generated separately and is absent from a fresh clone.
@@ -185,8 +185,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 208 recorded Source builds,
-176 with accepted pairs and 32 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 209 recorded Source builds,
+177 with accepted pairs and 32 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.

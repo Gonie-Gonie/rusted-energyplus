@@ -79,6 +79,58 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
     };
 
     let weather = single_day_weather_fixture();
+    let construction_native_names_match = [PortingScope::A,PortingScope::B].iter().all(|scope| {
+        [["C"," C "],["\u{b}","C"],["\u{a0}","C"],["C","\u{a0}C"],["C","C\u{a0}"]]
+            .iter().all(|names| {
+                let mut value=input(*scope);
+                value["Construction"]=Value::Object(serde_json::Map::from_iter(names.iter()
+                    .map(|name|((*name).into(),json!({"outside_layer":"Opaque"})))));
+                for (index,surface) in value["BuildingSurface:Detailed"].as_object_mut().unwrap().values_mut().enumerate() {
+                    surface["construction_name"]=json!(names[index%2]);
+                }
+                let raw=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+                let compiled=ep_compiler::compile_raw_model_for_source(&raw);
+                let input=match scope {
+                    PortingScope::A=>crate::ordinary_input_processor::resolve_source_a(&raw),
+                    PortingScope::B=>crate::ordinary_input_processor::resolve_source_b(&raw),
+                }.expect("real Source construction-name/surface admission");
+                let projected=crate::ordinary_heat_balance_input::resolve_source(&raw,&input).unwrap();
+                let ok=!compiled.has_errors() && compiled.model.as_ref().is_some_and(|model| {
+                    let ids=(*names).map(|name|model.construction_names.resolve(name));
+                    model.construction_names.is_source_exact_namespace()
+                        && ids[0].is_some() && ids[1].is_some() && ids[0]!=ids[1]
+                        && names.iter().zip(ids).all(|(name,id)|model.constructions.iter().any(|row|
+                            Some(row.id)==id && row.name.0==name.to_ascii_uppercase()
+                                && model.ctf_report_names.constructions.contains(&(row.id,name.to_ascii_uppercase()))))
+                        && model.surfaces.len()==6 && projected.surface.building_surfaces.len()==6
+                        && model.surfaces.iter().all(|surface| {
+                            let (_,authored)=value["BuildingSurface:Detailed"].as_object().unwrap().iter()
+                                .find(|(name,_)|name.eq_ignore_ascii_case(&surface.name.0)).unwrap();
+                            model.construction_names.resolve(authored["construction_name"].as_str().unwrap())
+                                ==Some(surface.construction)
+                        })
+                        && projected.surface.building_surfaces.iter().all(|surface| {
+                            let authored=value["BuildingSurface:Detailed"][&surface.object.object_name]["construction_name"]
+                                .as_str().unwrap();
+                            surface.object.fields.get("construction_name")==Some(
+                                &ep_runtime::heat_balance::selected_project_data::ProjectInputValue::String(authored.into()))
+                        })
+                        && inspect_porting_scope(&raw,&compiled.report,Some(model),*scope).admissible
+                }) && compile_raw_model(&raw).has_errors();
+                if !ok { eprintln!("Source Construction name/reference mismatch: {scope:?}/{names:?}"); }
+                ok
+            })
+    }) && [""," \t\r\u{c}","Bad\nName"].iter().all(|name| {
+        let mut value=input(PortingScope::A);
+        value["Construction"]=Value::Object(serde_json::Map::from_iter([
+            ((*name).into(),json!({"outside_layer":"Opaque"}))]));
+        for surface in value["BuildingSurface:Detailed"].as_object_mut().unwrap().values_mut() {
+            surface["construction_name"]=json!(name);
+        }
+        let raw=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+        ep_compiler::compile_raw_model_for_source(&raw).has_errors()
+            && crate::ordinary_input_processor::resolve_source_a(&raw).is_err()
+    });
     for (scope, count, roof_type) in
         [PortingScope::A, PortingScope::B]
             .into_iter()
@@ -145,7 +197,7 @@ fn closed_opaque_faces_reach_source_layout_and_view_factor_kernel() {
             .expect("compiled closed opaque faces");
         let mut admitted = inspect_porting_scope(&raw, &compiled.report, Some(model), scope);
         assert!(
-            admitted.admissible,
+            admitted.admissible && construction_native_names_match,
             "{scope:?}/{count}/{roof_type}: {:?}",
             admitted.violations
         );
@@ -8603,6 +8655,43 @@ MaterialProperty:GlazingSpectralData,
                     })
             }
         };
+        // Original Construction names use the real shared layout/order/F path.
+        let construction_original_names_match = [["\u{b}","C"],["\u{a0}","C"],["C","\u{a0}C"],["C","C\u{a0}"]]
+            .iter().all(|names| {
+                let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
+                value["Material:NoMass"]=serde_json::json!({"QA CONSTRUCTION LAYER":{"roughness":"Rough","thermal_resistance":0.2}});
+                value["Construction"]=serde_json::Value::Object(serde_json::Map::from_iter(names.iter()
+                    .map(|name|((*name).into(),serde_json::json!({"outside_layer":"QA CONSTRUCTION LAYER"})))));
+                std::fs::write(&converted_path,value.to_string()).unwrap();
+                std::fs::write(&original_path,format!("{preamble}\nMaterial:NoMass,QA CONSTRUCTION LAYER,Rough,0.2;\nConstruction,{},QA CONSTRUCTION LAYER;\nConstruction,{},QA CONSTRUCTION LAYER;",names[0],names[1])).unwrap();
+                let raw=ep_raw_model::load_epjson_file_with_idf_order_for_source(&converted_path,&original_path).unwrap();
+                let compiled=ep_compiler::compile_raw_model_for_source(&raw);
+                let mut ip=crate::ordinary_input_processor::resolve_source_b(&raw).unwrap();
+                let capacity=ip.get_object_def_max_args("Construction").unwrap();
+                let projected=crate::ordinary_heat_balance_input::resolve_source(&raw,&ip).unwrap();
+                let ordered=raw.source_ordered_instances("Construction").unwrap();
+                let mut missing_f=raw.clone();
+                missing_f.objects.get_mut(&ep_raw_model::ObjectType("Construction".into())).unwrap()
+                    .get_mut(&ep_raw_model::ObjectName(names[0].into())).unwrap().fields
+                    .remove(&ep_raw_model::FieldName("idf_max_fields".into()));
+                let ok=!raw.is_epjson() && raw.validate_source_idf_object_custody("Construction").is_ok()
+                    && (capacity.alphas,capacity.numerics,capacity.total().unwrap())==(11,0,11)
+                    && ordered.len()==2 && ordered.iter().zip(names).all(|((name,row),expected)|name.0==*expected
+                        && matches!(row.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),Some(ep_raw_model::RawValue::Number(token)) if token=="2"))
+                    && projected.objects["Construction"].iter().zip(names).all(|(row,name)|row.object_name==*name
+                        && row.idf_max_fields==Some(2))
+                    && !compiled.has_errors() && compiled.model.as_ref().is_some_and(|model| {
+                        let ids=(*names).map(|name|model.construction_names.resolve(name));
+                        model.construction_names.is_source_exact_namespace() && ids[0].is_some() && ids[1].is_some() && ids[0]!=ids[1]
+                            && names.iter().zip(ids).all(|(name,id)|model.constructions.iter().any(|row|Some(row.id)==id
+                                && row.name.0==name.to_ascii_uppercase() && row.layers.len()==1
+                                && model.ctf_report_names.constructions.contains(&(row.id,name.to_ascii_uppercase()))))
+                    }) && ep_compiler::compile_raw_model(&raw).has_errors()
+                    && missing_f.validate_source_idf_object_custody("Construction").is_err()
+                    && crate::ordinary_input_processor::resolve_source_b(&missing_f).is_err();
+                if !ok {eprintln!("Original Construction names lost custody: {names:?}");}
+                ok
+            });
         // The raw final EOF absorptance stays present, while actual Source
         // compilation supplies the effective NoMass owner selected by Native
         // Material286/293/300 returned-count guards. JSON/Legacy stay raw-valued.
@@ -8726,7 +8815,7 @@ MaterialProperty:GlazingSpectralData,
         });
         // This complete existing Source B scene reaches the real EcoRoof ancillary
         // Construction caller, including the NBSP outside name and uncounted EOF tail.
-        let no_mass_support_matches = {
+        let no_mass_support_matches = ["Wall", "\u{a0}", "\u{b}"].iter().all(|wall_name| {
             let mut value = input(PortingScope::B);
             value["Version"] = json!({"Version 1":{"version_identifier":"26.1"}});
             value["Building"] = json!({"Building":{
@@ -8751,9 +8840,9 @@ MaterialProperty:GlazingSpectralData,
                 "PLAIN":{"roughness":"MediumRough","thermal_resistance":0.03},
                 "\u{a0}PLAIN\u{a0}":{"roughness":"MediumRough","thermal_resistance":0.05}});
             value["Material:RoofVegetation"] = json!({"REPAIR ROOF":{}});
-            value["Construction"] = json!({
-                "ECO":{"outside_layer":"REPAIR ROOF","layer_2":"Mass Layer"},
-                "Wall":{"outside_layer":"\u{a0}","layer_2":"Mass Layer","layer_3":"PLAIN"}});
+            value["Construction"] = Value::Object(serde_json::Map::from_iter([
+                ("ECO".into(),json!({"outside_layer":"REPAIR ROOF","layer_2":"Mass Layer"})),
+                ((*wall_name).into(),json!({"outside_layer":"\u{a0}","layer_2":"Mass Layer","layer_3":"PLAIN"}))]));
             value["ZoneHVAC:EquipmentConnections"] = json!({"ZoneHVAC:EquipmentConnections 1":{
                 "zone_name":"Zone","zone_conditioning_equipment_list_name":"Equipment",
                 "zone_air_inlet_node_or_nodelist_name":"Supply","zone_air_node_name":"Air",
@@ -8768,7 +8857,7 @@ MaterialProperty:GlazingSpectralData,
                 .unwrap()
                 .iter_mut()
                 .for_each(|(name, row)| {
-                    row["construction_name"] = json!(if name == "Roof" { "ECO" } else { "Wall" });
+                    row["construction_name"] = json!(if name == "Roof" { "ECO" } else { *wall_name });
                     row["number_of_vertices"] = json!(4);
                 });
             let surfaces = value["BuildingSurface:Detailed"].as_object().unwrap().iter()
@@ -8827,10 +8916,11 @@ MaterialProperty:GlazingSpectralData,
                     "ZoneHVAC:IdealLoadsAirSystem,{};\n",
                     "ZoneHVAC:EquipmentList,Equipment,SequentialLoad,ZoneHVAC:IdealLoadsAirSystem,Ideal,1,1;\n",
                     "ZoneHVAC:EquipmentConnections,Zone,Equipment,Supply,,Air,Return;\n",
-                    "{}Construction,Wall,\u{a0},Mass Layer,PLAIN"
+                    "{}Construction,{},\u{a0},Mass Layer,PLAIN"
                 ),
                 ideal_fields.join(","),
-                surfaces
+                surfaces,
+                wall_name
             );
             std::fs::write(&converted_path, value.to_string()).unwrap();
             std::fs::write(&original_path, original).unwrap();
@@ -8850,8 +8940,8 @@ MaterialProperty:GlazingSpectralData,
                 .expect("full actual Construction getter operands");
             let wall = model
                 .construction_names
-                .resolve("Wall")
-                .expect("same Wall identity");
+                .resolve(wall_name)
+                .expect("same exact ordinary Construction identity");
             let outside = model
                 .material_names
                 .resolve("\u{a0}")
@@ -8866,7 +8956,7 @@ MaterialProperty:GlazingSpectralData,
                 .expect("same filled tail material");
             let projected_wall = projected.objects["Construction"]
                 .iter()
-                .find(|row| row.object_name == "Wall")
+                .find(|row| row.object_name == *wall_name)
                 .expect("same raw Wall projection");
             let mut selected =
                 inspect_porting_scope(&raw, &compiled.report, Some(model), PortingScope::B);
@@ -8917,6 +9007,9 @@ MaterialProperty:GlazingSpectralData,
                     .validate_source_idf_object_custody("Material:NoMass")
                     .is_ok()
                 && model.material_names.is_source_exact_namespace()
+                && model.construction_names.is_source_exact_namespace()
+                && model.constructions.iter().any(|row| row.id == wall
+                    && row.name == model.construction_names.normalized_name(wall_name))
                 && projected_wall.idf_max_fields == Some(3)
                 && projected_wall.fields.get("outside_layer")
                     == Some(
@@ -8961,11 +9054,11 @@ MaterialProperty:GlazingSpectralData,
                     None,
                 )
                 .allows_rust_runtime()
-        };
+        });
         std::fs::remove_file(converted_path).unwrap();
         std::fs::remove_file(original_path).unwrap();
         std::fs::remove_dir(home).unwrap();
-        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_extra_members_matches && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
+        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_extra_members_matches && construction_original_names_match && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
             // This table proves its original 24 material/curve layouts. The two
             // OA layouts and DSOA have separate original-IDF existing-body cases.
             && observed_families.len() == 24

@@ -904,7 +904,7 @@ fn resolve_raw(
             let blank_name = if source_analytic_curve_family
                 || source_spectral_data_family
                 || source_calendar_ingress
-                    && family.0 == "Material:NoMass"
+                    && matches!(family.0.as_str(), "Material:NoMass" | "Construction")
                     && (raw.is_epjson() || source_original_idf_metadata)
                 || source_refraction_family
                 || source_glazing_family
@@ -1220,6 +1220,20 @@ fn resolve_raw(
                 } else if (source_b_ingress
                     && family.0 == "Construction"
                     && required == "outside_layer")
+                    || (source_calendar_ingress
+                        && family.0 == "BuildingSurface:Detailed"
+                        && required == "construction_name"
+                        && field(object, required).is_some_and(|value| {
+                            let RawValue::String(reference) = value else {
+                                return false;
+                            };
+                            raw.objects
+                                .get(&ObjectType("Construction".into()))
+                                .is_some_and(|rows| {
+                                    rows.keys()
+                                        .any(|name| name.0.eq_ignore_ascii_case(reference))
+                                })
+                        }))
                     || (source_calendar_ingress
                         && (matches!(
                             (family.0.as_str(), required),

@@ -90,7 +90,8 @@
       "Source A composes ZoneLists, sole whole-Zone Spaces and positive/empty SpaceLists with People, OtherEquipment and ElectricEquipment. Exact precedence, ordered names, final Zone-to-Space floors and selected sizing reach real owners. Electric heat and meters retain separate owners; see current same-input evidence. Group/Space compositions, B/legacy Electric, multiple/remainder Spaces, SpaceHB/HVAC and arbitrary combinations remain unvalidated.",
       "Source B additionally validates a NoLimit five-DesignDay composition with only ROOF and WALL Y0 changed to SunExposed/WindExposed. All 115 series/54,480 values pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams exactly while exposed-face and demand/supply results change. This establishes joint exposure-to-surface/HVAC behavior for the declared case. The other four faces remain NoSun/NoWind. Arbitrary values/combinations, separate Sun/Wind attribution, subsurfaces, authored shades, OA/latent control, sizing and frozen CON-01 promotion remain outside this evidence. Whole EIO/SHD and five warmup counts agree; unrequested coefficient, DXF and tabular reports receive no credit.",
       "A bounded two-Zone opaque weather case composes ten SunExposed/NoWind exterior walls/roofs with two Ground floors. Both engines report 37 material partial-fraction samples on the declared ZULU wall and roof. All 115 series/11,040 values pass unchanged limits. This establishes cross-Zone geometric shading for the declared composition; reciprocal shading, baseline thermal causality, positive shadow-shadow area, arbitrary combinations and full-object conformance remain unestablished.",
-      "A retained two-Zone opaque composition now includes actual obstruction-reflected beam-to-diffuse and sky-diffuse irradiance. All 145 series and 13,920 values pass unchanged limits; 84 beam and 185 sky paired positive samples and 960 opaque specular zero samples per engine are observed. This is finite public irradiance evidence, without private Native hit ownership or baseline thermal attribution."
+      "A retained two-Zone opaque composition now includes actual obstruction-reflected beam-to-diffuse and sky-diffuse irradiance. All 145 series and 13,920 values pass unchanged limits; 84 beam and 185 sky paired positive samples and 960 opaque specular zero samples per engine are observed. This is finite public irradiance evidence, without private Native hit ownership or baseline thermal attribution.",
+      "Source209 additionally qualifies exact ordinary Construction-name references in one fixed Source B direct-epJSON five-DesignDay case. WALL X0/X1/Y0 refer to NBSP-only, VT-only and ASCII-padded Wall aliases; FLOOR/WALL Y1 retain unpadded Wall and ROOF retains its real EcoRoof construction. Literal selected-map resolution and ancillary Roof support preserve the same full recipes without changing geometry, material operands or existing physical guards. All 34 fixed gates and 158 series/75,120 values pass. Constructor order/count explanations are reviewed CODE-derived metadata, not private Native state; nonordinary/internal-source, Legacy/Original criteria and arbitrary combinations remain held."
     ],
     "Site:GroundTemperature:BuildingSurface": [
       "all twelve finite numeric monthly fields and original eighteen-degree omitted/default behavior",
@@ -471,6 +472,10 @@
       "One fresh Source204 active Input06 layer retains the final raw thermal absorptance 0.8125 while F3 returns only N1. Both actual Material Details rows report effective 0.9/0.7/0.7; all 34 scientific gates pass the fixed complete streams. Existing-body controls cover primitive rejection and F-qualified thermal/solar/visible selection, not every legal combination or Native-name spelling.",
       "Source207 Input07 retains the complete final Wall PLAIN raw layer, while genuine original-IDF F3 selects two effective layers through reviewed compiler/support/initialization owners. The successful whole case and matching three Material Details rows do not expose Native private TotLayers or prove direct-JSON three-layer equivalence. Construction-name namespace widening and unknown NoMass direct-JSON members remain future work; all earlier Source204 count-default evidence remains retained.",
       "Source208 direct-epJSON admits the ten authored undeclared members on the active NBSP NoMass row, including nested values and name/idf_order/idf_max_fields lookalikes, without using them as identity/count metadata. Both actors consume the same full three-layer Wall DOM. Matching public Material Details rows retain active thermal absorptance 0.8125 and the other two materials' 0.9/0.7/0.7 defaults; all 34 gates and 158 series/75,120 values pass. Earlier original-IDF count/default evidence is unchanged; SourceRaw field-NUL/comparator fences and Construction-name widening remain open. No private Native layer-count observation or all-combinations completion is claimed."
+    ],
+    "Construction": [
+      "Consumed fields retain bounded one-Zone A/B and existing Source A reciprocal opaque-stack limits. Eligible Source ordinary Construction declarations use an independent exact ASCII-uppercase namespace without trimming, and actual BuildingSurface references resolve through that same map. One Source209 B five-DesignDay direct-epJSON case actively uses NBSP-only, VT-only and ASCII-padded Wall aliases alongside unpadded Wall, with identical full three-layer recipes and the real EcoRoof retained. Compiler, selected runtime initialization/cache/report and ancillary Roof support preserve those identities. Existing Source207 original-IDF F3 two-layer/raw-tail evidence and full raw primitive/contiguity validation remain held. Six other Construction:* families plus ConstructionProperty:InternalHeatSource, noneligible/Legacy policies and arbitrary-name/layer/value combinations remain outside this new qualification; no private Native TotLayers or full-object completion is claimed.",
+      "Source209 changes only three string-only Construction alias rows and three active BuildingSurface construction_name references from accepted Source208 fa3; all 1,330 numeric records and NoMass members remain exact. Both actors consume identical 636b direct input with full declared layer recipes, all 34 scientific gates/158 series/75,120 values pass unchanged policies, and three IR differences stay within the existing limit. Reviewed CODE/count/name-map custody explains Constructor order and reference selection; no private Native Constructor allocation, TotLayers or caller trace is observed. Separate existing-body controls cover eligible Source A/B and genuine Original name paths, while physical acceptance here is Source B direct epJSON only."
     ]
   },
   "verification": {
@@ -14320,6 +14325,169 @@
           "bytes": 4910
         },
         "qualification": "Root attributes current QA/workspace/build and the one Native/one Source scientific pair. Published V3 rejects this direct-epJSON input before reading streams and grants zero case/value/engine credit; frozen V13 supplies current acceptance. The original Source207 original-IDF comparer example and all earlier Source histories remain held. Publication-only companion binds two existing before-actor input peers without changing frozen runtime review, binding, actors or completion. No broader object/value completion is implied."
+      },
+      "direct_epjson_construction_exact_names_and_surface_refs": {
+        "actual_quality": {
+          "path": ".runtime/porting/Construction-exact-names-source/evidence01/quality-ledger.json",
+          "sha256": "7b98bdf996258638cbe7499837c2b0e453bcc2b6ba1edbc04bf61ee56a94239f",
+          "bytes": 3864
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/Construction-exact-names-source/evidence01/quality-ledger.json",
+          "sha256": "7b98bdf996258638cbe7499837c2b0e453bcc2b6ba1edbc04bf61ee56a94239f",
+          "bytes": 3864
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/Construction-exact-names-source/quality01/quality-preparation.json",
+          "sha256": "7b9c30c357ce6743344d8df7aaf21ac9349bdae22708afa18d7ad9141bd82375",
+          "bytes": 6887
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/Construction-exact-names-source/evidence01/source-authority.json",
+          "sha256": "53c6ff0c2cb6e33d1cafa9ce6368cccf8b8795aff438544f0c85f0657f26e033",
+          "bytes": 32845
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/porting/Construction-exact-names-source/evidence01/independent-Source-review01.json",
+          "sha256": "de133c33c77dab7da21f70449e060ff45b008a19fda36ac4a3de44ce5d0f74f7",
+          "bytes": 17759
+        },
+        "total_actual_QA_commands": 5,
+        "current_QA_commands": 5,
+        "failed_QA_attempts": 0,
+        "current_test_body_executions": 2,
+        "historical_named_body_executions": 0,
+        "historical_zero_match_test_records": 0,
+        "reused_body_credit": 0,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "actual_test_execution_evidence": [
+          {
+            "kind": "targeted_existing_test",
+            "role": "current",
+            "test_names": [
+              "porting_scope::tests::closed_opaque_faces_reach_source_layout_and_view_factor_kernel"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/Construction-exact-names-source/quality01/ordinary-construction-names-surface-bindings-tests/receipt.json",
+              "sha256": "6a49193648c1aaaf2c32111c45013a8221f8d9fba9162f0ffcb8450a8ff8d8dc",
+              "bytes": 40586
+            },
+            "actual_exit_code": 0,
+            "lineage": []
+          },
+          {
+            "kind": "targeted_existing_test",
+            "role": "current",
+            "test_names": [
+              "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/Construction-exact-names-source/quality01/original-construction-names-custody-support-tests/receipt.json",
+              "sha256": "2c82dc26fb6579ea2a5663e215f311d34140f0a6e245ac56119291e8dd78c54f",
+              "bytes": 40587
+            },
+            "actual_exit_code": 0,
+            "lineage": []
+          }
+        ],
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/Source209-Construction-exact-names-minimal-QA-DATA01/QA-profile.json",
+          "sha256": "d4a10e83d7e583967e860df577c334caac45e6593c57a5207364a4402c643867",
+          "bytes": 3362
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/Construction-exact-names-source/QA-profile-binding01.json",
+          "sha256": "fa02c3ecb826bce7f67fc14103bceeaa242cf0bbbb2ee0b761d5770caf0b4d1e",
+          "bytes": 2100
+        },
+        "current_required_test_names": [
+          "porting_scope::tests::closed_opaque_faces_reach_source_layout_and_view_factor_kernel",
+          "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support"
+        ],
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "new_recorded_Source_builds": 1,
+        "retained_failed_builds": [],
+        "retained_failed_Source_attempts": [],
+        "correction_reviews": [],
+        "integration_attempt": {
+          "Root_workspace01": {
+            "path": ".runtime/porting/Construction-exact-names-source/Root-workspace01-actual-readback.json",
+            "sha256": "a747d41117f2708db8dfe27676b63ff63d8ad31708bc1637128fe2fdc63e54bd",
+            "bytes": 2468
+          },
+          "workspace_passed": true,
+          "passed": 5051,
+          "failed": 0,
+          "ignored": 2,
+          "target_summaries": 23,
+          "whole_workspace": true,
+          "all11_package_all_target_Clippy_current_profile": false,
+          "current_Clippy_packages": [
+            "ep_compiler",
+            "ep_run"
+          ],
+          "Root_QA01": {
+            "path": ".runtime/porting/Construction-exact-names-source/Root-QA01-actual-readback.json",
+            "sha256": "3f7ba57e02d487c53e94e84bd654185d7e589e1bd05431329038f6cc7dd27b6a",
+            "bytes": 1210
+          },
+          "workspace_attempts": 1,
+          "qualification": "One complete actual workspace pass. Five current profile commands pass two exact existing ep_run bodies plus all-target warning-denying Clippy for ep_compiler and ep_run; no history/reuse/OA getter credit or new test functions. Parent208 and earlier units remain separate historical evidence."
+        },
+        "current_Source_CODE": [
+          {
+            "path": "crates/ep_compiler/src/compiler.rs",
+            "sha256": "82ba01527f22b31549de0d4f4a68a62c9ad4f817e9a06f803aa80ac5c92e9156",
+            "bytes": 972420
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+            "sha256": "a54e7f4c1265ed20bd3ba34e38c5825df212a68f81127bf064de4ac5478d7591",
+            "bytes": 292010
+          },
+          {
+            "path": "crates/ep_run/src/porting_scope/tests.rs",
+            "sha256": "11ee6d529b87ae1d646809c53a61b4eb6accec071e5efcbf91144d80bff41e34",
+            "bytes": 926432
+          },
+          {
+            "path": "crates/ep_run/src/support/source_admission.rs",
+            "sha256": "cc5dfa1366b6fb9403a7038eb3d9c289c86e54fb2e29222930c1bd9639bfe501",
+            "bytes": 88122
+          }
+        ],
+        "generic_reported_comparer_v3": {
+          "schema": "Root.GenericComparerDirectJSONScope.v1",
+          "accepted": false,
+          "status": "not-applicable-to-direct-epJSON",
+          "engines_launched": 0,
+          "new_qualifying_cases": 0,
+          "new_qualifying_values": 0,
+          "qualification": "Published reusable V3 compares original-IDF actor inputs only. No invocation or format retry for current209 directJSON. Frozen pairedV13 supplies the accepted full current comparison; historical Source207 original-IDF public example stays separate."
+        },
+        "whole_input_and_prospective_peer": {
+          "path": ".runtime/object-expansion/unit159-prep/Source209-Construction-exact-names-prospective-DATA-DRAFT01/independent-static-review01.json",
+          "sha256": "f08000eb79e0c38feb166df7c0b65f169f8ac0de2b6681316347df0f656cd64c",
+          "bytes": 11324
+        },
+        "retained_raw_input_peer": {
+          "path": ".runtime/object-expansion/unit159-prep/Source209-Construction-exact-name-active-aliases-INPUT-DRAFT01/independent-static-review01.json",
+          "sha256": "2300e0fc74ff844338d8725062d3d7bcaff38813bd2ad0982eab76bef07f117c",
+          "bytes": 3908
+        },
+        "current_Source_forecast_binding_peer": {
+          "path": ".runtime/porting/Construction-exact-names-source/prospective01/independent-current-Source-binding-audit02.json",
+          "sha256": "72e987b826522195f8098c0486f52f262a98b813d8f672078e265c48e1f8e082",
+          "bytes": 7251
+        },
+        "current_Runtime_peer": {
+          "path": ".runtime/porting/Construction-exact-names-source/runtime01/independent-runtime-review.json",
+          "sha256": "e72c1ee53bdbc20a3fbe8865456079c0f62479e3d6786ea5129ee7c080733ef4",
+          "bytes": 6491
+        },
+        "qualification": "Root attributes current QA/workspace/defaultbuild and one Native/one Source pair. Reusable V3 is original-IDF-only and is skipped for current directJSON, with no invocation or engineering/failure inventory credit. FrozenV13 supplies current scientific completion. Runtime uses whole input/prospectivef080 flat-bound to fixedmanifest2afb/input636b/priorraw2300; null-parent preparation remains immutable and Root-bound75f/f5e siblings have distinct72e/current11key reviews. Standard frozen publisher route applies; no publication companion or runtime provenance replacement is needed. No full object/name/value completion is implied."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -92087,12 +92255,319 @@
           "direct_epJSON_full_three_layer_Construction": true,
           "qualification": "Source-reviewed direct epJSON full three-layer path is physically exercised; EIO material rows are public observations and no private Native Construction TotLayers trace is claimed."
         }
+      },
+      {
+        "group": "Construction",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-source209-v13-Construction-exact-name-active-aliases",
+        "case_kind": "direct-epJSON-Construction-exact-name-active-aliases-full-three-layer-Wall",
+        "source_build": "source209-Construction-exact-names-and-active-surface-references",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/Source209-Construction-exact-name-active-aliases-INPUT-DRAFT01/input.epJSON",
+          "sha256": "636b3308e34bb62cd98b05f3f4af1f5c6d3c5ecb4640ffb3927ea9352c39e102",
+          "bytes": 142029
+        },
+        "scientific_dom": {
+          "path": ".runtime/object-expansion/unit159-prep/Source209-Construction-exact-name-active-aliases-INPUT-DRAFT01/input.epJSON",
+          "sha256": "636b3308e34bb62cd98b05f3f4af1f5c6d3c5ecb4640ffb3927ea9352c39e102",
+          "bytes": 142029
+        },
+        "fixed_input_manifest": {
+          "path": ".runtime/object-expansion/unit159-prep/Source209-Construction-exact-names-prospective-DATA-DRAFT01/fixed-input-manifest.json",
+          "sha256": "2afb278f738642a0823694cc1173489a94ccae0aa776625b2bbaa50ef37a9f77",
+          "bytes": 4258
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/Construction-exact-names-source/runtime01/native/command/receipt.json",
+          "sha256": "9b92937ec4a2674c2cb17b731d01b5cf5029d4c702800fbb53503de53f35a1fd",
+          "bytes": 334032
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/Construction-exact-names-source/runtime01/source/command/receipt.json",
+          "sha256": "6d291c8576730489a1923467541c22fe3708724b9d3108067428071ff77d2c17",
+          "bytes": 335404
+        },
+        "source_summary": {
+          "path": ".runtime/porting/Construction-exact-names-source/runtime01/source/output/run-summary.json",
+          "sha256": "dd14dd34ece98222d657041089e6ddc65cc3a89525e577a3cdd47834db964b45",
+          "bytes": 64496
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/bf/bf0ec51550bba2b37a11869823e9c436c8e79fdcb63b112c23b261b518a7f2c8",
+          "sha256": "bf0ec51550bba2b37a11869823e9c436c8e79fdcb63b112c23b261b518a7f2c8"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/Construction-exact-names-source/build01/frozen/eplus-rs.exe",
+          "sha256": "d92dcf5d955066d41b89b2c5c2b93c72acadbf910cac146da6dcde207d423181",
+          "bytes": 84296057
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/Construction-exact-names-source/build01/build/receipt.json",
+          "sha256": "bc69e44f085ab11a584da03b8c3b14a2f1c9de3b1e2d951196e9123d4bf9bf79",
+          "bytes": 41813
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/Construction-exact-names-source/runtime01/readback.json",
+          "sha256": "3c5efa85d8c76fa44375f8c411ebca8e3c47e8e6dae65b7968003364b841d37e",
+          "bytes": 539379
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/Construction-exact-names-source/runtime01/Root-scientific-review01.json",
+          "sha256": "94a6f332f11ea4537a9809259e9d43e8b5021c1ed0322b54eeb9b9219c71be67",
+          "bytes": 11100
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/Construction-exact-names-source/runtime01/case-config.json",
+          "sha256": "6c80b113c2a49061e566f5027afcad610d324786f1b7f12e6a0425976d467f2c",
+          "bytes": 175340
+        },
+        "coverage_kind": "direct_epjson_construction_exact_names_and_surface_refs",
+        "effective_state": "One fresh Source209 Source B direct-epJSON pair spans five DesignDays. Both actors consume identical 636b input/scientific DOM. Three full-Wall Construction aliases (NBSP-only, VT-only and ASCII-padded Wall) plus the original unpadded Wall are actively referenced by real surfaces; the real EcoRoof remains active. All five ordinary Construction instances retain their reviewed signed-doj order and full declared recipes; the three aliases and Wall use the same complete three-layer recipe. Only those three aliases and three surface references change from the parent; all 1,330 numeric records and existing NoMass extras remain held. All 34 gates, 158 series/75,120 values pass unchanged policies; three HorizontalIR operands differ within existing 1e-5 limits and all other 157 series/both meters are raw-exact. Public Material Details rows retain three distinct NoMass names and active thermal absorptance 0.8125. No private Native Construction TotLayers/identity trace, arbitrary name/value combinations, nonordinary/internal-source consumers, Legacy/Original widening, field-NUL/comparator widening, annual or full-object conformance is claimed.",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 3,
+          "parsed_binary64_unequal": 3,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.7053025658242404e-13,
+          "max_rmse_delta": 1.1309316871492875e-14
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v13/release.json",
+            "sha256": "d8338a1da6557ae14bc49f92596f222c9321f6aa4f9afe4448e92878186fa4bf",
+            "bytes": 17261
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/Construction-exact-names-source/runtime01/binding.json",
+            "sha256": "7573cee6fdd2d81359eab4dd93500470a7bcba79bdb552eaf3005e4802cdd53c",
+            "bytes": 1142
+          },
+          "case_config": {
+            "path": ".runtime/porting/Construction-exact-names-source/runtime01/case-config.json",
+            "sha256": "6c80b113c2a49061e566f5027afcad610d324786f1b7f12e6a0425976d467f2c",
+            "bytes": 175340
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/Construction-exact-names-source/evidence01/source-authority.json",
+            "sha256": "53c6ff0c2cb6e33d1cafa9ce6368cccf8b8795aff438544f0c85f0657f26e033",
+            "bytes": 32845
+          },
+          "completion": {
+            "path": ".runtime/porting/Construction-exact-names-source/runtime01/completed.json",
+            "sha256": "f036ca5b01c0dbba91ab6328b90472f306dcad4601471165b1ca87706cfc89d7",
+            "bytes": 2328
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/Construction-exact-names-source/runtime01/verify-command/receipt.json",
+            "sha256": "98c008f14de4b14f0a5b44c81f614db1cbf6e34b4c310bf68c3d1e0985e2cac3",
+            "bytes": 335146
+          },
+          "actual_build": {
+            "path": ".runtime/porting/Construction-exact-names-source/build01/build-row.json",
+            "sha256": "990e544afe5cbf469e74eee25cac4d9b441e28079d2d15b707ca489579febf11",
+            "bytes": 1430
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/Construction-exact-names-source/evidence01/quality-ledger.json",
+            "sha256": "7b98bdf996258638cbe7499837c2b0e453bcc2b6ba1edbc04bf61ee56a94239f",
+            "bytes": 3864
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/Construction-exact-names-source/evidence01/source-authority.json",
+            "sha256": "53c6ff0c2cb6e33d1cafa9ce6368cccf8b8795aff438544f0c85f0657f26e033",
+            "bytes": 32845
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "Root_physical_truth": {
+            "path": ".runtime/porting/Construction-exact-names-source/runtime01/Root-scientific-review01.json",
+            "sha256": "94a6f332f11ea4537a9809259e9d43e8b5021c1ed0322b54eeb9b9219c71be67",
+            "bytes": 11100
+          }
+        },
+        "public_observations_and_scope": {
+          "three_exact_NoMass_names_and_MaterialDetails_rows": {
+            "Native": {
+              "artifact": {
+                "path": ".runtime/porting/Construction-exact-names-source/runtime01/native/output/nativeout.eio",
+                "sha256": "858f86f89ffa3409ced32f0092b04d4a42fc6d0ca56df6909da815b38557757a",
+                "bytes": 22197
+              },
+              "rows": [
+                [
+                  " Material Details",
+                  " ",
+                  "0.2000",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.8125",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  " PLAIN ",
+                  "5.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  "PLAIN",
+                  "3.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ]
+              ]
+            },
+            "Source": {
+              "artifact": {
+                "path": ".runtime/porting/Construction-exact-names-source/runtime01/source/output/eplusrs.eio",
+                "sha256": "3f40a79407562c383270b92333c07e19b2bcb412beedf28bd7bbfdef50931951",
+                "bytes": 22161
+              },
+              "rows": [
+                [
+                  " Material Details",
+                  " ",
+                  "0.2000",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.8125",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  " PLAIN ",
+                  "5.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  "PLAIN",
+                  "3.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ]
+              ]
+            }
+          },
+          "material_rows_raw_equal": true,
+          "all34_gates_passed": true,
+          "reported_series": 158,
+          "reported_values": 75120,
+          "unequal_series": [
+            {
+              "stream": "eso",
+              "index": 58,
+              "report_id": 10,
+              "name": "Site Horizontal Infrared Radiation Rate per Area",
+              "key": "Environment",
+              "units": "W/m2",
+              "policy": {
+                "key": "Environment",
+                "variable": "Site Horizontal Infrared Radiation Rate per Area",
+                "units": "W/m2",
+                "frequency": "Timestep",
+                "sampling_stage": "zone",
+                "atol": 1e-05,
+                "rtol": 0.0,
+                "rmse_max": 1e-05
+              },
+              "producer": {
+                "stage": "Zone",
+                "store": "Average",
+                "units": "W/m2",
+                "raw": "Zone,Average,Site Horizontal Infrared Radiation Rate per Area [W/m2]"
+              },
+              "samples": 480,
+              "raw_operand_unequal": 3,
+              "parsed_binary64_unequal": 3,
+              "sum_squared_delta": 6.139231108792002e-26,
+              "max_abs_delta": 1.7053025658242404e-13,
+              "rmse": 1.1309316871492875e-14,
+              "tolerance_failures": 0,
+              "rmse_limit_met": true
+            }
+          ],
+          "direct_epJSON_full_three_layer_Construction": true,
+          "qualification": "Source-reviewed direct epJSON full three-layer path is physically exercised; EIO material rows are public observations and no private Native Construction TotLayers trace is claimed."
+        },
+        "Construction_identity_scope": {
+          "authored_order_by_reviewed_signed_doj_CODE": [
+            " ",
+            "\u000b",
+            " Wall ",
+            "ACTIVE ECO ROOF CONSTRUCTION",
+            "Wall"
+          ],
+          "actual_case_active_aliases": [
+            " ",
+            "\u000b",
+            " Wall "
+          ],
+          "all1330_numeric_records_and_NoMass_members_held": true,
+          "full_three_layer_Wall_recipe": [
+            " ",
+            "Mass Layer",
+            "PLAIN"
+          ],
+          "Native_private_Construction_state_observed": false,
+          "qualification": "Whole fixed-case physical acceptance and authored input/Source-selected owner custody. The order/count/identity explanation is reviewed CODE-derived metadata, not an instrumented Native constructor report or private caller trace."
+        }
       }
     ],
     "totals": {
-      "paired_cases": 280,
-      "reported_samples": 12975736,
-      "raw_operand_unequal": 3246597,
+      "paired_cases": 281,
+      "reported_samples": 13050856,
+      "raw_operand_unequal": 3246600,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -96276,6 +96751,38 @@
           "sha256": "cf00f46a557842931be3a2f6c61135ccd06329aeaf313f2a8e86d7a3e33012f2",
           "bytes": 39086
         }
+      },
+      {
+        "id": "source209-Construction-exact-names-and-active-surface-references",
+        "receipt": {
+          "path": ".runtime/porting/Construction-exact-names-source/build01/build/receipt.json",
+          "sha256": "bc69e44f085ab11a584da03b8c3b14a2f1c9de3b1e2d951196e9123d4bf9bf79",
+          "bytes": 41813
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/bf/bf0ec51550bba2b37a11869823e9c436c8e79fdcb63b112c23b261b518a7f2c8",
+          "sha256": "bf0ec51550bba2b37a11869823e9c436c8e79fdcb63b112c23b261b518a7f2c8"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/Construction-exact-names-source/build01/frozen/eplus-rs.exe",
+          "sha256": "d92dcf5d955066d41b89b2c5c2b93c72acadbf910cac146da6dcde207d423181",
+          "bytes": 84296057
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/Construction-exact-names-source/build01/frozen/build-receipt.json",
+          "sha256": "df2b7c1edad12d2162722f8deedbd2e203ff20d3847e0ae2ddbb563a2cfed188",
+          "bytes": 1653070
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/Construction-exact-names-source/quality01/quality-preparation.json",
+          "sha256": "7b9c30c357ce6743344d8df7aaf21ac9349bdae22708afa18d7ad9141bd82375",
+          "bytes": 6887
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/Construction-exact-names-source/build01/freeze/receipt.json",
+          "sha256": "52609da6ba1d99cac893ccb457ecf7cf1d27e871bf0742c2da55fe0276678592",
+          "bytes": 40822
+        }
       }
     ],
     "focused_since_workspace": {
@@ -96944,14 +97451,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 208,
-      "builds_with_accepted_paired_cases": 176,
+      "actual_recorded_builds": 209,
+      "builds_with_accepted_paired_cases": 177,
       "builds_with_only_retained_failed_Source_attempts": 13,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 6,
       "builds_with_only_unaccepted_Source_attempts": 24,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "208 actual Source builds: 176 retain accepted pairs and 32 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. Failed builds 201/202/205/206 remain zero-credit. One fresh Source208 direct-epJSON case adds 75,120 values; all earlier accepted cases, builds and unaccepted histories remain unchanged. The auxiliary original-IDF-only comparer rejection is outside Source attempt/build accounting.",
+      "qualification": "209 actual Source builds: 177 retain accepted pairs and 32 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. Failed builds 201/202/205/206 remain zero-credit. One fresh Source209 direct-epJSON Construction-name/reference case adds 75,120 values; all earlier accepted cases, builds and unaccepted histories remain unchanged. The current original-IDF-only generic comparer is skipped without invocation or failure-inventory credit.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,
