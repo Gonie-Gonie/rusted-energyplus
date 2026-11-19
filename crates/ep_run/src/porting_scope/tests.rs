@@ -8554,7 +8554,7 @@ MaterialProperty:GlazingSpectralData,
                 && crate::ordinary_input_processor::resolve_source_b(&raw).is_err()
         }) && {
             let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
-            value["Material:AirGap\u{0}tail"]=serde_json::json!({"QA FAMILY ALIAS":{"thermal_resistance":0.15}});
+            value["Material:NoMass\u{0}tail"]=serde_json::json!({"QA OTHER FAMILY ALIAS":{"thermal_resistance":0.15}});
             ep_raw_model::parse_epjson_str_for_source(&value.to_string()).is_err()
         } && [""," \t\r\u{c}","bad\nname"].iter().all(|name| {
             let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
@@ -9443,8 +9443,161 @@ MaterialProperty:GlazingSpectralData,
             TraceLevel::Normal,
             Some(&admission),
         );
+        // A Source-only canonical AirGap cache consumes the retained root alias.
+        // Raw/statistics/unusedInputs keep that full spelling, independently of
+        // canonical getObjectItem mark-used and the unchanged material getter.
+        let family_alias_matches = {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            let alias = "Material:AirGap\0tail";
+            let mut aliased = value.clone();
+            let mut rows = aliased.as_object_mut().unwrap().remove(FAMILY).unwrap();
+            for fields in rows.as_object_mut().unwrap().values_mut() {
+                let fields = fields.as_object_mut().unwrap();
+                let resistance = fields.remove("thermal_resistance").unwrap();
+                fields.insert("thermal_resistance\0tail".into(), resistance);
+                fields.insert("ignored".into(), json!({"nested\0tail":[null,true]}));
+            }
+            aliased[alias] = rows;
+            let alias_raw = ep_raw_model::parse_epjson_str_for_source(&aliased.to_string())
+                .expect("Source direct AirGap family and field aliases");
+            let held_raw = alias_raw.objects.clone();
+            let alias_compiled = ep_compiler::compile_raw_model_for_source(&alias_raw);
+            let alias_model = alias_compiled
+                .model
+                .as_ref()
+                .expect("canonical typed AirGap owner");
+            let mut alias_ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&alias_raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&alias_raw),
+            }
+            .expect("same retained Raw family and canonical Source IP cache");
+            let baseline_ip = match scope {
+                PortingScope::A => crate::ordinary_input_processor::resolve_source_a(&raw),
+                PortingScope::B => crate::ordinary_input_processor::resolve_source_b(&raw),
+            }
+            .unwrap();
+            let mut stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            let mut baseline_stats =
+                ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            alias_ip
+                .report_source_idf_records_stats(&mut stats)
+                .unwrap();
+            baseline_ip
+                .report_source_idf_records_stats(&mut baseline_stats)
+                .unwrap();
+            let capacity = alias_ip.get_object_def_max_args(FAMILY).unwrap();
+            let projected =
+                crate::ordinary_material_input::resolve_source(&alias_raw, &alias_ip).unwrap();
+            let owner_matches = alias_ip.get_num_objects_found(FAMILY) == 2
+                && alias_ip.get_num_objects_found(alias) == 2
+                && alias_ip.get_num_sections_found(FAMILY).unwrap() == 2
+                && alias_ip.get_num_sections_found(alias).unwrap() == 2
+                && alias_ip.has_object(FAMILY, "MiXeD Gap")
+                && alias_ip.has_object(alias, "MiXeD Gap")
+                && (capacity.alphas, capacity.numerics) == (1, 1)
+                && alias_ip
+                    .source_raw_object_fields(FAMILY, "MiXeD Gap")
+                    .unwrap()
+                    == alias_ip
+                        .source_raw_object_fields(alias, "MiXeD Gap")
+                        .unwrap()
+                && alias_ip.source_raw_object_names(FAMILY).unwrap()
+                    == alias_ip.source_raw_object_names(alias).unwrap()
+                && alias_ip
+                    .source_raw_object_fields(FAMILY, "MiXeD Gap")
+                    .unwrap()
+                    .get("thermal_resistance\0tail")
+                    == Some(&match scope {
+                        PortingScope::A => S::OtherScalar,
+                        PortingScope::B => S::Number("0.15".into()),
+                    })
+                && alias_ip.is_object_unused(alias, "MiXeD Gap")
+                && !alias_ip.is_object_unused(FAMILY, "MiXeD Gap");
+            alias_ip.mark_object_as_used(FAMILY, "MiXeD Gap");
+            let unused_matches = alias_ip.is_object_unused(alias, "MiXeD Gap");
+            let mut selected =
+                inspect_porting_scope(&alias_raw, &alias_compiled.report, Some(alias_model), scope);
+            selected.environment = Some(
+                super::environment::environment_from_weather(
+                    alias_model,
+                    &weather,
+                    "embedded AirGap family-alias weather",
+                )
+                .unwrap(),
+            );
+            let admission =
+                crate::support::SourceSupportAdmission::from_validated_scope(&alias_raw, &selected)
+                    .expect("actual scope, environment, canonical IP and retained raw family");
+            let supported = crate::support::assess_support_with_source_admission(
+                &alias_raw,
+                &alias_compiled.report,
+                Some(alias_model),
+                RunMode::Compatibility,
+                PartialRunPolicy::Deny,
+                RunOutputFormat::RustNative,
+                TraceLevel::Normal,
+                Some(&admission),
+            );
+            let mut collision = alias_raw.clone();
+            collision.objects.insert(
+                ep_raw_model::ObjectType(FAMILY.into()),
+                collision.objects[&ep_raw_model::ObjectType(alias.into())].clone(),
+            );
+            let mut invalid = alias_raw.clone();
+            invalid
+                .objects
+                .get_mut(&ep_raw_model::ObjectType(alias.into()))
+                .unwrap()
+                .get_mut(&ep_raw_model::ObjectName("MiXeD Gap".into()))
+                .unwrap()
+                .fields
+                .insert(
+                    ep_raw_model::FieldName("thermal_resistance\0tail".into()),
+                    ep_raw_model::RawValue::Bool(true),
+                );
+            !alias_compiled.has_errors()
+                && selected.admissible
+                && supported.allows_rust_runtime()
+                && alias_model.material_names.is_source_exact_namespace()
+                && alias_compiled.report.coverage.iter().any(|entry| {
+                    entry.object_type == FAMILY
+                        && entry.object_count == 2
+                        && entry.status == ep_compiler::ObjectCoverageStatus::Typed
+                })
+                && alias_raw.object_type_counts().get(alias) == Some(&2)
+                && !alias_raw
+                    .objects
+                    .contains_key(&ep_raw_model::ObjectType(FAMILY.into()))
+                && alias_raw.objects == held_raw
+                && owner_matches
+                && unused_matches
+                && projected.air_gaps.len() == 2
+                && projected.air_gaps.iter().all(|row| {
+                    row.idf_max_fields.is_none()
+                        && row.fields.len() == 1
+                        && row.fields.contains_key("thermal_resistance")
+                })
+                && stats.number_input_records == baseline_stats.number_input_records
+                && stats.number_defaulted_fields == baseline_stats.number_defaulted_fields
+                && stats.total_fields_with_defaults == baseline_stats.total_fields_with_defaults
+                && stats.number_autosized_fields == baseline_stats.number_autosized_fields
+                && stats.total_autosizable_fields == baseline_stats.total_autosizable_fields
+                && stats.number_autocalculated_fields == baseline_stats.number_autocalculated_fields
+                && stats.total_autocalculatable_fields
+                    == baseline_stats.total_autocalculatable_fields
+                && collision.source_ordered_instances(FAMILY).is_err()
+                && ep_compiler::compile_raw_model_for_source(&collision).has_errors()
+                && crate::ordinary_input_processor::resolve_source_a(&collision).is_err()
+                && crate::ordinary_input_processor::resolve_source_b(&collision).is_err()
+                && ep_compiler::compile_raw_model_for_source(&invalid).has_errors()
+                && crate::ordinary_input_processor::resolve_source_a(&invalid).is_err()
+                && crate::ordinary_input_processor::resolve_source_b(&invalid).is_err()
+                && crate::ordinary_input_processor::resolve(&alias_raw).is_err()
+                && ep_compiler::compile_raw_model(&alias_raw).has_errors()
+        };
         assert!(
-            assessment.allows_rust_runtime(),
+            assessment.allows_rust_runtime() && family_alias_matches,
             "{:?}",
             assessment.diagnostics
         );

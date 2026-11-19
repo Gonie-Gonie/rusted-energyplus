@@ -143,7 +143,7 @@ impl SelectedInputProcessor {
         for (family_name, family) in &self.families {
             let objects = raw
                 .objects
-                .get(family_name)
+                .get(self.source_statistics_family(family_name))
                 .ok_or(SelectedInputUnavailable::Association)?;
             let SourceInputFamily::Objects(shapes) = family else {
                 return Err(SelectedInputUnavailable::Association);
@@ -271,7 +271,7 @@ impl SelectedInputProcessor {
     ) -> Result<&SourceInputStatisticsFields, SelectedInputUnavailable> {
         self.statistics_input
             .as_ref()
-            .and_then(|raw| raw.objects.get(family))
+            .and_then(|raw| raw.objects.get(self.source_statistics_family(family)))
             .and_then(|objects| objects.get(object))
             .ok_or(SelectedInputUnavailable::Association)
     }
@@ -286,7 +286,7 @@ impl SelectedInputProcessor {
     ) -> Result<&[String], SelectedInputUnavailable> {
         self.statistics_input
             .as_ref()
-            .and_then(|raw| raw.object_order.get(family))
+            .and_then(|raw| raw.object_order.get(self.source_statistics_family(family)))
             .map(Vec::as_slice)
             .ok_or(SelectedInputUnavailable::Association)
     }
@@ -323,7 +323,7 @@ impl SelectedInputProcessor {
             .ok_or(SelectedInputUnavailable::Association)?;
         let objects = raw
             .objects
-            .get(&canonical)
+            .get(self.source_statistics_family(&canonical))
             .ok_or(SelectedInputUnavailable::Association)?;
         // Native JSON map traversal precedes getIDFObjNum: duplicate field
         // values select the first lexical object, not the first IDF object.
@@ -371,11 +371,12 @@ impl SelectedInputProcessor {
             .as_ref()
             .ok_or(SelectedInputUnavailable::Association)?;
         for (family_name, objects) in &raw.objects {
-            let definition = schema::definition(family_name).ok_or_else(|| {
-                SelectedInputUnavailable::Definition(format!(
-                    "actual input statistics schema for {family_name}"
-                ))
-            })?;
+            let definition =
+                schema::definition(self.source_query_family(family_name)).ok_or_else(|| {
+                    SelectedInputUnavailable::Definition(format!(
+                        "actual input statistics schema for {family_name}"
+                    ))
+                })?;
             for fields in objects.values() {
                 increment(&mut output.number_input_records)?;
                 for field in definition.regular {

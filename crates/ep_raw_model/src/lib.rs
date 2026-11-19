@@ -247,6 +247,30 @@ impl RawModel {
         self.source_json_instances(object_type)
     }
 
+    /// Canonical schema/cache owner for the bounded direct-JSON AirGap family.
+    /// The retained Raw key is never renamed. Uncoalesced root aliases are unavailable.
+    ///
+    /// # Errors
+    /// Rejects multiple retained families with the same AirGap C-string identity.
+    pub fn source_family_name<'a>(&self, family: &'a str) -> Result<&'a str, String> {
+        if self.is_epjson() && family.split('\0').next() == Some("Material:AirGap") {
+            if self
+                .objects
+                .keys()
+                .filter(|key| key.0.split('\0').next() == Some("Material:AirGap"))
+                .count()
+                > 1
+            {
+                return Err(
+                    "SourceFamilyLookupUnavailable: uncoalesced AirGap family aliases".into(),
+                );
+            }
+            Ok("Material:AirGap")
+        } else {
+            Ok(family)
+        }
+    }
+
     /// Returns the pinned Source JSON map order, including for converted IDF.
     ///
     /// Direct DOM readers such as the reporting pre-scan never apply the IDF
@@ -257,7 +281,17 @@ impl RawModel {
         &self,
         object_type: &str,
     ) -> Result<Vec<(&ObjectName, &RawObject)>, String> {
-        let Some(instances) = self.objects.get(&ObjectType(object_type.into())) else {
+        let canonical = self.source_family_name(object_type)?;
+        let retained = if self.is_epjson() && canonical == "Material:AirGap" {
+            self.objects
+                .keys()
+                .find(|key| key.0.split('\0').next() == Some(canonical))
+        } else {
+            self.objects
+                .get_key_value(&ObjectType(object_type.into()))
+                .map(|(key, _)| key)
+        };
+        let Some(instances) = retained.and_then(|key| self.objects.get(key)) else {
             return Ok(Vec::new());
         };
         let unavailable = || {
@@ -569,8 +603,9 @@ pub fn parse_epjson_str(contents: &str) -> Result<RawModel, EpJsonError> {
 ///
 /// Each map retains the first decoded key spelling and the last whole value
 /// for comparator-equivalent keys. Schedule reference strings are untouched.
-/// Retained family and other-family field NUL keys stay an explicit lookup
-/// boundary. Direct NoMass/AirGap declared-value queries own their field aliases;
+/// Only a direct AirGap root-family C-string alias has a canonical cache owner;
+/// other-family NUL keys remain an explicit lookup boundary. Direct NoMass/AirGap
+/// declared-value queries own their field aliases;
 /// finite comparator quotients remain strict. This is not a general Native JSON or
 /// schema implementation; generic syntax/number admission stays unchanged.
 pub fn parse_epjson_str_for_source(contents: &str) -> Result<RawModel, EpJsonError> {
@@ -602,7 +637,10 @@ fn parse_epjson_str_with_source_dom(
                 object_type: object_type_name,
             });
         };
-        if source_dom && object_type_name.contains('\0') {
+        if source_dom
+            && object_type_name.contains('\0')
+            && object_type_name.split('\0').next() != Some("Material:AirGap")
+        {
             return Err(EpJsonError::SourceLookupUnavailable {
                 kind: "object type",
                 key: object_type_name,
@@ -615,7 +653,10 @@ fn parse_epjson_str_with_source_dom(
             // family/field operands must not be admitted or rejected as live.
             if source_dom
                 && !matches!(
-                    object_type_name.as_str(),
+                    object_type_name
+                        .split('\0')
+                        .next()
+                        .unwrap_or(&object_type_name),
                     "Material:NoMass" | "Material:AirGap"
                 )
                 && matches!(&fields_value, RawValue::Object(_))

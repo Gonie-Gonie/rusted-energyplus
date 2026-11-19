@@ -116,7 +116,11 @@ pub fn inspect_porting_scope(
         .collect();
     let mut inactive_branches = Vec::new();
     for (kind, objects) in &raw.objects {
-        if !objects.is_empty() && !permitted_object(&kind.0, scope) {
+        if !objects.is_empty()
+            && !raw
+                .source_family_name(&kind.0)
+                .is_ok_and(|family| permitted_object(family, scope))
+        {
             violations.push(format!("{} is outside scope {}", kind.0, scope.id()));
         }
     }

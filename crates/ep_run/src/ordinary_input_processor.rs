@@ -63,8 +63,15 @@ fn project(
             .collect();
         families.insert(family.0.clone(), SourceInputFamily::Objects(shapes));
     }
-    let mut input = SelectedInputProcessor::from_admitted_input(schema::definitions(), families)
-        .map_err(|error| error.to_string())?;
+    let mut input = if source_json_order && raw.is_epjson() {
+        SelectedInputProcessor::from_admitted_source_direct_json_input(
+            schema::definitions(),
+            families,
+        )
+    } else {
+        SelectedInputProcessor::from_admitted_input(schema::definitions(), families)
+    }
+    .map_err(|error| error.to_string())?;
     if source_json_order && !raw.is_epjson() {
         for &family in ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES {
             if raw

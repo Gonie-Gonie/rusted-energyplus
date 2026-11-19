@@ -44,7 +44,7 @@ already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122
 This inventory correction adds no physical evidence; retained116 is unchanged.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 283 paired physical cases and 13,201,096 reported values with zero
+contains 284 paired physical cases and 13,276,216 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -74,16 +74,16 @@ The original-IDF route supplies the same physical IDF to both actors and uses th
 
 Source199 Simple and Source200 Advanced remain accepted direct-epJSON pairs; Source203 retains its accepted Input04 original-IDF Advanced pair. The older Source199 v10 Advanced attempt remains at 31/34 gates with zero credit, and failed builds 201 (import parsing) and 202 (DSOA sizing input) remain separate zero-credit history.
 
-Source204/207 original-IDF count/default witnesses, Source208 NoMass extras, Source209 Construction names and Source210 NoMass field-query/count evidence remain retained. Source211 adds one Source B direct-epJSON internal-AirGap pair across five DesignDays, with one official Native and one Source run and no reruns. All 34 gates and 158 series/75,120 values pass unchanged policies. Only three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meter bodies are raw-exact.
+Source204/207 original-IDF count/default witnesses and Source208–211 direct-JSON material/reference evidence remain retained. Source212 adds one Source B direct-epJSON pair across five DesignDays for the root family `Material:AirGap\u0000tail`, with one qualifying official Native and one Source run and no reruns. All 34 gates and 158 series/75,120 values pass unchanged policies. Only three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meter bodies are raw-exact.
 
-Four distinct AirGap names (NBSP-padded `GAP`, VT-only, ASCII-padded `GAP` and `GAP`) retain required resistance field-NUL aliases and ignored nonnumeric/nested metadata. Public EIO rows match exactly: four `Material:Air` rows each report resistance 0.1500, and the three NoMass `Material Details` rows retain Source210 properties. Four full four-layer Wall recipes place the AirGap internally between outside NoMass and the retained Mass Layer/inside NoMass. The paired solver exercises that reviewed path; no Construction Details rows or private Native F/NumNums/TotLayers/default counters are observed. Those counts remain CODE-derived.
+Canonical Source A/B query/cache and typed ownership resolve this AirGap family while Raw/statistics/unused keys retain its spelling. All 1,336 numeric values, four internal AirGap R 0.15 rows, three NoMass rows, full four-layer Wall recipes, real EcoRoof and nine topology drivers are held. Seven public EIO rows match exactly. Native-only legality preparation preceded the prospective metadata and adds no qualifying pair credit. Private Native F/NumNums/cache/unused/TotLayers remain CODE-derived; broad `getObjectItem(alias)` API parity is outside this scene.
 
-The current snapshot passes five qualified QA commands with two existing bodies and four-package all-target Clippy. The complete unit history retains ten commands/three failures, including the failed first formatter and two failed preparation U07 invocations. Workspace02 passes 5,051/0/2 after a retained disk-space linker failure in workspace01; there is one default build 211. Material-getter execution is real; OA-getter, historical and reused-body credits remain zero, with no new test functions. Reviewed V14 preserves the genuine earlier successful format/check and metadata failure history separately, without repeating Rust QA/build or changing science.
+Four qualified QA commands pass one existing U07 body. All Rust QA is seven commands/one failure, including an auxiliary workspace all-target Clippy pass and two workspace test attempts. The first failed before bodies due disk/link exhaustion; the explicit library/binary/integration retry passes 5,051/0/2 across 13 targets and omits doctests. One default build 212 is recorded. Dedicated material/OA getter, historical and reused profile-body credits remain zero, with no new test functions.
 
-Real EcoRoof, all five ordinary Construction names/surface links and nine topology drivers remain held. The earlier original-IDF F3 two-layer/raw-tail case stays distinct. Existing positive-resistance/type checks and inside/outside AirGap bans, Original/Legacy, family-NUL, other-family field-NUL and comparator-order fences remain. Six other Construction:* families plus ConstructionProperty:InternalHeatSource, positive-OA Humidistat, active window/CFS/EQL/shading, Source A physical expansion, annual runs and full-object conformance remain outside this new physical qualification.
+Existing positive-resistance/type checks, inside/outside AirGap bans, Original/Legacy and other family/field-NUL and comparator fences remain. Six other Construction:* families plus ConstructionProperty:InternalHeatSource, positive-OA Humidistat, active window/CFS/EQL/shading, Source A physical expansion, annual runs and full-object conformance remain outside this new physical qualification. The earlier original-IDF F3 two-layer/raw-tail case stays distinct.
 
 Complete current streams and per-series results are retained in
-`.runtime/porting/AirGap-native-names-extra-members-source/runtime01/`: `readback.json`,
+`.runtime/porting/AirGap-root-family-NUL-source/runtime01/`: `readback.json`,
 `native/output/nativeout.eso`, `native/output/nativeout.mtr`,
 `source/output/eplusrs.eso` and `source/output/eplusrs.mtr`.
 The unchanged scientific reader under reviewed V14 supplies the accepted current

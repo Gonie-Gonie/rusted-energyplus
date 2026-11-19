@@ -779,8 +779,8 @@ impl<'a> Compiler<'a> {
                 || ["Material:NoMass", "Material:AirGap"].iter().any(|family| {
                     (self.raw_model.is_epjson()
                         || self.raw_model.validate_source_idf_object_custody(family).is_ok())
-                        && self.raw_model.objects.get(&ep_raw_model::ObjectType((*family).into()))
-                            .is_some_and(|rows| !rows.is_empty())
+                        && self.raw_model.source_ordered_instances(family)
+                            .is_ok_and(|rows| !rows.is_empty())
                 })
                 || self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:GasMixture".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| self.source_unused_window_gas_mixture(&name.0, object)))
@@ -947,6 +947,13 @@ impl<'a> Compiler<'a> {
         let mut coverage = compile_coverage(self.raw_model);
         if self.source_file_declarations {
             for entry in &mut coverage {
+                if self.raw_model.is_epjson()
+                    && let Ok("Material:AirGap") =
+                        self.raw_model.source_family_name(&entry.object_type)
+                {
+                    entry.object_type = "Material:AirGap".into();
+                    entry.status = ObjectCoverageStatus::Typed;
+                }
                 if entry.object_type == "Schedule:File" {
                     entry.status = ObjectCoverageStatus::RawOnly;
                 } else if entry.object_type == "ElectricEquipment" {

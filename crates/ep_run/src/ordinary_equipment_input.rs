@@ -715,7 +715,12 @@ fn resolve_raw(
     if source_calendar_ingress && !source_b_ingress {
         roof_vegetation::validate(raw)?;
     }
-    for (family, objects) in &raw.objects {
+    for (retained_family, objects) in &raw.objects {
+        let family = if source_calendar_ingress {
+            ObjectType(raw.source_family_name(&retained_family.0)?.into())
+        } else {
+            retained_family.clone()
+        };
         if objects.is_empty() {
             continue;
         }

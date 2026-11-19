@@ -54,6 +54,8 @@ pub struct SelectedInputProcessor {
     // Same original epJSON operands, not computed statistics or a readiness flag.
     statistics_input: Option<SourceInputStatisticsInput>,
     source_direct_json_no_mass_fields: bool,
+    // Canonical AirGap cache owner, distinct from retained raw/statistics/unused spelling.
+    source_direct_json_air_gap_family: Option<String>,
     original_idf_fixed_fields: BTreeMap<String, Vec<(String, bool, String)>>,
     original_idf_extension_fields: BTreeMap<String, Vec<(String, bool, String)>>,
 }
@@ -136,9 +138,86 @@ impl SelectedInputProcessor {
             unused_inputs,
             statistics_input: None,
             source_direct_json_no_mass_fields: false,
+            source_direct_json_air_gap_family: None,
             original_idf_fixed_fields: BTreeMap::new(),
             original_idf_extension_fields: BTreeMap::new(),
         })
+    }
+
+    /// Build the real Source direct-JSON cache while retaining its AirGap raw key.
+    /// Other families and the ordinary/Original constructor keep exact ownership.
+    ///
+    /// # Errors
+    /// Rejects uncoalesced AirGap roots, unknown families or inconsistent schema.
+    pub fn from_admitted_source_direct_json_input(
+        definitions: Vec<SourceObjectDefinition>,
+        mut families: BTreeMap<String, SourceInputFamily>,
+    ) -> Result<Self, SelectedInputUnavailable> {
+        const FAMILY: &str = "Material:AirGap";
+        let mut aliases = families
+            .keys()
+            .filter(|name| {
+                name.as_str() != FAMILY && ep_model::source_json_c_string_prefix(name) == FAMILY
+            })
+            .cloned()
+            .collect::<Vec<_>>();
+        if aliases.len() > 1 || (!aliases.is_empty() && families.contains_key(FAMILY)) {
+            return Err(SelectedInputUnavailable::Association);
+        }
+        let retained = aliases.pop();
+        if let Some(name) = &retained {
+            let objects = families
+                .remove(name)
+                .ok_or(SelectedInputUnavailable::Association)?;
+            families.insert(FAMILY.into(), objects);
+        }
+        let mut input = Self::from_admitted_input(definitions, families)?;
+        if let Some(name) = retained {
+            let definition = input.source_object_definition(FAMILY)?;
+            if (
+                definition.alpha_fields,
+                definition.numeric_fields,
+                definition.alpha_extensions,
+                definition.numeric_extensions,
+            ) != (1, 1, 0, 0)
+                || definition.extension.is_some()
+            {
+                return Err(SelectedInputUnavailable::Association);
+            }
+            let Some(SourceInputFamily::Objects(objects)) = input.families.get(FAMILY) else {
+                return Err(SelectedInputUnavailable::Association);
+            };
+            for object in objects {
+                input
+                    .unused_inputs
+                    .remove(&(FAMILY.into(), object.object_name.clone()));
+                input
+                    .unused_inputs
+                    .insert((name.clone(), object.object_name.clone()));
+            }
+            input.source_direct_json_air_gap_family = Some(name);
+        }
+        Ok(input)
+    }
+
+    fn source_query_family<'a>(&self, family: &'a str) -> &'a str {
+        if self.source_direct_json_air_gap_family.is_some()
+            && ep_model::source_json_c_string_prefix(family) == "Material:AirGap"
+        {
+            "Material:AirGap"
+        } else {
+            family
+        }
+    }
+
+    fn source_statistics_family<'a>(&'a self, family: &'a str) -> &'a str {
+        if self.source_query_family(family) == "Material:AirGap" {
+            self.source_direct_json_air_gap_family
+                .as_deref()
+                .unwrap_or(family)
+        } else {
+            family
+        }
     }
 
     /// Retain genuine Source original-IDF fixed/extension field metadata from ingress.
@@ -304,6 +383,7 @@ impl SelectedInputProcessor {
     }
 
     fn canonical_type(&self, object_type: &str) -> Result<String, SelectedInputUnavailable> {
+        let object_type = self.source_query_family(object_type);
         self.definitions
             .keys()
             .find(|key| key.eq_ignore_ascii_case(object_type))
@@ -328,7 +408,7 @@ impl SelectedInputProcessor {
         &self,
         section_word: &str,
     ) -> Result<i32, SelectedInputUnavailable> {
-        match self.families.get(section_word) {
+        match self.families.get(self.source_query_family(section_word)) {
             None => Ok(-1),
             Some(SourceInputFamily::Null) => Ok(0),
             Some(SourceInputFamily::Objects(objects)) => {
@@ -340,7 +420,7 @@ impl SelectedInputProcessor {
     /// Inspect permanent exact-case raw identity, including an already used object.
     /// This does not consult or mutate the distinct unusedInputs owner.
     pub fn has_object(&self, object_type: &str, object_name: &str) -> bool {
-        match self.families.get(object_type) {
+        match self.families.get(self.source_query_family(object_type)) {
             Some(SourceInputFamily::Objects(objects)) => objects
                 .iter()
                 .any(|object| object.object_name == object_name),
@@ -364,7 +444,7 @@ impl SelectedInputProcessor {
     /// Literal epJSON.find identity: exact case, no insertion or count query.
     /// Distinguishes absent, an earlier definition-created null, and an empty map.
     pub(crate) fn find_exact_family(&self, object_type: &str) -> Option<&SourceInputFamily> {
-        self.families.get(object_type)
+        self.families.get(self.source_query_family(object_type))
     }
 
     /// Borrow the actual selected schema without getObjectDefMaxArgs null insertion.
@@ -380,6 +460,7 @@ impl SelectedInputProcessor {
 
     /// Actual presence, including null insertion, is observable by subsequent getters.
     pub fn family(&self, object_type: &str) -> Option<&SourceInputFamily> {
+        let object_type = self.source_query_family(object_type);
         self.families.get(object_type).or_else(|| {
             self.families
                 .iter()
