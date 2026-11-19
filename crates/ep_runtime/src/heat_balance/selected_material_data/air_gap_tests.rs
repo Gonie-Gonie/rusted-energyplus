@@ -475,6 +475,148 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             "Original AirGap EOF: F1/N0 count, filled N1 and same real material/report owner"
         );
     }
+    // Native NoMass optional owners use returned NumNums, while all raw
+    // scratch slots still fill. Expected effective properties below are CPP
+    // guard/default controls, not observed Native Material or physics data.
+    for (provided, eof_fields, eof_effective, raw_effective) in [
+        (1usize, 3usize, [0.9_f64, 0.7, 0.7], [0.8125_f64, 0.7, 0.7]),
+        (2, 4, [0.8125, 0.7, 0.7], [0.8125, 0.3125, 0.7]),
+        (3, 5, [0.8125, 0.3125, 0.7], [0.8125, 0.3125, 0.5625]),
+    ] {
+        for epjson in [false, true] {
+            for semicolon in [false, true] {
+                let (mut model, mut raw) = fixture(epjson, 0.15);
+                for (field, value) in [
+                    ("thermal_absorptance", 0.8125),
+                    ("solar_absorptance", 0.3125),
+                    ("visible_absorptance", 0.5625),
+                ]
+                .into_iter()
+                .take(provided)
+                {
+                    raw.no_mass[0]
+                        .fields
+                        .insert(field.into(), Value::Number(value));
+                }
+                let maximum = eof_fields + usize::from(semicolon);
+                raw.no_mass[0].idf_max_fields = (!epjson).then_some(maximum);
+                let expected = if epjson || semicolon {
+                    raw_effective
+                } else {
+                    eof_effective
+                };
+                let typed = match &mut model.materials[1].definition {
+                    MaterialDefinition::NoMass(typed) => Some(typed),
+                    _ => None,
+                }
+                .expect("existing NoMass typed fixture");
+                typed.surface = OpaqueSurfaceProperties {
+                    thermal_absorptance: expected[0],
+                    solar_absorptance: expected[1],
+                    visible_absorptance: expected[2],
+                };
+                let (data, mut input, mut shortcut) = get_materials(&model, &raw)
+                    .expect("real NoMass parent accepts count-selected effective typed properties");
+                let mut scan = ReportScanState::default();
+                let globals = SelectedHeatBalanceGlobals::default();
+                let mut state = error_state();
+                let (mut errors, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+                let mut errors_found = false;
+                let mut backend = SourceErrorBackend {
+                    state: &mut state,
+                    error_stream: Some(&mut errors),
+                    console: &mut console,
+                    out_unit1: None,
+                    out_unit2: None,
+                    f_message: None,
+                    message_callback: None,
+                    error_callback: None,
+                    sqlite: None,
+                };
+                let mut owners = MaterialDataOwners {
+                    curves: None,
+                    model: &model,
+                    input: &mut input,
+                    shortcut: &mut shortcut,
+                    scan: &mut scan,
+                    globals: &globals,
+                    backend: &mut backend,
+                    eio: &mut eio,
+                    errors_found: &mut errors_found,
+                    diagnostic_flags: None,
+                };
+                owners.shortcut.alpha_args.fill("stale".into());
+                owners.shortcut.alpha_field_names.fill("stale".into());
+                owners.shortcut.alpha_field_blanks.fill(true);
+                owners.shortcut.numeric_args.fill(-123.0);
+                owners.shortcut.numeric_field_names.fill("stale".into());
+                owners.shortcut.numeric_field_blanks.fill(false);
+                let counts = raw
+                    .get_no_mass_item(&raw.no_mass[0], &mut owners)
+                    .expect("same real NoMass getter fills every optional scratch slot");
+                let expected_numbers = if epjson || semicolon {
+                    provided + 1
+                } else {
+                    provided
+                };
+                let mut report = Vec::new();
+                data.write_material_reports(&model, &mut report)
+                    .expect("actual NoMass report owner");
+                assert!(
+                    counts == (2, expected_numbers)
+                        && owners.shortcut.alpha_args == ["NO MASS", "MEDIUMROUGH"]
+                        && owners.shortcut.alpha_field_names
+                            == (if epjson {
+                                ["name", "roughness"]
+                            } else {
+                                ["Name", "Roughness"]
+                            })
+                        && owners.shortcut.alpha_field_blanks == [false, false]
+                        && owners.shortcut.numeric_args[..4]
+                            .iter()
+                            .map(|value| value.to_bits())
+                            .eq([0.2, raw_effective[0], raw_effective[1], raw_effective[2]]
+                                .map(f64::to_bits))
+                        && owners.shortcut.numeric_args[4..]
+                            .iter()
+                            .all(|value| value.to_bits() == 0)
+                        && owners.shortcut.numeric_field_names[..4]
+                            .iter()
+                            .map(String::as_str)
+                            .eq(if epjson {
+                                [
+                                    "thermal_resistance",
+                                    "thermal_absorptance",
+                                    "solar_absorptance",
+                                    "visible_absorptance",
+                                ]
+                            } else {
+                                [
+                                    "Thermal Resistance",
+                                    "Thermal Absorptance",
+                                    "Solar Absorptance",
+                                    "Visible Absorptance",
+                                ]
+                            })
+                        && owners.shortcut.numeric_field_names[4..]
+                            .iter()
+                            .all(String::is_empty)
+                        && owners.shortcut.numeric_field_blanks[..4]
+                            .iter()
+                            .copied()
+                            .eq([false, provided < 1, provided < 2, provided < 3])
+                        && owners.shortcut.numeric_field_blanks[4..]
+                            .iter()
+                            .all(|blank| *blank)
+                        && data.resistance_only[&MaterialId(1)]
+                        && data.nominal_r[1].to_bits() == 0.2_f64.to_bits()
+                        && !owners.input.is_object_unused("Material:NoMass", "No mass")
+                        && !report.is_empty(),
+                    "NoMass epjson={epjson} semicolon={semicolon} F={maximum}: full buffers and count-selected effective owner"
+                );
+            }
+        }
+    }
     // Extend the same real ordered getter/CTF-owner test with the name-only
     // fourth opaque family, keeping its genuine group and Invalid roughness.
     for epjson in [false, true] {

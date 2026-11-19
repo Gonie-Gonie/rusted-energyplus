@@ -48,12 +48,25 @@ pub const SOURCE_IDF_OBJECT_FAMILIES: &[&str] = &[
     "OutdoorAir:NodeList",
     "DesignSpecification:OutdoorAir",
     "Material:AirGap",
+    "Material:NoMass",
 ];
 
 /// Borrow original-IDF metadata, never an object-admission allowlist.
 #[must_use]
 pub fn source_idf_object_layout(family: &str) -> Option<SourceIdfObjectLayout> {
     match family {
+        "Material:NoMass" => Some((
+            3,
+            &[
+                ("name", true, "Name"),
+                ("roughness", true, "Roughness"),
+                ("thermal_resistance", false, "Thermal Resistance"),
+                ("thermal_absorptance", false, "Thermal Absorptance"),
+                ("solar_absorptance", false, "Solar Absorptance"),
+                ("visible_absorptance", false, "Visible Absorptance"),
+            ],
+            &[],
+        )),
         "Material:AirGap" => Some((
             2,
             &[

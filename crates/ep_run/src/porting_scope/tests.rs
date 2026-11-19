@@ -8341,16 +8341,137 @@ MaterialProperty:GlazingSpectralData,
                 && matches!(ip.source_raw_object_fields(family, name).unwrap().get("idf_max_fields"),
                     Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == "1")
         };
+        // The raw final EOF absorptance stays present, while actual Source
+        // compilation supplies the effective NoMass owner selected by Native
+        // Material286/293/300 returned-count guards. JSON/Legacy stay raw-valued.
+        let no_mass_effective_matches = [
+            ("NM THERMAL", "0.8125", r#"{"thermal_absorptance":0.8125}"#,
+                [0.9_f64, 0.7, 0.7], [0.8125_f64, 0.7, 0.7], 3usize),
+            ("NM SOLAR", "0.8125,0.3125", r#"{"thermal_absorptance":0.8125,"solar_absorptance":0.3125}"#,
+                [0.8125, 0.7, 0.7], [0.8125, 0.3125, 0.7], 4),
+            ("NM VISIBLE", "0.8125,0.3125,0.5625", r#"{"thermal_absorptance":0.8125,"solar_absorptance":0.3125,"visible_absorptance":0.5625}"#,
+                [0.8125, 0.3125, 0.7], [0.8125, 0.3125, 0.5625], 5),
+        ].iter().all(|(name, tail, operands, eof_expected, raw_expected, eof_fields)| {
+            [false, true].into_iter().all(|semicolon| {
+                let family = "Material:NoMass";
+                let mut fields: serde_json::Value = serde_json::from_str(operands).unwrap();
+                fields["roughness"] = serde_json::json!("MediumRough");
+                fields["thermal_resistance"] = serde_json::json!(0.2);
+                let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+                value[family] = serde_json::Value::Object(serde_json::Map::from_iter([((*name).into(), fields.clone())]));
+                std::fs::write(&converted_path, value.to_string()).unwrap();
+                std::fs::write(&original_path, format!("{preamble}\n{family},{name},MediumRough,0.2,{tail}{}",
+                    if semicolon { ";" } else { "" })).unwrap();
+                let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(&converted_path, &original_path)
+                    .expect("genuine original NoMass terminal numeric and true EOF count");
+                let ip = crate::ordinary_input_processor::resolve_source_b(&raw).expect("genuine NoMass fixed custody transfer");
+                let projected = crate::ordinary_material_input::resolve_source(&raw, &ip).expect("same raw NoMass projection");
+                let source = ep_compiler::compile_raw_model_for_source(&raw);
+                let legacy = ep_compiler::compile_raw_model(&raw);
+                let json_raw = ep_raw_model::parse_epjson_str(&value.to_string()).unwrap();
+                let json_source = ep_compiler::compile_raw_model_for_source(&json_raw);
+                let expected = if semicolon { raw_expected } else { eof_expected };
+                let terminal_field = ["thermal_absorptance", "solar_absorptance", "visible_absorptance"][*eof_fields - 3];
+                let mut wrong_type = raw.clone();
+                wrong_type.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                    .get_mut(&ep_raw_model::ObjectName((*name).into())).unwrap().fields
+                    .insert(ep_raw_model::FieldName(terminal_field.into()), ep_raw_model::RawValue::Bool(true));
+                let mut out_of_range = raw.clone();
+                out_of_range.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                    .get_mut(&ep_raw_model::ObjectName((*name).into())).unwrap().fields
+                    .insert(ep_raw_model::FieldName(terminal_field.into()), ep_raw_model::RawValue::Number("1.5".into()));
+                !source.has_errors() && !legacy.has_errors() && !json_source.has_errors()
+                    && raw.validate_source_idf_object_custody(family).is_ok()
+                    && ep_compiler::compile_raw_model_for_source(&wrong_type).has_errors()
+                    && ep_compiler::compile_raw_model_for_source(&out_of_range).has_errors()
+                    && crate::ordinary_input_processor::resolve_source_b(&wrong_type).is_err()
+                    && crate::ordinary_input_processor::resolve_source_b(&out_of_range).is_err()
+                    && projected.no_mass.len() == 1
+                    && projected.no_mass[0].idf_max_fields == Some(*eof_fields + usize::from(semicolon))
+                    && [(&source, expected), (&legacy, raw_expected), (&json_source, raw_expected)]
+                        .iter().all(|(compiled, expected)| compiled.model.as_ref().and_then(|model|
+                            model.materials.iter().find(|row| row.kind() == ep_model::MaterialKind::NoMass))
+                            .and_then(|row| row.surface_properties()).is_some_and(|surface|
+                                [surface.thermal_absorptance, surface.solar_absorptance, surface.visible_absorptance]
+                                    .map(f64::to_bits) == expected.map(f64::to_bits)))
+                    && fields.as_object().unwrap().iter().all(|(key,value)| {
+                        let actual = &raw.objects[&ep_raw_model::ObjectType(family.into())]
+                            [&ep_raw_model::ObjectName((*name).into())].fields[&ep_raw_model::FieldName(key.clone())];
+                        match (value, actual) {
+                            (serde_json::Value::String(a), ep_raw_model::RawValue::String(b)) => a == b,
+                            (serde_json::Value::Number(a), ep_raw_model::RawValue::Number(b)) =>
+                                ep_model::classify_source_json_number(&a.to_string()).unwrap().as_f64().to_bits()
+                                    == ep_model::classify_source_json_number(b).unwrap().as_f64().to_bits(),
+                            _ => false,
+                        }
+                    })
+            })
+        });
+        let dsoa_uncounted_reference_matches = [
+            ("DSOA A3 EOF", "0.0001,0.00002,0.00003,0.144,MISSING A3", "outdoor_air_schedule_name", 6usize),
+            ("DSOA A4 EOF", "0.0001,0.00002,0.00003,0.144,QA FRACTION,MISSING A4",
+                "proportional_control_minimum_outdoor_air_flow_rate_schedule_name", 7),
+        ].iter().all(|(name, tail, field, maximum)| {
+            let mut fields = serde_json::json!({"outdoor_air_method":"Sum","outdoor_air_flow_per_person":0.0001,
+                "outdoor_air_flow_per_zone_floor_area":0.00002,"outdoor_air_flow_per_zone":0.00003,
+                "outdoor_air_flow_air_changes_per_hour":0.144});
+            if *maximum == 7 { fields["outdoor_air_schedule_name"] = serde_json::json!("QA FRACTION"); }
+            fields[*field] = serde_json::json!(if *maximum == 6 { "MISSING A3" } else { "MISSING A4" });
+            let family = "DesignSpecification:OutdoorAir";
+            let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+            value[family] = serde_json::Value::Object(serde_json::Map::from_iter([((*name).into(), fields)]));
+            value["Schedule:Constant"] = serde_json::json!({"QA FRACTION":{"hourly_value":0.5}});
+            value["OutdoorAir:Node"] = serde_json::json!({"QA DSOA OA":{}});
+            value["ZoneHVAC:IdealLoadsAirSystem"] = serde_json::json!({"QA DSOA UNIT":{
+                "zone_supply_air_node_name":"QA DSOA SUPPLY", "dehumidification_control_type":"None",
+                "humidification_control_type":"None", "design_specification_outdoor_air_object_name":*name,
+                "outdoor_air_inlet_node_name":"QA DSOA OA"}});
+            let unit = [
+                "QA DSOA UNIT", "", "QA DSOA SUPPLY", "", "", // A1..A5
+                "", "", "", "", // N1..N4
+                "", "", "", "", "", "", // A6,N5,N6,A7,N7,N8
+                "", "", "None", "", "None", // A8,A9,A10,N9,A11
+                *name, "QA DSOA OA", "", "", "", // A12..A16
+                "", "", "", "", "", "", "", // N10,N11,A17..A21
+            ].join(",");
+            std::fs::write(&converted_path, value.to_string()).unwrap();
+            let original = format!("{preamble}\nSchedule:Constant,QA FRACTION,,0.5;\nOutdoorAir:Node,QA DSOA OA;\nZoneHVAC:IdealLoadsAirSystem,{unit};\n{family},{name},Sum,{tail}");
+            std::fs::write(&original_path, &original).unwrap();
+            let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(&converted_path, &original_path)
+                .expect("genuine positive-OA EOF reference fixture");
+            let source = ep_compiler::compile_raw_model_for_source(&raw);
+            let ip = crate::ordinary_input_processor::resolve_source_b(&raw);
+            let counted = {
+                std::fs::write(&original_path, format!("{original};")).unwrap();
+                ep_raw_model::load_epjson_file_with_idf_order_for_source(&converted_path, &original_path).unwrap()
+            };
+            let json_raw = ep_raw_model::parse_epjson_str(&value.to_string()).unwrap();
+            let mut wrong_type = raw.clone();
+            wrong_type.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                .get_mut(&ep_raw_model::ObjectName((*name).into())).unwrap().fields
+                .insert(ep_raw_model::FieldName((*field).into()), ep_raw_model::RawValue::Number("1".into()));
+            !source.has_errors() && ip.is_ok()
+                && source.model.as_ref().is_some_and(|model| model.design_specification_outdoor_air.len() == 1
+                    && if *maximum == 6 { model.design_specification_outdoor_air[0].outdoor_air_schedule.is_none() }
+                        else { model.design_specification_outdoor_air[0].outdoor_air_schedule.is_some()
+                            && model.design_specification_outdoor_air[0].proportional_control_minimum_outdoor_air_flow_rate_schedule.is_none() })
+                && ep_compiler::compile_raw_model(&raw).has_errors()
+                && ep_compiler::compile_raw_model_for_source(&json_raw).has_errors()
+                && ep_compiler::compile_raw_model_for_source(&counted).has_errors()
+                && crate::ordinary_input_processor::resolve_source_b(&counted).is_err()
+                && crate::ordinary_input_processor::resolve_source_b(&wrong_type).is_err()
+                && ep_compiler::compile_raw_model_for_source(&wrong_type).has_errors()
+        });
         std::fs::remove_file(converted_path).unwrap();
         std::fs::remove_file(original_path).unwrap();
         std::fs::remove_dir(home).unwrap();
-        matches && dsoa_ingress_matches && air_gap_eof_matches
+        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_effective_matches && dsoa_uncounted_reference_matches
             // This table proves its original 24 material/curve layouts. The two
             // OA layouts and DSOA have separate original-IDF existing-body cases.
             && observed_families.len() == 24
-            && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.len() == 28
+            && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.len() == 29
             && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.iter().all(|family| {
-                matches!(*family, "OutdoorAir:Node" | "OutdoorAir:NodeList" | "DesignSpecification:OutdoorAir" | "Material:AirGap")
+                matches!(*family, "OutdoorAir:Node" | "OutdoorAir:NodeList" | "DesignSpecification:OutdoorAir" | "Material:AirGap" | "Material:NoMass")
                     || observed_families.contains(*family)
             })
     };

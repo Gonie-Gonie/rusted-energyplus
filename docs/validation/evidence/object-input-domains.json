@@ -348,8 +348,8 @@
       "Additional bounded Source B direct-epJSON HVAC Humidistat consumer scope: zero or one same-Zone control, actual remaining moisture demands, and supported real schedules. 1 fixed scenes qualify (no-control None/Humidistat zero-demand path); only the 0 listed positive-control scenes provide their declared positive-service evidence. Full161-series comparisons and all original155 gates are mandatory; absence is a genuine six-report zero path. No universal humidity/SHR/capacity law, private mode, positive original-IDF/A, OA, EMS/fault, AFN/Space/sizing or full-object completion is implied."
     ],
     "DesignSpecification:OutdoorAir": [
-      "Bounded Source B retains its six basic-method direct-epJSON evidence, real geometry/occupants/schedules and all existing positive-OA hard-limit, DCV/economizer/recovery and non-Humidistat prerequisites. Genuine original-IDF fixed-layout/order/F metadata now reaches the same sizing getter: min1/4A4N capacity, complete IDD/default/blank fills and returned-prefix counts remain distinct. Source203 qualifies one fixed SUM original-IDF Advanced ordinary-CTF scene under all34 gates/158series/75120values; no every-method or arbitrary cross-combination inference follows. Uncounted A3/A4 schedule-reference lookup widening, crossed Humidistat, active CO2/IAQ, Source A, Space/airloop/sizing expansion, private mode and full-object completion remain held.",
-      "The genuine Original-IDF fixed owner keeps Raw order/F/L, full IDD/default/blank fills and returned counts separate from caller consumption. Only the fixed F6 SUM scene is newly qualified; existing direct-epJSON accepted comparisons retain their original policies and scopes. Uncounted A3/A4 lookup changes and arbitrary combinations remain future work."
+      "Bounded Source B retains its six basic-method direct-epJSON evidence, genuine original-IDF fixed-layout/order/F custody and fixed SUM ordinary-CTF scene. Full IDD/default/blank fills remain distinct from returned counts. Only genuine original-IDF uncounted A3(F<7)/A4(F<8) skip schedule lookup after primitive String/type/schema validation; counted references, direct epJSON and Legacy retain their rules. Existing positive-OA hard-limit, DCV/economizer/recovery, non-Humidistat, cardinality, Source A, Space/airloop/sizing and CO2/IAQ limits remain; no arbitrary combinations, private mode or full-object completion is established.",
+      "The existing fixed F6 SUM scenes retain physical qualification. Existing-body controls cover only genuine original-IDF uncounted A3/A4 semantic lookup skipping after primitive validation; no new arbitrary EOF-reference physics, method/control combinations, Humidistat or Source A route is inferred."
     ],
     "ZoneHVAC:EquipmentList": [
       "Source B direct epJSON preserves JSON integer and floating accessor behavior for bounded EquipmentList priorities and the IdealLoads, thermostat and basic DSOA numeric getters. One fixed NoLimit SUM comparison retains 1 qualifying case and 75,120 values under all 158 rules; raw wide integers remain authored, typed positive priorities resolve to 1, and full-object support remains open."
@@ -465,6 +465,10 @@
     "OutdoorAir:NodeList": [
       "Bounded ordinary no-AFN Source B dependency in direct epJSON and genuine original IDF. The object is nameless: generated keys own IP order/used identity, not A1. Omitted/empty arrays and exact-empty member values retain zero-node behavior; whitespace remains a real name. Type-only IDF preserves its actual class-token member and recovered order/F/L.",
       "All lists fill before singles; general-list expansion preserves new-ref0/existing-ref increments, per-member registration and advancing streams, with only final registry deduplication and success-only commit. The selected consumer uses real CheckAndAdd. Complete BND/export checks concern public order, not private OA scratch. AFN, duct/EMS, unsafe expanded interior-blank zero prefixes, arbitrary combinations, Source A/Legacy expansion and full-object completion remain held."
+    ],
+    "Material:NoMass": [
+      "Validated fields retain bounded one-Zone A/B and existing Source A normal stacks. Genuine Source original-IDF NoMass retains full raw/getter values while true F selects effective thermal/solar/visible defaults 0.9/0.7/0.7 at F<4/<5/<6, after all existing primitive/type/range checks. One active EOF NoMass layer qualifies in the fixed Source204 Source B ordinary-CTF scene; direct epJSON/Legacy and existing MaterialId/group/Construction/CTF criteria remain unchanged. Native-name widening, arbitrary combinations and full-object completion remain outside this unit.",
+      "One fresh Source204 active Input06 layer retains the final raw thermal absorptance 0.8125 while F3 returns only N1. Both actual Material Details rows report effective 0.9/0.7/0.7; all 34 scientific gates pass the fixed complete streams. Existing-body controls cover primitive rejection and F-qualified thermal/solar/visible selection, not every legal combination or Native-name spelling."
     ]
   },
   "verification": {
@@ -13704,6 +13708,166 @@
           "scientific_acceptance": false,
           "qualification": "Root-observed execution of the genuinely reviewed ignored v3 afterimage: eight tests and the complete same-actor158series75120value reread pass, with3raw/binary64 differences and0point/RMSE failures. This adds no engine run, Source build, Rust QA body or scientific case/value credit. Tracked installation/publication and the published usage/rerun command remain pending."
         }
+      },
+      "original_idf_active_nomass_and_dsoa_eof": {
+        "actual_quality": {
+          "path": ".runtime/porting/original-idf-NoMass-source/evidence01/quality-ledger.json",
+          "sha256": "e08c6e9dd97ec0e280c28ed916067589964c9c359cd8ac785af75a68e919927e",
+          "bytes": 5698
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/original-idf-NoMass-source/evidence01/quality-ledger.json",
+          "sha256": "e08c6e9dd97ec0e280c28ed916067589964c9c359cd8ac785af75a68e919927e",
+          "bytes": 5698
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/original-idf-NoMass-source/quality02/quality-preparation.json",
+          "sha256": "c8ffd082562deaeaa4e2313f31d815cdf9a017c490472cede937ce0d33bc2d38",
+          "bytes": 10821
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/original-idf-NoMass-source/evidence01/source-authority.json",
+          "sha256": "74745908dbe8fb9aea98f87cfd55a425b9ce8a5f97b33d6aef6e1443b48174f1",
+          "bytes": 42111
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/porting/original-idf-NoMass-source/evidence01/independent-Source-review01.json",
+          "sha256": "94f4537c849aa23b954807ade59d2abbc4d8a148f713b5971923e07defe904bb",
+          "bytes": 19675
+        },
+        "total_actual_QA_commands": 10,
+        "current_QA_commands": 5,
+        "failed_QA_attempts": 1,
+        "current_test_body_executions": 2,
+        "historical_named_body_executions": 2,
+        "historical_zero_match_test_records": 0,
+        "reused_body_credit": 0,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "actual_test_execution_evidence": {
+          "path": ".runtime/porting/original-idf-NoMass-source/evidence01/source-evidence.json",
+          "sha256": "e2a2ac4d85dc4725119593dff66e7430681e0e0c57cb43a99cbbba4776ffc71a",
+          "bytes": 18563
+        },
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/Source204-NoMass-DSOA-minimal-QA-profile-DATA01/QA-profile.json",
+          "sha256": "9b0718be29f1a2b2f4f6c28d084d99b77721e718c78320cc333b4e86af15ba6d",
+          "bytes": 4566
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/original-idf-NoMass-source/QA-profile-binding02.json",
+          "sha256": "adea671991f8bf399ae2a1e4188dbc6395926b569f890bafeef14abba1a9d91e",
+          "bytes": 3158
+        },
+        "current_required_test_names": [
+          "heat_balance::selected_material_data::air_gap_tests::air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report",
+          "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support"
+        ],
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "retained_failed_builds": [],
+        "correction_reviews": [
+          {
+            "path": ".runtime/porting/original-idf-NoMass-source/correction01.json",
+            "sha256": "3c930fe1ff272c7929a0bfb120052388049297e575a5e0696923a4f23ea05cd0",
+            "bytes": 3965
+          }
+        ],
+        "integration_attempt": {
+          "Root_workspace01": {
+            "path": ".runtime/porting/original-idf-NoMass-source/Root-workspace01-actual-readback.json",
+            "sha256": "3cdb3bac0e4672324f2dfab840efe119eef98b1f54f4d1ba429eef4e651e0530",
+            "bytes": 5886
+          },
+          "workspace_passed": true,
+          "passed": 5051,
+          "failed": 0,
+          "ignored": 2,
+          "target_summaries": 23,
+          "whole_workspace": true,
+          "all11_package_all_target_Clippy_current_profile": true,
+          "Root_QA02": {
+            "path": ".runtime/porting/original-idf-NoMass-source/Root-quality02-actual-readback.json",
+            "sha256": "082d94630f05713ec5eb0bf91ea90a8edf40ea372c6d32391a39fd95f57f9fa1",
+            "bytes": 1075
+          },
+          "qualification": "One actual workspace run and current five-command profile on the same Source204 snapshot. All ten actual profile commands, including the prior Clippy failure and two historical body executions, remain retained without current reuse; no new test function."
+        },
+        "current_Source_CODE": [
+          {
+            "path": "crates/ep_compiler/src/compiler.rs",
+            "sha256": "8de39e419ae2909730354b28fd45ac4d2f12faf085baa88fef58ce3994b215c3",
+            "bytes": 967381
+          },
+          {
+            "path": "crates/ep_raw_model/src/idf_order.rs",
+            "sha256": "7086aae186fcad8ddb553c0c6e823fd4234765d49510171028fb46c31c2d3294",
+            "bytes": 150295
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+            "sha256": "7ce86188789274c66ca12231ee7022d077f13f7d1393d0a2b3fd9d4649a3d0a1",
+            "bytes": 289868
+          },
+          {
+            "path": "crates/ep_run/src/porting_scope/tests.rs",
+            "sha256": "c3688ac6416354515d1f80cc9d5b80617e7fbfddd989ef046a534963bd938ee2",
+            "bytes": 886292
+          },
+          {
+            "path": "crates/ep_runtime/src/heat_balance/selected_material_data/air_gap_tests.rs",
+            "sha256": "0738ac3a79161a592d37f329853f159778cf29c6f06fcd9c8665e42c4f9fc233",
+            "bytes": 1154205
+          }
+        ],
+        "generic_reported_comparer_v3": {
+          "schema": "Root.ActualSource204GenericReportedStreamReview.v1",
+          "accepted": true,
+          "manifest": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/reported-comparison-manifest01.json",
+            "sha256": "aa55596f01caefb8d8e81a2a22472be017254585f9d0cb9976715a4807a7eb2e",
+            "bytes": 4171
+          },
+          "actual_invocation": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/reported-comparison-invocation01.json",
+            "sha256": "f619db7c6c34d422a891f64d6f12c0468d3ca2d4baee6006ebf1dbea71634fe3",
+            "bytes": 6321
+          },
+          "actual_receipt": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/reported-comparison-command01/receipt.json",
+            "sha256": "60745fe6da81e3ce9998eae83e38b6ba382408e7f61f27e8b975e0f223391e5c",
+            "bytes": 18286
+          },
+          "comparison": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/reported-comparison01/comparison.json",
+            "sha256": "bdb4439f88743f34685f8ffcc28afed3b0e5cd1e61fbbe8be1dc14f24a257bf9",
+            "bytes": 224396
+          },
+          "totals": {
+            "series": 158,
+            "samples": 75120,
+            "raw_operand_unequal": 3,
+            "parsed_binary64_unequal": 3,
+            "tolerance_failures": 0,
+            "rmse_failures": 0
+          },
+          "all_series_rows_checked": true,
+          "all_tolerance_failures": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/reported-comparison01/all-tolerance-failures.jsonl",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "all_raw_differences": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/reported-comparison01/all-raw-differences.jsonl",
+            "sha256": "61f2d63160cfa13867fe0f428acf0a64747b3f31bf5d1f3a16b40f39152a0429",
+            "bytes": 1062
+          },
+          "engines_launched": 0,
+          "new_qualifying_cases": 0,
+          "new_qualifying_values": 0,
+          "qualification": "One published reusable comparer reread of the same Source204 actors. No new physical credit; frozenV13 remains scientific completion authority."
+        },
+        "qualification": "Current QA02 executes only the existing Material and U07 bodies. The frozen OA getter-credit flag is false because its distinct cohort body is not in this profile; no historical/current OA getter or wider DSOA physics credit is inferred. Root observed all execution/custody/physical outcomes; metadata delegates did not hydrate originals."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -90230,12 +90394,627 @@
             }
           }
         }
+      },
+      {
+        "group": "Material:NoMass",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "IDF",
+        "id": "ideal-loads-source204-v13-original-idf-active-NoMass-EOF",
+        "case_kind": "active-NoMass-EOF-Advanced-original-IDF",
+        "source_build": "source204-original-IDF-active-NoMass-EOF-and-DSOA",
+        "input": {
+          "path": ".runtime/porting/original-idf-NoMass-active-input/input01/active-NoMass-EOF.idf",
+          "sha256": "621212a6499e47f6bd1d4d600aed1e08d95f89f5890ba66a2e9c699713f68034",
+          "bytes": 41261
+        },
+        "scientific_dom": {
+          "path": ".runtime/porting/original-idf-NoMass-active-input/converted01/active-NoMass-EOF.epJSON",
+          "sha256": "f0ebce9e53051536457d952b0ad1fb4f905c8f487993f4a392f3cde0676741a1",
+          "bytes": 140447
+        },
+        "input_contract": {
+          "path": ".runtime/object-expansion/unit159-prep/NoMass-active-OriginalIDF-Input06-DRAFT01/OriginalIDFInput.json",
+          "sha256": "31d1a08b2264a079ac3f9a9e03156091e986d8fc22c099859c4fbfe8606968ec",
+          "bytes": 63795
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/original-idf-NoMass-source/runtime03/native/command/receipt.json",
+          "sha256": "c3c730bc47aeb174cc93e9ddcc73b63bf19fdf869f127a84f36da73264a7d75d",
+          "bytes": 386837
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/original-idf-NoMass-source/runtime03/source/command/receipt.json",
+          "sha256": "440adf1c52ebd9f0d8e48052f76f2c6d140c61ae936a8805a0d03ccc62d9d97e",
+          "bytes": 388293
+        },
+        "source_summary": {
+          "path": ".runtime/porting/original-idf-NoMass-source/runtime03/source/output/run-summary.json",
+          "sha256": "efc0e6c52f4611d3b93b9b1f9c326dea250f9b77265b604a280ccd9373588eed",
+          "bytes": 64355
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc1965b69d816bd351c3d4a6949c08e81ac3d01abd649a62ab520f9b639b22c4",
+          "sha256": "cc1965b69d816bd351c3d4a6949c08e81ac3d01abd649a62ab520f9b639b22c4"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/original-idf-NoMass-source/build01/frozen/eplus-rs.exe",
+          "sha256": "6165c7669522773905de3122e1d1429ea7885b559697a62dfa34f5a4de1dac83",
+          "bytes": 84267383
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/original-idf-NoMass-source/build01/build/receipt.json",
+          "sha256": "83d969632596894aa464c1ca34777a81edc608fbf4d42a560617ec2fb28d4d98",
+          "bytes": 45279
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/original-idf-NoMass-source/runtime03/readback.json",
+          "sha256": "d20f5ff9a16c70b66f27e384eb114405284b38ac07d12c283d3ba545ddead9aa",
+          "bytes": 531198
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/original-idf-NoMass-source/runtime03/Root-scientific-review01.json",
+          "sha256": "346490581e99cd4921c24bf97f2e0fff42fbed0e7d8a35e17ca3fbb4bbb3eb7f",
+          "bytes": 9655
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/original-idf-NoMass-source/runtime03/case-config.json",
+          "sha256": "8ff013ce59444f9f9e8d08606b9cd0d53e5a32cf7fe62432d92ff20e2ad404c1",
+          "bytes": 171868
+        },
+        "coverage_kind": "original_idf_active_nomass_and_dsoa_eof",
+        "effective_state": "One fresh Source B original-IDF Input06 Advanced ordinary-CTF case adds an active NoMass EOF layer to the existing Wall construction. Both engines receive the same physical IDF; complete input/topology exports and all 34 gates for 158 series/75,120 values pass unchanged policies. Filled raw thermal absorptance 0.8125 remains distinct from count-selected effective 0.9. Only three HorizontalIR operands differ (maximum 1.71e-13 W/m2); all others and both meters are raw-exact. One Native and one Source run, no reruns. DSOA uncounted-reference behavior has bounded existing-body coverage; Native-name expansion, active window/CFS/EQL/shading, annual/arbitrary combinations and full-object support remain outside this evidence.",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 3,
+          "parsed_binary64_unequal": 3,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.7053025658242404e-13,
+          "max_rmse_delta": 1.1309316871492875e-14
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v13/release.json",
+            "sha256": "d8338a1da6557ae14bc49f92596f222c9321f6aa4f9afe4448e92878186fa4bf",
+            "bytes": 17261
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/binding.json",
+            "sha256": "a63c1fefb5c793e7061ee61777468b1df168f4fecc3c5d26a76e207c0ec9319f",
+            "bytes": 1122
+          },
+          "case_config": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/case-config.json",
+            "sha256": "8ff013ce59444f9f9e8d08606b9cd0d53e5a32cf7fe62432d92ff20e2ad404c1",
+            "bytes": 171868
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/original-idf-NoMass-source/evidence01/source-authority.json",
+            "sha256": "74745908dbe8fb9aea98f87cfd55a425b9ce8a5f97b33d6aef6e1443b48174f1",
+            "bytes": 42111
+          },
+          "completion": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/completed.json",
+            "sha256": "a301b5d5bc6291769b5800de10ffb0ecf331f9a06b54c3123b99028a0a258de5",
+            "bytes": 2285
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/verify-command/receipt.json",
+            "sha256": "3677365e984c654a793704778700f91b9785fbad3c9376ac63f690429d4dbf76",
+            "bytes": 387948
+          },
+          "actual_build": {
+            "path": ".runtime/porting/original-idf-NoMass-source/build01/build-row.json",
+            "sha256": "0715bdb4bc977c0d7d5b22b321985006f7df6b7f96938e4b34dea43f5c44d894",
+            "bytes": 1391
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/original-idf-NoMass-source/evidence01/quality-ledger.json",
+            "sha256": "e08c6e9dd97ec0e280c28ed916067589964c9c359cd8ac785af75a68e919927e",
+            "bytes": 5698
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/original-idf-NoMass-source/evidence01/source-authority.json",
+            "sha256": "74745908dbe8fb9aea98f87cfd55a425b9ce8a5f97b33d6aef6e1443b48174f1",
+            "bytes": 42111
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "Root_physical_truth": {
+            "path": ".runtime/porting/original-idf-NoMass-source/runtime03/Root-scientific-review01.json",
+            "sha256": "346490581e99cd4921c24bf97f2e0fff42fbed0e7d8a35e17ca3fbb4bbb3eb7f",
+            "bytes": 9655
+          }
+        },
+        "active_nomass_eof": {
+          "material": "ACTIVE NOMASS EOF INNER LAYER",
+          "raw_thermal_absorptance": 0.8125,
+          "effective_thermal_absorptance": 0.9,
+          "observed_Material_Details": {
+            "Native": {
+              "artifact": {
+                "path": ".runtime/porting/original-idf-NoMass-source/runtime03/native/output/nativeout.eio",
+                "sha256": "cfac6162abe8a82485b94c2e9d036fb58fb8c191ef21887bc223e5b98a9863a2",
+                "bytes": 22015
+              },
+              "row": [
+                " Material Details",
+                "ACTIVE NOMASS EOF INNER LAYER",
+                "0.2000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.9000",
+                "0.7000",
+                "0.7000"
+              ]
+            },
+            "Source": {
+              "artifact": {
+                "path": ".runtime/porting/original-idf-NoMass-source/runtime03/source/output/eplusrs.eio",
+                "sha256": "70d3e1d703052993acbcbc30473099960c7afc605cf6a158e291b367bcc1bd68",
+                "bytes": 21979
+              },
+              "row": [
+                " Material Details",
+                "ACTIVE NOMASS EOF INNER LAYER",
+                "0.2000",
+                "MediumRough",
+                "0.0000",
+                "0.000",
+                "0.000",
+                "0.000",
+                "0.9000",
+                "0.7000",
+                "0.7000"
+              ]
+            }
+          },
+          "scope": "One active Source B ordinary-CTF Input06 case; raw/full fill and count-selected effective owner remain distinct. No Native-name expansion or arbitrary legal combination is inferred."
+        },
+        "public_response_summary": {
+          "Native": {
+            "warmup_days": [
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "series": 158,
+            "values": 75120,
+            "ASHRAE_pair_counts": {
+              "(-1, -1)": 288,
+              "(0, 0)": 58,
+              "(0, 1)": 12,
+              "(1, 1)": 122
+            },
+            "CEN_triple_counts": {
+              "(-1, -1, -1)": 288,
+              "(0, 0, 0)": 16,
+              "(0, 0, 1)": 47,
+              "(0, 1, 1)": 13,
+              "(1, 1, 1)": 116
+            },
+            "cooling": {
+              "off_potential_samples": 48,
+              "on_potential_samples": 336,
+              "positive_on_service_samples": 336
+            },
+            "heating": {
+              "winter_off_potential_samples": 12,
+              "winter_on_potential_samples": 24,
+              "winter_positive_on_service_samples": 24
+            },
+            "outdoor_air": {
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 245,
+              "mixed_humidity_response_samples": 360,
+              "activation_accepted": true
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "warning_accounting": {
+              "immediate_warning_heads": 7,
+              "uncounted_psychrometric_first_heads": 0,
+              "counted_immediate_warning_heads": 7,
+              "recurring_total": 0,
+              "completed": 7
+            },
+            "EcoRoof_AdvancedStability": {
+              "family": "EcoRoof.AdvancedStability.v1",
+              "count": 1,
+              "eligibility": {
+                "input": {
+                  "path": ".runtime/porting/original-idf-NoMass-active-input/input01/active-NoMass-EOF.idf",
+                  "sha256": "621212a6499e47f6bd1d4d600aed1e08d95f89f5890ba66a2e9c699713f68034",
+                  "bytes": 41261
+                },
+                "ordinary_external_surfaces": [
+                  {
+                    "surface": "ROOF",
+                    "construction": "ACTIVE ECO ROOF CONSTRUCTION",
+                    "material": "ACTIVE ECO ROOF SIMPLE"
+                  }
+                ],
+                "material": "ACTIVE ECO ROOF SIMPLE",
+                "method": "ADVANCED",
+                "eligible": true
+              },
+              "effective_timesteps_per_hour": 4,
+              "effective_integer_minutes": 15,
+              "required_frequency": 32,
+              "reported_integer_tokens": [
+                "4",
+                "32"
+              ],
+              "branch": "le60",
+              "position": 1,
+              "immediate_continuations": [
+                "   **   ~~~   ** ...Entered Timesteps per hour=[4], Change to some value greater than or equal to [32] for assured stability.",
+                "   **   ~~~   ** ...Note that EnergyPlus has a maximum of 60 timesteps per hour",
+                "   **   ~~~   ** ...The program will continue, but if the simulation fails due to too low/high temperatures, instability here could be the reason."
+              ],
+              "recurring_count": 0,
+              "phase_from_head": "unobserved_untimestamped_family",
+              "trigger_from_input": "not_recomputed"
+            },
+            "topology": {
+              "actual_nodes": [
+                [
+                  "Node",
+                  "1",
+                  "ZONE ONE INLET 가",
+                  "Air",
+                  "15"
+                ],
+                [
+                  "Node",
+                  "2",
+                  "ZONE ONE EXHAUST",
+                  "Air",
+                  "11"
+                ],
+                [
+                  "Node",
+                  "3",
+                  "ZONE ONE AIR NODE",
+                  "Air",
+                  "2"
+                ],
+                [
+                  "Node",
+                  "4",
+                  "ZONE ONE FIRST RETURN 125",
+                  "Air",
+                  "1"
+                ],
+                [
+                  "Node",
+                  "5",
+                  "ZONE ONE RETURN",
+                  "Air",
+                  "1"
+                ],
+                [
+                  "Node",
+                  "6",
+                  "OA 확장 A",
+                  "Air",
+                  "3"
+                ],
+                [
+                  "Node",
+                  "7",
+                  "OA 확장 B",
+                  "Air",
+                  "2"
+                ],
+                [
+                  "Node",
+                  "8",
+                  "OUTDOORAIR:NODELIST",
+                  "Air",
+                  "0"
+                ],
+                [
+                  "Node",
+                  "9",
+                  "OA 직접 C",
+                  "Air",
+                  "0"
+                ],
+                [
+                  "Node",
+                  "10",
+                  "144 OUTDOOR AIR 각",
+                  "Air",
+                  "1"
+                ],
+                [
+                  "Node",
+                  "11",
+                  "OA 단일 D",
+                  "Air",
+                  "0"
+                ]
+              ],
+              "total_nonparent_connections": 37,
+              "outdoor_air_registry": [
+                [
+                  "Outdoor Air Node",
+                  "8",
+                  "OUTDOORAIR:NODELIST"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "6",
+                  "OA 확장 A"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "7",
+                  "OA 확장 B"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "9",
+                  "OA 직접 C"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "10",
+                  "144 OUTDOOR AIR 각"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "11",
+                  "OA 단일 D"
+                ]
+              ],
+              "private_getter_telemetry_observed": false
+            }
+          },
+          "Source": {
+            "warmup_days": [
+              6,
+              6,
+              6,
+              6,
+              6
+            ],
+            "series": 158,
+            "values": 75120,
+            "ASHRAE_pair_counts": {
+              "(-1, -1)": 288,
+              "(0, 0)": 58,
+              "(0, 1)": 12,
+              "(1, 1)": 122
+            },
+            "CEN_triple_counts": {
+              "(-1, -1, -1)": 288,
+              "(0, 0, 0)": 16,
+              "(0, 0, 1)": 47,
+              "(0, 1, 1)": 13,
+              "(1, 1, 1)": 116
+            },
+            "cooling": {
+              "off_potential_samples": 48,
+              "on_potential_samples": 336,
+              "positive_on_service_samples": 336
+            },
+            "heating": {
+              "winter_off_potential_samples": 12,
+              "winter_on_potential_samples": 24,
+              "winter_positive_on_service_samples": 24
+            },
+            "outdoor_air": {
+              "common_candidate_samples": 360,
+              "mixed_temperature_response_samples": 245,
+              "mixed_humidity_response_samples": 360,
+              "activation_accepted": true
+            },
+            "diagnostic_counters": {
+              "Warmup": {
+                "warnings": 1,
+                "severe": 0
+              },
+              "Sizing": {
+                "warnings": 0,
+                "severe": 0
+              }
+            },
+            "warning_accounting": {
+              "immediate_warning_heads": 7,
+              "uncounted_psychrometric_first_heads": 0,
+              "counted_immediate_warning_heads": 7,
+              "recurring_total": 0,
+              "completed": 7
+            },
+            "EcoRoof_AdvancedStability": {
+              "family": "EcoRoof.AdvancedStability.v1",
+              "count": 1,
+              "eligibility": {
+                "input": {
+                  "path": ".runtime/porting/original-idf-NoMass-active-input/input01/active-NoMass-EOF.idf",
+                  "sha256": "621212a6499e47f6bd1d4d600aed1e08d95f89f5890ba66a2e9c699713f68034",
+                  "bytes": 41261
+                },
+                "ordinary_external_surfaces": [
+                  {
+                    "surface": "ROOF",
+                    "construction": "ACTIVE ECO ROOF CONSTRUCTION",
+                    "material": "ACTIVE ECO ROOF SIMPLE"
+                  }
+                ],
+                "material": "ACTIVE ECO ROOF SIMPLE",
+                "method": "ADVANCED",
+                "eligible": true
+              },
+              "effective_timesteps_per_hour": 4,
+              "effective_integer_minutes": 15,
+              "required_frequency": 32,
+              "reported_integer_tokens": [
+                "4",
+                "32"
+              ],
+              "branch": "le60",
+              "position": 1,
+              "immediate_continuations": [
+                "   **   ~~~   ** ...Entered Timesteps per hour=[4], Change to some value greater than or equal to [32] for assured stability.",
+                "   **   ~~~   ** ...Note that EnergyPlus has a maximum of 60 timesteps per hour",
+                "   **   ~~~   ** ...The program will continue, but if the simulation fails due to too low/high temperatures, instability here could be the reason."
+              ],
+              "recurring_count": 0,
+              "phase_from_head": "unobserved_untimestamped_family",
+              "trigger_from_input": "not_recomputed"
+            },
+            "topology": {
+              "actual_nodes": [
+                [
+                  "Node",
+                  "1",
+                  "ZONE ONE INLET 가",
+                  "Air",
+                  "15"
+                ],
+                [
+                  "Node",
+                  "2",
+                  "ZONE ONE EXHAUST",
+                  "Air",
+                  "11"
+                ],
+                [
+                  "Node",
+                  "3",
+                  "ZONE ONE AIR NODE",
+                  "Air",
+                  "2"
+                ],
+                [
+                  "Node",
+                  "4",
+                  "ZONE ONE FIRST RETURN 125",
+                  "Air",
+                  "1"
+                ],
+                [
+                  "Node",
+                  "5",
+                  "ZONE ONE RETURN",
+                  "Air",
+                  "1"
+                ],
+                [
+                  "Node",
+                  "6",
+                  "OA 확장 A",
+                  "Air",
+                  "3"
+                ],
+                [
+                  "Node",
+                  "7",
+                  "OA 확장 B",
+                  "Air",
+                  "2"
+                ],
+                [
+                  "Node",
+                  "8",
+                  "OUTDOORAIR:NODELIST",
+                  "Air",
+                  "0"
+                ],
+                [
+                  "Node",
+                  "9",
+                  "OA 직접 C",
+                  "Air",
+                  "0"
+                ],
+                [
+                  "Node",
+                  "10",
+                  "144 OUTDOOR AIR 각",
+                  "Air",
+                  "1"
+                ],
+                [
+                  "Node",
+                  "11",
+                  "OA 단일 D",
+                  "Air",
+                  "0"
+                ]
+              ],
+              "total_nonparent_connections": 37,
+              "outdoor_air_registry": [
+                [
+                  "Outdoor Air Node",
+                  "8",
+                  "OUTDOORAIR:NODELIST"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "6",
+                  "OA 확장 A"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "7",
+                  "OA 확장 B"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "9",
+                  "OA 직접 C"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "10",
+                  "144 OUTDOOR AIR 각"
+                ],
+                [
+                  "Outdoor Air Node",
+                  "11",
+                  "OA 단일 D"
+                ]
+              ],
+              "private_getter_telemetry_observed": false
+            }
+          }
+        }
       }
     ],
     "totals": {
-      "paired_cases": 277,
-      "reported_samples": 12750376,
-      "raw_operand_unequal": 3246587,
+      "paired_cases": 278,
+      "reported_samples": 12825496,
+      "raw_operand_unequal": 3246590,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -94259,6 +95038,38 @@
           "sha256": "ff41862f36a7783cd7b4babe79b314cb8e067724cdaf2dfdc9af3fc159404a6c",
           "bytes": 265694
         }
+      },
+      {
+        "id": "source204-original-IDF-active-NoMass-EOF-and-DSOA",
+        "receipt": {
+          "path": ".runtime/porting/original-idf-NoMass-source/build01/build/receipt.json",
+          "sha256": "83d969632596894aa464c1ca34777a81edc608fbf4d42a560617ec2fb28d4d98",
+          "bytes": 45279
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/cc/cc1965b69d816bd351c3d4a6949c08e81ac3d01abd649a62ab520f9b639b22c4",
+          "sha256": "cc1965b69d816bd351c3d4a6949c08e81ac3d01abd649a62ab520f9b639b22c4"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/original-idf-NoMass-source/build01/frozen/eplus-rs.exe",
+          "sha256": "6165c7669522773905de3122e1d1429ea7885b559697a62dfa34f5a4de1dac83",
+          "bytes": 84267383
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/original-idf-NoMass-source/build01/frozen/build-receipt.json",
+          "sha256": "2fd4c68df2b4705297d840ffbd4f6e7e2a5a7efd1b380b6e2c76af7f26b96f57",
+          "bytes": 1653025
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/original-idf-NoMass-source/quality02/quality-preparation.json",
+          "sha256": "c8ffd082562deaeaa4e2313f31d815cdf9a017c490472cede937ce0d33bc2d38",
+          "bytes": 10821
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/original-idf-NoMass-source/build01/freeze/receipt.json",
+          "sha256": "7ee03d7c9fbebb6fd32ebc0d5e1343a4508c03e6d102b295f5e0f43a494bd9e4",
+          "bytes": 44278
+        }
       }
     ],
     "focused_since_workspace": {
@@ -94849,14 +95660,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 203,
-      "builds_with_accepted_paired_cases": 173,
+      "actual_recorded_builds": 204,
+      "builds_with_accepted_paired_cases": 174,
       "builds_with_only_retained_failed_Source_attempts": 11,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 6,
       "builds_with_only_unaccepted_Source_attempts": 22,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "203 actual Source builds: 173 retain accepted pairs and 30 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; retained histories add zero accepted cases or values. Failed builds201 (import parsing) and202 (DSOA sizing input) remain zero-credit; one fresh original-IDF Advanced case adds75,120values on Source203. Earlier unaccepted Advanced comparisons remain unchanged.",
+      "qualification": "204 actual Source builds: 174 retain accepted pairs and 30 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. Failed builds 201 (import parsing) and 202 (DSOA sizing input) remain zero-credit; one fresh active NoMass Input06 case adds 75,120 values on Source204. Source203 and all earlier accepted/unaccepted comparisons remain unchanged.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,

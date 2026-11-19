@@ -466,7 +466,7 @@ pub fn compile_raw_model(raw_model: &RawModel) -> CompileResult {
     Compiler::new(raw_model, None).compile()
 }
 
-/// Compiles identities needed by the actual Source input route.
+/// Compiles identities and effective properties for the actual Source input route.
 ///
 /// `Schedule:File` remains RawOnly: only its ID and names are declared here.
 /// Field validation, defaults, type lookup and external data belong to the
@@ -4429,6 +4429,25 @@ impl<'a> Compiler<'a> {
         }
     }
 
+    // Effective Source properties may depend on the genuine returned IDF count,
+    // even when the converted raw map retains its final EOF scalar. Legacy and
+    // direct epJSON compilation keep the existing raw-value interpretation.
+    fn source_original_fixed_maximum(&self, family: &str, object: &RawObject) -> Option<usize> {
+        if !self.source_file_declarations
+            || self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody(family)
+                .is_err()
+        {
+            return None;
+        }
+        match field_value(object, "idf_max_fields") {
+            Some(RawValue::Number(token)) => token.parse::<usize>().ok(),
+            _ => None,
+        }
+    }
+
     fn parse_nomass_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "Material:NoMass";
         for (name, object) in self.objects(OBJECT_TYPE) {
@@ -4441,7 +4460,20 @@ impl<'a> Compiler<'a> {
                 0.001,
                 true,
             );
-            let surface = self.opaque_surface_properties(OBJECT_TYPE, &name, &object);
+            let mut surface = self.opaque_surface_properties(OBJECT_TYPE, &name, &object);
+            if let Some(maximum) = self.source_original_fixed_maximum(OBJECT_TYPE, &object) {
+                // Native Material286/293/300 gates the three effective owners
+                // by NumNums, after getObjectItem has filled every raw slot.
+                if maximum < 4 {
+                    surface.thermal_absorptance = 0.9;
+                }
+                if maximum < 5 {
+                    surface.solar_absorptance = 0.7;
+                }
+                if maximum < 6 {
+                    surface.visible_absorptance = 0.7;
+                }
+            }
             let (Some(roughness), Some(thermal_resistance_m2_k_per_w)) =
                 (roughness, thermal_resistance_m2_k_per_w)
             else {
@@ -15197,6 +15229,8 @@ impl<'a> Compiler<'a> {
 
     fn parse_design_specification_outdoor_air(&mut self, model: &mut TypedModel) {
         for (name, object) in self.objects("DesignSpecification:OutdoorAir") {
+            let original_maximum =
+                self.source_original_fixed_maximum("DesignSpecification:OutdoorAir", &object);
             let Some(id_value) = self.checked_id(
                 "DesignSpecification:OutdoorAir",
                 &name,
@@ -15259,21 +15293,45 @@ impl<'a> Compiler<'a> {
                         0.0,
                         0.0..=f64::INFINITY,
                     ),
-                    outdoor_air_schedule: self.optional_schedule_reference(
-                        model,
-                        "DesignSpecification:OutdoorAir",
-                        &name,
-                        &object,
-                        "outdoor_air_schedule_name",
-                    ),
-                    proportional_control_minimum_outdoor_air_flow_rate_schedule: self
-                        .optional_schedule_reference(
+                    outdoor_air_schedule: if original_maximum.is_some_and(|maximum| maximum < 7) {
+                        // Preserve unconditional alpha/type checks. Native only
+                        // looks up this filled A3 when returned NumAlphas > 2.
+                        let _ = self.optional_schedule_name(
+                            "DesignSpecification:OutdoorAir",
+                            &name,
+                            &object,
+                            "outdoor_air_schedule_name",
+                        );
+                        None
+                    } else {
+                        self.optional_schedule_reference(
+                            model,
+                            "DesignSpecification:OutdoorAir",
+                            &name,
+                            &object,
+                            "outdoor_air_schedule_name",
+                        )
+                    },
+                    proportional_control_minimum_outdoor_air_flow_rate_schedule: if original_maximum
+                        .is_some_and(|maximum| maximum < 8)
+                    {
+                        // Native's A4 lookup likewise requires NumAlphas > 3.
+                        let _ = self.optional_schedule_name(
+                            "DesignSpecification:OutdoorAir",
+                            &name,
+                            &object,
+                            "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
+                        );
+                        None
+                    } else {
+                        self.optional_schedule_reference(
                             model,
                             "DesignSpecification:OutdoorAir",
                             &name,
                             &object,
                             "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
-                        ),
+                        )
+                    },
                 });
         }
     }

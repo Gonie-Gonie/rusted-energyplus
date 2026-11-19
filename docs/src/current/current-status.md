@@ -44,7 +44,7 @@ already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122
 This inventory correction adds no physical evidence; retained116 is unchanged.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 277 paired physical cases and 12,750,376 reported values with zero
+contains 278 paired physical cases and 12,825,496 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -70,32 +70,18 @@ from the retained 116-type corpus and combined 123-name inventory above.
 
 Bounded Source B retains Raw/original-typed outside, ordered and effective Construction custody. Unused WindowMaterial, Curve and spectral getters use actual runtime owners; Materials reporting and Source geometry do not expose Native-private optics, TAR or pointers.
 
-The current fixed original-IDF scene supplies the same physical IDF to both actors and uses the whole official converted DOM for scientific inspection. It covers the existing fifteen WindowMaterial families, five analytic Curve getters, spectral/Gap helpers and ordinary no-AFN OA input custody. Recovered declaration order, F/L, defaults, blanks, IDD labels and raw numeric kinds remain distinct from returned counts and caller effects.
+The original-IDF route supplies the same physical IDF to both actors and uses the whole official converted DOM for scientific inspection. It retains the existing fifteen WindowMaterial families, five analytic Curve getters, spectral/Gap helpers and ordinary no-AFN OA custody. Recovered order/F/L, full defaults/blanks/IDD labels and raw numeric kinds remain separate from returned counts and caller effects.
 
-Source199 Simple and Source200 Advanced remain separate accepted direct-epJSON
-pairs; the older Source199 v10 Advanced attempt remains at 31/34 gates with zero
-credit. Source203 adds one fresh original-IDF Advanced pair: both engines receive
-the same physical Input04, all 34 gates and 158 series/75,120 values pass unchanged
-policies, and neither actor is rerun. Only three HorizontalIR operands differ
-(maximum 1.71e-13 W/m2, RMSE 1.13e-14); all other operands, including both meters,
-are raw-exact. Failed builds201 (import parsing) and202 (DSOA sizing input) remain
-separate zero-credit records. The original-IDF scene uses the same bounded Source B Advanced ordinary-CTF owner; Source A Roof remains input/unit-only. Direct epJSON and Legacy behavior are unchanged. Active window/CFS/EQL/shading and CurveValue/evaluation, Source A Window expansion, arbitrary legal combinations, annual runs and full-object conformance remain outside this evidence.
+Source199 Simple and Source200 Advanced remain accepted direct-epJSON pairs; Source203 retains its accepted Input04 original-IDF Advanced pair. The older Source199 v10 Advanced attempt remains at 31/34 gates with zero credit, and failed builds 201 (import parsing) and 202 (DSOA sizing input) remain separate zero-credit history.
 
-The current Source203 snapshot passes workspace tests (5,051 passed, zero failed,
-two ignored) and all-target Clippy across all eleven packages. Its seven current
-QA commands execute four existing bodies; all 53 actual commands, six failures
-and one historical zero-match invocation retain their contexts without reuse.
+Source204 adds one fresh Input06 original-IDF pair with an active NoMass EOF layer in the existing Wall construction. One Native and one Source run pass all 34 gates and 158 series/75,120 values under unchanged policies, without reruns. Only three HorizontalIR operands differ (maximum 1.71e-13 W/m2, RMSE1.13e-14); all others and both meters are raw-exact. The final raw thermal absorptance 0.8125 remains in the converted input, while the returned count selects effective 0.9; both actual Material Details rows retain 0.9/0.7/0.7.
 
-Genuine original-IDF DSOA now transports its actual fixed layout and F-qualified
-counts to the sizing getter; the fixed SUM positive-OA scene qualifies. The
-AirGap EOF F1/N0 versus filled N1 distinction and count-independent material
-parent are separately checked by public IP and the existing body. This does
-not qualify arbitrary EOF schedule-reference combinations or a new active
-AirGap scene; future NoMass EOF-property, ComplexShade and positive-OA Humidistat work remains
-outside this publication.
+The current Source204 snapshot passes workspace tests (5,051 passed, zero failed, two ignored) and all-target Clippy across all eleven packages. Five current QA commands execute two existing bodies; all ten actual profile commands, including one failure and two historical body executions, retain their contexts without reuse or new test functions.
+
+For genuine Source original IDF, NoMass effective absorptance defaults follow the returned counts after existing primitive/type/range checks; full raw/getter slots are retained. DSOA skips A3/A4 schedule lookup only when true F leaves them uncounted, after primitive validation; counted references and direct epJSON/Legacy rules remain. The fixed SUM OA scene and separate AirGap EOF/public-IP/material-parent checks retain their scope. No new active AirGap or arbitrary EOF-reference physics follows. Native-name widening, ComplexShade, positive-OA Humidistat, active window/CFS/EQL/shading, Source A Roof/Window expansion, annual runs and full-object conformance remain outside this publication.
 
 Complete streams and per-series results for this accepted pair are retained in
-`.runtime/porting/original-idf-window-six/runtime05/`: `readback.json`,
+`.runtime/porting/original-idf-NoMass-source/runtime03/`: `readback.json`,
 `native/output/nativeout.eso`, `native/output/nativeout.mtr`,
 `source/output/eplusrs.eso` and `source/output/eplusrs.mtr`.
 The installed [v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py)
@@ -108,7 +94,7 @@ With the retained local artifacts above, rerun the comparison from the repo
 root, choosing a new output directory each time:
 
 ```powershell
-python -B tools/porting/check_completed_reported_streams_v3.py --manifest ".runtime/porting/original-idf-window-six/runtime05/reported-comparison-manifest01.json#e7b68d83a98ea191b6e46edc270eab226a5ef3878e159adb11846746a646c45f#4160" --output-dir .runtime/porting/reported-streams-user-check01
+python -B tools/porting/check_completed_reported_streams_v3.py --manifest ".runtime/porting/original-idf-NoMass-source/runtime03/reported-comparison-manifest01.json#aa55596f01caefb8d8e81a2a22472be017254585f9d0cb9976715a4807a7eb2e#4171" --output-dir .runtime/porting/reported-streams-user-check01
 ```
 
 The output includes `report.md`, `comparison.json`, `series.csv`,
@@ -198,8 +184,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 203 recorded Source builds,
-173 with accepted pairs and 30 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 204 recorded Source builds,
+174 with accepted pairs and 30 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.

@@ -364,13 +364,28 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     }) {
         return error();
     }
-    for name in [
-        "outdoor_air_schedule_name",
-        "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
+    let source_original_maximum = (!raw.is_epjson()
+        && raw
+            .validate_source_idf_object_custody("DesignSpecification:OutdoorAir")
+            .is_ok())
+    .then(|| field(requirement, "idf_max_fields"))
+    .flatten()
+    .and_then(|value| match value {
+        RawValue::Number(token) => token.parse::<usize>().ok(),
+        _ => None,
+    });
+    for (name, position) in [
+        ("outdoor_air_schedule_name", 7),
+        (
+            "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
+            8,
+        ),
     ] {
+        let uncounted = source_original_maximum.is_some_and(|maximum| maximum < position);
         match field(requirement, name) {
             None => {},
-            Some(RawValue::String(reference)) if reference.is_empty() || has_source_schedule_reference(raw, reference) => {},
+            Some(RawValue::String(reference)) if reference.is_empty()
+                || uncounted || has_source_schedule_reference(raw, reference) => {},
             _ => return Some("SourceB DSOA schedule requires an actual supported schedule reference; the getter retains its 0..1 contract".into()),
         }
     }
