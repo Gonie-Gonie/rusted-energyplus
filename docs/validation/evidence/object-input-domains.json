@@ -467,9 +467,10 @@
       "All lists fill before singles; general-list expansion preserves new-ref0/existing-ref increments, per-member registration and advancing streams, with only final registry deduplication and success-only commit. The selected consumer uses real CheckAndAdd. Complete BND/export checks concern public order, not private OA scratch. AFN, duct/EMS, unsafe expanded interior-blank zero prefixes, arbitrary combinations, Source A/Legacy expansion and full-object completion remain held."
     ],
     "Material:NoMass": [
-      "Validated fields retain bounded one-Zone A/B and existing Source A normal stacks. Genuine Source original-IDF NoMass retains full raw/getter values while true F selects effective thermal/solar/visible defaults 0.9/0.7/0.7 at F<4/<5/<6, after primitive/type/range checks. Source204 retains its active EOF default witness. Source207 adds one fixed Source B five-DesignDay original-IDF case with distinct NBSP-only, PLAIN and NBSP-padded PLAIN names; active counted thermal absorptance 0.8125 reaches matching Material Details rows. Actual selected name maps now retain material/reference/report identity through ordinary initialization and CTF caches. Existing direct-epJSON/Legacy criteria remain; broader name combinations, active window consumers and full-object completion are unclaimed.",
+      "Validated fields retain bounded one-Zone A/B and existing Source A normal stacks. Genuine Source original-IDF NoMass retains full raw/getter values while true F selects effective thermal/solar/visible defaults 0.9/0.7/0.7 at F<4/<5/<6, after primitive/type/range checks. Source204 retains its active EOF default witness; Source207 retains exact NBSP-only, PLAIN and NBSP-padded PLAIN names with counted thermal absorptance 0.8125 and actual selected-map identity through initialization/CTF caches. Source208 adds one fixed Source B five-DesignDay direct-epJSON pair: ten undeclared primitive/nested/body-metadata members remain raw-owned and are ignored by declared-field projection, while the five known property fields remain strict and the map key supplies Name. Its full three-layer Wall recipe is distinct from the parent original-IDF F3 two-layer case. Original-IDF/Legacy, NUL-field/comparator-order fences, broader names/combinations and full-object completion remain held.",
       "One fresh Source204 active Input06 layer retains the final raw thermal absorptance 0.8125 while F3 returns only N1. Both actual Material Details rows report effective 0.9/0.7/0.7; all 34 scientific gates pass the fixed complete streams. Existing-body controls cover primitive rejection and F-qualified thermal/solar/visible selection, not every legal combination or Native-name spelling.",
-      "Source207 Input07 retains the complete final Wall PLAIN raw layer, while genuine original-IDF F3 selects two effective layers through reviewed compiler/support/initialization owners. The successful whole case and matching three Material Details rows do not expose Native private TotLayers or prove direct-JSON three-layer equivalence. Construction-name namespace widening and unknown NoMass direct-JSON members remain future work; all earlier Source204 count-default evidence remains retained."
+      "Source207 Input07 retains the complete final Wall PLAIN raw layer, while genuine original-IDF F3 selects two effective layers through reviewed compiler/support/initialization owners. The successful whole case and matching three Material Details rows do not expose Native private TotLayers or prove direct-JSON three-layer equivalence. Construction-name namespace widening and unknown NoMass direct-JSON members remain future work; all earlier Source204 count-default evidence remains retained.",
+      "Source208 direct-epJSON admits the ten authored undeclared members on the active NBSP NoMass row, including nested values and name/idf_order/idf_max_fields lookalikes, without using them as identity/count metadata. Both actors consume the same full three-layer Wall DOM. Matching public Material Details rows retain active thermal absorptance 0.8125 and the other two materials' 0.9/0.7/0.7 defaults; all 34 gates and 158 series/75,120 values pass. Earlier original-IDF count/default evidence is unchanged; SourceRaw field-NUL/comparator fences and Construction-name widening remain open. No private Native layer-count observation or all-combinations completion is claimed."
     ]
   },
   "verification": {
@@ -14142,6 +14143,183 @@
           "bytes": 3378
         },
         "qualification": "Current QA04 executes the existing U07, GasMixture and ordinary runtime cache/report bodies. The distinct OA getter-credit body is absent, so current_getter_credit remains false. Plans01/02 retain their original wrong6af documentary selection, late evidence02 correction remains explicit, and plans03/04 prospectively bind207f. Root owns actual custody/execution outcomes; this current finite pair grants no broader object or parameter-combination completion."
+      },
+      "direct_epjson_nomass_undeclared_members": {
+        "actual_quality": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/evidence01/quality-ledger.json",
+          "sha256": "53ae6abfe53c8022a059994ccc4a29b7b3edd28372043047b2bb3a4385d5b164",
+          "bytes": 3102
+        },
+        "complete_QA_ledger": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/evidence01/quality-ledger.json",
+          "sha256": "53ae6abfe53c8022a059994ccc4a29b7b3edd28372043047b2bb3a4385d5b164",
+          "bytes": 3102
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/quality01/quality-preparation.json",
+          "sha256": "7427bcea6dd41b65ce6ec261a8c752846316cd20c34d97967d9a5e593f95a02c",
+          "bytes": 6142
+        },
+        "Source_authority": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/evidence01/source-authority.json",
+          "sha256": "d5a4972eafdacfadf17f7c1502cb9fb0f4f19164042d6546495fb87f0b2a9898",
+          "bytes": 29418
+        },
+        "Source_metadata_review": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/evidence01/independent-Source-review01.json",
+          "sha256": "41edb3f58f17cee8d8d014d3ca5f0d7ac1636fe6cff88b1f760f77966784eafe",
+          "bytes": 7725
+        },
+        "total_actual_QA_commands": 4,
+        "current_QA_commands": 4,
+        "failed_QA_attempts": 0,
+        "current_test_body_executions": 1,
+        "historical_named_body_executions": 0,
+        "historical_zero_match_test_records": 0,
+        "reused_body_credit": 0,
+        "new_test_functions": 0,
+        "current_getter_execution": false,
+        "actual_test_execution_evidence": [
+          {
+            "kind": "targeted_existing_test",
+            "role": "current",
+            "test_names": [
+              "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support"
+            ],
+            "receipt": {
+              "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/quality01/original-idf-window-six-raw-ip-custody-tests/receipt.json",
+              "sha256": "746140ec1ca5f07969944603ea1a1c3105a8de62f6078caa63fadaf13aa844aa",
+              "bytes": 38821
+            },
+            "actual_exit_code": 0,
+            "lineage": []
+          }
+        ],
+        "QA_profile": {
+          "path": ".runtime/object-expansion/unit159-prep/Source208-NoMass-extra-members-minimal-QA-DATA03/QA-profile.json",
+          "sha256": "8c82650e191110d525dbe9a19ec973513920c352cbeef970afcf56b99ac0b6be",
+          "bytes": 2150
+        },
+        "QA_profile_binding": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/QA-profile-binding01.json",
+          "sha256": "93c879dcbe6df653800684e41046631e7e336a8ef9a74cb04cf567598539bcf6",
+          "bytes": 2122
+        },
+        "current_required_test_names": [
+          "porting_scope::tests::interior_air_gap_preserves_raw_ip_typed_identity_and_source_support"
+        ],
+        "default_builds": 1,
+        "freezer_executions": 1,
+        "new_recorded_Source_builds": 1,
+        "retained_failed_builds": [],
+        "retained_failed_Source_attempts": [],
+        "correction_reviews": [],
+        "integration_attempt": {
+          "Root_workspace01": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/Root-workspace01-actual-readback.json",
+            "sha256": "025592926305998b8469fd048d06b54c18d27855c8bdd597855274e292c4c90e",
+            "bytes": 2467
+          },
+          "workspace_passed": true,
+          "passed": 5051,
+          "failed": 0,
+          "ignored": 2,
+          "target_summaries": 23,
+          "whole_workspace": true,
+          "all11_package_all_target_Clippy_current_profile": false,
+          "current_Clippy_packages": [
+            "ep_run"
+          ],
+          "Root_QA01": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/Root-QA01-actual-readback.json",
+            "sha256": "a4c7660f75e6e5b4b2e086353e605b2387dff980b7ff73e2119dd3c7f89acd03",
+            "bytes": 1193
+          },
+          "workspace_attempts": 1,
+          "qualification": "One actual complete workspace pass. Four current profile commands pass one exact existing U07 body and ep_run all-target Clippy; no new body, historical execution, reuse or current OA getter credit. Parent Source207 all-package Clippy remains historical, not current Source208 credit."
+        },
+        "current_Source_CODE": [
+          {
+            "path": "crates/ep_run/src/ordinary_equipment_input.rs",
+            "sha256": "727bbc585bf6d6136b28f4f65593312155aff10b449cf28212d63e7c2d0d3aa9",
+            "bytes": 291208
+          },
+          {
+            "path": "crates/ep_run/src/ordinary_material_input.rs",
+            "sha256": "7eeb604fbba3c2b2124582e66ae8dd38fdc419c4464e7d1a83e1f32fbf6e9211",
+            "bytes": 18793
+          },
+          {
+            "path": "crates/ep_run/src/porting_scope/tests.rs",
+            "sha256": "1c7eb98d391b805e1ea05b53a64be445bb9bf915790b7fc98ea644146211de05",
+            "bytes": 918503
+          }
+        ],
+        "generic_reported_comparer_v3": {
+          "Root_not_applicable_review": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/Root-generic-v3-not-applicable-readback01.json",
+            "sha256": "23f2d9c2caeb7355ad515e73ecade10b7df101dc9db88bd7fbc987e5719aa154",
+            "bytes": 2402
+          },
+          "schema": "Root.ActualSource208GenericComparerNotApplicableReadback.v1",
+          "accepted": false,
+          "complete": false,
+          "status": "not-applicable-to-direct-epJSON",
+          "actual_manifest": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/reported-comparison-manifest01.json",
+            "sha256": "edd32b46ba07939d5d85b0f5af4ff0791288bb01eca31ae5caa111e484bee69c",
+            "bytes": 4369
+          },
+          "actual_invocation": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/reported-comparison-invocation01.json",
+            "sha256": "d66acba72008f476999dd747084d628dadb72f1567ee816173b70b32a28741f4",
+            "bytes": 5860
+          },
+          "actual_receipt": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/reported-comparison-command01/receipt.json",
+            "sha256": "30031f03f08c05b97575bcefed2ce29984c000e667a90951348d76007d3e7967",
+            "bytes": 18653
+          },
+          "retained_rejected_comparison": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/reported-comparison01/comparison.json",
+            "sha256": "c09415b81e7c00826ca5b130b3196f260691686a68263449af9df5a353b36109",
+            "bytes": 3015
+          },
+          "error": "ValueError: Original IDF and optional EPW files required",
+          "Root_cause": "Root reused the published original-IDF-only V3 comparison wrapper for this direct epJSON case. The tool correctly rejected the input extension before reading reported streams.",
+          "all_actor_and_source_inputs_unchanged": true,
+          "engines_launched": 0,
+          "reruns": 0,
+          "new_qualifying_cases": 0,
+          "new_qualifying_values": 0,
+          "original_IDF_generic_example_held": {
+            "path": ".runtime/porting/original-idf-NoMass-names-Construction-source/runtime03/reported-comparison-manifest02.json",
+            "sha256": "7f2b8c5cd272e1e232cd02b469a2912cb53a5ed41b790e919a0c2e7422e3ed5c",
+            "bytes": 4469
+          },
+          "authoritative_current_completion": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/completed.json",
+            "sha256": "08ad24a22e191ce41f3fd42812f7a61f445c3954068949a0c9c13eb2a4f25ec6",
+            "bytes": 2385
+          },
+          "qualification": "No retry, input substitution, tool edit or actor relabel. Frozen pairedV13 independently completed all34 gates and158series75120values. Generic original-IDF comparer acceptance is not claimed for directJSON. Historical published207 original-IDF reusable example remains valid."
+        },
+        "publication_input_review_companion": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/publication-input-peer-companion01/companion.json",
+          "sha256": "3001608152dd2b1bba28f8a95eb172e95e4c4ebac564045f77220f66e7879f6b",
+          "bytes": 3541
+        },
+        "publication_fixed_input_review": {
+          "path": ".runtime/object-expansion/unit159-prep/Source208-direct-JSON-prospective-DATA-DRAFT01/independent-static-review01.json",
+          "sha256": "0a0c515a03fec278cd578e7e533f5ff2fc25b747c5c9b21b68519b388ea221a8",
+          "bytes": 9262
+        },
+        "runtime_independent_input_review": {
+          "path": ".runtime/object-expansion/unit159-prep/NoMass-direct-JSON-extra-members-INPUT-DRAFT01/independent-static-review01.json",
+          "sha256": "68041266abba4a79ba8b498a7f5c2711681f0fe6ca2dc5fc0c416cd8697775ff",
+          "bytes": 4910
+        },
+        "qualification": "Root attributes current QA/workspace/build and the one Native/one Source scientific pair. Published V3 rejects this direct-epJSON input before reading streams and grants zero case/value/engine credit; frozen V13 supplies current acceptance. The original Source207 original-IDF comparer example and all earlier Source histories remain held. Publication-only companion binds two existing before-actor input peers without changing frozen runtime review, binding, actors or completion. No broader object/value completion is implied."
       }
     },
     "original_execution_path": "target/debug/eplus-rs.exe",
@@ -91624,12 +91802,297 @@
             "values": 75120
           }
         }
+      },
+      {
+        "group": "Material:NoMass",
+        "scope": "B",
+        "fixed_conformance_case": false,
+        "input_format": "epJSON",
+        "id": "ideal-loads-source208-v13-direct-epJSON-NoMass-undeclared-members",
+        "case_kind": "direct-epJSON-NoMass-extra-members-full-Construction-recipe",
+        "source_build": "source208-direct-epJSON-NoMass-undeclared-members",
+        "input": {
+          "path": ".runtime/object-expansion/unit159-prep/NoMass-direct-JSON-extra-members-INPUT-DRAFT01/input.epJSON",
+          "sha256": "fa3ca48be882d4c9197d8aae1f213e21e48930e03906e8ab7eb3ef046d4e8f8c",
+          "bytes": 141614
+        },
+        "scientific_dom": {
+          "path": ".runtime/object-expansion/unit159-prep/NoMass-direct-JSON-extra-members-INPUT-DRAFT01/input.epJSON",
+          "sha256": "fa3ca48be882d4c9197d8aae1f213e21e48930e03906e8ab7eb3ef046d4e8f8c",
+          "bytes": 141614
+        },
+        "fixed_input_manifest": {
+          "path": ".runtime/object-expansion/unit159-prep/Source208-direct-JSON-prospective-DATA-DRAFT01/fixed-input-manifest.json",
+          "sha256": "e32c3c54af92d4d14b012a91daead6c57cf4dbe70f100f32c22ca419e736a300",
+          "bytes": 4165
+        },
+        "native_receipt": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/native/command/receipt.json",
+          "sha256": "5c3a4143e0ee6cc1fb1221f7afa601d2ec63be8035955a1fde20b2237fc40d83",
+          "bytes": 329949
+        },
+        "source_receipt": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/source/command/receipt.json",
+          "sha256": "fa45702c9aa8cc9320c3e01537809aa25d75179b89a5a5b6134728018e035aa6",
+          "bytes": 331377
+        },
+        "source_summary": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/source/output/run-summary.json",
+          "sha256": "052828aa25d646f6257b154cfbdc0417d922ba41f69b75c61a9359e0af1bef0e",
+          "bytes": 64711
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/7c/7cbea7d0d18368cf123a6604e4f2c360fb1f530d75839c9db23fe274465f7610",
+          "sha256": "7cbea7d0d18368cf123a6604e4f2c360fb1f530d75839c9db23fe274465f7610"
+        },
+        "source_executable": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/build01/frozen/eplus-rs.exe",
+          "sha256": "a60d6bb73e95f48b7aa25cd5ca80c4d4c2b99685cd59b7151114e64cacf412a3",
+          "bytes": 84280693
+        },
+        "source_build_receipt": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/build01/build/receipt.json",
+          "sha256": "ad9a86f05ac3b260489a96ef0c9f7c4b9b8fc4df6247a38a8fb081940566dc1a",
+          "bytes": 40061
+        },
+        "complete_comparison": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/readback.json",
+          "sha256": "0c53bdc5b7d2db3588882b30b2ebaa98677f69c09233acefa48f357594fcbd21",
+          "bytes": 539593
+        },
+        "Root_completed_readback_review": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/Root-scientific-review01.json",
+          "sha256": "de56b30ba9ac4db41bdbbff60f85f7ff50164b289c196bc331c3105514df375a",
+          "bytes": 13129
+        },
+        "input_derivation_plan": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/case-config.json",
+          "sha256": "fe4dab36429c90276c43a832afe3e8cad5a18a5f7a11afd0aef594b20e64281a",
+          "bytes": 174353
+        },
+        "coverage_kind": "direct_epjson_nomass_undeclared_members",
+        "effective_state": "One fresh Source208 Source B direct-epJSON pair spans five DesignDays, with identical fa3 physical/scientific input for both actors and the complete three-layer Wall recipe. Ten undeclared primitive/nested/body-metadata NoMass members remain in raw/statistics custody and are ignored by the declared-field projection; known properties and map-key identity remain strict. All 34 gates, 158 series and 75,120 values pass unchanged policies. Matching Material Details rows retain the three distinct names and active NBSP thermal absorptance 0.8125. Three HorizontalIR operands differ within the existing 1e-5 limits; all other series and both meters are raw-exact. The parent original-IDF F3 two-layer case is retained separately, without an equivalence or private Native TotLayers claim. Construction-name widening, NUL-field/comparator-order widening, arbitrary legal combinations, Source A expansion and full-object completion remain unclaimed.",
+        "totals": {
+          "series": 158,
+          "samples": 75120,
+          "raw_operand_unequal": 3,
+          "parsed_binary64_unequal": 3,
+          "tolerance_failures": 0,
+          "rmse_failures": 0,
+          "passed": true
+        },
+        "scientific_gate_counts": {
+          "Native": 12,
+          "Source": 12,
+          "paired": 8,
+          "exports": 2
+        },
+        "physical_metrics": {
+          "max_abs_delta": 1.7053025658242404e-13,
+          "max_rmse_delta": 1.1309316871492875e-14
+        },
+        "comparison_provenance": {
+          "release": {
+            "path": "tools/porting/paired/v13/release.json",
+            "sha256": "d8338a1da6557ae14bc49f92596f222c9321f6aa4f9afe4448e92878186fa4bf",
+            "bytes": 17261
+          },
+          "runtime_binding": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/binding.json",
+            "sha256": "951b3a58ea0bdadebaa336179ca304e705c7a6c2b8e78dd91ed4ff94f9e56c3e",
+            "bytes": 1174
+          },
+          "case_config": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/case-config.json",
+            "sha256": "fe4dab36429c90276c43a832afe3e8cad5a18a5f7a11afd0aef594b20e64281a",
+            "bytes": 174353
+          },
+          "Source_authority": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/evidence01/source-authority.json",
+            "sha256": "d5a4972eafdacfadf17f7c1502cb9fb0f4f19164042d6546495fb87f0b2a9898",
+            "bytes": 29418
+          },
+          "completion": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/completed.json",
+            "sha256": "08ad24a22e191ce41f3fd42812f7a61f445c3954068949a0c9c13eb2a4f25ec6",
+            "bytes": 2385
+          },
+          "verification_receipt": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/verify-command/receipt.json",
+            "sha256": "c0cd3cf01107a4d56ca9fc720c8a8aaf00fb79b01998c8e7ead2d3bb13dd4dc1",
+            "bytes": 331127
+          },
+          "actual_build": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/build01/build-row.json",
+            "sha256": "35c4b14ac2ba94ec186eb4a4e82c47d5c6aa1ad119e81a96471ae42d698237ba",
+            "bytes": 1455
+          },
+          "actual_quality": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/evidence01/quality-ledger.json",
+            "sha256": "53ae6abfe53c8022a059994ccc4a29b7b3edd28372043047b2bb3a4385d5b164",
+            "bytes": 3102
+          },
+          "owner_execution_review": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/evidence01/source-authority.json",
+            "sha256": "d5a4972eafdacfadf17f7c1502cb9fb0f4f19164042d6546495fb87f0b2a9898",
+            "bytes": 29418
+          },
+          "fresh_Native_processes": 1,
+          "fresh_Source_processes": 1,
+          "new_test_functions": 0,
+          "no_replay": true,
+          "Root_physical_truth": {
+            "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/Root-scientific-review01.json",
+            "sha256": "de56b30ba9ac4db41bdbbff60f85f7ff50164b289c196bc331c3105514df375a",
+            "bytes": 13129
+          }
+        },
+        "direct_epjson_nomass_members": {
+          "three_exact_NoMass_names_and_MaterialDetails_rows": {
+            "Native": {
+              "artifact": {
+                "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/native/output/nativeout.eio",
+                "sha256": "a972844a85fa9bb51ef0fadc17121fbf71ef503cf3cc4d873c5649b2dc29350b",
+                "bytes": 22197
+              },
+              "rows": [
+                [
+                  " Material Details",
+                  " ",
+                  "0.2000",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.8125",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  " PLAIN ",
+                  "5.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  "PLAIN",
+                  "3.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ]
+              ]
+            },
+            "Source": {
+              "artifact": {
+                "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/source/output/eplusrs.eio",
+                "sha256": "3f40a79407562c383270b92333c07e19b2bcb412beedf28bd7bbfdef50931951",
+                "bytes": 22161
+              },
+              "rows": [
+                [
+                  " Material Details",
+                  " ",
+                  "0.2000",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.8125",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  " PLAIN ",
+                  "5.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ],
+                [
+                  " Material Details",
+                  "PLAIN",
+                  "3.0000E-002",
+                  "MediumRough",
+                  "0.0000",
+                  "0.000",
+                  "0.000",
+                  "0.000",
+                  "0.9000",
+                  "0.7000",
+                  "0.7000"
+                ]
+              ]
+            }
+          },
+          "material_rows_raw_equal": true,
+          "all34_gates_passed": true,
+          "reported_series": 158,
+          "reported_values": 75120,
+          "unequal_series": [
+            {
+              "stream": "eso",
+              "index": 58,
+              "report_id": 10,
+              "name": "Site Horizontal Infrared Radiation Rate per Area",
+              "key": "Environment",
+              "units": "W/m2",
+              "policy": {
+                "key": "Environment",
+                "variable": "Site Horizontal Infrared Radiation Rate per Area",
+                "units": "W/m2",
+                "frequency": "Timestep",
+                "sampling_stage": "zone",
+                "atol": 1e-05,
+                "rtol": 0.0,
+                "rmse_max": 1e-05
+              },
+              "producer": {
+                "stage": "Zone",
+                "store": "Average",
+                "units": "W/m2",
+                "raw": "Zone,Average,Site Horizontal Infrared Radiation Rate per Area [W/m2]"
+              },
+              "samples": 480,
+              "raw_operand_unequal": 3,
+              "parsed_binary64_unequal": 3,
+              "sum_squared_delta": 6.139231108792002e-26,
+              "max_abs_delta": 1.7053025658242404e-13,
+              "rmse": 1.1309316871492875e-14,
+              "tolerance_failures": 0,
+              "rmse_limit_met": true
+            }
+          ],
+          "direct_epJSON_full_three_layer_Construction": true,
+          "qualification": "Source-reviewed direct epJSON full three-layer path is physically exercised; EIO material rows are public observations and no private Native Construction TotLayers trace is claimed."
+        }
       }
     ],
     "totals": {
-      "paired_cases": 279,
-      "reported_samples": 12900616,
-      "raw_operand_unequal": 3246594,
+      "paired_cases": 280,
+      "reported_samples": 12975736,
+      "raw_operand_unequal": 3246597,
       "tolerance_failures": 0,
       "rmse_failures": 0,
       "passed": true
@@ -95781,6 +96244,38 @@
           "sha256": "af98cae56524e4a2ec11d5419898c4679a701f29dd6477ff26a0bde7a3496991",
           "bytes": 72201
         }
+      },
+      {
+        "id": "source208-direct-epJSON-NoMass-undeclared-members",
+        "receipt": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/build01/build/receipt.json",
+          "sha256": "ad9a86f05ac3b260489a96ef0c9f7c4b9b8fc4df6247a38a8fb081940566dc1a",
+          "bytes": 40061
+        },
+        "source_snapshot": {
+          "path": ".runtime/porting/source-objects/7c/7cbea7d0d18368cf123a6604e4f2c360fb1f530d75839c9db23fe274465f7610",
+          "sha256": "7cbea7d0d18368cf123a6604e4f2c360fb1f530d75839c9db23fe274465f7610"
+        },
+        "retained_executable": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/build01/frozen/eplus-rs.exe",
+          "sha256": "a60d6bb73e95f48b7aa25cd5ca80c4d4c2b99685cd59b7151114e64cacf412a3",
+          "bytes": 84280693
+        },
+        "frozen_build_receipt": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/build01/frozen/build-receipt.json",
+          "sha256": "a056538443bdf7bbccdf79b5a7548b7d53fe9140085e39dfa8f6a5121d7413c9",
+          "bytes": 1653142
+        },
+        "quality_preparation": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/quality01/quality-preparation.json",
+          "sha256": "7427bcea6dd41b65ce6ec261a8c752846316cd20c34d97967d9a5e593f95a02c",
+          "bytes": 6142
+        },
+        "freeze_execution": {
+          "path": ".runtime/porting/NoMass-direct-JSON-extra-members-source/build01/freeze/receipt.json",
+          "sha256": "cf00f46a557842931be3a2f6c61135ccd06329aeaf313f2a8e86d7a3e33012f2",
+          "bytes": 39086
+        }
       }
     ],
     "focused_since_workspace": {
@@ -96449,14 +96944,14 @@
       }
     ],
     "source_build_inventory_accounting": {
-      "actual_recorded_builds": 207,
-      "builds_with_accepted_paired_cases": 175,
+      "actual_recorded_builds": 208,
+      "builds_with_accepted_paired_cases": 176,
       "builds_with_only_retained_failed_Source_attempts": 13,
       "failed_attempts_in_paired_case_or_sample_totals": 0,
       "builds_with_only_retained_unaccepted_observer_attempts": 6,
       "builds_with_only_unaccepted_Source_attempts": 24,
       "unaccepted_observer_attempts_in_paired_case_or_sample_totals": 0,
-      "qualification": "207 actual Source builds: 175 retain accepted pairs and 32 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. Failed builds 201/202 and now 205 (support admission) and 206 (initialization identity) remain zero-credit. One fresh corrected Source207 Input07 case adds 75,120 values; all earlier accepted cases, builds and unaccepted histories remain unchanged.",
+      "qualification": "208 actual Source builds: 176 retain accepted pairs and 32 have none, including 8 without Source execution. Exclusive failed/observer/comparison counters omit mixed unaccepted histories; all retained histories add zero accepted cases or values. Failed builds 201/202/205/206 remain zero-credit. One fresh Source208 direct-epJSON case adds 75,120 values; all earlier accepted cases, builds and unaccepted histories remain unchanged. The auxiliary original-IDF-only comparer rejection is outside Source attempt/build accounting.",
       "builds_with_only_retained_unaccepted_Source_comparison_attempts": 4,
       "unaccepted_comparison_attempts_in_paired_case_or_sample_totals": 0,
       "builds_without_Source_execution": 8,

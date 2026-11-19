@@ -1054,110 +1054,125 @@ fn resolve_raw(
                     // allow additional members. Only an unconsumed top-level member
                     // may pass here, after both existing operand validators.
                     // The three actual IDF metadata predicates stay unchanged.
-                    let metadata = source_calendar_ingress
-                        && !matches!(
-                            field.0.as_str(),
-                            "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
-                        )
-                        && match family.0.as_str() {
-                            "Material:InfraredTransparent" if source_irt_family => true,
-                            "People" if source_people_family => !people::known_field(&field.0),
-                            "SizingPeriod:DesignDay" if source_design_day_family => {
-                                !design_days::known_field(&field.0)
-                            }
-                            "Output:Diagnostics" => field.0 != "diagnostics",
-                            "ScheduleTypeLimits" => !matches!(
+                    let metadata = (source_calendar_ingress
+                        && raw.is_epjson()
+                        && family.0 == "Material:NoMass"
+                        && ep_raw_model::source_idf_object_layout(&family.0).is_some_and(
+                            |(_, fixed, _)| {
+                                // Name is the object-map key, not an instance operand.
+                                fixed
+                                    .iter()
+                                    .skip(1)
+                                    .all(|(name, _, _)| *name != field.0.as_str())
+                            },
+                        ))
+                        || source_calendar_ingress
+                            && !matches!(
                                 field.0.as_str(),
-                                "lower_limit_value"
-                                    | "upper_limit_value"
-                                    | "numeric_type"
-                                    | "unit_type"
-                            ),
-                            "Schedule:Constant" => !matches!(
-                                field.0.as_str(),
-                                "schedule_type_limits_name" | "hourly_value"
-                            ),
-                            "Schedule:Compact" => {
-                                !matches!(field.0.as_str(), "schedule_type_limits_name" | "data")
-                            }
-                            "Schedule:File" => !matches!(
-                                field.0.as_str(),
-                                "schedule_type_limits_name"
-                                    | "file_name"
-                                    | "column_number"
-                                    | "rows_to_skip_at_top"
-                                    | "number_of_hours_of_data"
-                                    | "column_separator"
-                                    | "interpolate_to_timestep"
-                                    | "minutes_per_item"
-                                    | "adjust_schedule_for_daylight_savings"
-                            ),
-                            "Schedule:Year" => !matches!(
-                                field.0.as_str(),
-                                "schedule_type_limits_name" | "schedule_weeks"
-                            ),
-                            "Schedule:Day:Hourly" => {
-                                field.0 != "schedule_type_limits_name"
-                                    && !field
-                                        .0
-                                        .strip_prefix("hour_")
-                                        .and_then(|suffix| suffix.parse::<u32>().ok())
-                                        .is_some_and(|hour| {
-                                            (1..=24).contains(&hour)
-                                                && field.0 == format!("hour_{hour}")
-                                        })
-                            }
-                            "Schedule:Day:Interval" => !matches!(
-                                field.0.as_str(),
-                                "schedule_type_limits_name" | "interpolate_to_timestep" | "data"
-                            ),
-                            "Schedule:Day:List" => !matches!(
-                                field.0.as_str(),
-                                "schedule_type_limits_name"
-                                    | "interpolate_to_timestep"
-                                    | "minutes_per_item"
-                                    | "extensions"
-                            ),
-                            "Schedule:Week:Daily" => !matches!(
-                                field.0.as_str(),
-                                "sunday_schedule_day_name"
-                                    | "monday_schedule_day_name"
-                                    | "tuesday_schedule_day_name"
-                                    | "wednesday_schedule_day_name"
-                                    | "thursday_schedule_day_name"
-                                    | "friday_schedule_day_name"
-                                    | "saturday_schedule_day_name"
-                                    | "holiday_schedule_day_name"
-                                    | "summerdesignday_schedule_day_name"
-                                    | "winterdesignday_schedule_day_name"
-                                    | "customday1_schedule_day_name"
-                                    | "customday2_schedule_day_name"
-                            ),
-                            "Schedule:Week:Compact" => field.0 != "data",
-                            "ZoneList" if source_zone_list_ingress => field.0 != "zones",
-                            "Space" if source_space_family => !spaces::known_field(&field.0),
-                            "SpaceList" if source_space_list_family => field.0 != "spaces",
-                            "ZoneGroup" if source_zone_group_ingress => !matches!(
-                                field.0.as_str(),
-                                "zone_list_name" | "zone_list_multiplier"
-                            ),
-                            "OtherEquipment" => !matches!(
-                                field.0.as_str(),
-                                "fuel_type"
-                                    | "zone_or_zonelist_or_space_or_spacelist_name"
-                                    | "schedule_name"
-                                    | "design_level_calculation_method"
-                                    | "design_level"
-                                    | "power_per_floor_area"
-                                    | "power_per_person"
-                                    | "fraction_latent"
-                                    | "fraction_radiant"
-                                    | "fraction_lost"
-                                    | "carbon_dioxide_generation_rate"
-                                    | "end_use_subcategory"
-                            ),
-                            _ => false,
-                        };
+                                "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
+                            )
+                            && match family.0.as_str() {
+                                "Material:InfraredTransparent" if source_irt_family => true,
+                                "People" if source_people_family => !people::known_field(&field.0),
+                                "SizingPeriod:DesignDay" if source_design_day_family => {
+                                    !design_days::known_field(&field.0)
+                                }
+                                "Output:Diagnostics" => field.0 != "diagnostics",
+                                "ScheduleTypeLimits" => !matches!(
+                                    field.0.as_str(),
+                                    "lower_limit_value"
+                                        | "upper_limit_value"
+                                        | "numeric_type"
+                                        | "unit_type"
+                                ),
+                                "Schedule:Constant" => !matches!(
+                                    field.0.as_str(),
+                                    "schedule_type_limits_name" | "hourly_value"
+                                ),
+                                "Schedule:Compact" => !matches!(
+                                    field.0.as_str(),
+                                    "schedule_type_limits_name" | "data"
+                                ),
+                                "Schedule:File" => !matches!(
+                                    field.0.as_str(),
+                                    "schedule_type_limits_name"
+                                        | "file_name"
+                                        | "column_number"
+                                        | "rows_to_skip_at_top"
+                                        | "number_of_hours_of_data"
+                                        | "column_separator"
+                                        | "interpolate_to_timestep"
+                                        | "minutes_per_item"
+                                        | "adjust_schedule_for_daylight_savings"
+                                ),
+                                "Schedule:Year" => !matches!(
+                                    field.0.as_str(),
+                                    "schedule_type_limits_name" | "schedule_weeks"
+                                ),
+                                "Schedule:Day:Hourly" => {
+                                    field.0 != "schedule_type_limits_name"
+                                        && !field
+                                            .0
+                                            .strip_prefix("hour_")
+                                            .and_then(|suffix| suffix.parse::<u32>().ok())
+                                            .is_some_and(|hour| {
+                                                (1..=24).contains(&hour)
+                                                    && field.0 == format!("hour_{hour}")
+                                            })
+                                }
+                                "Schedule:Day:Interval" => !matches!(
+                                    field.0.as_str(),
+                                    "schedule_type_limits_name"
+                                        | "interpolate_to_timestep"
+                                        | "data"
+                                ),
+                                "Schedule:Day:List" => !matches!(
+                                    field.0.as_str(),
+                                    "schedule_type_limits_name"
+                                        | "interpolate_to_timestep"
+                                        | "minutes_per_item"
+                                        | "extensions"
+                                ),
+                                "Schedule:Week:Daily" => !matches!(
+                                    field.0.as_str(),
+                                    "sunday_schedule_day_name"
+                                        | "monday_schedule_day_name"
+                                        | "tuesday_schedule_day_name"
+                                        | "wednesday_schedule_day_name"
+                                        | "thursday_schedule_day_name"
+                                        | "friday_schedule_day_name"
+                                        | "saturday_schedule_day_name"
+                                        | "holiday_schedule_day_name"
+                                        | "summerdesignday_schedule_day_name"
+                                        | "winterdesignday_schedule_day_name"
+                                        | "customday1_schedule_day_name"
+                                        | "customday2_schedule_day_name"
+                                ),
+                                "Schedule:Week:Compact" => field.0 != "data",
+                                "ZoneList" if source_zone_list_ingress => field.0 != "zones",
+                                "Space" if source_space_family => !spaces::known_field(&field.0),
+                                "SpaceList" if source_space_list_family => field.0 != "spaces",
+                                "ZoneGroup" if source_zone_group_ingress => !matches!(
+                                    field.0.as_str(),
+                                    "zone_list_name" | "zone_list_multiplier"
+                                ),
+                                "OtherEquipment" => !matches!(
+                                    field.0.as_str(),
+                                    "fuel_type"
+                                        | "zone_or_zonelist_or_space_or_spacelist_name"
+                                        | "schedule_name"
+                                        | "design_level_calculation_method"
+                                        | "design_level"
+                                        | "power_per_floor_area"
+                                        | "power_per_person"
+                                        | "fraction_latent"
+                                        | "fraction_radiant"
+                                        | "fraction_lost"
+                                        | "carbon_dioxide_generation_rate"
+                                        | "end_use_subcategory"
+                                ),
+                                _ => false,
+                            };
                     if !metadata {
                         return Err(format!(
                             "ordinary equipment field unavailable: {}.{}",

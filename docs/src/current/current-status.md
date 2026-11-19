@@ -44,7 +44,7 @@ already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122
 This inventory correction adds no physical evidence; retained116 is unchanged.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 279 paired physical cases and 12,900,616 reported values with zero
+contains 280 paired physical cases and 12,975,736 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
@@ -74,23 +74,25 @@ The original-IDF route supplies the same physical IDF to both actors and uses th
 
 Source199 Simple and Source200 Advanced remain accepted direct-epJSON pairs; Source203 retains its accepted Input04 original-IDF Advanced pair. The older Source199 v10 Advanced attempt remains at 31/34 gates with zero credit, and failed builds 201 (import parsing) and 202 (DSOA sizing input) remain separate zero-credit history.
 
-Source204 retains its active NoMass EOF default witness. Source207 adds one corrected Input07 original-IDF pair across five DesignDays, with one Native and one Source run, all 34 gates and 158 series/75,120 values passing unchanged policies. Three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit) and one FLOOR inside-convection coefficient differs (maximum 2.22e-16 W/m2-K, existing 1e-9 limit); zero point/RMSE failures and both meters are raw-exact. Actual Material Details rows preserve three distinct names: NBSP-only, `PLAIN` and NBSP-padded `PLAIN`. The active NBSP layer reports counted thermal absorptance 0.8125.
+Source204 retains its active NoMass EOF default witness; Source207 retains its corrected original-IDF names/Construction pair. Source208 adds one direct-epJSON pair across five DesignDays, with one Native and one Source run, all 34 gates and 158 series/75,120 values passing unchanged policies. Three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meters are raw-exact. Matching Material Details rows retain the three distinct NoMass names and active NBSP thermal absorptance 0.8125.
 
-The current Source207 snapshot passes workspace tests (5,051 passed, zero failed, two ignored) and all-target Clippy across all eleven packages. Six current QA commands execute three existing bodies; all twenty successful profile commands and five historical body executions retain their contexts without reuse or new test functions. The earlier partial workspace failure and Source205 support-stop/Source206 initialization-stop attempts remain zero-credit history.
+The current Source208 snapshot passes workspace tests (5,051 passed, zero failed, two ignored). Four current QA commands execute one existing body and ep_run all-target Clippy, with no historical/reused body credit or new test functions. The earlier Source207 all-package Clippy, partial workspace failure and Source205 support-stop/Source206 initialization-stop attempts retain their separate histories.
 
-Genuine original-IDF Construction F3 selects two effective layers while its complete raw final `PLAIN` tail remains held; this is reviewed CODE/count custody, without a Native private TotLayers observation or direct-JSON three-layer equivalence. Ancillary Roof support and ordinary initialization now preserve the actual selected material/name maps. NoMass count-selected defaults, DSOA uncounted-reference rules and separate AirGap checks retain their prior limits. Construction-name widening, unknown NoMass direct-JSON members, ComplexShade, positive-OA Humidistat, active window/CFS/EQL/shading, Source A expansion, annual runs, arbitrary legal combinations and full-object conformance remain outside this publication.
+Genuine original-IDF Construction F3 selects two effective layers while its complete raw final `PLAIN` tail remains held; no private Native TotLayers observation or format equivalence is claimed. Source208 direct epJSON instead consumes the full three-layer Wall recipe. Its ten undeclared primitive/nested/body-metadata NoMass members stay raw-owned and are ignored by projection; the five known properties remain strict, and body `name`/`idf_*` lookalikes do not replace map-key identity or counts. Earlier count-default, DSOA, AirGap and selected-map initialization boundaries remain held. Construction-name widening, field-NUL/comparator-order widening, ComplexShade, positive-OA Humidistat, active window/CFS/EQL/shading, Source A expansion, annual runs, arbitrary legal combinations and full-object conformance remain outside this publication.
 
-Complete streams and per-series results for this accepted pair are retained in
-`.runtime/porting/original-idf-NoMass-names-Construction-source/runtime03/`: `readback.json`,
+Complete streams and per-series results for Source208 are retained in
+`.runtime/porting/NoMass-direct-JSON-extra-members-source/runtime01/`: `readback.json`,
 `native/output/nativeout.eso`, `native/output/nativeout.mtr`,
 `source/output/eplusrs.eso` and `source/output/eplusrs.mtr`.
-The installed [v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py)
-accepts the actual CSV and IDF meter dictionaries. Its complete same-actor
-reread covers 158 series/75,120 values: four raw differences, zero point/RMSE
-failures and no engine launches. This engineering reread adds no case credit.
+The frozen V13 reader supplies the accepted current comparison. The installed
+[v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py) is
+original-IDF-only and correctly rejects this direct-epJSON input before reading
+streams; that auxiliary attempt adds no case, value or Source failure credit.
 
-With the retained local artifacts above, rerun the comparison from the repo
-root, choosing a new output directory each time:
+The following historical Source207 original-IDF example remains valid. Its
+same-actor reread covers 158 series/75,120 values, four raw differences and zero
+point/RMSE failures, without engine launches or new case credit. With those
+Source207 local artifacts, rerun from the repo root using a fresh directory:
 
 ```powershell
 python -B tools/porting/check_completed_reported_streams_v3.py --manifest ".runtime/porting/original-idf-NoMass-names-Construction-source/runtime03/reported-comparison-manifest02.json#7f2b8c5cd272e1e232cd02b469a2912cb53a5ed41b790e919a0c2e7422e3ed5c#4469" --output-dir .runtime/porting/reported-streams-user-check02
@@ -183,8 +185,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 207 recorded Source builds,
-175 with accepted pairs and 32 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 208 recorded Source builds,
+176 with accepted pairs and 32 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.

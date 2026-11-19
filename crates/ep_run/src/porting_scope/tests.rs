@@ -8503,6 +8503,106 @@ MaterialProperty:GlazingSpectralData,
                 if !ok { eprintln!("Construction final-alpha custody failed for ending {ending:?}"); }
                 ok
             });
+        // The official NoMass instance schema permits undeclared JSON members.
+        // Keep them in Raw/public SourceB statistics, never as getter operands.
+        let no_mass_extra_members_matches = {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            let family = "Material:NoMass";
+            let name = "QA EXTRA NO MASS";
+            [
+                serde_json::json!({"roughness":"Rough","thermal_resistance":0.2}),
+                serde_json::json!({"roughness":"VerySmooth","thermal_resistance":0.001,
+                    "thermal_absorptance":0.99999,"solar_absorptance":0.0,"visible_absorptance":1.0}),
+            ].iter().all(|operands| {
+                let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+                value[family] = serde_json::json!({"QA EXTRA NO MASS":operands});
+                let baseline = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+                let baseline_compiled = ep_compiler::compile_raw_model_for_source(&baseline);
+                let baseline_model = baseline_compiled.model.as_ref().unwrap();
+                let baseline_id = baseline_model.material_names.resolve(name).unwrap();
+                let baseline_material = baseline_model.materials.iter().find(|row|row.id==baseline_id).unwrap();
+                let baseline_ip = crate::ordinary_input_processor::resolve_source_b(&baseline).unwrap();
+                let baseline_projection = crate::ordinary_material_input::resolve_source(&baseline,&baseline_ip).unwrap();
+                [
+                    (serde_json::json!(null), S::Null),
+                    (serde_json::json!(true), S::Bool(true)),
+                    (serde_json::json!(17), S::Number("17".into())),
+                    (serde_json::json!(17.5), S::Number("17.5".into())),
+                    (serde_json::json!("ignored"), S::String("ignored".into())),
+                    (serde_json::json!([null,true]), S::Array(vec![S::Null,S::Bool(true)])),
+                    (serde_json::json!({"x":[null,true]}), S::Object(std::collections::BTreeMap::from([
+                        ("x".into(),S::Array(vec![S::Null,S::Bool(true)]))]))),
+                ].iter().all(|(extra,expected_stat)| {
+                    let mut value = value.clone();
+                    for key in ["source_note","name","idf_order","idf_max_fields","idf_max_extensible_fields"] {
+                        value[family][name][key] = extra.clone();
+                    }
+                    let raw = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+                    let raw_objects = raw.objects.clone();
+                    let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                    let mut ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                        .expect("only unconsumed Source JSON NoMass members are ignored");
+                    let capacity = ip.get_object_def_max_args(family).unwrap();
+                    let stats = ip.source_raw_object_fields(family,name).unwrap().clone();
+                    let projected = crate::ordinary_material_input::resolve_source(&raw,&ip)
+                        .expect("unchanged actual NoMass getter operand projection");
+                    let source_a = crate::ordinary_input_processor::resolve_source_a(&raw)
+                        .expect("the same extra-member rule belongs to both Source lanes");
+                    let a_projection = crate::ordinary_material_input::resolve_source(&raw,&source_a).unwrap();
+                    let raw_fields = &raw.objects[&ep_raw_model::ObjectType(family.into())]
+                        [&ep_raw_model::ObjectName(name.into())].fields;
+                    let ok = raw.is_epjson() && raw.objects==raw_objects && !compiled.has_errors()
+                        && (capacity.alphas,capacity.numerics,capacity.total().unwrap())==(2,4,6)
+                        && ["source_note","name","idf_order","idf_max_fields","idf_max_extensible_fields"].iter()
+                            .all(|key| raw_fields.contains_key(&ep_raw_model::FieldName((*key).into()))
+                                && stats.get(*key)==Some(expected_stat))
+                        && ip.source_raw_object_fields(family,name).is_ok_and(|fields| fields == &stats)
+                        && projected.no_mass==baseline_projection.no_mass
+                        && a_projection.no_mass==baseline_projection.no_mass
+                        && projected.no_mass.iter().all(|row|row.idf_max_fields.is_none())
+                        && compiled.model.as_ref().is_some_and(|model|model.material_names.resolve(name)
+                            .is_some_and(|id|model.materials.iter().any(|row|row.id==id
+                                && row.name==baseline_material.name && row.definition==baseline_material.definition)))
+                        && !ep_compiler::compile_raw_model(&raw).has_errors()
+                        && crate::ordinary_input_processor::resolve(&raw).is_err();
+                    if !ok { eprintln!("NoMass ignored JSON member mismatch for {operands:?}, {extra:?}"); }
+                    ok
+                })
+            }) && [
+                ("roughness",serde_json::json!(["Rough"])),
+                ("thermal_resistance",serde_json::json!(true)),
+                ("thermal_resistance",serde_json::json!(0.0009)),
+                ("thermal_absorptance",serde_json::json!(null)),
+                ("thermal_absorptance",serde_json::json!(0.0)),
+                ("thermal_absorptance",serde_json::json!(1.0)),
+                ("solar_absorptance",serde_json::json!({"value":0.5})),
+                ("solar_absorptance",serde_json::json!(-0.001)),
+                ("visible_absorptance",serde_json::json!([0.5])),
+                ("visible_absorptance",serde_json::json!(1.0001)),
+            ].iter().all(|(field,bad)| {
+                let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+                value[family] = serde_json::json!({"QA EXTRA NO MASS":{"roughness":"Rough","thermal_resistance":0.2}});
+                value[family][name][*field] = bad.clone();
+                value[family][name]["source_note"] = serde_json::json!({"ignored":true});
+                let raw = ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+                ep_compiler::compile_raw_model_for_source(&raw).has_errors()
+            }) && {
+                let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+                value[family] = serde_json::json!({"QA EXTRA NO MASS":{"roughness":"Rough","thermal_resistance":0.2}});
+                std::fs::write(&converted_path,value.to_string()).unwrap();
+                std::fs::write(&original_path,format!("{preamble}\nMaterial:NoMass,{name},Rough,0.2;")).unwrap();
+                let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(&converted_path,&original_path).unwrap();
+                !raw.is_epjson() && raw.validate_source_idf_object_custody(family).is_ok()
+                    && crate::ordinary_input_processor::resolve_source_b(&raw).is_ok()
+                    && ["idf_order","idf_max_fields","idf_max_extensible_fields"].iter().all(|key| {
+                        let mut bad = raw.clone();
+                        bad.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                            .get_mut(&ep_raw_model::ObjectName(name.into())).unwrap().fields
+                            .insert(ep_raw_model::FieldName((*key).into()),ep_raw_model::RawValue::String("not custody".into()));
+                        crate::ordinary_input_processor::resolve_source_b(&bad).is_err()
+                    })
+            }
+        };
         // The raw final EOF absorptance stays present, while actual Source
         // compilation supplies the effective NoMass owner selected by Native
         // Material286/293/300 returned-count guards. JSON/Legacy stay raw-valued.
@@ -8865,7 +8965,7 @@ MaterialProperty:GlazingSpectralData,
         std::fs::remove_file(converted_path).unwrap();
         std::fs::remove_file(original_path).unwrap();
         std::fs::remove_dir(home).unwrap();
-        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
+        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_extra_members_matches && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
             // This table proves its original 24 material/curve layouts. The two
             // OA layouts and DSOA have separate original-IDF existing-body cases.
             && observed_families.len() == 24

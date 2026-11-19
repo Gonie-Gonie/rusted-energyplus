@@ -174,6 +174,23 @@ fn resolve_ordered(
             let mut fields = BTreeMap::new();
             let mut idf_max_fields = None;
             for (field, value) in &row.fields {
+                // Native direct JSON reads only the declared NoMass operands.
+                // This includes ignoring idf_* lookalikes and a nested name;
+                // genuine Original-IDF custody still follows the existing path.
+                if source_order
+                    && raw.is_epjson()
+                    && family == "Material:NoMass"
+                    && ep_raw_model::source_idf_object_layout(family).is_some_and(
+                        |(_, fixed, _)| {
+                            fixed
+                                .iter()
+                                .skip(1)
+                                .all(|(name, _, _)| *name != field.0.as_str())
+                        },
+                    )
+                {
+                    continue;
+                }
                 if source_order
                     && !raw.is_epjson()
                     && ep_raw_model::source_idf_object_layout(family).is_some()
