@@ -94,6 +94,56 @@ class ComparisonBoundaryTests(unittest.TestCase):
                 with self.subTest(v2_policy=(group, field, value)), self.assertRaises(ValueError):
                     v2.policy(pin)
 
+    def test_csv_and_idf_mdd_bind_actual_noncumulative_authority(self):
+        import check_completed_reported_streams_v3 as v3
+
+        name = "Heating:EnergyTransfer"
+        csv_header = "Program Version,fixture\nVar Type (reported time step),Var Report Type,Variable Name [Units]\n"
+        idf_header = "! Program Version,fixture\n! Output:Meter Objects (applicable to this run)\n"
+        csv_line = "Zone,Meter,Heating:EnergyTransfer [J]"
+        idf_line = "Output:Meter,Heating:EnergyTransfer,hourly; !- [J]"
+        cumulative = "Output:Meter:Cumulative,Heating:EnergyTransfer,hourly; !- [J]"
+        regular = v3.meter_dictionary(csv_header + csv_line + "\n")
+        idf = v3.meter_dictionary(idf_header + idf_line + "\n" + cumulative + "\n")
+        rows = [{"meter": name, "units": "J", "frequency": "Hourly"}]
+        source_pin = {"path": "authored-unit-source.mdd", "sha256": "0" * 64, "bytes": 0}
+        native_pin = dict(source_pin, path="authored-unit-native.mdd")
+        # Pure authored text fixtures only; these pins are carried, not authenticated
+        # receipts or physical dictionaries. Production authenticates both pins.
+        for source, native in ((regular, regular), (idf, idf), (regular, idf), (idf, regular)):
+            with self.subTest(formats=(source["format"], native["format"])):
+                bound = v3.meter_bindings(source, native, rows, source_pin, native_pin)
+                authority = bound[(name, "J", "Hourly")]
+                self.assertEqual(authority["Source"]["raw_line"], source["rows"][(name, False)]["raw_line"])
+                self.assertEqual(authority["Native"]["raw_line"], native["rows"][(name, False)]["raw_line"])
+                self.assertNotIn("raw_line", authority)
+                self.assertEqual((authority["store_type"], authority["cumulative"]), ("Sum", False))
+                for actor, document in (("Source", source), ("Native", native)):
+                    companion = authority[actor]["cumulative_companion"]
+                    self.assertEqual(companion["raw_line"] if companion is not None else None,
+                                     cumulative if document["format"] == "IDF" else None)
+                membership = v3.MeterMembership(bound)
+                self.assertIn(idf_line, membership)
+                for query in (cumulative, idf_line.replace("[J]", "[W]"), idf_line.replace("hourly", "daily"),
+                              idf_line.replace(name, "Cooling:EnergyTransfer")):
+                    self.assertNotIn(query, membership)
+        for text in ("", csv_header + "HVAC,Meter," + name + " [J]\n",
+                     csv_header + csv_line + "\n" + csv_line + "\n",
+                     csv_header + csv_line + "\n" + csv_line.replace("[J]", "[W]") + "\n",
+                     csv_header + csv_line + ",extra\n", idf_header + idf_line.replace("hourly", "daily") + "\n",
+                     idf_header + idf_line + "\n" + cumulative + "\n" + cumulative + "\n",
+                     idf_header + idf_line + "\n" + cumulative.replace("[J]", "[W]") + "\n"):
+            with self.subTest(malformed=text), self.assertRaises(ValueError):
+                v3.meter_dictionary(text)
+        for changed in (v3.meter_dictionary(idf_header + cumulative + "\n"),
+                        v3.meter_dictionary(csv_header + csv_line.replace("[J]", "[W]") + "\n"),
+                        v3.meter_dictionary(csv_header + csv_line.replace(name, "Cooling:EnergyTransfer") + "\n")):
+            with self.subTest(mismatch=changed), self.assertRaises(ValueError):
+                v3.meter_bindings(regular, changed, rows, source_pin, native_pin)
+        for policies in (rows + rows, [dict(rows[0], frequency="TimeStep")]):
+            with self.subTest(policy=policies), self.assertRaises(ValueError):
+                v3.meter_bindings(regular, regular, policies, source_pin, native_pin)
+
     def test_changed_idf_is_rejected_before_any_comparison(self):
         case = json.loads(e.DEFAULT_CASE.read_text(encoding="utf8"))
         with tempfile.TemporaryDirectory() as td:

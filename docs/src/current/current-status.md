@@ -97,13 +97,26 @@ outside this publication.
 Complete streams and per-series results for this accepted pair are retained in
 `.runtime/porting/original-idf-window-six/runtime05/`: `readback.json`,
 `native/output/nativeout.eso`, `native/output/nativeout.mtr`,
-`source/output/eplusrs.eso` and `source/output/eplusrs.mtr`. The standalone v2
-reread did not complete because its frozen kernel rejects CSV MDD declarations;
-that tooling format gap is separate from the accepted frozen-v12 comparison.
-A genuinely reviewed ignored v3 prototype has now passed eight tests and the
-complete same-actor 158-series/75,120-value reread with three raw differences
-and zero point/RMSE failures, without launching either engine. Its tracked
-installation/publication and published usage/rerun command remain pending.
+`source/output/eplusrs.eso` and `source/output/eplusrs.mtr`.
+The installed [v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py)
+accepts the actual CSV and IDF meter dictionaries and passes eight tests.
+Its complete same-actor reread covers 158 series/75,120 values: three raw
+differences, zero point/RMSE failures, and no engine launches. The retained v2
+CSV dictionary rejection is a separate tooling format limit.
+
+With the retained local artifacts above, rerun the comparison from the repo
+root, choosing a new output directory each time:
+
+```powershell
+python -B tools/porting/check_completed_reported_streams_v3.py --manifest ".runtime/porting/original-idf-window-six/runtime05/reported-comparison-manifest01.json#e7b68d83a98ea191b6e46edc270eab226a5ef3878e159adb11846746a646c45f#4160" --output-dir .runtime/porting/reported-streams-user-check01
+```
+
+The output includes `report.md`, `comparison.json`, `series.csv`,
+`all-raw-differences.jsonl` and `all-tolerance-failures.jsonl`. This command
+rereads the recorded pair; it does not run either engine. For a different
+input/run, supply its own pinned v2-schema manifest, input, clock, policy and
+both actors' receipts and ESO/MTR/RDD/MDD artifacts. Local `.runtime` evidence
+is generated separately and is absent from a fresh clone.
 
 Direct Source epJSON retains the first comparator-equivalent member spelling
 and last whole subtree, checked by two Native convert-only observations and
