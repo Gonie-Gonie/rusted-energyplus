@@ -53,7 +53,7 @@ $testParameters = @{ Plan = $Plan }
 $clippyArguments = @("clippy", "--locked")
 if ($Full) {
     Write-Host "Check scope: full workspace quality and broader integration."
-    Write-Host "Rust tests run once for the workspace; child smokes retain their additional report/marker checks."
+    Write-Host "Workspace libraries, binaries and integration tests run once; doctests run separately. Child smokes retain their additional report/marker checks."
     $clippyArguments += "--workspace"
 }
 else {

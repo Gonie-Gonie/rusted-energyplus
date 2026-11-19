@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: docs
-last_reviewed: 2026-10-28
+last_reviewed: 2026-11-20
 ---
 
 # Developer Workflow
@@ -32,9 +32,13 @@ matching tests. Zero matches and ignored-only selections fail.
 
 At an integration milestone, `check -Full` runs workspace lint/tests and
 broader guards once. It rejects partial package/test selectors. `test` without
-selectors runs the workspace once. Reuse a successful unchanged run rather
-than repeating focused and full suites. The detailed change-to-test mapping
-and optional Native cohort are in [Contributing](../../../CONTRIBUTING.md#test-selection).
+selectors runs workspace library, binary and integration tests, then a separate
+workspace doctest command. Workspace Clippy still checks examples with
+`--all-targets`; these test commands avoid linking examples that would not run.
+Package, filter, `-Lib` and `-List` selections keep their explicit scope. Reuse
+a successful unchanged run rather than repeating focused and full suites. The
+detailed change-to-test mapping and optional Native cohort are in
+[Contributing](../../../CONTRIBUTING.md#test-selection).
 
 ## Inspect Inputs And State
 

@@ -26,10 +26,18 @@ if ($PSBoundParameters.ContainsKey("Package")) {
     }
 }
 
+$runWorkspaceDocs = $packages.Count -eq 0 -and -not $Filter -and -not $Lib -and -not $List
+$docArguments = @("test", "--locked", "--workspace", "--doc")
 $arguments = @("test", "--locked")
 if ($packages.Count -eq 0) {
     $arguments += "--workspace"
-    Write-Host "Test scope: entire workspace."
+    if ($runWorkspaceDocs) {
+        $arguments += @("--lib", "--bins", "--tests")
+        Write-Host "Test scope: workspace libraries, binaries and integration tests, then doctests."
+    }
+    else {
+        Write-Host "Test scope: entire workspace."
+    }
 }
 else {
     foreach ($name in $packages) { $arguments += @("-p", $name) }
@@ -43,6 +51,7 @@ $displayArguments = @($arguments | ForEach-Object {
 })
 Write-Host ("cargo " + ($displayArguments -join " "))
 if ($Plan) {
+    if ($runWorkspaceDocs) { Write-Host ("cargo " + ($docArguments -join " ")) }
     Write-Host "Plan only; no Cargo command was executed."
     return
 }
@@ -67,4 +76,10 @@ if ($Filter -and -not $List) {
     if ($passed -eq 0) {
         throw "Filter '$Filter' selected only ignored tests; no test executed. Use -List to inspect test names."
     }
+}
+
+if ($runWorkspaceDocs) {
+    Write-Host ("cargo " + ($docArguments -join " "))
+    & cargo @docArguments
+    if ($LASTEXITCODE -ne 0) { throw "cargo doctests failed" }
 }

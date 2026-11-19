@@ -31,6 +31,20 @@ are available. It includes the repository's comparison and documentation
 checks. Packaging and historical release verification are separate operations.
 `-Plan` shows the exact scope without starting Cargo or a comparison.
 
+Without test selectors, `test` and the test stage of `check -Full` execute two
+disjoint target sets:
+
+```powershell
+cargo test --locked --workspace --lib --bins --tests
+cargo test --locked --workspace --doc
+```
+
+This preserves library, binary, integration and documentation tests while
+avoiding the linking of examples that Cargo would only compile. `check -Full`
+still checks examples with workspace `clippy --all-targets`. Package, filter,
+`-Lib` and `-List` selections keep their explicit scope. Feature-gated Native
+cohorts still require their dedicated commands below.
+
 ## Test Selection
 
 | Change | During implementation | Before integration |
