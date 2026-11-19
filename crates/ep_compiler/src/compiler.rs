@@ -4484,6 +4484,67 @@ impl<'a> Compiler<'a> {
     fn parse_nomass_materials(&mut self, model: &mut TypedModel) {
         const OBJECT_TYPE: &str = "Material:NoMass";
         for (name, object) in self.objects(OBJECT_TYPE) {
+            let source_json_no_mass = self.source_file_declarations && self.raw_model.is_epjson();
+            let maximum = if source_json_no_mass {
+                Some(
+                    [
+                        "name",
+                        "roughness",
+                        "thermal_resistance",
+                        "thermal_absorptance",
+                        "solar_absorptance",
+                        "visible_absorptance",
+                    ]
+                    .iter()
+                    .enumerate()
+                    .fold(3usize, |count, (index, field)| {
+                        if object.fields.contains_key(&FieldName((*field).into())) {
+                            count.max(index + 1)
+                        } else {
+                            count
+                        }
+                    }),
+                )
+            } else {
+                self.source_original_fixed_maximum(OBJECT_TYPE, &object)
+            };
+            let object = if source_json_no_mass {
+                let mut queried = RawObject {
+                    fields: std::collections::BTreeMap::new(),
+                    source_span: object.source_span.clone(),
+                };
+                let mut ambiguous = false;
+                for (field, value) in &object.fields {
+                    let key = ep_model::source_json_c_string_prefix(&field.0);
+                    if matches!(
+                        key,
+                        "roughness"
+                            | "thermal_resistance"
+                            | "thermal_absorptance"
+                            | "solar_absorptance"
+                            | "visible_absorptance"
+                    ) && queried
+                        .fields
+                        .insert(FieldName(key.into()), value.clone())
+                        .is_some()
+                    {
+                        self.error(
+                            "SourceFieldLookupUnavailable",
+                            OBJECT_TYPE,
+                            Some(&name),
+                            Some(&field.0),
+                            "uncoalesced Source NoMass field aliases".into(),
+                        );
+                        ambiguous = true;
+                    }
+                }
+                if ambiguous {
+                    continue;
+                }
+                queried
+            } else {
+                object
+            };
             let roughness = self.required_material_roughness(OBJECT_TYPE, &name, &object);
             let thermal_resistance_m2_k_per_w = self.required_number_minimum(
                 OBJECT_TYPE,
@@ -4494,7 +4555,7 @@ impl<'a> Compiler<'a> {
                 true,
             );
             let mut surface = self.opaque_surface_properties(OBJECT_TYPE, &name, &object);
-            if let Some(maximum) = self.source_original_fixed_maximum(OBJECT_TYPE, &object) {
+            if let Some(maximum) = maximum {
                 // Native Material286/293/300 gates the three effective owners
                 // by NumNums, after getObjectItem has filled every raw slot.
                 if maximum < 4 {

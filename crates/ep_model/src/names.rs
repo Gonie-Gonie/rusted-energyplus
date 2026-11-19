@@ -2,6 +2,14 @@
 
 use std::collections::BTreeMap;
 
+/// C-string prefix used by explicit Source declared-field lookups.
+/// Keep retained Raw keys and exact field-count comparisons unchanged. This
+/// performs neither case folding nor alphanumeric digit-run comparison.
+#[must_use]
+pub fn source_json_c_string_prefix(value: &str) -> &str {
+    value.split_once('\0').map_or(value, |(prefix, _)| prefix)
+}
+
 /// Normalized name used only during compile, diagnostics, and export.
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct NormalizedName(pub String);

@@ -53,6 +53,7 @@ pub struct SelectedInputProcessor {
     unused_inputs: BTreeSet<(String, String)>,
     // Same original epJSON operands, not computed statistics or a readiness flag.
     statistics_input: Option<SourceInputStatisticsInput>,
+    source_direct_json_no_mass_fields: bool,
     original_idf_fixed_fields: BTreeMap<String, Vec<(String, bool, String)>>,
     original_idf_extension_fields: BTreeMap<String, Vec<(String, bool, String)>>,
 }
@@ -134,6 +135,7 @@ impl SelectedInputProcessor {
             families,
             unused_inputs,
             statistics_input: None,
+            source_direct_json_no_mass_fields: false,
             original_idf_fixed_fields: BTreeMap::new(),
             original_idf_extension_fields: BTreeMap::new(),
         })

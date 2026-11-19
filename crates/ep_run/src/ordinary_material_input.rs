@@ -174,6 +174,13 @@ fn resolve_ordered(
             let mut fields = BTreeMap::new();
             let mut idf_max_fields = None;
             for (field, value) in &row.fields {
+                let source_json_no_mass =
+                    source_order && raw.is_epjson() && family == "Material:NoMass";
+                let projected_key = if source_json_no_mass {
+                    ep_model::source_json_c_string_prefix(&field.0)
+                } else {
+                    field.0.as_str()
+                };
                 // Native direct JSON reads only the declared NoMass operands.
                 // This includes ignoring idf_* lookalikes and a nested name;
                 // genuine Original-IDF custody still follows the existing path.
@@ -185,7 +192,7 @@ fn resolve_ordered(
                             fixed
                                 .iter()
                                 .skip(1)
-                                .all(|(name, _, _)| *name != field.0.as_str())
+                                .all(|(name, _, _)| *name != projected_key)
                         },
                     )
                 {
@@ -374,7 +381,13 @@ fn resolve_ordered(
                         ));
                     }
                 };
-                fields.insert(field.0.clone(), value);
+                if source_json_no_mass {
+                    if fields.insert(projected_key.into(), value).is_some() {
+                        return Err("uncoalesced Source NoMass field aliases".into());
+                    }
+                } else {
+                    fields.insert(field.0.clone(), value);
+                }
             }
             if !raw.is_epjson()
                 && (matches!(

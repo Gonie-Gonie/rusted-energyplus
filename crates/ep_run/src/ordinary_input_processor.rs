@@ -94,6 +94,17 @@ fn project(
     input
         .retain_source_input_statistics(statistics)
         .map_err(|error| error.to_string())?;
+    if source_json_order
+        && raw.is_epjson()
+        && raw
+            .objects
+            .get(&ep_raw_model::ObjectType("Material:NoMass".into()))
+            .is_some_and(|rows| !rows.is_empty())
+    {
+        input
+            .retain_source_direct_json_no_mass_fields()
+            .map_err(|error| error.to_string())?;
+    }
     Ok(input)
 }
 

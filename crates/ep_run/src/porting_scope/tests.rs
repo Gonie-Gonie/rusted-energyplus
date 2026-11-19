@@ -8655,6 +8655,146 @@ MaterialProperty:GlazingSpectralData,
                     })
             }
         };
+        // Native JSON lookup uses C-string aliases, while direct maxF compares
+        // retained complete keys. These are CODE-derived cases, not observations.
+        let no_mass_nul_fields_match = {
+            use ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue as S;
+            use ep_runtime::heat_balance::selected_project_data::ProjectInputValue as V;
+            let family = "Material:NoMass";
+            let name = "QA NUL NO MASS";
+            [
+                (r#"{"roughness":"Rough","thermal_resistance\u0000tail":0.2}"#,
+                    "thermal_resistance\0tail", "0.2", "Rough", None, None, [0.9_f64,0.7,0.7], 0),
+                (r#"{"roughness":"Rough","thermal_resistance":0.2,"thermal_absorptance\u0000tail":0.8125}"#,
+                    "thermal_absorptance\0tail", "0.8125", "Rough", Some(0.8125), None, [0.9,0.7,0.7], 1),
+                (r#"{"roughness":"Rough","thermal_resistance":0.2,"thermal_absorptance\u0000tail":0.8125,"visible_absorptance":0.5}"#,
+                    "thermal_absorptance\0tail", "0.8125", "Rough", Some(0.8125), Some(0.5), [0.8125,0.7,0.5], 2),
+                (r#"{"roughness":"Rough","thermal_resistance":0.2,"thermal_absorptance":0.3,"thermal_absorptance\u0000tail":0.8125}"#,
+                    "thermal_absorptance", "0.8125", "Rough", Some(0.8125), None, [0.8125,0.7,0.7], 1),
+                (r#"{"roughness":"Rough","thermal_resistance":0.2,"thermal_absorptance\u0000tail":0.3,"thermal_absorptance":0.8125}"#,
+                    "thermal_absorptance\0tail", "0.8125", "Rough", Some(0.8125), None, [0.9,0.7,0.7], 1),
+                (r#"{"roughness":"Rough","thermal_resistance":0.2,"source_note":{"stale":17},"source_note\u0000tail":{"x\u0000tail":[null,true]}}"#,
+                    "source_note", "", "Rough", None, None, [0.9,0.7,0.7], 0),
+                (r#"{"roughness":"Rough","thermal_resistance":0.2,"Thermal_Absorptance":0.8125,"Solar_Absorptance\u0000tail":0.3125}"#,
+                    "Thermal_Absorptance", "0.8125", "Rough", None, None, [0.9,0.7,0.7], 0),
+                (r#"{"roughness\u0000tail":"VerySmooth","thermal_resistance":0.2}"#,
+                    "roughness\0tail", "", "VerySmooth", None, None, [0.9,0.7,0.7], 0),
+            ].iter().all(|(members, retained, token, roughness, thermal, visible, effective, present)| {
+                let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+                value[family] = serde_json::json!({"QA NUL NO MASS":"__NO_MASS_NUL_FIELDS__"});
+                let text = value.to_string().replace(r#""__NO_MASS_NUL_FIELDS__""#,members);
+                let raw = ep_raw_model::parse_epjson_str_for_source(&text).unwrap();
+                let before = raw.objects.clone();
+                let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+                let fields = &raw.objects[&ep_raw_model::ObjectType(family.into())]
+                    [&ep_raw_model::ObjectName(name.into())].fields;
+                let retained_value = fields.get(&ep_raw_model::FieldName((*retained).into()));
+                let retained_matches = if retained == &"source_note" {
+                    retained_value == Some(&ep_raw_model::RawValue::Object(std::collections::BTreeMap::from([
+                        (ep_raw_model::FieldName("x\0tail".into()),ep_raw_model::RawValue::Array(vec![
+                            ep_raw_model::RawValue::Null,ep_raw_model::RawValue::Bool(true)]))])))
+                } else if retained == &"roughness\0tail" {
+                    retained_value == Some(&ep_raw_model::RawValue::String((*roughness).into()))
+                } else {
+                    retained_value == Some(&ep_raw_model::RawValue::Number((*token).into()))
+                };
+                let query_spelling_matches = if *retained == "thermal_absorptance" {
+                    !fields.contains_key(&ep_raw_model::FieldName("thermal_absorptance\0tail".into()))
+                } else if *retained == "thermal_absorptance\0tail" {
+                    !fields.contains_key(&ep_raw_model::FieldName("thermal_absorptance".into()))
+                } else { true };
+                let typed_matches = compiled.model.as_ref().is_some_and(|model|model.material_names.resolve(name)
+                    .is_some_and(|id|model.materials.iter().any(|row|row.id==id && match &row.definition {
+                        ep_model::MaterialDefinition::NoMass(properties) => properties.thermal_resistance_m2_k_per_w.to_bits()==0.2_f64.to_bits()
+                            && [properties.surface.thermal_absorptance,properties.surface.solar_absorptance,
+                                properties.surface.visible_absorptance].map(f64::to_bits)==effective.map(f64::to_bits),
+                        _ => false,
+                    })));
+                let lanes_match = [false,true].iter().all(|source_a| {
+                    let input = if *source_a {crate::ordinary_input_processor::resolve_source_a(&raw)}
+                        else {crate::ordinary_input_processor::resolve_source_b(&raw)}
+                        .expect("genuine direct Source NoMass NUL query admission");
+                    let projection = crate::ordinary_material_input::resolve_source(&raw,&input).unwrap();
+                    let operand = &projection.no_mass[0];
+                    let stats = input.source_raw_object_fields(family,name).unwrap();
+                    let mut statistics = ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                    input.report_source_idf_records_stats(&mut statistics).unwrap();
+                    let mut baseline_value:serde_json::Value=serde_json::from_str(base).unwrap();
+                    baseline_value[family]=serde_json::json!({"QA NUL NO MASS":{"roughness":"Rough","thermal_resistance":0.2}});
+                    let baseline_raw=ep_raw_model::parse_epjson_str_for_source(&baseline_value.to_string()).unwrap();
+                    let baseline_ip=if *source_a {crate::ordinary_input_processor::resolve_source_a(&baseline_raw)}
+                        else {crate::ordinary_input_processor::resolve_source_b(&baseline_raw)}.unwrap();
+                    let mut baseline_statistics=ep_runtime::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+                    baseline_ip.report_source_idf_records_stats(&mut baseline_statistics).unwrap();
+                    let retained_stat = if *source_a { true } else if retained == &"source_note" {
+                        stats.get(*retained)==Some(&S::Object(std::collections::BTreeMap::from([
+                            ("x\0tail".into(),S::Array(vec![S::Null,S::Bool(true)]))])))
+                    } else if retained == &"roughness\0tail" {
+                        stats.get(*retained)==Some(&S::String((*roughness).into()))
+                    } else { stats.get(*retained)==Some(&S::Number((*token).into())) };
+                    stats.len()==fields.len() && stats.keys().all(|key|fields.contains_key(&ep_raw_model::FieldName(key.clone())))
+                        && retained_stat && operand.idf_max_fields.is_none()
+                        && operand.fields.get("roughness")==Some(&V::String((*roughness).into()))
+                        && operand.fields.get("thermal_resistance")==Some(&V::Number(0.2))
+                        && operand.fields.get("thermal_absorptance")==thermal.map(V::Number).as_ref()
+                        && operand.fields.get("visible_absorptance")==visible.map(V::Number).as_ref()
+                        && !operand.fields.keys().any(|key|key.contains('\0') || key=="source_note" || key=="Thermal_Absorptance")
+                        && statistics.number_defaulted_fields==baseline_statistics.number_defaulted_fields-*present
+                        && statistics.total_fields_with_defaults==baseline_statistics.total_fields_with_defaults
+                        && statistics.number_input_records==baseline_statistics.number_input_records
+                });
+                let legacy = ep_raw_model::parse_epjson_str(&text).unwrap();
+                let ok=retained_matches && query_spelling_matches && !compiled.has_errors()
+                    && typed_matches && lanes_match && raw.objects==before
+                    && crate::ordinary_input_processor::resolve(&legacy).is_err();
+                if !ok {eprintln!("NoMass NUL query/count/statistics mismatch: {members}");}
+                ok
+            }) && [
+                ("roughness\0tail","roughness",serde_json::json!(true)),
+                ("thermal_resistance\0tail","thermal_resistance",serde_json::json!(null)),
+                ("thermal_resistance\0tail","thermal_resistance",serde_json::json!(false)),
+                ("thermal_resistance\0tail","thermal_resistance",serde_json::json!(0.0009)),
+                ("thermal_absorptance\0tail","thermal_absorptance",serde_json::json!(null)),
+                ("thermal_absorptance\0tail","thermal_absorptance",serde_json::json!({"value":0.5})),
+                ("thermal_absorptance\0tail","thermal_absorptance",serde_json::json!(1.0)),
+                ("solar_absorptance\0tail","solar_absorptance",serde_json::json!(-0.001)),
+                ("visible_absorptance\0tail","visible_absorptance",serde_json::json!([0.5])),
+                ("visible_absorptance\0tail","visible_absorptance",serde_json::json!(1.0001)),
+            ].iter().all(|(key,declared,bad)| {
+                let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
+                value[family]=serde_json::json!({"QA NUL NO MASS":{"roughness":"Rough","thermal_resistance":0.2}});
+                let fields=value[family][name].as_object_mut().unwrap();
+                fields.remove(*declared);
+                fields.insert((*key).into(),bad.clone());
+                let raw=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).unwrap();
+                ep_compiler::compile_raw_model_for_source(&raw).has_errors()
+                    && [crate::ordinary_input_processor::resolve_source_a(&raw),crate::ordinary_input_processor::resolve_source_b(&raw)]
+                        .iter().all(|input|match input {
+                            Err(_) => true,
+                            Ok(input) => crate::ordinary_material_input::resolve_source(&raw,input).is_err(),
+                        })
+            }) && {
+                let mut value:serde_json::Value=serde_json::from_str(base).unwrap();
+                value["Material:NoMass\0tail"]=serde_json::json!({"QA NUL NO MASS":{"roughness":"Rough","thermal_resistance":0.2}});
+                let family_fence=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).is_err();
+                value.as_object_mut().unwrap().remove("Material:NoMass\0tail");
+                let building_name=value["Building"].as_object().unwrap().keys().next().unwrap().clone();
+                value["Building"][&building_name]["unknown\0tail"]=serde_json::json!(null);
+                let other_family_fence=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).is_err();
+                value["Building"][&building_name].as_object_mut().unwrap().remove("unknown\0tail");
+                value[family]=serde_json::json!({"QA NUL NO MASS":{"roughness":"Rough","thermal_resistance":0.2,
+                    "source_note":{"X0":0,"X2147483648":0}}});
+                let strict_order_fence=ep_raw_model::parse_epjson_str_for_source(&value.to_string()).is_err();
+                value[family]=serde_json::json!({"QA NUL NO MASS":{"roughness":"Rough","thermal_resistance":0.2,
+                    "thermal_absorptance\0tail":0.8125}});
+                std::fs::write(&converted_path,value.to_string()).unwrap();
+                std::fs::write(&original_path,format!("{preamble}\nMaterial:NoMass,{name},Rough,0.2;")).unwrap();
+                let original=ep_raw_model::load_epjson_file_with_idf_order_for_source(&converted_path,&original_path).unwrap();
+                family_fence && other_family_fence && strict_order_fence && !original.is_epjson()
+                    && original.validate_source_idf_object_custody(family).is_ok()
+                    && crate::ordinary_input_processor::resolve_source_b(&original).is_err()
+            }
+        };
         // Original Construction names use the real shared layout/order/F path.
         let construction_original_names_match = [["\u{b}","C"],["\u{a0}","C"],["C","\u{a0}C"],["C","C\u{a0}"]]
             .iter().all(|names| {
@@ -9058,7 +9198,7 @@ MaterialProperty:GlazingSpectralData,
         std::fs::remove_file(converted_path).unwrap();
         std::fs::remove_file(original_path).unwrap();
         std::fs::remove_dir(home).unwrap();
-        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_extra_members_matches && construction_original_names_match && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
+        matches && dsoa_ingress_matches && air_gap_eof_matches && no_mass_native_name_matches && construction_eof_matches && no_mass_extra_members_matches && no_mass_nul_fields_match && construction_original_names_match && no_mass_effective_matches && dsoa_uncounted_reference_matches && no_mass_support_matches
             // This table proves its original 24 material/curve layouts. The two
             // OA layouts and DSOA have separate original-IDF existing-body cases.
             && observed_families.len() == 24

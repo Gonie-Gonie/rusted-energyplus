@@ -978,7 +978,14 @@ fn resolve_raw(
             {
                 return Err(format!("blank ordinary {} name", family.0));
             }
+            let source_json_no_mass =
+                source_calendar_ingress && raw.is_epjson() && family.0 == "Material:NoMass";
             for (field, value) in &object.fields {
+                let field_name = if source_json_no_mass {
+                    ep_model::source_json_c_string_prefix(&field.0)
+                } else {
+                    field.0.as_str()
+                };
                 if source_b_ingress
                     && family.0 == "ZoneHVAC:IdealLoadsAirSystem"
                     && field.0 == "dehumidification_control_type"
@@ -986,7 +993,7 @@ fn resolve_raw(
                 {
                     return Err(error.into());
                 }
-                if !admitted_field(&family.0, &field.0, value, source_calendar_ingress)
+                if !admitted_field(&family.0, field_name, value, source_calendar_ingress)
                     // Reserved bookkeeping never becomes a physical getter operand.
                     && !(source_original_idf_metadata
                         && matches!(
@@ -1060,10 +1067,7 @@ fn resolve_raw(
                         && ep_raw_model::source_idf_object_layout(&family.0).is_some_and(
                             |(_, fixed, _)| {
                                 // Name is the object-map key, not an instance operand.
-                                fixed
-                                    .iter()
-                                    .skip(1)
-                                    .all(|(name, _, _)| *name != field.0.as_str())
+                                fixed.iter().skip(1).all(|(name, _, _)| *name != field_name)
                             },
                         ))
                         || source_calendar_ingress
@@ -1210,7 +1214,18 @@ fn resolve_raw(
             for &required in required_fields(&family.0) {
                 // Meter keys are required strings but the schema has no
                 // minLength: an authored empty key reaches the real not-found warning.
-                let required_is_missing = if (matches!(
+                let required_value = if source_json_no_mass {
+                    object
+                        .fields
+                        .iter()
+                        .find(|(key, _)| ep_model::source_json_c_string_prefix(&key.0) == required)
+                        .map(|(_, value)| value)
+                } else {
+                    field(object, required)
+                };
+                let required_is_missing = if source_json_no_mass {
+                    required_value.is_none_or(blank)
+                } else if (matches!(
                     family.0.as_str(),
                     "Output:Meter" | "Output:Meter:MeterFileOnly"
                 ) && required == "key_name")

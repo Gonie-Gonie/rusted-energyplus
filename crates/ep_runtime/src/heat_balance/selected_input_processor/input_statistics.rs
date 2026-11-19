@@ -77,6 +77,7 @@ fn process_field(
     field: &SchemaField,
     raw: &SourceInputStatisticsFields,
     output: &mut SourceOutputPreScan,
+    source_no_mass_query: bool,
 ) -> Result<(), SelectedInputUnavailable> {
     let mut has_default = false;
     let mut can_be_autosized = false;
@@ -101,7 +102,14 @@ fn process_field(
             }
         }
     }
-    if let Some(value) = raw.get(field.name) {
+    let value = if source_no_mass_query {
+        raw.iter()
+            .find(|(key, _)| ep_model::source_json_c_string_prefix(key) == field.name)
+            .map(|(_, value)| value)
+    } else {
+        raw.get(field.name)
+    };
+    if let Some(value) = value {
         if let SourceInputStatisticsValue::String(value) = value {
             if can_be_autosized && value == "Autosize" {
                 increment(&mut output.number_autosized_fields)?;
@@ -176,6 +184,78 @@ impl SelectedInputProcessor {
         }
         self.statistics_input = Some(raw);
         Ok(())
+    }
+
+    /// Retain the explicit direct-JSON NoMass field-query policy after genuine
+    /// Source projection has transferred the same raw shapes and object order.
+    /// No values, defaults, counts or readiness state are manufactured here.
+    ///
+    /// # Errors
+    /// Rejects repeated retention, Original layout, missing raw/order/schema
+    /// custody or uncoalesced declared-field aliases.
+    pub fn retain_source_direct_json_no_mass_fields(
+        &mut self,
+    ) -> Result<(), SelectedInputUnavailable> {
+        const FAMILY: &str = "Material:NoMass";
+        if self.source_direct_json_no_mass_fields
+            || self.original_idf_fixed_fields.contains_key(FAMILY)
+        {
+            return Err(SelectedInputUnavailable::Association);
+        }
+        let definition = self
+            .definitions
+            .get(FAMILY)
+            .ok_or(SelectedInputUnavailable::Association)?;
+        if definition.alpha_fields != 2
+            || definition.numeric_fields != 4
+            || definition.alpha_extensions != 0
+            || definition.numeric_extensions != 0
+            || definition.extension.is_some()
+        {
+            return Err(SelectedInputUnavailable::Association);
+        }
+        let raw = self
+            .statistics_input
+            .as_ref()
+            .ok_or(SelectedInputUnavailable::Association)?;
+        let rows = raw
+            .objects
+            .get(FAMILY)
+            .ok_or(SelectedInputUnavailable::Association)?;
+        let order = raw
+            .object_order
+            .get(FAMILY)
+            .ok_or(SelectedInputUnavailable::Association)?;
+        if rows.is_empty()
+            || order.len() != rows.len()
+            || order.iter().any(|name| !rows.contains_key(name))
+        {
+            return Err(SelectedInputUnavailable::Association);
+        }
+        for fields in rows.values() {
+            for field in [
+                "roughness",
+                "thermal_resistance",
+                "thermal_absorptance",
+                "solar_absorptance",
+                "visible_absorptance",
+            ] {
+                if fields
+                    .keys()
+                    .filter(|key| ep_model::source_json_c_string_prefix(key) == field)
+                    .count()
+                    > 1
+                {
+                    return Err(SelectedInputUnavailable::Association);
+                }
+            }
+        }
+        self.source_direct_json_no_mass_fields = true;
+        Ok(())
+    }
+
+    pub(crate) fn uses_source_direct_json_no_mass_fields(&self) -> bool {
+        self.source_direct_json_no_mass_fields
     }
 
     /// Borrow retained original object fields for a later genuine Source getter.
@@ -308,7 +388,12 @@ impl SelectedInputProcessor {
                         }
                         continue;
                     }
-                    process_field(field, fields, output)?;
+                    process_field(
+                        field,
+                        fields,
+                        output,
+                        self.source_direct_json_no_mass_fields && family_name == "Material:NoMass",
+                    )?;
                 }
                 if !definition.extensible.is_empty() {
                     let extension = definition
@@ -323,7 +408,7 @@ impl SelectedInputProcessor {
                                 return Err(SelectedInputUnavailable::Association);
                             };
                             for field in definition.extensible {
-                                process_field(field, extension_fields, output)?;
+                                process_field(field, extension_fields, output, false)?;
                             }
                         }
                     }

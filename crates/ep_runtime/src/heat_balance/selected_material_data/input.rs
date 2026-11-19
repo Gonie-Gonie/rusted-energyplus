@@ -1978,13 +1978,29 @@ impl SelectedMaterialInput {
             "Visible Absorptance",
         ];
         let max_fields = if self.source_is_epjson {
-            fields.iter().enumerate().fold(3, |count, (index, field)| {
-                if object.fields.contains_key(*field) {
-                    count.max(index + 1)
-                } else {
-                    count
-                }
-            })
+            if owners.input.uses_source_direct_json_no_mass_fields() {
+                let retained = owners
+                    .input
+                    .source_raw_object_fields("Material:NoMass", &object.object_name)
+                    .map_err(|_| {
+                        unavailable("actual Source NoMass direct-JSON raw count custody")
+                    })?;
+                fields.iter().enumerate().fold(3, |count, (index, field)| {
+                    if retained.contains_key(*field) {
+                        count.max(index + 1)
+                    } else {
+                        count
+                    }
+                })
+            } else {
+                fields.iter().enumerate().fold(3, |count, (index, field)| {
+                    if object.fields.contains_key(*field) {
+                        count.max(index + 1)
+                    } else {
+                        count
+                    }
+                })
+            }
         } else {
             object
                 .idf_max_fields

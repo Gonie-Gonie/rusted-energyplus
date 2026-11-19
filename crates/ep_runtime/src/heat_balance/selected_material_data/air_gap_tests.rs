@@ -475,6 +475,310 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             "Original AirGap EOF: F1/N0 count, filled N1 and same real material/report owner"
         );
     }
+    // Full Raw first-spelling states are supplied by the existing U07 producer
+    // table. This same existing getter/parent/report body checks their physical
+    // count boundaries using Native CODE expectations, not observed output.
+    let no_mass_nul_runtime_matches = [
+        (
+            "thermal_resistance\0tail",
+            None,
+            None,
+            1usize,
+            [0.9_f64, 0.7, 0.7],
+            6,
+        ),
+        (
+            "thermal_absorptance\0tail",
+            Some(0.8125),
+            None,
+            1,
+            [0.9, 0.7, 0.7],
+            5,
+        ),
+        (
+            "thermal_absorptance\0tail",
+            Some(0.8125),
+            Some(0.5),
+            4,
+            [0.8125, 0.7, 0.5],
+            4,
+        ),
+        (
+            "thermal_absorptance",
+            Some(0.8125),
+            None,
+            2,
+            [0.8125, 0.7, 0.7],
+            5,
+        ),
+        (
+            "thermal_absorptance\0tail",
+            Some(0.8125),
+            None,
+            1,
+            [0.9, 0.7, 0.7],
+            5,
+        ),
+        ("source_note", None, None, 1, [0.9, 0.7, 0.7], 6),
+        ("Thermal_Absorptance", None, None, 1, [0.9, 0.7, 0.7], 6),
+        ("roughness\0tail", None, None, 1, [0.9, 0.7, 0.7], 6),
+    ]
+    .iter()
+    .all(
+        |(retained, thermal, visible, expected_numbers, effective, expected_defaults)| {
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+            };
+            let (mut model, mut raw) = fixture(true, 0.15);
+            if let Some(value) = thermal {
+                raw.no_mass[0]
+                    .fields
+                    .insert("thermal_absorptance".into(), Value::Number(*value));
+            }
+            if let Some(value) = visible {
+                raw.no_mass[0]
+                    .fields
+                    .insert("visible_absorptance".into(), Value::Number(*value));
+            }
+            let MaterialDefinition::NoMass(typed) = &mut model.materials[1].definition else {
+                return false;
+            };
+            typed.surface = OpaqueSurfaceProperties {
+                thermal_absorptance: effective[0],
+                solar_absorptance: effective[1],
+                visible_absorptance: effective[2],
+            };
+            let mut retained_fields: BTreeMap<String, S> = BTreeMap::from([
+                ("roughness".into(), S::String("MediumRough".into())),
+                ("thermal_resistance".into(), S::Number("0.2".into())),
+            ]);
+            match *retained {
+                "thermal_resistance\0tail" => {
+                    retained_fields.remove("thermal_resistance");
+                    retained_fields.insert((*retained).into(), S::Number("0.2".into()));
+                }
+                "roughness\0tail" => {
+                    retained_fields.remove("roughness");
+                    retained_fields.insert((*retained).into(), S::String("MediumRough".into()));
+                }
+                "thermal_absorptance" | "thermal_absorptance\0tail" => {
+                    retained_fields.insert((*retained).into(), S::Number("0.8125".into()));
+                }
+                "source_note" => {
+                    retained_fields.insert(
+                        (*retained).into(),
+                        S::Object(BTreeMap::from([(
+                            "x\0tail".into(),
+                            S::Array(vec![S::Null, S::Bool(true)]),
+                        )])),
+                    );
+                }
+                "Thermal_Absorptance" => {
+                    retained_fields.insert((*retained).into(), S::Number("0.8125".into()));
+                    retained_fields
+                        .insert("Solar_Absorptance\0tail".into(), S::Number("0.3125".into()));
+                }
+                _ => return false,
+            }
+            if visible.is_some() {
+                retained_fields.insert("visible_absorptance".into(), S::Number("0.5".into()));
+            }
+            let families = [
+                ("Material", &raw.regular, 2, 7),
+                ("Material:NoMass", &raw.no_mass, 2, 4),
+                ("Material:AirGap", &raw.air_gaps, 1, 1),
+                (
+                    "Material:InfraredTransparent",
+                    &raw.infrared_transparent,
+                    1,
+                    0,
+                ),
+                ("WindowMaterial:Gas", &raw.window_gas, 2, 12),
+                (
+                    "WindowMaterial:SimpleGlazingSystem",
+                    &raw.simple_glazing,
+                    1,
+                    3,
+                ),
+            ];
+            let mut statistics = SourceInputStatisticsInput {
+                objects: BTreeMap::new(),
+                object_order: BTreeMap::new(),
+            };
+            for (family, objects, _, _) in &families {
+                statistics.object_order.insert(
+                    (*family).into(),
+                    objects.iter().map(|row| row.object_name.clone()).collect(),
+                );
+                statistics.objects.insert(
+                    (*family).into(),
+                    objects
+                        .iter()
+                        .map(|row| {
+                            let fields = if *family == "Material:NoMass" {
+                                retained_fields.clone()
+                            } else {
+                                row.fields
+                                    .iter()
+                                    .map(|(key, value)| {
+                                        let value = match value {
+                                            Value::String(value) => S::String(value.clone()),
+                                            Value::Number(value) => S::Number(value.to_string()),
+                                        };
+                                        (key.clone(), value)
+                                    })
+                                    .collect()
+                            };
+                            (row.object_name.clone(), fields)
+                        })
+                        .collect(),
+                );
+            }
+            let definitions = families
+                .iter()
+                .map(|(family, _, alphas, numerics)| SourceObjectDefinition {
+                    object_type: (*family).into(),
+                    alpha_fields: *alphas,
+                    numeric_fields: *numerics,
+                    alpha_extensions: 0,
+                    numeric_extensions: 0,
+                    extension: None,
+                })
+                .collect();
+            let shapes = statistics
+                .objects
+                .iter()
+                .map(|(family, objects)| {
+                    (
+                        family.clone(),
+                        SourceInputFamily::Objects(
+                            objects
+                                .iter()
+                                .map(|(name, fields)| SourceObjectShape {
+                                    object_name: name.clone(),
+                                    // Every top-level field in these authored rows has JSON size1;
+                                    // source_note is one object member, including its nested array.
+                                    field_sizes: fields
+                                        .keys()
+                                        .map(|key| (key.clone(), 1))
+                                        .collect(),
+                                })
+                                .collect(),
+                        ),
+                    )
+                })
+                .collect();
+            let mut input =
+                SelectedInputProcessor::from_admitted_input(definitions, shapes).unwrap();
+            let missing_raw_rejected = input
+                .clone()
+                .retain_source_direct_json_no_mass_fields()
+                .is_err();
+            input.retain_source_input_statistics(statistics).unwrap();
+            input.retain_source_direct_json_no_mass_fields().unwrap();
+            let repeated_policy_rejected =
+                input.retain_source_direct_json_no_mass_fields().is_err();
+            let mut input_counters =
+                crate::heat_balance::source_output_prescan::SourceOutputPreScan::default();
+            input
+                .report_source_idf_records_stats(&mut input_counters)
+                .unwrap();
+            let mut shortcut = SourceInputProcessorShortCut::default();
+            shortcut.allocate_from_input(&input).unwrap();
+            let mut scan = ReportScanState::default();
+            let globals = SelectedHeatBalanceGlobals::default();
+            let mut state = error_state();
+            let (mut errors, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+            let mut backend = SourceErrorBackend {
+                state: &mut state,
+                error_stream: Some(&mut errors),
+                console: &mut console,
+                out_unit1: None,
+                out_unit2: None,
+                f_message: None,
+                message_callback: None,
+                error_callback: None,
+                sqlite: None,
+            };
+            let mut errors_found = false;
+            let mut owners = MaterialDataOwners {
+                curves: None,
+                model: &model,
+                input: &mut input,
+                shortcut: &mut shortcut,
+                scan: &mut scan,
+                globals: &globals,
+                backend: &mut backend,
+                eio: &mut eio,
+                errors_found: &mut errors_found,
+                diagnostic_flags: None,
+            };
+            let mut data = SelectedMaterialData::default();
+            data.get_material_data(&raw, &mut owners).expect(
+                "actual NoMass getter/parent accepts exact Raw prefix and effective typed owner",
+            );
+            owners.shortcut.alpha_args.fill("stale".into());
+            owners.shortcut.numeric_args.fill(-123.0);
+            owners.shortcut.alpha_field_names.fill("stale".into());
+            owners.shortcut.numeric_field_names.fill("stale".into());
+            owners.shortcut.alpha_field_blanks.fill(true);
+            owners.shortcut.numeric_field_blanks.fill(false);
+            let counts = raw.get_no_mass_item(&raw.no_mass[0], &mut owners).unwrap();
+            let mut report = Vec::new();
+            data.write_material_reports(&model, &mut report).unwrap();
+            let ok = missing_raw_rejected
+                && repeated_policy_rejected
+                && counts == (2, *expected_numbers)
+                && owners.input.uses_source_direct_json_no_mass_fields()
+                && owners
+                    .input
+                    .source_raw_object_fields("Material:NoMass", "No mass")
+                    .unwrap()
+                    == &retained_fields
+                && owners.shortcut.alpha_args == ["NO MASS", "MEDIUMROUGH"]
+                && owners.shortcut.alpha_field_names == ["name", "roughness"]
+                && owners.shortcut.alpha_field_blanks == [false, false]
+                && owners.shortcut.numeric_args[..4]
+                    .iter()
+                    .map(|value| value.to_bits())
+                    .eq([0.2, thermal.unwrap_or(0.9), 0.7, visible.unwrap_or(0.7)]
+                        .map(f64::to_bits))
+                && owners.shortcut.numeric_field_blanks[..4]
+                    == [false, thermal.is_none(), true, visible.is_none()]
+                && owners.shortcut.numeric_field_names[..4]
+                    .iter()
+                    .map(String::as_str)
+                    .eq([
+                        "thermal_resistance",
+                        "thermal_absorptance",
+                        "solar_absorptance",
+                        "visible_absorptance",
+                    ])
+                && owners.shortcut.numeric_args[4..]
+                    .iter()
+                    .all(|value| value.to_bits() == 0)
+                && owners.shortcut.numeric_field_blanks[4..]
+                    .iter()
+                    .all(|value| *value)
+                && owners.shortcut.numeric_field_names[4..]
+                    .iter()
+                    .all(String::is_empty)
+                && !owners.input.is_object_unused("Material:NoMass", "No mass")
+                && data.resistance_only[&MaterialId(1)]
+                && data.nominal_r[1].to_bits() == 0.2_f64.to_bits()
+                && input_counters.number_defaulted_fields == *expected_defaults
+                && input_counters.total_fields_with_defaults == 6
+                && input_counters.number_input_records == 3
+                && !report.is_empty()
+                && !*owners.errors_found;
+            if !ok {
+                eprintln!(
+                    "NoMass retained Raw/count/fullfill mismatch: {retained:?}/{expected_numbers}"
+                );
+            }
+            ok
+        },
+    );
     // Native NoMass optional owners use returned NumNums, while all raw
     // scratch slots still fill. Expected effective properties below are CPP
     // guard/default controls, not observed Native Material or physics data.
@@ -564,6 +868,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                     .expect("actual NoMass report owner");
                 assert!(
                     counts == (2, expected_numbers)
+                        && no_mass_nul_runtime_matches
                         && owners.shortcut.alpha_args == ["NO MASS", "MEDIUMROUGH"]
                         && owners.shortcut.alpha_field_names
                             == (if epjson {
