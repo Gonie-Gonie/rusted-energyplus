@@ -59,7 +59,15 @@ impl SelectedMaterialData {
             let (alphas, numbers) = raw.get_window_drape_equivalent_layer_item(object, owners)?;
             // Generic min_fields4 includes Name; original required N2..N5 are
             // enforced by Source admission, not an invented primitive floor5.
-            if alphas != 1 || !(3..=13).contains(&numbers) {
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Drape:EquivalentLayer",
+                object,
+                owners,
+            )? {
+                Some(expected) => (alphas, numbers) != expected,
+                None => alphas != 1 || !(3..=13).contains(&numbers),
+            };
+            if invalid_counts {
                 return Err(unavailable("DrapeEQL1A13N/min4 primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

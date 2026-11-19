@@ -32,7 +32,9 @@ fn resolve_ordered(
     };
     if source_order {
         if !raw.is_epjson() {
-            crate::ordinary_equipment_input::source_b_validate_unused_roof_vegetation(raw)?;
+            for &family in ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES {
+                raw.validate_source_idf_object_custody(family)?;
+            }
         }
         let family = "MaterialProperty:GlazingSpectralData";
         let rows = raw.source_ordered_instances(family)?;
@@ -55,7 +57,19 @@ fn resolve_ordered(
             }
             let mut fields = BTreeMap::new();
             let mut extensions = Vec::new();
+            let mut idf_max_fields = None;
             for (field, value) in &row.fields {
+                if !raw.is_epjson() && field.0 == "idf_max_fields" {
+                    let RawValue::Number(token) = value else {
+                        return Err("Source spectral original-IDF fixed-field custody".into());
+                    };
+                    idf_max_fields = Some(
+                        token
+                            .parse::<usize>()
+                            .map_err(|_| "Source spectral original-IDF fixed-field custody")?,
+                    );
+                    continue;
+                }
                 if !crate::ordinary_equipment_input::source_b_spectral_data_known_field(&field.0) {
                     continue;
                 }
@@ -89,7 +103,7 @@ fn resolve_ordered(
                 object: ProjectInputObject {
                     object_name: name.0.clone(),
                     fields,
-                    idf_max_fields: None,
+                    idf_max_fields,
                 },
                 extensions,
             });
@@ -160,6 +174,20 @@ fn resolve_ordered(
             let mut fields = BTreeMap::new();
             let mut idf_max_fields = None;
             for (field, value) in &row.fields {
+                if source_order
+                    && !raw.is_epjson()
+                    && ep_raw_model::source_idf_object_layout(family).is_some()
+                    && field.0 == "idf_max_fields"
+                {
+                    let RawValue::Number(text) = value else {
+                        return Err("Material idf_max_fields numeric custody".into());
+                    };
+                    idf_max_fields = Some(
+                        text.parse::<usize>()
+                            .map_err(|_| "Material idf_max_fields usize custody")?,
+                    );
+                    continue;
+                }
                 // Native's direct-JSON named Gas getter reads only declared
                 // fields; Raw/IP retain every ignored member, including idf_*.
                 if source_order
@@ -241,20 +269,6 @@ fn resolve_ordered(
                         family, &field.0,
                     )
                 {
-                    continue;
-                }
-                if source_order
-                    && !raw.is_epjson()
-                    && family == "Material:RoofVegetation"
-                    && field.0 == "idf_max_fields"
-                {
-                    let RawValue::Number(text) = value else {
-                        return Err("Material idf_max_fields numeric custody".into());
-                    };
-                    idf_max_fields = Some(
-                        text.parse::<usize>()
-                            .map_err(|_| "Material idf_max_fields usize custody")?,
-                    );
                     continue;
                 }
                 if source_order
@@ -346,13 +360,10 @@ fn resolve_ordered(
                 fields.insert(field.0.clone(), value);
             }
             if !raw.is_epjson()
-                && matches!(
+                && (matches!(
                     family,
-                    "Material:NoMass"
-                        | "Material:AirGap"
-                        | "Material:InfraredTransparent"
-                        | "Material:RoofVegetation"
-                )
+                    "Material:NoMass" | "Material:AirGap" | "Material:InfraredTransparent"
+                ) || (source_order && ep_raw_model::source_idf_object_layout(family).is_some()))
                 && idf_max_fields.is_none()
             {
                 return Err(format!("actual {family} IDF physical field count absent"));

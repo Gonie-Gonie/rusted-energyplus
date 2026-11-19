@@ -290,7 +290,15 @@ impl SelectedMaterialData {
         }
         for object in &raw.window_blind {
             let (alphas, numbers) = raw.get_window_blind_item(object, owners)?;
-            if alphas != 2 || numbers != 27 {
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Blind",
+                object,
+                owners,
+            )? {
+                Some(expected) => (alphas, numbers) != expected,
+                None => alphas != 2 || numbers != 27,
+            };
+            if invalid_counts {
                 return Err(unavailable("Blind2A27N/min29 primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

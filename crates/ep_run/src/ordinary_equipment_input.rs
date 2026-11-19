@@ -183,7 +183,10 @@ pub(crate) fn source_b_positive_oa_prerequisite_error(raw: &RawModel) -> Option<
     let error = || {
         Some("SourceB positive OA requires one basic DSOA, distinct bare OA Node, no Humidistat and owned hard-limit, non-Humidistat humidity and basic DCV selectors".into())
     };
-    if !raw.is_epjson()
+    if (!raw.is_epjson()
+        && ["OutdoorAir:Node", "OutdoorAir:NodeList"]
+            .iter()
+            .any(|family| raw.validate_source_idf_object_custody(family).is_err()))
         || units.is_none_or(|rows| rows.len() != 1)
         || raw
             .objects
@@ -430,6 +433,17 @@ fn has_source_schedule_reference(raw: &RawModel, reference: &str) -> bool {
 /// Local authored-object prerequisites only. The existing full positive-OA
 /// validator calls this leaf after proving both real references; no reverse edge.
 fn source_b_authored_outdoor_air_node_prerequisite_error(raw: &RawModel) -> Option<String> {
+    let original_idf = !raw.is_epjson();
+    if original_idf
+        && ["OutdoorAir:Node", "OutdoorAir:NodeList"]
+            .iter()
+            .any(|family| raw.validate_source_idf_object_custody(family).is_err())
+    {
+        return Some(
+            "SourceB authored outdoor air original IDF requires actual recovered order/F/L custody"
+                .into(),
+        );
+    }
     let error = || {
         Some("SourceB authored outdoor air requires schema-shaped nameless lists and finite-height singles, owned DB/WB and wind schedules, and inactive no-AFN WPC alpha fields".into())
     };
@@ -442,7 +456,12 @@ fn source_b_authored_outdoor_air_node_prerequisite_error(raw: &RawModel) -> Opti
         if field(object, "nodes").is_some_and(|value| {
             !matches!(value, RawValue::Array(members) if members.iter().all(|member| {
                 matches!(member, RawValue::Object(fields)
-                    if matches!(fields.get(&FieldName("node_or_nodelist_name".into())), Some(RawValue::String(_))))
+                    if (!original_idf || fields.keys().all(|field| field.0 == "node_or_nodelist_name"))
+                        && match fields.get(&FieldName("node_or_nodelist_name".into())) {
+                            Some(RawValue::String(_)) => true,
+                            None => original_idf,
+                            _ => false,
+                        })
             }))
         }) {
             return error();
@@ -655,6 +674,10 @@ fn resolve_raw(
         space_lists::validate(raw)?;
     }
     if source_b_ingress {
+        // Original DSOA/AirGap counts use the same recovered Raw declaration.
+        // Direct epJSON and absent families keep the existing no-metadata route.
+        raw.validate_source_idf_object_custody("DesignSpecification:OutdoorAir")?;
+        raw.validate_source_idf_object_custody("Material:AirGap")?;
         source_b::validate_unused_analytic_curves(raw)?;
         simple_glazing::validate(raw)?;
         simple_glazing::validate_unused_spectral_average(raw)?;
@@ -685,7 +708,7 @@ fn resolve_raw(
         let source_space_list_family = source_space_list_ingress && family.0 == "SpaceList";
         let source_b_family = source_b_ingress && source_b::is_family(&family.0);
         let source_analytic_curve_family =
-            source_b_ingress && raw.is_epjson() && source_b::is_analytic_curve_family(&family.0);
+            source_b_ingress && source_b::is_analytic_curve_family(&family.0);
         let source_node_list_family = source_calendar_ingress && family.0 == "NodeList";
         let source_design_day_family =
             source_calendar_ingress && family.0 == "SizingPeriod:DesignDay";
@@ -842,6 +865,12 @@ fn resolve_raw(
         {
             return Err(format!("ordinary equipment requires unique {}", family.0));
         }
+        // The actual Source lane and retained original-IDF custody are
+        // family facts; do not revalidate the whole family for each field.
+        let source_original_idf_metadata = source_calendar_ingress
+            && !raw.is_epjson()
+            && ep_raw_model::source_idf_object_layout(&family.0).is_some()
+            && raw.validate_source_idf_object_custody(&family.0).is_ok();
         for (name, object) in objects {
             let source_empty_gain = source_space_list_ingress
                 && matches!(
@@ -940,8 +969,15 @@ fn resolve_raw(
                     return Err(error.into());
                 }
                 if !admitted_field(&family.0, &field.0, value, source_calendar_ingress)
+                    // Reserved bookkeeping never becomes a physical getter operand.
+                    && !(source_original_idf_metadata
+                        && matches!(
+                            field.0.as_str(),
+                            "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
+                        )
+                        && matches!(value, RawValue::Number(token) if token.parse::<usize>().is_ok()))
                     && !((source_b_family || source_compact_family)
-                        && source_b::admitted_field(&family.0, &field.0, value))
+                        && source_b::admitted_field(&family.0, &field.0, value, raw.is_epjson()))
                     && !(source_node_list_family
                         && source_node_lists::admitted_field(&field.0, value, raw.is_epjson()))
                     // Only direct JSON single-instance metadata is ignored by

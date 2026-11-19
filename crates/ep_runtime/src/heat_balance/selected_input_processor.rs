@@ -53,6 +53,8 @@ pub struct SelectedInputProcessor {
     unused_inputs: BTreeSet<(String, String)>,
     // Same original epJSON operands, not computed statistics or a readiness flag.
     statistics_input: Option<SourceInputStatisticsInput>,
+    original_idf_fixed_fields: BTreeMap<String, Vec<(String, bool, String)>>,
+    original_idf_extension_fields: BTreeMap<String, Vec<(String, bool, String)>>,
 }
 
 /// Independent Original alpha/numeric argument counts.
@@ -132,7 +134,171 @@ impl SelectedInputProcessor {
             families,
             unused_inputs,
             statistics_input: None,
+            original_idf_fixed_fields: BTreeMap::new(),
+            original_idf_extension_fields: BTreeMap::new(),
         })
+    }
+
+    /// Retain genuine Source original-IDF fixed/extension field metadata from ingress.
+    ///
+    /// # Errors
+    /// Rejects duplicate layouts or a layout inconsistent with the existing schema capacities.
+    pub fn retain_source_original_idf_fields(
+        &mut self,
+        family: &str,
+        fields: Vec<(String, bool, String)>,
+        extensions: Vec<(String, bool, String)>,
+    ) -> Result<(), SelectedInputUnavailable> {
+        let definition = self.source_object_definition(family)?;
+        let alphas = fields.iter().filter(|(_, alpha, _)| *alpha).count();
+        let numerics = fields.len().saturating_sub(alphas);
+        let ext_alphas = extensions.iter().filter(|(_, alpha, _)| *alpha).count();
+        let ext_numerics = extensions.len().saturating_sub(ext_alphas);
+        if (!fields.is_empty()
+            && fields
+                .first()
+                .is_none_or(|(name, alpha, label)| name != "name" || !*alpha || label != "Name"))
+            || (fields.is_empty()
+                && (definition.alpha_fields != 0
+                    || definition.numeric_fields != 0
+                    || extensions.is_empty()))
+            || fields
+                .iter()
+                .chain(&extensions)
+                .any(|(name, _, label)| name.is_empty() || label.is_empty())
+            || fields
+                .iter()
+                .map(|(name, _, _)| name)
+                .collect::<BTreeSet<_>>()
+                .len()
+                != fields.len()
+            || extensions
+                .iter()
+                .map(|(name, _, _)| name)
+                .collect::<BTreeSet<_>>()
+                .len()
+                != extensions.len()
+            || alphas != definition.alpha_fields
+            || numerics != definition.numeric_fields
+            || ext_alphas != definition.alpha_extensions
+            || ext_numerics != definition.numeric_extensions
+            || definition.extension.is_some() == extensions.is_empty()
+            || self.original_idf_fixed_fields.contains_key(family)
+        {
+            return Err(SelectedInputUnavailable::Association);
+        }
+        self.original_idf_fixed_fields.insert(family.into(), fields);
+        self.original_idf_extension_fields
+            .insert(family.into(), extensions);
+        Ok(())
+    }
+
+    pub(crate) fn source_original_idf_fixed_fields(
+        &self,
+        family: &str,
+    ) -> Option<&[(String, bool, String)]> {
+        self.original_idf_fixed_fields
+            .get(family)
+            .map(Vec::as_slice)
+    }
+
+    pub(crate) fn source_original_idf_argument_counts(
+        &self,
+        family: &str,
+        maximum: usize,
+        maximum_extensions: Option<usize>,
+        retained_rows: usize,
+    ) -> Result<SourceArgumentCounts, SelectedInputUnavailable> {
+        let fields = self
+            .original_idf_fixed_fields
+            .get(family)
+            .ok_or_else(|| SelectedInputUnavailable::Definition(family.into()))?;
+        let extensions = self
+            .original_idf_extension_fields
+            .get(family)
+            .ok_or_else(|| SelectedInputUnavailable::Definition(family.into()))?;
+        if extensions.is_empty() && retained_rows != 0
+            || !extensions.is_empty() && maximum_extensions.is_none()
+        {
+            return Err(SelectedInputUnavailable::Association);
+        }
+        let extra = extensions
+            .len()
+            .checked_mul(retained_rows)
+            .ok_or(SelectedInputUnavailable::Size)?;
+        let _total_fields = fields
+            .len()
+            .checked_add(extra)
+            .ok_or(SelectedInputUnavailable::Size)?;
+        let (mut alpha, mut numeric) = (0, 0);
+        let mut counts = SourceArgumentCounts::default();
+        for (position, (_, is_alpha, _)) in fields.iter().enumerate() {
+            if *is_alpha {
+                alpha += 1;
+                if position == 0 || position < maximum {
+                    counts.alphas = alpha;
+                }
+            } else {
+                numeric += 1;
+                if position < maximum {
+                    counts.numerics = numeric;
+                }
+            }
+        }
+        for (position, (_, is_alpha, _)) in extensions.iter().cycle().take(extra).enumerate() {
+            if *is_alpha {
+                alpha += 1;
+                if position < maximum_extensions.unwrap_or(0) {
+                    counts.alphas = alpha;
+                }
+            } else {
+                numeric += 1;
+                if position < maximum_extensions.unwrap_or(0) {
+                    counts.numerics = numeric;
+                }
+            }
+        }
+        counts.total()?;
+        Ok(counts)
+    }
+
+    pub(crate) fn source_original_idf_field_names(
+        &self,
+        family: &str,
+        retained_rows: usize,
+        alpha_names: &mut [String],
+        numeric_names: &mut [String],
+    ) -> Result<(), SelectedInputUnavailable> {
+        let fields = self
+            .original_idf_fixed_fields
+            .get(family)
+            .ok_or_else(|| SelectedInputUnavailable::Definition(family.into()))?;
+        let extensions = self
+            .original_idf_extension_fields
+            .get(family)
+            .ok_or_else(|| SelectedInputUnavailable::Definition(family.into()))?;
+        let extra = extensions
+            .len()
+            .checked_mul(retained_rows)
+            .ok_or(SelectedInputUnavailable::Size)?;
+        let (mut alpha, mut numeric) = (0, 0);
+        for (_, is_alpha, label) in fields.iter().chain(extensions.iter().cycle().take(extra)) {
+            let cell = if *is_alpha {
+                let cell = alpha_names
+                    .get_mut(alpha)
+                    .ok_or(SelectedInputUnavailable::Size)?;
+                alpha += 1;
+                cell
+            } else {
+                let cell = numeric_names
+                    .get_mut(numeric)
+                    .ok_or(SelectedInputUnavailable::Size)?;
+                numeric += 1;
+                cell
+            };
+            *cell = label.clone();
+        }
+        Ok(())
     }
 
     fn canonical_type(&self, object_type: &str) -> Result<String, SelectedInputUnavailable> {

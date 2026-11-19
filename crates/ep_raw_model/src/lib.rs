@@ -7,7 +7,8 @@ use std::fmt::{Display, Formatter};
 use std::path::{Path, PathBuf};
 
 pub use idf_order::{
-    IDF_ORDER_TARGETS, IdfOrderError, IdfOrderTarget, apply_idf_declaration_order,
+    IDF_ORDER_TARGETS, IdfOrderError, IdfOrderTarget, SOURCE_IDF_OBJECT_FAMILIES, SourceIdfField,
+    SourceIdfObjectLayout, apply_idf_declaration_order, source_idf_object_layout,
 };
 
 /// EnergyPlus object type name as found in epJSON.
@@ -96,6 +97,53 @@ impl RawModel {
     #[must_use]
     pub fn is_epjson(&self) -> bool {
         self.source_input_format == SourceInputFormat::EpJson
+    }
+
+    /// Require genuine recovered Source original-IDF metadata before family schema checks.
+    ///
+    /// # Errors
+    /// Returns the missing order or per-object physical-field-count custody boundary.
+    pub fn validate_source_idf_object_custody(&self, family: &str) -> Result<(), String> {
+        if self.is_epjson() {
+            return Ok(());
+        }
+        let Some(rows) = self.objects.get(&ObjectType(family.into())) else {
+            return Ok(());
+        };
+        if rows.is_empty() {
+            return Ok(());
+        }
+        let (_, _, extension) = source_idf_object_layout(family)
+            .ok_or_else(|| format!("Source original-IDF object schema unavailable: {family}"))?;
+        let label = if family == "Material:RoofVegetation" {
+            "RoofVegetation"
+        } else {
+            family
+        };
+        if !self.has_idf_declaration_order(family) {
+            return Err(format!(
+                "Source {label} original IDF requires recovered declaration order"
+            ));
+        }
+        if rows.values().any(|object| {
+            !matches!(object.fields.get(&FieldName("idf_max_fields".into())),
+                Some(RawValue::Number(token)) if token.parse::<usize>().is_ok())
+        }) {
+            return Err(format!(
+                "Source {label} original IDF requires idf_max_fields for every object"
+            ));
+        }
+        if !extension.is_empty()
+            && rows.values().any(|object| {
+                !matches!(object.fields.get(&FieldName("idf_max_extensible_fields".into())),
+                Some(RawValue::Number(token)) if token.parse::<usize>().is_ok())
+            })
+        {
+            return Err(format!(
+                "Source {label} original IDF requires idf_max_extensible_fields for every object"
+            ));
+        }
+        Ok(())
     }
 
     /// Returns the total object instance count.

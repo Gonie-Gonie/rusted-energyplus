@@ -6735,6 +6735,1625 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
         .fields
         .remove(&ep_raw_model::FieldName("idf_max_fields".into()))
         .expect("remove only the actual final-row max-field custody");
+    // One compact authored-input table extends real staged ingress; Native DTOs supply only expectations.
+    // No Session is prepared here, and the literals never insert getter-defaulted values.
+    let original_window_six_ingress = {
+        let preamble = r#"Version,
+26.1;
+Building,
+Rusted EnergyPlus IdealLoads Flow And Capacity Limit Diagnostic,
+0.0,
+Suburbs,
+0.04,
+0.4,
+FullExterior,
+25,
+6;
+GlobalGeometryRules,
+UpperLeftCorner,
+Counterclockwise,
+World;
+Zone,
+ZONE ONE,
+0,
+0,
+0,
+0,
+1,
+1,
+1,
+1;"#;
+        let base = r#"{"Version":{"Version 1":{"version_identifier":"26.1"}},"Building":{"Rusted EnergyPlus IdealLoads Flow And Capacity Limit Diagnostic":{"north_axis":0.0,"terrain":"Suburbs","loads_convergence_tolerance_value":0.04,"temperature_convergence_tolerance_value":0.4,"solar_distribution":"FullExterior","maximum_number_of_warmup_days":25,"minimum_number_of_warmup_days":6}},"GlobalGeometryRules":{"GlobalGeometryRules 1":{"starting_vertex_position":"UpperLeftCorner","vertex_entry_direction":"Counterclockwise","coordinate_system":"World"}},"Zone":{"ZONE ONE":{"direction_of_relative_north":0,"x_origin":0,"y_origin":0,"z_origin":0,"type":1,"multiplier":1,"ceiling_height":1,"volume":1}}}"#;
+        let cases = [
+            (
+                "WindowMaterial:SimpleGlazingSystem",
+                r#"WindowMaterial:SimpleGlazingSystem,
+Z MINIMAL SIMPLEGLAZINGSYSTEM,
+4.2,
+0.57;
+WindowMaterial:SimpleGlazingSystem,
+A FULL EOF SIMPLEGLAZINGSYSTEM,
+4.2,
+0.57,
+0.57"#,
+                r#"{"WindowMaterial:SimpleGlazingSystem":{"Z MINIMAL SIMPLEGLAZINGSYSTEM":{"u_factor":4.2,"solar_heat_gain_coefficient":0.57},"A FULL EOF SIMPLEGLAZINGSYSTEM":{"u_factor":4.2,"solar_heat_gain_coefficient":0.57,"visible_transmittance":0.57}}}"#,
+                (1, 3, 4),
+                vec![
+                    (
+                        "Z MINIMAL SIMPLEGLAZINGSYSTEM",
+                        3usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF SIMPLEGLAZINGSYSTEM",
+                        3usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "WindowMaterial:Glazing",
+                r#"MaterialProperty:GlazingSpectralData,
+spectral unused a,
+0.7,
+0.8,
+0.1,
+0.1;
+Curve:Biquadratic,
+CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC,
+0.5,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+90.0,
+0.1,
+4.0;
+WindowMaterial:Glazing,
+Z MINIMAL GLAZING,
+SpectralAverage,
+,
+0.003;
+WindowMaterial:Glazing,
+A FULL EOF GLAZING,
+SpectralAndAngle,
+spectral unused a,
+0.003,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+0.0,
+0.84,
+0.84,
+0.9,
+1.0,
+No,
+7.2e10,
+0.22,
+CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC,
+CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC,
+CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC"#,
+                r#"{"MaterialProperty:GlazingSpectralData":{"spectral unused a":{"wavelength_1":0.7,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1}},"Curve:Biquadratic":{"CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC":{"coefficient1_constant":0.5,"coefficient2_x":0.0,"coefficient3_x_2":0.0,"coefficient4_y":0.0,"coefficient5_y_2":0.0,"coefficient6_x_y":0.0,"minimum_value_of_x":0.0,"maximum_value_of_x":90.0,"minimum_value_of_y":0.1,"maximum_value_of_y":4.0}},"WindowMaterial:Glazing":{"Z MINIMAL GLAZING":{"optical_data_type":"SpectralAverage","thickness":0.003},"A FULL EOF GLAZING":{"optical_data_type":"SpectralAndAngle","window_glass_spectral_data_set_name":"spectral unused a","thickness":0.003,"solar_transmittance_at_normal_incidence":0.0,"front_side_solar_reflectance_at_normal_incidence":0.0,"back_side_solar_reflectance_at_normal_incidence":0.0,"visible_transmittance_at_normal_incidence":0.0,"front_side_visible_reflectance_at_normal_incidence":0.0,"back_side_visible_reflectance_at_normal_incidence":0.0,"infrared_transmittance_at_normal_incidence":0.0,"front_side_infrared_hemispherical_emissivity":0.84,"back_side_infrared_hemispherical_emissivity":0.84,"conductivity":0.9,"dirt_correction_factor_for_solar_and_visible_transmittance":1.0,"solar_diffusing":"No","young_s_modulus":72000000000.0,"poisson_s_ratio":0.22,"window_glass_spectral_and_incident_angle_transmittance_data_set_table_name":"CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC","window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name":"CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC","window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name":"CURVE UNUSED SPECTRAL ANGLE BIQUADRATIC"}}}"#,
+                (7, 14, 21),
+                vec![
+                    ("Z MINIMAL GLAZING", 14usize, 0usize, 7usize, 0usize),
+                    ("A FULL EOF GLAZING", 20usize, 0usize, 8usize, 0usize),
+                ],
+            ),
+            (
+                "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                r#"WindowMaterial:Glazing:RefractionExtinctionMethod,
+Z MINIMAL GLAZING-REFRACTIONEXTINCTIONMETHOD,
+0.003,
+1.5,
+20.0,
+1.7,
+100.0;
+WindowMaterial:Glazing:RefractionExtinctionMethod,
+A FULL EOF GLAZING-REFRACTIONEXTINCTIONMETHOD,
+0.003,
+1.5,
+20.0,
+1.7,
+100.0,
+0.0,
+0.84,
+0.9,
+1.0,
+No"#,
+                r#"{"WindowMaterial:Glazing:RefractionExtinctionMethod":{"Z MINIMAL GLAZING-REFRACTIONEXTINCTIONMETHOD":{"thickness":0.003,"solar_index_of_refraction":1.5,"solar_extinction_coefficient":20.0,"visible_index_of_refraction":1.7,"visible_extinction_coefficient":100.0},"A FULL EOF GLAZING-REFRACTIONEXTINCTIONMETHOD":{"thickness":0.003,"solar_index_of_refraction":1.5,"solar_extinction_coefficient":20.0,"visible_index_of_refraction":1.7,"visible_extinction_coefficient":100.0,"infrared_transmittance_at_normal_incidence":0.0,"infrared_hemispherical_emissivity":0.84,"conductivity":0.9,"dirt_correction_factor_for_solar_and_visible_transmittance":1.0,"solar_diffusing":"No"}}}"#,
+                (2, 9, 11),
+                vec![
+                    (
+                        "Z MINIMAL GLAZING-REFRACTIONEXTINCTIONMETHOD",
+                        6usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF GLAZING-REFRACTIONEXTINCTIONMETHOD",
+                        10usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "WindowMaterial:Gas",
+                r#"WindowMaterial:Gas,
+Z MINIMAL GAS,
+Argon,
+0.012;
+WindowMaterial:Gas,
+A FULL EOF GAS,
+Custom,
+0.012,
+0.02,
+0.0,
+0.0,
+1e-05,
+0.0,
+0.0,
+1000.0,
+0.0,
+0.0,
+28.0,
+1.4"#,
+                r#"{"WindowMaterial:Gas":{"Z MINIMAL GAS":{"gas_type":"Argon","thickness":0.012},"A FULL EOF GAS":{"gas_type":"Custom","thickness":0.012,"conductivity_coefficient_a":0.02,"conductivity_coefficient_b":0.0,"conductivity_coefficient_c":0.0,"viscosity_coefficient_a":1e-05,"viscosity_coefficient_b":0.0,"viscosity_coefficient_c":0.0,"specific_heat_coefficient_a":1000.0,"specific_heat_coefficient_b":0.0,"specific_heat_coefficient_c":0.0,"molecular_weight":28.0,"specific_heat_ratio":1.4}}}"#,
+                (2, 12, 14),
+                vec![
+                    ("Z MINIMAL GAS", 3usize, 0usize, 5usize, 0usize),
+                    ("A FULL EOF GAS", 13usize, 0usize, 6usize, 0usize),
+                ],
+            ),
+            (
+                "WindowMaterial:GasMixture",
+                r#"WindowMaterial:GasMixture,
+Z MINIMAL GASMIXTURE,
+0.012,
+2,
+Air,
+0.5,
+Argon,
+0.5;
+WindowMaterial:GasMixture,
+A FULL EOF GASMIXTURE,
+0.012,
+2,
+Air,
+0.5,
+Argon,
+0.5,
+Air,
+0.5,
+Argon,
+0.5"#,
+                r#"{"WindowMaterial:GasMixture":{"Z MINIMAL GASMIXTURE":{"thickness":0.012,"number_of_gases_in_mixture":2,"gas_1_type":"Air","gas_1_fraction":0.5,"gas_2_type":"Argon","gas_2_fraction":0.5},"A FULL EOF GASMIXTURE":{"thickness":0.012,"number_of_gases_in_mixture":2,"gas_1_type":"Air","gas_1_fraction":0.5,"gas_2_type":"Argon","gas_2_fraction":0.5,"gas_3_type":"Air","gas_3_fraction":0.5,"gas_4_type":"Argon","gas_4_fraction":0.5}}}"#,
+                (5, 6, 11),
+                vec![
+                    ("Z MINIMAL GASMIXTURE", 7usize, 0usize, 5usize, 0usize),
+                    ("A FULL EOF GASMIXTURE", 10usize, 0usize, 6usize, 0usize),
+                ],
+            ),
+            (
+                "WindowMaterial:Gap",
+                r#"WindowMaterial:Gas,
+GAS UNUSED CUSTOM NORMAL,
+Custom,
+0.012,
+0.02,
+,
+,
+1e-05,
+,
+,
+1000.0,
+,
+,
+28.0;
+WindowGap:DeflectionState,
+M DIFFERENT DEFLECTION,
+0.01,
+20.0,
+90000.0;
+WindowGap:SupportPillar,
+M DIFFERENT PILLAR,
+0.03,
+0.0003;
+WindowMaterial:Gap,
+Z MINIMAL GAP,
+0.0127,
+GAS UNUSED CUSTOM NORMAL;
+WindowMaterial:Gap,
+A FULL EOF GAP,
+0.0127,
+GAS UNUSED CUSTOM NORMAL,
+90000.0,
+M DIFFERENT DEFLECTION,
+M DIFFERENT PILLAR"#,
+                r#"{"WindowMaterial:Gas":{"GAS UNUSED CUSTOM NORMAL":{"gas_type":"Custom","thickness":0.012,"conductivity_coefficient_a":0.02,"viscosity_coefficient_a":1e-05,"specific_heat_coefficient_a":1000.0,"molecular_weight":28.0}},"WindowGap:DeflectionState":{"M DIFFERENT DEFLECTION":{"deflected_thickness":0.01,"initial_temperature":20.0,"initial_pressure":90000.0}},"WindowGap:SupportPillar":{"M DIFFERENT PILLAR":{"spacing":0.03,"radius":0.0003}},"WindowMaterial:Gap":{"Z MINIMAL GAP":{"thickness":0.0127,"gas_or_gas_mixture_":"GAS UNUSED CUSTOM NORMAL"},"A FULL EOF GAP":{"thickness":0.0127,"gas_or_gas_mixture_":"GAS UNUSED CUSTOM NORMAL","pressure":90000.0,"deflection_state":"M DIFFERENT DEFLECTION","support_pillar":"M DIFFERENT PILLAR"}}}"#,
+                (4, 2, 6),
+                vec![
+                    ("Z MINIMAL GAP", 3usize, 0usize, 8usize, 0usize),
+                    ("A FULL EOF GAP", 5usize, 0usize, 9usize, 0usize),
+                ],
+            ),
+            (
+                "WindowMaterial:Shade",
+                r#"WindowMaterial:Shade,
+Z MINIMAL SHADE,
+0.1,
+0.2,
+0.2,
+0.3,
+0.84,
+0.02,
+0.002,
+0.1;
+WindowMaterial:Shade,
+A FULL EOF SHADE,
+0.1,
+0.2,
+0.2,
+0.3,
+0.84,
+0.02,
+0.002,
+0.1,
+0.04,
+0.1,
+0.2,
+0.3,
+0.4,
+0.05"#,
+                r#"{"WindowMaterial:Shade":{"Z MINIMAL SHADE":{"solar_transmittance":0.1,"solar_reflectance":0.2,"visible_transmittance":0.2,"visible_reflectance":0.3,"infrared_hemispherical_emissivity":0.84,"infrared_transmittance":0.02,"thickness":0.002,"conductivity":0.1},"A FULL EOF SHADE":{"solar_transmittance":0.1,"solar_reflectance":0.2,"visible_transmittance":0.2,"visible_reflectance":0.3,"infrared_hemispherical_emissivity":0.84,"infrared_transmittance":0.02,"thickness":0.002,"conductivity":0.1,"shade_to_glass_distance":0.04,"top_opening_multiplier":0.1,"bottom_opening_multiplier":0.2,"left_side_opening_multiplier":0.3,"right_side_opening_multiplier":0.4,"airflow_permeability":0.05}}}"#,
+                (1, 14, 15),
+                vec![
+                    ("Z MINIMAL SHADE", 15usize, 0usize, 5usize, 0usize),
+                    ("A FULL EOF SHADE", 14usize, 0usize, 6usize, 0usize),
+                ],
+            ),
+            (
+                "WindowMaterial:Blind",
+                r#"WindowMaterial:Blind,
+Z MINIMAL BLIND,
+,
+0.025,
+0.02,
+,
+,
+,
+,
+0.5,
+0.4,
+,
+0.5,
+0.4,
+0.05;
+WindowMaterial:Blind,
+A FULL EOF BLIND,
+Horizontal,
+0.025,
+0.02,
+0.001,
+45.0,
+0.25,
+0.1,
+0.5,
+0.4,
+0.1,
+0.5,
+0.4,
+0.05,
+0.4,
+0.3,
+0.05,
+0.4,
+0.3,
+0.0,
+0.84,
+0.76,
+0.04,
+0.1,
+0.2,
+0.3,
+0.4,
+30.0,
+10.0"#,
+                r#"{"WindowMaterial:Blind":{"Z MINIMAL BLIND":{"slat_width":0.025,"slat_separation":0.02,"front_side_slat_beam_solar_reflectance":0.5,"back_side_slat_beam_solar_reflectance":0.4,"front_side_slat_diffuse_solar_reflectance":0.5,"back_side_slat_diffuse_solar_reflectance":0.4,"slat_beam_visible_transmittance":0.05},"A FULL EOF BLIND":{"slat_orientation":"Horizontal","slat_width":0.025,"slat_separation":0.02,"slat_thickness":0.001,"slat_angle":45.0,"slat_conductivity":0.25,"slat_beam_solar_transmittance":0.1,"front_side_slat_beam_solar_reflectance":0.5,"back_side_slat_beam_solar_reflectance":0.4,"slat_diffuse_solar_transmittance":0.1,"front_side_slat_diffuse_solar_reflectance":0.5,"back_side_slat_diffuse_solar_reflectance":0.4,"slat_beam_visible_transmittance":0.05,"front_side_slat_beam_visible_reflectance":0.4,"back_side_slat_beam_visible_reflectance":0.3,"slat_diffuse_visible_transmittance":0.05,"front_side_slat_diffuse_visible_reflectance":0.4,"back_side_slat_diffuse_visible_reflectance":0.3,"slat_infrared_hemispherical_transmittance":0.0,"front_side_slat_infrared_hemispherical_emissivity":0.84,"back_side_slat_infrared_hemispherical_emissivity":0.76,"blind_to_glass_distance":0.04,"blind_top_opening_multiplier":0.1,"blind_bottom_opening_multiplier":0.2,"blind_left_side_opening_multiplier":0.3,"blind_right_side_opening_multiplier":0.4,"minimum_slat_angle":30.0,"maximum_slat_angle":10.0}}}"#,
+                (2, 27, 29),
+                vec![
+                    ("Z MINIMAL BLIND", 29usize, 0usize, 5usize, 0usize),
+                    ("A FULL EOF BLIND", 28usize, 0usize, 6usize, 0usize),
+                ],
+            ),
+            (
+                "WindowMaterial:Screen",
+                r#"WindowMaterial:Screen,
+Z MINIMAL SCREEN,
+,
+0.25,
+0.5,
+,
+,
+0.004,
+0.001;
+WindowMaterial:Screen,
+A FULL EOF SCREEN,
+ModelAsDiffuse,
+0.25,
+0.5,
+0.75,
+0.25,
+0.004,
+0.001,
+0.04,
+0.1,
+0.2,
+0.3,
+0.4,
+5.0"#,
+                r#"{"WindowMaterial:Screen":{"Z MINIMAL SCREEN":{"diffuse_solar_reflectance":0.25,"diffuse_visible_reflectance":0.5,"screen_material_spacing":0.004,"screen_material_diameter":0.001},"A FULL EOF SCREEN":{"reflected_beam_transmittance_accounting_method":"ModelAsDiffuse","diffuse_solar_reflectance":0.25,"diffuse_visible_reflectance":0.5,"thermal_hemispherical_emissivity":0.75,"conductivity":0.25,"screen_material_spacing":0.004,"screen_material_diameter":0.001,"screen_to_glass_distance":0.04,"top_opening_multiplier":0.1,"bottom_opening_multiplier":0.2,"left_side_opening_multiplier":0.3,"right_side_opening_multiplier":0.4,"angle_of_resolution_for_screen_transmittance_output_map":5.0}}}"#,
+                (2, 12, 14),
+                vec![
+                    ("Z MINIMAL SCREEN", 9usize, 0usize, 5usize, 0usize),
+                    ("A FULL EOF SCREEN", 13usize, 0usize, 6usize, 0usize),
+                ],
+            ),
+            (
+                "WindowMaterial:Shade:EquivalentLayer",
+                r#"WindowMaterial:Shade:EquivalentLayer,
+Z MINIMAL SHADE-EQUIVALENTLAYER,
+,
+0.2,
+0.25,
+0.3,
+0.35;
+WindowMaterial:Shade:EquivalentLayer,
+A FULL EOF SHADE-EQUIVALENTLAYER,
+0.1,
+0.2,
+0.25,
+0.3,
+0.35,
+0.05,
+0.1,
+0.2,
+0.05,
+0.84,
+0.76"#,
+                r#"{"WindowMaterial:Shade:EquivalentLayer":{"Z MINIMAL SHADE-EQUIVALENTLAYER":{"front_side_shade_beam_diffuse_solar_transmittance":0.2,"back_side_shade_beam_diffuse_solar_transmittance":0.25,"front_side_shade_beam_diffuse_solar_reflectance":0.3,"back_side_shade_beam_diffuse_solar_reflectance":0.35},"A FULL EOF SHADE-EQUIVALENTLAYER":{"shade_beam_beam_solar_transmittance":0.1,"front_side_shade_beam_diffuse_solar_transmittance":0.2,"back_side_shade_beam_diffuse_solar_transmittance":0.25,"front_side_shade_beam_diffuse_solar_reflectance":0.3,"back_side_shade_beam_diffuse_solar_reflectance":0.35,"shade_beam_beam_visible_transmittance_at_normal_incidence":0.05,"shade_beam_diffuse_visible_transmittance_at_normal_incidence":0.1,"shade_beam_diffuse_visible_reflectance_at_normal_incidence":0.2,"shade_material_infrared_transmittance":0.05,"front_side_shade_material_infrared_emissivity":0.84,"back_side_shade_material_infrared_emissivity":0.76}}}"#,
+                (1, 11, 12),
+                vec![
+                    (
+                        "Z MINIMAL SHADE-EQUIVALENTLAYER",
+                        6usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF SHADE-EQUIVALENTLAYER",
+                        11usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "WindowMaterial:Drape:EquivalentLayer",
+                r#"WindowMaterial:Drape:EquivalentLayer,
+Z MINIMAL DRAPE-EQUIVALENTLAYER,
+,
+0.2,
+0.25,
+0.3,
+0.35;
+WindowMaterial:Drape:EquivalentLayer,
+A FULL EOF DRAPE-EQUIVALENTLAYER,
+0.1,
+0.2,
+0.25,
+0.3,
+0.35,
+0.05,
+0.1,
+0.2,
+0.05,
+0.84,
+0.76,
+0.1,
+0.2"#,
+                r#"{"WindowMaterial:Drape:EquivalentLayer":{"Z MINIMAL DRAPE-EQUIVALENTLAYER":{"front_side_drape_beam_diffuse_solar_transmittance":0.2,"back_side_drape_beam_diffuse_solar_transmittance":0.25,"front_side_drape_beam_diffuse_solar_reflectance":0.3,"back_side_drape_beam_diffuse_solar_reflectance":0.35},"A FULL EOF DRAPE-EQUIVALENTLAYER":{"drape_beam_beam_solar_transmittance_at_normal_incidence":0.1,"front_side_drape_beam_diffuse_solar_transmittance":0.2,"back_side_drape_beam_diffuse_solar_transmittance":0.25,"front_side_drape_beam_diffuse_solar_reflectance":0.3,"back_side_drape_beam_diffuse_solar_reflectance":0.35,"drape_beam_beam_visible_transmittance":0.05,"drape_beam_diffuse_visible_transmittance":0.1,"drape_beam_diffuse_visible_reflectance":0.2,"drape_material_infrared_transmittance":0.05,"front_side_drape_material_infrared_emissivity":0.84,"back_side_drape_material_infrared_emissivity":0.76,"width_of_pleated_fabric":0.1,"length_of_pleated_fabric":0.2}}}"#,
+                (1, 13, 14),
+                vec![
+                    (
+                        "Z MINIMAL DRAPE-EQUIVALENTLAYER",
+                        6usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF DRAPE-EQUIVALENTLAYER",
+                        13usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "WindowMaterial:Blind:EquivalentLayer",
+                r#"WindowMaterial:Blind:EquivalentLayer,
+Z MINIMAL BLIND-EQUIVALENTLAYER,
+,
+0.02,
+0.015,
+,
+,
+,
+,
+0.3,
+0.35,
+,
+,
+,
+,
+,
+0.2,
+0.3;
+WindowMaterial:Blind:EquivalentLayer,
+A FULL EOF BLIND-EQUIVALENTLAYER,
+Horizontal,
+0.02,
+0.015,
+0.0015,
+45.0,
+0.1,
+0.15,
+0.3,
+0.35,
+0.02,
+0.03,
+0.25,
+0.28,
+0.1,
+0.2,
+0.3,
+0.11,
+0.22,
+0.33,
+0.05,
+0.84,
+0.76,
+FixedSlatAngle"#,
+                r#"{"WindowMaterial:Blind:EquivalentLayer":{"Z MINIMAL BLIND-EQUIVALENTLAYER":{"slat_width":0.02,"slat_separation":0.015,"front_side_slat_beam_diffuse_solar_reflectance":0.3,"back_side_slat_beam_diffuse_solar_reflectance":0.35,"front_side_slat_diffuse_diffuse_solar_reflectance":0.2,"back_side_slat_diffuse_diffuse_solar_reflectance":0.3},"A FULL EOF BLIND-EQUIVALENTLAYER":{"slat_orientation":"Horizontal","slat_width":0.02,"slat_separation":0.015,"slat_crown":0.0015,"slat_angle":45.0,"front_side_slat_beam_diffuse_solar_transmittance":0.1,"back_side_slat_beam_diffuse_solar_transmittance":0.15,"front_side_slat_beam_diffuse_solar_reflectance":0.3,"back_side_slat_beam_diffuse_solar_reflectance":0.35,"front_side_slat_beam_diffuse_visible_transmittance":0.02,"back_side_slat_beam_diffuse_visible_transmittance":0.03,"front_side_slat_beam_diffuse_visible_reflectance":0.25,"back_side_slat_beam_diffuse_visible_reflectance":0.28,"slat_diffuse_diffuse_solar_transmittance":0.1,"front_side_slat_diffuse_diffuse_solar_reflectance":0.2,"back_side_slat_diffuse_diffuse_solar_reflectance":0.3,"slat_diffuse_diffuse_visible_transmittance":0.11,"front_side_slat_diffuse_diffuse_visible_reflectance":0.22,"back_side_slat_diffuse_diffuse_visible_reflectance":0.33,"slat_infrared_transmittance":0.05,"front_side_slat_infrared_emissivity":0.84,"back_side_slat_infrared_emissivity":0.76,"slat_angle_control":"FixedSlatAngle"}}}"#,
+                (3, 21, 24),
+                vec![
+                    (
+                        "Z MINIMAL BLIND-EQUIVALENTLAYER",
+                        17usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF BLIND-EQUIVALENTLAYER",
+                        23usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "WindowMaterial:Screen:EquivalentLayer",
+                r#"WindowMaterial:Screen:EquivalentLayer,
+Z MINIMAL SCREEN-EQUIVALENTLAYER,
+,
+0.2,
+0.3,
+0.05,
+0.1,
+0.2;
+WindowMaterial:Screen:EquivalentLayer,
+A FULL EOF SCREEN-EQUIVALENTLAYER,
+0.1,
+0.2,
+0.3,
+0.05,
+0.1,
+0.2,
+0.02,
+0.93,
+0.025,
+0.005"#,
+                r#"{"WindowMaterial:Screen:EquivalentLayer":{"Z MINIMAL SCREEN-EQUIVALENTLAYER":{"screen_beam_diffuse_solar_transmittance":0.2,"screen_beam_diffuse_solar_reflectance":0.3,"screen_beam_beam_visible_transmittance":0.05,"screen_beam_diffuse_visible_transmittance":0.1,"screen_beam_diffuse_visible_reflectance":0.2},"A FULL EOF SCREEN-EQUIVALENTLAYER":{"screen_beam_beam_solar_transmittance":0.1,"screen_beam_diffuse_solar_transmittance":0.2,"screen_beam_diffuse_solar_reflectance":0.3,"screen_beam_beam_visible_transmittance":0.05,"screen_beam_diffuse_visible_transmittance":0.1,"screen_beam_diffuse_visible_reflectance":0.2,"screen_infrared_transmittance":0.02,"screen_infrared_emissivity":0.93,"screen_wire_spacing":0.025,"screen_wire_diameter":0.005}}}"#,
+                (1, 10, 11),
+                vec![
+                    (
+                        "Z MINIMAL SCREEN-EQUIVALENTLAYER",
+                        11usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF SCREEN-EQUIVALENTLAYER",
+                        10usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "WindowMaterial:Glazing:EquivalentLayer",
+                r#"MaterialProperty:GlazingSpectralData,
+spectral unused a,
+0.7,
+0.8,
+0.1,
+0.1;
+WindowMaterial:Glazing:EquivalentLayer,
+Z MINIMAL GLAZING-EQUIVALENTLAYER,
+,
+,
+0.61,
+0.57,
+0.17,
+0.23;
+WindowMaterial:Glazing:EquivalentLayer,
+A FULL EOF GLAZING-EQUIVALENTLAYER,
+SpectralAverage,
+spectral unused a,
+0.61,
+0.57,
+0.17,
+0.23,
+0.64,
+0.58,
+0.13,
+0.18,
+0.02,
+0.03,
+0.04,
+0.05,
+0.06,
+0.07,
+0.08,
+0.09,
+0.11,
+0.21,
+0.31,
+0.37,
+0.47,
+0.53,
+0.01,
+0.83,
+0.79,
+0.173"#,
+                r#"{"MaterialProperty:GlazingSpectralData":{"spectral unused a":{"wavelength_1":0.7,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1}},"WindowMaterial:Glazing:EquivalentLayer":{"Z MINIMAL GLAZING-EQUIVALENTLAYER":{"front_side_beam_beam_solar_transmittance":0.61,"back_side_beam_beam_solar_transmittance":0.57,"front_side_beam_beam_solar_reflectance":0.17,"back_side_beam_beam_solar_reflectance":0.23},"A FULL EOF GLAZING-EQUIVALENTLAYER":{"optical_data_type":"SpectralAverage","window_glass_spectral_data_set_name":"spectral unused a","front_side_beam_beam_solar_transmittance":0.61,"back_side_beam_beam_solar_transmittance":0.57,"front_side_beam_beam_solar_reflectance":0.17,"back_side_beam_beam_solar_reflectance":0.23,"front_side_beam_beam_visible_solar_transmittance":0.64,"back_side_beam_beam_visible_solar_transmittance":0.58,"front_side_beam_beam_visible_solar_reflectance":0.13,"back_side_beam_beam_visible_solar_reflectance":0.18,"front_side_beam_diffuse_solar_transmittance":0.02,"back_side_beam_diffuse_solar_transmittance":0.03,"front_side_beam_diffuse_solar_reflectance":0.04,"back_side_beam_diffuse_solar_reflectance":0.05,"front_side_beam_diffuse_visible_solar_transmittance":0.06,"back_side_beam_diffuse_visible_solar_transmittance":0.07,"front_side_beam_diffuse_visible_solar_reflectance":0.08,"back_side_beam_diffuse_visible_solar_reflectance":0.09,"diffuse_diffuse_solar_transmittance":0.11,"front_side_diffuse_diffuse_solar_reflectance":0.21,"back_side_diffuse_diffuse_solar_reflectance":0.31,"diffuse_diffuse_visible_solar_transmittance":0.37,"front_side_diffuse_diffuse_visible_solar_reflectance":0.47,"back_side_diffuse_diffuse_visible_solar_reflectance":0.53,"infrared_transmittance_applies_to_front_and_back_":0.01,"front_side_infrared_emissivity":0.83,"back_side_infrared_emissivity":0.79,"thermal_resistance":0.173}}}"#,
+                (3, 26, 29),
+                vec![
+                    (
+                        "Z MINIMAL GLAZING-EQUIVALENTLAYER",
+                        11usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF GLAZING-EQUIVALENTLAYER",
+                        28usize,
+                        0usize,
+                        7usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "WindowMaterial:Gap:EquivalentLayer",
+                r#"WindowMaterial:Gap:EquivalentLayer,
+Z MINIMAL GAP-EQUIVALENTLAYER,
+CUSTOM,
+0.0125,
+VentedOutdoor;
+WindowMaterial:Gap:EquivalentLayer,
+A FULL EOF GAP-EQUIVALENTLAYER,
+CUSTOM,
+0.0125,
+VentedOutdoor,
+0.0031,
+7.5e-05,
+1e-08,
+3.9e-06,
+4.9e-08,
+1e-12,
+1005.3,
+0.0127,
+1.1e-06,
+28.97,
+1.4"#,
+                r#"{"WindowMaterial:Gap:EquivalentLayer":{"Z MINIMAL GAP-EQUIVALENTLAYER":{"gas_type":"CUSTOM","thickness":0.0125,"gap_vent_type":"VentedOutdoor"},"A FULL EOF GAP-EQUIVALENTLAYER":{"gas_type":"CUSTOM","thickness":0.0125,"gap_vent_type":"VentedOutdoor","conductivity_coefficient_a":0.0031,"conductivity_coefficient_b":7.5e-05,"conductivity_coefficient_c":1e-08,"viscosity_coefficient_a":3.9e-06,"viscosity_coefficient_b":4.9e-08,"viscosity_coefficient_c":1e-12,"specific_heat_coefficient_a":1005.3,"specific_heat_coefficient_b":0.0127,"specific_heat_coefficient_c":1.1e-06,"molecular_weight":28.97,"specific_heat_ratio":1.4}}}"#,
+                (3, 12, 15),
+                vec![
+                    (
+                        "Z MINIMAL GAP-EQUIVALENTLAYER",
+                        4usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF GAP-EQUIVALENTLAYER",
+                        14usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "Curve:Biquadratic",
+                r#"Curve:Biquadratic,
+Z MINIMAL CURVE-BIQUADRATIC,
+18446744073709551615,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0;
+Curve:Biquadratic,
+A FULL EOF CURVE-BIQUADRATIC,
+18446744073709551615,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0,
+-10.0,
+50.0,
+Dimensionless,
+Dimensionless,
+Dimensionless"#,
+                r#"{"Curve:Biquadratic":{"Z MINIMAL CURVE-BIQUADRATIC":{"coefficient1_constant":1.8446744073709552e+19,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_y_2":0.5,"coefficient6_x_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0},"A FULL EOF CURVE-BIQUADRATIC":{"coefficient1_constant":1.8446744073709552e+19,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_y_2":0.5,"coefficient6_x_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0,"minimum_curve_output":-10.0,"maximum_curve_output":50.0,"input_unit_type_for_x":"Dimensionless","input_unit_type_for_y":"Dimensionless","output_unit_type":"Dimensionless"}}}"#,
+                (4, 12, 16),
+                vec![
+                    (
+                        "Z MINIMAL CURVE-BIQUADRATIC",
+                        11usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF CURVE-BIQUADRATIC",
+                        15usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "Curve:QuadraticLinear",
+                r#"Curve:QuadraticLinear,
+Z MINIMAL CURVE-QUADRATICLINEAR,
+0.1,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0;
+Curve:QuadraticLinear,
+A FULL EOF CURVE-QUADRATICLINEAR,
+0.1,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0,
+-10.0,
+50.0,
+Dimensionless,
+Dimensionless,
+Dimensionless"#,
+                r#"{"Curve:QuadraticLinear":{"Z MINIMAL CURVE-QUADRATICLINEAR":{"coefficient1_constant":0.1,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_x_y":0.5,"coefficient6_x_2_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0},"A FULL EOF CURVE-QUADRATICLINEAR":{"coefficient1_constant":0.1,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_x_y":0.5,"coefficient6_x_2_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0,"minimum_curve_output":-10.0,"maximum_curve_output":50.0,"input_unit_type_for_x":"Dimensionless","input_unit_type_for_y":"Dimensionless","output_unit_type":"Dimensionless"}}}"#,
+                (4, 12, 16),
+                vec![
+                    (
+                        "Z MINIMAL CURVE-QUADRATICLINEAR",
+                        11usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF CURVE-QUADRATICLINEAR",
+                        15usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "Curve:CubicLinear",
+                r#"Curve:CubicLinear,
+Z MINIMAL CURVE-CUBICLINEAR,
+0.1,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0;
+Curve:CubicLinear,
+A FULL EOF CURVE-CUBICLINEAR,
+0.1,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0,
+-10.0,
+50.0,
+Dimensionless,
+Dimensionless,
+Dimensionless"#,
+                r#"{"Curve:CubicLinear":{"Z MINIMAL CURVE-CUBICLINEAR":{"coefficient1_constant":0.1,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_x_3":0.4,"coefficient5_y":0.5,"coefficient6_x_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0},"A FULL EOF CURVE-CUBICLINEAR":{"coefficient1_constant":0.1,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_x_3":0.4,"coefficient5_y":0.5,"coefficient6_x_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0,"minimum_curve_output":-10.0,"maximum_curve_output":50.0,"input_unit_type_for_x":"Dimensionless","input_unit_type_for_y":"Dimensionless","output_unit_type":"Dimensionless"}}}"#,
+                (4, 12, 16),
+                vec![
+                    (
+                        "Z MINIMAL CURVE-CUBICLINEAR",
+                        11usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF CURVE-CUBICLINEAR",
+                        15usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "Curve:Bicubic",
+                r#"Curve:Bicubic,
+Z MINIMAL CURVE-BICUBIC,
+0.1,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+0.7,
+0.8,
+0.9,
+1.0,
+-10.0,
+50.0,
+-5.0,
+25.0;
+Curve:Bicubic,
+A FULL EOF CURVE-BICUBIC,
+0.1,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+0.7,
+0.8,
+0.9,
+1.0,
+-10.0,
+50.0,
+-5.0,
+25.0,
+-10.0,
+50.0,
+Dimensionless,
+Dimensionless,
+Dimensionless"#,
+                r#"{"Curve:Bicubic":{"Z MINIMAL CURVE-BICUBIC":{"coefficient1_constant":0.1,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_y_2":0.5,"coefficient6_x_y":0.6,"coefficient7_x_3":0.7,"coefficient8_y_3":0.8,"coefficient9_x_2_y":0.9,"coefficient10_x_y_2":1.0,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0},"A FULL EOF CURVE-BICUBIC":{"coefficient1_constant":0.1,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_y_2":0.5,"coefficient6_x_y":0.6,"coefficient7_x_3":0.7,"coefficient8_y_3":0.8,"coefficient9_x_2_y":0.9,"coefficient10_x_y_2":1.0,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0,"minimum_curve_output":-10.0,"maximum_curve_output":50.0,"input_unit_type_for_x":"Dimensionless","input_unit_type_for_y":"Dimensionless","output_unit_type":"Dimensionless"}}}"#,
+                (4, 16, 20),
+                vec![
+                    ("Z MINIMAL CURVE-BICUBIC", 15usize, 0usize, 5usize, 0usize),
+                    ("A FULL EOF CURVE-BICUBIC", 19usize, 0usize, 6usize, 0usize),
+                ],
+            ),
+            (
+                "Curve:FanPressureRise",
+                r#"Curve:FanPressureRise,
+Z MINIMAL CURVE-FANPRESSURERISE,
+0.1,
+0.2,
+0.3,
+0.4,
+0.1,
+2.0,
+50.0,
+500.0;
+Curve:FanPressureRise,
+A FULL EOF CURVE-FANPRESSURERISE,
+0.1,
+0.2,
+0.3,
+0.4,
+0.1,
+2.0,
+50.0,
+500.0,
+50.0,
+500.0"#,
+                r#"{"Curve:FanPressureRise":{"Z MINIMAL CURVE-FANPRESSURERISE":{"coefficient1_c1":0.1,"coefficient2_c2":0.2,"coefficient3_c3":0.3,"coefficient4_c4":0.4,"minimum_value_of_qfan":0.1,"maximum_value_of_qfan":2.0,"minimum_value_of_psm":50.0,"maximum_value_of_psm":500.0},"A FULL EOF CURVE-FANPRESSURERISE":{"coefficient1_c1":0.1,"coefficient2_c2":0.2,"coefficient3_c3":0.3,"coefficient4_c4":0.4,"minimum_value_of_qfan":0.1,"maximum_value_of_qfan":2.0,"minimum_value_of_psm":50.0,"maximum_value_of_psm":500.0,"minimum_curve_output":50.0,"maximum_curve_output":500.0}}}"#,
+                (1, 10, 11),
+                vec![
+                    (
+                        "Z MINIMAL CURVE-FANPRESSURERISE",
+                        9usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF CURVE-FANPRESSURERISE",
+                        10usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "MaterialProperty:GlazingSpectralData",
+                r#"MaterialProperty:GlazingSpectralData,
+Z FULL RETAINED EXTENSION SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8,
+0.8,
+0.1,
+0.1;
+MaterialProperty:GlazingSpectralData,
+Y PARTIAL EXTENSION SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8;
+MaterialProperty:GlazingSpectralData,
+X COMPLETE EMPTY EXTENSION SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+,
+,
+,
+;
+MaterialProperty:GlazingSpectralData,
+W INCOMPLETE BLANK TAIL SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+,
+;
+MaterialProperty:GlazingSpectralData,
+A TWO EXTENSIONS EOF SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8,
+0.8,
+0.1,
+0.1,
+0.9,
+0.8,
+0.1,
+0.1"#,
+                r#"{"MaterialProperty:GlazingSpectralData":{"Z FULL RETAINED EXTENSION SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{"wavelength":0.8,"transmittance":0.8,"front_reflectance":0.1,"back_reflectance":0.1}]},"Y PARTIAL EXTENSION SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{"wavelength":0.8}]},"X COMPLETE EMPTY EXTENSION SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{}]},"W INCOMPLETE BLANK TAIL SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1},"A TWO EXTENSIONS EOF SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1}}}"#,
+                (1, 20, 21),
+                vec![
+                    (
+                        "Z FULL RETAINED EXTENSION SPECTRAL",
+                        21usize,
+                        4usize,
+                        5usize,
+                        1usize,
+                    ),
+                    (
+                        "Y PARTIAL EXTENSION SPECTRAL",
+                        18usize,
+                        1usize,
+                        6usize,
+                        1usize,
+                    ),
+                    (
+                        "X COMPLETE EMPTY EXTENSION SPECTRAL",
+                        21usize,
+                        4usize,
+                        7usize,
+                        1usize,
+                    ),
+                    (
+                        "W INCOMPLETE BLANK TAIL SPECTRAL",
+                        19usize,
+                        2usize,
+                        8usize,
+                        0usize,
+                    ),
+                    (
+                        "A TWO EXTENSIONS EOF SPECTRAL",
+                        24usize,
+                        8usize,
+                        9usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "Curve:Biquadratic",
+                r#"Curve:Biquadratic,
+Z MINIMAL CURVE-BIQUADRATIC,
+18446744073709551615,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0;
+Curve:Biquadratic,
+A FULL EOF CURVE-BIQUADRATIC,
+18446744073709551615,
+0.2,
+0.3,
+0.4,
+0.5,
+0.6,
+-10.0,
+50.0,
+-5.0,
+25.0,
+-10.0,
+50.0,
+Dimensionless,
+Dimensionless,
+Dimensionless,"#,
+                r#"{"Curve:Biquadratic":{"Z MINIMAL CURVE-BIQUADRATIC":{"coefficient1_constant":1.8446744073709552e+19,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_y_2":0.5,"coefficient6_x_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0},"A FULL EOF CURVE-BIQUADRATIC":{"coefficient1_constant":1.8446744073709552e+19,"coefficient2_x":0.2,"coefficient3_x_2":0.3,"coefficient4_y":0.4,"coefficient5_y_2":0.5,"coefficient6_x_y":0.6,"minimum_value_of_x":-10.0,"maximum_value_of_x":50.0,"minimum_value_of_y":-5.0,"maximum_value_of_y":25.0,"minimum_curve_output":-10.0,"maximum_curve_output":50.0,"input_unit_type_for_x":"Dimensionless","input_unit_type_for_y":"Dimensionless","output_unit_type":"Dimensionless"}}}"#,
+                (4, 12, 16),
+                vec![
+                    (
+                        "Z MINIMAL CURVE-BIQUADRATIC",
+                        11usize,
+                        0usize,
+                        5usize,
+                        0usize,
+                    ),
+                    (
+                        "A FULL EOF CURVE-BIQUADRATIC",
+                        16usize,
+                        0usize,
+                        6usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "MaterialProperty:GlazingSpectralData",
+                r#"MaterialProperty:GlazingSpectralData,
+Z FULL RETAINED EXTENSION SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8,
+0.8,
+0.1,
+0.1;
+MaterialProperty:GlazingSpectralData,
+Y PARTIAL EXTENSION SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8;
+MaterialProperty:GlazingSpectralData,
+X COMPLETE EMPTY EXTENSION SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+,
+,
+,
+;
+MaterialProperty:GlazingSpectralData,
+W INCOMPLETE BLANK TAIL SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+,
+;
+MaterialProperty:GlazingSpectralData,
+A TWO EXTENSIONS EOF SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8,
+0.8,
+0.1,
+0.1,
+0.9,
+0.8,
+0.1,
+0.1,"#,
+                r#"{"MaterialProperty:GlazingSpectralData":{"Z FULL RETAINED EXTENSION SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{"wavelength":0.8,"transmittance":0.8,"front_reflectance":0.1,"back_reflectance":0.1}]},"Y PARTIAL EXTENSION SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{"wavelength":0.8}]},"X COMPLETE EMPTY EXTENSION SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{}]},"W INCOMPLETE BLANK TAIL SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1},"A TWO EXTENSIONS EOF SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1}}}"#,
+                (1, 20, 21),
+                vec![
+                    (
+                        "Z FULL RETAINED EXTENSION SPECTRAL",
+                        21usize,
+                        4usize,
+                        5usize,
+                        1usize,
+                    ),
+                    (
+                        "Y PARTIAL EXTENSION SPECTRAL",
+                        18usize,
+                        1usize,
+                        6usize,
+                        1usize,
+                    ),
+                    (
+                        "X COMPLETE EMPTY EXTENSION SPECTRAL",
+                        21usize,
+                        4usize,
+                        7usize,
+                        1usize,
+                    ),
+                    (
+                        "W INCOMPLETE BLANK TAIL SPECTRAL",
+                        19usize,
+                        2usize,
+                        8usize,
+                        0usize,
+                    ),
+                    (
+                        "A TWO EXTENSIONS EOF SPECTRAL",
+                        25usize,
+                        8usize,
+                        9usize,
+                        0usize,
+                    ),
+                ],
+            ),
+            (
+                "MaterialProperty:GlazingSpectralData",
+                r#"MaterialProperty:GlazingSpectralData,
+Z COMMA CONTROL SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8, 0.8, 0.1, 0.1, 0.9, 0.8, 0.1, 0.1;
+MaterialProperty:GlazingSpectralData,
+A COMMENT NEWLINE SPECTRAL,
+0.4,
+0.8,
+0.1,
+0.1,
+0.5,
+0.8,
+0.1,
+0.1,
+0.6,
+0.8,
+0.1,
+0.1,
+0.7,
+0.8,
+0.1,
+0.1,
+0.8 ! numeric token ends at comment before delimiter
+0.8, 0.1, 0.1, 0.9, 0.8, 0.1, 0.1;"#,
+                r#"{"MaterialProperty:GlazingSpectralData":{"Z COMMA CONTROL SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{"wavelength":0.8,"transmittance":0.8,"front_reflectance":0.1,"back_reflectance":0.1},{"wavelength":0.9,"transmittance":0.8,"front_reflectance":0.1,"back_reflectance":0.1}]},"A COMMENT NEWLINE SPECTRAL":{"wavelength_1":0.4,"transmittance_1":0.8,"front_reflectance_1":0.1,"back_reflectance_1":0.1,"wavelength_2":0.5,"transmittance_2":0.8,"front_reflectance_2":0.1,"back_reflectance_2":0.1,"wavelength_3":0.6,"transmittance_3":0.8,"front_reflectance_3":0.1,"back_reflectance_3":0.1,"wavelength_4":0.7,"transmittance_4":0.8,"front_reflectance_4":0.1,"back_reflectance_4":0.1,"extensions":[{"wavelength":0.8,"transmittance":0.8,"front_reflectance":0.1,"back_reflectance":0.1},{"wavelength":0.9,"transmittance":0.8,"front_reflectance":0.1,"back_reflectance":0.1}]}}}"#,
+                (1, 24, 25),
+                vec![
+                    ("Z COMMA CONTROL SPECTRAL", 25usize, 8usize, 5usize, 2usize),
+                    (
+                        "A COMMENT NEWLINE SPECTRAL",
+                        24usize,
+                        8usize,
+                        6usize,
+                        2usize,
+                    ),
+                ],
+            ),
+            // Same Input04 authored Spectral rows: exact raw keys remain distinct,
+            // while Native alpha/NameMap lookup intentionally keeps the first fold.
+            (
+                "MaterialProperty:GlazingSpectralData",
+                r#"MaterialProperty:GlazingSpectralData,
+  SPECTRAL UNUSED A,
+  0.5,
+  -1,
+  0.2,
+  0.3;
+MaterialProperty:GlazingSpectralData,
+  Z FULL RETAINED EXTENSION SPECTRAL,
+  0.4,
+  0.8,
+  0.1,
+  0.1,
+  0.5,
+  0.8,
+  0.1,
+  0.1,
+  0.6,
+  0.8,
+  0.1,
+  0.1,
+  0.7,
+  0.8,
+  0.1,
+  0.1,
+  0.8,
+  0.8,
+  0.1,
+  0.1;
+MaterialProperty:GlazingSpectralData,
+  spectral unused a,
+  0.7,
+  0.8,
+  0.1,
+  0.1;"#,
+                r#"{"MaterialProperty:GlazingSpectralData":{"SPECTRAL UNUSED A":{"back_reflectance_1":0.3,"front_reflectance_1":0.2,"transmittance_1":-1,"wavelength_1":0.5},"Z FULL RETAINED EXTENSION SPECTRAL":{"back_reflectance_1":0.1,"back_reflectance_2":0.1,"back_reflectance_3":0.1,"back_reflectance_4":0.1,"extensions":[{"back_reflectance":0.1,"front_reflectance":0.1,"transmittance":0.8,"wavelength":0.8}],"front_reflectance_1":0.1,"front_reflectance_2":0.1,"front_reflectance_3":0.1,"front_reflectance_4":0.1,"transmittance_1":0.8,"transmittance_2":0.8,"transmittance_3":0.8,"transmittance_4":0.8,"wavelength_1":0.4,"wavelength_2":0.5,"wavelength_3":0.6,"wavelength_4":0.7},"spectral unused a":{"back_reflectance_1":0.1,"front_reflectance_1":0.1,"transmittance_1":0.8,"wavelength_1":0.7}}}"#,
+                (1, 20, 21),
+                vec![
+                    ("SPECTRAL UNUSED A", 5usize, 0usize, 5usize, 0usize),
+                    (
+                        "Z FULL RETAINED EXTENSION SPECTRAL",
+                        21usize,
+                        4usize,
+                        6usize,
+                        1usize,
+                    ),
+                    ("spectral unused a", 5usize, 0usize, 7usize, 0usize),
+                ],
+            ),
+        ];
+        let home = std::env::temp_dir().join(format!(
+            "ep-run-original-window-six-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos(),
+        ));
+        std::fs::create_dir(&home).unwrap();
+        let converted_path = home.join("converted.epJSON");
+        let original_path = home.join("original.idf");
+        let mut observed_families = source_idf_raw
+            .objects
+            .keys()
+            .filter(|family| ep_raw_model::source_idf_object_layout(&family.0).is_some())
+            .map(|family| family.0.clone())
+            .collect::<std::collections::BTreeSet<_>>();
+        let matches = cases.iter().all(|(family, suffix, operands, capacity, expected)| {
+            let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+            let additional: serde_json::Value = serde_json::from_str(operands).unwrap();
+            value.as_object_mut().unwrap().extend(additional.as_object().unwrap().clone());
+            std::fs::write(&converted_path, value.to_string()).unwrap();
+            std::fs::write(&original_path, format!("{preamble}\n{suffix}")).unwrap();
+            let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+                &converted_path, &original_path,
+            ).expect("same authored converted operands and real original-IDF file");
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            let mut ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                .expect("real original-IDF24-family immutable metadata handoff");
+            let projected = crate::ordinary_material_input::resolve_source(&raw, &ip)
+                .expect("real original-IDF material projection including helper custody");
+            observed_families.extend(raw.objects.keys().filter(|family|
+                ep_raw_model::source_idf_object_layout(&family.0).is_some()).map(|family|family.0.clone()));
+            let names = ip.source_raw_object_names(family).unwrap().to_vec();
+            let args = ip.get_object_def_max_args(family).unwrap();
+            let helper_capacity_ok = [
+                ("WindowGap:DeflectionState",1usize,3usize),
+                ("WindowGap:SupportPillar",1usize,2usize),
+            ].iter().all(|(helper,alphas,numerics)| {
+                if raw.objects.contains_key(&ep_raw_model::ObjectType((*helper).into())) {
+                    let counts=ip.get_object_def_max_args(helper).unwrap();
+                    (counts.alphas,counts.numerics)==(*alphas,*numerics)
+                } else {true}
+            });
+            let identity_ok = compiled.model.as_ref().is_some_and(|model| {
+                if family.starts_with("WindowMaterial:") {
+                    expected.iter().all(|(name,_,_,_,_)| model.material_names.resolve(name)
+                        .and_then(|id|model.materials.iter().find(|row|row.id==id))
+                        .is_some_and(|row|row.name.0==name.to_ascii_uppercase()
+                            && model.ctf_report_names.materials.contains(&(row.id,name.to_ascii_uppercase()))))
+                } else if *family=="MaterialProperty:GlazingSpectralData" {
+                    model.glazing_spectral_data_names.is_source_exact_namespace()
+                        && expected.iter().all(|(name,_,_,_,_)|model.glazing_spectral_data_names.resolve(name).is_some())
+                        && model.glazing_spectral_data.len() == expected.len()
+                        && projected.spectral_data.len() == expected.len()
+                        && expected.iter().enumerate().all(|(index,(name,fields,_,_,rows))| {
+                            let canonical = name.to_ascii_uppercase();
+                            model.glazing_spectral_data.get(index).is_some_and(|row| {
+                                row.name.0 == canonical
+                                    && model.glazing_spectral_data_names.names().get(index)
+                                        .is_some_and(|name| name.0 == canonical)
+                                    && model.glazing_spectral_data.iter().take(index)
+                                        .all(|earlier| earlier.id != row.id)
+                                    && model.glazing_spectral_data_names.resolve(name)
+                                        == model.glazing_spectral_data.iter()
+                                            .find(|first| first.name.0 == canonical).map(|first| first.id)
+                                    && projected.spectral_data.get(index).is_some_and(|input| {
+                                        input.object.object_name == *name
+                                            && input.object.idf_max_fields == Some(*fields)
+                                            && input.extensions.len() == *rows
+                                    })
+                            })
+                        })
+                } else {true}
+            });
+            let ordered = raw.source_ordered_instances(family).unwrap();
+            let case_matches = !raw.is_epjson() && !projected.source_is_epjson && !compiled.has_errors()
+                && helper_capacity_ok && identity_ok
+                && raw.has_idf_declaration_order(family)
+                && (args.alphas, args.numerics, args.total().unwrap()) == *capacity
+                && names.len() == expected.len() && ordered.len() == expected.len()
+                && expected.iter().enumerate().all(|(index, (name, fields, extensions, ordinal, rows))| {
+                    let raw_fields = &ordered[index].1.fields;
+                    let original = ip.source_raw_object_fields(family, name).unwrap();
+                    names[index] == *name && ordered[index].0.0 == *name
+                        && matches!(raw_fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),
+                            Some(ep_raw_model::RawValue::Number(token)) if token==&fields.to_string())
+                        && matches!(raw_fields.get(&ep_raw_model::FieldName("idf_max_extensible_fields".into())),
+                            Some(ep_raw_model::RawValue::Number(token)) if token==&extensions.to_string())
+                        && matches!(raw_fields.get(&ep_raw_model::FieldName("idf_order".into())),
+                            Some(ep_raw_model::RawValue::Number(token)) if token==&ordinal.to_string())
+                        && matches!(original.get("idf_max_fields"),
+                            Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token==&fields.to_string())
+                        && (*family != "Curve:Biquadratic" || !name.starts_with("Z MINIMAL")
+                            || matches!(raw_fields.get(&ep_raw_model::FieldName("coefficient1_constant".into())),
+                                Some(ep_raw_model::RawValue::Number(token)) if matches!(
+                                    ep_model::classify_source_json_number(token),
+                                    Ok(ep_model::SourceJsonNumber::Float(value)) if value.to_bits()==0x43f0_0000_0000_0000_u64)))
+                        && (*family != "MaterialProperty:GlazingSpectralData"
+                            || match raw_fields.get(&ep_raw_model::FieldName("extensions".into())) {
+                                None=>*rows==0,
+                                Some(ep_raw_model::RawValue::Array(values))=>values.len()==*rows,
+                                _=>false,
+                            })
+                });
+            if !case_matches {
+                eprintln!(
+                    "original-IDF ingress/IP case failed: family={family}, expected_capacity={capacity:?}, actual_capacity=({:?}, {:?}, {:?}), names={names:?}, expected_rows={}, helper_capacity_ok={helper_capacity_ok}, identity_ok={identity_ok}, compiler_errors={}, compiler_diagnostics={:?}",
+                    args.alphas, args.numerics, args.total(), expected.len(),
+                    compiled.has_errors(), compiled.report.diagnostics,
+                );
+            }
+            case_matches
+        });
+        // DSOA is an independent runtime owner, outside the material/curve table.
+        // The F6 operands are copied actual Input04; its public Native IP witness
+        // is 2A4N. Fresh Root public-IP probes also confirm F0/F1/F5/F8 and
+        // AirGap EOF counts/full slots; no Native sizing/material data is claimed.
+        let dsoa_ingress_matches = [
+            (
+                "Z DSOA FULL F8",
+                "DesignSpecification:OutdoorAir,Z DSOA FULL F8,Sum,0.0001,0.00002,0.00003,0.144,,;",
+                r#"{"outdoor_air_method":"Sum","outdoor_air_flow_per_person":0.0001,"outdoor_air_flow_per_zone_floor_area":0.00002,"outdoor_air_flow_per_zone":0.00003,"outdoor_air_flow_air_changes_per_hour":0.144}"#,
+                8usize,
+            ),
+            (
+                "144 BASIC DSOA",
+                "DesignSpecification:OutdoorAir,144 BASIC DSOA,Sum,0.0001,0.00002,0.00003,0.144;",
+                r#"{"outdoor_air_method":"Sum","outdoor_air_flow_per_person":0.0001,"outdoor_air_flow_per_zone_floor_area":0.00002,"outdoor_air_flow_per_zone":0.00003,"outdoor_air_flow_air_changes_per_hour":0.144}"#,
+                6,
+            ),
+            (
+                "B DSOA MIN F1",
+                "DesignSpecification:OutdoorAir,B DSOA MIN F1;",
+                "{}",
+                1,
+            ),
+            (
+                "A DSOA EOF F5",
+                "DesignSpecification:OutdoorAir,A DSOA EOF F5,Sum,0.0001,0.00002,0.00003,0.144",
+                r#"{"outdoor_air_method":"Sum","outdoor_air_flow_per_person":0.0001,"outdoor_air_flow_per_zone_floor_area":0.00002,"outdoor_air_flow_per_zone":0.00003,"outdoor_air_flow_air_changes_per_hour":0.144}"#,
+                5,
+            ),
+            (
+                "A DSOA NAME EOF F0",
+                "DesignSpecification:OutdoorAir,A DSOA NAME EOF F0",
+                "{}",
+                0,
+            ),
+        ].iter().all(|(name, suffix, operands, maximum)| {
+            let family = "DesignSpecification:OutdoorAir";
+            let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+            value[family] = serde_json::Value::Object(serde_json::Map::from_iter([
+                ((*name).into(), serde_json::from_str::<serde_json::Value>(operands).unwrap()),
+            ]));
+            // Resolve_source_b is the full Raw admission boundary. Positive
+            // DSOA therefore carries a real sole IdealLoads unit and distinct OA
+            // Node, rather than borrowing the material-only prefix as a waiver.
+            value["OutdoorAir:Node"] = serde_json::json!({"QA DSOA OA":{}});
+            value["ZoneHVAC:IdealLoadsAirSystem"] = serde_json::json!({"QA DSOA UNIT":{
+                "zone_supply_air_node_name":"QA DSOA SUPPLY",
+                "dehumidification_control_type":"None",
+                "humidification_control_type":"None",
+                "design_specification_outdoor_air_object_name":*name,
+                "outdoor_air_inlet_node_name":"QA DSOA OA",
+            }});
+            // Exact original IDD positions through field32. Blank values stay
+            // absent in converted operands; no getter default is inserted here.
+            let unit = [
+                "QA DSOA UNIT", "", "QA DSOA SUPPLY", "", "", // A1..A5
+                "", "", "", "", // N1..N4
+                "", "", "", "", "", "", // A6,N5,N6,A7,N7,N8
+                "", "", "None", "", "None", // A8,A9,A10,N9,A11
+                *name, "QA DSOA OA", "", "", "", // A12..A16
+                "", "", "", "", "", "", "", // N10,N11,A17..A21
+            ].join(",");
+            std::fs::write(&converted_path, value.to_string()).unwrap();
+            std::fs::write(&original_path, format!(
+                "{preamble}\nOutdoorAir:Node,QA DSOA OA;\nZoneHVAC:IdealLoadsAirSystem,{unit};\n{suffix}"
+            )).unwrap();
+            let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+                &converted_path, &original_path,
+            ).expect("actual complete positive-OA DSOA staged input, including literal EOF");
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            let mut ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                .expect("genuine recovered DSOA custody transfer");
+            let objects = raw.source_ordered_instances(family).unwrap();
+            let fields = ip.source_raw_object_fields(family, name).unwrap();
+            let mut missing = raw.clone();
+            missing.objects.get_mut(&ep_raw_model::ObjectType(family.into())).unwrap()
+                .get_mut(&ep_raw_model::ObjectName((*name).into())).unwrap().fields
+                .remove(&ep_raw_model::FieldName("idf_max_fields".into())).unwrap();
+            !raw.is_epjson() && !compiled.has_errors()
+                && raw.validate_source_idf_object_custody(family).is_ok()
+                && crate::ordinary_input_processor::resolve_source_b(&missing).is_err()
+                && objects.len() == 1 && objects[0].0.0 == *name
+                && ip.source_raw_object_names(family).unwrap().iter().map(String::as_str).eq([*name])
+                && matches!(fields.get("idf_order"), Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == "7")
+                && matches!(fields.get("idf_max_fields"), Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == &maximum.to_string())
+                && matches!(fields.get("idf_max_extensible_fields"), Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == "0")
+                && ip.get_object_def_max_args(family).is_ok_and(|args| (args.alphas, args.numerics) == (4, 4))
+        });
+        let air_gap_eof_matches = {
+            let family = "Material:AirGap";
+            let name = "CORRECTION12 AIR GAP EOF";
+            let mut value: serde_json::Value = serde_json::from_str(base).unwrap();
+            value[family] = serde_json::Value::Object(serde_json::Map::from_iter([(
+                name.into(),
+                serde_json::json!({"thermal_resistance":0.03125}),
+            )]));
+            std::fs::write(&converted_path, value.to_string()).unwrap();
+            std::fs::write(
+                &original_path,
+                format!("{preamble}\nMaterial:AirGap,{name},0.03125"),
+            )
+            .unwrap();
+            let raw = ep_raw_model::load_epjson_file_with_idf_order_for_source(
+                &converted_path,
+                &original_path,
+            )
+            .expect("real AirGap final numeric EOF input");
+            let compiled = ep_compiler::compile_raw_model_for_source(&raw);
+            let ip = crate::ordinary_input_processor::resolve_source_b(&raw)
+                .expect("real original AirGap metadata handoff");
+            let projected = crate::ordinary_material_input::resolve_source(&raw, &ip)
+                .expect("real AirGap projection from the same retained original input");
+            !raw.is_epjson()
+                && !compiled.has_errors()
+                && !projected.source_is_epjson
+                && raw.validate_source_idf_object_custody(family).is_ok()
+                && projected.air_gaps.len() == 1
+                && projected.air_gaps[0].object_name == name
+                && projected.air_gaps[0].idf_max_fields == Some(1)
+                && matches!(ip.source_raw_object_fields(family, name).unwrap().get("idf_max_fields"),
+                    Some(ep_runtime::heat_balance::selected_input_processor::SourceInputStatisticsValue::Number(token)) if token == "1")
+        };
+        std::fs::remove_file(converted_path).unwrap();
+        std::fs::remove_file(original_path).unwrap();
+        std::fs::remove_dir(home).unwrap();
+        matches && dsoa_ingress_matches && air_gap_eof_matches
+            // This table proves its original 24 material/curve layouts. The two
+            // OA layouts and DSOA have separate original-IDF existing-body cases.
+            && observed_families.len() == 24
+            && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.len() == 28
+            && ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES.iter().all(|family| {
+                matches!(*family, "OutdoorAir:Node" | "OutdoorAir:NodeList" | "DesignSpecification:OutdoorAir" | "Material:AirGap")
+                    || observed_families.contains(*family)
+            })
+    };
     for scope in [PortingScope::A, PortingScope::B] {
         let mut value = input(scope);
         value["Material"] = json!({"Solid":{"roughness":"MediumRough","thickness":0.1,"conductivity":1.7,"density":2200,"specific_heat":840}});
@@ -13145,7 +14764,7 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                     && glazing_eql_idf_compiled.model.as_ref().is_some_and(|model|model.materials.len() == 1
                         && model.materials[0].kind() == ep_model::MaterialKind::WindowGlazingEquivalentLayer)
                     && crate::ordinary_equipment_input::resolve_source_b(&glazing_eql_idf)
-                        .is_err_and(|error|error == "Source unused GlazingEQL requires direct epJSON")
+                        .is_err_and(|error|error == "Source WindowMaterial:Glazing:EquivalentLayer original IDF requires recovered declaration order")
                     && crate::ordinary_equipment_input::resolve_source_a(&glazing_eql_idf).is_err()
                     && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&controlled_glazing_eql.to_string()).expect("control Raw")).is_err()
                     && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&active_glazing_eql.to_string()).expect("active EQL Raw")).is_err()
@@ -13811,7 +15430,7 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 && crate::ordinary_equipment_input::resolve(&gap_eql_raw).is_err()
                 && !gap_eql_idf.is_epjson() && !gap_eql_idf_compiled.has_errors()
                 && gap_eql_idf_compiled.model.as_ref().is_some_and(|model|model.materials.len() == 1 && model.materials[0].kind() == ep_model::MaterialKind::WindowGapEquivalentLayer)
-                && crate::ordinary_equipment_input::resolve_source_b(&gap_eql_idf).is_err_and(|e|e == "Source unused GapEQL requires direct epJSON")
+                && crate::ordinary_equipment_input::resolve_source_b(&gap_eql_idf).is_err_and(|e|e == "Source WindowMaterial:Gap:EquivalentLayer original IDF requires recovered declaration order")
                 && crate::ordinary_equipment_input::resolve_source_a(&gap_eql_idf).is_err()
                 && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&controlled.to_string()).expect("control Raw")).is_err()
                 && crate::ordinary_equipment_input::resolve_source_b(&ep_raw_model::parse_epjson_str_for_source(&active.to_string()).expect("active Raw")).is_err()
@@ -14552,7 +16171,8 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                 && source_idf_projection.roof_vegetation[1].fields.is_empty()
                 && matches!(&source_idf_removed_count,ep_raw_model::RawValue::Number(token) if token=="0")
                 && source_idf_generic_negative.is_err_and(|e|e=="Source RoofVegetation original IDF requires recovered declaration order")
-                && source_idf_count_negative.is_err_and(|e|e=="Source RoofVegetation original IDF requires idf_max_fields for every object"));
+                && source_idf_count_negative.is_err_and(|e|e=="Source RoofVegetation original IDF requires idf_max_fields for every object")
+                && original_window_six_ingress);
             // U08: invalid original names cannot fall through either Source loader; bounded values do not license UIntMAX.
             assert!(
                 ["", "\n", " \t\r\u{c}", "BAD\nNAME"].iter().all(|name| {
@@ -15941,7 +17561,7 @@ fn interior_air_gap_preserves_raw_ip_typed_identity_and_source_support() {
                     && crate::ordinary_equipment_input::source_b_validate_unused_window_gap(
                         &gap_idf
                     )
-                    .is_err_and(|e| e == "Source unused WindowGap requires direct epJSON")
+                    .is_err_and(|e| e == "Source WindowMaterial:Gap original IDF requires recovered declaration order")
                     && crate::ordinary_equipment_input::resolve_source_b(&gap_idf).is_err(),
                 "positive Legacy IDF is held outside SourceB while all three new families stay out of SourceA"
             );

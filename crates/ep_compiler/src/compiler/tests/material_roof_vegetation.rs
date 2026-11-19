@@ -676,21 +676,40 @@ fn roof_vegetation_materializes_defaults_source_state_and_opaque_projections()
             "Zone,Zone;Material:RoofVegetation,IDF ROOF,,,,,,,,,,,,,,,,,,;",
         )?;
         let idf_legacy = compile_raw_model(&roof_idf);
-        // C08: Source-only unused selection does not turn active constructions or IDF into Source getter evidence.
+        let epjson_legacy = compile_raw_model(&roof_raw);
+        // C08: active Source Roof retains exact typed/report/Construction identity; Legacy keeps its own namespace.
         assert!(
-            !compile_raw_model(&roof_raw).has_errors()
+            !epjson_legacy.has_errors()
+                && epjson_legacy.model.as_ref().is_some_and(|model| {
+                    !model.material_names.is_source_exact_namespace()
+                        && model.ctf_report_names.materials.is_empty()
+                        && model.materials.len() == 1
+                        && model.materials[0].kind() == MaterialKind::RoofVegetation
+                })
                 && !idf_legacy.has_errors()
                 && !roof_idf.is_epjson()
                 && idf_legacy
                     .model
                     .as_ref()
                     .is_some_and(|model| model.materials.len() == 1
-                        && model.materials[0].kind() == MaterialKind::RoofVegetation)
-                && active.model.as_ref().is_none_or(|model| model
-                    .ctf_report_names
-                    .materials
-                    .iter()
-                    .all(|(_, name)| name != " ROOF STANDALONE "))
+                        && model.materials[0].kind() == MaterialKind::RoofVegetation
+                        && !model.material_names.is_source_exact_namespace()
+                        && model.ctf_report_names.materials.is_empty())
+                && !active.has_errors()
+                && active.model.as_ref().is_some_and(|model| {
+                    model.material_names.is_source_exact_namespace()
+                        && model.material_names.resolve(" roof standalone ")
+                            == Some(ep_model::MaterialId(0))
+                        && model.materials.len() == 1
+                        && model.materials[0].id == ep_model::MaterialId(0)
+                        && model.materials[0].kind() == MaterialKind::RoofVegetation
+                        && model.materials[0].name.0 == " ROOF STANDALONE "
+                        && model.ctf_report_names.materials
+                            == [(ep_model::MaterialId(0), " ROOF STANDALONE ".into())]
+                        && model.constructions.len() == 1
+                        && model.constructions[0].name.0 == "USED ROOF"
+                        && model.constructions[0].effective_layers() == [ep_model::MaterialId(0)]
+                })
         );
     }
     Ok(())

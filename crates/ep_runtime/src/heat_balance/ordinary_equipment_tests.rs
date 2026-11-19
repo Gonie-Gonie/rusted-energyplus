@@ -2477,6 +2477,526 @@ fn actual_native_get_equipment_pair_and_input_owner_transitions()
                             " Non-Parent Node Connection,AUTO APPENDED OA,OUTDOORAIR:NODE,OutdoorAir:Node,OutdoorAir,7",
                         ]
                     );
+                    // Two original-IDF counted-prefix controls on the same real
+                    // caller/Node owners. Native fills the EOF numeric out slot,
+                    // but NumNums=0 must not write the preexisting physical Height.
+                    // These are coalesced public-IP witnesses, not a full model
+                    // or private manager scratch-buffer observation.
+                    {
+                        use crate::heat_balance::selected_input_processor::{
+                            SourceInputStatisticsInput, SourceInputStatisticsValue as OriginalValue,
+                        };
+                        use crate::heat_balance::startup_integrity::SourceNodeObjectType;
+                        const ORIGINAL_NODE: &str = "OutdoorAir:Node";
+                        const ORIGINAL_LIST: &str = "OutdoorAir:NodeList";
+                        const ORIGINAL_NAME: &str = "A EXPLICIT HEIGHT EOF";
+                        const ORIGINAL_LIST_KEY: &str = "OutdoorAir:NodeList 1";
+                        for (fields, returned_numbers, expected_height) in
+                            [(1_usize, 0_usize, -321.0_f64), (2, 1, 12.5_f64)]
+                        {
+                            let objects: BTreeMap<
+                                String,
+                                BTreeMap<String, BTreeMap<String, OriginalValue>>,
+                            > = BTreeMap::from([
+                                (
+                                    ORIGINAL_NODE.into(),
+                                    BTreeMap::from([(
+                                        ORIGINAL_NAME.into(),
+                                        BTreeMap::from([
+                                            (
+                                                "height_above_ground".into(),
+                                                OriginalValue::Number("12.5".into()),
+                                            ),
+                                            ("idf_order".into(), OriginalValue::Number("5".into())),
+                                            (
+                                                "idf_max_fields".into(),
+                                                OriginalValue::Number(fields.to_string()),
+                                            ),
+                                            (
+                                                "idf_max_extensible_fields".into(),
+                                                OriginalValue::Number("0".into()),
+                                            ),
+                                        ]),
+                                    )]),
+                                ),
+                                (
+                                    ORIGINAL_LIST.into(),
+                                    BTreeMap::from([(
+                                        ORIGINAL_LIST_KEY.into(),
+                                        BTreeMap::from([
+                                            (
+                                                "nodes".into(),
+                                                OriginalValue::Array(vec![OriginalValue::Object(
+                                                    BTreeMap::from([(
+                                                        "node_or_nodelist_name".into(),
+                                                        OriginalValue::String(
+                                                            "OutdoorAir:NodeList".into(),
+                                                        ),
+                                                    )]),
+                                                )]),
+                                            ),
+                                            (
+                                                "idf_order".into(),
+                                                OriginalValue::Number("40".into()),
+                                            ),
+                                            (
+                                                "idf_max_fields".into(),
+                                                OriginalValue::Number("1".into()),
+                                            ),
+                                            (
+                                                "idf_max_extensible_fields".into(),
+                                                OriginalValue::Number("1".into()),
+                                            ),
+                                        ]),
+                                    )]),
+                                ),
+                            ]);
+                            let families = objects
+                                .iter()
+                                .map(|(family, rows)| {
+                                    (
+                                        family.clone(),
+                                        SourceInputFamily::Objects(
+                                            rows.iter()
+                                                .map(|(name, values)| SourceObjectShape {
+                                                    object_name: name.clone(),
+                                                    field_sizes: values
+                                                        .iter()
+                                                        .map(|(field, value)| {
+                                                            (
+                                                                field.clone(),
+                                                                match value {
+                                                                    OriginalValue::Array(rows) => {
+                                                                        rows.len()
+                                                                    }
+                                                                    OriginalValue::Object(rows) => {
+                                                                        rows.len()
+                                                                    }
+                                                                    OriginalValue::Null => 0,
+                                                                    _ => 1,
+                                                                },
+                                                            )
+                                                        })
+                                                        .collect(),
+                                                })
+                                                .collect(),
+                                        ),
+                                    )
+                                })
+                                .collect();
+                            let order = objects
+                                .iter()
+                                .map(|(family, rows)| {
+                                    (family.clone(), rows.keys().cloned().collect())
+                                })
+                                .collect();
+                            let mut original_ip = SelectedInputProcessor::from_admitted_input(
+                                definitions.clone(),
+                                families,
+                            )?;
+                            original_ip.retain_source_input_statistics(
+                                SourceInputStatisticsInput {
+                                    objects: objects.clone(),
+                                    object_order: order,
+                                },
+                            )?;
+                            original_ip.retain_source_original_idf_fields(
+                                ORIGINAL_NODE,
+                                [
+                                    ("name", true, "Name"),
+                                    ("height_above_ground", false, "Height Above Ground"),
+                                    (
+                                        "drybulb_temperature_schedule_name",
+                                        true,
+                                        "Drybulb Temperature Schedule Name",
+                                    ),
+                                    (
+                                        "wetbulb_temperature_schedule_name",
+                                        true,
+                                        "Wetbulb Temperature Schedule Name",
+                                    ),
+                                    ("wind_speed_schedule_name", true, "Wind Speed Schedule Name"),
+                                    (
+                                        "wind_direction_schedule_name",
+                                        true,
+                                        "Wind Direction Schedule Name",
+                                    ),
+                                    (
+                                        "wind_pressure_coefficient_curve_name",
+                                        true,
+                                        "Wind Pressure Coefficient Curve Name",
+                                    ),
+                                    (
+                                        "symmetric_wind_pressure_coefficient_curve",
+                                        true,
+                                        "Symmetric Wind Pressure Coefficient Curve",
+                                    ),
+                                    ("wind_angle_type", true, "Wind Angle Type"),
+                                ]
+                                .into_iter()
+                                .map(|(key, alpha, label)| (key.into(), alpha, label.into()))
+                                .collect(),
+                                Vec::new(),
+                            )?;
+                            original_ip.retain_source_original_idf_fields(
+                                ORIGINAL_LIST,
+                                Vec::new(),
+                                vec![(
+                                    "node_or_nodelist_name".into(),
+                                    true,
+                                    "Node or NodeList Name".into(),
+                                )],
+                            )?;
+                            let counts = original_ip.source_original_idf_argument_counts(
+                                ORIGINAL_NODE,
+                                fields,
+                                None,
+                                0,
+                            )?;
+                            let list_counts = original_ip.source_original_idf_argument_counts(
+                                ORIGINAL_LIST,
+                                1,
+                                Some(1),
+                                1,
+                            )?;
+                            let mut alpha_labels: [String; 8] =
+                                std::array::from_fn(|_| "unwritten".into());
+                            let mut numeric_labels = ["unwritten".to_string()];
+                            original_ip.source_original_idf_field_names(
+                                ORIGINAL_NODE,
+                                0,
+                                &mut alpha_labels,
+                                &mut numeric_labels,
+                            )?;
+                            let mut list_labels = ["unwritten".to_string()];
+                            original_ip.source_original_idf_field_names(
+                                ORIGINAL_LIST,
+                                1,
+                                &mut list_labels,
+                                &mut [],
+                            )?;
+                            let original_clock =
+                                OrdinaryEquipmentInput::from_source_a_family_inventory(
+                                    [("NodeList", original_ip.get_num_objects_found("NodeList"))],
+                                    timesteps,
+                                )?;
+                            let mut original_equipment = OrdinaryEquipment::new_for_source_ordered(
+                                &model,
+                                original_clock,
+                                &zone_ids,
+                                &space_ids,
+                            )?;
+                            let mut original_registry =
+                                crate::heat_balance::ordinary_hvac_manager::SourceOutdoorAirNodes::default();
+                            let mut original_branch =
+                                crate::heat_balance::startup_integrity::SourceBranchNodeConnections::default();
+                            let mut original_state = error_state.clone();
+                            let (mut original_error, mut original_console) =
+                                (Vec::new(), Vec::new());
+                            let any_local_before = globals.any_local_environments_in_model;
+                            let (mut number_nodes, mut node_numbers, mut errors_found) =
+                                (0_usize, [0_usize; 1], false);
+                            let unused_before;
+                            let input_was_consumed;
+                            let registry_was_cold = original_registry.get_input_flag;
+                            {
+                                let mut backend = SourceErrorBackend {
+                                    state: &mut original_state,
+                                    error_stream: Some(&mut original_error),
+                                    console: &mut original_console,
+                                    out_unit1: None,
+                                    out_unit2: None,
+                                    f_message: None,
+                                    message_callback: None,
+                                    error_callback: None,
+                                    sqlite: None,
+                                };
+                                original_equipment.get_source_authored_outdoor_air_node_nums(
+                                    &mut original_ip,
+                                    &mut original_branch,
+                                    SourceNodeObjectType::OutdoorAirNode,
+                                    ORIGINAL_NAME,
+                                    "Name",
+                                    1,
+                                    &mut number_nodes,
+                                    &mut node_numbers,
+                                    &mut errors_found,
+                                    &mut backend,
+                                    None,
+                                )?;
+                                original_equipment.set_source_authored_outdoor_air_node_height(
+                                    node_numbers[0],
+                                    -321.0,
+                                )?;
+                                unused_before = original_ip
+                                    .is_object_unused(ORIGINAL_NODE, ORIGINAL_NAME)
+                                    && original_ip
+                                        .is_object_unused(ORIGINAL_LIST, ORIGINAL_LIST_KEY);
+                                input_was_consumed = original_registry
+                                    .prepare_source_outdoor_air_nodes_input(
+                                    &mut original_ip,
+                                    &mut original_equipment,
+                                    &mut original_branch,
+                                    false,
+                                    &mut backend,
+                                    Some(
+                                        crate::heat_balance::error_backend::SourceDiagnosticFlags {
+                                            kickoff: &globals.kickoff_simulation,
+                                            developer: &developer,
+                                            warmup: &clock.warmup_flag,
+                                            doing_sizing: &globals.doing_sizing,
+                                        },
+                                    ),
+                                    &mut multi_schedules,
+                                    &mut globals.any_local_environments_in_model,
+                                )?;
+                            }
+                            let node_at = node_numbers[0]
+                                .checked_sub(1)
+                                .ok_or("actual original OA Node")?;
+                            let physical = &original_equipment
+                                .nodes
+                                .physical
+                                .as_ref()
+                                .ok_or("actual original OA physical owner")?[node_at];
+                            let registry = original_registry
+                                .outside_air_node_list
+                                .as_deref()
+                                .ok_or("actual original OA registry")?;
+                            let mut connections = Vec::new();
+                            original_branch.report_source_node_connections(
+                                &original_equipment,
+                                &mut connections,
+                            )?;
+                            let connections = String::from_utf8(connections)?;
+                            assert!(
+                                number_nodes == 1 && !errors_found && unused_before
+                                    && registry_was_cold && input_was_consumed
+                                    && (counts.alphas, counts.numerics) == (1, returned_numbers)
+                                    && (list_counts.alphas, list_counts.numerics) == (1, 0)
+                                    && alpha_labels.iter().map(String::as_str).eq([
+                                        "Name", "Drybulb Temperature Schedule Name", "Wetbulb Temperature Schedule Name",
+                                        "Wind Speed Schedule Name", "Wind Direction Schedule Name",
+                                        "Wind Pressure Coefficient Curve Name", "Symmetric Wind Pressure Coefficient Curve",
+                                        "Wind Angle Type",
+                                    ])
+                                    && numeric_labels.iter().map(String::as_str).eq(["Height Above Ground"])
+                                    && list_labels.iter().map(String::as_str).eq(["Node or NodeList Name"])
+                                    && original_ip.source_raw_object_names(ORIGINAL_NODE)?.iter().map(String::as_str).eq([ORIGINAL_NAME])
+                                    && original_ip.source_raw_object_names(ORIGINAL_LIST)?.iter().map(String::as_str).eq([ORIGINAL_LIST_KEY])
+                                    && original_ip.source_raw_object_fields(ORIGINAL_NODE, ORIGINAL_NAME)?
+                                        == &objects[ORIGINAL_NODE][ORIGINAL_NAME]
+                                    && original_ip.source_raw_object_fields(ORIGINAL_LIST, ORIGINAL_LIST_KEY)?
+                                        == &objects[ORIGINAL_LIST][ORIGINAL_LIST_KEY]
+                                    && physical.height.to_bits() == expected_height.to_bits()
+                                    && !original_registry.get_input_flag
+                                    && original_registry.number_outside_air_nodes == 2
+                                    && registry.len() == 2 && usize::try_from(registry[1])? == node_numbers[0]
+                                    && original_equipment.source_node_id(usize::try_from(registry[0])?)? == "OUTDOORAIR:NODELIST"
+                                    && original_equipment.source_node_id(usize::try_from(registry[1])?)? == ORIGINAL_NAME
+                                    && !original_ip.is_object_unused(ORIGINAL_NODE, ORIGINAL_NAME)
+                                    && !original_ip.is_object_unused(ORIGINAL_LIST, ORIGINAL_LIST_KEY)
+                                    && globals.any_local_environments_in_model == any_local_before
+                                    && original_state.tracking.total_severe_errors == 0
+                                    && original_state.tracking.total_warning_errors == 0
+                                    && original_error.is_empty() && original_console.is_empty()
+                                    && connections.contains(" Non-Parent Node Connection,OUTDOORAIR:NODELIST,OUTDOORAIR:NODELIST,OutdoorAir:NodeList,OutdoorAir,1")
+                                    && !connections.contains("OUTDOORAIR:NODELIST 1"),
+                                "original OA F={fields}: counted height and nameless-list metadata/caller custody"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        // DSOA uses its actual returned physical counts, including full buffers
+        // beyond an EOF extent. F6 is the copied Input04 public Native-IP row;
+        // F0/F1/F5/F8 are authored Native-CODE controls until Root probes them.
+        // This extends the existing public OA owner body, not a scratch seam or
+        // a new complete Source Session. Existing direct-JSON OA cases above hold.
+        {
+            use crate::heat_balance::selected_input_processor::{
+                SourceInputStatisticsInput, SourceInputStatisticsValue as V,
+            };
+            use crate::heat_balance::selected_sizing::SelectedOAFlowMethod as Method;
+            const DSOA: &str = "DesignSpecification:OutdoorAir";
+            for (name, maximum, counts, expected_original) in [
+                (
+                    "CORRECTION12 DSOA MIN F1",
+                    1usize,
+                    (1usize, 0usize),
+                    [0.00944_f64, 0.0, 0.0, 0.0],
+                ),
+                (
+                    "144 BASIC DSOA",
+                    6,
+                    (2, 4),
+                    [0.0001, 0.00002, 0.00003, 0.144],
+                ),
+                (
+                    "CORRECTION12 DSOA EOF F5",
+                    5,
+                    (2, 3),
+                    [0.0001, 0.00002, 0.00003, 0.0],
+                ),
+                (
+                    "CORRECTION12 DSOA FULL F8",
+                    8,
+                    (4, 4),
+                    [0.0001, 0.00002, 0.00003, 0.144],
+                ),
+                (
+                    "CORRECTION12 DSOA NAME EOF F0",
+                    0,
+                    (1, 0),
+                    [0.00944, 0.0, 0.0, 0.0],
+                ),
+            ] {
+                for original in [false, true] {
+                    let mut fields: BTreeMap<String, V> = BTreeMap::from([
+                        ("idf_order".into(), V::Number("21".into())),
+                        ("idf_max_fields".into(), V::Number(maximum.to_string())),
+                        ("idf_max_extensible_fields".into(), V::Number("0".into())),
+                    ]);
+                    if maximum > 1 {
+                        fields.extend([
+                            ("outdoor_air_method".into(), V::String("Sum".into())),
+                            (
+                                "outdoor_air_flow_per_person".into(),
+                                V::Number("0.0001".into()),
+                            ),
+                            (
+                                "outdoor_air_flow_per_zone_floor_area".into(),
+                                V::Number("0.00002".into()),
+                            ),
+                            (
+                                "outdoor_air_flow_per_zone".into(),
+                                V::Number("0.00003".into()),
+                            ),
+                            (
+                                "outdoor_air_flow_air_changes_per_hour".into(),
+                                V::Number("0.144".into()),
+                            ),
+                        ]);
+                    }
+                    let mut dsoa_ip = SelectedInputProcessor::from_admitted_input(
+                        vec![SourceObjectDefinition {
+                            object_type: DSOA.into(),
+                            alpha_fields: 4,
+                            numeric_fields: 4,
+                            alpha_extensions: 0,
+                            numeric_extensions: 0,
+                            extension: None,
+                        }],
+                        BTreeMap::from([(
+                            DSOA.into(),
+                            SourceInputFamily::Objects(vec![SourceObjectShape {
+                                object_name: name.into(),
+                                field_sizes: fields.keys().map(|key| (key.clone(), 1)).collect(),
+                            }]),
+                        )]),
+                    )?;
+                    dsoa_ip.retain_source_input_statistics(SourceInputStatisticsInput {
+                        object_order: BTreeMap::from([(DSOA.into(), vec![name.into()])]),
+                        objects: BTreeMap::from([(
+                            DSOA.into(),
+                            BTreeMap::from([(name.into(), fields.clone())]),
+                        )]),
+                    })?;
+                    let mut alpha_labels: [String; 4] = std::array::from_fn(|_| "unwritten".into());
+                    let mut numeric_labels: [String; 4] =
+                        std::array::from_fn(|_| "unwritten".into());
+                    let metadata_ok = if original {
+                        dsoa_ip.retain_source_original_idf_fields(
+                            DSOA,
+                            [
+                                ("name", true, "Name"),
+                                ("outdoor_air_method", true, "Outdoor Air Method"),
+                                ("outdoor_air_flow_per_person", false, "Outdoor Air Flow per Person"),
+                                ("outdoor_air_flow_per_zone_floor_area", false, "Outdoor Air Flow per Zone Floor Area"),
+                                ("outdoor_air_flow_per_zone", false, "Outdoor Air Flow per Zone"),
+                                ("outdoor_air_flow_air_changes_per_hour", false, "Outdoor Air Flow Air Changes per Hour"),
+                                ("outdoor_air_schedule_name", true, "Outdoor Air Schedule Name"),
+                                ("proportional_control_minimum_outdoor_air_flow_rate_schedule_name", true,
+                                    "Proportional Control Minimum Outdoor Air Flow Rate Schedule Name"),
+                            ].into_iter().map(|(key, alpha, label)| (key.into(), alpha, label.into())).collect(),
+                            Vec::new(),
+                        )?;
+                        let returned =
+                            dsoa_ip.source_original_idf_argument_counts(DSOA, maximum, None, 0)?;
+                        dsoa_ip.source_original_idf_field_names(
+                            DSOA,
+                            0,
+                            &mut alpha_labels,
+                            &mut numeric_labels,
+                        )?;
+                        (returned.alphas, returned.numerics) == counts
+                            && alpha_labels.iter().map(String::as_str).eq([
+                                "Name",
+                                "Outdoor Air Method",
+                                "Outdoor Air Schedule Name",
+                                "Proportional Control Minimum Outdoor Air Flow Rate Schedule Name",
+                            ])
+                            && numeric_labels.iter().map(String::as_str).eq([
+                                "Outdoor Air Flow per Person",
+                                "Outdoor Air Flow per Zone Floor Area",
+                                "Outdoor Air Flow per Zone",
+                                "Outdoor Air Flow Air Changes per Hour",
+                            ])
+                    } else {
+                        true
+                    };
+                    let mut dsoa_schedules = crate::heat_balance::selected_schedule_manager::SelectedScheduleManager::default();
+                    dsoa_schedules.init_constant_state(timesteps)?;
+                    let mut dsoa_sizing =
+                        crate::heat_balance::selected_sizing::SelectedSizingManager::default();
+                    dsoa_ip.report_source_idf_records_stats(&mut SourceOutputPreScan::default())?;
+                    let was_unused = dsoa_ip.is_object_unused(DSOA, name);
+                    dsoa_sizing.get_oa_requirements(
+                        &mut dsoa_ip,
+                        &mut dsoa_schedules,
+                        &clock,
+                        !original,
+                    )?;
+                    let rows = dsoa_sizing
+                        .oa_requirements
+                        .as_ref()
+                        .ok_or("actual original DSOA owner")?;
+                    let row = rows.first().ok_or("actual named original DSOA row")?;
+                    let expected = if !original && maximum == 5 {
+                        [0.0001, 0.00002, 0.00003, 0.144]
+                    } else {
+                        expected_original
+                    };
+                    assert!(
+                        metadata_ok
+                            && was_unused
+                            && !dsoa_ip.is_object_unused(DSOA, name)
+                            && dsoa_ip.source_raw_object_fields(DSOA, name)? == &fields
+                            && dsoa_sizing.number_of_oa_requirements == 2
+                            && dsoa_sizing.default_oa_requirement == 2
+                            && rows.len() == 2
+                            && row.name == name
+                            && row.flow_method
+                                == (if maximum > 1 {
+                                    Method::Sum
+                                } else {
+                                    Method::PerPerson
+                                })
+                            && [
+                                row.flow_per_person,
+                                row.flow_per_area,
+                                row.flow_per_zone,
+                                row.flow_air_changes_per_hour
+                            ]
+                            .map(f64::to_bits)
+                                == expected.map(f64::to_bits)
+                            && row.flow_fraction_schedule == Some(dsoa_schedules.always_on()?)
+                            && row.proportional_control_minimum_schedule.is_none()
+                            && rows[1].name == "Default-0.00944[m3/s-person]"
+                            && rows[1].flow_per_person.to_bits() == 0.00944_f64.to_bits(),
+                        "DSOA original={original} physical F={maximum}: counted owner/default/EOF and retained custody"
+                    );
                 }
             }
         }

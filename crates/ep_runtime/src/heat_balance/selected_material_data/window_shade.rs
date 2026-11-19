@@ -68,7 +68,15 @@ impl SelectedMaterialData {
         }
         for object in &raw.window_shade {
             let (alphas, numbers) = raw.get_window_shade_item(object, owners)?;
-            if (alphas, numbers) != (1, 14) {
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Shade",
+                object,
+                owners,
+            )? {
+                Some(expected) => (alphas, numbers) != expected,
+                None => (alphas, numbers) != (1, 14),
+            };
+            if invalid_counts {
                 return Err(unavailable("Shade1A14N primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

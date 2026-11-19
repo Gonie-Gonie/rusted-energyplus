@@ -2,7 +2,7 @@
 status: active
 claim_level: none
 owner: core
-last_reviewed: 2026-11-18
+last_reviewed: 2026-11-19
 ---
 
 # Current Status
@@ -44,12 +44,13 @@ already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122
 This inventory correction adds no physical evidence; retained116 is unchanged.
 Legal-value completion remains tracked per object. The retained
 [input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 276 paired physical cases and 12,675,256 reported values with zero
+contains 277 paired physical cases and 12,750,376 reported values with zero
 tolerance or RMSE failures. These cases span recorded Source builds; they do
 not establish arbitrary legal object/value combinations.
 
-Unused material coverage is limited to the fixed Source B direct-epJSON scenes
-in the [input-domain evidence](../../validation/evidence/object-input-domains.json).
+Unused material coverage comprises the retained fixed Source B direct-epJSON scenes
+and the separately recorded original-IDF scene in the
+[input-domain evidence](../../validation/evidence/object-input-domains.json).
 Actual runtime owners supply getter state, public MaterialDetails and Source
 geometry; typed properties do not replace that state. Each accepted case retains
 its recorded input, reports, comparison policies, topology, clock and export checks.
@@ -67,33 +68,42 @@ from the retained 116-type corpus and combined 123-name inventory above.
 | Material:RoofVegetation | Unused getter/common-report evidence; active EcoRoof evidence is separate below. |
 | WindowMaterial:Gap | Unused getter/report rows with raw-only WindowGap:DeflectionState and WindowGap:SupportPillar helpers; public rows do not pair private helper state. |
 
-The shared fourteen-family checks retain Raw/original-typed Construction
-references, including nonempty outside_layer. Their unit/static coverage adds
-no separate physical case or build credit. These unused scenes do not establish
-active Construction/window/shading consumers, CurveValue/evaluation, private
-Native optics/TAR/pointers, Source A/original-IDF/Legacy extensions, arbitrary
-legal combinations or full-object conformance.
+Bounded Source B retains Raw/original-typed outside, ordered and effective Construction custody. Unused WindowMaterial, Curve and spectral getters use actual runtime owners; Materials reporting and Source geometry do not expose Native-private optics, TAR or pointers.
 
-Source199's accepted Source B direct-epJSON active EcoRoof Simple ordinary-CTF
-case passes all 34 gates for 158 series and 75,120 values under unchanged policies.
-Reported Roof and meter values are raw-exact; three HorizontalIR operands differ
-by at most 1.71e-13. It uses one fresh Native/Source pair with zero reruns.
+The current fixed original-IDF scene supplies the same physical IDF to both actors and uses the whole official converted DOM for scientific inspection. It covers the existing fifteen WindowMaterial families, five analytic Curve getters, spectral/Gap helpers and ordinary no-AFN OA input custody. Recovered declaration order, F/L, defaults, blanks, IDD labels and raw numeric kinds remain distinct from returned counts and caller effects.
 
-Source200 adds one fresh fixed Advanced pair: all 158 series/75,120 values and
-34 gates pass under the same numerical policy and the reviewed v11 typed warning
-contract. Reported Roof and meter values are raw-exact; only three HorizontalIR
-operands differ, by at most 1.71e-13, with zero tolerance or RMSE failures.
-The Source199 v10 Advanced attempt remains historical at 31/34 gates and adds
-zero qualifying credit; the new acceptance does not rewrite that record.
+Source199 Simple and Source200 Advanced remain separate accepted direct-epJSON
+pairs; the older Source199 v10 Advanced attempt remains at 31/34 gates with zero
+credit. Source203 adds one fresh original-IDF Advanced pair: both engines receive
+the same physical Input04, all 34 gates and 158 series/75,120 values pass unchanged
+policies, and neither actor is rerun. Only three HorizontalIR operands differ
+(maximum 1.71e-13 W/m2, RMSE 1.13e-14); all other operands, including both meters,
+are raw-exact. Failed builds201 (import parsing) and202 (DSOA sizing input) remain
+separate zero-credit records. The original-IDF scene uses the same bounded Source B Advanced ordinary-CTF owner; Source A Roof remains input/unit-only. Direct epJSON and Legacy behavior are unchanged. Active window/CFS/EQL/shading and CurveValue/evaluation, Source A Window expansion, arbitrary legal combinations, annual runs and full-object conformance remain outside this evidence.
 
-Source200 also enables explicit Source A/B original-IDF Roof input custody.
-The existing body checks B Raw/IP/typed identity and A Raw admission. This is
-input/unit evidence, not an accepted original-IDF physics pair. Legacy, private
-Native state, annual runs, arbitrary combinations and full-object parity remain
-outside these finite results. Other Window/Curve/Spectral IDF extensions remain
-pending.
+The current Source203 snapshot passes workspace tests (5,051 passed, zero failed,
+two ignored) and all-target Clippy across all eleven packages. Its seven current
+QA commands execute four existing bodies; all 53 actual commands, six failures
+and one historical zero-match invocation retain their contexts without reuse.
 
-Workspace integration is unfinished: two existing compiler assertions failed; CODE review/correction is pending, and workspace Clippy has not run.
+Genuine original-IDF DSOA now transports its actual fixed layout and F-qualified
+counts to the sizing getter; the fixed SUM positive-OA scene qualifies. The
+AirGap EOF F1/N0 versus filled N1 distinction and count-independent material
+parent are separately checked by public IP and the existing body. This does
+not qualify arbitrary EOF schedule-reference combinations or a new active
+AirGap scene; future NoMass EOF-property, ComplexShade and positive-OA Humidistat work remains
+outside this publication.
+
+Complete streams and per-series results for this accepted pair are retained in
+`.runtime/porting/original-idf-window-six/runtime05/`: `readback.json`,
+`native/output/nativeout.eso`, `native/output/nativeout.mtr`,
+`source/output/eplusrs.eso` and `source/output/eplusrs.mtr`. The standalone v2
+reread did not complete because its frozen kernel rejects CSV MDD declarations;
+that tooling format gap is separate from the accepted frozen-v12 comparison.
+A genuinely reviewed ignored v3 prototype has now passed eight tests and the
+complete same-actor 158-series/75,120-value reread with three raw differences
+and zero point/RMSE failures, without launching either engine. Its tracked
+installation/publication and published usage/rerun command remain pending.
 
 Direct Source epJSON retains the first comparator-equivalent member spelling
 and last whole subtree, checked by two Native convert-only observations and
@@ -175,8 +185,8 @@ The original high-load Native model and two earlier Source attempts remain
 unaccepted; the accepted pair uses corrected Build104 and the sole retained
 low-load Native reference. Four existing test executions are retained without
 rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 200 recorded Source builds,
-172 with accepted pairs and 28 without accepted pairs, including 8 builds
+validate the consumer corrections. There are 203 recorded Source builds,
+173 with accepted pairs and 30 without accepted pairs, including 8 builds
 without Source execution. B/legacy Electric,
 Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
 and arbitrary/full-object combinations remain unvalidated.
@@ -248,7 +258,11 @@ is implied.
 
 The bounded Source B direct-epJSON Humidistat producer uses one real Zone/control, RH schedules and normal-mixing ThirdOrder, Analytical or Euler prediction. Analytical single50 with the omitted dehumidifying schedule and Euler crossed65/45 qualify under all161-series rules. ThirdOrder dual40/60 remains unaccepted: 14 new dehumidifying-report points exceed the unchanged1e-12 kgWater/s limit (maximum1.1494137e-12); all original155 streams and response gates pass.
 
-Bounded Source B direct epJSON retains its established outdoor-air, hard-limit, DCV/economizer/recovery and non-Humidistat humidity evidence. On basic positive-OA paths, named or present exact-empty humidity choices still require both actual OA references and every existing prerequisite. Coherent authored OutdoorAir:Node singles and nameless OutdoorAir:NodeList objects reach the bounded ordinary no-AFN owner under the same full positive-OA prerequisites. Each single permits finite Native-effective height and omitted, exact-empty or owned supported DB, WB and wind schedule fields, including both named temperature schedules. On this ordinary no-AFN route, the curve-name field is any String; symmetry is exactly empty/No/Yes and angle is exactly empty/Absolute/Relative. Direct epJSON enum case is significant. Omitted and exact-empty fields retain the actual defaults and blank metadata. Actual A2 then A3 lookup, nullable pointers and used state determine IsLocal; positional AnyLocal alone does not. The genuine eight-alpha getter still marks the object used, fills all fields and preserves positional counts, counted default Height and AnyLocal effects; these do not create IsLocal without a temperature pointer. Ordinary weather handling does not resolve the WPC curve or write AFN pressure state. OutdoorAir:NodeList instance keys are input-order and used-object identities, never an A1 node name. Omitted or empty member arrays perform the real zero-alpha input fill; each nodes array member is an Object with a required String node_or_nodelist_name field. An exact-empty field value returns zero nodes, while whitespace remains a real name. All OA-list objects are filled before all singles in actual IP order. Every returned membership preserves the exact Native allocation/reference effects: newly assigned names begin at ref0 and references to existing names increment. OutsideAir registrations and advancing fluid streams are retained per membership; only the final outdoor-node registry deduplicates node numbers. Single registration still precedes Height and schedule writes. Success alone commits the final list/count and clears the consumed input flag. The selected IdealLoads member consumer uses the existing registry path without invented reference or registration effects. True InitCall preserves global/point weather, DB-before-WB/wind and the local outer WB>DB clamp. A present WB pointer selects the existing backend-aware W(Tdb,Twb,P) owner, including the combined route. With only DB present, global W is written BEFORE cached Twb and nested TsatPb/Psat; computed WB commits only on child success. Earlier weather/clamp writes, failure prefixes and later H/P/Quality retain their order. False local calls retain real W without schedule refresh or outer clamp; nonlocal nodes retain global W. The same live owners, cache, saved pressure and default interpolation=false remain through three cold callers/HB. Fixed inherited scenes and the selected coherent multi/list scene retain unchanged158-series policies, full original science, clocks, ancillary and independent nine-report OA/mixed response. The new scene preserves every inherited active OA climate field and all numeric values. A complete source-derived topology prediction, sealed before actors from the empty node seed and actual report cutoff, is compared against the whole BND body, including node references, ordered registrations, streams and conditional blocks. Complete general-NodeList and Scheduled-manager exports retain public name/order custody; neither export is private OA getter telemetry. Prediction changes cannot be fitted to observed output. Distinct DB/WB schedule names with equal declared values establish one normal boundary, not arbitrary order, private clamp or call-count evidence. Active AFN/Curve/Table objects, defaulted multizone AFN, duct-loss routes, EMS, Source A/IDF, crossed Humidistat and arbitrary/full-object compositions stay held. Direct epJSON OutdoorAir:Node singles also retain unknown body members of every JSON kind, including name and idf_* bookkeeping, while Native ignores them as getter operands. A1 remains the actual instance map key; only the eight declared body properties affect this getter. Their existing type, enum, numeric and reference checks remain strict. The fixed metadata child preserves all755 inherited numeric records and adds two ignored Float records, not two physical operands. Weather math, node topology, reports and the frozen comparison criteria remain unchanged. Legacy, Source A/IDF, AFN and all other getter guards retain their boundaries.
+Bounded ordinary no-AFN Source B accepts direct epJSON and genuine original-IDF OA input under the existing DSOA, real-node/schedule and positive-OA prerequisites. Named or exact-empty non-Humidistat humidity choices retain both actual OA references and all current hard-limit/DCV/economizer/recovery checks. Direct-JSON WPC/AFN enums keep exact case and empty/default distinctions; ignored fields remain unconsumed.
+
+OutdoorAir:NodeList keys own input order and used identity, never A1. Direct-JSON empty membership and original-IDF type-only class-token membership remain distinct. Lists precede singles; allocation/reference effects, per-membership OutsideAir registrations/streams and success-only registry commit retain their order. A single's filled height and F-qualified returned count remain separate: an uncounted original-IDF height does not overwrite the Node. Positional AnyLocal does not create IsLocal without a temperature pointer.
+
+Existing true/false InitCall, DB-before-WB/wind, local WB>DB clamp, fallible psychrometric/cache and partial-write order remain bounded. Whole pre-actor BND prediction and complete public NodeList/Scheduled exports retain order/identity custody; they are not private OA scratch telemetry. Active AFN/WPC/duct/EMS, crossed Humidistat, Source A/Legacy expansion, unsafe interior-blank Node(0), arbitrary combinations and full-object completion remain outside this evidence.
 
 Actual remaining moisture demands reach IdealLoads Humidistat consumers. Only the absent-control six-report zero path qualifies under every161-series rule. The three authored-control scenes retain zero credit after16/4/6 point failures at the unchanged1e-12 kgWater/s limit; all RMSE and original155 checks pass. The finite-cooling scene also lacks its Winter humidification witness in both engines. Broader combinations, Source A/IDF, OA, EMS/faults, AFN/Space/sizing and full-object completion remain open.
 

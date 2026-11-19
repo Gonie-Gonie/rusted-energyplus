@@ -67,9 +67,7 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
     if rows.is_empty() {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source unused WindowMaterial:Gas requires direct epJSON".into());
-    }
+    raw.validate_source_idf_object_custody("WindowMaterial:Gas")?;
     for (name, object) in rows {
         if !valid_name(&name.0) {
             return Err("Source Gas requires an actual material name".into());
@@ -163,9 +161,7 @@ pub(crate) fn validate_mixture(raw: &RawModel) -> Result<(), String> {
     if rows.is_empty() {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source unused GasMixture requires direct epJSON".into());
-    }
+    raw.validate_source_idf_object_custody("WindowMaterial:GasMixture")?;
     for (name, object) in rows {
         if !valid_name(&name.0) {
             return Err("Source GasMixture requires an actual material name".into());

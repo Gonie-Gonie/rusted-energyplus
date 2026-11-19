@@ -374,6 +374,107 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             }
         }
     }
+    // Original-IDF EOF retains the full N1 scratch value while returning N0.
+    // Native Material367 consumes that filled value without a NumNums gate.
+    // First reuse the existing successful semicolon context, then call the real
+    // getter/parent with genuine retained AirGap layout and the changed F only.
+    {
+        let (model, mut raw) = fixture(false, 0.03125);
+        let (before, mut input, mut shortcut) = get_materials(&model, &raw)
+            .expect("held semicolon AirGap context before EOF count control");
+        raw.air_gaps[0].idf_max_fields = Some(1);
+        input
+            .retain_source_original_idf_fields(
+                "Material:AirGap",
+                vec![
+                    ("name".into(), true, "Name".into()),
+                    (
+                        "thermal_resistance".into(),
+                        false,
+                        "Thermal Resistance".into(),
+                    ),
+                ],
+                Vec::new(),
+            )
+            .expect("genuine fixed AirGap layout declared by the authored input control");
+        let mut scan = ReportScanState::default();
+        let globals = SelectedHeatBalanceGlobals::default();
+        let mut state = error_state();
+        let (mut errors, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
+        let mut errors_found = false;
+        let mut backend = SourceErrorBackend {
+            state: &mut state,
+            error_stream: Some(&mut errors),
+            console: &mut console,
+            out_unit1: None,
+            out_unit2: None,
+            f_message: None,
+            message_callback: None,
+            error_callback: None,
+            sqlite: None,
+        };
+        let mut owners = MaterialDataOwners {
+            curves: None,
+            model: &model,
+            input: &mut input,
+            shortcut: &mut shortcut,
+            scan: &mut scan,
+            globals: &globals,
+            backend: &mut backend,
+            eio: &mut eio,
+            errors_found: &mut errors_found,
+            diagnostic_flags: None,
+        };
+        owners.shortcut.alpha_args.fill("stale EOF alpha".into());
+        owners.shortcut.numeric_args.fill(-123.0);
+        owners
+            .shortcut
+            .alpha_field_names
+            .fill("stale EOF label".into());
+        owners
+            .shortcut
+            .numeric_field_names
+            .fill("stale EOF label".into());
+        owners.shortcut.alpha_field_blanks.fill(false);
+        owners.shortcut.numeric_field_blanks.fill(false);
+        let returned = raw
+            .get_air_gap_item(&raw.air_gaps[0], &mut owners)
+            .expect("real EOF AirGap getObjectItem still fills the complete buffers");
+        let scratch_ok = returned == (1, 0)
+            && owners.shortcut.alpha_args == ["MIXED GAP", ""]
+            && owners.shortcut.alpha_field_names == ["Name", ""]
+            && owners.shortcut.alpha_field_blanks == [false, true]
+            && owners.shortcut.numeric_args[0].to_bits() == 0.03125_f64.to_bits()
+            && owners.shortcut.numeric_field_names[0] == "Thermal Resistance"
+            && !owners.shortcut.numeric_field_blanks[0]
+            && owners.shortcut.numeric_args[1..]
+                .iter()
+                .all(|value| value.to_bits() == 0)
+            && owners.shortcut.numeric_field_names[1..]
+                .iter()
+                .all(String::is_empty)
+            && owners.shortcut.numeric_field_blanks[1..]
+                .iter()
+                .all(|blank| *blank);
+        let mut data = SelectedMaterialData::default();
+        data.get_material_data(&raw, &mut owners)
+            .expect("actual material parent consumes EOF N1 independently of returned NumNums");
+        data.write_material_reports(&model, &mut Vec::new())
+            .expect("same reached public material report accepts the real retained row");
+        assert!(
+            scratch_ok
+                && data.materials == before.materials
+                && data.material_groups[&MaterialId(2)] == SourceMaterialGroup::AirGap
+                && data.resistance_only[&MaterialId(2)]
+                && data.nominal_r == before.nominal_r
+                && data.nominal_r[2].to_bits() == 0.03125_f64.to_bits()
+                && !owners
+                    .input
+                    .is_object_unused("Material:AirGap", "MiXeD gap")
+                && !*owners.errors_found,
+            "Original AirGap EOF: F1/N0 count, filled N1 and same real material/report owner"
+        );
+    }
     // Extend the same real ordered getter/CTF-owner test with the name-only
     // fourth opaque family, keeping its genuine group and Invalid roughness.
     for epjson in [false, true] {
@@ -2180,6 +2281,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
         let (mut text, mut console, mut eio) = (Vec::new(), Vec::new(), Vec::new());
         let mut errors_found = false;
         let mut data = SelectedMaterialData::default();
+        let original_spectral_ok;
 
         assert!(data.spectral_data.is_none());
         let args = input
@@ -2265,6 +2367,579 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             }
             data.get_glass_spectral_data(&raw, &mut owners).unwrap();
             data.get_material_data(&raw, &mut owners).unwrap();
+            // Input rows below copy only explicit authored IDF operands; EOF arrays stay absent.
+            // F/L are authored syntax metadata, crosschecked separately against copied Native observations.
+            let original_fixed_operands = BTreeMap::from([
+                ("wavelength_1".into(), Value::Number(0.4)),
+                ("transmittance_1".into(), Value::Number(0.8)),
+                ("front_reflectance_1".into(), Value::Number(0.1)),
+                ("back_reflectance_1".into(), Value::Number(0.1)),
+                ("wavelength_2".into(), Value::Number(0.5)),
+                ("transmittance_2".into(), Value::Number(0.8)),
+                ("front_reflectance_2".into(), Value::Number(0.1)),
+                ("back_reflectance_2".into(), Value::Number(0.1)),
+                ("wavelength_3".into(), Value::Number(0.6)),
+                ("transmittance_3".into(), Value::Number(0.8)),
+                ("front_reflectance_3".into(), Value::Number(0.1)),
+                ("back_reflectance_3".into(), Value::Number(0.1)),
+                ("wavelength_4".into(), Value::Number(0.7)),
+                ("transmittance_4".into(), Value::Number(0.8)),
+                ("front_reflectance_4".into(), Value::Number(0.1)),
+                ("back_reflectance_4".into(), Value::Number(0.1)),
+            ]);
+            let native_fixed_bits = [
+                0x3fd9_9999_9999_999a_u64,
+                0x3fe9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+                0x3fe0_0000_0000_0000_u64,
+                0x3fe9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+                0x3fe3_3333_3333_3333_u64,
+                0x3fe9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+                0x3fe6_6666_6666_6666_u64,
+                0x3fe9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+                0x3fb9_9999_9999_999a_u64,
+            ];
+            let original_cases = [
+                (
+                    vec![
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "Z FULL RETAINED EXTENSION SPECTRAL".into(),
+                                idf_max_fields: Some(21),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![BTreeMap::from([
+                                ("wavelength".into(), Value::Number(0.8)),
+                                ("transmittance".into(), Value::Number(0.8)),
+                                ("front_reflectance".into(), Value::Number(0.1)),
+                                ("back_reflectance".into(), Value::Number(0.1)),
+                            ])],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "Y PARTIAL EXTENSION SPECTRAL".into(),
+                                idf_max_fields: Some(18),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![BTreeMap::from([(
+                                "wavelength".into(),
+                                Value::Number(0.8),
+                            )])],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "X COMPLETE EMPTY EXTENSION SPECTRAL".into(),
+                                idf_max_fields: Some(21),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![BTreeMap::new()],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "W INCOMPLETE BLANK TAIL SPECTRAL".into(),
+                                idf_max_fields: Some(19),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "A TWO EXTENSIONS EOF SPECTRAL".into(),
+                                idf_max_fields: Some(24),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![],
+                        },
+                    ],
+                    vec![4usize, 1usize, 4usize, 2usize, 8usize],
+                    vec![
+                        (
+                            20usize,
+                            vec![
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                            ],
+                            vec![false, false, false, false],
+                            20usize,
+                        ),
+                        (
+                            17usize,
+                            vec![
+                                0x3fe9_9999_9999_999a_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![false, true, true, true],
+                            20usize,
+                        ),
+                        (
+                            20usize,
+                            vec![
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![true, true, true, true],
+                            20usize,
+                        ),
+                        (
+                            16usize,
+                            vec![
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![true, true, true, true],
+                            16usize,
+                        ),
+                        (
+                            16usize,
+                            vec![
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![true, true, true, true],
+                            16usize,
+                        ),
+                    ],
+                ),
+                (
+                    vec![
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "Z FULL RETAINED EXTENSION SPECTRAL".into(),
+                                idf_max_fields: Some(21),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![BTreeMap::from([
+                                ("wavelength".into(), Value::Number(0.8)),
+                                ("transmittance".into(), Value::Number(0.8)),
+                                ("front_reflectance".into(), Value::Number(0.1)),
+                                ("back_reflectance".into(), Value::Number(0.1)),
+                            ])],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "Y PARTIAL EXTENSION SPECTRAL".into(),
+                                idf_max_fields: Some(18),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![BTreeMap::from([(
+                                "wavelength".into(),
+                                Value::Number(0.8),
+                            )])],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "X COMPLETE EMPTY EXTENSION SPECTRAL".into(),
+                                idf_max_fields: Some(21),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![BTreeMap::new()],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "W INCOMPLETE BLANK TAIL SPECTRAL".into(),
+                                idf_max_fields: Some(19),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "A TWO EXTENSIONS EOF SPECTRAL".into(),
+                                idf_max_fields: Some(25),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![],
+                        },
+                    ],
+                    vec![4usize, 1usize, 4usize, 2usize, 8usize],
+                    vec![
+                        (
+                            20usize,
+                            vec![
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                            ],
+                            vec![false, false, false, false],
+                            20usize,
+                        ),
+                        (
+                            17usize,
+                            vec![
+                                0x3fe9_9999_9999_999a_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![false, true, true, true],
+                            20usize,
+                        ),
+                        (
+                            20usize,
+                            vec![
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![true, true, true, true],
+                            20usize,
+                        ),
+                        (
+                            16usize,
+                            vec![
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![true, true, true, true],
+                            16usize,
+                        ),
+                        (
+                            16usize,
+                            vec![
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                                0x0000_0000_0000_0000_u64,
+                            ],
+                            vec![true, true, true, true],
+                            16usize,
+                        ),
+                    ],
+                ),
+                (
+                    vec![
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "Z COMMA CONTROL SPECTRAL".into(),
+                                idf_max_fields: Some(25),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![
+                                BTreeMap::from([
+                                    ("wavelength".into(), Value::Number(0.8)),
+                                    ("transmittance".into(), Value::Number(0.8)),
+                                    ("front_reflectance".into(), Value::Number(0.1)),
+                                    ("back_reflectance".into(), Value::Number(0.1)),
+                                ]),
+                                BTreeMap::from([
+                                    ("wavelength".into(), Value::Number(0.9)),
+                                    ("transmittance".into(), Value::Number(0.8)),
+                                    ("front_reflectance".into(), Value::Number(0.1)),
+                                    ("back_reflectance".into(), Value::Number(0.1)),
+                                ]),
+                            ],
+                        },
+                        SourceGlazingSpectralInput {
+                            object: ProjectInputObject {
+                                object_name: "A COMMENT NEWLINE SPECTRAL".into(),
+                                idf_max_fields: Some(24),
+                                fields: original_fixed_operands.clone(),
+                            },
+                            extensions: vec![
+                                BTreeMap::from([
+                                    ("wavelength".into(), Value::Number(0.8)),
+                                    ("transmittance".into(), Value::Number(0.8)),
+                                    ("front_reflectance".into(), Value::Number(0.1)),
+                                    ("back_reflectance".into(), Value::Number(0.1)),
+                                ]),
+                                BTreeMap::from([
+                                    ("wavelength".into(), Value::Number(0.9)),
+                                    ("transmittance".into(), Value::Number(0.8)),
+                                    ("front_reflectance".into(), Value::Number(0.1)),
+                                    ("back_reflectance".into(), Value::Number(0.1)),
+                                ]),
+                            ],
+                        },
+                    ],
+                    vec![8usize, 8usize],
+                    vec![
+                        (
+                            24usize,
+                            vec![
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fec_cccc_cccc_cccd_u64,
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                            ],
+                            vec![false, false, false, false, false, false, false, false],
+                            24usize,
+                        ),
+                        (
+                            24usize,
+                            vec![
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fec_cccc_cccc_cccd_u64,
+                                0x3fe9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                                0x3fb9_9999_9999_999a_u64,
+                            ],
+                            vec![false, false, false, false, false, false, false, false],
+                            24usize,
+                        ),
+                    ],
+                ),
+            ];
+            let native_fixed_labels = [
+                "Wavelength 1",
+                "Transmittance 1",
+                "Front Reflectance 1",
+                "Back Reflectance 1",
+                "Wavelength 2",
+                "Transmittance 2",
+                "Front Reflectance 2",
+                "Back Reflectance 2",
+                "Wavelength 3",
+                "Transmittance 3",
+                "Front Reflectance 3",
+                "Back Reflectance 3",
+                "Wavelength 4",
+                "Transmittance 4",
+                "Front Reflectance 4",
+                "Back Reflectance 4",
+            ];
+            let native_extension_labels = [
+                "Wavelength",
+                "Transmittance",
+                "Front Reflectance",
+                "Back Reflectance",
+            ];
+            original_spectral_ok = original_cases.iter().all(|(rows, limits, expected)| {
+                use crate::heat_balance::selected_input_processor::{
+                    SourceInputStatisticsInput, SourceInputStatisticsValue as S,
+                };
+                let family = "MaterialProperty:GlazingSpectralData";
+                let definition = owners
+                    .input
+                    .source_object_definition(family)
+                    .unwrap()
+                    .clone();
+                let shapes = rows
+                    .iter()
+                    .map(|row| {
+                        let mut fields = row
+                            .object
+                            .fields
+                            .keys()
+                            .map(|key| (key.clone(), 1))
+                            .collect::<BTreeMap<_, _>>();
+                        fields.insert("idf_max_fields".into(), 1);
+                        fields.insert("idf_max_extensible_fields".into(), 1);
+                        if !row.extensions.is_empty() {
+                            fields.insert("extensions".into(), row.extensions.len());
+                        }
+                        SourceObjectShape {
+                            object_name: row.object.object_name.clone(),
+                            field_sizes: fields,
+                        }
+                    })
+                    .collect();
+                let mut original_input = SelectedInputProcessor::from_admitted_input(
+                    vec![definition],
+                    BTreeMap::from([(family.into(), SourceInputFamily::Objects(shapes))]),
+                )
+                .unwrap();
+                let fields = rows
+                    .iter()
+                    .zip(limits)
+                    .map(|(row, limit)| {
+                        let mut fields = row
+                            .object
+                            .fields
+                            .iter()
+                            .map(|(key, value)| {
+                                let value = match value {
+                                    Value::Number(v) => S::Number(v.to_string()),
+                                    Value::String(v) => S::String(v.clone()),
+                                };
+                                (key.clone(), value)
+                            })
+                            .collect::<BTreeMap<_, _>>();
+                        if !row.extensions.is_empty() {
+                            fields.insert(
+                                "extensions".into(),
+                                S::Array(
+                                    row.extensions
+                                        .iter()
+                                        .map(|extension| {
+                                            S::Object(
+                                                extension
+                                                    .iter()
+                                                    .map(|(key, value)| {
+                                                        let value = match value {
+                                                            Value::Number(v) => {
+                                                                S::Number(v.to_string())
+                                                            }
+                                                            Value::String(v) => {
+                                                                S::String(v.clone())
+                                                            }
+                                                        };
+                                                        (key.clone(), value)
+                                                    })
+                                                    .collect(),
+                                            )
+                                        })
+                                        .collect(),
+                                ),
+                            );
+                        }
+                        fields.insert(
+                            "idf_max_fields".into(),
+                            S::Number(row.object.idf_max_fields.unwrap().to_string()),
+                        );
+                        fields.insert(
+                            "idf_max_extensible_fields".into(),
+                            S::Number(limit.to_string()),
+                        );
+                        (row.object.object_name.clone(), fields)
+                    })
+                    .collect();
+                original_input
+                    .retain_source_input_statistics(SourceInputStatisticsInput {
+                        objects: BTreeMap::from([(family.into(), fields)]),
+                        object_order: BTreeMap::from([(
+                            family.into(),
+                            rows.iter()
+                                .map(|row| row.object.object_name.clone())
+                                .collect(),
+                        )]),
+                    })
+                    .unwrap();
+                original_input
+                    .retain_source_original_idf_fields(
+                        family,
+                        [
+                            ("name", true, "Name"),
+                            ("wavelength_1", false, "Wavelength 1"),
+                            ("transmittance_1", false, "Transmittance 1"),
+                            ("front_reflectance_1", false, "Front Reflectance 1"),
+                            ("back_reflectance_1", false, "Back Reflectance 1"),
+                            ("wavelength_2", false, "Wavelength 2"),
+                            ("transmittance_2", false, "Transmittance 2"),
+                            ("front_reflectance_2", false, "Front Reflectance 2"),
+                            ("back_reflectance_2", false, "Back Reflectance 2"),
+                            ("wavelength_3", false, "Wavelength 3"),
+                            ("transmittance_3", false, "Transmittance 3"),
+                            ("front_reflectance_3", false, "Front Reflectance 3"),
+                            ("back_reflectance_3", false, "Back Reflectance 3"),
+                            ("wavelength_4", false, "Wavelength 4"),
+                            ("transmittance_4", false, "Transmittance 4"),
+                            ("front_reflectance_4", false, "Front Reflectance 4"),
+                            ("back_reflectance_4", false, "Back Reflectance 4"),
+                        ]
+                        .into_iter()
+                        .map(|(key, alpha, label)| (key.into(), alpha, label.into()))
+                        .collect(),
+                        [
+                            ("wavelength", false, "Wavelength"),
+                            ("transmittance", false, "Transmittance"),
+                            ("front_reflectance", false, "Front Reflectance"),
+                            ("back_reflectance", false, "Back Reflectance"),
+                        ]
+                        .into_iter()
+                        .map(|(key, alpha, label)| (key.into(), alpha, label.into()))
+                        .collect(),
+                    )
+                    .unwrap();
+                let mut original_shortcut = SourceInputProcessorShortCut::default();
+                original_shortcut
+                    .allocate_from_input(&original_input)
+                    .unwrap();
+                let original = SelectedMaterialInput {
+                    source_is_epjson: false,
+                    spectral_data: rows.clone(),
+                    ..SelectedMaterialInput::default()
+                };
+                rows.iter()
+                    .zip(expected)
+                    .all(|(row, (returned, bits, blanks, labelled))| {
+                        let was_unused =
+                            original_input.is_object_unused(family, &row.object.object_name);
+                        original_shortcut.alpha_args.fill("stale".into());
+                        original_shortcut.numeric_args.fill(-123.0);
+                        original_shortcut.alpha_field_names.fill("stale".into());
+                        original_shortcut.numeric_field_names.fill("stale".into());
+                        original_shortcut.alpha_field_blanks.fill(false);
+                        original_shortcut.numeric_field_blanks.fill(false);
+                        let mut original_owners = MaterialDataOwners {
+                            curves: None,
+                            model: owners.model,
+                            input: &mut original_input,
+                            shortcut: &mut original_shortcut,
+                            scan: &mut *owners.scan,
+                            globals: owners.globals,
+                            backend: &mut *owners.backend,
+                            eio: &mut *owners.eio,
+                            errors_found: &mut *owners.errors_found,
+                            diagnostic_flags: owners.diagnostic_flags,
+                        };
+                        let counts = original
+                            .get_spectral_data_item(row, &mut original_owners)
+                            .unwrap();
+                        was_unused
+                            && counts == (1, *returned)
+                            && !original_owners
+                                .input
+                                .is_object_unused(family, &row.object.object_name)
+                            && original_owners.shortcut.alpha_args
+                                == [row.object.object_name.to_ascii_uppercase()]
+                            && original_owners.shortcut.alpha_field_names == ["Name"]
+                            && original_owners.shortcut.alpha_field_blanks == [false]
+                            && original_owners.shortcut.numeric_args.len() == 16 + bits.len()
+                            && original_owners.shortcut.numeric_args[..16]
+                                .iter()
+                                .map(|v| v.to_bits())
+                                .eq(native_fixed_bits)
+                            && original_owners.shortcut.numeric_args[16..]
+                                .iter()
+                                .map(|v| v.to_bits())
+                                .eq(bits.iter().copied())
+                            && original_owners.shortcut.numeric_field_blanks[..16]
+                                .iter()
+                                .all(|blank| !*blank)
+                            && original_owners.shortcut.numeric_field_blanks[16..] == *blanks
+                            && original_owners
+                                .shortcut
+                                .numeric_field_names
+                                .iter()
+                                .enumerate()
+                                .all(|(index, name)| {
+                                    if index < 16 {
+                                        name == native_fixed_labels[index]
+                                    } else if index < *labelled {
+                                        name == native_extension_labels[(index - 16) % 4]
+                                    } else {
+                                        name.is_empty()
+                                    }
+                                })
+                    })
+            });
         }
         let rows = data.spectral_data.as_ref().unwrap();
         assert_eq!((data.num_spectral_data, rows.len()), (5, 5));
@@ -2351,6 +3026,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 && data.material_groups[&MaterialId(3)] == SourceMaterialGroup::Glass
                 && !errors_found
                 && text.is_empty()
+                && original_spectral_ok
                 && raw.spectral_data.iter().all(|row| !input.is_object_unused(
                     "MaterialProperty:GlazingSpectralData",
                     &row.object.object_name
@@ -2539,6 +3215,70 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 .collect(),
         )
         .unwrap();
+        // A fresh existing IP owner receives the same operands plus Fan metadata.
+        // Derive its scalar shapes after that metadata is present; the original
+        // direct-epJSON owner and its later statistics transfer stay unchanged.
+        let mut original_fan_objects = objects.clone();
+        original_fan_objects
+            .get_mut("Curve:FanPressureRise")
+            .unwrap()
+            .get_mut("FANPRESSURERISE")
+            .unwrap()
+            .insert("idf_max_fields".into(), S::Number("9".into()));
+        let mut original_fan_input = SelectedInputProcessor::from_admitted_input(
+            original_fan_objects
+                .keys()
+                .map(|family| input.source_object_definition(family).unwrap().clone())
+                .collect(),
+            original_fan_objects
+                .iter()
+                .map(|(family, rows)| {
+                    (
+                        family.clone(),
+                        SourceInputFamily::Objects(
+                            rows.iter()
+                                .map(|(name, fields)| SourceObjectShape {
+                                    object_name: name.clone(),
+                                    field_sizes: fields
+                                        .keys()
+                                        .map(|key| (key.clone(), 1))
+                                        .collect(),
+                                })
+                                .collect(),
+                        ),
+                    )
+                })
+                .collect(),
+        )
+        .unwrap();
+        original_fan_input
+            .retain_source_input_statistics(SourceInputStatisticsInput {
+                objects: original_fan_objects,
+                object_order: object_order.clone(),
+            })
+            .unwrap();
+        original_fan_input
+            .retain_source_original_idf_fields(
+                "Curve:FanPressureRise",
+                [
+                    ("name", true, "Name"),
+                    ("coefficient1_c1", false, "Coefficient1 C1"),
+                    ("coefficient2_c2", false, "Coefficient2 C2"),
+                    ("coefficient3_c3", false, "Coefficient3 C3"),
+                    ("coefficient4_c4", false, "Coefficient4 C4"),
+                    ("minimum_value_of_qfan", false, "Minimum Value of Qfan"),
+                    ("maximum_value_of_qfan", false, "Maximum Value of Qfan"),
+                    ("minimum_value_of_psm", false, "Minimum Value of Psm"),
+                    ("maximum_value_of_psm", false, "Maximum Value of Psm"),
+                    ("minimum_curve_output", false, "Minimum Curve Output"),
+                    ("maximum_curve_output", false, "Maximum Curve Output"),
+                ]
+                .into_iter()
+                .map(|(key, alpha, label)| (key.into(), alpha, label.into()))
+                .collect(),
+                Vec::new(),
+            )
+            .unwrap();
         input
             .retain_source_input_statistics(SourceInputStatisticsInput {
                 objects,
@@ -2602,6 +3342,60 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             error_callback: None,
             sqlite: None,
         };
+        // The public initializer reaches the real getter; private14A/10000N arrays/return tuple remain unobserved.
+        let was_unused =
+            original_fan_input.is_object_unused("Curve:FanPressureRise", "FANPRESSURERISE");
+        let mut original_fan_shortcut = shortcut.clone();
+        original_fan_shortcut.alpha_field_names.fill("stale".into());
+        original_fan_shortcut
+            .numeric_field_names
+            .fill("stale".into());
+        original_fan_shortcut.numeric_field_blanks.fill(false);
+        let mut original_fan_curves = SelectedCurves::default();
+        original_fan_curves
+            .initialize_state(
+                &mut original_fan_input,
+                &mut original_fan_shortcut,
+                &flags,
+                &mut backend,
+            )
+            .unwrap();
+        let original_fan = original_fan_curves.get_curve("FANPRESSURERISE").unwrap();
+        let original_fan_ok = was_unused
+            && !original_fan_input.is_object_unused("Curve:FanPressureRise", "FANPRESSURERISE")
+            && original_fan.coeff[..4] == [0.1, 0.2, 0.3, 0.4]
+            && !original_fan.output_limits.min_present
+            && !original_fan.output_limits.max_present
+            && original_fan_shortcut.alpha_field_names[0] == "Name"
+            && original_fan_shortcut.numeric_field_names[..10]
+                == [
+                    "Coefficient1 C1",
+                    "Coefficient2 C2",
+                    "Coefficient3 C3",
+                    "Coefficient4 C4",
+                    "Minimum Value of Qfan",
+                    "Maximum Value of Qfan",
+                    "Minimum Value of Psm",
+                    "Maximum Value of Psm",
+                    "Minimum Curve Output",
+                    "Maximum Curve Output",
+                ]
+            && original_fan_shortcut.numeric_field_blanks[..8]
+                .iter()
+                .all(|blank| !*blank)
+            && original_fan_shortcut.numeric_field_blanks[8..]
+                .iter()
+                .all(|blank| *blank)
+            && original_fan_shortcut.alpha_args == shortcut.alpha_args
+            && original_fan_shortcut.numeric_args == shortcut.numeric_args
+            && original_fan_shortcut.alpha_field_blanks == shortcut.alpha_field_blanks
+            && original_fan_shortcut.current_module_object == shortcut.current_module_object
+            && original_fan_shortcut.alpha_field_names[1..]
+                .iter()
+                .all(String::is_empty)
+            && original_fan_shortcut.numeric_field_names[10..]
+                .iter()
+                .all(String::is_empty);
         curves
             .initialize_state(&mut input, &mut shortcut, &flags, &mut backend)
             .unwrap();
@@ -2789,7 +3583,8 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             std::fs::remove_file(path).unwrap();
         }
         assert!(
-            state.tracking.total_severe_errors == 0
+            original_fan_ok
+                && state.tracking.total_severe_errors == 0
                 && state.tracking.total_warning_errors == 0
                 && text.is_empty()
                 && eio.is_empty()
@@ -6589,6 +7384,112 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                 object_order,
             })
             .unwrap();
+        // Clone while genuinely unused; no Material state/latch is reset.
+        let mut original_blind_input = input.clone();
+        original_blind_input
+            .retain_source_original_idf_fields(
+                "WindowMaterial:Blind:EquivalentLayer",
+                [
+                    ("name", true, "Name"),
+                    ("slat_orientation", true, "Slat Orientation"),
+                    ("slat_width", false, "Slat Width"),
+                    ("slat_separation", false, "Slat Separation"),
+                    ("slat_crown", false, "Slat Crown"),
+                    ("slat_angle", false, "Slat Angle"),
+                    (
+                        "front_side_slat_beam_diffuse_solar_transmittance",
+                        false,
+                        "Front Side Slat Beam-Diffuse Solar Transmittance",
+                    ),
+                    (
+                        "back_side_slat_beam_diffuse_solar_transmittance",
+                        false,
+                        "Back Side Slat Beam-Diffuse Solar Transmittance",
+                    ),
+                    (
+                        "front_side_slat_beam_diffuse_solar_reflectance",
+                        false,
+                        "Front Side Slat Beam-Diffuse Solar Reflectance",
+                    ),
+                    (
+                        "back_side_slat_beam_diffuse_solar_reflectance",
+                        false,
+                        "Back Side Slat Beam-Diffuse Solar Reflectance",
+                    ),
+                    (
+                        "front_side_slat_beam_diffuse_visible_transmittance",
+                        false,
+                        "Front Side Slat Beam-Diffuse Visible Transmittance",
+                    ),
+                    (
+                        "back_side_slat_beam_diffuse_visible_transmittance",
+                        false,
+                        "Back Side Slat Beam-Diffuse Visible Transmittance",
+                    ),
+                    (
+                        "front_side_slat_beam_diffuse_visible_reflectance",
+                        false,
+                        "Front Side Slat Beam-Diffuse Visible Reflectance",
+                    ),
+                    (
+                        "back_side_slat_beam_diffuse_visible_reflectance",
+                        false,
+                        "Back Side Slat Beam-Diffuse Visible Reflectance",
+                    ),
+                    (
+                        "slat_diffuse_diffuse_solar_transmittance",
+                        false,
+                        "Slat Diffuse-Diffuse Solar Transmittance",
+                    ),
+                    (
+                        "front_side_slat_diffuse_diffuse_solar_reflectance",
+                        false,
+                        "Front Side Slat Diffuse-Diffuse Solar Reflectance",
+                    ),
+                    (
+                        "back_side_slat_diffuse_diffuse_solar_reflectance",
+                        false,
+                        "Back Side Slat Diffuse-Diffuse Solar Reflectance",
+                    ),
+                    (
+                        "slat_diffuse_diffuse_visible_transmittance",
+                        false,
+                        "Slat Diffuse-Diffuse Visible Transmittance",
+                    ),
+                    (
+                        "front_side_slat_diffuse_diffuse_visible_reflectance",
+                        false,
+                        "Front Side Slat Diffuse-Diffuse Visible Reflectance",
+                    ),
+                    (
+                        "back_side_slat_diffuse_diffuse_visible_reflectance",
+                        false,
+                        "Back Side Slat Diffuse-Diffuse Visible Reflectance",
+                    ),
+                    (
+                        "slat_infrared_transmittance",
+                        false,
+                        "Slat Infrared Transmittance",
+                    ),
+                    (
+                        "front_side_slat_infrared_emissivity",
+                        false,
+                        "Front Side Slat Infrared Emissivity",
+                    ),
+                    (
+                        "back_side_slat_infrared_emissivity",
+                        false,
+                        "Back Side Slat Infrared Emissivity",
+                    ),
+                    ("slat_angle_control", true, "Slat Angle Control"),
+                ]
+                .into_iter()
+                .map(|(key, alpha, label)| (key.into(), alpha, label.into()))
+                .collect(),
+                Vec::new(),
+            )
+            .unwrap();
+
         let mut shortcut = SourceInputProcessorShortCut::default();
         shortcut.allocate_from_input(&input).unwrap();
         let globals = SelectedHeatBalanceGlobals::default();
@@ -6822,6 +7723,7 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
             (2, 15),
         ];
         let mut text = Vec::new();
+        let original_blind_ok;
         {
             let mut backend = SourceErrorBackend {
                 state: &mut state,
@@ -7046,9 +7948,74 @@ fn air_gap_getter_retains_real_group_and_ronly_through_ctf_and_material_report()
                             .all(|blank| *blank)
                 );
             }
+            // A full24-field literal EOF leaves F23: A3 is populated but not returned.
+            // Values/blank expectations reuse the held full input row; Native supplies the count/IDD-label boundary.
+            let mut original = raw.clone();
+            original.source_is_epjson = false;
+            original.window_blind_equivalent_layer[2].idf_max_fields = Some(23);
+            let object = &original.window_blind_equivalent_layer[2];
+            let was_unused = original_blind_input
+                .is_object_unused("WindowMaterial:Blind:EquivalentLayer", &object.object_name);
+            let mut original_shortcut = owners.shortcut.clone();
+            original_shortcut.alpha_args.fill("stale".into());
+            original_shortcut.numeric_args.fill(-123.0);
+            original_shortcut.alpha_field_names.fill("stale".into());
+            original_shortcut.numeric_field_names.fill("stale".into());
+            original_shortcut.alpha_field_blanks.fill(false);
+            original_shortcut.numeric_field_blanks.fill(false);
+            let mut original_owners = MaterialDataOwners {
+                input: &mut original_blind_input,
+                shortcut: &mut original_shortcut,
+                ..owners
+            };
+            let counts = original
+                .get_window_blind_equivalent_layer_item(object, &mut original_owners)
+                .unwrap();
+            original_blind_ok = was_unused
+                && counts == (2, 21)
+                && !original_owners
+                    .input
+                    .is_object_unused("WindowMaterial:Blind:EquivalentLayer", &object.object_name)
+                && original_owners.shortcut.alpha_args[..3]
+                    == [
+                        names[2],
+                        expected_alpha_values[2][0],
+                        expected_alpha_values[2][1],
+                    ]
+                && original_owners.shortcut.alpha_field_names[..3]
+                    == ["Name", "Slat Orientation", "Slat Angle Control"]
+                && original_owners.shortcut.alpha_field_blanks[..3] == expected_alpha_blanks[2]
+                && original_owners.shortcut.numeric_args[..21]
+                    .iter()
+                    .zip(numeric_rows[2])
+                    .all(|(got, want)| got.to_bits() == want.to_bits())
+                && original_owners.shortcut.numeric_field_blanks[..21]
+                    == expected_numeric_blanks[2]
+                && original_owners.shortcut.numeric_field_names[0] == "Slat Width"
+                && original_owners.shortcut.numeric_field_names[20]
+                    == "Back Side Slat Infrared Emissivity"
+                && original_owners.shortcut.alpha_args[3..]
+                    .iter()
+                    .all(String::is_empty)
+                && original_owners.shortcut.alpha_field_names[3..]
+                    .iter()
+                    .all(String::is_empty)
+                && original_owners.shortcut.alpha_field_blanks[3..]
+                    .iter()
+                    .all(|blank| *blank)
+                && original_owners.shortcut.numeric_args[21..]
+                    .iter()
+                    .all(|v| v.to_bits() == 0)
+                && original_owners.shortcut.numeric_field_names[21..]
+                    .iter()
+                    .all(String::is_empty)
+                && original_owners.shortcut.numeric_field_blanks[21..]
+                    .iter()
+                    .all(|blank| *blank);
         }
         assert!(
-            !errors_found
+            original_blind_ok
+                && !errors_found
                 && data.num_eql_blinds == 15
                 && data.window_blind_equivalent_layer.len() == 15
                 && data.materials.len() == 18

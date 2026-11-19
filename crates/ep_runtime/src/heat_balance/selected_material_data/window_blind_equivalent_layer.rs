@@ -86,10 +86,19 @@ impl SelectedMaterialData {
         }
         for object in &raw.window_blind_equivalent_layer {
             let (alphas, numbers) = raw.get_window_blind_equivalent_layer_item(object, owners)?;
-            if !(2..=3).contains(&alphas)
-                || !(15..=21).contains(&numbers)
-                || (alphas == 3 && numbers != 21)
-            {
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Blind:EquivalentLayer",
+                object,
+                owners,
+            )? {
+                Some(expected) => (alphas, numbers) != expected,
+                None => {
+                    !(2..=3).contains(&alphas)
+                        || !(15..=21).contains(&numbers)
+                        || (alphas == 3 && numbers != 21)
+                }
+            };
+            if invalid_counts {
                 return Err(unavailable("BlindEQL3A21N/min10 legal15..21N primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

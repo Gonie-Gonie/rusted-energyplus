@@ -524,7 +524,7 @@ fn window_gas_follows_material_source_order_reports_typed_coverage_and_shares_na
                     && diagnostic.object_name.as_deref() == Some("shared")
             })
     );
-    // The exact Source namespace is selected only by a valid named Gas owner.
+    // Named Gas shares the exact Source material namespace with other eligible Window families.
     // The original Legacy order, coverage and duplicate assertions above remain.
     let source_result = super::super::compile_raw_model_for_source(&raw_model);
     assert!(
@@ -657,14 +657,28 @@ fn window_gas_follows_material_source_order_reports_typed_coverage_and_shares_na
         .remove(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()));
     let no_gas_result = super::super::compile_raw_model_for_source(&no_gas);
     assert!(!no_gas_result.has_errors());
-    assert!(
-        !no_gas_result
-            .model
-            .as_ref()
-            .unwrap()
-            .material_names
-            .is_source_exact_namespace()
-    );
+    assert!(no_gas_result.model.as_ref().is_some_and(|model| {
+        model.material_names.is_source_exact_namespace()
+            && model.materials.len() == 7
+            && model.material_names.resolve("Gas Gap").is_none()
+            && model.material_names.resolve("Direct Glass") == Some(MaterialId(4))
+            && model.material_names.resolve("Alternative Glass") == Some(MaterialId(5))
+            && model.material_names.resolve("Equivalent Glass") == Some(MaterialId(6))
+            && model.materials[4].id == MaterialId(4)
+            && model.materials[4].kind() == MaterialKind::WindowGlazing
+            && model
+                .ctf_report_names
+                .materials
+                .contains(&(MaterialId(4), "DIRECT GLASS".into()))
+            && model
+                .ctf_report_names
+                .materials
+                .contains(&(MaterialId(5), "ALTERNATIVE GLASS".into()))
+            && model
+                .ctf_report_names
+                .materials
+                .contains(&(MaterialId(6), "EQUIVALENT GLASS".into()))
+    }));
     let custom = parse_epjson_str(
         r#"{"WindowMaterial:Gas":{"Custom Gap":{
         "gas_type":"Custom","thickness":0.012,"conductivity_coefficient_a":0.01,

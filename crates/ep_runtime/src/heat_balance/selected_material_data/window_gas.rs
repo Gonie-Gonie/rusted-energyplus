@@ -78,7 +78,15 @@ impl SelectedMaterialData {
             return Err(unavailable("WindowMaterial:GasMixture raw/IP count"));
         }
         for object in &raw.window_gas_mixture {
-            raw.get_window_gas_mixture_item(object, owners)?;
+            let counts = raw.get_window_gas_mixture_item(object, owners)?;
+            if raw
+                .source_original_idf_fixed_counts("WindowMaterial:GasMixture", object, owners)?
+                .is_some_and(|expected| counts != expected)
+            {
+                return Err(unavailable(
+                    "Source original-IDF fixed material returned counts",
+                ));
+            }
             let name = owners.shortcut.alpha_args[0].clone();
             if self.material_map.contains_key(&name) {
                 let flags = owners.diagnostic_flags.as_ref().ok_or_else(|| {
@@ -187,7 +195,15 @@ impl SelectedMaterialData {
             return Err(unavailable("WindowMaterial:Gas raw/IP count"));
         }
         for object in &raw.window_gas {
-            raw.get_window_gas_item(object, owners)?;
+            let counts = raw.get_window_gas_item(object, owners)?;
+            if raw
+                .source_original_idf_fixed_counts("WindowMaterial:Gas", object, owners)?
+                .is_some_and(|expected| counts != expected)
+            {
+                return Err(unavailable(
+                    "Source original-IDF fixed material returned counts",
+                ));
+            }
             let name = owners.shortcut.alpha_args[0].clone();
             if self.material_map.contains_key(&name) {
                 let flags = owners

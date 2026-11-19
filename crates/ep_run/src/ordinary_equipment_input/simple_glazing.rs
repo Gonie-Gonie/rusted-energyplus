@@ -27,9 +27,7 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
     if rows.is_empty() {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source unused SimpleGlazing requires direct epJSON".into());
-    }
+    raw.validate_source_idf_object_custody("WindowMaterial:SimpleGlazingSystem")?;
     for (name, object) in rows {
         if name.0.trim().is_empty() {
             return Err("Source SimpleGlazing requires an actual material name".into());
@@ -159,9 +157,7 @@ pub(crate) fn validate_unused_spectral_average(raw: &RawModel) -> Result<(), Str
     if rows.is_empty() {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source unused SpectralAverage requires direct epJSON".into());
-    }
+    raw.validate_source_idf_object_custody("WindowMaterial:Glazing")?;
     for (name, object) in rows {
         if !super::window_gas::valid_name(&name.0) {
             return Err("Source Glazing requires the actual schema material name".into());
@@ -253,9 +249,7 @@ pub(crate) fn validate_unused_refraction(raw: &RawModel) -> Result<(), String> {
     if rows.is_empty() {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source unused Refraction requires direct epJSON".into());
-    }
+    raw.validate_source_idf_object_custody("WindowMaterial:Glazing:RefractionExtinctionMethod")?;
     for (name, object) in rows {
         if !super::window_gas::valid_name(&name.0) {
             return Err("Source Refraction requires actual schema material name".into());
@@ -337,9 +331,7 @@ pub(crate) fn validate_spectral_data(raw: &RawModel) -> Result<(), String> {
     if rows.is_empty() {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source spectral data requires direct epJSON".into());
-    }
+    raw.validate_source_idf_object_custody("MaterialProperty:GlazingSpectralData")?;
     for (name, object) in rows {
         if !super::window_gas::valid_name(&name.0)
             || object

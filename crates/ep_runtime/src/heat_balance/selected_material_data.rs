@@ -1031,8 +1031,23 @@ impl SelectedMaterialData {
             return Err(unavailable("AirGap raw/IP count"));
         }
         for object in &raw.air_gaps {
-            let (_num_alphas, num_numbers) = raw.get_air_gap_item(object, o)?;
-            if num_numbers != 1 {
+            let (num_alphas, num_numbers) = raw.get_air_gap_item(object, o)?;
+            let original_counts = if !raw.source_is_epjson
+                && o.input
+                    .source_original_idf_fixed_fields("Material:AirGap")
+                    .is_some()
+            {
+                raw.source_original_idf_fixed_counts("Material:AirGap", object, o)?
+            } else {
+                None
+            };
+            if let Some(expected) = original_counts {
+                if (num_alphas, num_numbers) != expected {
+                    return Err(unavailable(
+                        "Source original-IDF AirGap returned-count custody",
+                    ));
+                }
+            } else if num_numbers != 1 {
                 return Err(unavailable("required AirGap numeric argument count"));
             }
             let name = &o.shortcut.alpha_args[0];

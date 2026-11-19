@@ -419,11 +419,11 @@ fn model_binding_resolves_exact_typed_ids_and_schedule_roles() {
                 }
                 10 => {
                     typed.ideal_loads_air_systems[0].dehumidification_control_type =
-                        DehumidificationControlType::ConstantSensibleHeatRatio
+                        DehumidificationControlType::Humidistat
                 }
                 11 => {
                     typed.ideal_loads_air_systems[0].humidification_control_type =
-                        HumidificationControlType::ConstantSupplyHumidityRatio
+                        HumidificationControlType::Humidistat
                 }
                 12 => typed.ideal_loads_air_systems[0].outdoor_air_inlet_node_name = None,
                 13 => {

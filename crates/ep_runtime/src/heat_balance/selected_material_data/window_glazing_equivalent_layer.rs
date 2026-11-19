@@ -71,7 +71,15 @@ impl SelectedMaterialData {
         }
         for object in &raw.window_glazing_equivalent_layer {
             let (alphas, numbers) = raw.get_window_glazing_equivalent_layer_item(object, owners)?;
-            if alphas != 3 || !(8..=26).contains(&numbers) {
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Glazing:EquivalentLayer",
+                object,
+                owners,
+            )? {
+                Some(expected) => (alphas, numbers) != expected,
+                None => alphas != 3 || !(8..=26).contains(&numbers),
+            };
+            if invalid_counts {
                 return Err(unavailable("GlazingEQL3A26N/min11 primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

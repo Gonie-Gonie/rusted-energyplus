@@ -139,8 +139,8 @@ pub(crate) fn validate_unused_analytic_curves(raw: &RawModel) -> Result<(), Stri
     if !selected {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source unused analytic curves require direct epJSON".into());
+    for family in ANALYTIC_CURVE_FAMILIES {
+        raw.validate_source_idf_object_custody(family)?;
     }
     if raw.objects.iter().any(|(family, rows)| {
         !rows.is_empty()
@@ -212,25 +212,41 @@ pub(super) fn is_family(family: &str) -> bool {
 }
 // Retain the ordered raw input-bound predicates without changing admission logic.
 #[allow(clippy::manual_range_contains)]
-pub(super) fn admitted_field(family: &str, name: &str, value: &RawValue) -> bool {
+pub(super) fn admitted_field(
+    family: &str,
+    name: &str,
+    value: &RawValue,
+    source_is_epjson: bool,
+) -> bool {
     if is_analytic_curve_family(family) {
         return analytic_curve_admitted_field(family, name, value);
     }
-    // This nameless family reaches only the direct-epJSON positive-OA route.
-    // Its instance schema has only the optional nodes array; all other fields
-    // (including IDF bookkeeping) are unconsumed JSON metadata on that route.
+    // Direct JSON keeps its existing unconsumed-metadata boundary. Original
+    // IDF bookkeeping is admitted separately only with real raw custody.
     if family == "OutdoorAir:NodeList" {
-        return name != "nodes"
-            || matches!(value, RawValue::Array(members) if members.iter().all(|member| {
+        return if name == "nodes" {
+            matches!(value, RawValue::Array(members) if members.iter().all(|member| {
                 matches!(member, RawValue::Object(fields)
-                    if matches!(fields.get(&FieldName("node_or_nodelist_name".into())), Some(RawValue::String(_))))
-            }));
+                    if (source_is_epjson || fields.keys().all(|field| field.0 == "node_or_nodelist_name"))
+                        && match fields.get(&FieldName("node_or_nodelist_name".into())) {
+                            Some(RawValue::String(_)) => true,
+                            None => !source_is_epjson,
+                            _ => false,
+                        })
+            }))
+        } else {
+            source_is_epjson
+        };
     }
     if matches!(
         name,
         "idf_order" | "idf_max_fields" | "idf_max_extensible_fields"
     ) {
-        return matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
+        // Original OA/DSOA metadata is accepted only by the caller's genuine
+        // recovered-custody branch, never this generic three-key fallback.
+        return (source_is_epjson
+            || !matches!(family, "OutdoorAir:Node" | "DesignSpecification:OutdoorAir"))
+            && matches!(value, RawValue::Number(text) if text.parse::<usize>().is_ok());
     }
     match (family, name) {
         (

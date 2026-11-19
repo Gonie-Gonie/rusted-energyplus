@@ -56,7 +56,12 @@ impl SelectedMaterialData {
         }
         for object in &raw.window_gap {
             let (alphas, numbers) = raw.get_window_gap_item(object, owners)?;
-            if !(2..=4).contains(&alphas) || !(1..=2).contains(&numbers) {
+            let invalid_counts =
+                match raw.source_original_idf_fixed_counts("WindowMaterial:Gap", object, owners)? {
+                    Some(expected) => (alphas, numbers) != expected,
+                    None => !(2..=4).contains(&alphas) || !(1..=2).contains(&numbers),
+                };
+            if invalid_counts {
                 return Err(unavailable("Gap4A2N/min0 returned primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

@@ -716,7 +716,8 @@ impl<'a> Compiler<'a> {
             // Selected single-Gas Source declarations share Native's exact
             // material namespace with opaque dependencies. Legacy/no-Gas/
             // invalid-only inputs retain their policy; unused Custom is independent.
-            if self.raw_model.is_epjson()
+            if (self.raw_model.is_epjson()
+                || self.raw_model.validate_source_idf_object_custody("WindowMaterial:Gas").is_ok())
                 && self.raw_model.objects.get(&ep_raw_model::ObjectType("WindowMaterial:Gas".into()))
                     .is_some_and(|rows| rows.iter().any(|(name, object)| {
                         let name_valid = !name.0.contains('\n')
@@ -784,7 +785,10 @@ impl<'a> Compiler<'a> {
         }
 
         if self.source_file_declarations
-            && self.raw_model.is_epjson()
+            && self
+                .raw_model
+                .validate_source_idf_object_custody("MaterialProperty:GlazingSpectralData")
+                .is_ok()
             && self
                 .raw_model
                 .objects
@@ -4523,7 +4527,10 @@ impl<'a> Compiler<'a> {
     // not permission to defer the six optical sums to the genuine getter.
     fn source_unused_spectral_average(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Glazing")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -4611,7 +4618,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_spectral(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Glazing")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -4700,7 +4710,10 @@ impl<'a> Compiler<'a> {
     // Independent original-schema unused Angle admission; runtime owns all Curve lookup.
     fn source_unused_spectral_and_angle(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Glazing")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -4789,7 +4802,10 @@ impl<'a> Compiler<'a> {
     // Original schema only: Native owns count/clamp/integrity diagnostics.
     fn source_spectral_data(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("MaterialProperty:GlazingSpectralData")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -5153,7 +5169,12 @@ impl<'a> Compiler<'a> {
     // defers the IR>=1 diagnostic to the actual Refraction getter.
     fn source_unused_refraction(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody(
+                    "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                )
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -5379,7 +5400,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_glazing_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Glazing:EquivalentLayer")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -5810,7 +5834,10 @@ impl<'a> Compiler<'a> {
     // select that map while a Custom row is used or schema-invalid.
     fn source_unused_custom_window_gas(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Gas")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -6065,7 +6092,12 @@ impl<'a> Compiler<'a> {
                 continue;
             };
             if self.source_file_declarations
-                && self.raw_model.is_epjson()
+                && (self.raw_model.is_epjson()
+                    || (self
+                        .raw_model
+                        .validate_source_idf_object_custody(OBJECT_TYPE)
+                        .is_ok()
+                        && model.material_names.is_source_exact_namespace()))
                 && (gas_type != WindowGasType::Custom || source_unused_custom)
             {
                 model
@@ -6088,7 +6120,10 @@ impl<'a> Compiler<'a> {
     // Declaration selection only; real GasMix getter owns physical properties and joint diagnostics.
     fn source_unused_gap_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Gap:EquivalentLayer")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -6368,7 +6403,10 @@ impl<'a> Compiler<'a> {
     // Exact declaration selection only; properties remain the real IP/getter's.
     fn source_unused_window_gas_mixture(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:GasMixture")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -6642,7 +6680,10 @@ impl<'a> Compiler<'a> {
     // Original-schema unused Shade only; its real getter owns the three sums.
     fn source_unused_shade(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Shade")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -6956,7 +6997,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_shade_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Shade:EquivalentLayer")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -7269,7 +7313,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_drape_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Drape:EquivalentLayer")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -7607,7 +7654,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_screen(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Screen")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -7705,7 +7755,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_blind(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Blind")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -8198,7 +8251,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_screen_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Screen:EquivalentLayer")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -8281,7 +8337,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_blind_equivalent_layer(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Blind:EquivalentLayer")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -9680,14 +9739,10 @@ impl<'a> Compiler<'a> {
     // Selection only: actual EcoRoof getter owns warning, resistance and late moisture reset.
     fn source_unused_roof_vegetation(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || (!self.raw_model.is_epjson()
-                && (!self
-                    .raw_model
-                    .has_idf_declaration_order("Material:RoofVegetation")
-                    || !matches!(
-                        object.fields.get(&ep_raw_model::FieldName("idf_max_fields".into())),
-                        Some(RawValue::Number(token)) if token.parse::<usize>().is_ok()
-                    )))
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("Material:RoofVegetation")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -10342,7 +10397,10 @@ impl<'a> Compiler<'a> {
 
     fn source_unused_window_gap(&self, name: &str, object: &RawObject) -> bool {
         if !self.source_file_declarations
-            || !self.raw_model.is_epjson()
+            || self
+                .raw_model
+                .validate_source_idf_object_custody("WindowMaterial:Gap")
+                .is_err()
             || name.contains('\n')
             || name
                 .bytes()
@@ -11151,7 +11209,11 @@ impl<'a> Compiler<'a> {
                 .and_then(|rows| rows.get(&ep_raw_model::ObjectName(name.into())))
                 .is_some_and(|object| self.source_unused_window_gap(name, object));
         let blank_name = if self.source_file_declarations
-            && (self.raw_model.is_epjson() || source_roof_vegetation_name)
+            && (self.raw_model.is_epjson()
+                || self
+                    .raw_model
+                    .validate_source_idf_object_custody(object_type)
+                    .is_ok())
             && (matches!(
                 object_type,
                 "WindowMaterial:Gas" | "WindowMaterial:GasMixture"

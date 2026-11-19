@@ -116,22 +116,9 @@ impl SelectedMaterialData {
         }
         for object in &raw.roof_vegetation {
             let counts = raw.get_roof_vegetation_item(object, owners)?;
-            let expected_counts = if raw.source_is_epjson {
-                (4, 15)
-            } else {
-                let maximum = object
-                    .idf_max_fields
-                    .ok_or_else(|| unavailable("missing actual RoofVegetation IDF field count"))?;
-                (
-                    1 + usize::from(6 < maximum)
-                        + usize::from(7 < maximum)
-                        + usize::from(18 < maximum),
-                    [1_usize, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-                        .into_iter()
-                        .filter(|position| *position < maximum)
-                        .count(),
-                )
-            };
+            let expected_counts = raw
+                .source_original_idf_fixed_counts("Material:RoofVegetation", object, owners)?
+                .unwrap_or((4, 15));
             if counts != expected_counts {
                 return Err(unavailable("RoofVegetation4A15N primitive"));
             }

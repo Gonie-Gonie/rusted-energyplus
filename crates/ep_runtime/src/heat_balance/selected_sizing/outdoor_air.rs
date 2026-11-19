@@ -47,6 +47,7 @@ fn json_number(token: &str) -> Result<f64, E> {
 fn get_object(
     input: &mut SelectedInputProcessor,
     number: usize,
+    source_is_epjson: bool,
     local: &mut LocalArrays,
 ) -> Result<(usize, usize), E> {
     let name = input
@@ -59,13 +60,50 @@ fn get_object(
         .cloned()
         .ok_or(E::Unavailable("actual DSOA getObjectItem row"))?;
     let fields = input.source_raw_object_fields(FAMILY, &name)?;
-    let maximum = FIELDS.iter().enumerate().fold(1, |maximum, (at, field)| {
-        if fields.contains_key(*field) {
-            maximum.max(at + 1)
-        } else {
-            maximum
+    let maximum = if source_is_epjson {
+        FIELDS.iter().enumerate().fold(1, |maximum, (at, field)| {
+            if fields.contains_key(*field) {
+                maximum.max(at + 1)
+            } else {
+                maximum
+            }
+        })
+    } else {
+        match fields.get("idf_max_fields") {
+            Some(V::Number(token)) => token
+                .parse::<usize>()
+                .map_err(|_| E::Unavailable("actual DSOA original-IDF field-count integer"))?,
+            _ => {
+                return Err(E::Unavailable(
+                    "actual DSOA original-IDF field-count custody",
+                ));
+            }
         }
-    });
+    };
+    let original_layout = if source_is_epjson {
+        None
+    } else {
+        let fields = input
+            .source_original_idf_fixed_fields(FAMILY)
+            .ok_or(E::Unavailable(
+                "actual DSOA original-IDF fixed layout custody",
+            ))?;
+        if fields.len() != FIELDS.len()
+            || fields.iter().enumerate().any(|(at, (name, alpha, _))| {
+                name != FIELDS[at] || *alpha != matches!(at, 0 | 1 | 6 | 7)
+            })
+        {
+            return Err(E::Unavailable(
+                "actual DSOA original-IDF fixed layout identity",
+            ));
+        }
+        Some(fields.to_vec())
+    };
+    let original_counts = if source_is_epjson {
+        None
+    } else {
+        Some(input.source_original_idf_argument_counts(FAMILY, maximum, None, 0)?)
+    };
     let (alphas, alpha_names, numeric_names, numbers, alpha_blanks, numeric_blanks) = local;
     if alphas.len() < 4
         || alpha_names.len() < 4
@@ -86,10 +124,13 @@ fn get_object(
     let fields = input.source_raw_object_fields(FAMILY, &name)?;
     let (mut alpha, mut numeric, mut num_alphas, mut num_numbers) = (0, 0, 0, 0);
     for (at, field) in FIELDS.iter().enumerate() {
+        let label = original_layout
+            .as_ref()
+            .map_or(*field, |fields| fields[at].2.as_str());
         if at == 0 {
             alphas[alpha] = name.to_ascii_uppercase();
             alpha_blanks[alpha] = name.is_empty();
-            alpha_names[alpha] = (*field).into();
+            alpha_names[alpha] = label.into();
             alpha += 1;
             num_alphas = alpha;
         } else if matches!(at, 1 | 6 | 7) {
@@ -102,7 +143,7 @@ fn get_object(
             };
             alphas[alpha] = value.to_ascii_uppercase();
             alpha_blanks[alpha] = blank;
-            alpha_names[alpha] = (*field).into();
+            alpha_names[alpha] = label.into();
             alpha += 1;
             if at < maximum {
                 num_alphas = alpha;
@@ -118,14 +159,18 @@ fn get_object(
             };
             numbers[numeric] = value;
             numeric_blanks[numeric] = blank;
-            numeric_names[numeric] = (*field).into();
+            numeric_names[numeric] = label.into();
             numeric += 1;
             if at < maximum {
                 num_numbers = numeric;
             }
         }
     }
-    Ok((num_alphas, num_numbers))
+    if let Some(counts) = original_counts {
+        Ok((counts.alphas, counts.numerics))
+    } else {
+        Ok((num_alphas, num_numbers))
+    }
 }
 
 impl Method {
@@ -225,11 +270,9 @@ impl SelectedSizingManager {
         default.flow_method = Method::PerPerson;
         default.flow_per_person = 0.00944;
         default.flow_fraction_schedule = Some(schedules.always_on()?);
-        if count > 0 && !source_is_epjson {
-            return Err(E::Unavailable("actual DSOA IDF declaration/count metadata"));
-        }
         for number in 1..=count {
-            let (num_alphas, num_numbers) = get_object(input, number, &mut local)?;
+            let (num_alphas, num_numbers) =
+                get_object(input, number, source_is_epjson, &mut local)?;
             let (alphas, _, _, numbers, alpha_blanks, _) = &local;
             let row = self
                 .oa_requirements

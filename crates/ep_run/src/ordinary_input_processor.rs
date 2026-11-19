@@ -65,6 +65,32 @@ fn project(
     }
     let mut input = SelectedInputProcessor::from_admitted_input(schema::definitions(), families)
         .map_err(|error| error.to_string())?;
+    if source_json_order && !raw.is_epjson() {
+        for &family in ep_raw_model::SOURCE_IDF_OBJECT_FAMILIES {
+            if raw
+                .objects
+                .get(&ep_raw_model::ObjectType(family.into()))
+                .is_some_and(|rows| !rows.is_empty())
+            {
+                raw.validate_source_idf_object_custody(family)?;
+                let (_, fields, extensions) = ep_raw_model::source_idf_object_layout(family)
+                    .ok_or_else(|| format!("Source fixed layout absent: {family}"))?;
+                input
+                    .retain_source_original_idf_fields(
+                        family,
+                        fields
+                            .iter()
+                            .map(|(name, alpha, label)| ((*name).into(), *alpha, (*label).into()))
+                            .collect(),
+                        extensions
+                            .iter()
+                            .map(|(name, alpha, label)| ((*name).into(), *alpha, (*label).into()))
+                            .collect(),
+                    )
+                    .map_err(|error| error.to_string())?;
+            }
+        }
+    }
     input
         .retain_source_input_statistics(statistics)
         .map_err(|error| error.to_string())?;

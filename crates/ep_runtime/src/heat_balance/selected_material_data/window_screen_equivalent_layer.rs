@@ -58,7 +58,16 @@ impl SelectedMaterialData {
             return Err(unavailable("ScreenEQL raw/IP count"));
         }
         for object in &raw.window_screen_equivalent_layer {
-            if raw.get_window_screen_equivalent_layer_item(object, owners)? != (1, 10) {
+            let counts = raw.get_window_screen_equivalent_layer_item(object, owners)?;
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Screen:EquivalentLayer",
+                object,
+                owners,
+            )? {
+                Some(expected) => counts != expected,
+                None => counts != (1, 10),
+            };
+            if invalid_counts {
                 return Err(unavailable("ScreenEQL1A10N/min11 primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

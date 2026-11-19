@@ -352,6 +352,30 @@ impl SourceCurveInputArrays {
                 .max()
                 .unwrap_or(0)
         };
+        let original_counts = if input
+            .source_original_idf_fixed_fields(definition.family)
+            .is_some()
+        {
+            let fields = input
+                .source_raw_object_fields(definition.family, name)
+                .map_err(SelectedSetupServiceError::Input)?;
+            let Some(SourceInputStatisticsValue::Number(token)) = fields.get("idf_max_fields")
+            else {
+                return Err(SelectedSetupServiceError::Input(
+                    SelectedInputUnavailable::Association,
+                ));
+            };
+            let fixed = token.parse::<usize>().map_err(|_| {
+                SelectedSetupServiceError::Input(SelectedInputUnavailable::Association)
+            })?;
+            Some(
+                input
+                    .source_original_idf_argument_counts(definition.family, fixed, None, 0)
+                    .map_err(SelectedSetupServiceError::Input)?,
+            )
+        } else {
+            None
+        };
         self.alphas.fill(String::new());
         self.numerics.fill(Some(0.0));
         shortcut.numeric_field_blanks.fill(true);
@@ -411,6 +435,17 @@ impl SourceCurveInputArrays {
                 }
                 numeric += 1;
             }
+        }
+        if let Some(counts) = original_counts {
+            input
+                .source_original_idf_field_names(
+                    definition.family,
+                    0,
+                    &mut shortcut.alpha_field_names,
+                    &mut shortcut.numeric_field_names,
+                )
+                .map_err(SelectedSetupServiceError::Input)?;
+            return Ok((counts.alphas, counts.numerics, 1));
         }
         Ok((num_alphas, num_numbers, 1))
     }

@@ -78,7 +78,15 @@ impl SelectedMaterialData {
         }
         for object in &raw.window_shade_equivalent_layer {
             let (alphas, numbers) = raw.get_window_shade_equivalent_layer_item(object, owners)?;
-            if alphas != 1 || !(5..=11).contains(&numbers) {
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Shade:EquivalentLayer",
+                object,
+                owners,
+            )? {
+                Some(expected) => (alphas, numbers) != expected,
+                None => alphas != 1 || !(5..=11).contains(&numbers),
+            };
+            if invalid_counts {
                 return Err(unavailable("ShadeEQL1A11N/min6 primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

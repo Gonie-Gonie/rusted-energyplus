@@ -265,7 +265,19 @@ impl SelectedMaterialData {
             return Err(unavailable("SimpleGlazing raw/IP count"));
         }
         for object in &raw.simple_glazing {
-            raw.get_simple_glazing_item(object, owners)?;
+            let counts = raw.get_simple_glazing_item(object, owners)?;
+            if raw
+                .source_original_idf_fixed_counts(
+                    "WindowMaterial:SimpleGlazingSystem",
+                    object,
+                    owners,
+                )?
+                .is_some_and(|expected| counts != expected)
+            {
+                return Err(unavailable(
+                    "Source original-IDF fixed material returned counts",
+                ));
+            }
             let name = owners.shortcut.alpha_args[0].clone();
             if self.material_map.contains_key(&name) {
                 let flags = owners
@@ -635,7 +647,15 @@ impl SelectedMaterialData {
             return Err(unavailable("Glazing raw/IP count"));
         }
         for object in &raw.glazing {
-            raw.get_glazing_item(object, owners)?;
+            let counts = raw.get_glazing_item(object, owners)?;
+            if raw
+                .source_original_idf_fixed_counts("WindowMaterial:Glazing", object, owners)?
+                .is_some_and(|expected| counts != expected)
+            {
+                return Err(unavailable(
+                    "Source original-IDF fixed material returned counts",
+                ));
+            }
             let name = owners.shortcut.alpha_args[0].clone();
             if self.material_map.contains_key(&name) {
                 let flags = owners
@@ -1033,7 +1053,19 @@ impl SelectedMaterialData {
             return Err(unavailable("Refraction raw/IP count"));
         }
         for object in &raw.refraction {
-            raw.get_refraction_item(object, owners)?;
+            let counts = raw.get_refraction_item(object, owners)?;
+            if raw
+                .source_original_idf_fixed_counts(
+                    "WindowMaterial:Glazing:RefractionExtinctionMethod",
+                    object,
+                    owners,
+                )?
+                .is_some_and(|expected| counts != expected)
+            {
+                return Err(unavailable(
+                    "Source original-IDF fixed material returned counts",
+                ));
+            }
             let name = owners.shortcut.alpha_args[0].clone();
             if self.material_map.contains_key(&name) {
                 let flags = owners

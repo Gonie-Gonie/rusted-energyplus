@@ -58,9 +58,7 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
         if rows.is_empty() {
             continue;
         }
-        if !raw.is_epjson() {
-            return Err("Source unused WindowGap requires direct epJSON".into());
-        }
+        raw.validate_source_idf_object_custody(family)?;
         raw.source_json_instances(family)?;
         for (name, object) in rows {
             if !super::window_gas::valid_name(&name.0) {

@@ -136,7 +136,15 @@ impl SelectedMaterialData {
         }
         for object in &raw.window_screen {
             let (alphas, numbers) = raw.get_window_screen_item(object, owners)?;
-            if alphas != 2 || !(7..=12).contains(&numbers) {
+            let invalid_counts = match raw.source_original_idf_fixed_counts(
+                "WindowMaterial:Screen",
+                object,
+                owners,
+            )? {
+                Some(expected) => (alphas, numbers) != expected,
+                None => alphas != 2 || !(7..=12).contains(&numbers),
+            };
+            if invalid_counts {
                 return Err(unavailable("Screen2A12N/min9 primitive"));
             }
             let name = owners.shortcut.alpha_args[0].clone();

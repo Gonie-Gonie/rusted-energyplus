@@ -90,13 +90,62 @@ pub(super) fn numeric(
 }
 
 impl SelectedMaterialInput {
+    pub(super) fn source_original_idf_fixed_counts(
+        &self,
+        family: &str,
+        object: &ProjectInputObject,
+        owners: &MaterialDataOwners<'_, '_>,
+    ) -> Result<Option<(usize, usize)>, RuntimeError> {
+        if self.source_is_epjson {
+            return Ok(None);
+        }
+        if !owners.input.has_object(family, &object.object_name) {
+            return Err(unavailable(
+                "Source original-IDF fixed material raw/IP identity",
+            ));
+        }
+        let maximum = object
+            .idf_max_fields
+            .ok_or_else(|| unavailable("Source original-IDF fixed material field-count custody"))?;
+        let counts = owners
+            .input
+            .source_original_idf_argument_counts(family, maximum, None, 0)
+            .map_err(|_| unavailable("Source original-IDF fixed material layout custody"))?;
+        Ok(Some((counts.alphas, counts.numerics)))
+    }
+
+    fn finish_source_idf_item(
+        &self,
+        family: &str,
+        owners: &mut MaterialDataOwners<'_, '_>,
+        original_counts: Option<(usize, usize)>,
+        retained_rows: usize,
+        epjson_counts: (usize, usize),
+    ) -> Result<(usize, usize), RuntimeError> {
+        if let Some(counts) = original_counts {
+            owners
+                .input
+                .source_original_idf_field_names(
+                    family,
+                    retained_rows,
+                    &mut owners.shortcut.alpha_field_names,
+                    &mut owners.shortcut.numeric_field_names,
+                )
+                .map_err(|_| unavailable("Source original-IDF material field-label capacity"))?;
+            return Ok(counts);
+        }
+        Ok(epjson_counts)
+    }
+
     pub(super) fn get_window_gap_item(
         &self,
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
+        let original_counts =
+            self.source_original_idf_fixed_counts("WindowMaterial:Gap", object, owners)?;
         const FAMILY: &str = "WindowMaterial:Gap";
-        if !self.source_is_epjson || !owners.input.has_object(FAMILY, &object.object_name) {
+        if !owners.input.has_object(FAMILY, &object.object_name) {
             return Err(unavailable("Gap owned direct-epJSON raw/IP identity"));
         }
         const FIELDS: [(&str, bool); 6] = [
@@ -171,7 +220,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((alphas, numerics))
+        self.finish_source_idf_item(
+            "WindowMaterial:Gap",
+            owners,
+            original_counts,
+            0,
+            (alphas, numerics),
+        )
     }
 
     pub(super) fn get_roof_vegetation_item(
@@ -179,19 +234,14 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
+        let original_counts =
+            self.source_original_idf_fixed_counts("Material:RoofVegetation", object, owners)?;
         let family = "Material:RoofVegetation";
         if !owners.input.has_object(family, &object.object_name) {
             return Err(unavailable(
                 "RoofVegetation owned direct-epJSON raw/IP identity",
             ));
         }
-        let max_fields = if self.source_is_epjson {
-            19
-        } else {
-            object
-                .idf_max_fields
-                .ok_or_else(|| unavailable("missing actual RoofVegetation IDF field count"))?
-        };
         let s = &mut owners.shortcut;
         if s.alpha_args.len() < 4
             || s.alpha_field_names.len() < 4
@@ -212,29 +262,14 @@ impl SelectedMaterialInput {
             .input
             .mark_object_as_used(family, &object.object_name);
         s.alpha_args[0] = object.object_name.to_ascii_uppercase();
-        s.alpha_field_names[0] = if self.source_is_epjson {
-            "name"
-        } else {
-            "Name"
-        }
-        .into();
+        s.alpha_field_names[0] = "name".into();
         s.alpha_field_blanks[0] = object.object_name.is_empty();
-        for (index, name, legacy, default) in [
-            (
-                1_usize,
-                "soil_layer_name",
-                "Soil Layer Name",
-                "GREEN ROOF SOIL",
-            ),
-            (2_usize, "roughness", "Roughness", "MEDIUMROUGH"),
-            (
-                3_usize,
-                "moisture_diffusion_calculation_method",
-                "Moisture Diffusion Calculation Method",
-                "ADVANCED",
-            ),
+        for (index, name, default) in [
+            (1_usize, "soil_layer_name", "GREEN ROOF SOIL"),
+            (2_usize, "roughness", "MEDIUMROUGH"),
+            (3_usize, "moisture_diffusion_calculation_method", "ADVANCED"),
         ] {
-            s.alpha_field_names[index] = if self.source_is_epjson { name } else { legacy }.into();
+            s.alpha_field_names[index] = name.into();
             s.alpha_args[index] = default.into();
             match object.fields.get(name) {
                 Some(ProjectInputValue::String(text)) => {
@@ -270,30 +305,8 @@ impl SelectedMaterialInput {
             ),
             ("initial_volumetric_moisture_content_of_the_soil_layer", 0.1),
         ];
-        const IDF_LABELS: [&str; 15] = [
-            "Height of Plants",
-            "Leaf Area Index",
-            "Leaf Reflectivity",
-            "Leaf Emissivity",
-            "Minimum Stomatal Resistance",
-            "Thickness",
-            "Conductivity of Dry Soil",
-            "Density of Dry Soil",
-            "Specific Heat of Dry Soil",
-            "Thermal Absorptance",
-            "Solar Absorptance",
-            "Visible Absorptance",
-            "Saturation Volumetric Moisture Content of the Soil Layer",
-            "Residual Volumetric Moisture Content of the Soil Layer",
-            "Initial Volumetric Moisture Content of the Soil Layer",
-        ];
         for (index, (name, default)) in FIELDS.iter().enumerate() {
-            s.numeric_field_names[index] = if self.source_is_epjson {
-                *name
-            } else {
-                IDF_LABELS[index]
-            }
-            .into();
+            s.numeric_field_names[index] = (*name).into();
             s.numeric_args[index] = *default;
             match object.fields.get(*name) {
                 Some(ProjectInputValue::Number(value)) if value.is_finite() => {
@@ -308,17 +321,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        // All capacity cells above are filled independently of the returned counts.
-        // Name counts even at END max_fields0; other fields count only within F.
-        let alphas = 1
-            + usize::from(6 < max_fields)
-            + usize::from(7 < max_fields)
-            + usize::from(18 < max_fields);
-        let numerics = [1_usize, 2, 3, 4, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-            .into_iter()
-            .filter(|position| *position < max_fields)
-            .count();
-        Ok((alphas, numerics))
+        self.finish_source_idf_item(
+            "Material:RoofVegetation",
+            owners,
+            original_counts,
+            0,
+            (4, 15),
+        )
     }
 
     pub(super) fn get_spectral_data_item(
@@ -327,7 +336,40 @@ impl SelectedMaterialInput {
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
         let family = "MaterialProperty:GlazingSpectralData";
-        if !self.source_is_epjson || !owners.input.has_object(family, &row.object.object_name) {
+        let original_counts = if self.source_is_epjson {
+            None
+        } else {
+            let maximum = row
+                .object
+                .idf_max_fields
+                .ok_or_else(|| unavailable("Source spectral original-IDF fixed-field custody"))?;
+            let fields = owners
+                .input
+                .source_raw_object_fields(family, &row.object.object_name)
+                .map_err(|_| unavailable("Source spectral original-IDF raw/IP custody"))?;
+            let Some(super::super::selected_input_processor::SourceInputStatisticsValue::Number(
+                token,
+            )) = fields.get("idf_max_extensible_fields")
+            else {
+                return Err(unavailable(
+                    "Source spectral original-IDF extension-field custody",
+                ));
+            };
+            let maximum_extensions = token
+                .parse::<usize>()
+                .map_err(|_| unavailable("Source spectral original-IDF extension-field custody"))?;
+            let counts = owners
+                .input
+                .source_original_idf_argument_counts(
+                    family,
+                    maximum,
+                    Some(maximum_extensions),
+                    row.extensions.len(),
+                )
+                .map_err(|_| unavailable("Source spectral original-IDF layout custody"))?;
+            Some((counts.alphas, counts.numerics))
+        };
+        if !owners.input.has_object(family, &row.object.object_name) {
             return Err(unavailable("spectral data actual raw/IP identity"));
         }
         const FIXED: [&str; 16] = [
@@ -412,7 +454,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((1, maximum))
+        self.finish_source_idf_item(
+            family,
+            owners,
+            original_counts,
+            row.extensions.len(),
+            (1, maximum),
+        )
     }
 
     pub(super) fn get_refraction_item(
@@ -420,12 +468,15 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners.input.has_object(
-                "WindowMaterial:Glazing:RefractionExtinctionMethod",
-                &object.object_name,
-            )
-        {
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:Glazing:RefractionExtinctionMethod",
+            object,
+            owners,
+        )?;
+        if !owners.input.has_object(
+            "WindowMaterial:Glazing:RefractionExtinctionMethod",
+            &object.object_name,
+        ) {
             return Err(unavailable(
                 "Refraction actual direct-epJSON raw/IP identity",
             ));
@@ -518,7 +569,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((alphas, numerics))
+        self.finish_source_idf_item(
+            "WindowMaterial:Glazing:RefractionExtinctionMethod",
+            owners,
+            original_counts,
+            0,
+            (alphas, numerics),
+        )
     }
 
     pub(super) fn get_glazing_item(
@@ -526,10 +583,11 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Glazing", &object.object_name)
+        let original_counts =
+            self.source_original_idf_fixed_counts("WindowMaterial:Glazing", object, owners)?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Glazing", &object.object_name)
         {
             return Err(unavailable("Glazing owned direct-epJSON raw/IP identity"));
         }
@@ -651,7 +709,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((alphas, numerics))
+        self.finish_source_idf_item(
+            "WindowMaterial:Glazing",
+            owners,
+            original_counts,
+            0,
+            (alphas, numerics),
+        )
     }
 
     pub(super) fn get_window_blind_item(
@@ -659,10 +723,11 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Blind", &object.object_name)
+        let original_counts =
+            self.source_original_idf_fixed_counts("WindowMaterial:Blind", object, owners)?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Blind", &object.object_name)
         {
             return Err(unavailable("Blind owned direct-epJSON raw/IP identity"));
         }
@@ -741,7 +806,7 @@ impl SelectedMaterialInput {
             }
         }
         // Original min_fields29 makes all27 fixed numeric slots returned.
-        Ok((2, 27))
+        self.finish_source_idf_item("WindowMaterial:Blind", owners, original_counts, 0, (2, 27))
     }
 
     pub(super) fn get_window_screen_item(
@@ -749,10 +814,11 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Screen", &object.object_name)
+        let original_counts =
+            self.source_original_idf_fixed_counts("WindowMaterial:Screen", object, owners)?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Screen", &object.object_name)
         {
             return Err(unavailable("Screen owned direct-epJSON raw/IP identity"));
         }
@@ -861,7 +927,13 @@ impl SelectedMaterialInput {
                 _ => return Err(unavailable("admitted Screen numeric scalar")),
             }
         }
-        Ok((2, maximum - 2))
+        self.finish_source_idf_item(
+            "WindowMaterial:Screen",
+            owners,
+            original_counts,
+            0,
+            (2, maximum - 2),
+        )
     }
 
     pub(super) fn get_window_shade_equivalent_layer_item(
@@ -869,10 +941,14 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Shade:EquivalentLayer", &object.object_name)
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:Shade:EquivalentLayer",
+            object,
+            owners,
+        )?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Shade:EquivalentLayer", &object.object_name)
         {
             return Err(unavailable("ShadeEQL owned direct-epJSON raw/IP identity"));
         }
@@ -938,7 +1014,13 @@ impl SelectedMaterialInput {
                 _ => return Err(unavailable("admitted ShadeEQL numeric scalar")),
             }
         }
-        Ok((1, numbers))
+        self.finish_source_idf_item(
+            "WindowMaterial:Shade:EquivalentLayer",
+            owners,
+            original_counts,
+            0,
+            (1, numbers),
+        )
     }
 
     pub(super) fn get_window_drape_equivalent_layer_item(
@@ -946,10 +1028,14 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Drape:EquivalentLayer", &object.object_name)
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:Drape:EquivalentLayer",
+            object,
+            owners,
+        )?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Drape:EquivalentLayer", &object.object_name)
         {
             return Err(unavailable("DrapeEQL owned direct-epJSON raw/IP identity"));
         }
@@ -1013,7 +1099,13 @@ impl SelectedMaterialInput {
                 _ => return Err(unavailable("admitted DrapeEQL numeric scalar")),
             }
         }
-        Ok((1, numbers))
+        self.finish_source_idf_item(
+            "WindowMaterial:Drape:EquivalentLayer",
+            owners,
+            original_counts,
+            0,
+            (1, numbers),
+        )
     }
 
     pub(super) fn get_window_glazing_equivalent_layer_item(
@@ -1021,12 +1113,15 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners.input.has_object(
-                "WindowMaterial:Glazing:EquivalentLayer",
-                &object.object_name,
-            )
-        {
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:Glazing:EquivalentLayer",
+            object,
+            owners,
+        )?;
+        if !owners.input.has_object(
+            "WindowMaterial:Glazing:EquivalentLayer",
+            &object.object_name,
+        ) {
             return Err(unavailable(
                 "GlazingEQL owned direct-epJSON raw/IP identity",
             ));
@@ -1132,7 +1227,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((3, numbers))
+        self.finish_source_idf_item(
+            "WindowMaterial:Glazing:EquivalentLayer",
+            owners,
+            original_counts,
+            0,
+            (3, numbers),
+        )
     }
 
     pub(super) fn get_window_blind_equivalent_layer_item(
@@ -1140,10 +1241,14 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Blind:EquivalentLayer", &object.object_name)
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:Blind:EquivalentLayer",
+            object,
+            owners,
+        )?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Blind:EquivalentLayer", &object.object_name)
         {
             return Err(unavailable("BlindEQL owned direct-epJSON raw/IP identity"));
         }
@@ -1226,9 +1331,21 @@ impl SelectedMaterialInput {
         }
         // Explicit trailing A3, even empty, extends Native max_fields24 across all21 numbers.
         if object.fields.contains_key("slat_angle_control") {
-            Ok((3, 21))
+            self.finish_source_idf_item(
+                "WindowMaterial:Blind:EquivalentLayer",
+                owners,
+                original_counts,
+                0,
+                (3, 21),
+            )
         } else {
-            Ok((2, numbers))
+            self.finish_source_idf_item(
+                "WindowMaterial:Blind:EquivalentLayer",
+                owners,
+                original_counts,
+                0,
+                (2, numbers),
+            )
         }
     }
 
@@ -1237,10 +1354,14 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Screen:EquivalentLayer", &object.object_name)
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:Screen:EquivalentLayer",
+            object,
+            owners,
+        )?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Screen:EquivalentLayer", &object.object_name)
         {
             return Err(unavailable("ScreenEQL owned direct-epJSON raw/IP identity"));
         }
@@ -1298,7 +1419,13 @@ impl SelectedMaterialInput {
             }
         }
         // Official min_fields11 includes Name; even missing wires return all ten numbers.
-        Ok((1, 10))
+        self.finish_source_idf_item(
+            "WindowMaterial:Screen:EquivalentLayer",
+            owners,
+            original_counts,
+            0,
+            (1, 10),
+        )
     }
 
     pub(super) fn get_window_shade_item(
@@ -1306,10 +1433,11 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:Shade", &object.object_name)
+        let original_counts =
+            self.source_original_idf_fixed_counts("WindowMaterial:Shade", object, owners)?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:Shade", &object.object_name)
         {
             return Err(unavailable("Shade owned direct-epJSON raw/IP identity"));
         }
@@ -1382,7 +1510,7 @@ impl SelectedMaterialInput {
             }
         }
         // Official min_fields15 includes Name: all14 numeric slots are returned.
-        Ok((1, 14))
+        self.finish_source_idf_item("WindowMaterial:Shade", owners, original_counts, 0, (1, 14))
     }
 
     pub(super) fn get_window_gas_mixture_item(
@@ -1390,10 +1518,11 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson
-            || !owners
-                .input
-                .has_object("WindowMaterial:GasMixture", &object.object_name)
+        let original_counts =
+            self.source_original_idf_fixed_counts("WindowMaterial:GasMixture", object, owners)?;
+        if !owners
+            .input
+            .has_object("WindowMaterial:GasMixture", &object.object_name)
         {
             return Err(unavailable(
                 "GasMixture owned direct-epJSON raw/IP identity",
@@ -1479,7 +1608,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((alphas, numerics))
+        self.finish_source_idf_item(
+            "WindowMaterial:GasMixture",
+            owners,
+            original_counts,
+            0,
+            (alphas, numerics),
+        )
     }
 
     pub(super) fn get_window_gap_equivalent_layer_item(
@@ -1487,9 +1622,11 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson {
-            return Err(unavailable("GapEQL requires owned direct-epJSON getter"));
-        }
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:Gap:EquivalentLayer",
+            object,
+            owners,
+        )?;
         if !owners
             .input
             .has_object("WindowMaterial:Gap:EquivalentLayer", &object.object_name)
@@ -1557,7 +1694,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((3, numeric_count))
+        self.finish_source_idf_item(
+            "WindowMaterial:Gap:EquivalentLayer",
+            owners,
+            original_counts,
+            0,
+            (3, numeric_count),
+        )
     }
 
     pub(super) fn get_window_gas_item(
@@ -1565,9 +1708,8 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson {
-            return Err(unavailable("named Gas requires owned direct-epJSON getter"));
-        }
+        let original_counts =
+            self.source_original_idf_fixed_counts("WindowMaterial:Gas", object, owners)?;
         if !owners
             .input
             .has_object("WindowMaterial:Gas", &object.object_name)
@@ -1632,7 +1774,13 @@ impl SelectedMaterialInput {
                 }
             }
         }
-        Ok((2, numeric_count))
+        self.finish_source_idf_item(
+            "WindowMaterial:Gas",
+            owners,
+            original_counts,
+            0,
+            (2, numeric_count),
+        )
     }
 
     pub(super) fn get_simple_glazing_item(
@@ -1640,11 +1788,11 @@ impl SelectedMaterialInput {
         object: &ProjectInputObject,
         owners: &mut MaterialDataOwners<'_, '_>,
     ) -> Result<(usize, usize), RuntimeError> {
-        if !self.source_is_epjson {
-            return Err(unavailable(
-                "SimpleGlazing requires the owned Source epJSON getter",
-            ));
-        }
+        let original_counts = self.source_original_idf_fixed_counts(
+            "WindowMaterial:SimpleGlazingSystem",
+            object,
+            owners,
+        )?;
         if !owners
             .input
             .has_object("WindowMaterial:SimpleGlazingSystem", &object.object_name)
@@ -1698,7 +1846,13 @@ impl SelectedMaterialInput {
             }
             Some(_) => return Err(unavailable("SimpleGlazing optional VT numeric scalar")),
         };
-        Ok((1, numerics))
+        self.finish_source_idf_item(
+            "WindowMaterial:SimpleGlazingSystem",
+            owners,
+            original_counts,
+            0,
+            (1, numerics),
+        )
     }
 
     pub(super) fn get_infrared_item(

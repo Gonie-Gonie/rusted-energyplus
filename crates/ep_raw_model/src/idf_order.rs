@@ -13,6 +13,1234 @@ pub struct IdfOrderTarget {
     pub name_field_index: usize,
 }
 
+/// Raw key, alpha/numeric kind and exact original IDD field label.
+pub type SourceIdfField = (&'static str, bool, &'static str);
+/// Schema minimum, fixed fields and optional repeated extension fields.
+pub type SourceIdfObjectLayout = (usize, &'static [SourceIdfField], &'static [SourceIdfField]);
+
+/// One Source original-IDF field-metadata owner; values/defaults remain in existing getters.
+pub const SOURCE_IDF_OBJECT_FAMILIES: &[&str] = &[
+    "Curve:Bicubic",
+    "Curve:Biquadratic",
+    "Curve:CubicLinear",
+    "Curve:FanPressureRise",
+    "Curve:QuadraticLinear",
+    "Material:RoofVegetation",
+    "MaterialProperty:GlazingSpectralData",
+    "WindowGap:DeflectionState",
+    "WindowGap:SupportPillar",
+    "WindowMaterial:Blind",
+    "WindowMaterial:Blind:EquivalentLayer",
+    "WindowMaterial:Drape:EquivalentLayer",
+    "WindowMaterial:Gap",
+    "WindowMaterial:Gap:EquivalentLayer",
+    "WindowMaterial:Gas",
+    "WindowMaterial:GasMixture",
+    "WindowMaterial:Glazing",
+    "WindowMaterial:Glazing:EquivalentLayer",
+    "WindowMaterial:Glazing:RefractionExtinctionMethod",
+    "WindowMaterial:Screen",
+    "WindowMaterial:Screen:EquivalentLayer",
+    "WindowMaterial:Shade",
+    "WindowMaterial:Shade:EquivalentLayer",
+    "WindowMaterial:SimpleGlazingSystem",
+    "OutdoorAir:Node",
+    "OutdoorAir:NodeList",
+    "DesignSpecification:OutdoorAir",
+    "Material:AirGap",
+];
+
+/// Borrow original-IDF metadata, never an object-admission allowlist.
+#[must_use]
+pub fn source_idf_object_layout(family: &str) -> Option<SourceIdfObjectLayout> {
+    match family {
+        "Material:AirGap" => Some((
+            2,
+            &[
+                ("name", true, "Name"),
+                ("thermal_resistance", false, "Thermal Resistance"),
+            ],
+            &[],
+        )),
+        "DesignSpecification:OutdoorAir" => Some((
+            1,
+            &[
+                ("name", true, "Name"),
+                ("outdoor_air_method", true, "Outdoor Air Method"),
+                (
+                    "outdoor_air_flow_per_person",
+                    false,
+                    "Outdoor Air Flow per Person",
+                ),
+                (
+                    "outdoor_air_flow_per_zone_floor_area",
+                    false,
+                    "Outdoor Air Flow per Zone Floor Area",
+                ),
+                (
+                    "outdoor_air_flow_per_zone",
+                    false,
+                    "Outdoor Air Flow per Zone",
+                ),
+                (
+                    "outdoor_air_flow_air_changes_per_hour",
+                    false,
+                    "Outdoor Air Flow Air Changes per Hour",
+                ),
+                (
+                    "outdoor_air_schedule_name",
+                    true,
+                    "Outdoor Air Schedule Name",
+                ),
+                (
+                    "proportional_control_minimum_outdoor_air_flow_rate_schedule_name",
+                    true,
+                    "Proportional Control Minimum Outdoor Air Flow Rate Schedule Name",
+                ),
+            ],
+            &[],
+        )),
+        "OutdoorAir:Node" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("height_above_ground", false, "Height Above Ground"),
+                (
+                    "drybulb_temperature_schedule_name",
+                    true,
+                    "Drybulb Temperature Schedule Name",
+                ),
+                (
+                    "wetbulb_temperature_schedule_name",
+                    true,
+                    "Wetbulb Temperature Schedule Name",
+                ),
+                ("wind_speed_schedule_name", true, "Wind Speed Schedule Name"),
+                (
+                    "wind_direction_schedule_name",
+                    true,
+                    "Wind Direction Schedule Name",
+                ),
+                (
+                    "wind_pressure_coefficient_curve_name",
+                    true,
+                    "Wind Pressure Coefficient Curve Name",
+                ),
+                (
+                    "symmetric_wind_pressure_coefficient_curve",
+                    true,
+                    "Symmetric Wind Pressure Coefficient Curve",
+                ),
+                ("wind_angle_type", true, "Wind Angle Type"),
+            ],
+            &[],
+        )),
+        "OutdoorAir:NodeList" => Some((
+            0,
+            &[],
+            &[("node_or_nodelist_name", true, "Node or NodeList Name")],
+        )),
+        "Curve:Bicubic" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("coefficient1_constant", false, "Coefficient1 Constant"),
+                ("coefficient2_x", false, "Coefficient2 x"),
+                ("coefficient3_x_2", false, "Coefficient3 x**2"),
+                ("coefficient4_y", false, "Coefficient4 y"),
+                ("coefficient5_y_2", false, "Coefficient5 y**2"),
+                ("coefficient6_x_y", false, "Coefficient6 x*y"),
+                ("coefficient7_x_3", false, "Coefficient7 x**3"),
+                ("coefficient8_y_3", false, "Coefficient8 y**3"),
+                ("coefficient9_x_2_y", false, "Coefficient9 x**2*y"),
+                ("coefficient10_x_y_2", false, "Coefficient10 x*y**2"),
+                ("minimum_value_of_x", false, "Minimum Value of x"),
+                ("maximum_value_of_x", false, "Maximum Value of x"),
+                ("minimum_value_of_y", false, "Minimum Value of y"),
+                ("maximum_value_of_y", false, "Maximum Value of y"),
+                ("minimum_curve_output", false, "Minimum Curve Output"),
+                ("maximum_curve_output", false, "Maximum Curve Output"),
+                ("input_unit_type_for_x", true, "Input Unit Type for X"),
+                ("input_unit_type_for_y", true, "Input Unit Type for Y"),
+                ("output_unit_type", true, "Output Unit Type"),
+            ],
+            &[],
+        )),
+        "Curve:Biquadratic" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("coefficient1_constant", false, "Coefficient1 Constant"),
+                ("coefficient2_x", false, "Coefficient2 x"),
+                ("coefficient3_x_2", false, "Coefficient3 x**2"),
+                ("coefficient4_y", false, "Coefficient4 y"),
+                ("coefficient5_y_2", false, "Coefficient5 y**2"),
+                ("coefficient6_x_y", false, "Coefficient6 x*y"),
+                ("minimum_value_of_x", false, "Minimum Value of x"),
+                ("maximum_value_of_x", false, "Maximum Value of x"),
+                ("minimum_value_of_y", false, "Minimum Value of y"),
+                ("maximum_value_of_y", false, "Maximum Value of y"),
+                ("minimum_curve_output", false, "Minimum Curve Output"),
+                ("maximum_curve_output", false, "Maximum Curve Output"),
+                ("input_unit_type_for_x", true, "Input Unit Type for X"),
+                ("input_unit_type_for_y", true, "Input Unit Type for Y"),
+                ("output_unit_type", true, "Output Unit Type"),
+            ],
+            &[],
+        )),
+        "Curve:CubicLinear" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("coefficient1_constant", false, "Coefficient1 Constant"),
+                ("coefficient2_x", false, "Coefficient2 x"),
+                ("coefficient3_x_2", false, "Coefficient3 x**2"),
+                ("coefficient4_x_3", false, "Coefficient4 x**3"),
+                ("coefficient5_y", false, "Coefficient5 y"),
+                ("coefficient6_x_y", false, "Coefficient6 x*y"),
+                ("minimum_value_of_x", false, "Minimum Value of x"),
+                ("maximum_value_of_x", false, "Maximum Value of x"),
+                ("minimum_value_of_y", false, "Minimum Value of y"),
+                ("maximum_value_of_y", false, "Maximum Value of y"),
+                ("minimum_curve_output", false, "Minimum Curve Output"),
+                ("maximum_curve_output", false, "Maximum Curve Output"),
+                ("input_unit_type_for_x", true, "Input Unit Type for X"),
+                ("input_unit_type_for_y", true, "Input Unit Type for Y"),
+                ("output_unit_type", true, "Output Unit Type"),
+            ],
+            &[],
+        )),
+        "Curve:FanPressureRise" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("coefficient1_c1", false, "Coefficient1 C1"),
+                ("coefficient2_c2", false, "Coefficient2 C2"),
+                ("coefficient3_c3", false, "Coefficient3 C3"),
+                ("coefficient4_c4", false, "Coefficient4 C4"),
+                ("minimum_value_of_qfan", false, "Minimum Value of Qfan"),
+                ("maximum_value_of_qfan", false, "Maximum Value of Qfan"),
+                ("minimum_value_of_psm", false, "Minimum Value of Psm"),
+                ("maximum_value_of_psm", false, "Maximum Value of Psm"),
+                ("minimum_curve_output", false, "Minimum Curve Output"),
+                ("maximum_curve_output", false, "Maximum Curve Output"),
+            ],
+            &[],
+        )),
+        "Curve:QuadraticLinear" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("coefficient1_constant", false, "Coefficient1 Constant"),
+                ("coefficient2_x", false, "Coefficient2 x"),
+                ("coefficient3_x_2", false, "Coefficient3 x**2"),
+                ("coefficient4_y", false, "Coefficient4 y"),
+                ("coefficient5_x_y", false, "Coefficient5 x*y"),
+                ("coefficient6_x_2_y", false, "Coefficient6 x**2*y"),
+                ("minimum_value_of_x", false, "Minimum Value of x"),
+                ("maximum_value_of_x", false, "Maximum Value of x"),
+                ("minimum_value_of_y", false, "Minimum Value of y"),
+                ("maximum_value_of_y", false, "Maximum Value of y"),
+                ("minimum_curve_output", false, "Minimum Curve Output"),
+                ("maximum_curve_output", false, "Maximum Curve Output"),
+                ("input_unit_type_for_x", true, "Input Unit Type for X"),
+                ("input_unit_type_for_y", true, "Input Unit Type for Y"),
+                ("output_unit_type", true, "Output Unit Type"),
+            ],
+            &[],
+        )),
+        "Material:RoofVegetation" => Some((
+            19,
+            &[
+                ("name", true, "Name"),
+                ("height_of_plants", false, "Height of Plants"),
+                ("leaf_area_index", false, "Leaf Area Index"),
+                ("leaf_reflectivity", false, "Leaf Reflectivity"),
+                ("leaf_emissivity", false, "Leaf Emissivity"),
+                (
+                    "minimum_stomatal_resistance",
+                    false,
+                    "Minimum Stomatal Resistance",
+                ),
+                ("soil_layer_name", true, "Soil Layer Name"),
+                ("roughness", true, "Roughness"),
+                ("thickness", false, "Thickness"),
+                (
+                    "conductivity_of_dry_soil",
+                    false,
+                    "Conductivity of Dry Soil",
+                ),
+                ("density_of_dry_soil", false, "Density of Dry Soil"),
+                (
+                    "specific_heat_of_dry_soil",
+                    false,
+                    "Specific Heat of Dry Soil",
+                ),
+                ("thermal_absorptance", false, "Thermal Absorptance"),
+                ("solar_absorptance", false, "Solar Absorptance"),
+                ("visible_absorptance", false, "Visible Absorptance"),
+                (
+                    "saturation_volumetric_moisture_content_of_the_soil_layer",
+                    false,
+                    "Saturation Volumetric Moisture Content of the Soil Layer",
+                ),
+                (
+                    "residual_volumetric_moisture_content_of_the_soil_layer",
+                    false,
+                    "Residual Volumetric Moisture Content of the Soil Layer",
+                ),
+                (
+                    "initial_volumetric_moisture_content_of_the_soil_layer",
+                    false,
+                    "Initial Volumetric Moisture Content of the Soil Layer",
+                ),
+                (
+                    "moisture_diffusion_calculation_method",
+                    true,
+                    "Moisture Diffusion Calculation Method",
+                ),
+            ],
+            &[],
+        )),
+        "MaterialProperty:GlazingSpectralData" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("wavelength_1", false, "Wavelength 1"),
+                ("transmittance_1", false, "Transmittance 1"),
+                ("front_reflectance_1", false, "Front Reflectance 1"),
+                ("back_reflectance_1", false, "Back Reflectance 1"),
+                ("wavelength_2", false, "Wavelength 2"),
+                ("transmittance_2", false, "Transmittance 2"),
+                ("front_reflectance_2", false, "Front Reflectance 2"),
+                ("back_reflectance_2", false, "Back Reflectance 2"),
+                ("wavelength_3", false, "Wavelength 3"),
+                ("transmittance_3", false, "Transmittance 3"),
+                ("front_reflectance_3", false, "Front Reflectance 3"),
+                ("back_reflectance_3", false, "Back Reflectance 3"),
+                ("wavelength_4", false, "Wavelength 4"),
+                ("transmittance_4", false, "Transmittance 4"),
+                ("front_reflectance_4", false, "Front Reflectance 4"),
+                ("back_reflectance_4", false, "Back Reflectance 4"),
+            ],
+            &[
+                ("wavelength", false, "Wavelength"),
+                ("transmittance", false, "Transmittance"),
+                ("front_reflectance", false, "Front Reflectance"),
+                ("back_reflectance", false, "Back Reflectance"),
+            ],
+        )),
+        "WindowGap:DeflectionState" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("deflected_thickness", false, "Deflected Thickness"),
+                ("initial_temperature", false, "Initial Temperature"),
+                ("initial_pressure", false, "Initial Pressure"),
+            ],
+            &[],
+        )),
+        "WindowGap:SupportPillar" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("spacing", false, "Spacing"),
+                ("radius", false, "Radius"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Blind" => Some((
+            29,
+            &[
+                ("name", true, "Name"),
+                ("slat_orientation", true, "Slat Orientation"),
+                ("slat_width", false, "Slat Width"),
+                ("slat_separation", false, "Slat Separation"),
+                ("slat_thickness", false, "Slat Thickness"),
+                ("slat_angle", false, "Slat Angle"),
+                ("slat_conductivity", false, "Slat Conductivity"),
+                (
+                    "slat_beam_solar_transmittance",
+                    false,
+                    "Slat Beam Solar Transmittance",
+                ),
+                (
+                    "front_side_slat_beam_solar_reflectance",
+                    false,
+                    "Front Side Slat Beam Solar Reflectance",
+                ),
+                (
+                    "back_side_slat_beam_solar_reflectance",
+                    false,
+                    "Back Side Slat Beam Solar Reflectance",
+                ),
+                (
+                    "slat_diffuse_solar_transmittance",
+                    false,
+                    "Slat Diffuse Solar Transmittance",
+                ),
+                (
+                    "front_side_slat_diffuse_solar_reflectance",
+                    false,
+                    "Front Side Slat Diffuse Solar Reflectance",
+                ),
+                (
+                    "back_side_slat_diffuse_solar_reflectance",
+                    false,
+                    "Back Side Slat Diffuse Solar Reflectance",
+                ),
+                (
+                    "slat_beam_visible_transmittance",
+                    false,
+                    "Slat Beam Visible Transmittance",
+                ),
+                (
+                    "front_side_slat_beam_visible_reflectance",
+                    false,
+                    "Front Side Slat Beam Visible Reflectance",
+                ),
+                (
+                    "back_side_slat_beam_visible_reflectance",
+                    false,
+                    "Back Side Slat Beam Visible Reflectance",
+                ),
+                (
+                    "slat_diffuse_visible_transmittance",
+                    false,
+                    "Slat Diffuse Visible Transmittance",
+                ),
+                (
+                    "front_side_slat_diffuse_visible_reflectance",
+                    false,
+                    "Front Side Slat Diffuse Visible Reflectance",
+                ),
+                (
+                    "back_side_slat_diffuse_visible_reflectance",
+                    false,
+                    "Back Side Slat Diffuse Visible Reflectance",
+                ),
+                (
+                    "slat_infrared_hemispherical_transmittance",
+                    false,
+                    "Slat Infrared Hemispherical Transmittance",
+                ),
+                (
+                    "front_side_slat_infrared_hemispherical_emissivity",
+                    false,
+                    "Front Side Slat Infrared Hemispherical Emissivity",
+                ),
+                (
+                    "back_side_slat_infrared_hemispherical_emissivity",
+                    false,
+                    "Back Side Slat Infrared Hemispherical Emissivity",
+                ),
+                ("blind_to_glass_distance", false, "Blind to Glass Distance"),
+                (
+                    "blind_top_opening_multiplier",
+                    false,
+                    "Blind Top Opening Multiplier",
+                ),
+                (
+                    "blind_bottom_opening_multiplier",
+                    false,
+                    "Blind Bottom Opening Multiplier",
+                ),
+                (
+                    "blind_left_side_opening_multiplier",
+                    false,
+                    "Blind Left Side Opening Multiplier",
+                ),
+                (
+                    "blind_right_side_opening_multiplier",
+                    false,
+                    "Blind Right Side Opening Multiplier",
+                ),
+                ("minimum_slat_angle", false, "Minimum Slat Angle"),
+                ("maximum_slat_angle", false, "Maximum Slat Angle"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Blind:EquivalentLayer" => Some((
+            10,
+            &[
+                ("name", true, "Name"),
+                ("slat_orientation", true, "Slat Orientation"),
+                ("slat_width", false, "Slat Width"),
+                ("slat_separation", false, "Slat Separation"),
+                ("slat_crown", false, "Slat Crown"),
+                ("slat_angle", false, "Slat Angle"),
+                (
+                    "front_side_slat_beam_diffuse_solar_transmittance",
+                    false,
+                    "Front Side Slat Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "back_side_slat_beam_diffuse_solar_transmittance",
+                    false,
+                    "Back Side Slat Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "front_side_slat_beam_diffuse_solar_reflectance",
+                    false,
+                    "Front Side Slat Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "back_side_slat_beam_diffuse_solar_reflectance",
+                    false,
+                    "Back Side Slat Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "front_side_slat_beam_diffuse_visible_transmittance",
+                    false,
+                    "Front Side Slat Beam-Diffuse Visible Transmittance",
+                ),
+                (
+                    "back_side_slat_beam_diffuse_visible_transmittance",
+                    false,
+                    "Back Side Slat Beam-Diffuse Visible Transmittance",
+                ),
+                (
+                    "front_side_slat_beam_diffuse_visible_reflectance",
+                    false,
+                    "Front Side Slat Beam-Diffuse Visible Reflectance",
+                ),
+                (
+                    "back_side_slat_beam_diffuse_visible_reflectance",
+                    false,
+                    "Back Side Slat Beam-Diffuse Visible Reflectance",
+                ),
+                (
+                    "slat_diffuse_diffuse_solar_transmittance",
+                    false,
+                    "Slat Diffuse-Diffuse Solar Transmittance",
+                ),
+                (
+                    "front_side_slat_diffuse_diffuse_solar_reflectance",
+                    false,
+                    "Front Side Slat Diffuse-Diffuse Solar Reflectance",
+                ),
+                (
+                    "back_side_slat_diffuse_diffuse_solar_reflectance",
+                    false,
+                    "Back Side Slat Diffuse-Diffuse Solar Reflectance",
+                ),
+                (
+                    "slat_diffuse_diffuse_visible_transmittance",
+                    false,
+                    "Slat Diffuse-Diffuse Visible Transmittance",
+                ),
+                (
+                    "front_side_slat_diffuse_diffuse_visible_reflectance",
+                    false,
+                    "Front Side Slat Diffuse-Diffuse Visible Reflectance",
+                ),
+                (
+                    "back_side_slat_diffuse_diffuse_visible_reflectance",
+                    false,
+                    "Back Side Slat Diffuse-Diffuse Visible Reflectance",
+                ),
+                (
+                    "slat_infrared_transmittance",
+                    false,
+                    "Slat Infrared Transmittance",
+                ),
+                (
+                    "front_side_slat_infrared_emissivity",
+                    false,
+                    "Front Side Slat Infrared Emissivity",
+                ),
+                (
+                    "back_side_slat_infrared_emissivity",
+                    false,
+                    "Back Side Slat Infrared Emissivity",
+                ),
+                ("slat_angle_control", true, "Slat Angle Control"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Drape:EquivalentLayer" => Some((
+            4,
+            &[
+                ("name", true, "Name"),
+                (
+                    "drape_beam_beam_solar_transmittance_at_normal_incidence",
+                    false,
+                    "Drape Beam-Beam Solar Transmittance at Normal Incidence",
+                ),
+                (
+                    "front_side_drape_beam_diffuse_solar_transmittance",
+                    false,
+                    "Front Side Drape Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "back_side_drape_beam_diffuse_solar_transmittance",
+                    false,
+                    "Back Side Drape Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "front_side_drape_beam_diffuse_solar_reflectance",
+                    false,
+                    "Front Side Drape Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "back_side_drape_beam_diffuse_solar_reflectance",
+                    false,
+                    "Back Side Drape Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "drape_beam_beam_visible_transmittance",
+                    false,
+                    "Drape Beam-Beam Visible Transmittance",
+                ),
+                (
+                    "drape_beam_diffuse_visible_transmittance",
+                    false,
+                    "Drape Beam-Diffuse Visible Transmittance",
+                ),
+                (
+                    "drape_beam_diffuse_visible_reflectance",
+                    false,
+                    "Drape Beam-Diffuse Visible Reflectance",
+                ),
+                (
+                    "drape_material_infrared_transmittance",
+                    false,
+                    "Drape Material Infrared Transmittance",
+                ),
+                (
+                    "front_side_drape_material_infrared_emissivity",
+                    false,
+                    "Front Side Drape Material Infrared Emissivity",
+                ),
+                (
+                    "back_side_drape_material_infrared_emissivity",
+                    false,
+                    "Back Side Drape Material Infrared Emissivity",
+                ),
+                ("width_of_pleated_fabric", false, "Width of Pleated Fabric"),
+                (
+                    "length_of_pleated_fabric",
+                    false,
+                    "Length of Pleated Fabric",
+                ),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Gap" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("thickness", false, "Thickness"),
+                ("gas_or_gas_mixture_", true, "Gas (or Gas Mixture)"),
+                ("pressure", false, "Pressure"),
+                ("deflection_state", true, "Deflection State"),
+                ("support_pillar", true, "Support Pillar"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Gap:EquivalentLayer" => Some((
+            3,
+            &[
+                ("name", true, "Name"),
+                ("gas_type", true, "Gas Type"),
+                ("thickness", false, "Thickness"),
+                ("gap_vent_type", true, "Gap Vent Type"),
+                (
+                    "conductivity_coefficient_a",
+                    false,
+                    "Conductivity Coefficient A",
+                ),
+                (
+                    "conductivity_coefficient_b",
+                    false,
+                    "Conductivity Coefficient B",
+                ),
+                (
+                    "conductivity_coefficient_c",
+                    false,
+                    "Conductivity Coefficient C",
+                ),
+                ("viscosity_coefficient_a", false, "Viscosity Coefficient A"),
+                ("viscosity_coefficient_b", false, "Viscosity Coefficient B"),
+                ("viscosity_coefficient_c", false, "Viscosity Coefficient C"),
+                (
+                    "specific_heat_coefficient_a",
+                    false,
+                    "Specific Heat Coefficient A",
+                ),
+                (
+                    "specific_heat_coefficient_b",
+                    false,
+                    "Specific Heat Coefficient B",
+                ),
+                (
+                    "specific_heat_coefficient_c",
+                    false,
+                    "Specific Heat Coefficient C",
+                ),
+                ("molecular_weight", false, "Molecular Weight"),
+                ("specific_heat_ratio", false, "Specific Heat Ratio"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Gas" => Some((
+            3,
+            &[
+                ("name", true, "Name"),
+                ("gas_type", true, "Gas Type"),
+                ("thickness", false, "Thickness"),
+                (
+                    "conductivity_coefficient_a",
+                    false,
+                    "Conductivity Coefficient A",
+                ),
+                (
+                    "conductivity_coefficient_b",
+                    false,
+                    "Conductivity Coefficient B",
+                ),
+                (
+                    "conductivity_coefficient_c",
+                    false,
+                    "Conductivity Coefficient C",
+                ),
+                ("viscosity_coefficient_a", false, "Viscosity Coefficient A"),
+                ("viscosity_coefficient_b", false, "Viscosity Coefficient B"),
+                ("viscosity_coefficient_c", false, "Viscosity Coefficient C"),
+                (
+                    "specific_heat_coefficient_a",
+                    false,
+                    "Specific Heat Coefficient A",
+                ),
+                (
+                    "specific_heat_coefficient_b",
+                    false,
+                    "Specific Heat Coefficient B",
+                ),
+                (
+                    "specific_heat_coefficient_c",
+                    false,
+                    "Specific Heat Coefficient C",
+                ),
+                ("molecular_weight", false, "Molecular Weight"),
+                ("specific_heat_ratio", false, "Specific Heat Ratio"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:GasMixture" => Some((
+            7,
+            &[
+                ("name", true, "Name"),
+                ("thickness", false, "Thickness"),
+                (
+                    "number_of_gases_in_mixture",
+                    false,
+                    "Number of Gases in Mixture",
+                ),
+                ("gas_1_type", true, "Gas 1 Type"),
+                ("gas_1_fraction", false, "Gas 1 Fraction"),
+                ("gas_2_type", true, "Gas 2 Type"),
+                ("gas_2_fraction", false, "Gas 2 Fraction"),
+                ("gas_3_type", true, "Gas 3 Type"),
+                ("gas_3_fraction", false, "Gas 3 Fraction"),
+                ("gas_4_type", true, "Gas 4 Type"),
+                ("gas_4_fraction", false, "Gas 4 Fraction"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Glazing" => Some((
+            14,
+            &[
+                ("name", true, "Name"),
+                ("optical_data_type", true, "Optical Data Type"),
+                (
+                    "window_glass_spectral_data_set_name",
+                    true,
+                    "Window Glass Spectral Data Set Name",
+                ),
+                ("thickness", false, "Thickness"),
+                (
+                    "solar_transmittance_at_normal_incidence",
+                    false,
+                    "Solar Transmittance at Normal Incidence",
+                ),
+                (
+                    "front_side_solar_reflectance_at_normal_incidence",
+                    false,
+                    "Front Side Solar Reflectance at Normal Incidence",
+                ),
+                (
+                    "back_side_solar_reflectance_at_normal_incidence",
+                    false,
+                    "Back Side Solar Reflectance at Normal Incidence",
+                ),
+                (
+                    "visible_transmittance_at_normal_incidence",
+                    false,
+                    "Visible Transmittance at Normal Incidence",
+                ),
+                (
+                    "front_side_visible_reflectance_at_normal_incidence",
+                    false,
+                    "Front Side Visible Reflectance at Normal Incidence",
+                ),
+                (
+                    "back_side_visible_reflectance_at_normal_incidence",
+                    false,
+                    "Back Side Visible Reflectance at Normal Incidence",
+                ),
+                (
+                    "infrared_transmittance_at_normal_incidence",
+                    false,
+                    "Infrared Transmittance at Normal Incidence",
+                ),
+                (
+                    "front_side_infrared_hemispherical_emissivity",
+                    false,
+                    "Front Side Infrared Hemispherical Emissivity",
+                ),
+                (
+                    "back_side_infrared_hemispherical_emissivity",
+                    false,
+                    "Back Side Infrared Hemispherical Emissivity",
+                ),
+                ("conductivity", false, "Conductivity"),
+                (
+                    "dirt_correction_factor_for_solar_and_visible_transmittance",
+                    false,
+                    "Dirt Correction Factor for Solar and Visible Transmittance",
+                ),
+                ("solar_diffusing", true, "Solar Diffusing"),
+                ("young_s_modulus", false, "Young's modulus"),
+                ("poisson_s_ratio", false, "Poisson's ratio"),
+                (
+                    "window_glass_spectral_and_incident_angle_transmittance_data_set_table_name",
+                    true,
+                    "Window Glass Spectral and Incident Angle Transmittance Data Set Table Name",
+                ),
+                (
+                    "window_glass_spectral_and_incident_angle_front_reflectance_data_set_table_name",
+                    true,
+                    "Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name",
+                ),
+                (
+                    "window_glass_spectral_and_incident_angle_back_reflectance_data_set_table_name",
+                    true,
+                    "Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name",
+                ),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Glazing:EquivalentLayer" => Some((
+            11,
+            &[
+                ("name", true, "Name"),
+                ("optical_data_type", true, "Optical Data Type"),
+                (
+                    "window_glass_spectral_data_set_name",
+                    true,
+                    "Window Glass Spectral Data Set Name",
+                ),
+                (
+                    "front_side_beam_beam_solar_transmittance",
+                    false,
+                    "Front Side Beam-Beam Solar Transmittance",
+                ),
+                (
+                    "back_side_beam_beam_solar_transmittance",
+                    false,
+                    "Back Side Beam-Beam Solar Transmittance",
+                ),
+                (
+                    "front_side_beam_beam_solar_reflectance",
+                    false,
+                    "Front Side Beam-Beam Solar Reflectance",
+                ),
+                (
+                    "back_side_beam_beam_solar_reflectance",
+                    false,
+                    "Back Side Beam-Beam Solar Reflectance",
+                ),
+                (
+                    "front_side_beam_beam_visible_solar_transmittance",
+                    false,
+                    "Front Side Beam-Beam Visible Solar Transmittance",
+                ),
+                (
+                    "back_side_beam_beam_visible_solar_transmittance",
+                    false,
+                    "Back Side Beam-Beam Visible Solar Transmittance",
+                ),
+                (
+                    "front_side_beam_beam_visible_solar_reflectance",
+                    false,
+                    "Front Side Beam-Beam Visible Solar Reflectance",
+                ),
+                (
+                    "back_side_beam_beam_visible_solar_reflectance",
+                    false,
+                    "Back Side Beam-Beam Visible Solar Reflectance",
+                ),
+                (
+                    "front_side_beam_diffuse_solar_transmittance",
+                    false,
+                    "Front Side Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "back_side_beam_diffuse_solar_transmittance",
+                    false,
+                    "Back Side Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "front_side_beam_diffuse_solar_reflectance",
+                    false,
+                    "Front Side Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "back_side_beam_diffuse_solar_reflectance",
+                    false,
+                    "Back Side Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "front_side_beam_diffuse_visible_solar_transmittance",
+                    false,
+                    "Front Side Beam-Diffuse Visible Solar Transmittance",
+                ),
+                (
+                    "back_side_beam_diffuse_visible_solar_transmittance",
+                    false,
+                    "Back Side Beam-Diffuse Visible Solar Transmittance",
+                ),
+                (
+                    "front_side_beam_diffuse_visible_solar_reflectance",
+                    false,
+                    "Front Side Beam-Diffuse Visible Solar Reflectance",
+                ),
+                (
+                    "back_side_beam_diffuse_visible_solar_reflectance",
+                    false,
+                    "Back Side Beam-Diffuse Visible Solar Reflectance",
+                ),
+                (
+                    "diffuse_diffuse_solar_transmittance",
+                    false,
+                    "Diffuse-Diffuse Solar Transmittance",
+                ),
+                (
+                    "front_side_diffuse_diffuse_solar_reflectance",
+                    false,
+                    "Front Side Diffuse-Diffuse Solar Reflectance",
+                ),
+                (
+                    "back_side_diffuse_diffuse_solar_reflectance",
+                    false,
+                    "Back Side Diffuse-Diffuse Solar Reflectance",
+                ),
+                (
+                    "diffuse_diffuse_visible_solar_transmittance",
+                    false,
+                    "Diffuse-Diffuse Visible Solar Transmittance",
+                ),
+                (
+                    "front_side_diffuse_diffuse_visible_solar_reflectance",
+                    false,
+                    "Front Side Diffuse-Diffuse Visible Solar Reflectance",
+                ),
+                (
+                    "back_side_diffuse_diffuse_visible_solar_reflectance",
+                    false,
+                    "Back Side Diffuse-Diffuse Visible Solar Reflectance",
+                ),
+                (
+                    "infrared_transmittance_applies_to_front_and_back_",
+                    false,
+                    "Infrared Transmittance (applies to front and back)",
+                ),
+                (
+                    "front_side_infrared_emissivity",
+                    false,
+                    "Front Side Infrared Emissivity",
+                ),
+                (
+                    "back_side_infrared_emissivity",
+                    false,
+                    "Back Side Infrared Emissivity",
+                ),
+                ("thermal_resistance", false, "Thermal Resistance"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Glazing:RefractionExtinctionMethod" => Some((
+            0,
+            &[
+                ("name", true, "Name"),
+                ("thickness", false, "Thickness"),
+                (
+                    "solar_index_of_refraction",
+                    false,
+                    "Solar Index of Refraction",
+                ),
+                (
+                    "solar_extinction_coefficient",
+                    false,
+                    "Solar Extinction Coefficient",
+                ),
+                (
+                    "visible_index_of_refraction",
+                    false,
+                    "Visible Index of Refraction",
+                ),
+                (
+                    "visible_extinction_coefficient",
+                    false,
+                    "Visible Extinction Coefficient",
+                ),
+                (
+                    "infrared_transmittance_at_normal_incidence",
+                    false,
+                    "Infrared Transmittance at Normal Incidence",
+                ),
+                (
+                    "infrared_hemispherical_emissivity",
+                    false,
+                    "Infrared Hemispherical Emissivity",
+                ),
+                ("conductivity", false, "Conductivity"),
+                (
+                    "dirt_correction_factor_for_solar_and_visible_transmittance",
+                    false,
+                    "Dirt Correction Factor for Solar and Visible Transmittance",
+                ),
+                ("solar_diffusing", true, "Solar Diffusing"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Screen" => Some((
+            9,
+            &[
+                ("name", true, "Name"),
+                (
+                    "reflected_beam_transmittance_accounting_method",
+                    true,
+                    "Reflected Beam Transmittance Accounting Method",
+                ),
+                (
+                    "diffuse_solar_reflectance",
+                    false,
+                    "Diffuse Solar Reflectance",
+                ),
+                (
+                    "diffuse_visible_reflectance",
+                    false,
+                    "Diffuse Visible Reflectance",
+                ),
+                (
+                    "thermal_hemispherical_emissivity",
+                    false,
+                    "Thermal Hemispherical Emissivity",
+                ),
+                ("conductivity", false, "Conductivity"),
+                ("screen_material_spacing", false, "Screen Material Spacing"),
+                (
+                    "screen_material_diameter",
+                    false,
+                    "Screen Material Diameter",
+                ),
+                (
+                    "screen_to_glass_distance",
+                    false,
+                    "Screen to Glass Distance",
+                ),
+                ("top_opening_multiplier", false, "Top Opening Multiplier"),
+                (
+                    "bottom_opening_multiplier",
+                    false,
+                    "Bottom Opening Multiplier",
+                ),
+                (
+                    "left_side_opening_multiplier",
+                    false,
+                    "Left Side Opening Multiplier",
+                ),
+                (
+                    "right_side_opening_multiplier",
+                    false,
+                    "Right Side Opening Multiplier",
+                ),
+                (
+                    "angle_of_resolution_for_screen_transmittance_output_map",
+                    false,
+                    "Angle of Resolution for Screen Transmittance Output Map",
+                ),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Screen:EquivalentLayer" => Some((
+            11,
+            &[
+                ("name", true, "Name"),
+                (
+                    "screen_beam_beam_solar_transmittance",
+                    false,
+                    "Screen Beam-Beam Solar Transmittance",
+                ),
+                (
+                    "screen_beam_diffuse_solar_transmittance",
+                    false,
+                    "Screen Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "screen_beam_diffuse_solar_reflectance",
+                    false,
+                    "Screen Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "screen_beam_beam_visible_transmittance",
+                    false,
+                    "Screen Beam-Beam Visible Transmittance",
+                ),
+                (
+                    "screen_beam_diffuse_visible_transmittance",
+                    false,
+                    "Screen Beam-Diffuse Visible Transmittance",
+                ),
+                (
+                    "screen_beam_diffuse_visible_reflectance",
+                    false,
+                    "Screen Beam-Diffuse Visible Reflectance",
+                ),
+                (
+                    "screen_infrared_transmittance",
+                    false,
+                    "Screen Infrared Transmittance",
+                ),
+                (
+                    "screen_infrared_emissivity",
+                    false,
+                    "Screen Infrared Emissivity",
+                ),
+                ("screen_wire_spacing", false, "Screen Wire Spacing"),
+                ("screen_wire_diameter", false, "Screen Wire Diameter"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Shade" => Some((
+            15,
+            &[
+                ("name", true, "Name"),
+                ("solar_transmittance", false, "Solar Transmittance"),
+                ("solar_reflectance", false, "Solar Reflectance"),
+                ("visible_transmittance", false, "Visible Transmittance"),
+                ("visible_reflectance", false, "Visible Reflectance"),
+                (
+                    "infrared_hemispherical_emissivity",
+                    false,
+                    "Infrared Hemispherical Emissivity",
+                ),
+                ("infrared_transmittance", false, "Infrared Transmittance"),
+                ("thickness", false, "Thickness"),
+                ("conductivity", false, "Conductivity"),
+                ("shade_to_glass_distance", false, "Shade to Glass Distance"),
+                ("top_opening_multiplier", false, "Top Opening Multiplier"),
+                (
+                    "bottom_opening_multiplier",
+                    false,
+                    "Bottom Opening Multiplier",
+                ),
+                (
+                    "left_side_opening_multiplier",
+                    false,
+                    "Left-Side Opening Multiplier",
+                ),
+                (
+                    "right_side_opening_multiplier",
+                    false,
+                    "Right-Side Opening Multiplier",
+                ),
+                ("airflow_permeability", false, "Airflow Permeability"),
+            ],
+            &[],
+        )),
+        "WindowMaterial:Shade:EquivalentLayer" => Some((
+            6,
+            &[
+                ("name", true, "Name"),
+                (
+                    "shade_beam_beam_solar_transmittance",
+                    false,
+                    "Shade Beam-Beam Solar Transmittance",
+                ),
+                (
+                    "front_side_shade_beam_diffuse_solar_transmittance",
+                    false,
+                    "Front Side Shade Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "back_side_shade_beam_diffuse_solar_transmittance",
+                    false,
+                    "Back Side Shade Beam-Diffuse Solar Transmittance",
+                ),
+                (
+                    "front_side_shade_beam_diffuse_solar_reflectance",
+                    false,
+                    "Front Side Shade Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "back_side_shade_beam_diffuse_solar_reflectance",
+                    false,
+                    "Back Side Shade Beam-Diffuse Solar Reflectance",
+                ),
+                (
+                    "shade_beam_beam_visible_transmittance_at_normal_incidence",
+                    false,
+                    "Shade Beam-Beam Visible Transmittance at Normal Incidence",
+                ),
+                (
+                    "shade_beam_diffuse_visible_transmittance_at_normal_incidence",
+                    false,
+                    "Shade Beam-Diffuse Visible Transmittance at Normal Incidence",
+                ),
+                (
+                    "shade_beam_diffuse_visible_reflectance_at_normal_incidence",
+                    false,
+                    "Shade Beam-Diffuse Visible Reflectance at Normal Incidence",
+                ),
+                (
+                    "shade_material_infrared_transmittance",
+                    false,
+                    "Shade Material Infrared Transmittance",
+                ),
+                (
+                    "front_side_shade_material_infrared_emissivity",
+                    false,
+                    "Front Side Shade Material Infrared Emissivity",
+                ),
+                (
+                    "back_side_shade_material_infrared_emissivity",
+                    false,
+                    "Back Side Shade Material Infrared Emissivity",
+                ),
+            ],
+            &[],
+        )),
+        "WindowMaterial:SimpleGlazingSystem" => Some((
+            3,
+            &[
+                ("name", true, "Name"),
+                ("u_factor", false, "U-Factor"),
+                (
+                    "solar_heat_gain_coefficient",
+                    false,
+                    "Solar Heat Gain Coefficient",
+                ),
+                ("visible_transmittance", false, "Visible Transmittance"),
+            ],
+            &[],
+        )),
+        _ => None,
+    }
+}
+
 /// IDF declaration-order targets backed by current source and oracle evidence.
 ///
 /// This default is deliberately limited to source-order-sensitive families with
@@ -328,6 +1556,7 @@ struct ScannedObject {
     idf_order: u32,
     max_fields: usize,
     semicolon_terminated: bool,
+    source_max_extensible_fields: Option<usize>,
     comfort_max_extensible_fields: Option<usize>,
     name: String,
     line: usize,
@@ -343,17 +1572,29 @@ pub fn apply_idf_declaration_order(
     idf: &str,
     targets: &[IdfOrderTarget],
 ) -> Result<(), IdfOrderError> {
+    apply_idf_declaration_order_inner(model, idf, targets, false)
+}
+
+fn apply_idf_declaration_order_inner(
+    model: &mut RawModel,
+    idf: &str,
+    targets: &[IdfOrderTarget],
+    source_object_layouts: bool,
+) -> Result<(), IdfOrderError> {
     validate_targets(targets)?;
-    let scanned = scan_target_objects(idf, targets)?;
+    let scanned = scan_target_objects(idf, targets, source_object_layouts)?;
     let mut overlay = BTreeMap::new();
     let mut report_field_counts = Vec::new();
     let mut report_idf_orders = Vec::new();
 
     for target in targets {
         let exact_names = target.object_type == "ComfortViewFactorAngles";
-        // Native preserves case-distinct NodeList declarations before its
-        // alpha getter uppercases names. Keep Comfort-only metadata gates separate.
-        let node_list_names = target.object_type.eq_ignore_ascii_case("NodeList");
+        // Native preserves exact converted keys before its alpha getter uppercases
+        // names. Only Source-layout SpectralData joins the existing NodeList rule;
+        // Comfort-only metadata gates and all other family policies stay separate.
+        let converted_exact_names = target.object_type.eq_ignore_ascii_case("NodeList")
+            || (source_object_layouts
+                && target.object_type == "MaterialProperty:GlazingSpectralData");
         let idf_objects = scanned.get(target.object_type).ok_or_else(|| {
             IdfOrderError::new(format!(
                 "internal IDF order recovery error: missing scan bucket for {}",
@@ -362,7 +1603,7 @@ pub fn apply_idf_declaration_order(
         })?;
         for (index, idf_object) in idf_objects.iter().enumerate() {
             if idf_objects[..index].iter().any(|earlier| {
-                if exact_names || node_list_names {
+                if exact_names || converted_exact_names {
                     earlier.name == idf_object.name
                 } else {
                     earlier.name.eq_ignore_ascii_case(&idf_object.name)
@@ -407,7 +1648,7 @@ pub fn apply_idf_declaration_order(
         let actual_names = instances.keys().collect::<Vec<_>>();
         for (index, actual_name) in actual_names.iter().enumerate() {
             if actual_names[..index].iter().any(|earlier| {
-                if exact_names || node_list_names {
+                if exact_names || converted_exact_names {
                     earlier.0 == actual_name.0
                 } else {
                     earlier.0.eq_ignore_ascii_case(&actual_name.0)
@@ -435,15 +1676,15 @@ pub fn apply_idf_declaration_order(
         let mut seen_actual_names = BTreeSet::new();
         let mut ordered_names = Vec::with_capacity(idf_objects.len());
         for idf_object in idf_objects {
-            // NodeList case variants have separate exact converted keys.
+            // Case variants retain separate exact converted keys in these families.
             // Prefer that genuine identity; retain the established unique
             // case-insensitive fallback when a caller supplies only one spelling.
-            let exact_node_list_name = if node_list_names {
+            let exact_converted_name = if converted_exact_names {
                 instances.keys().find(|name| name.0 == idf_object.name)
             } else {
                 None
             };
-            let matching_names = if let Some(name) = exact_node_list_name {
+            let matching_names = if let Some(name) = exact_converted_name {
                 vec![name]
             } else {
                 instances
@@ -489,7 +1730,24 @@ pub fn apply_idf_declaration_order(
                     "staged ComfortViewFactorAngles EOF must retain absent angles",
                 ));
             }
-            if unnamed_legacy_type(target.object_type)
+            if source_object_layouts
+                && !idf_object.semicolon_terminated
+                && source_idf_object_layout(target.object_type)
+                    .is_some_and(|(_, _, extension)| !extension.is_empty())
+                && instances[&actual_name].fields.contains_key(&FieldName(
+                    match target.object_type {
+                        "OutdoorAir:NodeList" => "nodes",
+                        _ => "extensions",
+                    }
+                    .into(),
+                ))
+            {
+                return Err(IdfOrderError::new(
+                    "Source original-IDF EOF must retain absent extension array",
+                ));
+            }
+            if (source_object_layouts && source_idf_object_layout(target.object_type).is_some())
+                || unnamed_legacy_type(target.object_type)
                 || matches!(
                     target.object_type,
                     "Material:NoMass"
@@ -525,6 +1783,20 @@ pub fn apply_idf_declaration_order(
                     actual_type.clone(),
                     actual_name.clone(),
                     match target.object_type {
+                        family
+                            if (source_object_layouts || family == "Material:RoofVegetation")
+                                && source_idf_object_layout(family).is_some() =>
+                        {
+                            let (minimum, _, _) =
+                                source_idf_object_layout(family).ok_or_else(|| {
+                                    IdfOrderError::new("Source fixed layout disappeared")
+                                })?;
+                            if idf_object.semicolon_terminated {
+                                idf_object.max_fields.max(minimum)
+                            } else {
+                                idf_object.max_fields.saturating_sub(1)
+                            }
+                        }
                         "BuildingSurface:Detailed" => idf_object.max_fields.max(20),
                         "Material:AirGap" | "RunPeriodControl:DaylightSavingTime" => {
                             idf_object.max_fields.max(2)
@@ -541,10 +1813,6 @@ pub fn apply_idf_declaration_order(
                         }
                         // Native END neither advances the last field nor min-pads.
                         "People" => idf_object.max_fields.saturating_sub(1),
-                        "Material:RoofVegetation" if idf_object.semicolon_terminated => {
-                            idf_object.max_fields.max(19)
-                        }
-                        "Material:RoofVegetation" => idf_object.max_fields.saturating_sub(1),
                         "Site:Location" => idf_object.max_fields.max(5),
                         "RunPeriod" => idf_object.max_fields.max(7),
                         "Schedule:Day:Hourly" => idf_object.max_fields.max(26),
@@ -582,12 +1850,34 @@ pub fn apply_idf_declaration_order(
                         "Schedule:Day:Interval" => Some(idf_object.max_fields.saturating_sub(3)),
                         "Schedule:Day:List" => Some(idf_object.max_fields.saturating_sub(4)),
                         "Schedule:Week:Compact" => Some(idf_object.max_fields.saturating_sub(1)),
-                        "SetpointManager:Scheduled" | "Material:RoofVegetation" => Some(0),
+                        family
+                            if (source_object_layouts || family == "Material:RoofVegetation")
+                                && source_idf_object_layout(family).is_some() =>
+                        {
+                            let (_, _, extension) =
+                                source_idf_object_layout(family).ok_or_else(|| {
+                                    IdfOrderError::new("Source IDF layout disappeared")
+                                })?;
+                            if extension.is_empty() {
+                                Some(0)
+                            } else {
+                                Some(idf_object.source_max_extensible_fields.ok_or_else(|| {
+                                    IdfOrderError::new(
+                                        "Source original-IDF extension token custody absent",
+                                    )
+                                })?)
+                            }
+                        }
+                        "SetpointManager:Scheduled" => Some(0),
                         _ => None,
                     },
                 ));
             }
-            if target.object_type == "SetpointManager:Scheduled" {
+            // Native retains the global parser ordinal on each original-IDF object.
+            // The Source layouts already own this same recovered declaration.
+            if target.object_type == "SetpointManager:Scheduled"
+                || (source_object_layouts && source_idf_object_layout(target.object_type).is_some())
+            {
                 report_idf_orders.push((
                     actual_type.clone(),
                     actual_name.clone(),
@@ -645,17 +1935,23 @@ pub(crate) fn apply_idf_declaration_order_bytes(
     apply_idf_declaration_order(model, &String::from_utf8_lossy(idf), targets)
 }
 
-/// One transaction keeps every common order target and adds only Source Roof.
+/// One transaction keeps common targets and adds the closed Source fixed-material layouts.
 pub(crate) fn apply_source_idf_declaration_order_bytes(
     model: &mut RawModel,
     idf: &[u8],
 ) -> Result<(), IdfOrderError> {
     let mut targets = IDF_ORDER_TARGETS.to_vec();
-    targets.push(IdfOrderTarget {
-        object_type: "Material:RoofVegetation",
-        name_field_index: 0,
-    });
-    apply_idf_declaration_order_bytes(model, idf, &targets)
+    for &family in SOURCE_IDF_OBJECT_FAMILIES {
+        // Source fixed layouts may share an existing common target (AirGap).
+        // Keep that same target once; the legacy target set is unchanged.
+        if !targets.iter().any(|target| target.object_type == family) {
+            targets.push(IdfOrderTarget {
+                object_type: family,
+                name_field_index: 0,
+            });
+        }
+    }
+    apply_idf_declaration_order_inner(model, &String::from_utf8_lossy(idf), &targets, true)
 }
 
 fn validate_targets(targets: &[IdfOrderTarget]) -> Result<(), IdfOrderError> {
@@ -681,6 +1977,7 @@ fn validate_targets(targets: &[IdfOrderTarget]) -> Result<(), IdfOrderError> {
 fn scan_target_objects(
     idf: &str,
     targets: &[IdfOrderTarget],
+    source_object_layouts: bool,
 ) -> Result<BTreeMap<&'static str, Vec<ScannedObject>>, IdfOrderError> {
     let idf = idf.trim_start_matches('\u{feff}');
     let mut scanned = targets
@@ -734,22 +2031,29 @@ fn scan_target_objects(
                     || !fields.is_empty()
                     || !normalized_field_is_empty(&field)
                 {
-                    fields.push(finish_field(&mut field, &mut parsed_field_segment));
-                    idf_order = idf_order.checked_add(1).ok_or_else(|| {
-                        IdfOrderError::new("IDF declaration-order counter exceeded u32")
-                    })?;
-                    record_object(
-                        &fields,
-                        object_start.unwrap_or((character_line, character_column)),
-                        idf_order,
-                        true,
-                        &idf[object_byte_start..byte_index + 1],
-                        targets,
-                        &mut scanned,
-                    )?;
-                    fields.clear();
-                    object_start = None;
-                    parsed_field_segment = None;
+                    if source_object_layouts && fields.is_empty() {
+                        // Native parse_object advances past the header delimiter
+                        // unconditionally, including a type-only semicolon. Keep
+                        // the following token in this same actual object.
+                        fields.push(finish_field(&mut field, &mut parsed_field_segment));
+                    } else {
+                        fields.push(finish_field(&mut field, &mut parsed_field_segment));
+                        idf_order = idf_order.checked_add(1).ok_or_else(|| {
+                            IdfOrderError::new("IDF declaration-order counter exceeded u32")
+                        })?;
+                        record_object(
+                            &fields,
+                            object_start.unwrap_or((character_line, character_column)),
+                            idf_order,
+                            (true, source_object_layouts),
+                            &idf[object_byte_start..byte_index + 1],
+                            targets,
+                            &mut scanned,
+                        )?;
+                        fields.clear();
+                        object_start = None;
+                        parsed_field_segment = None;
+                    }
                 }
             }
             _ => {
@@ -792,7 +2096,7 @@ fn scan_target_objects(
             &fields,
             (start_line, start_column),
             idf_order,
-            false,
+            (false, source_object_layouts),
             &idf[object_byte_start..],
             targets,
             &mut scanned,
@@ -846,13 +2150,20 @@ fn unnamed_legacy_type(object_type: &str) -> bool {
     )
 }
 
-// Comfort has one regular Name and alternating string/number extension
-// operands. IdfParser advances E for each parsed value or blank extension,
-// while F advances only at delimiters. String tokens include newlines;
-// numeric tokens stop at CR/LF as well as comments and delimiters.
-fn comfort_extensible_fields(raw_object: &str) -> usize {
+// Reuse the existing event scanner: E advances for each parsed value or blank
+// extension, while F advances only at delimiters. The sole layout owner supplies
+// field kinds: strings include newlines; numerics stop at CR/LF/comments.
+fn idf_extensible_fields(
+    raw_object: &str,
+    fixed_fields: usize,
+    numeric_field: impl Fn(usize, usize) -> bool,
+    source_object_layouts: bool,
+) -> usize {
     let bytes = raw_object.as_bytes();
-    let Some(comma) = bytes.iter().position(|byte| *byte == b',') else {
+    let Some(comma) = bytes
+        .iter()
+        .position(|byte| *byte == b',' || (source_object_layouts && *byte == b';'))
+    else {
         return 0;
     };
     let mut cursor = comma + 1;
@@ -871,7 +2182,7 @@ fn comfort_extensible_fields(raw_object: &str) -> usize {
         };
         match byte {
             b',' | b';' => {
-                if !was_value_parsed && legacy_index >= 1 {
+                if !was_value_parsed && legacy_index >= fixed_fields {
                     extensible_index += 1;
                 }
                 legacy_index += 1;
@@ -887,14 +2198,14 @@ fn comfort_extensible_fields(raw_object: &str) -> usize {
                 }
             }
             _ => {
-                let numeric = legacy_index >= 1 && extensible_index % 2 == 1;
+                let numeric = numeric_field(legacy_index, extensible_index);
                 while bytes.get(cursor).is_some_and(|byte| {
                     !(matches!(byte, b'!' | b',' | b';')
                         || numeric && matches!(byte, b'\r' | b'\n'))
                 }) {
                     cursor += 1;
                 }
-                if legacy_index >= 1 {
+                if legacy_index >= fixed_fields {
                     extensible_index += 1;
                 }
                 was_value_parsed = true;
@@ -903,11 +2214,21 @@ fn comfort_extensible_fields(raw_object: &str) -> usize {
     }
 }
 
+// Comfort keeps its original one-Name and alternating string/numeric semantics.
+fn comfort_extensible_fields(raw_object: &str) -> usize {
+    idf_extensible_fields(
+        raw_object,
+        1,
+        |legacy_index, extensible_index| legacy_index >= 1 && extensible_index % 2 == 1,
+        false,
+    )
+}
+
 fn record_object(
     fields: &[String],
     (line, column): (usize, usize),
     idf_order: u32,
-    semicolon_terminated: bool,
+    (semicolon_terminated, source_object_layouts): (bool, bool),
     raw_object: &str,
     targets: &[IdfOrderTarget],
     scanned: &mut BTreeMap<&'static str, Vec<ScannedObject>>,
@@ -929,7 +2250,9 @@ fn record_object(
     else {
         return Ok(());
     };
-    if unnamed_legacy_type(target.object_type) {
+    if unnamed_legacy_type(target.object_type)
+        || (source_object_layouts && target.object_type == "OutdoorAir:NodeList")
+    {
         let bucket = scanned.get_mut(target.object_type).ok_or_else(|| {
             IdfOrderError::new(format!(
                 "internal IDF order recovery error: missing target bucket for {}",
@@ -940,6 +2263,9 @@ fn record_object(
             idf_order,
             max_fields: fields.len() - 1,
             semicolon_terminated,
+            source_max_extensible_fields: (source_object_layouts
+                && target.object_type == "OutdoorAir:NodeList")
+                .then(|| idf_extensible_fields(raw_object, 0, |_, _| false, true)),
             comfort_max_extensible_fields: None,
             name: format!("{} {}", target.object_type, bucket.len() + 1),
             line,
@@ -981,6 +2307,24 @@ fn record_object(
         idf_order,
         max_fields: fields.len() - 1,
         semicolon_terminated,
+        source_max_extensible_fields: source_idf_object_layout(target.object_type).and_then(
+            |(_, fixed, extension)| {
+                (!extension.is_empty()).then(|| {
+                    idf_extensible_fields(
+                        raw_object,
+                        fixed.len(),
+                        |legacy_index, extensible_index| {
+                            if legacy_index < fixed.len() {
+                                !fixed[legacy_index].1
+                            } else {
+                                !extension[extensible_index % extension.len()].1
+                            }
+                        },
+                        source_object_layouts,
+                    )
+                })
+            },
+        ),
         // Values can advance across comments/numeric newlines without a
         // delimiter. Keep that Native event count independent of legacy F.
         comfort_max_extensible_fields: comfort.then(|| comfort_extensible_fields(raw_object)),

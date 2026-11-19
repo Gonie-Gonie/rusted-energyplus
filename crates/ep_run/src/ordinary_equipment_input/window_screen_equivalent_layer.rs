@@ -50,9 +50,7 @@ pub(crate) fn validate(raw: &RawModel) -> Result<(), String> {
     if rows.is_empty() {
         return Ok(());
     }
-    if !raw.is_epjson() {
-        return Err("Source unused ScreenEQL requires direct epJSON".into());
-    }
+    raw.validate_source_idf_object_custody("WindowMaterial:Screen:EquivalentLayer")?;
     for (name, object) in rows {
         if !super::window_gas::valid_name(&name.0) {
             return Err("Source ScreenEQL requires original RE2 material name".into());

@@ -294,11 +294,6 @@ impl SourceOutdoorAirNodes {
         let mut numbers = vec![0.0; maximum_numbers];
         let mut alpha_blanks = vec![true; maximum_alphas];
         let mut numeric_blanks = vec![true; maximum_numbers];
-        if (number_lists > 0 || number_singles > 0) && !source_is_epjson {
-            return Err(Error::Unavailable(
-                "authored outdoor-air original-IDF getter order",
-            ));
-        }
         // Native197: these objects have no Name alpha. The retained map key
         // identifies only the real IP row/usage; nodes are the extensible A1+.
         for ordinal in 0..number_lists {
@@ -329,8 +324,8 @@ impl SourceOutdoorAirNodes {
                     Some(Value::Array(members)) => members.as_slice(),
                     _ => return Err(Error::Unavailable("actual outdoor-air list extension type")),
                 };
-                num_alphas = members.len();
-                if num_alphas > alphas.len() {
+                let retained_rows = members.len();
+                if retained_rows > alphas.len() {
                     return Err(Error::Unavailable(
                         "actual outdoor-air list alpha allocation",
                     ));
@@ -339,13 +334,61 @@ impl SourceOutdoorAirNodes {
                     let Value::Object(fields) = member else {
                         return Err(Error::Unavailable("actual outdoor-air list member type"));
                     };
-                    let Some(Value::String(value)) = fields.get("node_or_nodelist_name") else {
-                        return Err(Error::Unavailable("actual outdoor-air list member alpha"));
+                    let value = match fields.get("node_or_nodelist_name") {
+                        Some(Value::String(value)) => value.as_str(),
+                        None if !source_is_epjson => "",
+                        _ => {
+                            return Err(Error::Unavailable("actual outdoor-air list member alpha"));
+                        }
                     };
                     alphas[alpha] = value.to_ascii_uppercase();
                     alpha_blanks[alpha] = value.is_empty();
                     alpha_fields[alpha] = "node_or_nodelist_name".into();
                 }
+                num_alphas = if source_is_epjson {
+                    retained_rows
+                } else {
+                    let maximum = match fields.get("idf_max_fields") {
+                        Some(Value::Number(value)) => value.parse::<usize>().ok(),
+                        _ => None,
+                    }
+                    .ok_or(Error::Unavailable(
+                        "actual outdoor-air list original F custody",
+                    ))?;
+                    let maximum_extensions = match fields.get("idf_max_extensible_fields") {
+                        Some(Value::Number(value)) => value.parse::<usize>().ok(),
+                        _ => None,
+                    }
+                    .ok_or(Error::Unavailable(
+                        "actual outdoor-air list original L custody",
+                    ))?;
+                    let counts = input
+                        .source_original_idf_argument_counts(
+                            LIST_FAMILY,
+                            maximum,
+                            Some(maximum_extensions),
+                            retained_rows,
+                        )
+                        .map_err(|_| {
+                            Error::Unavailable("actual outdoor-air list original argument counts")
+                        })?;
+                    if counts.numerics != 0 {
+                        return Err(Error::Unavailable(
+                            "actual outdoor-air list original numeric count",
+                        ));
+                    }
+                    input
+                        .source_original_idf_field_names(
+                            LIST_FAMILY,
+                            retained_rows,
+                            &mut alpha_fields,
+                            &mut numeric_fields,
+                        )
+                        .map_err(|_| {
+                            Error::Unavailable("actual outdoor-air list original field labels")
+                        })?;
+                    counts.alphas
+                };
             }
             // This nameless schema has zero numeric/default fields. Omitted
             // nodes and [] leave NumAlphas/NumNums zero, with reset scratch.
@@ -416,7 +459,7 @@ impl SourceOutdoorAirNodes {
             input.mark_object_as_used(FAMILY, &object);
             let mut maximum = 0_usize;
             let mut num_alphas = 1_usize;
-            let num_numbers;
+            let mut num_numbers;
             {
                 let fields = input
                     .source_raw_object_fields(FAMILY, &object)
@@ -462,6 +505,32 @@ impl SourceOutdoorAirNodes {
                     if index + 1 < maximum {
                         num_alphas = index + 1;
                     }
+                }
+                if !source_is_epjson {
+                    let maximum = match fields.get("idf_max_fields") {
+                        Some(Value::Number(value)) => value.parse::<usize>().ok(),
+                        _ => None,
+                    }
+                    .ok_or(Error::Unavailable(
+                        "actual outdoor-air single original F custody",
+                    ))?;
+                    let counts = input
+                        .source_original_idf_argument_counts(FAMILY, maximum, None, 0)
+                        .map_err(|_| {
+                            Error::Unavailable("actual outdoor-air single original argument counts")
+                        })?;
+                    num_alphas = counts.alphas;
+                    num_numbers = counts.numerics;
+                    input
+                        .source_original_idf_field_names(
+                            FAMILY,
+                            0,
+                            &mut alpha_fields,
+                            &mut numeric_fields,
+                        )
+                        .map_err(|_| {
+                            Error::Unavailable("actual outdoor-air single original field labels")
+                        })?;
                 }
             }
             let mut num_nodes = 0;
