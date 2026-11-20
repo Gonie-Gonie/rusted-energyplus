@@ -114,6 +114,18 @@ def source_review_cell(row: dict[str, Any]) -> str:
     return (boundary + (" Review: " + links + "." if links else "")).replace("|", "\\|").replace("\n", " ")
 
 
+def object_anchor(name: str) -> str:
+    return "object-" + re.sub(r"[^a-z0-9]+", "-", name.translate(ASCII_FOLD)).strip("-")
+
+
+def source_boundary_cell(row: dict[str, Any]) -> str:
+    """Keep the corpus index short; the registry retains the complete review."""
+    boundary = row.get("source_boundary", "Not reviewed for the ordinary Source route.").strip()
+    summary = re.split(r"(?<=\.)\s+", boundary, maxsplit=1)[0]
+    details = f"[Details](object-coverage.md#{object_anchor(row['name'])})"
+    return f"{summary} {details}".replace("|", "\\|").replace("\n", " ")
+
+
 def catalog_from_schema(path: Path) -> dict[str, Any]:
     raw = path.read_bytes()
     if hashlib.sha256(raw).hexdigest() != SCHEMA_SHA:
@@ -300,6 +312,11 @@ def markdown(repo_root: Path) -> str:
     known = [row for row in inventory["rows"] if row["schema_known"]]
     unknown = [row for row in inventory["rows"] if not row["schema_known"]]
     additional = inventory["additional_reviewed_types"]
+    admissions = Counter(row["review"]["source_admission"] for row in known)
+    admission_summary = ", ".join(
+        f"**{admissions[key]} {label}**"
+        for key, label in SOURCE_ADMISSION_LABELS.items() if admissions[key]
+    )
     lines = [
         "<!-- DO NOT EDIT. Generated from repository samples, accepted domain reviews, the pinned object catalog and specs/object_coverage.toml by tools/docs/generate_docs.py. -->",
         "", "# Example Objects and Source Boundaries", "",
@@ -307,21 +324,23 @@ def markdown(repo_root: Path) -> str:
         "",
         f"Including the additional types in published [accepted domain expansions](../../validation/evidence/object-input-domains.json), the combined inventory contains **{len(known) + len(additional)} canonical object types**. The additional types are listed separately below; they do not change the original corpus occurrence counts.",
         "",
+        f"Source admission in the file corpus: {admission_summary}. These labels describe bounded input admission, not complete object support.",
+        "",
         "Selection includes tracked and ordinary untracked input files under `data/` and `docs/validation/`, respecting Git ignores. It excludes runtime/reference trees and immutable `objects` stores. Invalid-field and negative fixtures remain included; embedded code literals and compressed artifacts are outside this file corpus.",
         "",
-        "This public corpus list separates occurrence counts, whole-object compiler typing and actual ordinary Source admission. **No row means full-object or arbitrary-combination support.** Counts include negative fixtures, inactive declarations and unused objects. Compiler typing comes from `Compiler::typed_coverage_status`; raw-only objects can still have genuine Source getters or partial projections. The [full registry](object-coverage.md) retains other reviewed types outside this corpus. [Capabilities](../../../specs/capabilities.toml), raw admission guards and connected consumers jointly bound execution; legacy/fixed-case evidence is not automatically Source support.",
+        "This index separates occurrences, compiler typing and ordinary Source admission. **No row establishes whole-object, all-value or arbitrary-combination support.** Counts include negative fixtures, inactive declarations and unused objects. A typed model or raw getter alone does not establish runtime support. Open each row's Details for the complete boundary, evidence and review references in the [full registry](object-coverage.md).",
         "",
-        "Review groups provide a development queue, not IDF declaration order or runtime execution order. Cross-group references and cycles require explicit register, resolve and consume phases. The [roadmap](../current/roadmap.md) defines the expansion work and [project contract](../current/project-contract.md#reviewing-a-porting-change) defines its evidence requirements.",
+        "Review groups organize this index; they are not IDF declaration order or runtime execution order.",
         "",
         "Canonical names and official groups come from the compact [EnergyPlus 26.1 catalog](../../../data/schema/energyplus-26.1-object-index.json). It records the original schema SHA256 and pinned source commit; installed EnergyPlus is not needed to regenerate this page.",
         "",
-        "Source labels are bounded A/B, bounded A only, bounded B only, inactive declaration only, blocked, or not reviewed. B is the bounded direct-Zone IdealLoads route; each admitted field combination has its own connected-owner and evidence boundary. An admitted family still requires every applicable field/reference/consumer condition. Review references are code/contract facts, not additional numerical conformance cases; promoted identities and tolerances are unchanged.",
-        "", "| Object type | Input files | Instances | Dependency review group | Compiler input typing | Source admission | Scope and review references |", "|---|---|---|---|---|---|---|",
+        "Source A/B labels require the corresponding explicit route; B is the bounded direct-Zone IdealLoads route. Every applicable field, reference, topology and consumer restriction still applies. Legacy or fixed-case evidence is not automatically Source support, and this index adds no numerical conformance claim.",
+        "", "| Object type | Input files | Instances | Dependency review group | Compiler input typing | Source admission | Boundary and details |", "|---|---|---|---|---|---|---|",
     ]
-    lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} | {row['group']} | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} | {source_review_cell(row['review'])} |" for row in known)
+    lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} | {row['group']} | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} | {source_boundary_cell(row['review'])} |" for row in known)
     if additional:
-        lines += ["", "## Additional Types From Accepted Domain Expansions", "", "These types occur in the retained domain-expansion inputs and have published review records. Their local runtime inputs are excluded from the file corpus above; the combined inventory includes each type once. Admission remains bounded by the [full registry](object-coverage.md).", "", "| Object type | Compiler input typing | Source admission |", "|---|---|---|"]
-        lines.extend(f"| `{row['name']}` | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} |" for row in additional)
+        lines += ["", "## Additional Types From Accepted Domain Expansions", "", "These types have published review records but their retained runtime inputs are outside the file corpus above. The combined inventory includes each type once; no file occurrence counts are added.", "", "| Object type | Compiler input typing | Source admission | Boundary and details |", "|---|---|---|---|"]
+        lines.extend(f"| `{row['name']}` | {input_typing(row['review'])} | {SOURCE_ADMISSION_LABELS[row['review']['source_admission']]} | {source_boundary_cell(row['review'])} |" for row in additional)
     if unknown:
         lines += ["", "## Unknown Input Types", "", "These names are absent from the pinned schema. `Unknown:Diagnostic` is an intentional local diagnostic fixture, not an EnergyPlus object type.", "", "| Input type | Input files | Instances |", "|---|---|---|"]
         lines.extend(f"| `{row['name']}` | {row['files']} | {row['instances']} |" for row in unknown)

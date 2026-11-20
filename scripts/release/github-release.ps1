@@ -1,95 +1,51 @@
 [CmdletBinding()]
 param(
-    [string]$Tag = "v0.1.0",
-    [string]$Version = "0.1.0",
+    [string]$Version = "0.2.0",
+    [string]$Tag = "",
     [string]$Repo = "Gonie-Gonie/rusted-energyplus",
-    [string]$Artifact = "dist/eplus-rs-v0.1.0-windows-x64.zip",
-    [string]$NotesFile = "docs/src/releases/v0.1.0.md",
-    [string]$EvidenceRoot = ""
+    [string]$Artifact = "",
+    [string]$NotesFile = ""
 )
-
-# Local/manual fallback publisher.
-# Normal releases are created by .github/workflows/release.yml when a vX.Y.Z tag is pushed.
-
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
-
-$ScriptsRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
-. (Join-Path $ScriptsRoot "lib\common.ps1")
-$RepoRoot = Get-RepoRoot
-Set-Location $RepoRoot
-
-$token = $env:GH_TOKEN
-if ([string]::IsNullOrWhiteSpace($token)) {
-    $token = $env:GITHUB_TOKEN
+. (Join-Path $PSScriptRoot "..\lib\common.ps1")
+Set-Location -LiteralPath (Get-RepoRoot)
+if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw 'Expected MAJOR.MINOR.PATCH.' }
+if ([string]::IsNullOrWhiteSpace($Tag)) { $Tag = "v$Version" }
+if ($Tag -ne "v$Version") { throw 'Tag and version differ.' }
+if ([string]::IsNullOrWhiteSpace($Artifact)) { $Artifact = "dist/eplus-rs-$Tag-windows-x64.zip" }
+if ([string]::IsNullOrWhiteSpace($NotesFile)) { $NotesFile = "docs/src/releases/$Tag.md" }
+$assets = @($Artifact, "$Artifact.sha256", "$Artifact.verification.json")
+foreach ($path in @($assets) + @($NotesFile)) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing release file: $path" }
 }
-
-if ([string]::IsNullOrWhiteSpace($token)) {
-    throw "GH_TOKEN or GITHUB_TOKEN is required to create a GitHub Release."
+$verification = Get-Content -LiteralPath "$Artifact.verification.json" -Raw | ConvertFrom-Json
+$hash = (Get-ReleaseFileHash -LiteralPath $Artifact -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($verification.passed -ne $true -or $verification.version -ne $Version -or $verification.zip_sha256 -ne $hash) {
+    throw 'Portable verification does not bind this release ZIP.'
 }
-
-$artifactPath = (Resolve-Path -LiteralPath $Artifact).Path
-$notesPath = (Resolve-Path -LiteralPath $NotesFile).Path
-$notes = Get-Content -Raw -LiteralPath $notesPath
-if ([string]::IsNullOrWhiteSpace($EvidenceRoot)) {
-    $EvidenceRoot = ".runtime\release-evidence\v$Version"
+if ($verification.source_tree_clean -ne $true -or $verification.source_commit -notmatch '^[0-9a-f]{40}$') {
+    throw 'Publication requires a package produced from a clean, identified commit.'
 }
-
-$headers = @{
-    "Accept" = "application/vnd.github+json"
-    "Authorization" = "Bearer $token"
-    "User-Agent" = "rusted-energyplus-release"
-    "X-GitHub-Api-Version" = "2022-11-28"
+$expectedChecksum = "$hash  $([IO.Path]::GetFileName($Artifact))"
+if ((Get-Content -LiteralPath "$Artifact.sha256" -Raw).Trim() -ne $expectedChecksum) {
+    throw 'Release ZIP checksum differs.'
 }
-
-$releaseBody = @{
-    tag_name = $Tag
-    target_commitish = "main"
-    name = "eplus-rs $Version"
-    body = $notes
-    draft = $false
-    prerelease = $true
-    generate_release_notes = $false
-} | ConvertTo-Json -Depth 5
-
-$releaseUri = "https://api.github.com/repos/$Repo/releases"
-$release = Invoke-RestMethod -Method Post -Headers $headers -Uri $releaseUri -Body $releaseBody -ContentType "application/json"
-
-function Get-AssetContentType {
-    param([Parameter(Mandatory = $true)][string]$Path)
-
-    switch ([System.IO.Path]::GetExtension($Path).ToLowerInvariant()) {
-        ".zip" { "application/zip"; break }
-        ".pdf" { "application/pdf"; break }
-        default { "application/octet-stream"; break }
-    }
+# GitHub CLI uses its configured credential provider; no token is printed.
+# --verify-tag requires the caller to have pushed the reviewed tag first.
+$tagJson = & gh api "repos/$Repo/git/ref/tags/$Tag"
+if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve the published tag.' }
+$tagObject = ($tagJson | ConvertFrom-Json).object
+$depth = 0
+while ($tagObject.type -eq 'tag') {
+    if ($depth -ge 8) { throw 'Unexpected annotated tag nesting.' }
+    $tagJson = & gh api "repos/$Repo/git/tags/$($tagObject.sha)"
+    if ($LASTEXITCODE -ne 0) { throw 'Cannot peel the published tag.' }
+    $tagObject = ($tagJson | ConvertFrom-Json).object
+    $depth += 1
 }
-
-function Upload-ReleaseAsset {
-    param(
-        [Parameter(Mandatory = $true)]$Release,
-        [Parameter(Mandatory = $true)][string]$Path
-    )
-
-    $assetPath = (Resolve-Path -LiteralPath $Path).Path
-    $assetName = [System.IO.Path]::GetFileName($assetPath)
-    $uploadUri = ($Release.upload_url -replace "\{\?name,label\}", "") + "?name=$([System.Uri]::EscapeDataString($assetName))"
-    $assetBytes = [System.IO.File]::ReadAllBytes($assetPath)
-    $contentType = Get-AssetContentType -Path $assetPath
-
-    Invoke-RestMethod -Method Post -Headers $headers -Uri $uploadUri -Body $assetBytes -ContentType $contentType | Out-Null
-    Write-Host "Uploaded release asset: $assetName"
+if ($tagObject.type -ne 'commit' -or $tagObject.sha -ne $verification.source_commit) {
+    throw 'Package producing commit differs from the remote release tag.'
 }
-
-$assetSelector = Join-Path $PSScriptRoot "select-release-assets.ps1"
-$assets = @(
-    & $assetSelector `
-        -Artifact $artifactPath `
-        -EvidenceRoot $EvidenceRoot
-)
-
-foreach ($asset in $assets) {
-    Upload-ReleaseAsset -Release $release -Path $asset
-}
-
-Write-Host "GitHub Release created: $($release.html_url)"
+& gh release create $Tag @assets --repo $Repo --verify-tag --title "eplus-rs $Version" --notes-file $NotesFile --prerelease
+if ($LASTEXITCODE -ne 0) { throw 'GitHub release creation or upload failed.' }

@@ -14,6 +14,23 @@ function Add-CargoBinToPath {
     $env:Path = "$cargoBin;$env:Path"
 }
 
+function Get-ReleaseFileHash {
+    param(
+        [Parameter(Mandatory = $true)][string]$LiteralPath,
+        [ValidateSet("SHA256")][string]$Algorithm = "SHA256"
+    )
+    $stream = [System.IO.File]::OpenRead($LiteralPath)
+    $hasher = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $hash = [System.BitConverter]::ToString($hasher.ComputeHash($stream)).Replace("-", "")
+        return [pscustomobject]@{ Algorithm = $Algorithm; Hash = $hash; Path = $LiteralPath }
+    }
+    finally {
+        $hasher.Dispose()
+        $stream.Dispose()
+    }
+}
+
 function Get-ScriptsRoot {
     return (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 }

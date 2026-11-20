@@ -58,12 +58,12 @@ EXPECTED_CURRENT_STATUS_CLASSIFICATION_IDS = [
     "not claimed",
 ]
 README_REQUIRED_PHRASES = [
-    "Rust-only EnergyPlus-compatible porting project.",
-    "EnergyPlus 26.1.0 as the locked oracle",
-    "Compatibility mode means source-order EnergyPlus algorithm behavior",
-    "Engineering algorithm changes do not belong in compatibility mode.",
-    "Ad-hoc user runs are not release conformance evidence.",
-    "A conformance claim requires a case manifest",
+    "A Rust simulation engine for a **bounded subset of EnergyPlus 26.1.0** inputs.",
+    "Compatibility mode preserves source-order algorithms against the locked EnergyPlus 26.1.0 reference.",
+    "Numerical claims require case manifests, declared outputs, tolerances, both engines' artifacts, comparison reports and a blocking gate.",
+    "Algorithm changes do not belong in compatibility mode.",
+    "Ad-hoc runs retain `conformance_claim=false`.",
+    "Rust does not silently substitute oracle results.",
 ]
 CURRENT_DOC_REQUIRED_PHRASES = [
     "The locked oracle is EnergyPlus 26.1.0.",

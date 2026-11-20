@@ -113,6 +113,9 @@ class ExampleObjectUnionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.classification_fixture(root, "")
+            evidence = root / "docs/validation/evidence"
+            evidence.mkdir(parents=True)
+            (evidence / "object-input-domains.json").write_text('{"reviewed_domains": {}}', encoding="utf8")
             (root / "data/schema").mkdir(parents=True)
             names = {"Zone": "Thermal Zones", **{f"Unused:{n}": "Other" for n in range(857)}}
             (root / "data/schema/energyplus-26.1-object-index.json").write_text(json.dumps({

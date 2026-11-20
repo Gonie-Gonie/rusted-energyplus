@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from example_object_union import (
-    OBJECT_STATUS_LABELS, SOURCE_ADMISSION_LABELS, input_typing, object_registry, source_review_cell,
+    OBJECT_STATUS_LABELS, SOURCE_ADMISSION_LABELS, input_typing, object_anchor, object_registry, source_review_cell,
     markdown as example_object_union,
 )
 from script_inventory import collect_script_inventory, script_inventory_toml
@@ -354,12 +354,16 @@ def conformance_case_index(repo_root: Path) -> str:
 
 
 def object_coverage(repo_root: Path) -> str:
+    objects = list(object_registry(repo_root).values())
+    anchors = [object_anchor(item["name"]) for item in objects]
+    if len(anchors) != len(set(anchors)):
+        raise ValueError("duplicate object documentation anchor")
     rows = [
-        [item["name"], item["family"], OBJECT_STATUS_LABELS[item["status"]],
+        [f'<a id="{object_anchor(item["name"])}"></a>{item["name"]}', item["family"], OBJECT_STATUS_LABELS[item["status"]],
          input_typing(item), SOURCE_ADMISSION_LABELS[item["source_admission"]],
          str(item.get("first_evidence", item.get("first_case", ""))),
          source_review_cell(item) + " Registered input boundary: " + boundary_summary(item, "support_boundary", "object_coverage.toml")]
-        for item in object_registry(repo_root).values()
+        for item in objects
     ]
     return (
         GENERATED_NOTICE + "# Object Coverage\n\n"

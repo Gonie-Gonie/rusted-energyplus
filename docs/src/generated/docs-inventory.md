@@ -9,21 +9,21 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Check | Result |
 |---|---|
-| docs files | 50 |
-| SUMMARY links | 19 |
-| README h2 sections | 6 |
+| docs files | 52 |
+| SUMMARY links | 21 |
+| README h2 sections | 4 |
 | README h2 section limit | pass |
 | Current nav expected | 4 |
-| Current nav actual | 4 |
-| Current nav missing | 0 |
+| Current nav actual | 2 |
+| Current nav missing | 2 |
 | Current nav unexpected | 0 |
-| README current docs missing | 0 |
+| README current docs missing | 4 |
 | README current docs unexpected | 0 |
 | Generated docs missing notice | 1 |
 | Removable docs in SUMMARY | 0 |
 | Obsolete docs in SUMMARY | 0 |
-| Non-core SUMMARY sections | 0 |
-| SUMMARY section scope violations | 0 |
+| Non-core SUMMARY sections | 2 |
+| SUMMARY section scope violations | 3 |
 | Release notes in Current nav | 0 |
 | Non-generated docs not in SUMMARY | 30 |
 
@@ -31,14 +31,17 @@ Documentation metadata is generated from `docs/src`, `docs/src/SUMMARY.md`, and 
 
 | Order | Expected | Actual | Result |
 |---|---|---|---|
-| 1 | docs/src/current/project-contract.md | docs/src/current/project-contract.md | pass |
-| 2 | docs/src/current/current-status.md | docs/src/current/current-status.md | pass |
-| 3 | docs/src/current/roadmap.md | docs/src/current/roadmap.md | pass |
-| 4 | docs/src/current/architecture-overview.md | docs/src/current/architecture-overview.md | pass |
+| 1 | docs/src/current/project-contract.md | docs/src/current/current-status.md | fail |
+| 2 | docs/src/current/current-status.md | docs/src/current/roadmap.md | fail |
+| 3 | docs/src/current/roadmap.md |  | fail |
+| 4 | docs/src/current/architecture-overview.md |  | fail |
 
 **README current docs missing**
 
-none
+- `docs/src/current/project-contract.md`
+- `docs/src/current/current-status.md`
+- `docs/src/current/roadmap.md`
+- `docs/src/current/architecture-overview.md`
 
 **README current docs unexpected**
 
@@ -58,11 +61,14 @@ none
 
 **Non-core SUMMARY sections**
 
-none
+- `Releases`
+- `Developer Reference`
 
 **SUMMARY section scope violations**
 
-none
+- `Developer Reference: docs/src/current/architecture-overview.md (current)`
+- `Developer Reference: docs/src/current/project-contract.md (current)`
+- `Releases: docs/src/releases/v0.2.0.md (release-note)`
 
 **Release notes in Current navigation**
 
@@ -81,10 +87,10 @@ none
 | docs/src/conformance/report-format.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-06-07 |
 | docs/src/conformance/support-coverage-report.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
 | docs/src/conformance/user-coverage-handbook.md | spec-explanation | not in SUMMARY | n/a | present | active | conformance | 2026-10-20 |
-| docs/src/current/architecture-overview.md | current | Current | n/a | present | active | core | 2026-10-20 |
-| docs/src/current/current-status.md | current | Current | n/a | present | active | core | 2026-11-20 |
-| docs/src/current/project-contract.md | current | Current | n/a | present | active | core | 2026-10-20 |
-| docs/src/current/roadmap.md | current | Current | n/a | present | active | core | 2026-10-20 |
+| docs/src/current/architecture-overview.md | current | Developer Reference | n/a | present | active | core | 2026-10-20 |
+| docs/src/current/current-status.md | current | Current | n/a | present | active | release | 2026-11-20 |
+| docs/src/current/project-contract.md | current | Developer Reference | n/a | present | active | core | 2026-10-20 |
+| docs/src/current/roadmap.md | current | Current | n/a | present | active | release | 2026-11-20 |
 | docs/src/generated/algorithm-ledger.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/capability-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/conformance-case-index.md | generated | Generated References | present | none |  |  |  |
@@ -96,11 +102,12 @@ none
 | docs/src/generated/script-index.md | generated | Generated References | present | none |  |  |  |
 | docs/src/generated/variable-coverage.md | generated | Generated References | present | none |  |  |  |
 | docs/src/guides/developer-workflow.md | guide | Guides | n/a | present | active | docs | 2026-11-20 |
-| docs/src/guides/release-process.md | guide | Guides | n/a | present | active | release | 2026-06-08 |
-| docs/src/guides/run-arbitrary-idf.md | guide | Guides | n/a | present | active | docs | 2026-10-20 |
+| docs/src/guides/release-process.md | guide | Guides | n/a | present | active | release | 2026-11-20 |
+| docs/src/guides/run-arbitrary-idf.md | guide | Guides | n/a | present | active | docs | 2026-11-20 |
 | docs/src/guides/setup.md | guide | Guides | n/a | present | active | docs | 2026-10-07 |
+| docs/src/guides/supported-inputs.md | guide | Guides | n/a | present | active | docs | 2026-11-20 |
 | docs/src/guides/verify-porting.md | guide | Guides | n/a | present | active | qa | 2026-10-20 |
-| docs/src/introduction.md | spec-explanation | Summary | n/a | present | active | docs | 2026-06-05 |
+| docs/src/introduction.md | spec-explanation | Summary | n/a | none |  |  |  |
 | docs/src/operations/documentation-framework.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-06-07 |
 | docs/src/operations/script-index.md | spec-explanation | not in SUMMARY | n/a | present | active | docs | 2026-10-20 |
 | docs/src/porting-map/algorithm-ledger.md | source-map | not in SUMMARY | n/a | present | active | core | 2026-07-14 |
@@ -121,4 +128,5 @@ none
 | docs/src/porting-map/zone-air-update-map.md | source-map | not in SUMMARY | n/a | present | active | runtime | 2026-10-07 |
 | docs/src/releases/README.md | release-note | not in SUMMARY | n/a | none |  |  |  |
 | docs/src/releases/v0.1.0.md | release-note | not in SUMMARY | n/a | present | ready | release | 2026-06-18 |
+| docs/src/releases/v0.2.0.md | release-note | Releases | n/a | none |  |  |  |
 | docs/src/releases/v0.32.0.md | release-note | not in SUMMARY | n/a | present | released | release | 2026-06-08 |

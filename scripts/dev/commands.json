@@ -1439,6 +1439,12 @@
                          "help":  "Verify the v0.32 user coverage handbook gate."
                      },
                      {
+                         "name":  "v0.2-verify",
+                         "path":  "release\\v0.2-verify.ps1",
+                         "group":  "release",
+                         "help":  "Verify the bounded-scope v0.2 Windows package without porting experiments."
+                     },
+                     {
                          "name":  "v0.1-verify",
                          "path":  "release\\v0.1-verify.ps1",
                          "group":  "release",

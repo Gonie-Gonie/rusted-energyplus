@@ -2,20 +2,28 @@
 
 [Introduction](introduction.md)
 
-# Current
-
-- [Project Contract](current/project-contract.md)
-- [Current Status](current/current-status.md)
-- [Roadmap](current/roadmap.md)
-- [Architecture Overview](current/architecture-overview.md)
-
 # Guides
 
 - [Setup](guides/setup.md)
+- [Supported Inputs](guides/supported-inputs.md)
 - [Developer Workflow](guides/developer-workflow.md)
 - [Run Arbitrary IDF](guides/run-arbitrary-idf.md)
 - [Verify The Port](guides/verify-porting.md)
 - [Release Process](guides/release-process.md)
+
+# Current
+
+- [Current Status](current/current-status.md)
+- [Maintenance Scope](current/roadmap.md)
+
+# Releases
+
+- [0.2.0 Release Notes](releases/v0.2.0.md)
+
+# Developer Reference
+
+- [Project Contract](current/project-contract.md)
+- [Architecture Overview](current/architecture-overview.md)
 
 # Generated References
 

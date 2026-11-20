@@ -14,149 +14,76 @@ concurrency:
 
 jobs:
   release:
-    name: Build and publish release
+    name: Verify portable package and publish
     runs-on: windows-latest
-
     defaults:
       run:
         shell: pwsh
-
     steps:
-      - name: Check out repository
+      - name: Check out release tag
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Resolve release metadata
+      - name: Resolve release identity
         run: |
           $tag = "${{ github.ref_name }}"
           if ($tag -notmatch '^v(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)$') {
-              throw "Release tag must match vMAJOR.MINOR.PATCH: $tag"
+              throw "Expected vMAJOR.MINOR.PATCH: $tag"
           }
-
           $version = $tag.Substring(1)
-          $verifyCommand = "v$($Matches.major).$($Matches.minor)-verify"
-          $verifyScript = "scripts\release\$verifyCommand.ps1"
-          $notesFile = "docs\src\releases\$tag.md"
-          $artifact = "dist\eplus-rs-$tag-windows-x64.zip"
-          $evidenceDir = ".runtime\release-evidence\$tag"
-
-          if (-not (Test-Path -LiteralPath $verifyScript -PathType Leaf)) {
-              throw "Missing release verification script: $verifyScript"
+          $gate = "v$($Matches.major).$($Matches.minor)-verify"
+          $notes = "docs/src/releases/$tag.md"
+          if (-not (Test-Path -LiteralPath "scripts/release/$gate.ps1") -or
+              -not (Test-Path -LiteralPath $notes)) {
+              throw "Missing verification gate or release notes for $tag"
           }
-          if (-not (Test-Path -LiteralPath $notesFile -PathType Leaf)) {
-              throw "Missing release notes: $notesFile"
-          }
+          "RELEASE_TAG=$tag" >> $env:GITHUB_ENV
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+          "RELEASE_GATE=$gate" >> $env:GITHUB_ENV
+          "RELEASE_NOTES=$notes" >> $env:GITHUB_ENV
+          "RELEASE_ARTIFACT=dist/eplus-rs-$tag-windows-x64.zip" >> $env:GITHUB_ENV
 
-          "RELEASE_TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "RELEASE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "VERIFY_COMMAND=$verifyCommand" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "VERIFY_SCRIPT=$verifyScript" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "RELEASE_NOTES=$notesFile" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "RELEASE_ARTIFACT=$artifact" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "RELEASE_EVIDENCE_DIR=$evidenceDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Set up Python for documentation checks
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
 
-      - name: Set up Rust and docs tools
-        run: .\scripts\dev.cmd setup -InstallRust -InstallDocsTools -SkipOracleDownload -SkipSourceDownload -SkipOracleSmoke
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.96.0-x86_64-pc-windows-gnu --profile minimal --component rustfmt --component clippy
 
-      - name: Set up EnergyPlus oracle
-        run: .\scripts\dev.cmd setup -SkipSourceDownload -SkipOracleSmoke
-
-      - name: Set up EnergyPlus reference source
-        run: .\scripts\dev.cmd setup -SkipOracleDownload -SkipOracleSmoke
-
-      - name: Verify release
-        run: .\scripts\dev.cmd $env:VERIFY_COMMAND
-
-      - name: Build release package
+      - name: Locate GNU linker
         run: |
-          if (Test-Path -LiteralPath $env:RELEASE_ARTIFACT -PathType Leaf) {
-              Write-Host "Release artifact already exists: $env:RELEASE_ARTIFACT"
-          }
-          else {
-              .\scripts\dev.cmd package -Version $env:RELEASE_VERSION
-          }
-
-      - name: Check packaged binary
-        run: |
-          if (-not (Test-Path -LiteralPath $env:RELEASE_ARTIFACT -PathType Leaf)) {
-              throw "Missing release artifact: $env:RELEASE_ARTIFACT"
-          }
-
-          $binary = (Resolve-Path -LiteralPath "target\release\eplus-rs.exe").Path
-          $binaryVersion = & $binary --version
-          $expectedVersion = "eplus-rs $env:RELEASE_VERSION"
-          if ($binaryVersion -ne $expectedVersion) {
-              throw "Release binary reported '$binaryVersion', expected '$expectedVersion'"
-          }
-
-      - name: Publish GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh --version
-
-          $releaseTitle = "eplus-rs $env:RELEASE_VERSION"
-          $assets = @(
-              powershell -NoProfile -ExecutionPolicy Bypass `
-                  -File .\scripts\release\select-release-assets.ps1 `
-                  -Artifact $env:RELEASE_ARTIFACT `
-                  -EvidenceRoot $env:RELEASE_EVIDENCE_DIR `
-                  -RequireEvidenceAssets
-          )
-          if ($LASTEXITCODE -ne 0) {
-              throw "Failed to select public release assets."
-          }
-
-          Write-Host "Public release assets:"
-          foreach ($asset in $assets) {
-              Write-Host " - $([System.IO.Path]::GetFileName($asset))"
-          }
-
-          $publicAssetNames = @{}
-          foreach ($asset in $assets) {
-              $publicAssetNames[[System.IO.Path]::GetFileName($asset)] = $true
-          }
-
-          function Remove-NonPublicReleaseAssets {
-              $releaseJson = gh release view $env:RELEASE_TAG `
-                  --repo $env:GITHUB_REPOSITORY `
-                  --json assets 2>$null
-
-              if ($LASTEXITCODE -ne 0) {
-                  return
-              }
-
-              $release = $releaseJson | ConvertFrom-Json
-              foreach ($asset in $release.assets) {
-                  if (-not $publicAssetNames.ContainsKey($asset.name)) {
-                      Write-Host "Removing non-public release asset: $($asset.name)"
-                      gh release delete-asset $env:RELEASE_TAG $asset.name `
-                          --repo $env:GITHUB_REPOSITORY `
-                          -y
-                      if ($LASTEXITCODE -ne 0) {
-                          throw "Failed to remove non-public release asset: $($asset.name)"
-                      }
+          $gcc = Get-Command gcc -ErrorAction SilentlyContinue
+          $compilerPath = if ($null -ne $gcc) { $gcc.Source } else { $null }
+          if ($null -eq $compilerPath) {
+              foreach ($folder in @('C:\mingw64\bin', 'C:\msys64\ucrt64\bin', 'C:\msys64\mingw64\bin')) {
+                  if (Test-Path -LiteralPath "$folder\gcc.exe") {
+                      $folder >> $env:GITHUB_PATH
+                      $compilerPath = "$folder\gcc.exe"
+                      break
                   }
               }
           }
+          if ($null -eq $compilerPath) { throw 'The pinned Windows GNU toolchain needs a MinGW-w64 linker.' }
+          & $compilerPath --version
 
-          if (gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY *> $null) {
-              gh release edit $env:RELEASE_TAG `
-                  --repo $env:GITHUB_REPOSITORY `
-                  --title $releaseTitle `
-                  --notes-file $env:RELEASE_NOTES `
-                  --prerelease
-              Remove-NonPublicReleaseAssets
-              gh release upload $env:RELEASE_TAG @assets `
-                  --repo $env:GITHUB_REPOSITORY `
-                  --clobber
-          }
-          else {
-              gh release create $env:RELEASE_TAG @assets `
-                  --repo $env:GITHUB_REPOSITORY `
-                  --verify-tag `
-                  --title $releaseTitle `
-                  --notes-file $env:RELEASE_NOTES `
-                  --prerelease
-          }
+      - name: Obtain locked reference runtime and sample weather
+        run: .\scripts\dev.cmd setup -SkipPythonSetup -SkipPythonSmoke -SkipSourceDownload -SkipOracleSmoke
+
+      - name: Check formatting and workspace regression tests
+        run: |
+          cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo test --locked --workspace --lib --bins --tests
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Verify the actual extracted package
+        run: .\scripts\dev.cmd $env:RELEASE_GATE
+
+      - name: Publish bounded-scope prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          .\scripts\dev.cmd github-release -Tag $env:RELEASE_TAG -Version $env:RELEASE_VERSION -Repo $env:GITHUB_REPOSITORY -Artifact $env:RELEASE_ARTIFACT -NotesFile $env:RELEASE_NOTES
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

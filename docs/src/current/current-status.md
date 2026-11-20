@@ -1,406 +1,103 @@
 ---
 status: active
 claim_level: none
-owner: core
+owner: release
 last_reviewed: 2026-11-20
 ---
 
-# Current Status
+# Current status
 
-## Fixed Porting Scope
+Version **0.2.0** packages the verified, bounded Rust Source scope against the
+locked **EnergyPlus 26.1.0** reference. This release concentrates on explicit
+support boundaries, usable documentation and a checked Windows package.
+Further object/parameter expansion is deferred.
 
-The [fixed CON-01 inputs](../../validation/contracts/scope.json) have completed
-their scoped validation: A is an opaque unconditioned one-zone model; B adds
-direct no-outdoor-air sensible IdealLoads with no limit or hard-sized flow,
-capacity, or combined limits. The original work covered 54 applicable units for
-A and 64 for B; their accepted adjudications remain in the validation evidence.
+The algorithm baseline is the published implementation through **Source212**.
+Unfinished active-Window porting and its unpublished validation tools are
+excluded. Release/version, documentation and packaging changes do not create
+new numerical conformance evidence.
 
-The fifteen cases cover 24 hours, 72 hours and a year for A and each of B's
-four limit modes. They use 2013 weather-only simulation at four zone timesteps
-per hour. B's hard-sized limits are 0.02 m3/s and 120 W; its availability is Off
-for the first three hours each day and On for the remaining twenty-one. The
-input contract excludes windows, active outdoor-air paths, infiltration/AFN,
-Plant, EMS, equipment autosizing, and multiple zones/equipment.
+## What can run
 
-The [final validation](../../validation/evidence/SRC-06-final-current-source-validation-60/summary.json)
-records fifteen normal runs, 16,427,880 reported values with zero tolerance or
-RMSE failures, real Surface/warmup handoffs, and Rust JSON/CSV output rereads.
-The [SUR-02 supplement](../../validation/evidence/SUR-02-isolated-history-impulse-61/summary.json)
-adds the previously missing executed impulse/current-row unit checks.
-File-wide byte equality is not established; headers, elapsed times and some
-inactive registry counters differ. Original abnormal afterstates remain
-unavailable. These finite results do not establish general EnergyPlus parity.
-The [validation assets](../../validation/README.md) retain the current inputs,
-policies and accepted evidence. The completed task packet is historical material
-at Git commit `b7907009cefd7372727672c6f1ecc211d897a383`.
-
-## Running And Comparing
-
-The [example-object union](../generated/example-object-union.md) contains 116
-object types: the original 110-type corpus plus accepted ComfortViewFactorAngles,
-ElectricEquipment, Space, SpaceList, ZoneGroup and ZoneList additions.
-The current generated domain inventory contains123 names after restoring the
-already accepted OutdoorAir:NodeList reviewed-domain key omitted from the old122.
-This inventory correction adds no physical evidence; retained116 is unchanged.
-Legal-value completion remains tracked per object. The retained
-[input-domain evidence](../../validation/evidence/object-input-domains.json)
-contains 284 paired physical cases and 13,276,216 reported values with zero
-tolerance or RMSE failures. These cases span recorded Source builds; they do
-not establish arbitrary legal object/value combinations.
-
-Unused material coverage comprises the retained fixed Source B direct-epJSON scenes
-and the separately recorded original-IDF scene in the
-[input-domain evidence](../../validation/evidence/object-input-domains.json).
-Actual runtime owners supply getter state, public MaterialDetails and Source
-geometry; typed properties do not replace that state. Each accepted case retains
-its recorded input, reports, comparison policies, topology, clock and export checks.
-The [object registry](../../../specs/object_coverage.toml) has 147 entries, distinct
-from the retained 116-type corpus and combined 123-name inventory above.
-
-| Family | Accepted fixed-scene boundary |
+| Select | Boundary |
 | --- | --- |
-| WindowMaterial:SimpleGlazingSystem | Unused getter, Setup properties and public material report. |
-| WindowMaterial:Gas and GasMixture | Named/Custom Gas and mixture getter rows; NominalR remains distinct from constructor/report Resistance. |
-| Glazing and spectral data | Unused SpectralAverage, Spectral, SpectralAndAngle and RefractionExtinction getters, with linked spectral datasets and Curve references where required. |
-| Five analytic 2D Curves | Biquadratic, QuadraticLinear, CubicLinear, Bicubic and FanPressureRise definition/report owners; SpectralAndAngle lookup does not establish evaluation. |
-| WindowMaterial:Shade, Screen and Blind | Unused getter/common-report rows and the required ordinary Blind calculation; public evidence does not expose private optical tables. |
-| Equivalent-layer Shade, Drape, Screen, Blind, Glazing and Gap | Unused getter/common-report rows; zero EQL Construction count does not establish positive EQL/ASHWAT consumption. |
-| Material:RoofVegetation | Unused getter/common-report evidence; active EcoRoof evidence is separate below. |
-| WindowMaterial:Gap | Unused getter/report rows with raw-only WindowGap:DeflectionState and WindowGap:SupportPillar helpers; public rows do not pair private helper state. |
+| `--porting-scope A` | Bounded opaque unconditioned heat balance, with separately reviewed geometry, multizone, Space/list and gains extensions. |
+| `--porting-scope B` | Bounded direct-Zone IdealLoads, with selected hard limits, humidity, outdoor-air, economizer and heat-recovery combinations. |
+| No scope flag | Older generic/diagnostic execution with separate capability and comparison behavior. |
 
-Bounded Source B retains Raw/original-typed outside, ordered and effective Construction custody. Unused WindowMaterial, Curve and spectral getters use actual runtime owners; Materials reporting and Source geometry do not expose Native-private optics, TAR or pointers.
+The Windows launcher uses the older generic route. Use the CLI for Source A/B.
+The [supported-input guide](../guides/supported-inputs.md) and
+[detailed object registry](../generated/object-coverage.md) define the actual
+field, value, reference, topology, algorithm and consumer limits. Run
+`--dry-run` and inspect the support report for a complete new input.
 
-The original-IDF route supplies the same physical IDF to both actors and uses the whole official converted DOM for scientific inspection. It retains the existing fifteen WindowMaterial families, five analytic Curve getters, spectral/Gap helpers and ordinary no-AFN OA custody. Recovered order/F/L, full defaults/blanks/IDD labels and raw numeric kinds remain separate from returned counts and caller effects.
+Active windows, general HVAC/Plant, sizing, EMS, PythonPlugin and AirflowNetwork
+remain outside ordinary Source release support. A recognized/typed object or
+an unused material definition does not establish an active simulation consumer.
+No arbitrary-valid-value or full-object completion is claimed.
 
-Source199 Simple and Source200 Advanced remain accepted direct-epJSON pairs; Source203 retains its accepted Input04 original-IDF Advanced pair. The older Source199 v10 Advanced attempt remains at 31/34 gates with zero credit, and failed builds 201 (import parsing) and 202 (DSOA sizing input) remain separate zero-credit history.
+## Retained evidence
 
-Source204/207 original-IDF count/default witnesses and Source208–211 direct-JSON material/reference evidence remain retained. Source212 adds one Source B direct-epJSON pair across five DesignDays for the root family `Material:AirGap\u0000tail`, with one qualifying official Native and one Source run and no reruns. All 34 gates and 158 series/75,120 values pass unchanged policies. Only three HorizontalIR operands differ (maximum 1.71e-13 W/m2, existing 1e-5 limit); zero point/RMSE failures, all other 157 series and both meter bodies are raw-exact.
+The exact case list is generated in `docs/src/generated/conformance-case-index.md`.
+Algorithm, object and coverage boundaries are generated from
+`specs/algorithm_ledger.toml`, `specs/object_coverage.toml`, and
+`specs/variable_coverage.toml`.
 
-Canonical Source A/B query/cache and typed ownership resolve this AirGap family while Raw/statistics/unused keys retain its spelling. All 1,336 numeric values, four internal AirGap R 0.15 rows, three NoMass rows, full four-layer Wall recipes, real EcoRoof and nine topology drivers are held. Seven public EIO rows match exactly. Native-only legality preparation preceded the prospective metadata and adds no qualifying pair credit. Private Native F/NumNums/cache/unused/TotLayers remain CODE-derived; broad `getObjectItem(alias)` API parity is outside this scene.
+| Archive | Accepted cases | Reported values | Result |
+| --- | ---: | ---: | --- |
+| Fixed CON-01 | 15 | 16,427,880 | Zero declared tolerance/RMSE failures. |
+| Published input-domain expansion through Source212 | 284 | 13,276,216 | Zero declared tolerance/RMSE failures. |
 
-Four qualified QA commands pass one existing U07 body. All Rust QA is seven commands/one failure, including an auxiliary workspace all-target Clippy pass and two workspace test attempts. The first failed before bodies due disk/link exhaustion; the explicit library/binary/integration retry passes 5,051/0/2 across 13 targets and omits doctests. One default build 212 is recorded. Dedicated material/OA getter, historical and reused profile-body credits remain zero, with no new test functions.
+These archives have different purposes and are not added into a unique total.
+Whole-file byte identity, all valid parameter combinations and general
+EnergyPlus replacement behavior are separate, unestablished claims.
 
-Existing positive-resistance/type checks, inside/outside AirGap bans, Original/Legacy and other family/field-NUL and comparator fences remain. Six other Construction:* families plus ConstructionProperty:InternalHeatSource, positive-OA Humidistat, active window/CFS/EQL/shading, Source A physical expansion, annual runs and full-object conformance remain outside this new physical qualification. The earlier original-IDF F3 two-layer/raw-tail case stays distinct.
+The [fixed final validation](../../validation/evidence/SRC-06-final-current-source-validation-60/summary.json),
+[SUR-02 supplement](../../validation/evidence/SUR-02-isolated-history-impulse-61/summary.json)
+and [input-domain archive](../../validation/evidence/object-input-domains.json)
+retain their policies, results and limitations. Historical local `.runtime/`
+receipts and executables are not present in a fresh clone. Their recorded
+paths are provenance, not a promise that every historical run can be replayed
+without obtaining the corresponding retained assets.
 
-Complete current streams and per-series results are retained in
-`.runtime/porting/AirGap-root-family-NUL-source/runtime01/`: `readback.json`,
-`native/output/nativeout.eso`, `native/output/nativeout.mtr`,
-`source/output/eplusrs.eso` and `source/output/eplusrs.mtr`.
-The unchanged scientific reader under reviewed V14 supplies the accepted current
-comparison. The installed [v3 comparer](../../../tools/porting/check_completed_reported_streams_v3.py)
-is original-IDF-only and was skipped without invocation for this direct-epJSON case;
-it adds no case, value or failure credit.
+## Complete object inventory
 
-The following historical Source207 original-IDF example remains valid. Its
-same-actor reread covers 158 series/75,120 values, four raw differences and zero
-point/RMSE failures, without engine launches or new case credit. With those
-Source207 local artifacts, rerun from the repo root using a fresh directory:
+The [generated list](../generated/example-object-union.md) covers **188 input
+files**, **110 occurring object types** and **9,118 instances**. Corpus labels
+are 47 bounded A/B, 27 bounded B-only and 36 blocked. Adding separately
+reviewed published types yields 123 names; the full registry has 147 entries.
+The historical 116-name checkpoint in the evidence remains historical.
+None of these inventories is a count of fully supported objects.
 
-```powershell
-python -B tools/porting/check_completed_reported_streams_v3.py --manifest ".runtime/porting/original-idf-NoMass-names-Construction-source/runtime03/reported-comparison-manifest02.json#7f2b8c5cd272e1e232cd02b469a2912cb53a5ed41b790e919a0c2e7422e3ed5c#4469" --output-dir .runtime/porting/reported-streams-user-check02
-```
-
-The output includes `report.md`, `comparison.json`, `series.csv`,
-`all-raw-differences.jsonl` and `all-tolerance-failures.jsonl`. This command
-rereads the recorded pair; it does not run either engine. For another original-IDF
-input/run, supply its own pinned v2-schema manifest, input, clock, policy and
-both actors' receipts and ESO/MTR/RDD/MDD artifacts. Local `.runtime` evidence
-is generated separately and is absent from a fresh clone.
-
-Direct Source epJSON retains the first comparator-equivalent member spelling
-and last whole subtree, checked by two Native convert-only observations and
-existing loader assertions. `Schedule:File` comparisons cover hourly and
-20-minute data on February 29, distinct leap-day values, per-file daylight-saving
-controls and the next-day handoff. That controlled weather copies February 28
-meteorology; full schedule-domain completion remains open.
-
-Within the bounded one-Zone A/B route, `Zone.multiplier` accepts the Native
-signed owner's positive range, `1..=2147483647`. The actual getter, aggregate
-demand, air balance, meters and reports retain the live factor; per-Zone
-intensive state keeps its original meaning. Those two witnesses retain Group/list factors of one.
-Two multiplier-2 models compare their complete original profiles: 15,144 values
-have zero tolerance or RMSE failures, with exact Zone Information records,
-dictionaries and clocks. This finite evidence retains the other model limits.
-
-The opaque Source route accepts all four `BuildingSurface:Detailed` class
-choices: Wall, Floor, Roof and Ceiling. Raw/typed Ceiling remains visible while
-the actual getter assigns its Roof class. Surface/full tracing now exports
-the retained current Source geometry after successful completion. Two full-profile
-Ceiling comparisons pass the original policies; their EIO bodies and DXF geometry
-agree within the explicitly recorded version-header and line-ending boundaries.
-
-Explicit Source A also accepts multiple closed opaque Zones, each with its
-implicit Space. Direct OtherEquipment can target each Zone with all thirteen
-non-Water fuels or thermal-only None and genuine built-in or authored schedules.
-Direct People supports all three sizing
-methods with live count, sensible/latent/radiant gains and humidity consumers.
-Source typed OtherEquipment names preserve authored whitespace with ASCII case
-folding. A direct-epJSON public-output witness distinguishes "A", " A ",
-and "A " under unchanged numeric policies. Constant's missing-type-limit
-warning uses the input format's field title.
-Positive ZoneLists expand People and OtherEquipment in authored member order
-into real instances on each implicit Space. People uses its selected count or
-area operand; unused fields retain schema-valid positive values. Its live design
-occupants reach OtherEquipment per-person sizing before simulation. Public Count
-retains its original tolerance even when nominal EIO uses scientific notation.
-The four genuine System list load outputs are connected; their uncontrolled
-physical witness is zero, while existing owner tests cover nonzero reductions,
-reset, order and Zone factors.
-Positive ZoneGroups now reach the bounded Source A route with implicit Spaces.
-The real getter retains the referenced ZoneList identity, multiplier/default and
-ordered diagnostics; checked signed products feed the existing Zone consumers.
-Local gain rates, design occupants and sizing stay per physical Zone. Facility
-meters apply each actual nominal owner's public Zone and list factors; ordered
-System list reductions use Zone factors, then four genuine Group outputs apply
-the Group factor once. One factor-2 case compares 408 series, 38,232 values and
-195 public joins with unchanged limits. Public EIO retains Zone factors 1/1 and
-list factors 2/2, 36 nominal owners, 175 records and 28 actual warmup days; whole
-ERR, DXF and CTF checks pass. All 16 System streams and 1,536 samples are genuine
-zeros. Passed existing owner tests separately establish nonzero reductions,
-reset/order and actual ListNum versus Group ordinal. Private Native Group/gain
-allocations and physical Source private Group/gain allocations are unobserved.
-Group compositions with authored Spaces or nonempty SpaceLists, optional comfort,
-Source B, Space heat balance, HVAC and arbitrary combinations remain unvalidated.
-Distinct People and OtherEquipment instances in different implicit Spaces can
-retain equal public report names with separate arena rows, Which bindings and
-ReportIDs. One alias case keeps 391 requests but emits 406 variable series and
-13 Hourly meter series: 39,288 values and 200 public joins pass the original
-limits. Completed-file parsing preserves each actual ID; occurrence bindings
-use public nominal Name/Zone order without sorting values. Whole EIO, ERR and
-DXF comparisons remain strict. Other collision and input-value domains remain open.
-Source A connects People, OtherEquipment and ElectricEquipment on bounded closed
-opaque Zones with one whole-Zone Space each. Zone, Space, ordered ZoneList and
-SpaceList targets retain distinct real owners, member order and singleton
-prefixes. Empty SpaceLists keep zero-length bindings without gain objects,
-object outputs or meters; structural schema checks always run. Positive explicit
-Zone floor adjusts its sole Space before sizing: initial raw Zulu Space6 becomes
-final12, with actual Count/schedule contributions feeding per-person designs.
-
-The Electric case compares 968 series, 91,992 values and 773 public joins,
-including 79 nominal owners and all three sizing methods, under unchanged
-limits. Defaults, retaincase subcategories and ignored retained JSON metadata
-reach genuine getters and consumers. The legal convective-fraction snap keeps
-object Q-Lost separate from Space/Zone component totals and real generic heat
-reports. Whole EIO, ERR, DXF, CTF and 30-day warmup checks pass. Source exports
-actual enclosure floors; private gain allocations remain separate owner evidence.
-The original high-load Native model and two earlier Source attempts remain
-unaccepted; the accepted pair uses corrected Build104 and the sole retained
-low-load Native reference. Four existing test executions are retained without
-rerun or new test functions; actual formatting/lint and physical regression
-validate the consumer corrections. There are 209 recorded Source builds,
-177 with accepted pairs and 32 without accepted pairs, including 8 builds
-without Source execution. B/legacy Electric,
-Group/Space compositions, multiple/remainder Spaces, Space heat balance/HVAC
-and arbitrary/full-object combinations remain unvalidated.
-
-Explicit Source A and bounded Source B execute active DesignDays with sizing
-off, either beside real weather or DD-only without a RunPeriod or EPW. Retained
-A witnesses cover all eight humidity selectors, four dry-bulb and five solar
-choices. Earlier rain wet-film, raw/effective dewpoint, pressure, DayType/DST and
-TS1 evidence remains retained. Snow uses unity reflectance and zero solar in
-snowy DDs; nontrivial snow-ground-solar change remains unobserved.
-
-Two B inputs preserve the original 102 output rules, nine Day owners, two Site
-solar rules and two separately declared Facility meter rules. NoLimit reports
-120 DD hours; hard flow/capacity limits report 120 DD hours plus 24 weather hours.
-All 119,856 values pass the original limits, complete ordered streams, whole EIO,
-ERR/END, dictionaries, SHD and actual warmup checks. CTF coefficient reports, DXF
-and tabular CSV are unrequested; paired absence is checked with zero coefficient
-rows or climatic cells credited. Actual CTF surface physics remains compared.
-Those two B cases retain six NoSun/NoWind surfaces; their positive Site solar
-alone does not establish surface/HVAC coupling. A further NoLimit case changes
-only ROOF and WALL Y0 to SunExposed/WindExposed. All 115 series and 54,480 values
-pass the unchanged policy. Both engines retain all 15 accepted108 forcing streams
-exactly, while all 16 exposed-face and 15 demand-or-supply series change. This
-establishes joint exposure-to-surface/HVAC behavior for that declared case.
-Whole EIO/SHD and five warmup reports agree. Unrequested coefficient, DXF and
-tabular reports receive no credit. Separate Sun/Wind effects, private film/local
-wind/HAT, arbitrary values/combinations, OA/latent control, sizing and legacy
-active DDs remain outside this evidence. No capability or frozen CON-01 identity
-is promoted.
-
-A separate two-Zone opaque weather case observes cross-Zone geometric shading.
-Ten SunExposed/NoWind walls and roofs surround two closed masses; two Ground
-floors use twelve authored 18C monthly values. Each engine reports 37 partial
-sunlit-fraction samples on the declared ZULU wall and roof. All 115 series and
-11,040 values pass unchanged limits, with complete streams and Source JSON/CSV
-joins. Whole requested reports, CTF, DXF, tables and six warmup days agree
-within their recorded identity boundaries. This finite case does not establish
-reciprocal shading, baseline thermal causality, positive shadow-shadow area or
-arbitrary object combinations.
-
-The opaque Source route now calculates exterior reflections. One retained
-two-Zone case changes the Building solar selection and adds 30 named irradiance
-requests. All 145 series and 13,920 values pass unchanged limits; all 30 new series
-match exactly. Beam-to-diffuse and sky-diffuse obstruction irradiance have 84
-and 185 paired positive samples; all 960 opaque specular samples per engine are
-zero. Whole requested reports, geometry and six warmup days agree. Windows,
-authored reflective shades, private Native hit ownership, baseline thermal
-causality and arbitrary/full-object combinations remain unestablished.
-
-The bounded inside-convection route now runs ASTMC1340 with actual uncapped
-Zone system flow and exposes six live inside heat-transfer coefficients. One
-Source B case uses five DesignDays and a Ground floor; all 121 series and
-57,360 values pass, including both genuine Hourly meter streams. The six new
-coefficient rules use explicit 1e-9 W/m2-K point and RMSE limits; all inherited
-rules remain exact. Positive public node flow confirms activation. Public
-averages do not instrument private Native convection-entry ACH or call history.
-Adaptive, surface-local/user/EMS/Kiva and reached window children remain bounded.
-
-Bounded Source A/B admits AdaptiveASH55 and AdaptiveCEN15251 for DesignDay-only
-execution. Two B cases with five DesignDays compare 125 series and 59,280 values
-for ASH55, and 130 series and 61,680 values for ASH55 plus CEN15251, under the
-preserved policies. Their adaptive outputs and complete AdaptiveComfortSummary
-tables use actual occupancy, the retained DesignDay mean and accumulated occupied
-hours. Weather/STAT/EPW history, sizing, non-Mixing RoomAir, Pierce/KSU/CoolingEffectASH55
-and arbitrary compositions remain unvalidated. These finite cases do not prove
-all threshold regions or full-object support; public samples do not expose
-private state or call histories. No capability or frozen conformance promotion
-is implied.
-
-The bounded Source B direct-epJSON Humidistat producer uses one real Zone/control, RH schedules and normal-mixing ThirdOrder, Analytical or Euler prediction. Analytical single50 with the omitted dehumidifying schedule and Euler crossed65/45 qualify under all161-series rules. ThirdOrder dual40/60 remains unaccepted: 14 new dehumidifying-report points exceed the unchanged1e-12 kgWater/s limit (maximum1.1494137e-12); all original155 streams and response gates pass.
-
-Bounded ordinary no-AFN Source B accepts direct epJSON and genuine original-IDF OA input under the existing DSOA, real-node/schedule and positive-OA prerequisites. Named or exact-empty non-Humidistat humidity choices retain both actual OA references and all current hard-limit/DCV/economizer/recovery checks. Direct-JSON WPC/AFN enums keep exact case and empty/default distinctions; ignored fields remain unconsumed.
-
-OutdoorAir:NodeList keys own input order and used identity, never A1. Direct-JSON empty membership and original-IDF type-only class-token membership remain distinct. Lists precede singles; allocation/reference effects, per-membership OutsideAir registrations/streams and success-only registry commit retain their order. A single's filled height and F-qualified returned count remain separate: an uncounted original-IDF height does not overwrite the Node. Positional AnyLocal does not create IsLocal without a temperature pointer.
-
-Existing true/false InitCall, DB-before-WB/wind, local WB>DB clamp, fallible psychrometric/cache and partial-write order remain bounded. Whole pre-actor BND prediction and complete public NodeList/Scheduled exports retain order/identity custody; they are not private OA scratch telemetry. Active AFN/WPC/duct/EMS, crossed Humidistat, Source A/Legacy expansion, unsafe interior-blank Node(0), arbitrary combinations and full-object completion remain outside this evidence.
-
-Actual remaining moisture demands reach IdealLoads Humidistat consumers. Only the absent-control six-report zero path qualifies under every161-series rule. The three authored-control scenes retain zero credit after16/4/6 point failures at the unchanged1e-12 kgWater/s limit; all RMSE and original155 checks pass. The finite-cooling scene also lacks its Winter humidification witness in both engines. Broader combinations, Source A/IDF, OA, EMS/faults, AFN/Space/sizing and full-object completion remain open.
-
-A separate passive diagnostic aligns all5,573 API-visible prediction frames by full clock, phase and occurrence order; 15 additional Source kickoff frames have no Native callback. The first observable difference is upstream temperature at warmup frame4, one binary64 step. Near-cap demand differences straddle18C and have different temperature-derived cache tags; actual Native cache entries and the underlying correction cause remain unobserved. The complete ordered Native ESO/MTR profile matches the original CLI run after report-ID identity and program-header normalization. Published production Source is restored unchanged. This diagnostic adds no qualifying case or value and changes no policy.
-
-The bounded Source no-outdoor-air owners retain heating-constant/cooling-capacity coupling and now implement constant sensible heat ratio (SHR) cooling. Eligibility permits named or omitted-default SHR (.7) with heating humidity explicitly None or ConstantSupplyHumidityRatio through the four cooling limit selectors, retaining all active numeric, topology, schedule and Legacy guards. Six prospectively frozen cases completed once under Source141; 6 meet every original numeric, export, clock, ancillary and science check plus their applicable public response witness. Qualifying cases: HEAT_CONST_COOL_NONE_CAPACITY_COUPLING, HEAT_CONST_COOL_NONE_FLOW_CAPACITY, HEAT_CONST_COOL_CONST_CAPACITY, HEAT_CONST_COOL_CONST_FLOW_CAPACITY, SHR_OMITTED_DEFAULTS_NO_LIMIT, SHR_NAMED_HEAT_CONST_FLOW_CAPACITY. The four prescribed heating-constant capacity/combined scenes include one designated Winter simultaneous heating/dehumidification witness; the two SHR scenes have their own Summer sensible/latent cooling witnesses. Those finite public interval responses imply no exact-quarter capacity, global SHR/humidity or private-mode law. Exact-empty humidity selectors now use the bounded Source B non-Humidistat NoOA/basic positive-OA paths described above; omitted defaults remain distinct. The four Source139 comparisons from Unit137 remain unaccepted. Broader HVAC Humidistat and OA/DCV/economizer/recovery compositions, sizing, remaining combinations and full-object conformance remain open.
-
-93 bounded Source B Scheduled/NodeList pairs retain 6,888,240 values. The unused Source A pair adds59,520, giving 94 pairs and 6,947,760 values. Qualifying scenes retain eighteen Scheduled joins, exhaust/returns, ordered NodeList/UTF-8, weather/fuel and comfort under every applicable frozen policy. Finite-route, zero-boundary and current-occupancy evidence have separate scope; no private state, exact averaged capacity/mixing or full-object claim follows.
-
-All three Zone air solution algorithms now reach bounded Source A/B consumers
-with Space heat balance disabled. Four one-Zone Euler and Analytical cases
-compare 360 series and 126,394 values under unchanged scalar limits, including
-both controlled Detailed node-temperature arrays. Their complete public
-intervals and Source JSON/CSV joins pass; shortened intervals are reporting
-evidence. Private solver histories and broader combinations remain unestablished.
-
-HVAC and remaining gain families remain outside this increment. Reciprocal interzone Wall–Wall
-and Roof–Floor pairs accept normal opaque stacks of one to ten layers, including
-the getter's Ceiling alias. Exact reverse Material
-identity retains the Native fast path; differing counts or layer identities use
-an actual Source nominal-U difference of at most 0.001. Equal-count mismatches
-retain Native's warning sequence. Infrared-transparent constructions retain
-their sole-layer exact-reverse branch on Wall pairs. Pairs require equal Zone
-and list factors and opposite coincident vertices. Twenty-seven 24-hour two-Zone
-cases cover 674,544 derived values with zero tolerance or RMSE failures;
-the maximum absolute difference is 3.8198777474462986e-11. Actual Zone/Space and enclosure links,
-EIO, diagnostics and DXF agree within their recorded boundaries. This separate
-class inherits no one-Zone capabilities or conformance promotion. Multiple/remainder Spaces, Space heat balance, Source B authored Spaces,
-Group compositions with authored Spaces or nonempty SpaceLists, Source B groups
-and multi-Zone HVAC remain open, as do broader interzone combinations.
-Source closure can complete collinear edge points in a temporary copy while
-retaining authored Surface vertices and volume inputs. Open-zone fallbacks remain held.
-Actual device and Zone W/J joins and Facility sums use their recorded public factors;
-None contributes heat without a resource report or meter.
-
-The reversed two-layer and unequal two/three-layer cases also match all emitted
-CTF records. The latter reads real nominal-U array slots by Construction number.
-The reversed two-layer case's original 30-day warmup allowance failed in Native;
-a separate input changes only that allowance to 100 days and converges after 32,
-with unchanged convergence tolerances. The original failed reference remains
-unaccepted.
-
-Paired Walls accept the legal Sun/Wind exposure enums, omission and empty defaults.
-IDF and direct epJSON comparisons preserve their distinct warning labels and
-surface order; non-external Sun warnings and paired Wind clearing agree with
-Native. Those two exposure cases finish with both flags false; raw authored fields
-retain their presence and values. The existing input table covers all sixteen
-presence/value combinations without adding test functions.
-
-The two-pair construction-warning case also checks repeated warning suppression.
-Both real Construction order-warning flags and the invocation-local hint follow
-Native's record order. Reusing the warned constructions skips the later pair's
-exposure clearing, so its actual WindExposed flags remain set. Internal Rust
-path bookkeeping is separate from the observed scientific owner fields.
-
-`Material:InfraredTransparent` now reaches the ordered Source A/B getter and
-single-layer CTF on Ground or Adiabatic boundaries, preserving the Native
-warnings and Invalid roughness. Ground and Adiabatic B comparisons plus proper
-reciprocal interzone A pairs cover 49,824 values with zero tolerance or RMSE
-failures. Adiabatic values are raw-exact; Ground's maximum absolute difference
-is 4.66e-10. Exterior roughness lookups, Materials reports and used-IRT
-Constructions reports remain excluded. Multi-Zone Ground/Adiabatic IRT uses,
-CondFD and broader object combinations remain open.
-
-Reporting key matching uses the [Rust RE2 port](../../../crates/ep_re2/README.md)
-at pre-scan, request construction and live registration. Eager OnePass analysis,
-a persistent anchored-longest DFA and the original-context NFA fallback use
-independently checked official-binary accounting. Component comparisons retain
-exact wire results, including resource failures and cache resets. Physical A/B
-regex cases cover 160 series and 15,144 values under the original policy.
-Two further 24-hour cases with a 100,000-byte Zone name cover 192 values and
-reproduce the failed-DFA diagnostics before successful matching. Their complete
-dictionaries and ordered timestamps agree; full-file equality is not claimed.
-
-`MINREPORTFREQUENCY` now reaches the shared variable/meter frequency parser
-through real reporting owners. It preserves first-call ordering, raw input
-spelling, abbreviation warnings and EIO records. Two same-input 24-hour cases
-with `Hourly` and `hour` compare 192 values across one variable and three meters;
-the maximum absolute difference is 8.66e-15 with zero tolerance or RMSE failures.
-Their dictionaries, clocks, override records and frequency diagnostics agree.
-Other frequency overrides have source and existing-table coverage; this physical
-comparison covers Hourly only. Unbound producers, unsupported output backends
-and general legal-value completion remain open.
-
-The current compatibility-mode arbitrary runtime covers the official
-`1ZoneUncontrolled` heat-balance path and the declared direct-Zone no-OA
-sensible PurchasedAir binding. The completed porting route is selected with
-`--porting-scope A|B` and writes its own ESO/MTR and JSON/CSV results.
-
-**Automatic oracle comparison is not connected to this Source route.**
-Adding `--oracle-baseline` or `--compare-oracle` retains the Rust output but
-returns `SourceReportedOracleComparisonUnsupported` (exit 4). Run the two
-engines separately and use the fixed-case checker described in
-[Verify the port](../guides/verify-porting.md).
-
-Ad-hoc and launcher runs keep `conformance_claim=false`. Unsupported inputs
-are blocked; explicitly allowed diagnostic partial runs remain diagnostic.
-See [Run an IDF](../guides/run-arbitrary-idf.md) for artifacts and exit codes,
-and [Roadmap](roadmap.md) for the remaining user-facing work.
-
-## Current Conformance Claims
-
-Current conformance evidence is limited to promoted manifests and declared
-variables/meters. The exact case list is generated in
-`docs/src/generated/conformance-case-index.md`. Algorithm and coverage boundaries
-are generated from `specs/algorithm_ledger.toml`, `specs/object_coverage.toml`,
-and `specs/variable_coverage.toml`.
-
-- official `1ZoneUncontrolled` dynamic source-order compatibility rows are
-  declared-variable compatibility only.
-- IdealLoads no-OA/no-limit sensible, numeric capacity limit, numeric flow
-  limit, flow-and-capacity limit, ConstantSensibleHeatRatio,
-  ConstantSupplyHumidityRatio, selected Humidistat, selected outdoor-air,
-  economizer, heat-recovery and reporting evidence remain case-scoped;
-  they do not establish full IdealLoads compatibility.
+## Output claim classification
 
 {{#include ../generated/current-status-classification.md}}
 
 {{#include ../generated/variable-coverage.md:current-status-variable-summary}}
 
-Diagnostic-only evidence remains useful for source-order porting but does not
-create compatibility claims. Historical diagnostic selectors and replay
-wrappers are tracked in `specs/diagnostic_probe_ledger.toml`, outside the
-default test suite. They are not additional finite-port production evidence.
+## Run, inspect and compare
 
-## Not Claimed
+Follow [quick start](../../../QUICKSTART.md), [run an input](../guides/run-arbitrary-idf.md)
+and [verify results](../guides/verify-porting.md). Source runs expose ESO/MTR,
+JSON/CSV reported results, support reports, diagnostics and run summaries.
+Ad-hoc runs keep `conformance_claim=false`; unsupported inputs do not silently
+substitute oracle results.
 
-General EnergyPlus replacement, broad heat-balance compatibility,
-broad HVAC/node/meter compatibility, Plant, sizing, EMS, PythonPlugin, AFN,
-fenestration, infiltration and broad ExampleFiles coverage are not claimed.
-There is no broad IdealLoads branch coverage beyond the declared cases.
-IdealLoads outdoor-air, economizer, heat-recovery and broader humidity branches
-remain outside arbitrary-run compatibility even when individual release cases
-have separate evidence.
+Source A/B automatic `--oracle-baseline`/`--compare-oracle` integration remains
+unconnected. Use separate same-input engine runs as described in the guide.
+The older generic route's comparison options do not certify the Source engine.
 
-Routine/domain readiness is owned by the algorithm ledger and project contract;
-input support is owned by the capability registry. A finite unit pass, parser
-support or successful demo does not promote those registries. The
-[project contract](project-contract.md) defines the promotion requirements.
+The [release process](../guides/release-process.md) verifies the extracted
+Windows package, including an existing accepted example and a blocked input.
+That delivery check does not expand numerical support.
+
+## Older generic route
+
+The retained legacy capability registry records official `1ZoneUncontrolled`
+dynamic source-order compatibility rows as declared-variable compatibility only.
+The current compatibility-mode arbitrary runtime covers the official
+`1ZoneUncontrolled` heat-balance path and selected no-OA IdealLoads limit and
+humidity branches. In that older generic route, IdealLoads outdoor-air,
+economizer, heat-recovery and broader missing combinations remain outside
+arbitrary-run compatibility. The separately reviewed Source B extensions do
+not change the legacy selector.

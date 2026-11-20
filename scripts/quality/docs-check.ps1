@@ -18,6 +18,7 @@ $required = @(
     "src\current\roadmap.md",
     "src\current\architecture-overview.md",
     "src\guides\setup.md",
+    "src\guides\supported-inputs.md",
     "src\guides\developer-workflow.md",
     "src\guides\run-arbitrary-idf.md",
     "src\guides\verify-porting.md",
@@ -29,6 +30,7 @@ $required = @(
     "src\generated\current-status-classification.md",
     "src\generated\capability-index.md",
     "src\generated\object-coverage.md",
+    "src\generated\example-object-union.md",
     "src\generated\variable-coverage.md",
     "src\generated\script-index.md",
     "src\generated\docs-inventory.md"
@@ -87,10 +89,8 @@ if ($currentStatus -match $directVariableCountPattern) {
     throw "current-status.md must not retain hand-written variable coverage counts."
 }
 $expectedCurrentLinks = @(
-    "current/project-contract.md",
     "current/current-status.md",
-    "current/roadmap.md",
-    "current/architecture-overview.md"
+    "current/roadmap.md"
 )
 $actualCurrentLinks = @()
 $inCurrentSection = $false
@@ -120,17 +120,9 @@ $readmeH2Count = ([regex]::Matches($readme, '(?m)^## ')).Count
 if ($readmeH2Count -gt 7) {
     throw "README.md must stay at 7 or fewer h2 sections; found $readmeH2Count."
 }
-$expectedReadmeCurrentLinks = @($expectedCurrentLinks | ForEach-Object { "docs/src/$_" })
-$readmeCurrentLinks = @(
-    [regex]::Matches($readme, '`(docs/src/current/[^`]+\.md)`') |
-        ForEach-Object { $_.Groups[1].Value }
-)
-if (@($readmeCurrentLinks).Count -ne $expectedReadmeCurrentLinks.Count) {
-    throw "README.md current docs list must contain exactly $($expectedReadmeCurrentLinks.Count) docs."
-}
-for ($index = 0; $index -lt $expectedReadmeCurrentLinks.Count; $index += 1) {
-    if ($readmeCurrentLinks[$index] -ne $expectedReadmeCurrentLinks[$index]) {
-        throw "README.md current docs mismatch at index $index`: expected $($expectedReadmeCurrentLinks[$index]), found $($readmeCurrentLinks[$index])"
+foreach ($requiredLink in @("QUICKSTART.md", "docs/src/guides/supported-inputs.md", "docs/src/generated/example-object-union.md")) {
+    if ($readme -notmatch ('\]\(' + [regex]::Escape($requiredLink) + '\)')) {
+        throw "README.md must link the user workflow: $requiredLink"
     }
 }
 foreach ($forbidden in @("# Archive", "archive/")) {
@@ -199,19 +191,21 @@ function Test-SummaryScope {
         "Summary" { return $RelativePath -eq "docs/src/introduction.md" }
         "Current" { return $Category -eq "current" }
         "Guides" { return $Category -eq "guide" }
+        "Releases" { return $Category -eq "release-note" }
+        "Developer Reference" { return $RelativePath -in @("docs/src/current/project-contract.md", "docs/src/current/architecture-overview.md") }
         "Generated References" { return $Category -eq "generated" }
         default { return $false }
     }
 }
 
-$allowedSummarySections = @("Summary", "Current", "Guides", "Generated References")
+$allowedSummarySections = @("Summary", "Current", "Guides", "Releases", "Developer Reference", "Generated References")
 $summaryLinks = @()
 $summarySection = ""
 foreach ($line in $summaryLines) {
     if ($line.StartsWith("# ")) {
         $summarySection = $line.Substring(2).Trim()
         if ($summarySection -notin $allowedSummarySections) {
-            throw "SUMMARY.md must stay limited to Summary, Current, Guides, and Generated References; found section: $summarySection"
+            throw "SUMMARY.md has an unclassified section: $summarySection"
         }
         continue
     }
