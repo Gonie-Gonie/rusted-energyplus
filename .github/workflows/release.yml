@@ -20,6 +20,9 @@ jobs:
       run:
         shell: pwsh
     steps:
+      - name: Enable long checkout paths on Windows
+        run: git config --global core.longpaths true
+
       - name: Check out release tag
         uses: actions/checkout@v5
         with:
